@@ -1,0 +1,311 @@
+Tenth Edition|10E|
+Unlimited Edition|2ED|
+Revised Edition|3ED|
+Fourth Edition|4ED|
+Fifth Dawn|5DN|
+Fifth Edition|5ED|
+Classic Sixth Edition|6ED|
+Seventh Edition|7ED|
+Eighth Edition|8ED|
+Ninth Edition|9ED|
+Alchemy: Dominaria|YDMU|
+Alchemy: Innistrad|Y22|
+Adventures in the Forgotten Realms|AFR|
+Forgotten Realms Commander|AFC|
+Aetherdrift|DFT|
+Aetherdrift Commander|DRC|
+Aether Revolt|AER|
+Amonkhet|AKH|
+Shards of Alara|ALA|
+Alliances|ALL|
+Arena Beginner Set|ANB|
+Asia Pacific Land Program|APAC|
+Apocalypse|APC|
+Alara Reborn|ARB|
+Archenemy|ARC|
+Arena League|ARENA|
+Arabian Nights|ARN|
+Anthologies|ATH|
+Antiquities|ATQ|
+Assassin's Creed|ACR|
+Avacyn Restored|AVR|
+Avatar: The Last Airbender|TLA|
+Avatar: The Last Airbender Eternal|TLE|
+Battle for Zendikar|BFZ|
+Battlebond|BBD|
+Born of the Gods|BNG|
+Betrayers of Kamigawa|BOK|
+Battle Royale Box Set|BRB|
+Beatdown Box Set|BTD|
+Bloomburrow|BLB|
+Bloomburrow Commander|BLC|
+Commander 2013|C13|
+Commander 2014|C14|
+Commander 2015|C15|
+Commander 2016|C16|
+Commander 2017|C17|
+Commander 2018|C18|
+Commander 2019|C19|
+Commander 2020|C20|
+Commander 2021|C21|
+Commander Legends|CMR|
+Commander Legends: Battle for Baldur's Gate|CLB|
+Champions of Kamigawa|CHK|
+Chronicles|CHR|
+Clash Pack|CLASH|
+Commander Anthology|CMA|
+Commander Anthology 2018|CM2|
+Commander's Arsenal|CM1|
+Commander Masters|CMM|
+Commander|CMD|
+Conspiracy|CNS|
+Conspiracy: Take the Crown|CN2|
+Conflux|CON|
+Coldsnap|CSP|
+Doctor Who|WHO|
+Duel Decks: Jace vs. Chandra|DD2|
+Duel Decks Anthology: Divine vs. Demonic|DVD|
+Duel Decks Anthology: Elves vs. Goblins|EVG|
+Duel Decks Anthology: Garruk vs. Liliana|GVL|
+Duel Decks Anthology: Jace vs. Chandra|JVC|
+Duel Decks: Divine vs. Demonic|DDC|
+Duel Decks: Garruk vs. Liliana|DDD|
+Duel Decks: Phyrexia vs. the Coalition|DDE|
+Duel Decks: Elspeth vs. Tezzeret|DDF|
+Duel Decks: Knights vs. Dragons|DDG|
+Duel Decks: Ajani vs. Nicol Bolas|DDH|
+Duel Decks: Venser vs. Koth|DDI|
+Duel Decks: Izzet vs. Golgari|DDJ|
+Duel Decks: Sorin vs. Tibalt|DDK|
+Duel Decks: Heroes vs. Monsters|DDL|
+Duel Decks: Jace vs. Vraska|DDM|
+Duel Decks: Speed vs. Cunning|DDN|
+Duel Decks: Elspeth vs. Kiora|DDO|
+Duel Decks: Zendikar vs. Eldrazi|DDP|
+Duel Decks: Blessed vs. Cursed|DDQ|
+Duel Decks: Nissa vs. Ob Nixilis|DDR|
+Duel Decks: Mind vs. Might|DDS|
+Duel Decks: Merfolk vs. Goblins|DDT|
+Duels of the Planeswalkers|DPA|
+Duskmourn: House of Horror|DSK|
+Duskmourn: House of Horror Commander|DSC|
+Dragon's Maze|DGM|
+Dissension|DIS|
+Dark Ascension|DKA|
+Deckmasters|DKM|
+Dominaria|DOM|
+Dominaria United|DMU|
+Dominaria United Commander|DMC|
+From the Vault: Dragons|DRB|
+The Dark|DRK|
+Darksteel|DST|
+Dragons of Tarkir|DTK|
+Archenemy: Nicol Bolas|E01|
+Explorers of Ixalan|E02|
+Edge of Eternities|EOE|
+Edge of Eternities Commander|EOC|
+Eternal Masters|EMA|
+Eldritch Moon|EMN|
+European Land Program|EURO|
+Eventide|EVE|
+Duel Decks: Elves vs. Goblins|EVG|
+Duel Decks: Elves vs. Inventors|DDU|
+Pro Tour Promos|PPRO|
+Exodus|EXO|
+Zendikar Expeditions|EXP|
+Fallout|PIP|
+Fallen Empires|FEM|
+Final Fantasy|FIN|
+Final Fantasy Commander|FIC|
+Friday Night Magic|FNMP|
+Fate Reforged|FRF|
+Foundations|FDN|
+Foundations Jumpstar|J25|
+Future Sight|FUT|
+Global Series Jiang Yanggu & Mu Yanling|GS1|
+Guildpact|GPT|
+Guilds of Ravnica|GRN|
+Grand Prix|PGPX|
+WPN Gateway|GRC|
+Gatecrash|GTC|
+Guru|PGRU|
+Premium Deck Series: Slivers|H09|
+Homelands|HML|
+Heroes of the Realm|HOTR|
+Planechase|HOP|
+Hour of Devastation|HOU|
+Ice Age|ICE|
+Iconic Masters|IMA|
+Ikoria: Lair of Behemoths|IKO|
+Invasion|INV|
+Innistrad|ISD|
+Lorwyn Eclipsed|ECL|
+The Lost Caverns of Ixalan|LCI|
+The Lost Caverns of Ixalan Commander|LCC|
+Innistrad: Midnight Hunt|MID|
+Midnight Hunt Commander|MIC|
+Innistrad: Crimson Vow|VOW|
+Crimson Vow Commander|VOC|
+Journey into Nyx|JOU|
+Judge Promo|JR|
+Judgment|JUD|
+Jumpstart|JMP|
+Jumpstart: Historic Horizons|J21|
+Jumpstart 2022|J22|
+Kaladesh|KLD|
+Kaldheim|KHM|
+Kaldheim Commander|KHC|
+Kamigawa: Neon Dynasty|NEO|
+Neon Dynasty Commander|NEC|
+Khans of Tarkir|KTK|
+Limited Edition Alpha|LEA|
+Limited Edition Beta|LEB|
+Legends|LEG|
+Legions|LGN|
+The Lord of the Rings: Tales of Middle-earth|LTR|
+Tales of Middle-earth Commander|LTC|
+Lorwyn|LRW|
+Magic 2010|M10|
+Magic 2011|M11|
+Magic 2012|M12|
+Magic 2013|M13|
+Magic 2014|M14|
+Magic 2015|M15|
+Core Set 2019|M19|
+Core Set 2020|M20|
+Core Set 2021|M21|
+Masters 25|A25|
+Magic: The Gathering-Commander|CMD|
+Magic: The Gathering-Conspiracy|CNS|
+Media Inserts|MBP|
+Marvel's Spider-Man|SPM|
+Marvel's Spider-Man Eternal|SPE|
+March of the Machine|MOM|
+March of the Machine Commander|MOC|
+March of the Machine: The Aftermath|MAT|
+Mirrodin Besieged|MBS|
+Masters Edition II|ME2|
+Masters Edition III|ME3|
+Masters Edition IV|ME4|
+Masters Edition|MED|
+Game Day|MGDC|
+Game Night|GNT|
+Game Night 2019|GN2|
+Game Night Free-for-All|GN3|
+Mirage|MIR|
+Launch Party|MLP|
+Modern Horizons|MH1|
+Modern Horizons 2|MH2|
+Modern Horizons 3|MH3|
+Modern Horizons 3 Commander|M3C|
+Modern Masters 2015|MM2|
+Modern Masters 2017|MM3|
+Modern Masters|MMA|
+Mercadian Masques|MMQ|
+Morningtide|MOR|
+Magic Player Rewards|MPRP|
+Masterpiece Series|MPS|
+Mirrodin|MRD|
+Murders at Karlov Manor|MKM|
+Murders at Karlov Manor Commander|MKC|
+Mystery Booster 2|MB2|
+Ravnica: Clue Edition|CLU|
+Nemesis|NEM|
+New Phyrexia|NPH|
+Odyssey|ODY|
+Oath of the Gatewatch|OGW|
+Onslaught|ONS|
+Outlaws of Thunder Junction|OTJ|
+Outlaws of Thunder Junction Commander|OTC|
+The Big Score|BIG|
+Magic Origins|ORI|
+Phyrexia: All Will Be One|ONE|
+Phyrexia: All Will Be One Commander|ONC|
+Portal Second Age|P02|
+Planechase 2012|PC2|
+Planechase Anthology|PCA|
+Prophecy|PCY|
+Premium Deck Series: Fire and Lightning|PD2|
+Premium Deck Series: Graveborn|PD3|
+Planar Chaos|PLC|
+Planeshift|PLS|
+Portal|POR|
+Prerelease Events|PPRE|
+Portal Three Kingdoms|PTK|
+Ravnica Allegiance|RNA|
+Ravnica: City of Guilds|RAV|
+Jurassic World Collection|REX|
+Rivals of Ixalan|RIX|
+Rise of the Eldrazi|ROE|
+Return to Ravnica|RTR|
+Sega Dreamcast Cards|PSDG|
+Starter 2000|S00|
+Starter 1999|S99|
+Starter Commander Decks|SCD|
+Strixhaven: School of Mages|STX|
+Scourge|SCG|
+Secret Lair|SLD|
+Secret Lair Showdown|SLP|
+Shadowmoor|SHM|
+Shadows over Innistrad|SOI|
+Saviors of Kamigawa|SOK|
+Scars of Mirrodin|SOM|
+Streets of New Capenna|SNC|
+New Capenna Commander|NCC|
+Stronghold|STH|
+Special Guests|SPG|
+Super Series|SUS|
+Tarkir: Dragonstorm|TDM|
+Tarkir: Dragonstorm Commander|TDC|
+Teenage Mutant Ninja Turtles|TMT|
+Teenage Mutant Ninja Turtles Eternal|TMC|
+Theros|THS|
+Theros Beyond Death|THB|
+The Brothers' War|BRO|
+The Brothers' War Commander|BRC|
+Tempest|TMP|
+Throne of Eldraine|ELD|
+Torment|TOR|
+Tempest Remastered|TPR|
+Time Spiral Timeshifted|TSB|
+Time Spiral|TSP|
+Transformers|BOT|
+Urza's Destiny|UDS|
+Ugin's Fate|UGIN|
+Unglued|UGL|
+Urza's Legacy|ULG|
+Unhinged|UNH|
+Unfinity|UNF|
+Urza's Saga|USG|
+Unstable|UST|
+HasCon 2017|H17|
+From the Vault: Exiled|V09|
+From the Vault: Relics|V10|
+From the Vault: Legends|V11|
+From the Vault: Realms|V12|
+From the Vault: Twenty|V13|
+From the Vault: Annihilation|V14|
+From the Vault: Angels|V15|
+From the Vault: Lore|V16|
+From the Vault: Transform|V17|
+Vanguard Set 1|VG1|
+Vanguard Set 2|VG2|
+Vanguard Set 3|VG3|
+Vanguard Set 4|VG4|
+MTGO Vanguard|VGO|
+Visions|VIS|
+Vintage Masters|VMA|
+War of the Spark|WAR|
+Welcome Deck 2016|W16|
+Welcome Deck 2017|W17|
+Weatherlight|WTH|
+Wilds of Eldraine|WOE|
+Wilds of Eldraine Commander|WOC|
+Worldwake|WWK|
+Ixalan|XLN|
+Zendikar|ZEN|
+Zendikar Rising|ZNR|
+Zendikar Rising Commander|ZNC|
+Star Wars|SWS|
+Happy Holidays|HHO|
+Warhammer 40,000 Commander|40K|
