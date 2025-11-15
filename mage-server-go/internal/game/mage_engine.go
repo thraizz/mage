@@ -303,14 +303,25 @@ func (e *MageEngine) SetNotificationHandler(handler NotificationHandler) {
 }
 
 // emitNotification sends a notification to the registered handler
-// Note: This method should not acquire locks as it may be called while holding locks
+// This method is safe to call while holding gameState locks because:
+// 1. It only briefly acquires e.mu.RLock() to read the handler
+// 2. The handler is called in a separate goroutine, so it doesn't block
+// 3. The goroutine can safely call back into the engine (e.g., GetGameView)
+//    because it runs asynchronously after emitNotification returns
 func (e *MageEngine) emitNotification(notification GameNotification) {
-	// Read handler without lock - this is safe for reads after initialization
-	// The handler is only set once during setup and never changed
+	// Read handler with RLock to prevent data race with SetNotificationHandler
+	// This is safe even when called while holding gameState.mu because:
+	// - e.mu and gameState.mu are different mutexes (no deadlock)
+	// - RLock allows concurrent reads (no contention)
+	// - The lock is held very briefly (just to read a pointer)
+	e.mu.RLock()
 	handler := e.notificationHandler
+	e.mu.RUnlock()
 
 	if handler != nil {
 		// Call handler in a goroutine to avoid blocking game logic
+		// The goroutine runs asynchronously, so it can safely acquire locks
+		// (e.g., call GetGameView) after emitNotification returns
 		go handler(notification)
 	}
 }
@@ -391,9 +402,11 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 	}
 
 	e.mu.Lock()
-	defer e.mu.Unlock()
+	// Note: We manually unlock before calling notifications to avoid deadlock
+	// Do not use defer here
 
 	if _, exists := e.games[gameID]; exists {
+		e.mu.Unlock()
 		return fmt.Errorf("game %s already exists", gameID)
 	}
 
@@ -488,7 +501,11 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 
 	e.games[gameID] = gameState
 
-	// Notify game start
+	// Release lock before sending notifications to avoid deadlock
+	// Notifications may trigger callbacks that need to acquire locks
+	e.mu.Unlock()
+
+	// Notify game start (safe to call after releasing lock)
 	e.notifyGameStateChange(gameID, map[string]interface{}{
 		"state":     "started",
 		"game_type": gameType,

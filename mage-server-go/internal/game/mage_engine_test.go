@@ -1059,3 +1059,99 @@ func TestNotificationSystem(t *testing.T) {
 		t.Fatal("timeout waiting for game start notification")
 	}
 }
+
+// TestNotificationDeadlock reproduces the deadlock bug where a notification handler
+// tries to call GetGameView() while the engine is holding gameState.mu lock.
+// This test documents the broken state before the fix.
+func TestNotificationDeadlock(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "deadlock-test"
+	players := []string{"Alice", "Bob"}
+
+	// Set up a notification handler that tries to get game view synchronously
+	// This simulates a real-world scenario where a websocket handler
+	// needs to fetch the current game state when a notification arrives
+	// We use a blocking channel to force synchronous execution
+	handlerStarted := make(chan bool, 1)
+	viewFetched := make(chan bool, 1)
+	deadlockDetected := make(chan bool, 1)
+
+	engine.SetNotificationHandler(func(notification game.GameNotification) {
+		// Only try to get view for stack updates (which happen while holding locks)
+		if notification.Type == "STACK_UPDATE" {
+			t.Logf("Notification handler received STACK_UPDATE, attempting to get game view...")
+			handlerStarted <- true
+			
+			// Try to get game view synchronously (blocking call)
+			// This will deadlock if ProcessAction is still holding gameState.mu
+			done := make(chan bool, 1)
+			go func() {
+				// This will deadlock if the notification is called while holding gameState.mu
+				_, err := engine.GetGameView(notification.GameID, "Alice")
+				if err != nil {
+					t.Logf("Error getting game view: %v", err)
+				} else {
+					t.Logf("Successfully fetched game view from notification handler")
+				}
+				done <- true
+			}()
+
+			// Wait for the GetGameView to complete or timeout
+			select {
+			case <-done:
+				viewFetched <- true
+			case <-time.After(100 * time.Millisecond):
+				t.Logf("DEADLOCK DETECTED: GetGameView() timed out in notification handler")
+				deadlockDetected <- true
+			}
+		}
+	})
+
+	// Start game
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Cast a spell in a goroutine so we can detect if it hangs
+	// This will trigger a STACK_UPDATE notification while holding gameState.mu lock
+	t.Logf("Casting spell to trigger STACK_UPDATE notification...")
+	castDone := make(chan error, 1)
+	go func() {
+		err := engine.ProcessAction(gameID, game.PlayerAction{
+			PlayerID:   "Alice",
+			ActionType: "SEND_STRING",
+			Data:       "Lightning Bolt",
+			Timestamp:  time.Now(),
+		})
+		castDone <- err
+	}()
+
+	// Wait for handler to start
+	select {
+	case <-handlerStarted:
+		t.Logf("Notification handler started")
+	case <-time.After(1 * time.Second):
+		t.Fatal("Notification handler never started")
+	}
+
+	// Now check if we can complete the operation or if we deadlock
+	select {
+	case <-deadlockDetected:
+		t.Fatal("DEADLOCK BUG REPRODUCED: Notification handler cannot call GetGameView() while locks are held")
+	case <-viewFetched:
+		// Wait for cast to complete
+		select {
+		case err := <-castDone:
+			if err != nil {
+				t.Fatalf("failed to cast spell: %v", err)
+			}
+			t.Log("SUCCESS: No deadlock detected, notification handler successfully fetched game view")
+		case <-time.After(1 * time.Second):
+			t.Fatal("ProcessAction hung after notification handler completed")
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("Test timed out - likely deadlock in ProcessAction or notification handler")
+	}
+}
