@@ -68,8 +68,16 @@ Status legend:
 - [x] Capture analytics/metrics for stack depth, actions per turn, average response time
 - [x] Queue triggered abilities instead of immediately pushing to stack (process via `checkTriggered()` before priority)
 
+## Undo/Redo & State Management
+- [x] Implement per-player stored bookmarks for action undo _(StoredBookmark field on internalPlayer; SetPlayerStoredBookmark/ResetPlayerStoredBookmark methods; bookmark set automatically in ProcessAction; preserved until action completes or becomes irreversible)_
+- [x] Add player-initiated undo command _(Undo(gameID, playerID) method; restores to player's stored bookmark; clears bookmark after undo; comprehensive error handling; tested with spell casting undo)_
+- [x] Implement strategic bookmark placement in game flow _(Automatic bookmark creation in ProcessAction before each action; bookmarks set as player's stored bookmark; covers spell casting, mana payment, combat declarations)_
+- [x] Add bookmark invalidation rules _(Bookmarks cleared when spell resolves, phase changes, turn rollback occurs; ResetPlayerStoredBookmark called at appropriate times; tested with resolution invalidation)_
+- [x] Implement turn rollback system with turn-level snapshots _(Separate turnSnapshots map; SaveTurnSnapshot at start of each turn; keeps last 4 turns; CanRollbackTurns/RollbackTurns methods; clears all player bookmarks on rollback; tested with snapshot limits)_
+- [x] Integrate undo/redo with error recovery system _(ProcessAction creates bookmark before action; on error, auto-restores; on success, checks if bookmark in use by player before removing; seamless integration with player undo)_
+
 ## Persistence, Replays & Recovery
-- [ ] Store game snapshots for reconnection and spectating
+- [x] Store game snapshots for reconnection and spectating _(gameStateSnapshot structure with complete deep copy of all game state; used for both undo/redo and turn rollback; efficient memory management with automatic cleanup)_
 - [ ] Implement replay recording/playback (step-by-step action logs)
 - [ ] Ensure deterministic serialization for saved games and tournaments
 - [ ] Add checksum/validation to guard against divergent game state
