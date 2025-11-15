@@ -4576,6 +4576,110 @@ func (e *MageEngine) ApplyCombatDamage(gameID string) error {
 	return nil
 }
 
+// EndCombat ends combat phase, clearing combat flags and moving to former groups
+// Per Java Combat.endCombat()
+func (e *MageEngine) EndCombat(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Clear combat flags on all creatures in combat
+	for _, group := range gameState.combat.groups {
+		// Clear attacker flags
+		for _, attackerID := range group.attackers {
+			if creature, exists := gameState.cards[attackerID]; exists {
+				creature.Attacking = false
+				creature.Blocking = false
+				creature.AttackingWhat = ""
+				creature.BlockingWhat = nil
+				// Clear damage tracking
+				creature.Damage = 0
+				creature.DamageSources = nil
+			}
+		}
+		
+		// Clear blocker flags
+		for _, blockerID := range group.blockers {
+			if creature, exists := gameState.cards[blockerID]; exists {
+				creature.Attacking = false
+				creature.Blocking = false
+				creature.AttackingWhat = ""
+				creature.BlockingWhat = nil
+				// Clear damage tracking
+				creature.Damage = 0
+				creature.DamageSources = nil
+			}
+		}
+		
+		// Move attackers to formerAttackers for "attacked this turn" queries
+		group.formerAttackers = append([]string{}, group.attackers...)
+	}
+	
+	// Move current groups to former groups (for historical queries)
+	gameState.combat.formerGroups = append([]*combatGroup{}, gameState.combat.groups...)
+	
+	// Clear current combat state
+	gameState.combat.groups = nil
+	gameState.combat.blockingGroups = make(map[string]*combatGroup)
+	gameState.combat.attackers = make(map[string]bool)
+	gameState.combat.blockers = make(map[string]bool)
+	gameState.combat.attackersTapped = make(map[string]bool)
+	// Keep defenders for queries
+	// Keep attackingPlayerID for queries
+	
+	// Fire end combat event
+	gameState.eventBus.Publish(rules.Event{
+		Type: rules.EventEndCombatStep,
+	})
+	
+	if e.logger != nil {
+		e.logger.Debug("ended combat",
+			zap.String("game_id", gameID),
+			zap.Int("former_groups", len(gameState.combat.formerGroups)),
+		)
+	}
+	
+	return nil
+}
+
+// GetAttackedThisTurn returns whether a creature attacked this turn
+// Checks formerGroups for historical attack data
+func (e *MageEngine) GetAttackedThisTurn(gameID, creatureID string) (bool, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return false, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+	
+	// Check current combat
+	if gameState.combat.attackers[creatureID] {
+		return true, nil
+	}
+	
+	// Check former groups
+	for _, group := range gameState.combat.formerGroups {
+		for _, attackerID := range group.formerAttackers {
+			if attackerID == creatureID {
+				return true, nil
+			}
+		}
+	}
+	
+	return false, nil
+}
+
 // Helper methods
 
 // dealsDamageThisStep checks if a creature deals damage this combat damage step
