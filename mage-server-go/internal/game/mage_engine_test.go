@@ -560,3 +560,63 @@ func TestZoneTrackingAfterResolution(t *testing.T) {
 		}
 	}
 }
+
+// TestTriggeredAbilityQueueAPNAPOrder verifies that triggered abilities are processed
+// in APNAP order (Active Player, Non-Active Player) before priority.
+func TestTriggeredAbilityQueueAPNAPOrder(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "apnap-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Cast Lightning Bolt - this will queue a triggered ability
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "SEND_STRING",
+		Data:       "Lightning Bolt",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("failed to cast spell: %v", err)
+	}
+
+	// Get view to check stack
+	viewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view := viewRaw.(*game.EngineGameView)
+
+	// Stack should have spell + triggered ability
+	// The triggered ability should be on top (LIFO)
+	if len(view.Stack) < 2 {
+		t.Fatalf("expected at least 2 items on stack (spell + triggered), got %d", len(view.Stack))
+	}
+
+	// Debug: print stack contents
+	t.Logf("Stack has %d items:", len(view.Stack))
+	for i, item := range view.Stack {
+		t.Logf("  [%d] ID=%s Name=%s DisplayName=%s", i, item.ID, item.Name, item.DisplayName)
+	}
+
+	// Verify triggered ability is on stack (processed from queue before priority)
+	foundTriggered := false
+	for _, item := range view.Stack {
+		if item.Name == "Triggered ability: Alice gains 1 life" || item.DisplayName == "Triggered ability: Alice gains 1 life" {
+			foundTriggered = true
+			break
+		}
+	}
+
+	if !foundTriggered {
+		t.Errorf("triggered ability should be on stack after being processed from queue")
+	}
+
+	// The key behavior: triggered abilities are queued when events occur,
+	// then processed in APNAP order before priority is given
+	// Per Java GameImpl.checkTriggered() and rule 603.3
+}

@@ -208,6 +208,16 @@ type internalPlayer struct {
 	Wins         int
 }
 
+// triggeredAbilityQueueItem represents a triggered ability waiting to be put on the stack
+type triggeredAbilityQueueItem struct {
+	ID          string
+	SourceID    string
+	Controller  string
+	Description string
+	Resolve     func(*engineGameState) error
+	UsesStack   bool // If false, executes immediately without going on stack
+}
+
 // engineGameState represents the internal state of a game
 type engineGameState struct {
 	gameID        string
@@ -229,6 +239,7 @@ type engineGameState struct {
 	legality      *rules.LegalityChecker
 	targetValidator *targeting.TargetValidator
 	layerSystem   *effects.LayerSystem
+	triggeredQueue []*triggeredAbilityQueueItem // Queue of triggered abilities waiting to be put on stack
 	messages      []EngineMessage
 	prompts       []EnginePrompt
 	startedAt     time.Time
@@ -972,30 +983,32 @@ func (e *MageEngine) resolveSpell(gameState *engineGameState, card *internalCard
 
 // createTriggeredAbilityForSpell creates a triggered ability when a spell is cast
 // This simulates effects like "Sanctuary" that trigger on spell casts
+// Per new implementation: adds to triggered queue instead of immediately to stack
 func (e *MageEngine) createTriggeredAbilityForSpell(gameState *engineGameState, card *internalCard, casterID string) {
 	// For Lightning Bolt, create a triggered ability that gains life
 	// This simulates a "Sanctuary" effect for testing
 	cardNameLower := strings.ToLower(card.Name)
 	if strings.Contains(cardNameLower, "lightning bolt") {
 		triggerID := uuid.New().String()
-		triggeredAbility := rules.StackItem{
+		
+		// Create triggered ability queue item
+		triggeredAbility := &triggeredAbilityQueueItem{
 			ID:          triggerID,
+			SourceID:    card.ID,
 			Controller:  casterID,
 			Description: fmt.Sprintf("Triggered ability: %s gains 1 life", casterID),
-			Kind:        rules.StackItemKindTriggered,
-			SourceID:    card.ID,
-			Metadata:    make(map[string]string),
-			Resolve: func() error {
-				player, exists := gameState.players[casterID]
+			UsesStack:   true, // This ability uses the stack
+			Resolve: func(gs *engineGameState) error {
+				player, exists := gs.players[casterID]
 				if !exists {
 					return fmt.Errorf("player %s not found", casterID)
 				}
 				oldLife := player.Life
 				player.Life += 1
-				gameState.addMessage(fmt.Sprintf("%s gains 1 life (now %d)", casterID, player.Life), "life")
+				gs.addMessage(fmt.Sprintf("%s gains 1 life (now %d)", casterID, player.Life), "life")
 				
 				// Emit life gain event
-				gameState.eventBus.Publish(rules.Event{
+				gs.eventBus.Publish(rules.Event{
 					Type:        rules.EventGainedLife,
 					ID:          uuid.New().String(),
 					TargetID:    casterID,
@@ -1008,11 +1021,13 @@ func (e *MageEngine) createTriggeredAbilityForSpell(gameState *engineGameState, 
 			},
 		}
 		
-		gameState.stack.Push(triggeredAbility)
-		gameState.addMessage(fmt.Sprintf("Triggered ability: %s gains 1 life", casterID), "action")
+		// Add to triggered queue instead of directly to stack
+		// Per rule 603.3: triggered abilities are put on stack before priority
+		gameState.triggeredQueue = append(gameState.triggeredQueue, triggeredAbility)
+		gameState.addMessage(fmt.Sprintf("Triggered: %s gains 1 life (queued)", casterID), "action")
 		
 		if e.logger != nil {
-			e.logger.Debug("created triggered ability",
+			e.logger.Debug("queued triggered ability",
 				zap.String("trigger_id", triggerID),
 				zap.String("spell_id", card.ID),
 				zap.String("controller", casterID),
@@ -1155,9 +1170,9 @@ func (e *MageEngine) buildStackViews(gameState *engineGameState) []EngineCardVie
 
 	// Items are already in correct order (bottom to top, topmost last)
 	for _, item := range items {
-		card, found := gameState.cards[item.SourceID]
-		if !found {
-			// Create a placeholder view for triggered abilities (they don't have source cards)
+		// Check if this is a triggered ability (not a spell)
+		if item.Kind == "TRIGGERED" || item.Kind == rules.StackItemKindTriggered {
+			// Create a view for triggered ability using its description
 			views = append(views, EngineCardView{
 				ID:          item.ID,
 				Name:        item.Description,
@@ -1166,9 +1181,22 @@ func (e *MageEngine) buildStackViews(gameState *engineGameState) []EngineCardVie
 				ControllerID: item.Controller,
 			})
 		} else {
-			cardView := e.buildCardViews([]*internalCard{card})[0]
-			cardView.Zone = zoneStack
-			views = append(views, cardView)
+			// This is a spell - use the card view
+			card, found := gameState.cards[item.SourceID]
+			if !found {
+				// Create a placeholder view if card not found
+				views = append(views, EngineCardView{
+					ID:          item.ID,
+					Name:        item.Description,
+					DisplayName: item.Description,
+					Zone:        zoneStack,
+					ControllerID: item.Controller,
+				})
+			} else {
+				cardView := e.buildCardViews([]*internalCard{card})[0]
+				cardView.Zone = zoneStack
+				views = append(views, cardView)
+			}
 		}
 	}
 
@@ -1311,26 +1339,193 @@ func (e *MageEngine) checkStateAndTriggeredAfterResolution(gameState *engineGame
 	e.checkStateAndTriggered(gameState)
 }
 
-// processTriggeredAbilities processes triggered abilities that should be put on the stack.
+// processTriggeredAbilities processes triggered abilities from the queue in APNAP order.
 // Returns true if any triggered abilities were processed.
 // Per rule 603.3: "Once an ability has triggered, its controller puts it on the stack
 // as an object that's not a card the next time a player would receive priority."
+// Per Java implementation: processes abilities in APNAP order (Active Player, Non-Active Player).
 func (e *MageEngine) processTriggeredAbilities(gameState *engineGameState) bool {
-	// Check watchers for triggered conditions
-	// For now, this is a placeholder that will be enhanced when triggered ability
-	// queue system is fully implemented (see task: "Queue triggered abilities instead
-	// of immediately pushing to stack")
+	if len(gameState.triggeredQueue) == 0 {
+		return false
+	}
 	
-	// Currently, triggered abilities are created immediately when events occur
-	// (e.g., in createTriggeredAbilityForSpell). This method provides a hook
-	// for future triggered ability processing in APNAP order.
+	played := false
+	activePlayerID := gameState.turnManager.ActivePlayer()
 	
-	// For now, we just ensure events are processed (watchers are already notified
-	// via event bus subscription, so they're up to date)
+	// Process in APNAP order: Active Player first, then Non-Active Players in turn order
+	// Per Java GameImpl.checkTriggered() line 2332: for (UUID playerId : state.getPlayerList(state.getActivePlayerId()))
+	playerOrder := e.getPlayerListStartingWithActive(gameState, activePlayerID)
 	
-	// Return false for now since we're not actively processing new triggers here yet
-	// This will be enhanced when the triggered ability queue system is implemented
-	return false
+	for _, playerID := range playerOrder {
+		player := gameState.players[playerID]
+		if player == nil {
+			continue
+		}
+		
+		// Process all triggered abilities for this player
+		// Per Java: while (player.canRespond()) - player can die or win caused by triggered abilities
+		for player.canRespond() {
+			// Get triggered abilities for this player
+			abilities := e.getTriggeredAbilitiesForPlayer(gameState, playerID)
+			if len(abilities) == 0 {
+				break
+			}
+			
+			// Per Java lines 2339-2347: Process non-stack abilities first
+			// (e.g., Banisher Priest return exiled creature)
+			for i := len(abilities) - 1; i >= 0; i-- {
+				ability := abilities[i]
+				if !ability.UsesStack {
+					// Remove from queue
+					e.removeTriggeredAbility(gameState, ability.ID)
+					
+					// Execute immediately
+					if ability.Resolve != nil {
+						if err := ability.Resolve(gameState); err != nil {
+							if e.logger != nil {
+								e.logger.Error("failed to execute non-stack triggered ability",
+									zap.String("ability_id", ability.ID),
+									zap.Error(err),
+								)
+							}
+						} else {
+							played = true
+						}
+					}
+					
+					// Remove from local list
+					abilities = append(abilities[:i], abilities[i+1:]...)
+				}
+			}
+			
+			if len(abilities) == 0 {
+				break
+			}
+			
+			// Per Java lines 2351-2360: If only one ability, put it on stack
+			// If multiple, player chooses order (for now, we process in queue order)
+			if len(abilities) == 1 {
+				ability := abilities[0]
+				e.removeTriggeredAbility(gameState, ability.ID)
+				
+				// Put on stack
+				if err := e.putTriggeredAbilityOnStack(gameState, ability); err != nil {
+					if e.logger != nil {
+						e.logger.Error("failed to put triggered ability on stack",
+							zap.String("ability_id", ability.ID),
+							zap.Error(err),
+						)
+					}
+				} else {
+					played = true
+				}
+			} else {
+				// Multiple abilities - for now, process in queue order
+				// In full implementation, player would choose order
+				for _, ability := range abilities {
+					e.removeTriggeredAbility(gameState, ability.ID)
+					
+					if err := e.putTriggeredAbilityOnStack(gameState, ability); err != nil {
+						if e.logger != nil {
+							e.logger.Error("failed to put triggered ability on stack",
+								zap.String("ability_id", ability.ID),
+								zap.Error(err),
+							)
+						}
+					} else {
+						played = true
+					}
+				}
+				break
+			}
+		}
+	}
+	
+	return played
+}
+
+// getPlayerListStartingWithActive returns the player list starting with the active player
+// and continuing in turn order. This is used for APNAP (Active Player, Non-Active Player) ordering.
+func (e *MageEngine) getPlayerListStartingWithActive(gameState *engineGameState, activePlayerID string) []string {
+	result := make([]string, 0, len(gameState.playerOrder))
+	
+	// Find active player index
+	activeIndex := -1
+	for i, pid := range gameState.playerOrder {
+		if pid == activePlayerID {
+			activeIndex = i
+			break
+		}
+	}
+	
+	if activeIndex == -1 {
+		// Active player not found, return normal order
+		return gameState.playerOrder
+	}
+	
+	// Start with active player, then continue in turn order
+	for i := 0; i < len(gameState.playerOrder); i++ {
+		idx := (activeIndex + i) % len(gameState.playerOrder)
+		result = append(result, gameState.playerOrder[idx])
+	}
+	
+	return result
+}
+
+// getTriggeredAbilitiesForPlayer returns all triggered abilities controlled by the specified player
+func (e *MageEngine) getTriggeredAbilitiesForPlayer(gameState *engineGameState, playerID string) []*triggeredAbilityQueueItem {
+	result := make([]*triggeredAbilityQueueItem, 0)
+	for _, ability := range gameState.triggeredQueue {
+		if ability.Controller == playerID {
+			result = append(result, ability)
+		}
+	}
+	return result
+}
+
+// removeTriggeredAbility removes a triggered ability from the queue
+func (e *MageEngine) removeTriggeredAbility(gameState *engineGameState, abilityID string) {
+	for i, ability := range gameState.triggeredQueue {
+		if ability.ID == abilityID {
+			gameState.triggeredQueue = append(gameState.triggeredQueue[:i], gameState.triggeredQueue[i+1:]...)
+			return
+		}
+	}
+}
+
+// putTriggeredAbilityOnStack puts a triggered ability on the stack
+func (e *MageEngine) putTriggeredAbilityOnStack(gameState *engineGameState, ability *triggeredAbilityQueueItem) error {
+	// Wrap the resolve function to match StackItem signature
+	resolveFunc := func() error {
+		if ability.Resolve != nil {
+			return ability.Resolve(gameState)
+		}
+		return nil
+	}
+	
+	// Create stack item for triggered ability
+	item := rules.StackItem{
+		ID:          ability.ID,
+		SourceID:    ability.SourceID,
+		Controller:  ability.Controller,
+		Description: ability.Description,
+		Kind:        "TRIGGERED",
+		Resolve:     resolveFunc,
+	}
+	
+	// Push to stack
+	gameState.stack.Push(item)
+	
+	if e.logger != nil {
+		e.logger.Debug("put triggered ability on stack",
+			zap.String("ability_id", ability.ID),
+			zap.String("source_id", ability.SourceID),
+			zap.String("controller", ability.Controller),
+			zap.String("description", ability.Description),
+		)
+	}
+	
+	return nil
 }
 
 // checkStateBasedActions checks and applies state-based actions per rule 117.5
