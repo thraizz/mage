@@ -14,7 +14,7 @@ Status legend:
 - [ ] Implement priority windows for casting during stack resolution (e.g., mana abilities, nested responses)
 - [ ] Persist stack/game events for replay and spectator synchronization
 - [ ] Add comprehensive error handling and rollback when resolution fails
-- [ ] Implement priority retention after casting (caster retains priority by default, only passes when explicitly passing)
+- [x] Implement priority retention after casting (caster retains priority by default, only passes when explicitly passing)
 - [ ] Add state bookmarking and rollback mechanism for error recovery
 - [ ] Implement comprehensive priority loop structure matching Java `playPriority()` pattern
 

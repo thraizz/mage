@@ -648,50 +648,32 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 	// Triggered abilities go on top of the stack (LIFO - last in, first out)
 	e.createTriggeredAbilityForSpell(gameState, card, playerID)
 
-	// After casting, pass priority to next player for responses
-	// Note: In strict MTG rules, caster retains priority, but for simplicity
-	// we pass priority to allow responses. The caster is considered to have
-	// "passed" for stack resolution purposes (if next player also passes, stack resolves)
-	player.Passed = true  // Caster has effectively passed by casting and not retaining priority
-	nextPlayerID := e.getNextPlayerWithPriority(gameState, playerID)
-	if nextPlayerID != "" && nextPlayerID != playerID {
-		// Per rule 117.5: Check state-based actions before priority
-		// Repeat until no more state-based actions occur
-		for e.checkStateBasedActions(gameState) {
-			// Continue checking until stable
+	// Per MTG rules 117.3c: After a player casts a spell, activates an ability, or takes a special action,
+	// that player retains priority and may take another action. Priority only passes when the player
+	// explicitly passes or when a spell/ability resolves.
+	// Reset all players' passed flags (except lost/left players) - matches Java's resetPassed() behavior
+	for _, pid := range gameState.playerOrder {
+		p := gameState.players[pid]
+		// Only reset passed flag if player hasn't lost or left
+		if !p.Lost && !p.Left {
+			p.Passed = false
+		} else {
+			// Preserve passed state for lost/left players
+			p.Passed = true
 		}
-		
-		player.HasPriority = false
-		gameState.turnManager.SetPriority(nextPlayerID)
-		gameState.players[nextPlayerID].HasPriority = true
-		gameState.players[nextPlayerID].Passed = false
-		gameState.addPrompt(nextPlayerID, "You have priority. Respond?", []string{"PASS", "CAST"})
-		
-		// Check if stack should resolve (all players passed)
-		allPassed := true
-		for _, pid := range gameState.playerOrder {
-			p := gameState.players[pid]
-			if !p.Passed && !p.Lost && !p.Left {
-				allPassed = false
-				break
-			}
-		}
-		if allPassed && !gameState.stack.IsEmpty() {
-			// Both players have passed, resolve stack
-			return e.resolveStack(gameState)
-		}
-	} else {
-		// Per rule 117.5: Check state-based actions before priority
-		// Repeat until no more state-based actions occur
-		for e.checkStateBasedActions(gameState) {
-			// Continue checking until stable
-		}
-		
-		// Caster retains priority if no other player available
-		player.HasPriority = true
-		player.Passed = false
-		gameState.addPrompt(playerID, "You have priority. Pass?", []string{"PASS", "CAST"})
 	}
+
+	// Per rule 117.5: Check state-based actions before priority
+	// Repeat until no more state-based actions occur
+	for e.checkStateBasedActions(gameState) {
+		// Continue checking until stable
+	}
+
+	// Caster retains priority after casting
+	player.HasPriority = true
+	player.Passed = false
+	gameState.turnManager.SetPriority(playerID)
+	gameState.addPrompt(playerID, "You have priority. Cast another spell or pass?", []string{"PASS", "CAST"})
 
 	return nil
 }

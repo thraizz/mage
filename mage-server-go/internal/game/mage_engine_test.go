@@ -193,15 +193,7 @@ func TestStateBasedActionsBeforePriority(t *testing.T) {
 			t.Fatalf("failed to cast spell: %v", err)
 		}
 
-		// Pass to resolve - Bob has priority after Alice casts
-		if err := engine.ProcessAction(gameID3, game.PlayerAction{
-			PlayerID:   "Bob",
-			ActionType: "PLAYER_ACTION",
-			Data:       "PASS",
-			Timestamp:  time.Now(),
-		}); err != nil {
-			t.Fatalf("bob pass failed: %v", err)
-		}
+		// Pass to resolve - Alice retains priority after casting, so Alice passes first
 		if err := engine.ProcessAction(gameID3, game.PlayerAction{
 			PlayerID:   "Alice",
 			ActionType: "PLAYER_ACTION",
@@ -209,6 +201,15 @@ func TestStateBasedActionsBeforePriority(t *testing.T) {
 			Timestamp:  time.Now(),
 		}); err != nil {
 			t.Fatalf("alice pass failed: %v", err)
+		}
+		// Now Bob has priority and passes
+		if err := engine.ProcessAction(gameID3, game.PlayerAction{
+			PlayerID:   "Bob",
+			ActionType: "PLAYER_ACTION",
+			Data:       "PASS",
+			Timestamp:  time.Now(),
+		}); err != nil {
+			t.Fatalf("bob pass failed: %v", err)
 		}
 
 		// Verify creature is on battlefield
@@ -281,7 +282,15 @@ func TestStateBasedActionsBetweenStackResolutions(t *testing.T) {
 
 	// Pass both players to resolve stack
 	// After each resolution, checkStateAndTriggeredAfterResolution should be called
-	// Bob already passed when casting, so Alice just needs to pass
+	// Bob retains priority after casting, so Bob passes first, then Alice passes
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("bob pass failed: %v", err)
+	}
 	if err := engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Alice",
 		ActionType: "PLAYER_ACTION",
