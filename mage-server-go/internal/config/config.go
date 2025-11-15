@@ -79,9 +79,10 @@ type PasswordValidation struct {
 
 // AuthConfig contains authentication settings
 type AuthConfig struct {
-	Mode                   string        `mapstructure:"mode"`
-	RequireEmail           bool          `mapstructure:"require_email"`
-	PasswordResetTokenTTL  time.Duration `mapstructure:"password_reset_token_ttl"`
+	Mode                  string        `mapstructure:"mode"`
+	RequireEmail          bool          `mapstructure:"require_email"`
+	PasswordResetTokenTTL time.Duration `mapstructure:"password_reset_token_ttl"`
+	AdminPassword         string        `mapstructure:"admin_password"`
 }
 
 // MailConfig contains email service settings
@@ -215,6 +216,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("auth.mode", "optional")
 	v.SetDefault("auth.require_email", false)
 	v.SetDefault("auth.password_reset_token_ttl", "1h")
+	v.SetDefault("auth.admin_password", "")
 
 	// Logging defaults
 	v.SetDefault("logging.level", "info")

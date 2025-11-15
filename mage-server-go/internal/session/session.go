@@ -5,6 +5,18 @@ import (
 	"time"
 )
 
+// Preferences captures user-specific settings stored in the session.
+type Preferences struct {
+	AvatarID                 int32
+	ShowAbsoluteAbilities    bool
+	AllowRequestsFromFriends bool
+	ConfirmEmptyManaPool     bool
+	UserGroup                string
+	SkipPrioritySteps        []string
+	FlagsName                string
+	AskMoveToGraveOrder      int32
+}
+
 // Session represents a user session
 type Session struct {
 	ID           string
@@ -15,6 +27,7 @@ type Session struct {
 	LastActivity time.Time
 	LeasePeriod  time.Duration
 	CallbackChan chan interface{} // Channel for WebSocket callbacks
+	preferences  *Preferences
 	mu           sync.RWMutex
 	reqMu        sync.Mutex // Prevents concurrent requests for same session
 }
@@ -106,4 +119,35 @@ func (s *Session) Lock() {
 // Unlock unlocks the session
 func (s *Session) Unlock() {
 	s.reqMu.Unlock()
+}
+
+// SetPreferences updates the session preferences.
+func (s *Session) SetPreferences(p Preferences) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	steps := make([]string, len(p.SkipPrioritySteps))
+	copy(steps, p.SkipPrioritySteps)
+	p.SkipPrioritySteps = steps
+
+	s.preferences = &p
+}
+
+// GetPreferences returns a copy of the session preferences if available.
+func (s *Session) GetPreferences() *Preferences {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if s.preferences == nil {
+		return nil
+	}
+
+	// Return a shallow copy with duplicated slice to avoid external mutation.
+	p := *s.preferences
+	if len(s.preferences.SkipPrioritySteps) > 0 {
+		steps := make([]string, len(s.preferences.SkipPrioritySteps))
+		copy(steps, s.preferences.SkipPrioritySteps)
+		p.SkipPrioritySteps = steps
+	}
+	return &p
 }

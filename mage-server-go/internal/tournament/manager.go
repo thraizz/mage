@@ -44,30 +44,30 @@ func (s TournamentState) String() string {
 type TournamentType string
 
 const (
-	TournamentTypeSwiss      TournamentType = "SWISS"
+	TournamentTypeSwiss       TournamentType = "SWISS"
 	TournamentTypeElimination TournamentType = "ELIMINATION"
 )
 
 // Player represents a tournament participant
 type Player struct {
-	Name      string
-	Points    int
-	Wins      int
-	Losses    int
-	Draws     int
+	Name       string
+	Points     int
+	Wins       int
+	Losses     int
+	Draws      int
 	Eliminated bool
-	Quit      bool
+	Quit       bool
 }
 
 // Pairing represents a match pairing in a round
 type Pairing struct {
-	Player1    string
-	Player2    string
-	TableID    string
-	Winner     string
+	Player1     string
+	Player2     string
+	TableID     string
+	Winner      string
 	Player1Wins int
 	Player2Wins int
-	Draws      int
+	Draws       int
 }
 
 // Round represents a tournament round
@@ -78,26 +78,75 @@ type Round struct {
 	Finished bool
 }
 
+// PlayerSnapshot captures tournament player data for external use.
+type PlayerSnapshot struct {
+	Name       string
+	Points     int
+	Wins       int
+	Losses     int
+	Draws      int
+	Eliminated bool
+	Quit       bool
+}
+
+// PairingSnapshot captures pairing data for external use.
+type PairingSnapshot struct {
+	Player1     string
+	Player2     string
+	TableID     string
+	Winner      string
+	Player1Wins int
+	Player2Wins int
+	Draws       int
+}
+
+// RoundSnapshot captures round data for external use.
+type RoundSnapshot struct {
+	Number   int
+	Started  bool
+	Finished bool
+	Pairings []PairingSnapshot
+}
+
+// TournamentSnapshot captures a consistent view of a tournament.
+type TournamentSnapshot struct {
+	ID             string
+	Name           string
+	Type           string
+	State          TournamentState
+	ControllerName string
+	RoomID         string
+	Players        []PlayerSnapshot
+	Rounds         []RoundSnapshot
+	CurrentRound   int
+	NumRounds      int
+	WinsRequired   int
+	CreateTime     time.Time
+	StartTime      *time.Time
+	EndTime        *time.Time
+}
+
 // Tournament represents a tournament
 type Tournament struct {
-	ID            string
-	Name          string
-	Type          TournamentType
+	ID                string
+	Name              string
+	Type              TournamentType
 	TournamentTypeStr string // "Constructed", "Booster Draft", "Sealed"
-	State         TournamentState
-	ControllerName string
-	RoomID        string
-	Players       map[string]*Player
-	PlayerOrder   []string // Maintains insertion order
-	Rounds        []*Round
-	CurrentRound  int
-	NumRounds     int
-	WinsRequired  int
-	CreateTime    time.Time
-	StartTime     *time.Time
-	EndTime       *time.Time
-	Winner        string
-	mu            sync.RWMutex
+	State             TournamentState
+	ControllerName    string
+	RoomID            string
+	Players           map[string]*Player
+	PlayerOrder       []string // Maintains insertion order
+	Rounds            []*Round
+	CurrentRound      int
+	NumRounds         int
+	WinsRequired      int
+	CreateTime        time.Time
+	StartTime         *time.Time
+	EndTime           *time.Time
+	Winner            string
+	Watchers          map[string]bool
+	mu                sync.RWMutex
 }
 
 // NewTournament creates a new tournament
@@ -117,6 +166,7 @@ func NewTournament(name, tournamentType, controllerName, roomID string, numRound
 		NumRounds:         numRounds,
 		WinsRequired:      winsRequired,
 		CreateTime:        time.Now(),
+		Watchers:          make(map[string]bool),
 	}
 }
 
@@ -178,6 +228,36 @@ func (t *Tournament) GetPlayerCount() int {
 	return len(t.Players)
 }
 
+// AddWatcher registers a watcher for the tournament.
+func (t *Tournament) AddWatcher(playerName string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.Watchers[playerName] = true
+}
+
+// RemoveWatcher removes a watcher from the tournament.
+func (t *Tournament) RemoveWatcher(playerName string) bool {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if _, exists := t.Watchers[playerName]; exists {
+		delete(t.Watchers, playerName)
+		return true
+	}
+	return false
+}
+
+// GetWatchers returns all watchers currently observing the tournament.
+func (t *Tournament) GetWatchers() []string {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+
+	watchers := make([]string, 0, len(t.Watchers))
+	for watcher := range t.Watchers {
+		watchers = append(watchers, watcher)
+	}
+	return watchers
+}
+
 // GetPlayers returns all players
 func (t *Tournament) GetPlayers() []*Player {
 	t.mu.RLock()
@@ -190,6 +270,20 @@ func (t *Tournament) GetPlayers() []*Player {
 		}
 	}
 	return players
+}
+
+// QuitPlayer marks a player as having quit an active tournament.
+func (t *Tournament) QuitPlayer(playerName string) error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	player, exists := t.Players[playerName]
+	if !exists {
+		return fmt.Errorf("player not found")
+	}
+
+	player.Quit = true
+	return nil
 }
 
 // SetState sets the tournament state
@@ -278,7 +372,7 @@ func (t *Tournament) RecordMatchResult(roundNum int, player1, player2, winner st
 	// Find the pairing
 	for _, pairing := range round.Pairings {
 		if (pairing.Player1 == player1 && pairing.Player2 == player2) ||
-		   (pairing.Player1 == player2 && pairing.Player2 == player1) {
+			(pairing.Player1 == player2 && pairing.Player2 == player1) {
 			pairing.Winner = winner
 			pairing.Player1Wins = player1Wins
 			pairing.Player2Wins = player2Wins
@@ -312,6 +406,108 @@ func (t *Tournament) IsController(playerName string) bool {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
 	return t.ControllerName == playerName
+}
+
+// Start transitions the tournament into progress and creates the first round.
+func (t *Tournament) Start() error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	if t.State != TournamentStateWaiting {
+		return fmt.Errorf("tournament already started")
+	}
+
+	if len(t.Players) < 2 {
+		return fmt.Errorf("not enough players")
+	}
+
+	now := time.Now()
+	if t.StartTime == nil {
+		t.StartTime = &now
+	}
+
+	t.State = TournamentStateInProgress
+	t.CurrentRound = 0
+
+	t.CurrentRound++
+	round := &Round{
+		Number:   t.CurrentRound,
+		Pairings: t.generatePairings(),
+		Started:  true,
+		Finished: false,
+	}
+	t.Rounds = append(t.Rounds, round)
+
+	return nil
+}
+
+// Snapshot returns a consistent copy of the tournament state.
+func (t *Tournament) Snapshot() TournamentSnapshot {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+
+	players := make([]PlayerSnapshot, 0, len(t.PlayerOrder))
+	for _, name := range t.PlayerOrder {
+		if player, ok := t.Players[name]; ok {
+			players = append(players, PlayerSnapshot{
+				Name:       player.Name,
+				Points:     player.Points,
+				Wins:       player.Wins,
+				Losses:     player.Losses,
+				Draws:      player.Draws,
+				Eliminated: player.Eliminated,
+				Quit:       player.Quit,
+			})
+		}
+	}
+
+	rounds := make([]RoundSnapshot, 0, len(t.Rounds))
+	for _, r := range t.Rounds {
+		pairings := make([]PairingSnapshot, 0, len(r.Pairings))
+		for _, p := range r.Pairings {
+			pairings = append(pairings, PairingSnapshot{
+				Player1:     p.Player1,
+				Player2:     p.Player2,
+				TableID:     p.TableID,
+				Winner:      p.Winner,
+				Player1Wins: p.Player1Wins,
+				Player2Wins: p.Player2Wins,
+				Draws:       p.Draws,
+			})
+		}
+
+		rounds = append(rounds, RoundSnapshot{
+			Number:   r.Number,
+			Started:  r.Started,
+			Finished: r.Finished,
+			Pairings: pairings,
+		})
+	}
+
+	return TournamentSnapshot{
+		ID:             t.ID,
+		Name:           t.Name,
+		Type:           t.TournamentTypeStr,
+		State:          t.State,
+		ControllerName: t.ControllerName,
+		RoomID:         t.RoomID,
+		Players:        players,
+		Rounds:         rounds,
+		CurrentRound:   t.CurrentRound,
+		NumRounds:      t.NumRounds,
+		WinsRequired:   t.WinsRequired,
+		CreateTime:     t.CreateTime,
+		StartTime:      cloneTime(t.StartTime),
+		EndTime:        cloneTime(t.EndTime),
+	}
+}
+
+func cloneTime(src *time.Time) *time.Time {
+	if src == nil {
+		return nil
+	}
+	cp := *src
+	return &cp
 }
 
 // Manager manages tournaments

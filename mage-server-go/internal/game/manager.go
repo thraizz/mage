@@ -44,20 +44,20 @@ type PlayerAction struct {
 
 // Game represents a game instance
 type Game struct {
-	ID              string
-	TableID         string
-	GameType        string
-	State           GameState
-	Players         []string
-	ActivePlayerID  string
-	PriorityPlayer  string
-	Turn            int
-	StartTime       time.Time
-	EndTime         *time.Time
-	Winner          string
-	ActionQueue     chan PlayerAction
-	Watchers        map[string]bool
-	mu              sync.RWMutex
+	ID             string
+	TableID        string
+	GameType       string
+	State          GameState
+	Players        []string
+	ActivePlayerID string
+	PriorityPlayer string
+	Turn           int
+	StartTime      time.Time
+	EndTime        *time.Time
+	Winner         string
+	ActionQueue    chan PlayerAction
+	Watchers       map[string]bool
+	mu             sync.RWMutex
 }
 
 // NewGame creates a new game instance
@@ -135,10 +135,10 @@ func (g *Game) IsPlayer(playerName string) bool {
 
 // Manager manages game instances
 type Manager struct {
-	games     map[string]*Game
+	games        map[string]*Game
 	gamesByTable map[string]string // tableID -> gameID
-	mu        sync.RWMutex
-	logger    *zap.Logger
+	mu           sync.RWMutex
+	logger       *zap.Logger
 }
 
 // NewManager creates a new game manager
@@ -204,6 +204,18 @@ func (m *Manager) RemoveGame(gameID string) {
 
 		m.logger.Info("game removed", zap.String("game_id", gameID))
 	}
+}
+
+// ListGames returns all active games.
+func (m *Manager) ListGames() []*Game {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	games := make([]*Game, 0, len(m.games))
+	for _, g := range m.games {
+		games = append(games, g)
+	}
+	return games
 }
 
 // GetActiveGames returns all active games
@@ -298,13 +310,43 @@ func NewEngineAdapter(engine GameEngine, logger *zap.Logger) *EngineAdapter {
 
 // ProcessGameActions processes actions from a game's action queue
 func (ea *EngineAdapter) ProcessGameActions(game *Game) {
+	if ea == nil || ea.engine == nil || game == nil {
+		return
+	}
+
 	for action := range game.ActionQueue {
 		if err := ea.engine.ProcessAction(game.ID, action); err != nil {
-			ea.logger.Error("failed to process action",
-				zap.String("game_id", game.ID),
-				zap.String("player_id", action.PlayerID),
-				zap.Error(err),
-			)
+			if ea.logger != nil {
+				ea.logger.Error("failed to process action",
+					zap.String("game_id", game.ID),
+					zap.String("player_id", action.PlayerID),
+					zap.Error(err),
+				)
+			}
 		}
 	}
+}
+
+// StartGame notifies the engine a game has started.
+func (ea *EngineAdapter) StartGame(game *Game) error {
+	if ea == nil || ea.engine == nil || game == nil {
+		return nil
+	}
+	return ea.engine.StartGame(game.ID, game.Players, game.GameType)
+}
+
+// EndGame notifies the engine a game has ended.
+func (ea *EngineAdapter) EndGame(game *Game, winner string) error {
+	if ea == nil || ea.engine == nil || game == nil {
+		return nil
+	}
+	return ea.engine.EndGame(game.ID, winner)
+}
+
+// GetGameView retrieves a game view from the engine.
+func (ea *EngineAdapter) GetGameView(gameID, playerID string) (interface{}, error) {
+	if ea == nil || ea.engine == nil {
+		return nil, nil
+	}
+	return ea.engine.GetGameView(gameID, playerID)
 }

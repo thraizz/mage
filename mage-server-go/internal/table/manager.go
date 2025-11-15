@@ -43,6 +43,12 @@ type Seat struct {
 	DeckValid  bool
 }
 
+// DeckList represents a player's deck submission.
+type DeckList struct {
+	MainDeck  []string
+	Sideboard []string
+}
+
 // Table represents a game table
 type Table struct {
 	ID             string
@@ -60,6 +66,8 @@ type Table struct {
 	TournamentID   string
 	Password       string
 	Spectators     []string
+	SubmittedDecks map[string]DeckList
+	Matches        []string
 	mu             sync.RWMutex
 }
 
@@ -84,6 +92,8 @@ func NewTable(name, gameType, controllerName, roomID string, numSeats int) *Tabl
 		NumSeats:       numSeats,
 		CreateTime:     time.Now(),
 		Spectators:     make([]string, 0),
+		SubmittedDecks: make(map[string]DeckList),
+		Matches:        make([]string, 0),
 	}
 }
 
@@ -118,6 +128,7 @@ func (t *Table) RemovePlayer(playerName string) error {
 			seat.PlayerName = ""
 			seat.PlayerType = ""
 			seat.DeckValid = false
+			delete(t.SubmittedDecks, playerName)
 			return nil
 		}
 	}
@@ -188,6 +199,55 @@ func (t *Table) RemoveSpectator(playerName string) {
 			return
 		}
 	}
+}
+
+// SubmitDeck stores a player's deck list and marks the seat as valid.
+func (t *Table) SubmitDeck(playerName string, deck DeckList) error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	if t.State != TableStateWaiting && t.State != TableStateStarting {
+		return fmt.Errorf("deck submission closed for this table")
+	}
+
+	for _, seat := range t.Seats {
+		if seat.PlayerName == playerName {
+			seat.DeckValid = true
+			copied := DeckList{
+				MainDeck:  append([]string(nil), deck.MainDeck...),
+				Sideboard: append([]string(nil), deck.Sideboard...),
+			}
+			t.SubmittedDecks[playerName] = copied
+			return nil
+		}
+	}
+
+	return fmt.Errorf("player not seated at table")
+}
+
+// GetSubmittedDeck returns a previously submitted deck, if present.
+func (t *Table) GetSubmittedDeck(playerName string) (DeckList, bool) {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+
+	deck, ok := t.SubmittedDecks[playerName]
+	if !ok {
+		return DeckList{}, false
+	}
+
+	copied := DeckList{
+		MainDeck:  append([]string(nil), deck.MainDeck...),
+		Sideboard: append([]string(nil), deck.Sideboard...),
+	}
+
+	return copied, true
+}
+
+// RecordMatch tracks a match/game ID associated with this table.
+func (t *Table) RecordMatch(matchID string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.Matches = append(t.Matches, matchID)
 }
 
 // SetState sets the table state

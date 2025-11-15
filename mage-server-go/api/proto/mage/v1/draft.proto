@@ -4,8 +4,6 @@ package mage.v1;
 
 option go_package = "github.com/magefree/mage-server-go/pkg/proto/mage/v1";
 
-import "mage/v1/models.proto";
-
 // Draft Messages
 
 message DraftJoinRequest {

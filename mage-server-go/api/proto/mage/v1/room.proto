@@ -4,6 +4,7 @@ package mage.v1;
 
 option go_package = "github.com/magefree/mage-server-go/pkg/proto/mage/v1";
 
+import "google/protobuf/timestamp.proto";
 import "mage/v1/models.proto";
 
 // Room and Lobby Messages

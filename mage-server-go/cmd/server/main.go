@@ -4,9 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/magefree/mage-server-go/internal/auth"
 	"github.com/magefree/mage-server-go/internal/chat"
@@ -17,12 +19,16 @@ import (
 	_ "github.com/magefree/mage-server-go/internal/plugin" // Import to register game types
 	"github.com/magefree/mage-server-go/internal/repository"
 	"github.com/magefree/mage-server-go/internal/room"
+	"github.com/magefree/mage-server-go/internal/server"
 	"github.com/magefree/mage-server-go/internal/session"
 	"github.com/magefree/mage-server-go/internal/table"
 	"github.com/magefree/mage-server-go/internal/tournament"
 	"github.com/magefree/mage-server-go/internal/user"
+	pb "github.com/magefree/mage-server-go/pkg/proto/mage/v1"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 )
 
 var (
@@ -52,6 +58,10 @@ func main() {
 		zap.String("version", version),
 		zap.String("config", *configPath),
 	)
+
+	if cfg.Auth.AdminPassword == "" {
+		logger.Warn("admin password not configured; admin RPC access disabled")
+	}
 
 	// Create context that listens for termination signals
 	ctx, cancel := context.WithCancel(context.Background())
@@ -116,6 +126,10 @@ func main() {
 	gameMgr := game.NewManager(logger)
 	logger.Info("game manager initialized")
 
+	// Initialize game engine adapter
+	mageEngine := game.NewMageEngine(logger)
+	gameAdapter := game.NewEngineAdapter(mageEngine, logger)
+
 	// Initialize tournament manager
 	tournamentMgr := tournament.NewManager(logger)
 	logger.Info("tournament manager initialized")
@@ -133,71 +147,61 @@ func main() {
 		logger.Info("email client initialized", zap.String("provider", cfg.Mail.Provider))
 	}
 
-	// Initialize card repository
-	cardRepo := repository.NewCardRepository(db, logger)
-	logger.Info("card repository initialized")
+	mageServer := server.NewMageServer(
+		cfg,
+		db,
+		sessionMgr,
+		userMgr,
+		userRepo,
+		roomMgr,
+		chatMgr,
+		tableMgr,
+		gameMgr,
+		tournamentMgr,
+		draftMgr,
+		tokenStore,
+		mailClient,
+		version,
+		logger,
+		gameAdapter,
+	)
 
-	// Keep references to prevent unused variable errors
-	_ = userMgr
-	_ = tokenStore
-	_ = chatMgr
-	_ = tableMgr
-	_ = gameMgr
-	_ = tournamentMgr
-	_ = draftMgr
-	_ = mailClient
-	_ = cardRepo
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(server.ChainUnaryInterceptors(
+			server.RecoveryInterceptor(logger),
+			server.LoggingInterceptor(logger),
+			server.SessionValidationInterceptor(sessionMgr),
+			server.AdminInterceptor(sessionMgr),
+			server.MetricsInterceptor(),
+		)),
+		grpc.KeepaliveParams(keepalive.ServerParameters{
+			Time:    30 * time.Second,
+			Timeout: 10 * time.Second,
+		}),
+		grpc.MaxConcurrentStreams(uint32(cfg.Server.GRPC.MaxConcurrentStreams)),
+	)
 
-	// NOTE: gRPC server initialization requires generated protobuf code
-	// Run 'make proto' to generate the required .pb.go files
-	// Then uncomment the following code:
-	//
-	// import (
-	//     "net"
-	//     "google.golang.org/grpc"
-	//     "google.golang.org/grpc/keepalive"
-	//     pb "github.com/magefree/mage-server-go/pkg/proto/mage/v1"
-	//     "github.com/magefree/mage-server-go/internal/server"
-	// )
-	//
-	// mageServer := server.NewMageServer(cfg, db, sessionMgr, userMgr, tokenStore, logger)
-	//
-	// grpcServer := grpc.NewServer(
-	//     grpc.UnaryInterceptor(server.ChainUnaryInterceptors(
-	//         server.RecoveryInterceptor(logger),
-	//         server.LoggingInterceptor(logger),
-	//         server.SessionValidationInterceptor(sessionMgr),
-	//         server.AdminInterceptor(sessionMgr),
-	//         server.MetricsInterceptor(),
-	//     )),
-	//     grpc.KeepaliveParams(keepalive.ServerParameters{
-	//         Time:    30 * time.Second,
-	//         Timeout: 10 * time.Second,
-	//     }),
-	//     grpc.MaxConcurrentStreams(uint32(cfg.Server.GRPC.MaxConcurrentStreams)),
-	// )
-	//
-	// pb.RegisterMageServerServer(grpcServer, mageServer)
-	//
-	// lis, err := net.Listen("tcp", cfg.Server.GRPC.Address)
-	// if err != nil {
-	//     logger.Fatal("failed to listen", zap.Error(err))
-	// }
-	//
-	// // Start gRPC server in goroutine
-	// go func() {
-	//     logger.Info("starting gRPC server", zap.String("address", cfg.Server.GRPC.Address))
-	//     if err := grpcServer.Serve(lis); err != nil {
-	//         logger.Error("gRPC server error", zap.Error(err))
-	//     }
-	// }()
-	//
-	// // Start WebSocket server in goroutine
-	// go func() {
-	//     if err := server.StartWebSocketServer(cfg.Server.WebSocket, sessionMgr, logger); err != nil {
-	//         logger.Error("WebSocket server error", zap.Error(err))
-	//     }
-	// }()
+	pb.RegisterMageServerServer(grpcServer, mageServer)
+
+	lis, err := net.Listen("tcp", cfg.Server.GRPC.Address)
+	if err != nil {
+		logger.Fatal("failed to listen", zap.Error(err))
+	}
+
+	// Start gRPC server
+	go func() {
+		logger.Info("starting gRPC server", zap.String("address", cfg.Server.GRPC.Address))
+		if serveErr := grpcServer.Serve(lis); serveErr != nil {
+			logger.Error("gRPC server error", zap.Error(serveErr))
+		}
+	}()
+
+	// Start WebSocket server
+	go func() {
+		if wsErr := server.StartWebSocketServer(cfg.Server.WebSocket, sessionMgr, logger); wsErr != nil {
+			logger.Error("WebSocket server error", zap.Error(wsErr))
+		}
+	}()
 
 	// TODO: Start metrics server if enabled
 	// if cfg.Metrics.Enabled {
@@ -211,10 +215,6 @@ func main() {
 		zap.Int("max_sessions", cfg.Server.MaxSessions),
 	)
 
-	logger.Warn("gRPC and WebSocket servers not started - protobuf generation required",
-		zap.String("command", "make proto"),
-	)
-
 	// Wait for termination signal
 	sig := <-sigChan
 	logger.Info("received shutdown signal", zap.String("signal", sig.String()))
@@ -226,8 +226,7 @@ func main() {
 	// Close all active sessions
 	sessionMgr.CloseAll()
 
-	// TODO: Stop gRPC server gracefully
-	// grpcServer.GracefulStop()
+	grpcServer.GracefulStop()
 
 	logger.Info("MAGE server stopped")
 }
