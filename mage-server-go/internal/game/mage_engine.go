@@ -917,6 +917,7 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 }
 
 // resolveSpell resolves a spell on the stack
+// Per Java Spell.resolve(): instant/sorcery goes to graveyard, permanents go to battlefield
 func (e *MageEngine) resolveSpell(gameState *engineGameState, card *internalCard) error {
 	if card == nil {
 		return fmt.Errorf("card is nil")
@@ -927,72 +928,42 @@ func (e *MageEngine) resolveSpell(gameState *engineGameState, card *internalCard
 			zap.String("card_id", card.ID),
 			zap.String("card_name", card.Name),
 			zap.Int("current_zone", card.Zone),
+			zap.String("card_type", card.Type),
 		)
 	}
 	
-	// For Lightning Bolt, move to battlefield as a creature (for testing)
-	// In real implementation, this would check card type and handle accordingly
-	cardNameLower := strings.ToLower(card.Name)
-	if strings.Contains(cardNameLower, "lightning bolt") {
-		// Ensure card zone is updated
-		oldZone := card.Zone
-		card.Zone = zoneBattlefield
-		card.Type = "Creature - Elemental"
-		card.Power = "1"
-		card.Toughness = "2"
-		
-		// Remove from any previous zone tracking
-		if oldZone == zoneStack {
-			// Already removed from stack via Pop, but ensure zone is updated
+	// Determine where the card should go based on its type
+	// Per Java: instant/sorcery -> graveyard, permanents (creature, artifact, enchantment, planeswalker, land) -> battlefield
+	cardType := strings.ToLower(card.Type)
+	
+	// Check if it's a permanent type
+	isPermanent := strings.Contains(cardType, "creature") ||
+		strings.Contains(cardType, "artifact") ||
+		strings.Contains(cardType, "enchantment") ||
+		strings.Contains(cardType, "planeswalker") ||
+		strings.Contains(cardType, "land")
+	
+	if isPermanent {
+		// Move to battlefield
+		// Per Java: controller.moveCards(card, Zone.BATTLEFIELD, ability, game)
+		if err := e.moveCard(gameState, card, zoneBattlefield, card.ControllerID); err != nil {
+			return fmt.Errorf("failed to move permanent to battlefield: %w", err)
 		}
 		
-		// Check if card is already on battlefield (shouldn't be, but be safe)
-		found := false
-		for _, bfCard := range gameState.battlefield {
-			if bfCard.ID == card.ID {
-				found = true
-				if e.logger != nil {
-					e.logger.Warn("card already on battlefield",
-						zap.String("card_id", card.ID),
-					)
-				}
-				break
-			}
+		// Apply layer system for power/toughness if it's a creature
+		if strings.Contains(cardType, "creature") {
+			power, _ := e.parsePowerToughness(card.Power)
+			toughness, _ := e.parsePowerToughness(card.Toughness)
+			snapshot := effects.NewSnapshot(card.ID, card.ControllerID, []string{"Creature"}, power, toughness, true, true)
+			gameState.layerSystem.Apply(snapshot)
+			card.Power = fmt.Sprintf("%d", snapshot.Power)
+			card.Toughness = fmt.Sprintf("%d", snapshot.Toughness)
 		}
-		if !found {
-			gameState.battlefield = append(gameState.battlefield, card)
-			if e.logger != nil {
-				e.logger.Debug("added card to battlefield",
-					zap.String("card_id", card.ID),
-					zap.String("card_name", card.Name),
-					zap.Int("battlefield_size", len(gameState.battlefield)),
-				)
-			}
-		}
-
-		// Apply layer system for power/toughness
-		snapshot := effects.NewSnapshot(card.ID, card.ControllerID, []string{"Creature"}, 1, 2, true, true)
-		gameState.layerSystem.Apply(snapshot)
-		card.Power = fmt.Sprintf("%d", snapshot.Power)
-		card.Toughness = fmt.Sprintf("%d", snapshot.Toughness)
-
-		// Emit enters battlefield event
-		gameState.eventBus.Publish(rules.Event{
-			Type:        rules.EventEntersTheBattlefield,
-			ID:          uuid.New().String(),
-			TargetID:    card.ID,
-			SourceID:    card.ID,
-			Controller:  card.ControllerID,
-			PlayerID:    card.ControllerID,
-			Zone:        zoneBattlefield,
-			Timestamp:   time.Now(),
-			Description: fmt.Sprintf("%s enters the battlefield", card.Name),
-		})
 	} else {
-		// Default: move instant/sorcery to graveyard
-		if player, exists := gameState.players[card.ControllerID]; exists {
-			card.Zone = zoneGraveyard
-			player.Graveyard = append(player.Graveyard, card)
+		// Move instant/sorcery to graveyard
+		// Per Java: controller.moveCards(card, Zone.GRAVEYARD, ability, game)
+		if err := e.moveCard(gameState, card, zoneGraveyard, ""); err != nil {
+			return fmt.Errorf("failed to move spell to graveyard: %w", err)
 		}
 	}
 
@@ -1502,32 +1473,160 @@ func (e *MageEngine) parseLoyalty(value string) (int, error) {
 }
 
 // moveCardToGraveyard moves a card from battlefield to graveyard
-func (e *MageEngine) moveCardToGraveyard(gameState *engineGameState, card *internalCard) {
-	// Remove from battlefield
-	for i, bfCard := range gameState.battlefield {
-		if bfCard.ID == card.ID {
-			gameState.battlefield = append(gameState.battlefield[:i], gameState.battlefield[i+1:]...)
-			break
+// moveCard moves a card from its current zone to a target zone with proper event emission.
+// This is the central function for all zone changes, matching Java's moveCards() behavior.
+// Per Java implementation: cards are removed from source zone, added to target zone, and zone change events are emitted.
+func (e *MageEngine) moveCard(gameState *engineGameState, card *internalCard, targetZone int, controllerID string) error {
+	if card == nil {
+		return fmt.Errorf("card is nil")
+	}
+
+	sourceZone := card.Zone
+	
+	// Remove from source zone
+	switch sourceZone {
+	case zoneStack:
+		// Stack removal is handled by StackManager.Pop(), so we don't need to remove here
+		// Just update the zone tracking
+	case zoneBattlefield:
+		// Remove from battlefield
+		for i, bfCard := range gameState.battlefield {
+			if bfCard.ID == card.ID {
+				gameState.battlefield = append(gameState.battlefield[:i], gameState.battlefield[i+1:]...)
+				break
+			}
+		}
+	case zoneHand:
+		// Remove from hand
+		if player, exists := gameState.players[card.OwnerID]; exists {
+			player.Hand = e.removeCardFromSlice(player.Hand, card.ID)
+		}
+	case zoneGraveyard:
+		// Remove from graveyard
+		if player, exists := gameState.players[card.OwnerID]; exists {
+			player.Graveyard = e.removeCardFromSlice(player.Graveyard, card.ID)
+		}
+	case zoneExile:
+		// Remove from exile
+		for i, exCard := range gameState.exile {
+			if exCard.ID == card.ID {
+				gameState.exile = append(gameState.exile[:i], gameState.exile[i+1:]...)
+				break
+			}
+		}
+	case zoneLibrary:
+		// Remove from library
+		if player, exists := gameState.players[card.OwnerID]; exists {
+			player.Library = e.removeCardFromSlice(player.Library, card.ID)
+		}
+	case zoneCommand:
+		// Remove from command zone
+		for i, cmdCard := range gameState.command {
+			if cmdCard.ID == card.ID {
+				gameState.command = append(gameState.command[:i], gameState.command[i+1:]...)
+				break
+			}
 		}
 	}
 
-	// Add to owner's graveyard
-	if player, exists := gameState.players[card.OwnerID]; exists {
-		card.Zone = zoneGraveyard
-		player.Graveyard = append(player.Graveyard, card)
+	// Update card zone and controller
+	card.Zone = targetZone
+	if controllerID != "" {
+		card.ControllerID = controllerID
+	}
 
-		// Emit dies event
+	// Add to target zone
+	switch targetZone {
+	case zoneBattlefield:
+		gameState.battlefield = append(gameState.battlefield, card)
+		
+		// Emit enters battlefield event
 		gameState.eventBus.Publish(rules.Event{
-			Type:        rules.EventPermanentDies,
+			Type:        rules.EventEntersTheBattlefield,
 			ID:          uuid.New().String(),
 			TargetID:    card.ID,
 			SourceID:    card.ID,
 			Controller:  card.ControllerID,
-			PlayerID:    card.OwnerID,
-			Zone:        zoneGraveyard,
+			PlayerID:    card.ControllerID,
+			Zone:        zoneBattlefield,
 			Timestamp:   time.Now(),
-			Description: fmt.Sprintf("%s dies", card.Name),
+			Description: fmt.Sprintf("%s enters the battlefield", card.Name),
 		})
+	case zoneGraveyard:
+		// Add to owner's graveyard (cards always go to owner's graveyard, not controller's)
+		if player, exists := gameState.players[card.OwnerID]; exists {
+			player.Graveyard = append(player.Graveyard, card)
+		}
+		
+		// If moving from battlefield, emit dies event
+		if sourceZone == zoneBattlefield {
+			gameState.eventBus.Publish(rules.Event{
+				Type:        rules.EventPermanentDies,
+				ID:          uuid.New().String(),
+				TargetID:    card.ID,
+				SourceID:    card.ID,
+				Controller:  card.ControllerID,
+				PlayerID:    card.OwnerID,
+				Zone:        zoneGraveyard,
+				Timestamp:   time.Now(),
+				Description: fmt.Sprintf("%s dies", card.Name),
+			})
+		}
+	case zoneHand:
+		if player, exists := gameState.players[card.OwnerID]; exists {
+			player.Hand = append(player.Hand, card)
+		}
+	case zoneExile:
+		gameState.exile = append(gameState.exile, card)
+	case zoneLibrary:
+		if player, exists := gameState.players[card.OwnerID]; exists {
+			player.Library = append(player.Library, card)
+		}
+	case zoneCommand:
+		gameState.command = append(gameState.command, card)
+	case zoneStack:
+		// Stack additions are handled by StackManager.Push(), not here
+		return fmt.Errorf("cannot move card to stack via moveCard, use StackManager.Push()")
+	}
+
+	// Emit zone change event
+	gameState.eventBus.Publish(rules.Event{
+		Type:        rules.EventZoneChange,
+		ID:          uuid.New().String(),
+		TargetID:    card.ID,
+		SourceID:    card.ID,
+		Controller:  card.ControllerID,
+		PlayerID:    card.OwnerID,
+		Zone:        targetZone,
+		Timestamp:   time.Now(),
+		Description: fmt.Sprintf("%s moved from zone %d to zone %d", card.Name, sourceZone, targetZone),
+		Metadata: map[string]string{
+			"source_zone": fmt.Sprintf("%d", sourceZone),
+			"target_zone": fmt.Sprintf("%d", targetZone),
+		},
+	})
+
+	if e.logger != nil {
+		e.logger.Debug("moved card",
+			zap.String("card_id", card.ID),
+			zap.String("card_name", card.Name),
+			zap.Int("source_zone", sourceZone),
+			zap.Int("target_zone", targetZone),
+		)
+	}
+
+	return nil
+}
+
+func (e *MageEngine) moveCardToGraveyard(gameState *engineGameState, card *internalCard) {
+	// Use the unified moveCard function
+	if err := e.moveCard(gameState, card, zoneGraveyard, ""); err != nil {
+		if e.logger != nil {
+			e.logger.Error("failed to move card to graveyard",
+				zap.String("card_id", card.ID),
+				zap.Error(err),
+			)
+		}
 	}
 }
 

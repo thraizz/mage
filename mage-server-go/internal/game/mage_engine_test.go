@@ -90,15 +90,20 @@ func TestCardIDConsistencyAcrossZones(t *testing.T) {
 	}
 	finalView := finalViewRaw.(*game.EngineGameView)
 
-	foundOnBattlefield := false
-	for _, card := range finalView.Battlefield {
-		if card.ID == originalCard.ID {
-			foundOnBattlefield = true
-			break
+	// Lightning Bolt is an instant, so it should be in the graveyard after resolution
+	foundInGraveyard := false
+	for _, player := range finalView.Players {
+		if player.PlayerID == "Alice" {
+			for _, card := range player.Graveyard {
+				if card.ID == originalCard.ID {
+					foundInGraveyard = true
+					break
+				}
+			}
 		}
 	}
-	if !foundOnBattlefield {
-		t.Fatalf("expected card %s to be present on battlefield after resolution", originalCard.ID)
+	if !foundInGraveyard {
+		t.Fatalf("expected card %s to be in graveyard after resolution (instants go to graveyard)", originalCard.ID)
 	}
 }
 
@@ -178,59 +183,20 @@ func TestStateBasedActionsBeforePriority(t *testing.T) {
 
 	// Test 3: Creature with 0 toughness dies before priority is passed
 	t.Run("CreatureDiesAtZeroToughness", func(t *testing.T) {
-		gameID3 := "sba-test-creature"
-		if err := engine.StartGame(gameID3, players, "Duel"); err != nil {
-			t.Fatalf("failed to start game: %v", err)
-		}
-
-		// Cast a spell to get something on the battlefield
-		if err := engine.ProcessAction(gameID3, game.PlayerAction{
-			PlayerID:   "Alice",
-			ActionType: "SEND_STRING",
-			Data:       "Lightning Bolt",
-			Timestamp:  time.Now(),
-		}); err != nil {
-			t.Fatalf("failed to cast spell: %v", err)
-		}
-
-		// Pass to resolve - Alice retains priority after casting, so Alice passes first
-		if err := engine.ProcessAction(gameID3, game.PlayerAction{
-			PlayerID:   "Alice",
-			ActionType: "PLAYER_ACTION",
-			Data:       "PASS",
-			Timestamp:  time.Now(),
-		}); err != nil {
-			t.Fatalf("alice pass failed: %v", err)
-		}
-		// Now Bob has priority and passes
-		if err := engine.ProcessAction(gameID3, game.PlayerAction{
-			PlayerID:   "Bob",
-			ActionType: "PLAYER_ACTION",
-			Data:       "PASS",
-			Timestamp:  time.Now(),
-		}); err != nil {
-			t.Fatalf("bob pass failed: %v", err)
-		}
-
-		// Verify creature is on battlefield
-		viewRaw, err := engine.GetGameView(gameID3, "Alice")
-		if err != nil {
-			t.Fatalf("failed to get view: %v", err)
-		}
-		view := viewRaw.(*game.EngineGameView)
-
-		if len(view.Battlefield) == 0 {
-			t.Fatalf("expected creature on battlefield")
-		}
-
-		creature := view.Battlefield[0]
-		if creature.Toughness != "2" {
-			t.Fatalf("expected creature to have toughness 2, got %s", creature.Toughness)
-		}
-
-		// The test verifies the infrastructure is in place
-		// Actual toughness reduction would happen through card effects
-		// When toughness becomes 0, the creature should die before priority
+		// This test verifies the infrastructure is in place for SBA checks
+		// In a real implementation, we would:
+		// 1. Cast a creature spell
+		// 2. Apply a toughness-reducing effect
+		// 3. Verify the creature dies before priority is passed
+		
+		// For now, we skip this test as it requires:
+		// - Creature card definitions
+		// - Toughness-reducing effects
+		// - Full SBA implementation for 0 toughness
+		
+		// The infrastructure is in place via checkStateBasedActions()
+		// which is called before each priority per rule 117.5
+		t.Skip("Skipping until creature cards and toughness-reducing effects are implemented")
 	})
 }
 
@@ -497,4 +463,100 @@ func TestCheckStateAndTriggered(t *testing.T) {
 	// This ensures SBAs are checked and triggered abilities are queued
 	// before the player receives priority
 	// Per Java: checkStateAndTriggered() runs in a loop until stable
+}
+
+// TestZoneTrackingAfterResolution verifies that cards are moved to the correct zones
+// after stack resolution with proper event emission.
+func TestZoneTrackingAfterResolution(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "zone-tracking-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Cast Lightning Bolt (instant)
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "SEND_STRING",
+		Data:       "Lightning Bolt",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("failed to cast spell: %v", err)
+	}
+
+	// Get the card ID before resolution
+	viewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view := viewRaw.(*game.EngineGameView)
+	
+	if len(view.Stack) == 0 {
+		t.Fatalf("expected spell on stack")
+	}
+	cardID := view.Stack[0].ID
+
+	// Pass priority to resolve
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("alice pass failed: %v", err)
+	}
+	
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("bob pass failed: %v", err)
+	}
+
+	// Verify instant went to graveyard
+	finalViewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get final view: %v", err)
+	}
+	finalView := finalViewRaw.(*game.EngineGameView)
+
+	// Check graveyard
+	foundInGraveyard := false
+	for _, player := range finalView.Players {
+		if player.PlayerID == "Alice" {
+			for _, card := range player.Graveyard {
+				if card.ID == cardID {
+					foundInGraveyard = true
+					if card.Zone != 3 { // zoneGraveyard = 3
+						t.Errorf("card zone not updated: expected 3, got %d", card.Zone)
+					}
+					break
+				}
+			}
+		}
+	}
+	
+	if !foundInGraveyard {
+		t.Errorf("instant should be in graveyard after resolution")
+	}
+
+	// Verify not on battlefield
+	for _, card := range finalView.Battlefield {
+		if card.ID == cardID {
+			t.Errorf("instant should not be on battlefield")
+		}
+	}
+
+	// Verify not on stack
+	for _, card := range finalView.Stack {
+		if card.ID == cardID {
+			t.Errorf("card should not be on stack after resolution")
+		}
+	}
 }
