@@ -51,7 +51,7 @@ Status legend:
 - [ ] Support multi-choice prompts (choose mode, targets, numbers, colors) _(target selection prompts covered by "target selection flow" task in Stack & Trigger System)_
 - [x] Implement mana payment flow (floating mana, cost reductions, hybrid costs) _(mana pool with regular/floating mana; cost parsing for generic, colored, X, hybrid; payment calculation and execution; cost reduction effects; floating mana empties at end of step; integrated with spell casting; comprehensive tests)_
 - [ ] Recreate combat damage assignment logic (first strike, double strike, trample)
-- [ ] Add concession, timeout, and match result handling aligned with rules
+- [x] Add concession, timeout, and match result handling aligned with rules
 
 ## Card Database & Ability Port
 - [ ] Inventory Java ability/card modules and map to Go packages
