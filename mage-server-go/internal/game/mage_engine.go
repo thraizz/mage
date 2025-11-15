@@ -240,6 +240,7 @@ type engineGameState struct {
 	targetValidator *targeting.TargetValidator
 	layerSystem   *effects.LayerSystem
 	triggeredQueue []*triggeredAbilityQueueItem // Queue of triggered abilities waiting to be put on stack
+	simultaneousEvents []rules.Event             // Queue of events that happened simultaneously
 	messages      []EngineMessage
 	prompts       []EnginePrompt
 	startedAt     time.Time
@@ -916,6 +917,12 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 	// Priority returns to active player
 	activePlayerID := gameState.turnManager.ActivePlayer()
 	
+	// Per Java GameImpl.resolve() lines 1857-1860: Process simultaneous events after stack resolution
+	// This handles events that occurred during resolution (e.g., multiple creatures dying)
+	for gameState.hasSimultaneousEvents() {
+		e.handleSimultaneousEvents(gameState)
+	}
+	
 	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
 	// Repeat until stable (SBA → triggers → repeat)
 	e.checkStateAndTriggered(gameState)
@@ -1442,6 +1449,43 @@ func (e *MageEngine) processTriggeredAbilities(gameState *engineGameState) bool 
 	}
 	
 	return played
+}
+
+// addSimultaneousEvent adds an event to the simultaneous events queue
+// These events will be processed together after stack resolution
+func (gameState *engineGameState) addSimultaneousEvent(event rules.Event) {
+	gameState.simultaneousEvents = append(gameState.simultaneousEvents, event)
+}
+
+// hasSimultaneousEvents returns true if there are events waiting to be processed
+func (gameState *engineGameState) hasSimultaneousEvents() bool {
+	return len(gameState.simultaneousEvents) > 0
+}
+
+// handleSimultaneousEvents processes all simultaneous events
+// Per Java GameState.handleSimultaneousEvent(): processes events that happened at the same time
+// This allows triggers to see all events that occurred together (e.g., multiple creatures dying)
+func (e *MageEngine) handleSimultaneousEvents(gameState *engineGameState) {
+	if !gameState.hasSimultaneousEvents() {
+		return
+	}
+	
+	// Copy events to process (new events might be added during processing)
+	eventsToHandle := make([]rules.Event, len(gameState.simultaneousEvents))
+	copy(eventsToHandle, gameState.simultaneousEvents)
+	gameState.simultaneousEvents = nil
+	
+	// Process each event through the event bus
+	// This allows watchers and triggers to respond to the events
+	for _, event := range eventsToHandle {
+		gameState.eventBus.Publish(event)
+	}
+	
+	if e.logger != nil && len(eventsToHandle) > 0 {
+		e.logger.Debug("processed simultaneous events",
+			zap.Int("count", len(eventsToHandle)),
+		)
+	}
 }
 
 // getPlayerListStartingWithActive returns the player list starting with the active player

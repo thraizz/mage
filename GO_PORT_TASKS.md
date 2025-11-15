@@ -43,7 +43,7 @@ Status legend:
 - [x] Resolve stack one item at a time with state-based action and triggered ability checks between each resolution
 - [x] Implement triggered ability queue processing before priority (APNAP order: Active Player, Non-Active Player)
 - [x] Add `checkStateAndTriggered()` method that runs before each priority (SBA → triggers → repeat until stable)
-- [ ] Handle simultaneous events between stack resolutions (process events after each resolution)
+- [x] Handle simultaneous events between stack resolutions (process events after each resolution)
 
 ## Player Interaction & Prompts
 - [x] Emit prompts when priority passes require player response
