@@ -28,7 +28,7 @@ Status legend:
 - [x] Provide deterministic UUID mapping for permanents, abilities, and triggers
 - [x] Call `checkStateBasedActions()` before each priority (per rule 117.5)
 - [x] Fix `resetPassed()` to preserve lost/left player state (`passed = loses || hasLeft()`)
-- [ ] Add `canRespond()` checking in pass logic (only consider responding players in `allPassed()`)
+- [x] Add `canRespond()` checking in pass logic (only consider responding players in `allPassed()`)
 - [ ] Ensure proper zone tracking after stack resolution (cards moved to correct zones with events)
 
 ## Stack & Trigger System
