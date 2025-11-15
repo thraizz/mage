@@ -29,7 +29,7 @@ Status legend:
 - [x] Call `checkStateBasedActions()` before each priority (per rule 117.5)
 - [x] Fix `resetPassed()` to preserve lost/left player state (`passed = loses || hasLeft()`)
 - [x] Add `canRespond()` checking in pass logic (only consider responding players in `allPassed()`)
-- [ ] Ensure proper zone tracking after stack resolution (cards moved to correct zones with events)
+- [x] Ensure proper zone tracking after stack resolution (cards moved to correct zones with events)
 
 ## Stack & Trigger System
 - [x] Record log message when a stack item resolves
