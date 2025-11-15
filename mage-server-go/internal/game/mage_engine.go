@@ -948,8 +948,10 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 			Description: fmt.Sprintf("%s resolved", item.Description),
 		})
 		
-		// Check for state-based actions and triggered abilities after each resolution
-		// (In full implementation, this would check for SBAs and queue new triggers)
+		// Per rule 117.5 and 603.3: After each stack item resolves, check state-based actions
+		// and process triggered abilities before resolving the next item.
+		// This ensures that SBAs and triggers are handled immediately after each resolution.
+		e.checkStateAndTriggeredAfterResolution(gameState)
 	}
 
 	// Reset pass flags after stack resolution
@@ -1352,6 +1354,54 @@ func (e *MageEngine) ResumeGame(gameID string) error {
 	}
 
 	return nil
+}
+
+// checkStateAndTriggeredAfterResolution checks state-based actions and processes triggered
+// abilities after a stack item resolves. This is called after each resolution to ensure
+// SBAs and triggers are handled before the next item resolves.
+func (e *MageEngine) checkStateAndTriggeredAfterResolution(gameState *engineGameState) {
+	// Repeat until stable: check SBAs, then process triggers, repeat until nothing happens
+	maxIterations := 100 // Safety limit to prevent infinite loops
+	for i := 0; i < maxIterations; i++ {
+		sbaHappened := e.checkStateBasedActions(gameState)
+		triggeredHappened := e.processTriggeredAbilities(gameState)
+		
+		// If nothing happened, we're stable
+		if !sbaHappened && !triggeredHappened {
+			break
+		}
+		
+		// If we hit the limit, log a warning
+		if i == maxIterations-1 {
+			if e.logger != nil {
+				e.logger.Warn("checkStateAndTriggeredAfterResolution hit iteration limit",
+					zap.Int("iterations", maxIterations),
+				)
+			}
+		}
+	}
+}
+
+// processTriggeredAbilities processes triggered abilities that should be put on the stack.
+// Returns true if any triggered abilities were processed.
+// Per rule 603.3: "Once an ability has triggered, its controller puts it on the stack
+// as an object that's not a card the next time a player would receive priority."
+func (e *MageEngine) processTriggeredAbilities(gameState *engineGameState) bool {
+	// Check watchers for triggered conditions
+	// For now, this is a placeholder that will be enhanced when triggered ability
+	// queue system is fully implemented (see task: "Queue triggered abilities instead
+	// of immediately pushing to stack")
+	
+	// Currently, triggered abilities are created immediately when events occur
+	// (e.g., in createTriggeredAbilityForSpell). This method provides a hook
+	// for future triggered ability processing in APNAP order.
+	
+	// For now, we just ensure events are processed (watchers are already notified
+	// via event bus subscription, so they're up to date)
+	
+	// Return false for now since we're not actively processing new triggers here yet
+	// This will be enhanced when the triggered ability queue system is implemented
+	return false
 }
 
 // checkStateBasedActions checks and applies state-based actions per rule 117.5

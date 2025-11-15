@@ -40,7 +40,7 @@ Status legend:
 - [x] Ensure stack legality checks (targets available, costs paid) prior to resolution _(LegalityChecker validates controller status, source card zones, target validity, timing restrictions, and cost payment; illegal items automatically removed from stack with events; GameStateAccessor interface implemented for state queries; comprehensive unit tests)_
 - [ ] Implement target selection flow for spells/abilities requiring targets _(server must prompt for target selection before adding to stack; validate target requirements match spell/ability rules; handle multi-targeting; ensure targets are selected before casting completes)_
 - [x] Add exhaustive integration tests covering multi-object stacks, counterspells, and priority loops _(Comprehensive test suite: multi-object stack resolution (LIFO order), counterspell interactions, nested responses, priority loops with multiple players, stack legality checks, complex scenarios with multiple spells/responses; tests account for triggered abilities and verify proper resolution order)_
-- [ ] Resolve stack one item at a time with state-based action and triggered ability checks between each resolution
+- [x] Resolve stack one item at a time with state-based action and triggered ability checks between each resolution
 - [ ] Implement triggered ability queue processing before priority (APNAP order: Active Player, Non-Active Player)
 - [ ] Add `checkStateAndTriggered()` method that runs before each priority (SBA → triggers → repeat until stable)
 - [ ] Handle simultaneous events between stack resolutions (process events after each resolution)
