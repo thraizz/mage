@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -249,6 +250,9 @@ type internalCard struct {
 	Blocking      bool     // Is this creature blocking
 	AttackingWhat string   // ID of what this creature is attacking (player/planeswalker/battle)
 	BlockingWhat  []string // IDs of creatures this creature is blocking
+	// Damage tracking
+	Damage        int      // Damage marked on this creature
+	DamageSources map[string]int // Damage by source ID
 }
 
 // internalPlayer represents a player in the game state
@@ -4393,6 +4397,323 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 			zap.String("game_id", gameID),
 			zap.Int("blocker_count", len(gameState.combat.blockers)),
 		)
+	}
+	
+	return nil
+}
+
+// AssignCombatDamage assigns combat damage for all combat groups
+// Per Java CombatDamageStep.beginStep()
+func (e *MageEngine) AssignCombatDamage(gameID string, firstStrike bool) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Assign damage to blockers (attackers dealing damage)
+	for _, group := range gameState.combat.groups {
+		if err := e.assignDamageToBlockers(gameState, group, firstStrike); err != nil {
+			return err
+		}
+	}
+	
+	// Assign damage to attackers (blockers dealing damage)
+	for _, group := range gameState.combat.groups {
+		if len(group.blockers) > 0 {
+			if err := e.assignDamageToAttackers(gameState, group, firstStrike); err != nil {
+				return err
+			}
+		}
+	}
+	
+	if e.logger != nil {
+		e.logger.Debug("combat damage assigned",
+			zap.String("game_id", gameID),
+			zap.Bool("first_strike", firstStrike),
+		)
+	}
+	
+	return nil
+}
+
+// assignDamageToBlockers handles attacker damage to blockers or defender
+// Per Java CombatGroup.assignDamageToBlockers()
+func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *combatGroup, firstStrike bool) error {
+	if len(group.attackers) == 0 {
+		return nil
+	}
+	
+	// Get the attacker (should only be one per group)
+	attackerID := group.attackers[0]
+	attacker, exists := gameState.cards[attackerID]
+	if !exists {
+		return nil
+	}
+	
+	// Check if attacker deals damage this step (first strike check)
+	if !e.dealsDamageThisStep(attacker, firstStrike) {
+		return nil
+	}
+	
+	// Get attacker's power
+	power, err := e.getCreaturePower(attacker)
+	if err != nil {
+		power = 0
+	}
+	
+	if len(group.blockers) == 0 {
+		// Unblocked - deal damage to defender
+		return e.dealDamageToDefender(gameState, attacker, group.defenderID, power)
+	}
+	
+	// Blocked - assign damage to blockers
+	// For now, we'll do simple damage assignment (divide evenly)
+	// TODO: Implement proper damage ordering and player choice
+	damagePerBlocker := power / len(group.blockers)
+	remainingDamage := power % len(group.blockers)
+	
+	for i, blockerID := range group.blockers {
+		blocker, exists := gameState.cards[blockerID]
+		if !exists {
+			continue
+		}
+		
+		damage := damagePerBlocker
+		if i == 0 {
+			damage += remainingDamage // Give remainder to first blocker
+		}
+		
+		// Mark damage on blocker
+		e.markDamage(blocker, damage, attackerID)
+	}
+	
+	return nil
+}
+
+// assignDamageToAttackers handles blocker damage to attackers
+// Per Java CombatGroup.assignDamageToAttackers()
+func (e *MageEngine) assignDamageToAttackers(gameState *engineGameState, group *combatGroup, firstStrike bool) error {
+	if len(group.blockers) == 0 {
+		return nil
+	}
+	
+	// For each blocker, deal damage to the attacker(s) it's blocking
+	for _, blockerID := range group.blockers {
+		blocker, exists := gameState.cards[blockerID]
+		if !exists {
+			continue
+		}
+		
+		// Check if blocker deals damage this step
+		if !e.dealsDamageThisStep(blocker, firstStrike) {
+			continue
+		}
+		
+		// Get blocker's power
+		power, err := e.getCreaturePower(blocker)
+		if err != nil {
+			power = 0
+		}
+		
+		// Deal damage to attacker(s)
+		// For now, simple assignment to first attacker
+		// TODO: Handle multiple attackers (banding)
+		if len(group.attackers) > 0 {
+			attackerID := group.attackers[0]
+			attacker, exists := gameState.cards[attackerID]
+			if exists {
+				e.markDamage(attacker, power, blockerID)
+			}
+		}
+	}
+	
+	return nil
+}
+
+// ApplyCombatDamage applies all marked damage
+// Per Java CombatGroup.applyDamage()
+func (e *MageEngine) ApplyCombatDamage(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Apply damage to all creatures in combat
+	for _, group := range gameState.combat.groups {
+		// Apply damage to attackers
+		for _, attackerID := range group.attackers {
+			if err := e.applyDamageToCreature(gameState, attackerID); err != nil {
+				return err
+			}
+		}
+		
+		// Apply damage to blockers
+		for _, blockerID := range group.blockers {
+			if err := e.applyDamageToCreature(gameState, blockerID); err != nil {
+				return err
+			}
+		}
+	}
+	
+	if e.logger != nil {
+		e.logger.Debug("combat damage applied",
+			zap.String("game_id", gameID),
+		)
+	}
+	
+	return nil
+}
+
+// Helper methods
+
+// dealsDamageThisStep checks if a creature deals damage this combat damage step
+// Per Java CombatGroup.dealsDamageThisStep()
+func (e *MageEngine) dealsDamageThisStep(creature *internalCard, firstStrike bool) bool {
+	if creature == nil {
+		return false
+	}
+	
+	// TODO: Check for first strike and double strike abilities
+	// For now, all creatures deal damage in the normal damage step
+	if firstStrike {
+		return false // No first strike implemented yet
+	}
+	
+	return true
+}
+
+// getCreaturePower gets the power of a creature
+func (e *MageEngine) getCreaturePower(creature *internalCard) (int, error) {
+	if creature.Power == "" {
+		return 0, nil
+	}
+	
+	// Parse power (handle X, *, etc.)
+	if creature.Power == "*" || creature.Power == "X" {
+		return 0, nil // TODO: Calculate dynamic power
+	}
+	
+	power, err := strconv.Atoi(creature.Power)
+	if err != nil {
+		return 0, err
+	}
+	
+	return power, nil
+}
+
+// getCreatureToughness gets the toughness of a creature
+func (e *MageEngine) getCreatureToughness(creature *internalCard) (int, error) {
+	if creature.Toughness == "" {
+		return 0, nil
+	}
+	
+	// Parse toughness (handle X, *, etc.)
+	if creature.Toughness == "*" || creature.Toughness == "X" {
+		return 0, nil // TODO: Calculate dynamic toughness
+	}
+	
+	toughness, err := strconv.Atoi(creature.Toughness)
+	if err != nil {
+		return 0, err
+	}
+	
+	return toughness, nil
+}
+
+// markDamage marks damage on a creature from a source
+func (e *MageEngine) markDamage(creature *internalCard, amount int, sourceID string) {
+	if amount <= 0 {
+		return
+	}
+	
+	// Initialize damage sources map if needed
+	if creature.DamageSources == nil {
+		creature.DamageSources = make(map[string]int)
+	}
+	
+	// Add damage
+	creature.Damage += amount
+	creature.DamageSources[sourceID] += amount
+}
+
+// dealDamageToDefender deals damage to a defending player or permanent
+// Per Java CombatGroup.defenderDamage()
+func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *internalCard, defenderID string, amount int) error {
+	if amount <= 0 {
+		return nil
+	}
+	
+	// Check if defender is a permanent (planeswalker/battle) or player
+	if defender, exists := gameState.cards[defenderID]; exists {
+		// Defender is a permanent
+		e.markDamage(defender, amount, attacker.ID)
+		return nil
+	}
+	
+	// Defender is a player
+	player, exists := gameState.players[defenderID]
+	if !exists {
+		return fmt.Errorf("defender %s not found", defenderID)
+	}
+	
+	// Deal damage to player
+	player.Life -= amount
+	
+	// Fire damage event
+	gameState.eventBus.Publish(rules.Event{
+		Type:       rules.EventDamagePlayer,
+		TargetID:   defenderID,
+		SourceID:   attacker.ID,
+		Amount:     amount,
+		Controller: attacker.ControllerID,
+	})
+	
+	return nil
+}
+
+// applyDamageToCreature applies marked damage to a creature and checks for death
+func (e *MageEngine) applyDamageToCreature(gameState *engineGameState, creatureID string) error {
+	creature, exists := gameState.cards[creatureID]
+	if !exists {
+		return nil
+	}
+	
+	if creature.Damage == 0 {
+		return nil
+	}
+	
+	// Get creature's toughness
+	toughness, err := e.getCreatureToughness(creature)
+	if err != nil {
+		toughness = 0
+	}
+	
+	// Check if creature dies (damage >= toughness)
+	if creature.Damage >= toughness && toughness > 0 {
+		// Creature dies - move to graveyard
+		if err := e.moveCard(gameState, creature, zoneGraveyard, ""); err != nil {
+			return err
+		}
+		
+		// Fire death event
+		gameState.eventBus.Publish(rules.Event{
+			Type:       rules.EventZoneChange,
+			SourceID:   creatureID,
+			Controller: creature.ControllerID,
+			Zone:       zoneGraveyard,
+		})
 	}
 	
 	return nil
