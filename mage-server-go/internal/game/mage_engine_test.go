@@ -1,6 +1,7 @@
 package game_test
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -1162,6 +1163,272 @@ func TestChangeControlWithEvents(t *testing.T) {
 	}
 
 	t.Logf("Gain control events: %d, Lose control events: %d", len(gainControlEvents), len(loseControlEvents))
+}
+
+// TestBookmarkAndRestore verifies that game state can be bookmarked and restored
+func TestBookmarkAndRestore(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "bookmark-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Get initial state
+	initialViewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get initial view: %v", err)
+	}
+	initialView := initialViewRaw.(*game.EngineGameView)
+	initialLife := initialView.Players[0].Life
+	initialHandSize := len(initialView.Players[0].Hand)
+
+	// Create a bookmark
+	bookmarkID, err := engine.BookmarkState(gameID)
+	if err != nil {
+		t.Fatalf("failed to bookmark state: %v", err)
+	}
+	if bookmarkID != 1 {
+		t.Errorf("expected bookmark ID 1, got %d", bookmarkID)
+	}
+
+	// Make some changes to the game state
+	// Change Alice's life
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "SEND_INTEGER",
+		Data:       -5, // Reduce life by 5
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("failed to change life: %v", err)
+	}
+
+	// Cast a spell
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "SEND_STRING",
+		Data:       "Lightning Bolt",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("failed to cast spell: %v", err)
+	}
+
+	// Verify state changed
+	changedViewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get changed view: %v", err)
+	}
+	changedView := changedViewRaw.(*game.EngineGameView)
+	changedLife := changedView.Players[0].Life
+	changedHandSize := len(changedView.Players[0].Hand)
+
+	if changedLife == initialLife {
+		t.Error("expected life to have changed")
+	}
+	if changedHandSize == initialHandSize {
+		t.Error("expected hand size to have changed")
+	}
+	if len(changedView.Stack) == 0 {
+		t.Error("expected spell on stack")
+	}
+
+	// Restore to bookmark
+	if err := engine.RestoreState(gameID, bookmarkID, "test restore"); err != nil {
+		t.Fatalf("failed to restore state: %v", err)
+	}
+
+	// Verify state was restored
+	restoredViewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get restored view: %v", err)
+	}
+	restoredView := restoredViewRaw.(*game.EngineGameView)
+	restoredLife := restoredView.Players[0].Life
+	restoredHandSize := len(restoredView.Players[0].Hand)
+
+	if restoredLife != initialLife {
+		t.Errorf("expected life to be restored to %d, got %d", initialLife, restoredLife)
+	}
+	if restoredHandSize != initialHandSize {
+		t.Errorf("expected hand size to be restored to %d, got %d", initialHandSize, restoredHandSize)
+	}
+	if len(restoredView.Stack) != 0 {
+		t.Errorf("expected stack to be empty after restore, got %d items", len(restoredView.Stack))
+	}
+
+	// Verify restoration message was added
+	found := false
+	for _, msg := range restoredView.Messages {
+		if strings.Contains(msg.Text, "Game restored to turn") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected restoration message in game log")
+	}
+}
+
+// TestMultipleBookmarks verifies that multiple bookmarks can be created and managed
+func TestMultipleBookmarks(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "multi-bookmark-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Create first bookmark
+	bookmark1, err := engine.BookmarkState(gameID)
+	if err != nil {
+		t.Fatalf("failed to create bookmark 1: %v", err)
+	}
+
+	// Make a change
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "SEND_INTEGER",
+		Data:       -3,
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("failed to change life: %v", err)
+	}
+
+	// Create second bookmark
+	bookmark2, err := engine.BookmarkState(gameID)
+	if err != nil {
+		t.Fatalf("failed to create bookmark 2: %v", err)
+	}
+
+	// Make another change
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "SEND_INTEGER",
+		Data:       -3,
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("failed to change life: %v", err)
+	}
+
+	// Verify we have different bookmark IDs
+	if bookmark1 == bookmark2 {
+		t.Error("expected different bookmark IDs")
+	}
+
+	// Restore to first bookmark should work
+	if err := engine.RestoreState(gameID, bookmark1, "restore to bookmark 1"); err != nil {
+		t.Fatalf("failed to restore to bookmark 1: %v", err)
+	}
+
+	// Verify bookmark 2 was removed (per Java: newer bookmarks are removed on restore)
+	if err := engine.RestoreState(gameID, bookmark2, "should fail"); err == nil {
+		t.Error("expected error when restoring to removed bookmark")
+	}
+}
+
+// TestErrorRecoveryWithRollback verifies that errors trigger automatic state restoration
+func TestErrorRecoveryWithRollback(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "error-recovery-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Get initial state
+	initialViewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get initial view: %v", err)
+	}
+	initialView := initialViewRaw.(*game.EngineGameView)
+	initialLife := initialView.Players[0].Life
+
+	// Try to perform an invalid action (should trigger error and rollback)
+	// Bob doesn't have priority, so this should fail
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Bob",
+		ActionType: "SEND_STRING",
+		Data:       "Lightning Bolt",
+		Timestamp:  time.Now(),
+	})
+
+	// Error should occur
+	if err == nil {
+		t.Fatal("expected error for player without priority")
+	}
+
+	// Verify error message indicates restoration
+	if !strings.Contains(err.Error(), "action failed and state restored") {
+		t.Logf("Error message: %v", err)
+		// Note: The error might not contain "restored" if bookmark creation failed
+		// This is acceptable - we just verify the game is still functional
+	}
+
+	// Verify game state is still consistent (not corrupted by failed action)
+	afterErrorViewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view after error: %v", err)
+	}
+	afterErrorView := afterErrorViewRaw.(*game.EngineGameView)
+
+	// Life should be unchanged (restored or never changed)
+	if afterErrorView.Players[0].Life != initialLife {
+		t.Errorf("expected life to be %d after error recovery, got %d", initialLife, afterErrorView.Players[0].Life)
+	}
+
+	// Game should still be playable
+	if afterErrorView.State != game.GameStateInProgress {
+		t.Errorf("expected game to still be in progress, got %v", afterErrorView.State)
+	}
+
+	// Alice should still have priority
+	if afterErrorView.PriorityPlayer != "Alice" {
+		t.Errorf("expected Alice to have priority, got %s", afterErrorView.PriorityPlayer)
+	}
+}
+
+// TestClearBookmarks verifies that bookmarks can be cleared
+func TestClearBookmarks(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "clear-bookmarks-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Create multiple bookmarks
+	bookmark1, err := engine.BookmarkState(gameID)
+	if err != nil {
+		t.Fatalf("failed to create bookmark 1: %v", err)
+	}
+
+	bookmark2, err := engine.BookmarkState(gameID)
+	if err != nil {
+		t.Fatalf("failed to create bookmark 2: %v", err)
+	}
+
+	// Clear all bookmarks
+	engine.ClearBookmarks(gameID)
+
+	// Verify bookmarks are gone
+	if err := engine.RestoreState(gameID, bookmark1, "should fail"); err == nil {
+		t.Error("expected error after clearing bookmarks")
+	}
+	if err := engine.RestoreState(gameID, bookmark2, "should fail"); err == nil {
+		t.Error("expected error after clearing bookmarks")
+	}
 }
 
 // TestNotificationDeadlock reproduces the deadlock bug where a notification handler

@@ -278,19 +278,53 @@ type GameNotification struct {
 // NotificationHandler is a function that handles game notifications
 type NotificationHandler func(notification GameNotification)
 
+// gameStateSnapshot represents a complete snapshot of game state for rollback
+type gameStateSnapshot struct {
+	// Core game state
+	gameID        string
+	gameType      string
+	state         GameState
+	turnNumber    int
+	activePlayer  string
+	priorityPlayer string
+	
+	// Players - deep copy of all player data
+	players       map[string]*internalPlayer
+	playerOrder   []string
+	
+	// Cards - deep copy of all cards
+	cards         map[string]*internalCard
+	battlefield   []*internalCard
+	exile         []*internalCard
+	command       []*internalCard
+	
+	// Stack state
+	stackItems    []rules.StackItem
+	
+	// Other state
+	messages      []EngineMessage
+	prompts       []EnginePrompt
+	timestamp     time.Time
+}
+
 // MageEngine is the main game engine implementation
 type MageEngine struct {
 	logger              *zap.Logger
 	mu                  sync.RWMutex
 	games               map[string]*engineGameState
 	notificationHandler NotificationHandler // Optional handler for UI/websocket notifications
+	
+	// State bookmarking for rollback/undo
+	// Maps gameID -> list of bookmarked states
+	bookmarks           map[string][]*gameStateSnapshot
 }
 
 // NewMageEngine creates a new MageEngine instance
 func NewMageEngine(logger *zap.Logger) *MageEngine {
 	return &MageEngine{
-		logger: logger,
-		games:  make(map[string]*engineGameState),
+		logger:    logger,
+		games:     make(map[string]*engineGameState),
+		bookmarks: make(map[string][]*gameStateSnapshot),
 	}
 }
 
@@ -556,8 +590,9 @@ func (e *MageEngine) createStarterCard(id, ownerID, cardName string) *internalCa
 	}
 }
 
-// ProcessAction processes a player action
-func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) error {
+// ProcessAction processes a player action with automatic error recovery
+// Per Java GameImpl.playPriority(): creates bookmark before action, restores on error
+func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err error) {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
@@ -572,6 +607,62 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) error {
 	if gameState.state == GameStateFinished {
 		return fmt.Errorf("game %s has ended", gameID)
 	}
+
+	// Create bookmark before processing action for error recovery
+	// Per Java GameImpl.playPriority() line 1728: rollbackBookmarkOnPriorityStart = bookmarkState()
+	var bookmarkID int
+	gameState.mu.Unlock() // Temporarily unlock to call BookmarkState
+	bookmarkID, bookmarkErr := e.BookmarkState(gameID)
+	gameState.mu.Lock() // Re-acquire lock
+	
+	if bookmarkErr != nil {
+		if e.logger != nil {
+			e.logger.Warn("failed to create bookmark before action",
+				zap.String("game_id", gameID),
+				zap.Error(bookmarkErr),
+			)
+		}
+		// Continue without bookmark - error recovery won't be available
+		bookmarkID = 0
+	}
+
+	// Defer error recovery: if action fails and we have a bookmark, restore state
+	defer func() {
+		if err != nil && bookmarkID > 0 {
+			// Restore to bookmarked state on error
+			// Per Java GameImpl.playPriority() line 1800: restoreState(rollbackBookmarkOnPriorityStart, "Game error: " + e)
+			gameState.mu.Unlock() // Temporarily unlock to call RestoreState
+			restoreErr := e.RestoreState(gameID, bookmarkID, fmt.Sprintf("Error recovery: %v", err))
+			gameState.mu.Lock() // Re-acquire lock
+			
+			if restoreErr != nil {
+				if e.logger != nil {
+					e.logger.Error("failed to restore state after error",
+						zap.String("game_id", gameID),
+						zap.Int("bookmark_id", bookmarkID),
+						zap.Error(err),
+						zap.Error(restoreErr),
+					)
+				}
+			} else {
+				if e.logger != nil {
+					e.logger.Info("auto-restored game state after error",
+						zap.String("game_id", gameID),
+						zap.Int("bookmark_id", bookmarkID),
+						zap.Error(err),
+					)
+				}
+				// Update error message to indicate restoration
+				err = fmt.Errorf("action failed and state restored: %w", err)
+			}
+		} else if bookmarkID > 0 {
+			// Action succeeded, remove the bookmark
+			// Per Java: bookmark is removed after successful action
+			gameState.mu.Unlock() // Temporarily unlock to call RemoveBookmark
+			e.RemoveBookmark(gameID, bookmarkID)
+			gameState.mu.Lock() // Re-acquire lock
+		}
+	}()
 
 	// Route action by type
 	switch action.ActionType {
@@ -2708,6 +2799,287 @@ func (e *MageEngine) ChangeControl(gameID, cardID, newControllerID string) error
 	}
 
 	return nil
+}
+
+// createSnapshot creates a deep copy snapshot of the current game state
+// This is used for bookmarking and rollback functionality
+func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapshot {
+	snapshot := &gameStateSnapshot{
+		gameID:         gameState.gameID,
+		gameType:       gameState.gameType,
+		state:          gameState.state,
+		turnNumber:     gameState.turnManager.TurnNumber(),
+		activePlayer:   gameState.turnManager.ActivePlayer(),
+		priorityPlayer: gameState.turnManager.PriorityPlayer(),
+		playerOrder:    make([]string, len(gameState.playerOrder)),
+		players:        make(map[string]*internalPlayer),
+		cards:          make(map[string]*internalCard),
+		battlefield:    make([]*internalCard, 0, len(gameState.battlefield)),
+		exile:          make([]*internalCard, 0, len(gameState.exile)),
+		command:        make([]*internalCard, 0, len(gameState.command)),
+		stackItems:     make([]rules.StackItem, 0),
+		messages:       make([]EngineMessage, len(gameState.messages)),
+		prompts:        make([]EnginePrompt, len(gameState.prompts)),
+		timestamp:      time.Now(),
+	}
+	
+	// Copy player order
+	copy(snapshot.playerOrder, gameState.playerOrder)
+	
+	// Deep copy players
+	for id, player := range gameState.players {
+		playerCopy := &internalPlayer{
+			PlayerID:     player.PlayerID,
+			Name:         player.Name,
+			Life:         player.Life,
+			Poison:       player.Poison,
+			Energy:       player.Energy,
+			Library:      make([]*internalCard, len(player.Library)),
+			Hand:         make([]*internalCard, len(player.Hand)),
+			Graveyard:    make([]*internalCard, len(player.Graveyard)),
+			ManaPool:     player.ManaPool.Copy(),
+			HasPriority:  player.HasPriority,
+			Passed:       player.Passed,
+			StateOrdinal: player.StateOrdinal,
+			Lost:         player.Lost,
+			Left:         player.Left,
+			Wins:         player.Wins,
+			Quit:         player.Quit,
+			TimerTimeout: player.TimerTimeout,
+			IdleTimeout:  player.IdleTimeout,
+			Conceded:     player.Conceded,
+		}
+		snapshot.players[id] = playerCopy
+	}
+	
+	// Deep copy all cards
+	for id, card := range gameState.cards {
+		cardCopy := e.copyCard(card)
+		snapshot.cards[id] = cardCopy
+		
+		// Update player zone references
+		if player, exists := snapshot.players[card.OwnerID]; exists {
+			switch card.Zone {
+			case zoneLibrary:
+				for i, c := range gameState.players[card.OwnerID].Library {
+					if c.ID == card.ID {
+						player.Library[i] = cardCopy
+						break
+					}
+				}
+			case zoneHand:
+				for i, c := range gameState.players[card.OwnerID].Hand {
+					if c.ID == card.ID {
+						player.Hand[i] = cardCopy
+						break
+					}
+				}
+			case zoneGraveyard:
+				for i, c := range gameState.players[card.OwnerID].Graveyard {
+					if c.ID == card.ID {
+						player.Graveyard[i] = cardCopy
+						break
+					}
+				}
+			case zoneBattlefield:
+				snapshot.battlefield = append(snapshot.battlefield, cardCopy)
+			case zoneExile:
+				snapshot.exile = append(snapshot.exile, cardCopy)
+			case zoneCommand:
+				snapshot.command = append(snapshot.command, cardCopy)
+			}
+		}
+	}
+	
+	// Copy stack items
+	if gameState.stack != nil {
+		snapshot.stackItems = append(snapshot.stackItems, gameState.stack.List()...)
+	}
+	
+	// Copy messages and prompts
+	copy(snapshot.messages, gameState.messages)
+	copy(snapshot.prompts, gameState.prompts)
+	
+	return snapshot
+}
+
+// copyCard creates a deep copy of a card
+func (e *MageEngine) copyCard(card *internalCard) *internalCard {
+	if card == nil {
+		return nil
+	}
+	
+	return &internalCard{
+		ID:             card.ID,
+		Name:           card.Name,
+		DisplayName:    card.DisplayName,
+		ManaCost:       card.ManaCost,
+		Type:           card.Type,
+		SubTypes:       append([]string(nil), card.SubTypes...),
+		SuperTypes:     append([]string(nil), card.SuperTypes...),
+		Color:          card.Color,
+		Power:          card.Power,
+		Toughness:      card.Toughness,
+		Loyalty:        card.Loyalty,
+		CardNumber:     card.CardNumber,
+		ExpansionSet:   card.ExpansionSet,
+		Rarity:         card.Rarity,
+		RulesText:      card.RulesText,
+		Tapped:         card.Tapped,
+		Flipped:        card.Flipped,
+		Transformed:    card.Transformed,
+		FaceDown:       card.FaceDown,
+		Zone:           card.Zone,
+		ControllerID:   card.ControllerID,
+		OwnerID:        card.OwnerID,
+		AttachedToCard: append([]string(nil), card.AttachedToCard...),
+		Abilities:      append([]EngineAbilityView(nil), card.Abilities...),
+		Counters:       card.Counters.Copy(),
+	}
+}
+
+// BookmarkState creates a bookmark of the current game state and returns the bookmark ID
+// The bookmark can be used later to restore the game to this state
+// Per Java GameImpl.bookmarkState(): saves state and returns index for later restoration
+func (e *MageEngine) BookmarkState(gameID string) (int, error) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	
+	gameState, exists := e.games[gameID]
+	if !exists {
+		return 0, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	snapshot := e.createSnapshot(gameState)
+	gameState.mu.RUnlock()
+	
+	// Add snapshot to bookmarks
+	if e.bookmarks[gameID] == nil {
+		e.bookmarks[gameID] = make([]*gameStateSnapshot, 0)
+	}
+	e.bookmarks[gameID] = append(e.bookmarks[gameID], snapshot)
+	bookmarkID := len(e.bookmarks[gameID])
+	
+	if e.logger != nil {
+		e.logger.Debug("bookmarked game state",
+			zap.String("game_id", gameID),
+			zap.Int("bookmark_id", bookmarkID),
+			zap.Int("turn", snapshot.turnNumber),
+		)
+	}
+	
+	return bookmarkID, nil
+}
+
+// RestoreState restores the game to a previously bookmarked state
+// Returns error if bookmark doesn't exist or restoration fails
+// Per Java GameImpl.restoreState(): rolls back to saved state and removes newer bookmarks
+func (e *MageEngine) RestoreState(gameID string, bookmarkID int, context string) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	
+	gameState, exists := e.games[gameID]
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	bookmarks := e.bookmarks[gameID]
+	if bookmarks == nil || bookmarkID < 1 || bookmarkID > len(bookmarks) {
+		return fmt.Errorf("bookmark %d not found for game %s", bookmarkID, gameID)
+	}
+	
+	snapshot := bookmarks[bookmarkID-1]
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Restore game state from snapshot
+	gameState.state = snapshot.state
+	gameState.gameType = snapshot.gameType
+	
+	// Restore players
+	gameState.players = make(map[string]*internalPlayer)
+	for id, player := range snapshot.players {
+		gameState.players[id] = player
+	}
+	gameState.playerOrder = append([]string(nil), snapshot.playerOrder...)
+	
+	// Restore cards
+	gameState.cards = make(map[string]*internalCard)
+	for id, card := range snapshot.cards {
+		gameState.cards[id] = card
+	}
+	
+	// Restore zones
+	gameState.battlefield = append([]*internalCard(nil), snapshot.battlefield...)
+	gameState.exile = append([]*internalCard(nil), snapshot.exile...)
+	gameState.command = append([]*internalCard(nil), snapshot.command...)
+	
+	// Restore stack
+	gameState.stack = rules.NewStackManager()
+	for _, item := range snapshot.stackItems {
+		gameState.stack.Push(item)
+	}
+	
+	// Restore messages and prompts
+	gameState.messages = append([]EngineMessage(nil), snapshot.messages...)
+	gameState.prompts = append([]EnginePrompt(nil), snapshot.prompts...)
+	
+	// Remove this bookmark and all newer bookmarks
+	e.bookmarks[gameID] = bookmarks[:bookmarkID-1]
+	
+	gameState.addMessage(fmt.Sprintf("Game restored to turn %d (%s)", snapshot.turnNumber, context), "system")
+	
+	if e.logger != nil {
+		e.logger.Info("restored game state",
+			zap.String("game_id", gameID),
+			zap.Int("bookmark_id", bookmarkID),
+			zap.Int("turn", snapshot.turnNumber),
+			zap.String("context", context),
+		)
+	}
+	
+	return nil
+}
+
+// RemoveBookmark removes a bookmark and all newer bookmarks
+// Per Java GameImpl.removeBookmark(): cleanup after restoration
+func (e *MageEngine) RemoveBookmark(gameID string, bookmarkID int) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	
+	bookmarks := e.bookmarks[gameID]
+	if bookmarks == nil || bookmarkID < 1 || bookmarkID > len(bookmarks) {
+		return fmt.Errorf("bookmark %d not found for game %s", bookmarkID, gameID)
+	}
+	
+	// Remove this bookmark and all newer ones
+	e.bookmarks[gameID] = bookmarks[:bookmarkID-1]
+	
+	if e.logger != nil {
+		e.logger.Debug("removed bookmark",
+			zap.String("game_id", gameID),
+			zap.Int("bookmark_id", bookmarkID),
+		)
+	}
+	
+	return nil
+}
+
+// ClearBookmarks removes all bookmarks for a game
+// Used when game ends or for cleanup
+func (e *MageEngine) ClearBookmarks(gameID string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	
+	delete(e.bookmarks, gameID)
+	
+	if e.logger != nil {
+		e.logger.Debug("cleared all bookmarks",
+			zap.String("game_id", gameID),
+		)
+	}
 }
 
 // GameStateAccessor implementation for engineGameState
