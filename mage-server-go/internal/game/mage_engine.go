@@ -218,6 +218,19 @@ type triggeredAbilityQueueItem struct {
 	UsesStack   bool // If false, executes immediately without going on stack
 }
 
+// gameAnalytics tracks metrics for a game
+type gameAnalytics struct {
+	maxStackDepth      int           // Maximum stack depth reached
+	totalStackItems    int           // Total items put on stack
+	actionsPerTurn     map[int]int   // Actions taken per turn number
+	turnStartTimes     map[int]time.Time // Turn start times
+	priorityPassCount  int           // Total priority passes
+	spellsCast         int           // Total spells cast
+	abilitiesActivated int           // Total abilities activated
+	triggersProcessed  int           // Total triggered abilities processed
+	gameStartTime      time.Time     // When game started
+}
+
 // engineGameState represents the internal state of a game
 type engineGameState struct {
 	gameID        string
@@ -241,6 +254,7 @@ type engineGameState struct {
 	layerSystem   *effects.LayerSystem
 	triggeredQueue []*triggeredAbilityQueueItem // Queue of triggered abilities waiting to be put on stack
 	simultaneousEvents []rules.Event             // Queue of events that happened simultaneously
+	analytics     *gameAnalytics                 // Game metrics and analytics
 	messages      []EngineMessage
 	prompts       []EnginePrompt
 	startedAt     time.Time
@@ -291,6 +305,11 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 		command:     make([]*internalCard, 0),
 		revealed:    make([]EngineRevealedView, 0),
 		lookedAt:    make([]EngineLookedAtView, 0),
+		analytics: &gameAnalytics{
+			actionsPerTurn: make(map[int]int),
+			turnStartTimes: make(map[int]time.Time),
+			gameStartTime:  time.Now(),
+		},
 		messages:    make([]EngineMessage, 0),
 		prompts:     make([]EnginePrompt, 0),
 		startedAt:   time.Now(),
@@ -473,6 +492,8 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 	e.checkStateAndTriggered(gameState)
 
 	player.Passed = true
+	gameState.trackPriorityPass()
+	gameState.trackAction()
 	gameState.addMessage(fmt.Sprintf("%s passes", playerID), "action")
 
 	// Check if all players who can respond have passed
@@ -615,6 +636,10 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 	}
 
 	gameState.stack.Push(stackItem)
+	gameState.trackStackItem()
+	gameState.trackStackDepth()
+	gameState.trackSpellCast()
+	gameState.trackAction()
 	gameState.addMessage(fmt.Sprintf("%s casts %s", playerID, card.Name), "action")
 
 	// Emit spell cast event
@@ -1227,6 +1252,19 @@ func (e *MageEngine) buildCounterViews(counters *counters.Counters) []EngineCoun
 	return views
 }
 
+// GetGameAnalytics returns analytics for a game
+func (e *MageEngine) GetGameAnalytics(gameID string) (map[string]interface{}, error) {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	gameState, exists := e.games[gameID]
+	if !exists {
+		return nil, fmt.Errorf("game %s not found", gameID)
+	}
+
+	return gameState.getAnalyticsSummary(), nil
+}
+
 // EndGame ends a game
 func (e *MageEngine) EndGame(gameID string, winner string) error {
 	e.mu.Lock()
@@ -1488,6 +1526,108 @@ func (e *MageEngine) handleSimultaneousEvents(gameState *engineGameState) {
 	}
 }
 
+// trackStackDepth updates stack depth metrics
+func (gameState *engineGameState) trackStackDepth() {
+	if gameState.analytics == nil {
+		return
+	}
+	
+	currentDepth := len(gameState.stack.List())
+	if currentDepth > gameState.analytics.maxStackDepth {
+		gameState.analytics.maxStackDepth = currentDepth
+	}
+}
+
+// trackStackItem increments the total stack items counter
+func (gameState *engineGameState) trackStackItem() {
+	if gameState.analytics != nil {
+		gameState.analytics.totalStackItems++
+	}
+}
+
+// trackPriorityPass increments the priority pass counter
+func (gameState *engineGameState) trackPriorityPass() {
+	if gameState.analytics != nil {
+		gameState.analytics.priorityPassCount++
+	}
+}
+
+// trackSpellCast increments the spells cast counter
+func (gameState *engineGameState) trackSpellCast() {
+	if gameState.analytics != nil {
+		gameState.analytics.spellsCast++
+	}
+}
+
+// trackTriggerProcessed increments the triggers processed counter
+func (gameState *engineGameState) trackTriggerProcessed() {
+	if gameState.analytics != nil {
+		gameState.analytics.triggersProcessed++
+	}
+}
+
+// trackAction increments the action count for the current turn
+func (gameState *engineGameState) trackAction() {
+	if gameState.analytics == nil {
+		return
+	}
+	
+	currentTurn := gameState.turnManager.TurnNumber()
+	gameState.analytics.actionsPerTurn[currentTurn]++
+}
+
+// trackTurnStart records the start time of a turn
+func (gameState *engineGameState) trackTurnStart() {
+	if gameState.analytics == nil {
+		return
+	}
+	
+	currentTurn := gameState.turnManager.TurnNumber()
+	gameState.analytics.turnStartTimes[currentTurn] = time.Now()
+}
+
+// getAnalyticsSummary returns a summary of game analytics
+func (gameState *engineGameState) getAnalyticsSummary() map[string]interface{} {
+	if gameState.analytics == nil {
+		return nil
+	}
+	
+	// Calculate average response time per turn
+	var totalTurnTime time.Duration
+	turnCount := 0
+	currentTurn := gameState.turnManager.TurnNumber()
+	
+	for turn := 1; turn < currentTurn; turn++ {
+		if startTime, exists := gameState.analytics.turnStartTimes[turn]; exists {
+			if endTime, exists := gameState.analytics.turnStartTimes[turn+1]; exists {
+				totalTurnTime += endTime.Sub(startTime)
+				turnCount++
+			}
+		}
+	}
+	
+	var avgTurnTime float64
+	if turnCount > 0 {
+		avgTurnTime = totalTurnTime.Seconds() / float64(turnCount)
+	}
+	
+	// Calculate total game time
+	gameTime := time.Since(gameState.analytics.gameStartTime).Seconds()
+	
+	return map[string]interface{}{
+		"max_stack_depth":       gameState.analytics.maxStackDepth,
+		"total_stack_items":     gameState.analytics.totalStackItems,
+		"priority_pass_count":   gameState.analytics.priorityPassCount,
+		"spells_cast":           gameState.analytics.spellsCast,
+		"abilities_activated":   gameState.analytics.abilitiesActivated,
+		"triggers_processed":    gameState.analytics.triggersProcessed,
+		"actions_per_turn":      gameState.analytics.actionsPerTurn,
+		"avg_turn_time_seconds": avgTurnTime,
+		"total_game_time_seconds": gameTime,
+		"current_turn":          currentTurn,
+	}
+}
+
 // getPlayerListStartingWithActive returns the player list starting with the active player
 // and continuing in turn order. This is used for APNAP (Active Player, Non-Active Player) ordering.
 func (e *MageEngine) getPlayerListStartingWithActive(gameState *engineGameState, activePlayerID string) []string {
@@ -1559,6 +1699,9 @@ func (e *MageEngine) putTriggeredAbilityOnStack(gameState *engineGameState, abil
 	
 	// Push to stack
 	gameState.stack.Push(item)
+	gameState.trackStackItem()
+	gameState.trackStackDepth()
+	gameState.trackTriggerProcessed()
 	
 	if e.logger != nil {
 		e.logger.Debug("put triggered ability on stack",

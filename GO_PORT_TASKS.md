@@ -10,7 +10,7 @@ Status legend:
 - [x] Provide `MageEngine` core skeleton that tracks games, players, and actions
 - [x] Implement `TurnManager` mirroring MTG phase/step progression and priority handoff
 - [x] Introduce `StackManager` with basic push/pop mechanics and simple resolution hooks
-- [~] Extend stack resolution to support triggered abilities, replacement effects, and modal choices _(trigger queue wired through event bus; replacement/modal hooks pending)_
+- [~] Extend stack resolution to support triggered abilities, replacement effects, and modal choices _(trigger queue with APNAP ordering implemented; triggered abilities queued and processed before priority; replacement/modal hooks pending)_
 - [ ] Implement priority windows for casting during stack resolution (e.g., mana abilities, nested responses)
 - [ ] Persist stack/game events for replay and spectator synchronization
 - [ ] Add comprehensive error handling and rollback when resolution fails
@@ -65,7 +65,7 @@ Status legend:
 - [x] Mirror Java event bus for game events _(Complete event bus implementation with all 200+ event types from Java GameEvent.EventType enum; typed subscriptions, batch events, helper functions; events wired for spell cast, zone changes, life changes, mana, phase/step transitions, stack resolution, permanent entry/dies)_
 - [x] Port watcher/listener infrastructure to track conditional abilities _(Watcher interface with Watch/Reset/ConditionMet methods; WatcherRegistry for managing watchers by scope (GAME/PLAYER/CARD); BaseWatcher helper; common watchers implemented: SpellsCastWatcher, CreaturesDiedWatcher, CardsDrawnWatcher, PermanentsEnteredWatcher; watchers wired to event bus; auto-reset on cleanup step; comprehensive integration tests covering event bus integration, multi-watcher scenarios, scope isolation, lifecycle management, thread safety, and real game flows)_
 - [ ] Provide hooks for UI/websocket notifications (combat updates, triggers, log lines)
-- [ ] Capture analytics/metrics for stack depth, actions per turn, average response time
+- [x] Capture analytics/metrics for stack depth, actions per turn, average response time
 - [x] Queue triggered abilities instead of immediately pushing to stack (process via `checkTriggered()` before priority)
 
 ## Persistence, Replays & Recovery
