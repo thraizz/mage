@@ -142,7 +142,64 @@ type EngineCombatView struct {
 type EngineCombatGroupView struct {
 	Attackers         []string
 	Blockers          []string
+	DefenderID        string
 	DefendingPlayerID string
+	Blocked           bool
+}
+
+// combatState tracks all combat-related state for a game
+// Per Java Combat class
+type combatState struct {
+	attackingPlayerID string
+	groups            []*combatGroup
+	formerGroups      []*combatGroup
+	blockingGroups    map[string]*combatGroup // blockerID -> group
+	defenders         map[string]bool         // all possible defenders (players, planeswalkers, battles)
+	attackers         map[string]bool         // all attacking creatures
+	blockers          map[string]bool         // all blocking creatures
+	attackersTapped   map[string]bool         // creatures tapped by attack
+}
+
+// combatGroup represents a single combat group (attackers vs defender + blockers)
+// Per Java CombatGroup class
+type combatGroup struct {
+	defenderID         string   // player, planeswalker, or battle being attacked
+	defenderIsPermanent bool     // is defender a permanent (vs player)
+	defendingPlayerID  string   // controller of defending permanents
+	attackers          []string // attacking creature IDs
+	formerAttackers    []string // historical attackers (for "attacked this turn")
+	blockers           []string // blocking creature IDs
+	blocked            bool     // is this group blocked
+	attackerOrder      map[string]int // damage assignment order for attackers
+	blockerOrder       map[string]int // damage assignment order for blockers
+}
+
+// newCombatState creates a new combat state
+func newCombatState() *combatState {
+	return &combatState{
+		groups:          make([]*combatGroup, 0),
+		formerGroups:    make([]*combatGroup, 0),
+		blockingGroups:  make(map[string]*combatGroup),
+		defenders:       make(map[string]bool),
+		attackers:       make(map[string]bool),
+		blockers:        make(map[string]bool),
+		attackersTapped: make(map[string]bool),
+	}
+}
+
+// newCombatGroup creates a new combat group
+func newCombatGroup(defenderID string, defenderIsPermanent bool, defendingPlayerID string) *combatGroup {
+	return &combatGroup{
+		defenderID:         defenderID,
+		defenderIsPermanent: defenderIsPermanent,
+		defendingPlayerID:  defendingPlayerID,
+		attackers:          make([]string, 0),
+		formerAttackers:    make([]string, 0),
+		blockers:           make([]string, 0),
+		blocked:            false,
+		attackerOrder:      make(map[string]int),
+		blockerOrder:       make(map[string]int),
+	}
 }
 
 // EngineMessage represents a game log message
@@ -187,6 +244,11 @@ type internalCard struct {
 	AttachedToCard []string
 	Abilities      []EngineAbilityView
 	Counters       *counters.Counters
+	// Combat fields
+	Attacking     bool     // Is this creature attacking
+	Blocking      bool     // Is this creature blocking
+	AttackingWhat string   // ID of what this creature is attacking (player/planeswalker/battle)
+	BlockingWhat  []string // IDs of creatures this creature is blocking
 }
 
 // internalPlayer represents a player in the game state
@@ -251,7 +313,7 @@ type engineGameState struct {
 	command       []*internalCard
 	revealed      []EngineRevealedView
 	lookedAt      []EngineLookedAtView
-	combat        EngineCombatView
+	combat        *combatState // Internal combat state
 	turnManager   *rules.TurnManager
 	stack         *rules.StackManager
 	eventBus      *rules.EventBus
@@ -470,6 +532,7 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 		command:     make([]*internalCard, 0),
 		revealed:    make([]EngineRevealedView, 0),
 		lookedAt:    make([]EngineLookedAtView, 0),
+		combat:      newCombatState(),
 		analytics: &gameAnalytics{
 			actionsPerTurn: make(map[int]int),
 			turnStartTimes: make(map[int]time.Time),
@@ -1424,7 +1487,7 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 		Command:         e.buildCardViews(gameState.command),
 		Revealed:        gameState.revealed,
 		LookedAt:        gameState.lookedAt,
-		Combat:          gameState.combat,
+		Combat:          e.buildCombatView(gameState),
 		StartedAt:       gameState.startedAt,
 		Messages:        make([]EngineMessage, len(gameState.messages)),
 		Prompts:         make([]EnginePrompt, len(gameState.prompts)),
@@ -1564,6 +1627,28 @@ func (e *MageEngine) buildStackViews(gameState *engineGameState) []EngineCardVie
 }
 
 // buildCounterViews converts counters to view format
+func (e *MageEngine) buildCombatView(gameState *engineGameState) EngineCombatView {
+	view := EngineCombatView{
+		AttackingPlayerID: gameState.combat.attackingPlayerID,
+		Groups:            make([]EngineCombatGroupView, 0, len(gameState.combat.groups)),
+	}
+	
+	for _, group := range gameState.combat.groups {
+		groupView := EngineCombatGroupView{
+			Attackers:         make([]string, len(group.attackers)),
+			Blockers:          make([]string, len(group.blockers)),
+			DefenderID:        group.defenderID,
+			DefendingPlayerID: group.defendingPlayerID,
+			Blocked:           group.blocked,
+		}
+		copy(groupView.Attackers, group.attackers)
+		copy(groupView.Blockers, group.blockers)
+		view.Groups = append(view.Groups, groupView)
+	}
+	
+	return view
+}
+
 func (e *MageEngine) buildCounterViews(counters *counters.Counters) []EngineCounterView {
 	if counters == nil {
 		return []EngineCounterView{}
@@ -3693,6 +3778,251 @@ func (e *MageEngine) EndMulligan(gameID string) error {
 	})
 	
 	return nil
+}
+
+// Combat System Implementation
+// Per Java Combat class
+
+// ResetCombat clears all combat state at the beginning of combat
+// Per Java Combat.reset()
+func (e *MageEngine) ResetCombat(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Create new combat state
+	gameState.combat = newCombatState()
+	
+	// Clear combat flags on all cards
+	for _, card := range gameState.cards {
+		card.Attacking = false
+		card.Blocking = false
+		card.AttackingWhat = ""
+		card.BlockingWhat = nil
+	}
+	
+	if e.logger != nil {
+		e.logger.Debug("reset combat", zap.String("game_id", gameID))
+	}
+	
+	return nil
+}
+
+// SetAttacker sets the attacking player for this combat
+// Per Java Combat.setAttacker()
+func (e *MageEngine) SetAttacker(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	if _, exists := gameState.players[playerID]; !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+	
+	gameState.combat.attackingPlayerID = playerID
+	
+	if e.logger != nil {
+		e.logger.Debug("set attacking player",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+		)
+	}
+	
+	return nil
+}
+
+// SetDefenders identifies all possible defenders (players, planeswalkers, battles)
+// Per Java Combat.setDefenders()
+func (e *MageEngine) SetDefenders(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	attackingPlayerID := gameState.combat.attackingPlayerID
+	if attackingPlayerID == "" {
+		return fmt.Errorf("no attacking player set")
+	}
+	
+	// Clear previous defenders
+	gameState.combat.defenders = make(map[string]bool)
+	
+	// Add all opponents as defenders
+	for playerID := range gameState.players {
+		if playerID != attackingPlayerID {
+			gameState.combat.defenders[playerID] = true
+		}
+	}
+	
+	// Add planeswalkers controlled by opponents
+	// Add battles that can be attacked
+	// TODO: Implement when planeswalkers and battles are added
+	
+	if e.logger != nil {
+		e.logger.Debug("set defenders",
+			zap.String("game_id", gameID),
+			zap.Int("defender_count", len(gameState.combat.defenders)),
+		)
+	}
+	
+	return nil
+}
+
+// DeclareAttacker declares a creature as an attacker
+// Per Java Combat.declareAttacker()
+func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Validate player
+	if playerID != gameState.combat.attackingPlayerID {
+		return fmt.Errorf("player %s is not the attacking player", playerID)
+	}
+	
+	// Validate creature exists and is controlled by player
+	creature, exists := gameState.cards[creatureID]
+	if !exists {
+		return fmt.Errorf("creature %s not found", creatureID)
+	}
+	
+	if creature.ControllerID != playerID {
+		return fmt.Errorf("creature %s is not controlled by player %s", creatureID, playerID)
+	}
+	
+	// Validate creature is on battlefield
+	if creature.Zone != zoneBattlefield {
+		return fmt.Errorf("creature %s is not on battlefield", creatureID)
+	}
+	
+	// Validate creature can attack (not tapped, not summoning sick)
+	if creature.Tapped {
+		return fmt.Errorf("creature %s is tapped", creatureID)
+	}
+	
+	// TODO: Check summoning sickness when we track turn entered
+	// TODO: Check for "can't attack" restrictions
+	// TODO: Check for "must attack" requirements
+	
+	// Validate defender exists
+	if !gameState.combat.defenders[defenderID] {
+		return fmt.Errorf("invalid defender %s", defenderID)
+	}
+	
+	// TODO: Validate can attack this specific defender (protection, etc.)
+	
+	// Find or create combat group for this defender
+	var group *combatGroup
+	for _, g := range gameState.combat.groups {
+		if g.defenderID == defenderID {
+			group = g
+			break
+		}
+	}
+	
+	if group == nil {
+		// Determine if defender is a permanent (planeswalker/battle) or player
+		defenderIsPermanent := false
+		defendingPlayerID := defenderID
+		// TODO: Check if defender is a permanent when planeswalkers/battles added
+		
+		group = newCombatGroup(defenderID, defenderIsPermanent, defendingPlayerID)
+		gameState.combat.groups = append(gameState.combat.groups, group)
+	}
+	
+	// Add attacker to group
+	group.attackers = append(group.attackers, creatureID)
+	gameState.combat.attackers[creatureID] = true
+	
+	// Tap creature (unless it has vigilance)
+	// TODO: Check for vigilance ability
+	hasVigilance := false // Placeholder
+	if !hasVigilance {
+		creature.Tapped = true
+		gameState.combat.attackersTapped[creatureID] = true
+	}
+	
+	// Set creature combat state
+	creature.Attacking = true
+	creature.AttackingWhat = defenderID
+	
+	// Fire attacker declared event
+	event := rules.NewEvent(rules.EventAttackerDeclared, creatureID, creatureID, playerID)
+	event.Metadata["defender_id"] = defenderID
+	gameState.eventBus.Publish(event)
+	
+	gameState.addMessage(fmt.Sprintf("%s attacks", creature.Name), "combat")
+	
+	if e.logger != nil {
+		e.logger.Debug("declared attacker",
+			zap.String("game_id", gameID),
+			zap.String("creature_id", creatureID),
+			zap.String("defender_id", defenderID),
+		)
+	}
+	
+	return nil
+}
+
+// GetCombatView builds the combat view for display
+func (e *MageEngine) GetCombatView(gameID string) (EngineCombatView, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return EngineCombatView{}, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+	
+	view := EngineCombatView{
+		AttackingPlayerID: gameState.combat.attackingPlayerID,
+		Groups:            make([]EngineCombatGroupView, 0, len(gameState.combat.groups)),
+	}
+	
+	for _, group := range gameState.combat.groups {
+		groupView := EngineCombatGroupView{
+			Attackers:         make([]string, len(group.attackers)),
+			Blockers:          make([]string, len(group.blockers)),
+			DefenderID:        group.defenderID,
+			DefendingPlayerID: group.defendingPlayerID,
+			Blocked:           group.blocked,
+		}
+		copy(groupView.Attackers, group.attackers)
+		copy(groupView.Blockers, group.blockers)
+		view.Groups = append(view.Groups, groupView)
+	}
+	
+	return view, nil
 }
 
 // GameStateAccessor implementation for engineGameState
