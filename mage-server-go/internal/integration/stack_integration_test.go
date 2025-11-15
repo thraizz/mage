@@ -62,6 +62,17 @@ func TestMultiObjectStackResolution(t *testing.T) {
 		t.Fatalf("Failed to cast spell 1: %v", err)
 	}
 
+	// Alice passes priority so Bob can respond
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass priority: %v", err)
+	}
+
 	// Bob casts spell 2 (goes on top)
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Bob",
@@ -71,6 +82,17 @@ func TestMultiObjectStackResolution(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("Failed to cast spell 2: %v", err)
+	}
+
+	// Bob passes priority so Alice can respond
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass priority: %v", err)
 	}
 
 	// Alice casts spell 3 (goes on top)
@@ -105,10 +127,11 @@ func TestMultiObjectStackResolution(t *testing.T) {
 
 	// All players pass - stack should resolve in reverse order
 	// Shock resolves first, then Counterspell, then Lightning Bolt
+	// Alice retains priority after casting Shock, so she passes first
 	err = engine.ProcessAction(gameID, game.PlayerAction{
-		PlayerID:   "Bob",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -116,9 +139,9 @@ func TestMultiObjectStackResolution(t *testing.T) {
 	}
 
 	err = engine.ProcessAction(gameID, game.PlayerAction{
-		PlayerID:   "Alice",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -205,6 +228,17 @@ func TestCounterspell(t *testing.T) {
 		}
 	}
 
+	// Alice passes priority so Bob can respond
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass priority: %v", err)
+	}
+
 	// Bob counters it
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Bob",
@@ -261,6 +295,17 @@ func TestNestedResponses(t *testing.T) {
 		t.Fatalf("Failed to cast spell: %v", err)
 	}
 
+	// Alice passes priority so Bob can respond
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass priority: %v", err)
+	}
+
 	// Bob casts Counterspell
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Bob",
@@ -270,6 +315,17 @@ func TestNestedResponses(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("Failed to cast counterspell: %v", err)
+	}
+
+	// Bob passes priority so Alice can respond
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass priority: %v", err)
 	}
 
 	// Alice casts another spell in response
@@ -295,21 +351,22 @@ func TestNestedResponses(t *testing.T) {
 		t.Errorf("Expected at least 3 items on stack, got %d", len(view.Stack))
 	}
 
-	// All pass - should resolve in reverse order
+	// Alice passes priority (she cast the last spell)
 	err = engine.ProcessAction(gameID, game.PlayerAction{
-		PlayerID:   "Bob",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
 		t.Fatalf("Failed to pass: %v", err)
 	}
 
+	// All pass - should resolve in reverse order
 	err = engine.ProcessAction(gameID, game.PlayerAction{
-		PlayerID:   "Alice",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -367,6 +424,28 @@ func TestPriorityLoops(t *testing.T) {
 	}
 	view := viewInterface.(*game.EngineGameView)
 
+	// Alice should have priority after casting (priority retention)
+	if view.PriorityPlayer != "Alice" {
+		t.Errorf("Expected Alice to have priority after casting, got %s", view.PriorityPlayer)
+	}
+
+	// Alice passes priority
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass: %v", err)
+	}
+
+	viewInterface, err = engine.GetGameView(gameID, "")
+	if err != nil {
+		t.Fatalf("Failed to get game view: %v", err)
+	}
+	view = viewInterface.(*game.EngineGameView)
+
 	// Bob should have priority
 	if view.PriorityPlayer != "Bob" {
 		t.Errorf("Expected Bob to have priority, got %s", view.PriorityPlayer)
@@ -375,8 +454,8 @@ func TestPriorityLoops(t *testing.T) {
 	// Bob passes
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Bob",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -397,8 +476,8 @@ func TestPriorityLoops(t *testing.T) {
 	// Charlie passes
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Charlie",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -471,7 +550,7 @@ func TestStackResolutionOrder(t *testing.T) {
 		t.Fatalf("Failed to start game: %v", err)
 	}
 
-	// Cast multiple spells in sequence
+	// Cast multiple spells in sequence (Alice retains priority between casts)
 	spellOrder := []string{"First", "Second", "Third"}
 	for _, spellName := range spellOrder {
 		err = engine.ProcessAction(gameID, game.PlayerAction{
@@ -483,6 +562,7 @@ func TestStackResolutionOrder(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to cast %s: %v", spellName, err)
 		}
+		// Note: Alice retains priority after each cast, so she can cast multiple spells
 	}
 
 	viewInterface, err := engine.GetGameView(gameID, "")
@@ -535,26 +615,27 @@ func TestPriorityAfterResolution(t *testing.T) {
 	}
 	view := viewInterface.(*game.EngineGameView)
 
-	// Bob should have priority
-	if view.PriorityPlayer != "Bob" {
-		t.Errorf("Expected Bob to have priority, got %s", view.PriorityPlayer)
+	// Alice should have priority after casting (priority retention)
+	if view.PriorityPlayer != "Alice" {
+		t.Errorf("Expected Alice to have priority after casting, got %s", view.PriorityPlayer)
 	}
 
-	// Both pass - spell resolves
+	// Alice passes priority so Bob can respond
 	err = engine.ProcessAction(gameID, game.PlayerAction{
-		PlayerID:   "Bob",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
 		t.Fatalf("Failed to pass: %v", err)
 	}
 
+	// Both pass - spell resolves
 	err = engine.ProcessAction(gameID, game.PlayerAction{
-		PlayerID:   "Alice",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -600,11 +681,22 @@ func TestStackWithStateBasedActions(t *testing.T) {
 		t.Fatalf("Failed to cast spell: %v", err)
 	}
 
+	// Alice passes priority so Bob can respond
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass: %v", err)
+	}
+
 	// Both pass - spell resolves
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Bob",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -613,8 +705,8 @@ func TestStackWithStateBasedActions(t *testing.T) {
 
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Alice",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -650,7 +742,7 @@ func TestMultiplePlayersStackInteraction(t *testing.T) {
 		t.Fatalf("Failed to start game: %v", err)
 	}
 
-	// Each player casts a spell in order
+	// Each player casts a spell in order (each must pass before next can cast)
 	spellNames := []string{"Spell A", "Spell B", "Spell C", "Spell D"}
 	for i, player := range players {
 		err = engine.ProcessAction(gameID, game.PlayerAction{
@@ -661,6 +753,18 @@ func TestMultiplePlayersStackInteraction(t *testing.T) {
 		})
 		if err != nil {
 			t.Fatalf("Failed to cast spell %s: %v", spellNames[i], err)
+		}
+		// Pass priority so next player can cast (except for last player)
+		if i < len(players)-1 {
+			err = engine.ProcessAction(gameID, game.PlayerAction{
+				PlayerID:   player,
+				ActionType: "PLAYER_ACTION",
+				Data:       "PASS",
+				Timestamp:  time.Now(),
+			})
+			if err != nil {
+				t.Fatalf("Failed to pass priority: %v", err)
+			}
 		}
 	}
 
@@ -738,11 +842,22 @@ func TestStackLegalityChecks(t *testing.T) {
 		t.Fatalf("Expected at least 1 item on stack, got %d", len(view.Stack))
 	}
 
+	// Alice passes priority so Bob can respond
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass: %v", err)
+	}
+
 	// Both pass - spell should resolve (legality checks happen during resolution)
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Bob",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -751,8 +866,8 @@ func TestStackLegalityChecks(t *testing.T) {
 
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Alice",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -798,6 +913,17 @@ func TestComplexStackScenario(t *testing.T) {
 		t.Fatalf("Failed to cast spell 1: %v", err)
 	}
 
+	// Alice passes priority so Bob can respond
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass priority: %v", err)
+	}
+
 	// Bob casts counterspell
 	err = engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Bob",
@@ -807,6 +933,17 @@ func TestComplexStackScenario(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("Failed to cast counterspell: %v", err)
+	}
+
+	// Bob passes priority so Alice can respond
+	err = engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	})
+	if err != nil {
+		t.Fatalf("Failed to pass priority: %v", err)
 	}
 
 	// Alice casts another spell
@@ -833,10 +970,11 @@ func TestComplexStackScenario(t *testing.T) {
 	}
 
 	// All pass - resolve in reverse order
+	// Alice retains priority after casting Shock, so she passes first
 	err = engine.ProcessAction(gameID, game.PlayerAction{
-		PlayerID:   "Bob",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
@@ -844,9 +982,9 @@ func TestComplexStackScenario(t *testing.T) {
 	}
 
 	err = engine.ProcessAction(gameID, game.PlayerAction{
-		PlayerID:   "Alice",
-		ActionType: "SEND_STRING",
-		Data:       "Pass",
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
 		Timestamp:  time.Now(),
 	})
 	if err != nil {
