@@ -766,3 +766,253 @@ func TestGameAnalytics(t *testing.T) {
 
 	t.Logf("Analytics: %+v", analytics)
 }
+
+// TestPlayerConcede verifies that player concession works correctly
+func TestPlayerConcede(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "concede-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Verify game is in progress
+	viewInterface, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get game view: %v", err)
+	}
+	view := viewInterface.(*game.EngineGameView)
+	if view.State != game.GameStateInProgress {
+		t.Errorf("expected game to be in progress, got %v", view.State)
+	}
+
+	// Alice concedes
+	if err := engine.PlayerConcede(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to concede: %v", err)
+	}
+
+	// Verify game ended
+	viewInterface, err = engine.GetGameView(gameID, "Bob")
+	if err != nil {
+		t.Fatalf("failed to get game view: %v", err)
+	}
+	view = viewInterface.(*game.EngineGameView)
+
+	if view.State != game.GameStateFinished {
+		t.Errorf("expected game to be finished after concession, got %v", view.State)
+	}
+
+	// Verify Alice lost and Bob won
+	var aliceView, bobView *game.EnginePlayerView
+	for i := range view.Players {
+		if view.Players[i].PlayerID == "Alice" {
+			aliceView = &view.Players[i]
+		}
+		if view.Players[i].PlayerID == "Bob" {
+			bobView = &view.Players[i]
+		}
+	}
+
+	if aliceView == nil || bobView == nil {
+		t.Fatal("could not find player views")
+	}
+
+	if !aliceView.Lost {
+		t.Error("expected Alice to have lost")
+	}
+	if !aliceView.Left {
+		t.Error("expected Alice to have left")
+	}
+	if bobView.Wins != 1 {
+		t.Errorf("expected Bob to have 1 win, got %d", bobView.Wins)
+	}
+
+	// Verify message was added
+	found := false
+	for _, msg := range view.Messages {
+		if msg.Text == "Bob wins the game!" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected win message not found")
+	}
+}
+
+// TestPlayerQuit verifies that player quit works correctly
+func TestPlayerQuit(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "quit-test"
+	players := []string{"Alice", "Bob", "Charlie"}
+
+	if err := engine.StartGame(gameID, players, "Multiplayer"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Bob quits
+	if err := engine.PlayerQuit(gameID, "Bob"); err != nil {
+		t.Fatalf("failed to quit: %v", err)
+	}
+
+	// Verify Bob is marked as quit and left
+	viewInterface, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get game view: %v", err)
+	}
+	view := viewInterface.(*game.EngineGameView)
+
+	var bobView *game.EnginePlayerView
+	for i := range view.Players {
+		if view.Players[i].PlayerID == "Bob" {
+			bobView = &view.Players[i]
+			break
+		}
+	}
+	if bobView == nil {
+		t.Fatal("could not find Bob's player view")
+	}
+
+	if !bobView.Lost {
+		t.Error("expected Bob to have lost")
+	}
+	if !bobView.Left {
+		t.Error("expected Bob to have left")
+	}
+
+	// Game should still be in progress with Alice and Charlie
+	if view.State != game.GameStateInProgress {
+		t.Errorf("expected game to still be in progress, got %v", view.State)
+	}
+
+	// Alice concedes
+	if err := engine.PlayerConcede(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to concede: %v", err)
+	}
+
+	// Now game should be finished with Charlie as winner
+	viewInterface, err = engine.GetGameView(gameID, "Charlie")
+	if err != nil {
+		t.Fatalf("failed to get game view: %v", err)
+	}
+	view = viewInterface.(*game.EngineGameView)
+
+	if view.State != game.GameStateFinished {
+		t.Errorf("expected game to be finished, got %v", view.State)
+	}
+
+	var charlieView *game.EnginePlayerView
+	for i := range view.Players {
+		if view.Players[i].PlayerID == "Charlie" {
+			charlieView = &view.Players[i]
+			break
+		}
+	}
+	if charlieView == nil {
+		t.Fatal("could not find Charlie's player view")
+	}
+
+	if charlieView.Wins != 1 {
+		t.Errorf("expected Charlie to have 1 win, got %d", charlieView.Wins)
+	}
+}
+
+// TestPlayerObjectsRemoved verifies that player objects are removed when they leave
+func TestPlayerObjectsRemoved(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "remove-objects-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Alice casts a spell
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "SEND_STRING",
+		Data:       "Lightning Bolt",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("failed to cast spell: %v", err)
+	}
+
+	// Verify spell is on stack
+	viewInterface, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get game view: %v", err)
+	}
+	view := viewInterface.(*game.EngineGameView)
+	if len(view.Stack) == 0 {
+		t.Fatal("expected spell on stack")
+	}
+
+	// Alice concedes
+	if err := engine.PlayerConcede(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to concede: %v", err)
+	}
+
+	// Verify Alice's spell was removed from stack
+	viewInterface, err = engine.GetGameView(gameID, "Bob")
+	if err != nil {
+		t.Fatalf("failed to get game view: %v", err)
+	}
+	view = viewInterface.(*game.EngineGameView)
+
+	// Stack should be empty (Alice's spell removed)
+	if len(view.Stack) != 0 {
+		t.Errorf("expected stack to be empty after Alice left, got %d items", len(view.Stack))
+	}
+}
+
+// TestTimerTimeout verifies timer timeout handling
+func TestTimerTimeout(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "timeout-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Alice times out
+	if err := engine.PlayerTimerTimeout(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to timeout: %v", err)
+	}
+
+	// Verify game ended
+	viewInterface, err := engine.GetGameView(gameID, "Bob")
+	if err != nil {
+		t.Fatalf("failed to get game view: %v", err)
+	}
+	view := viewInterface.(*game.EngineGameView)
+
+	if view.State != game.GameStateFinished {
+		t.Errorf("expected game to be finished after timeout, got %v", view.State)
+	}
+
+	// Verify Bob won
+	var bobView *game.EnginePlayerView
+	for i := range view.Players {
+		if view.Players[i].PlayerID == "Bob" {
+			bobView = &view.Players[i]
+			break
+		}
+	}
+	if bobView == nil {
+		t.Fatal("could not find Bob's player view")
+	}
+
+	if bobView.Wins != 1 {
+		t.Errorf("expected Bob to have 1 win, got %d", bobView.Wins)
+	}
+}

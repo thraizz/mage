@@ -191,21 +191,25 @@ type internalCard struct {
 
 // internalPlayer represents a player in the game state
 type internalPlayer struct {
-	PlayerID     string
-	Name         string
-	Life         int
-	Poison       int
-	Energy       int
-	Library      []*internalCard
-	Hand         []*internalCard
-	Graveyard    []*internalCard
-		ManaPool     *mana.ManaPool
-	HasPriority  bool
-	Passed       bool
-	StateOrdinal int
-	Lost         bool
-	Left         bool
-	Wins         int
+	PlayerID      string
+	Name          string
+	Life          int
+	Poison        int
+	Energy        int
+	Library       []*internalCard
+	Hand          []*internalCard
+	Graveyard     []*internalCard
+	ManaPool      *mana.ManaPool
+	HasPriority   bool
+	Passed        bool
+	StateOrdinal  int
+	Lost          bool
+	Left          bool
+	Wins          int
+	Quit          bool      // Player quit the match
+	TimerTimeout  bool      // Player lost due to timer timeout
+	IdleTimeout   bool      // Player lost due to idle timeout
+	Conceded      bool      // Player conceded
 }
 
 // triggeredAbilityQueueItem represents a triggered ability waiting to be put on the stack
@@ -254,6 +258,7 @@ type engineGameState struct {
 	layerSystem   *effects.LayerSystem
 	triggeredQueue []*triggeredAbilityQueueItem // Queue of triggered abilities waiting to be put on stack
 	simultaneousEvents []rules.Event             // Queue of events that happened simultaneously
+	concedingPlayers   []string                  // Queue of players requesting concession
 	analytics     *gameAnalytics                 // Game metrics and analytics
 	messages      []EngineMessage
 	prompts       []EnginePrompt
@@ -487,6 +492,12 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		return fmt.Errorf("player %s does not have priority", playerID)
 	}
 
+	// Check for concessions before priority
+	e.checkConcede(gameState)
+	if e.checkIfGameIsOver(gameState) {
+		return nil
+	}
+
 	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
 	// Repeat until stable (SBA → triggers → repeat)
 	e.checkStateAndTriggered(gameState)
@@ -500,7 +511,13 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 	if gameState.allPassed() {
 		// Resolve stack if not empty
 		if !gameState.stack.IsEmpty() {
-			return e.resolveStack(gameState)
+			err := e.resolveStack(gameState)
+			// Check for concessions after stack resolution
+			e.checkConcede(gameState)
+			if e.checkIfGameIsOver(gameState) {
+				return nil
+			}
+			return err
 		}
 
 		// Advance step/phase
@@ -529,18 +546,24 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		// Pass priority to next player
 		nextPlayerID := e.getNextPlayerWithPriority(gameState, playerID)
 		if nextPlayerID == "" {
-			// No valid next player, all players who can respond have passed
-			if gameState.allPassed() {
-				if !gameState.stack.IsEmpty() {
-					return e.resolveStack(gameState)
+		// No valid next player, all players who can respond have passed
+		if gameState.allPassed() {
+			if !gameState.stack.IsEmpty() {
+				err := e.resolveStack(gameState)
+				// Check for concessions after stack resolution
+				e.checkConcede(gameState)
+				if e.checkIfGameIsOver(gameState) {
+					return nil
 				}
+				return err
 			}
-			// Advance step/phase
-			nextPlayer := e.getNextPlayer(gameState)
-			phase, step := gameState.turnManager.AdvanceStep(nextPlayer)
-			gameState.addMessage(fmt.Sprintf("Game advances to %s - %s", phase.String(), step.String()), "action")
-			// Reset pass flags (preserves lost/left player state)
-			gameState.resetPassed()
+		}
+		// Advance step/phase
+		nextPlayer := e.getNextPlayer(gameState)
+		phase, step := gameState.turnManager.AdvanceStep(nextPlayer)
+		gameState.addMessage(fmt.Sprintf("Game advances to %s - %s", phase.String(), step.String()), "action")
+		// Reset pass flags (preserves lost/left player state)
+		gameState.resetPassed()
 			// Set priority to active player
 			activePlayerID := gameState.turnManager.ActivePlayer()
 			
@@ -1263,6 +1286,307 @@ func (e *MageEngine) GetGameAnalytics(gameID string) (map[string]interface{}, er
 	}
 
 	return gameState.getAnalyticsSummary(), nil
+}
+
+// PlayerConcede handles a player conceding the game
+// Per Java GameImpl.setConcedingPlayer() and PlayerImpl.concede()
+func (e *MageEngine) PlayerConcede(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Add to conceding players queue if not already there
+	alreadyQueued := false
+	for _, pid := range gameState.concedingPlayers {
+		if pid == playerID {
+			alreadyQueued = true
+			break
+		}
+	}
+	if !alreadyQueued {
+		gameState.concedingPlayers = append(gameState.concedingPlayers, playerID)
+	}
+
+	// Mark player as conceded
+	player.Conceded = true
+
+	if e.logger != nil {
+		e.logger.Info("player conceded",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.String("player_name", player.Name),
+		)
+	}
+
+	// Process concession immediately (in Java this is done on next priority check)
+	e.checkConcede(gameState)
+	e.checkIfGameIsOver(gameState)
+
+	return nil
+}
+
+// PlayerQuit handles a player quitting the match
+// Per Java PlayerImpl.quit()
+func (e *MageEngine) PlayerQuit(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	player, exists := gameState.players[playerID]
+	if !exists {
+		gameState.mu.Unlock()
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	player.Quit = true
+	gameState.addMessage(fmt.Sprintf("%s quits the match", player.Name), "system")
+	gameState.mu.Unlock()
+
+	if e.logger != nil {
+		e.logger.Info("player quit",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.String("player_name", player.Name),
+		)
+	}
+
+	// Quitting also triggers concession
+	return e.PlayerConcede(gameID, playerID)
+}
+
+// PlayerTimerTimeout handles a player timing out
+// Per Java PlayerImpl.timerTimeout()
+func (e *MageEngine) PlayerTimerTimeout(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	player, exists := gameState.players[playerID]
+	if !exists {
+		gameState.mu.Unlock()
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	player.Quit = true
+	player.TimerTimeout = true
+	gameState.addMessage(fmt.Sprintf("%s loses due to timer timeout", player.Name), "system")
+	gameState.mu.Unlock()
+
+	if e.logger != nil {
+		e.logger.Info("player timer timeout",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.String("player_name", player.Name),
+		)
+	}
+
+	// Timer timeout also triggers concession
+	return e.PlayerConcede(gameID, playerID)
+}
+
+// PlayerIdleTimeout handles a player idling out
+func (e *MageEngine) PlayerIdleTimeout(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	player, exists := gameState.players[playerID]
+	if !exists {
+		gameState.mu.Unlock()
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	player.Quit = true
+	player.IdleTimeout = true
+	gameState.addMessage(fmt.Sprintf("%s loses due to idle timeout", player.Name), "system")
+	gameState.mu.Unlock()
+
+	if e.logger != nil {
+		e.logger.Info("player idle timeout",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.String("player_name", player.Name),
+		)
+	}
+
+	// Idle timeout also triggers concession
+	return e.PlayerConcede(gameID, playerID)
+}
+
+// checkConcede processes all players in the conceding queue
+// Per Java GameImpl.checkConcede()
+func (e *MageEngine) checkConcede(gameState *engineGameState) {
+	for len(gameState.concedingPlayers) > 0 {
+		// Pop first player from queue
+		playerID := gameState.concedingPlayers[0]
+		gameState.concedingPlayers = gameState.concedingPlayers[1:]
+
+		// Process their leave
+		e.playerLeave(gameState, playerID)
+	}
+}
+
+// playerLeave handles a player leaving the game
+// Per Java PlayerImpl.leave() and GameImpl.leave()
+func (e *MageEngine) playerLeave(gameState *engineGameState, playerID string) {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return
+	}
+
+	// Mark player as left and lost
+	player.Left = true
+	player.Lost = true
+	player.Passed = true
+
+	// Emit player lost event
+	lostEvent := rules.Event{
+		Type:      rules.EventLost,
+		ID:        uuid.New().String(),
+		PlayerID:  playerID,
+		Timestamp: time.Now(),
+	}
+	gameState.eventBus.Publish(lostEvent)
+
+	gameState.addMessage(fmt.Sprintf("%s has lost the game", player.Name), "system")
+
+	if e.logger != nil {
+		e.logger.Info("player left game",
+			zap.String("game_id", gameState.gameID),
+			zap.String("player_id", playerID),
+			zap.String("player_name", player.Name),
+		)
+	}
+
+	// Per rule 800.4a: When a player leaves the game, all objects owned by that player leave the game
+	e.removePlayerObjects(gameState, playerID)
+}
+
+// removePlayerObjects removes all objects owned by a player from the game
+// Per Java GameImpl.leave() lines 3356-3420
+func (e *MageEngine) removePlayerObjects(gameState *engineGameState, playerID string) {
+	// Remove permanents from battlefield
+	remainingBattlefield := make([]*internalCard, 0)
+	for _, card := range gameState.battlefield {
+		if card.OwnerID != playerID {
+			remainingBattlefield = append(remainingBattlefield, card)
+		}
+	}
+	gameState.battlefield = remainingBattlefield
+
+	// Clear player's zones per rule 800.4a
+	if player, exists := gameState.players[playerID]; exists {
+		player.Hand = make([]*internalCard, 0)
+		player.Library = make([]*internalCard, 0)
+		player.Graveyard = make([]*internalCard, 0)
+	}
+
+	// Remove from exile
+	remainingExile := make([]*internalCard, 0)
+	for _, card := range gameState.exile {
+		if card.OwnerID != playerID {
+			remainingExile = append(remainingExile, card)
+		}
+	}
+	gameState.exile = remainingExile
+
+	// Remove from command zone
+	remainingCommand := make([]*internalCard, 0)
+	for _, card := range gameState.command {
+		if card.OwnerID != playerID {
+			remainingCommand = append(remainingCommand, card)
+		}
+	}
+	gameState.command = remainingCommand
+
+	// Remove from stack
+	stackItems := gameState.stack.List()
+	for _, item := range stackItems {
+		if item.Controller == playerID {
+			gameState.stack.Remove(item.ID)
+		}
+	}
+}
+
+// checkIfGameIsOver checks if the game should end
+// Per Java GameImpl.checkIfGameIsOver()
+func (e *MageEngine) checkIfGameIsOver(gameState *engineGameState) bool {
+	if gameState.state == GameStateFinished {
+		return true
+	}
+
+	// Count remaining and losing players
+	remainingPlayers := 0
+	numLosers := 0
+	var lastRemainingPlayer *internalPlayer
+
+	for _, pid := range gameState.playerOrder {
+		player := gameState.players[pid]
+		if !player.Left {
+			remainingPlayers++
+			lastRemainingPlayer = player
+		}
+		if player.Lost {
+			numLosers++
+		}
+	}
+
+	// Game ends if only one player remains or all players have lost
+	if remainingPlayers <= 1 || numLosers == len(gameState.playerOrder) {
+		if remainingPlayers == 1 && lastRemainingPlayer != nil {
+			// Single winner
+			lastRemainingPlayer.Wins++
+			gameState.state = GameStateFinished
+			gameState.addMessage(fmt.Sprintf("%s wins the game!", lastRemainingPlayer.Name), "system")
+
+			if e.logger != nil {
+				e.logger.Info("game ended",
+					zap.String("game_id", gameState.gameID),
+					zap.String("winner", lastRemainingPlayer.Name),
+				)
+			}
+		} else {
+			// Draw or all players lost
+			gameState.state = GameStateFinished
+			gameState.addMessage("Game ended in a draw", "system")
+
+			if e.logger != nil {
+				e.logger.Info("game ended in draw",
+					zap.String("game_id", gameState.gameID),
+				)
+			}
+		}
+		return true
+	}
+
+	return false
 }
 
 // EndGame ends a game
