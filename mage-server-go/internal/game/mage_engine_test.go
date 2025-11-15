@@ -2031,6 +2031,287 @@ func TestPauseResumeValidation(t *testing.T) {
 	}
 }
 
+// TestCombatInfrastructure tests combat state structures
+func TestCombatInfrastructure(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "combat-infra-test"
+	players := []string{"Alice", "Bob"}
+
+	// Start game
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Reset combat
+	if err := engine.ResetCombat(gameID); err != nil {
+		t.Fatalf("failed to reset combat: %v", err)
+	}
+
+	// Set Alice as attacker
+	if err := engine.SetAttacker(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to set attacker: %v", err)
+	}
+
+	// Set defenders
+	if err := engine.SetDefenders(gameID); err != nil {
+		t.Fatalf("failed to set defenders: %v", err)
+	}
+
+	// Verify combat view
+	combatView, err := engine.GetCombatView(gameID)
+	if err != nil {
+		t.Fatalf("failed to get combat view: %v", err)
+	}
+
+	if combatView.AttackingPlayerID != "Alice" {
+		t.Errorf("expected attacking player Alice, got %s", combatView.AttackingPlayerID)
+	}
+
+	if len(combatView.Groups) != 0 {
+		t.Errorf("expected 0 combat groups initially, got %d", len(combatView.Groups))
+	}
+}
+
+// TestCombatBasicAttack tests basic attacker declaration
+func TestCombatBasicAttack(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "combat-basic-test"
+	players := []string{"Alice", "Bob"}
+
+	// Start game
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Reset combat (normally done at beginning of combat step)
+	if err := engine.ResetCombat(gameID); err != nil {
+		t.Fatalf("failed to reset combat: %v", err)
+	}
+
+	// Set Alice as attacker
+	if err := engine.SetAttacker(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to set attacker: %v", err)
+	}
+
+	// Set defenders
+	if err := engine.SetDefenders(gameID); err != nil {
+		t.Fatalf("failed to set defenders: %v", err)
+	}
+
+	// Get a creature from Alice's battlefield
+	viewRaw, _ := engine.GetGameView(gameID, "Alice")
+	view := viewRaw.(*game.EngineGameView)
+	
+	if len(view.Battlefield) == 0 {
+		t.Skip("no creatures on battlefield to test")
+	}
+
+	creatureID := view.Battlefield[0].ID
+	
+	// Declare attacker
+	if err := engine.DeclareAttacker(gameID, creatureID, "Bob", "Alice"); err != nil {
+		t.Fatalf("failed to declare attacker: %v", err)
+	}
+
+	// Verify combat state
+	combatView, err := engine.GetCombatView(gameID)
+	if err != nil {
+		t.Fatalf("failed to get combat view: %v", err)
+	}
+
+	if combatView.AttackingPlayerID != "Alice" {
+		t.Errorf("expected attacking player Alice, got %s", combatView.AttackingPlayerID)
+	}
+
+	if len(combatView.Groups) != 1 {
+		t.Fatalf("expected 1 combat group, got %d", len(combatView.Groups))
+	}
+
+	group := combatView.Groups[0]
+	if len(group.Attackers) != 1 {
+		t.Errorf("expected 1 attacker, got %d", len(group.Attackers))
+	}
+
+	if group.DefenderID != "Bob" {
+		t.Errorf("expected defender Bob, got %s", group.DefenderID)
+	}
+}
+
+// TestCombatMultipleAttackers tests declaring multiple attackers
+func TestCombatMultipleAttackers(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "combat-multi-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	if err := engine.ResetCombat(gameID); err != nil {
+		t.Fatalf("failed to reset combat: %v", err)
+	}
+
+	if err := engine.SetAttacker(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to set attacker: %v", err)
+	}
+
+	if err := engine.SetDefenders(gameID); err != nil {
+		t.Fatalf("failed to set defenders: %v", err)
+	}
+
+	// Get creatures from battlefield
+	viewRaw, _ := engine.GetGameView(gameID, "Alice")
+	view := viewRaw.(*game.EngineGameView)
+	
+	if len(view.Battlefield) < 2 {
+		t.Skip("need at least 2 creatures to test")
+	}
+
+	// Declare multiple attackers
+	creature1 := view.Battlefield[0].ID
+	creature2 := view.Battlefield[1].ID
+
+	if err := engine.DeclareAttacker(gameID, creature1, "Bob", "Alice"); err != nil {
+		t.Fatalf("failed to declare first attacker: %v", err)
+	}
+
+	if err := engine.DeclareAttacker(gameID, creature2, "Bob", "Alice"); err != nil {
+		t.Fatalf("failed to declare second attacker: %v", err)
+	}
+
+	// Verify both attackers in same group
+	combatView, err := engine.GetCombatView(gameID)
+	if err != nil {
+		t.Fatalf("failed to get combat view: %v", err)
+	}
+
+	if len(combatView.Groups) != 1 {
+		t.Fatalf("expected 1 combat group, got %d", len(combatView.Groups))
+	}
+
+	if len(combatView.Groups[0].Attackers) != 2 {
+		t.Errorf("expected 2 attackers, got %d", len(combatView.Groups[0].Attackers))
+	}
+}
+
+// TestCombatValidation tests combat validation rules
+func TestCombatValidation(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "combat-validation-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	if err := engine.ResetCombat(gameID); err != nil {
+		t.Fatalf("failed to reset combat: %v", err)
+	}
+
+	if err := engine.SetAttacker(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to set attacker: %v", err)
+	}
+
+	if err := engine.SetDefenders(gameID); err != nil {
+		t.Fatalf("failed to set defenders: %v", err)
+	}
+
+	viewRaw, _ := engine.GetGameView(gameID, "Alice")
+	view := viewRaw.(*game.EngineGameView)
+	
+	if len(view.Battlefield) == 0 {
+		t.Skip("no creatures on battlefield to test")
+	}
+
+	creatureID := view.Battlefield[0].ID
+
+	// Test: Wrong player can't declare attacker
+	if err := engine.DeclareAttacker(gameID, creatureID, "Bob", "Bob"); err == nil {
+		t.Error("expected error when non-attacking player declares attacker")
+	}
+
+	// Test: Invalid defender
+	if err := engine.DeclareAttacker(gameID, creatureID, "InvalidDefender", "Alice"); err == nil {
+		t.Error("expected error for invalid defender")
+	}
+
+	// Test: Can't declare same creature twice
+	if err := engine.DeclareAttacker(gameID, creatureID, "Bob", "Alice"); err != nil {
+		t.Fatalf("failed to declare attacker: %v", err)
+	}
+	
+	// Creature is now tapped, should fail
+	if err := engine.DeclareAttacker(gameID, creatureID, "Bob", "Alice"); err == nil {
+		t.Error("expected error declaring tapped creature as attacker")
+	}
+}
+
+// TestCombatReset tests that combat state is properly reset
+func TestCombatReset(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "combat-reset-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Setup combat
+	if err := engine.ResetCombat(gameID); err != nil {
+		t.Fatalf("failed to reset combat: %v", err)
+	}
+	if err := engine.SetAttacker(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to set attacker: %v", err)
+	}
+	if err := engine.SetDefenders(gameID); err != nil {
+		t.Fatalf("failed to set defenders: %v", err)
+	}
+
+	viewRaw, _ := engine.GetGameView(gameID, "Alice")
+	view := viewRaw.(*game.EngineGameView)
+	
+	if len(view.Battlefield) == 0 {
+		t.Skip("no creatures on battlefield to test")
+	}
+
+	creatureID := view.Battlefield[0].ID
+	
+	// Declare attacker
+	if err := engine.DeclareAttacker(gameID, creatureID, "Bob", "Alice"); err != nil {
+		t.Fatalf("failed to declare attacker: %v", err)
+	}
+
+	// Verify attacker exists
+	combatView, _ := engine.GetCombatView(gameID)
+	if len(combatView.Groups) == 0 {
+		t.Fatal("expected combat groups before reset")
+	}
+
+	// Reset combat
+	if err := engine.ResetCombat(gameID); err != nil {
+		t.Fatalf("failed to reset combat: %v", err)
+	}
+
+	// Verify combat cleared
+	combatView, _ = engine.GetCombatView(gameID)
+	if combatView.AttackingPlayerID != "" {
+		t.Error("expected no attacking player after reset")
+	}
+	if len(combatView.Groups) != 0 {
+		t.Error("expected no combat groups after reset")
+	}
+}
+
 // TestNotificationDeadlock reproduces the deadlock bug where a notification handler
 // tries to call GetGameView() while the engine is holding gameState.mu lock.
 // This test documents the broken state before the fix.
