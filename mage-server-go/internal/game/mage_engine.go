@@ -2618,6 +2618,98 @@ func (e *MageEngine) removeCardFromSlice(cards []*internalCard, cardID string) [
 	return cards
 }
 
+// ChangeControl changes the controller of a permanent on the battlefield
+// Returns true if control was successfully changed, false otherwise
+// Per Java PermanentImpl.changeControllerId(): emits GAIN_CONTROL and LOSE_CONTROL events
+func (e *MageEngine) ChangeControl(gameID, cardID, newControllerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	// Find the card
+	card, found := gameState.cards[cardID]
+	if !found {
+		return fmt.Errorf("card %s not found", cardID)
+	}
+
+	// Verify card is on battlefield
+	if card.Zone != zoneBattlefield {
+		return fmt.Errorf("card %s is not on battlefield (zone %d)", cardID, card.Zone)
+	}
+
+	// Verify new controller exists and is in game
+	newController, exists := gameState.players[newControllerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", newControllerID)
+	}
+	if newController.Lost || newController.Left {
+		return fmt.Errorf("player %s is not in game", newControllerID)
+	}
+
+	oldControllerID := card.ControllerID
+
+	// Only emit events if control is actually changing
+	if oldControllerID != newControllerID {
+		// Emit LOSE_CONTROL event for old controller
+		loseControlEvent := rules.Event{
+			Type:        rules.EventLoseControl,
+			ID:          uuid.New().String(),
+			TargetID:    cardID,
+			SourceID:    cardID,
+			Controller:  oldControllerID,
+			PlayerID:    oldControllerID,
+			Timestamp:   time.Now(),
+			Description: fmt.Sprintf("%s loses control of %s", oldControllerID, card.Name),
+			Metadata: map[string]string{
+				"old_controller": oldControllerID,
+				"new_controller": newControllerID,
+			},
+		}
+		gameState.eventBus.Publish(loseControlEvent)
+
+		// Change the controller
+		card.ControllerID = newControllerID
+
+		// Emit GAIN_CONTROL event for new controller
+		gainControlEvent := rules.Event{
+			Type:        rules.EventGainControl,
+			ID:          uuid.New().String(),
+			TargetID:    cardID,
+			SourceID:    cardID,
+			Controller:  newControllerID,
+			PlayerID:    newControllerID,
+			Timestamp:   time.Now(),
+			Description: fmt.Sprintf("%s gains control of %s", newControllerID, card.Name),
+			Metadata: map[string]string{
+				"old_controller": oldControllerID,
+				"new_controller": newControllerID,
+			},
+		}
+		gameState.eventBus.Publish(gainControlEvent)
+
+		gameState.addMessage(fmt.Sprintf("%s gains control of %s", newControllerID, card.Name), "action")
+
+		if e.logger != nil {
+			e.logger.Info("control changed",
+				zap.String("game_id", gameID),
+				zap.String("card_id", cardID),
+				zap.String("card_name", card.Name),
+				zap.String("old_controller", oldControllerID),
+				zap.String("new_controller", newControllerID),
+			)
+		}
+	}
+
+	return nil
+}
+
 // GameStateAccessor implementation for engineGameState
 
 func (s *engineGameState) FindCard(cardID string) (rules.CardInfo, bool) {
