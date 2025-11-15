@@ -68,13 +68,13 @@ Status legend:
 - [x] Fire `EventAttackerDeclared` per attacker and `EventDeclaredAttackers` when complete
 
 ### Blocker Declaration (P0 - Critical)
-- [ ] Implement `DeclareBlocker(gameID, blockerID, attackerID, playerID)` - declare single blocker
-- [ ] Implement `CanBlock(gameID, blockerID, attackerID)` - validate creature can block (tapped, flying, restrictions)
-- [ ] Add blocker to combat group, update blocked status
-- [ ] Implement `AcceptBlockers(gameID)` - finalize blockers, check requirements/restrictions
+- [x] Implement `DeclareBlocker(gameID, blockerID, attackerID, playerID)` - declare single blocker
+- [x] Implement `CanBlock(gameID, blockerID, attackerID)` - validate creature can block (tapped, flying, restrictions)
+- [x] Add blocker to combat group, update blocked status
+- [x] Implement `AcceptBlockers(gameID)` - finalize blockers, check requirements/restrictions
 - [ ] Implement blocker ordering for multiple blockers on same attacker
-- [ ] Implement `RemoveBlocker(gameID, blockerID)` - undo blocker declaration
-- [ ] Fire `EventBlockerDeclared` per blocker and `EventDeclaredBlockers` when complete
+- [x] Implement `RemoveBlocker(gameID, blockerID)` - undo blocker declaration
+- [x] Fire `EventBlockerDeclared` per blocker and `EventDeclaredBlockers` when complete
 
 ### Damage Assignment & Application (P0 - Critical)
 - [ ] Implement `AssignCombatDamage(gameID, firstStrike bool)` - assign damage for attackers and blockers
