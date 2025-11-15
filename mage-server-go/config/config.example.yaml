@@ -48,6 +48,7 @@ auth:
   mode: "optional"  # "optional" allows anonymous play, "required" needs registration
   require_email: false  # Require email for registration
   password_reset_token_ttl: 1h  # Password reset token expiry
+  admin_password: ""  # Set to enable admin connections (leave empty to disable)
 
 mail:
   provider: ""  # "smtp" or "mailgun" (leave empty to disable email)

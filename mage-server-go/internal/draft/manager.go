@@ -55,6 +55,7 @@ type DraftPlayer struct {
 	Picks          []*Card
 	CurrentBooster *Booster
 	BoosterLoaded  bool
+	MarkedCards    map[string]bool
 }
 
 // Draft represents a draft session
@@ -96,8 +97,9 @@ func NewDraft(tournamentID, tableID string, players []string, numPacks, packSize
 	// Initialize players
 	for _, playerName := range players {
 		draft.Players[playerName] = &DraftPlayer{
-			Name:  playerName,
-			Picks: make([]*Card, 0),
+			Name:        playerName,
+			Picks:       make([]*Card, 0),
+			MarkedCards: make(map[string]bool),
 		}
 	}
 
@@ -118,8 +120,9 @@ func (d *Draft) AddPlayer(playerName string) error {
 	}
 
 	d.Players[playerName] = &DraftPlayer{
-		Name:  playerName,
-		Picks: make([]*Card, 0),
+		Name:        playerName,
+		Picks:       make([]*Card, 0),
+		MarkedCards: make(map[string]bool),
 	}
 	d.PlayerOrder = append(d.PlayerOrder, playerName)
 
@@ -288,6 +291,60 @@ func (d *Draft) GetPlayerPicks(playerName string) ([]*Card, error) {
 	}
 
 	return player.Picks, nil
+}
+
+// MarkCard marks or unmarks a card for a player.
+func (d *Draft) MarkCard(playerName, cardID string) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	player, ok := d.Players[playerName]
+	if !ok {
+		return fmt.Errorf("player not found")
+	}
+
+	if player.MarkedCards == nil {
+		player.MarkedCards = make(map[string]bool)
+	}
+
+	if cardID == "" {
+		return fmt.Errorf("card_id is required")
+	}
+
+	if player.MarkedCards[cardID] {
+		delete(player.MarkedCards, cardID)
+	} else {
+		player.MarkedCards[cardID] = true
+	}
+
+	return nil
+}
+
+// RemovePlayer removes a player from the draft.
+func (d *Draft) RemovePlayer(playerName string) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	if _, ok := d.Players[playerName]; !ok {
+		return fmt.Errorf("player not found")
+	}
+
+	delete(d.Players, playerName)
+
+	for i, name := range d.PlayerOrder {
+		if name == playerName {
+			d.PlayerOrder = append(d.PlayerOrder[:i], d.PlayerOrder[i+1:]...)
+			break
+		}
+	}
+
+	if len(d.PlayerOrder) == 0 {
+		d.State = DraftStateFinished
+		now := time.Now()
+		d.EndTime = &now
+	}
+
+	return nil
 }
 
 // Manager manages draft sessions

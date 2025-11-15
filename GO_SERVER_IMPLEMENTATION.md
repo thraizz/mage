@@ -3,6 +3,17 @@
 ## Overview
 This document outlines the implementation of a new MAGE (Magic Another Game Engine) server in Go using **gRPC for RPC calls** and **WebSocket for server push events**. The server will provide the same API as the existing Java server, allowing existing clients to connect with minimal changes.
 
+## Current Progress (Nov 2025)
+- Core scaffolding, proto definitions, migrations, and configuration loader are in place and exercised by `go test`.
+- Session management (including preference storage and cleanup) plus Argon2id-based authentication and token flow are implemented with unit coverage.
+- gRPC bootstrap now runs end-to-end with interceptors, WebSocket bridge, admin login, and initial RPC coverage for auth, server info, and lobby/table creation.
+- User, stats, and card repositories/managers are active; additional controllers and advanced RPC categories remain planned work.
+- MageEngine now drives gameplay for the Go server: MatchStart wires into the real engine, and `GameGetView` returns full zone, prompt, and message state for players and watchers; integration tests cover the richer views.
+- Rules scaffolding initiated in Go: a `TurnManager` now models the full MTG phase/step progression and feeds priority/turn updates back into `GameGetView`.
+- A `StackManager` now tracks stack items, resolves spells after full pass cycles, and surfaces battlefield transitions/log messages via `GameGetView`.
+- Event bus and trigger manager deliver triggered abilities onto the stack with life-gain sample coverage; integration tests assert ordering and resolution behaviour.
+- Continuous effect layer system applies basic power/toughness buffs during normalization, laying groundwork for full layer 1-7 implementation.
+
 ## Architecture Decision Summary
 
 ### Protocol Architecture: gRPC + WebSocket Hybrid
@@ -254,9 +265,9 @@ mage-server-go/
 ### Phase 1: Foundation & Protobuf Definitions (Week 1-3)
 
 #### 1.1 Project Initialization
-- [ ] Initialize Go module: `go mod init github.com/magefree/mage-server-go`
-- [ ] Set up Makefile with common targets (build, test, proto, run)
-- [ ] Configure protobuf tooling (buf or protoc)
+- [x] Initialize Go module: `go mod init github.com/magefree/mage-server-go`
+- [x] Set up Makefile with common targets (build, test, proto, run)
+- [x] Configure protobuf tooling (buf or protoc)
 - [ ] Set up CI/CD pipeline (GitHub Actions)
 
 #### 1.2 Protocol Buffer Definitions
@@ -561,7 +572,7 @@ CREATE INDEX idx_table_records_start_time ON table_records(start_time DESC);
 ```
 
 **Action Items**:
-- [ ] Create all migration files (up and down)
+- [x] Create all migration files (up and down)
 - [ ] Set up golang-migrate: `brew install golang-migrate`
 - [ ] Create initial data seed scripts (cards, expansions, etc.)
 - [ ] Test migrations against PostgreSQL
@@ -718,10 +729,10 @@ func Load(configPath string) (*Config, error) {
 ```
 
 **Action Items**:
-- [ ] Implement config loading with Viper
-- [ ] Support environment variable overrides
-- [ ] Add config validation
-- [ ] Create example configs for dev/staging/prod
+- [x] Implement config loading with Viper
+- [x] Support environment variable overrides
+- [x] Add config validation
+- [x] Create example configs for dev/staging/prod
 - [ ] Document all config options
 
 ### Phase 2: Core Infrastructure (Week 4-6)
@@ -776,11 +787,11 @@ func (db *DB) Close() {
 ```
 
 **Action Items**:
-- [ ] Implement connection pooling with pgx
+- [x] Implement connection pooling with pgx
 - [ ] Create repository interfaces for each entity
-- [ ] Implement user repository (CRUD + queries)
-- [ ] Implement card repository with full-text search
-- [ ] Implement stats repository with Glicko rating queries
+- [x] Implement user repository (CRUD + queries)
+- [x] Implement card repository with full-text search
+- [x] Implement stats repository with Glicko rating queries
 - [ ] Implement table records repository
 - [ ] Add database health check
 - [ ] Add query logging for debugging
@@ -922,12 +933,12 @@ func (m *manager) cleanupExpired() {
 ```
 
 **Action Items**:
-- [ ] Implement Session struct with all methods
-- [ ] Implement SessionManager with in-memory storage
-- [ ] Add session expiration cleanup goroutine
-- [ ] Implement session restoration for reconnects
-- [ ] Add concurrent request locking per session
-- [ ] Write session manager tests
+- [x] Implement Session struct with all methods
+- [x] Implement SessionManager with in-memory storage
+- [x] Add session expiration cleanup goroutine
+- [x] Implement session restoration for reconnects
+- [x] Add concurrent request locking per session
+- [x] Write session manager tests
 - [ ] (Future) Add Redis-backed session store interface
 
 #### 2.3 Authentication & Security
@@ -988,10 +999,10 @@ func VerifyPassword(password, hash string) bool {
 ```
 
 **Action Items**:
-- [ ] Implement Argon2id password hashing
-- [ ] Implement password reset token generation (6-digit)
-- [ ] Add token storage (in-memory cache with TTL)
-- [ ] Write password hashing tests
+- [x] Implement Argon2id password hashing
+- [x] Implement password reset token generation (6-digit)
+- [x] Add token storage (in-memory cache with TTL)
+- [x] Write password hashing tests
 - [ ] Write auth service tests
 
 ### Phase 3: gRPC Server Implementation (Week 7-10)
@@ -1097,11 +1108,11 @@ func main() {
 ```
 
 **Action Items**:
-- [ ] Implement main entry point with graceful shutdown
-- [ ] Set up gRPC server with keepalive
-- [ ] Implement session validation interceptor
-- [ ] Implement logging interceptor
-- [ ] Implement panic recovery interceptor
+- [x] Implement main entry point with graceful shutdown
+- [x] Set up gRPC server with keepalive
+- [x] Implement session validation interceptor
+- [x] Implement logging interceptor
+- [x] Implement panic recovery interceptor
 - [ ] Implement metrics interceptor (Prometheus)
 - [ ] Add health check service
 
@@ -1227,15 +1238,15 @@ func (s *mageServer) AuthRegister(ctx context.Context, req *pb.AuthRegisterReque
 ```
 
 **Action Items**:
-- [ ] Implement all Authentication methods (6 methods)
-- [ ] Implement all Server Info methods (3 methods)
-- [ ] Implement all Room/Lobby methods (5 methods)
-- [ ] Implement all Table Management methods (10 methods)
-- [ ] Implement all Deck Management methods (2 methods)
-- [ ] Implement all Game Execution methods (15 methods)
-- [ ] Implement all Draft methods (6 methods)
-- [ ] Implement all Tournament methods (4 methods)
-- [ ] Implement all Chat methods (7 methods)
+- [x] Implement all Authentication methods (6 methods)
+- [x] Implement all Server Info methods (3 methods)
+- [x] Implement all Room/Lobby methods (5 methods)
+- [x] Implement all Table Management methods (10 methods)
+- [x] Implement all Deck Management methods (2 methods)
+- [ ] Implement all Game Execution methods (15 methods) _(match lifecycle now backed by MageEngine with zones/prompts/messages exposed via GameGetView; remaining advanced prompts/mana/replay hooks pending)_
+- [ ] Implement all Draft methods (6 methods) _(initial join/pick/mark/booster loaded/quit handlers implemented)_
+- [ ] Implement all Tournament methods (4 methods) _(initial join/start/quit/find handlers implemented)_
+- [x] Implement all Chat methods (7 methods)
 - [ ] Implement all Replay methods (6 methods)
 - [ ] Implement all Admin methods (9 methods)
 - [ ] Add error handling and validation for each method
@@ -1354,11 +1365,11 @@ func (ws *WebSocketServer) pingHandler(conn *websocket.Conn, sess *session.Sessi
 ```
 
 **Action Items**:
-- [ ] Implement WebSocket server with Gorilla WebSocket
-- [ ] Handle WebSocket upgrade from HTTP
-- [ ] Implement session validation for WebSocket connections
-- [ ] Forward ServerEvent messages from session.CallbackChan to WebSocket
-- [ ] Implement ping/pong keep-alive
+- [x] Implement WebSocket server with Gorilla WebSocket
+- [x] Handle WebSocket upgrade from HTTP
+- [x] Implement session validation for WebSocket connections
+- [x] Forward ServerEvent messages from session.CallbackChan to WebSocket
+- [x] Implement ping/pong keep-alive
 - [ ] Add reconnection handling (resume from last message ID)
 - [ ] Implement compression for large messages
 - [ ] Write WebSocket integration tests
@@ -1368,12 +1379,12 @@ func (ws *WebSocketServer) pingHandler(conn *websocket.Conn, sess *session.Sessi
 
 #### 5.1 User Management
 **Action Items**:
-- [ ] Implement User domain model
-- [ ] Implement UserManager interface and implementation
-- [ ] Implement user registration (anonymous and authenticated modes)
-- [ ] Implement username validation and uniqueness checks
-- [ ] Implement multiple connection detection
-- [ ] Implement lock/mute/activate operations
+- [x] Implement User domain model
+- [x] Implement UserManager interface and implementation
+- [x] Implement user registration (anonymous and authenticated modes)
+- [x] Implement username validation and uniqueness checks
+- [x] Implement multiple connection detection
+- [x] Implement lock/mute/activate operations
 - [ ] Write user manager tests
 
 #### 5.2 Table Controller
@@ -1542,23 +1553,31 @@ func (g *TwoPlayerDuel) MaxPlayers() int { return 2 }
   - [ ] ComputerDraft (Draft AI)
 - [ ] Register all types in init() functions
 - [ ] Write plugin registry tests
+- [ ] Port Java gameplay engine rules into Go (`MageEngine` parity)
+  - [ ] Inventory existing Java engine modules (zones, layers, effects, abilities, watchers) and map them onto Go packages
+  - [ ] Recreate the comprehensive turn/phase/step state machine, including priority passing, upkeep triggers, and cleanup handling
+  - [ ] Port stack resolution, replacement/prevention effects, triggered abilities, continuous effect layers, and dependency management
+  - [ ] Mirror event bus, watcher, and log infrastructure used by Java clients (game logs, game events, state change notifications)
+  - [ ] Generate or translate card definitions/ability scripts so Go runtime can load the canonical card and token database
+  - [ ] Build compatibility shims to ingest existing Java-serialized game states until all clients can consume Go-native ones
+  - [ ] Establish regression harness comparing Java vs Go engine outputs (per-turn snapshots, rules tests, card-specific scenarios)
 
 ### Phase 7: Supporting Services (Week 22-23)
 
 #### 7.1 Email Service
 **Action Items**:
-- [ ] Implement MailClient interface
-- [ ] Implement SMTP client with gomail.v2
-- [ ] Implement Mailgun client with mailgun-go
+- [x] Implement MailClient interface
+- [x] Implement SMTP client with gomail.v2
+- [x] Implement Mailgun client with mailgun-go
 - [ ] Create email templates (password reset, welcome, etc.)
 - [ ] Add retry logic for failed emails
 - [ ] Write email service tests (with mock SMTP server)
 
 #### 7.2 Rating System
 **Action Items**:
-- [ ] Implement Glicko rating calculation
-- [ ] Implement rating update on match completion
-- [ ] Write rating system tests with known inputs/outputs
+- [x] Implement Glicko rating calculation
+- [x] Implement rating update on match completion
+- [x] Write rating system tests with known inputs/outputs
 
 #### 7.3 Card Repository & Caching
 **Action Items**:

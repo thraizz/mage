@@ -16,6 +16,7 @@ database:
 auth:
   mode: "optional"
   require_email: false
+  admin_password: ""
 
 mail:
   provider: ""  # Disable email in development
