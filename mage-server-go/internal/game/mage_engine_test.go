@@ -687,3 +687,82 @@ func TestSimultaneousEventsProcessing(t *testing.T) {
 	// and processed together after stack resolves
 	// Per Java GameImpl.resolve() lines 1857-1860
 }
+
+// TestGameAnalytics verifies that game analytics are tracked correctly
+func TestGameAnalytics(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "analytics-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Cast a spell
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "SEND_STRING",
+		Data:       "Lightning Bolt",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("failed to cast spell: %v", err)
+	}
+
+	// Pass priority
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Alice",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("alice pass failed: %v", err)
+	}
+
+	if err := engine.ProcessAction(gameID, game.PlayerAction{
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  time.Now(),
+	}); err != nil {
+		t.Fatalf("bob pass failed: %v", err)
+	}
+
+	// Get analytics
+	analytics, err := engine.GetGameAnalytics(gameID)
+	if err != nil {
+		t.Fatalf("failed to get analytics: %v", err)
+	}
+
+	// Verify analytics were collected
+	if analytics == nil {
+		t.Fatal("analytics should not be nil")
+	}
+
+	// Check that we tracked spells cast
+	spellsCast, ok := analytics["spells_cast"].(int)
+	if !ok || spellsCast < 1 {
+		t.Errorf("expected at least 1 spell cast, got %v", analytics["spells_cast"])
+	}
+
+	// Check that we tracked priority passes
+	priorityPasses, ok := analytics["priority_pass_count"].(int)
+	if !ok || priorityPasses < 2 {
+		t.Errorf("expected at least 2 priority passes, got %v", analytics["priority_pass_count"])
+	}
+
+	// Check that we tracked stack depth
+	maxStackDepth, ok := analytics["max_stack_depth"].(int)
+	if !ok || maxStackDepth < 1 {
+		t.Errorf("expected max stack depth >= 1, got %v", analytics["max_stack_depth"])
+	}
+
+	// Check that we tracked triggers
+	triggersProcessed, ok := analytics["triggers_processed"].(int)
+	if !ok || triggersProcessed < 1 {
+		t.Errorf("expected at least 1 trigger processed, got %v", analytics["triggers_processed"])
+	}
+
+	t.Logf("Analytics: %+v", analytics)
+}
