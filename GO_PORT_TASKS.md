@@ -1,5 +1,7 @@
 # Go Port Task Tracker
 
+Minimal tracker for the tasks of migrating the Java Mage MTG server to Go. This file shall only contain tasks, no descriptions, documentation or anything. Just tasks.
+
 Status legend:
 - `[x]` Completed
 - `[ ]` Pending / not yet started
@@ -77,12 +79,12 @@ Status legend:
 - [x] Fire `EventBlockerDeclared` per blocker and `EventDeclaredBlockers` when complete
 
 ### Damage Assignment & Application (P0 - Critical)
-- [ ] Implement `AssignCombatDamage(gameID, firstStrike bool)` - assign damage for attackers and blockers
-- [ ] Implement `combatGroup.assignDamageToBlockers()` - attacker damage to blockers with ordering
-- [ ] Implement `combatGroup.assignDamageToAttackers()` - blocker damage to attackers with ordering
-- [ ] Implement `ApplyCombatDamage(gameID)` - apply all assigned damage
-- [ ] Implement `combatGroup.applyDamage()` - mark damage on creatures and players
-- [ ] Handle unblocked attacker damage to defending player/permanent
+- [x] Implement `AssignCombatDamage(gameID, firstStrike bool)` - assign damage for attackers and blockers
+- [x] Implement `combatGroup.assignDamageToBlockers()` - attacker damage to blockers with ordering
+- [x] Implement `combatGroup.assignDamageToAttackers()` - blocker damage to attackers with ordering
+- [x] Implement `ApplyCombatDamage(gameID)` - apply all assigned damage
+- [x] Implement `combatGroup.applyDamage()` - mark damage on creatures and players
+- [x] Handle unblocked attacker damage to defending player/permanent
 - [ ] Fire `EventCombatDamageAssigned` and `EventCombatDamageApplied` events
 
 ### Combat Cleanup (P0 - Critical)
