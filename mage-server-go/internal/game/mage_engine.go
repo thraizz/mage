@@ -4025,6 +4025,379 @@ func (e *MageEngine) GetCombatView(gameID string) (EngineCombatView, error) {
 	return view, nil
 }
 
+// CanBlock checks if a creature can block a specific attacker
+// Per Java PermanentImpl.canBlock()
+func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return false, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+	
+	// Get blocker
+	blocker, exists := gameState.cards[blockerID]
+	if !exists {
+		return false, fmt.Errorf("blocker %s not found", blockerID)
+	}
+	
+	// Get attacker
+	_, exists = gameState.cards[attackerID]
+	if !exists {
+		return false, fmt.Errorf("attacker %s not found", attackerID)
+	}
+	
+	// Basic checks
+	// 1. Blocker must be untapped (or have ability to block while tapped)
+	if blocker.Tapped {
+		// TODO: Check for "can block while tapped" abilities
+		return false, nil
+	}
+	
+	// 2. Blocker must be a creature
+	if !strings.Contains(blocker.Type, "Creature") {
+		return false, nil
+	}
+	
+	// 3. Blocker must not be a battle
+	// TODO: Check for battle type when implemented
+	
+	// 4. Blocker must not be suspected
+	// TODO: Check for suspected status when implemented
+	
+	// 5. Blocker must be on battlefield
+	if blocker.Zone != zoneBattlefield {
+		return false, nil
+	}
+	
+	// 6. Attacker must be attacking
+	if !gameState.combat.attackers[attackerID] {
+		return false, nil
+	}
+	
+	// 7. Controller of blocker must be opponent of attacker's controller
+	// Find the group this attacker is in to get the defending player
+	var defendingPlayerID string
+	for _, group := range gameState.combat.groups {
+		for _, aid := range group.attackers {
+			if aid == attackerID {
+				defendingPlayerID = group.defendingPlayerID
+				break
+			}
+		}
+		if defendingPlayerID != "" {
+			break
+		}
+	}
+	
+	if defendingPlayerID == "" {
+		return false, fmt.Errorf("attacker %s not found in any combat group", attackerID)
+	}
+	
+	// Blocker must be controlled by the defending player
+	if blocker.ControllerID != defendingPlayerID {
+		return false, nil
+	}
+	
+	// TODO: Check restriction effects (can't block, can only block creatures with flying, etc.)
+	// TODO: Check attacker's evasion abilities (flying, shadow, etc.)
+	// TODO: Check protection
+	
+	return true, nil
+}
+
+// DeclareBlocker declares a creature as a blocker for an attacker
+// Per Java PlayerImpl.declareBlocker()
+func (e *MageEngine) DeclareBlocker(gameID, blockerID, attackerID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Validate blocker can block this attacker
+	canBlock, err := e.canBlockInternal(gameState, blockerID, attackerID)
+	if err != nil {
+		return err
+	}
+	if !canBlock {
+		return fmt.Errorf("creature %s cannot block attacker %s", blockerID, attackerID)
+	}
+	
+	// Find the combat group for this attacker
+	var group *combatGroup
+	for _, g := range gameState.combat.groups {
+		for _, aid := range g.attackers {
+			if aid == attackerID {
+				group = g
+				break
+			}
+		}
+		if group != nil {
+			break
+		}
+	}
+	
+	if group == nil {
+		return fmt.Errorf("attacker %s not found in any combat group", attackerID)
+	}
+	
+	// Validate player controls the blocker
+	blocker, exists := gameState.cards[blockerID]
+	if !exists {
+		return fmt.Errorf("blocker %s not found", blockerID)
+	}
+	
+	if blocker.ControllerID != playerID {
+		return fmt.Errorf("player %s does not control blocker %s", playerID, blockerID)
+	}
+	
+	// Check if blocker is already blocking
+	if blocker.Blocking {
+		// In MTG, a creature can block multiple attackers in some cases
+		// For now, we'll allow it but track it properly
+		// TODO: Check for restrictions on multiple blocks
+	}
+	
+	// Add blocker to the group
+	group.blockers = append(group.blockers, blockerID)
+	group.blocked = true
+	gameState.combat.blockers[blockerID] = true
+	
+	// Update blocker's blocking status
+	blocker.Blocking = true
+	if blocker.BlockingWhat == nil {
+		blocker.BlockingWhat = []string{}
+	}
+	blocker.BlockingWhat = append(blocker.BlockingWhat, attackerID)
+	
+	// Add to blocking groups map (blocker -> group)
+	gameState.combat.blockingGroups[blockerID] = group
+	
+	// Fire BLOCKER_DECLARED event
+	gameState.eventBus.Publish(rules.Event{
+		Type:       rules.EventBlockerDeclared,
+		SourceID:   blockerID,
+		TargetID:   attackerID,
+		PlayerID:   playerID,
+		Controller: playerID,
+	})
+	
+	if e.logger != nil {
+		e.logger.Debug("blocker declared",
+			zap.String("game_id", gameID),
+			zap.String("blocker_id", blockerID),
+			zap.String("attacker_id", attackerID),
+			zap.String("player_id", playerID),
+		)
+	}
+	
+	return nil
+}
+
+// canBlockInternal is an internal version of CanBlock that works with locked state
+func (e *MageEngine) canBlockInternal(gameState *engineGameState, blockerID, attackerID string) (bool, error) {
+	// Get blocker
+	blocker, exists := gameState.cards[blockerID]
+	if !exists {
+		return false, fmt.Errorf("blocker %s not found", blockerID)
+	}
+	
+	// Get attacker
+	_, exists = gameState.cards[attackerID]
+	if !exists {
+		return false, fmt.Errorf("attacker %s not found", attackerID)
+	}
+	
+	// Basic checks (same as CanBlock)
+	if blocker.Tapped {
+		return false, nil
+	}
+	
+	if !strings.Contains(blocker.Type, "Creature") {
+		return false, nil
+	}
+	
+	if blocker.Zone != zoneBattlefield {
+		return false, nil
+	}
+	
+	if !gameState.combat.attackers[attackerID] {
+		return false, nil
+	}
+	
+	// Find defending player
+	var defendingPlayerID string
+	for _, group := range gameState.combat.groups {
+		for _, aid := range group.attackers {
+			if aid == attackerID {
+				defendingPlayerID = group.defendingPlayerID
+				break
+			}
+		}
+		if defendingPlayerID != "" {
+			break
+		}
+	}
+	
+	if defendingPlayerID == "" {
+		return false, fmt.Errorf("attacker %s not found in any combat group", attackerID)
+	}
+	
+	if blocker.ControllerID != defendingPlayerID {
+		return false, nil
+	}
+	
+	return true, nil
+}
+
+// RemoveBlocker removes a blocker from combat
+// Per Java CombatGroup.remove()
+func (e *MageEngine) RemoveBlocker(gameID, blockerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Find the combat group this blocker is in
+	group, exists := gameState.combat.blockingGroups[blockerID]
+	if !exists {
+		return fmt.Errorf("blocker %s is not blocking", blockerID)
+	}
+	
+	// Remove blocker from group
+	for i, bid := range group.blockers {
+		if bid == blockerID {
+			group.blockers = append(group.blockers[:i], group.blockers[i+1:]...)
+			break
+		}
+	}
+	
+	// Update blocked status
+	if len(group.blockers) == 0 {
+		group.blocked = false
+	}
+	
+	// Remove from blocking groups map
+	delete(gameState.combat.blockingGroups, blockerID)
+	
+	// Remove from global blockers set
+	delete(gameState.combat.blockers, blockerID)
+	
+	// Update blocker card state
+	blocker, exists := gameState.cards[blockerID]
+	if exists {
+		blocker.Blocking = false
+		blocker.BlockingWhat = nil
+	}
+	
+	if e.logger != nil {
+		e.logger.Debug("blocker removed",
+			zap.String("game_id", gameID),
+			zap.String("blocker_id", blockerID),
+		)
+	}
+	
+	return nil
+}
+
+// AcceptBlockers finalizes the blocker declarations and fires events
+// Per Java Combat.acceptBlockers()
+func (e *MageEngine) AcceptBlockers(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Fire BLOCKER_DECLARED events for each blocker-attacker pair
+	// Per Java CombatGroup.acceptBlockers()
+	for _, group := range gameState.combat.groups {
+		if len(group.attackers) == 0 {
+			continue
+		}
+		
+		for _, blockerID := range group.blockers {
+			blocker, exists := gameState.cards[blockerID]
+			if !exists {
+				continue
+			}
+			
+			for _, attackerID := range group.attackers {
+				gameState.eventBus.Publish(rules.Event{
+					Type:       rules.EventBlockerDeclared,
+					SourceID:   blockerID,
+					TargetID:   attackerID,
+					PlayerID:   blocker.ControllerID,
+					Controller: blocker.ControllerID,
+				})
+			}
+		}
+		
+		// Fire CREATURE_BLOCKED event for each attacker that is blocked
+		if len(group.blockers) > 0 {
+			for _, attackerID := range group.attackers {
+				gameState.eventBus.Publish(rules.Event{
+					Type:       rules.EventCreatureBlocked,
+					SourceID:   attackerID,
+				})
+			}
+		}
+	}
+	
+	// Fire CREATURE_BLOCKS event for each blocker
+	// Per Java Combat.acceptBlockers()
+	for blockerID := range gameState.combat.blockers {
+		gameState.eventBus.Publish(rules.Event{
+			Type:       rules.EventCreatureBlocks,
+			SourceID:   blockerID,
+		})
+	}
+	
+	// Fire DECLARED_BLOCKERS event for each defending player
+	defendingPlayers := make(map[string]bool)
+	for _, group := range gameState.combat.groups {
+		defendingPlayers[group.defendingPlayerID] = true
+	}
+	
+	for playerID := range defendingPlayers {
+		gameState.eventBus.Publish(rules.Event{
+			Type:       rules.EventDeclaredBlockers,
+			PlayerID:   playerID,
+			Controller: playerID,
+		})
+	}
+	
+	if e.logger != nil {
+		e.logger.Debug("blockers accepted",
+			zap.String("game_id", gameID),
+			zap.Int("blocker_count", len(gameState.combat.blockers)),
+		)
+	}
+	
+	return nil
+}
+
 // GameStateAccessor implementation for engineGameState
 
 func (s *engineGameState) FindCard(cardID string) (rules.CardInfo, bool) {
