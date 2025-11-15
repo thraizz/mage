@@ -191,25 +191,26 @@ type internalCard struct {
 
 // internalPlayer represents a player in the game state
 type internalPlayer struct {
-	PlayerID      string
-	Name          string
-	Life          int
-	Poison        int
-	Energy        int
-	Library       []*internalCard
-	Hand          []*internalCard
-	Graveyard     []*internalCard
-	ManaPool      *mana.ManaPool
-	HasPriority   bool
-	Passed        bool
-	StateOrdinal  int
-	Lost          bool
-	Left          bool
-	Wins          int
-	Quit          bool      // Player quit the match
-	TimerTimeout  bool      // Player lost due to timer timeout
-	IdleTimeout   bool      // Player lost due to idle timeout
-	Conceded      bool      // Player conceded
+	PlayerID       string
+	Name           string
+	Life           int
+	Poison         int
+	Energy         int
+	Library        []*internalCard
+	Hand           []*internalCard
+	Graveyard      []*internalCard
+	ManaPool       *mana.ManaPool
+	HasPriority    bool
+	Passed         bool
+	StateOrdinal   int
+	Lost           bool
+	Left           bool
+	Wins           int
+	Quit           bool      // Player quit the match
+	TimerTimeout   bool      // Player lost due to timer timeout
+	IdleTimeout    bool      // Player lost due to idle timeout
+	Conceded       bool      // Player conceded
+	StoredBookmark int       // Bookmark ID for player undo (-1 = no undo available)
 }
 
 // triggeredAbilityQueueItem represents a triggered ability waiting to be put on the stack
@@ -317,14 +318,24 @@ type MageEngine struct {
 	// State bookmarking for rollback/undo
 	// Maps gameID -> list of bookmarked states
 	bookmarks           map[string][]*gameStateSnapshot
+	
+	// Turn rollback system (separate from action bookmarks)
+	// Maps gameID -> map[turnNumber -> snapshot]
+	// Keeps last 4 turns for player-requested rollback
+	turnSnapshots       map[string]map[int]*gameStateSnapshot
+	rollbackTurnsMax    int  // Maximum turns to keep for rollback (default 4)
+	rollbackAllowed     bool // Whether turn rollback is enabled (default true)
 }
 
 // NewMageEngine creates a new MageEngine instance
 func NewMageEngine(logger *zap.Logger) *MageEngine {
 	return &MageEngine{
-		logger:    logger,
-		games:     make(map[string]*engineGameState),
-		bookmarks: make(map[string][]*gameStateSnapshot),
+		logger:           logger,
+		games:            make(map[string]*engineGameState),
+		bookmarks:        make(map[string][]*gameStateSnapshot),
+		turnSnapshots:    make(map[string]map[int]*gameStateSnapshot),
+		rollbackTurnsMax: 4,    // Keep last 4 turns
+		rollbackAllowed:  true, // Enable turn rollback by default
 	}
 }
 
@@ -477,21 +488,22 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 	for i, playerID := range players {
 		gameState.playerOrder[i] = playerID
 		gameState.players[playerID] = &internalPlayer{
-			PlayerID:     playerID,
-			Name:         playerID,
-			Life:         20,
-			Poison:       0,
-			Energy:       0,
-			Library:      make([]*internalCard, 0),
-			Hand:         make([]*internalCard, 0),
-			Graveyard:    make([]*internalCard, 0),
-			ManaPool:     mana.NewManaPool(),
-			HasPriority:  false,
-			Passed:       false,
-			StateOrdinal: 0,
-			Lost:         false,
-			Left:         false,
-			Wins:         0,
+			PlayerID:       playerID,
+			Name:           playerID,
+			Life:           20,
+			Poison:         0,
+			Energy:         0,
+			Library:        make([]*internalCard, 0),
+			Hand:           make([]*internalCard, 0),
+			Graveyard:      make([]*internalCard, 0),
+			ManaPool:       mana.NewManaPool(),
+			HasPriority:    false,
+			Passed:         false,
+			StateOrdinal:   0,
+			Lost:           false,
+			Left:           false,
+			Wins:           0,
+			StoredBookmark: -1, // No undo available initially
 		}
 
 		// Create starting hand (7 cards)
@@ -538,6 +550,17 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 	// Release lock before sending notifications to avoid deadlock
 	// Notifications may trigger callbacks that need to acquire locks
 	e.mu.Unlock()
+
+	// Save initial turn snapshot (turn 1)
+	// Per Java: save state at start of each turn
+	if err := e.SaveTurnSnapshot(gameID, 1); err != nil {
+		if e.logger != nil {
+			e.logger.Warn("failed to save initial turn snapshot",
+				zap.String("game_id", gameID),
+				zap.Error(err),
+			)
+		}
+	}
 
 	// Notify game start (safe to call after releasing lock)
 	e.notifyGameStateChange(gameID, map[string]interface{}{
@@ -624,6 +647,12 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 		}
 		// Continue without bookmark - error recovery won't be available
 		bookmarkID = 0
+	} else {
+		// Set player's stored bookmark for undo
+		// Per Java PlayerImpl.setStoredBookmark(): enables undo button
+		if player, exists := gameState.players[action.PlayerID]; exists {
+			player.StoredBookmark = bookmarkID
+		}
 	}
 
 	// Defer error recovery: if action fails and we have a bookmark, restore state
@@ -656,11 +685,23 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 				err = fmt.Errorf("action failed and state restored: %w", err)
 			}
 		} else if bookmarkID > 0 {
-			// Action succeeded, remove the bookmark
-			// Per Java: bookmark is removed after successful action
-			gameState.mu.Unlock() // Temporarily unlock to call RemoveBookmark
-			e.RemoveBookmark(gameID, bookmarkID)
-			gameState.mu.Lock() // Re-acquire lock
+			// Action succeeded, check if any player is using this bookmark
+			// If so, don't remove it (player undo takes precedence)
+			// Per Java: bookmark is kept if player stored it for undo
+			bookmarkInUse := false
+			for _, player := range gameState.players {
+				if player.StoredBookmark == bookmarkID {
+					bookmarkInUse = true
+					break
+				}
+			}
+			
+			if !bookmarkInUse {
+				// Remove the bookmark since no player is using it
+				gameState.mu.Unlock() // Temporarily unlock to call RemoveBookmark
+				e.RemoveBookmark(gameID, bookmarkID)
+				gameState.mu.Lock() // Re-acquire lock
+			}
 		}
 	}()
 
@@ -737,8 +778,18 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 
 		// Advance step/phase
 		nextPlayer := e.getNextPlayer(gameState)
+		oldTurn := gameState.turnManager.TurnNumber()
 		phase, step := gameState.turnManager.AdvanceStep(nextPlayer)
+		newTurn := gameState.turnManager.TurnNumber()
 		gameState.addMessage(fmt.Sprintf("Game advances to %s - %s", phase.String(), step.String()), "action")
+
+		// Save turn snapshot if we advanced to a new turn
+		// Per Java GameImpl.saveRollBackGameState(): save at start of each turn
+		if newTurn > oldTurn {
+			gameState.mu.Unlock() // Temporarily unlock to call SaveTurnSnapshot
+			e.SaveTurnSnapshot(gameState.gameID, newTurn)
+			gameState.mu.Lock() // Re-acquire lock
+		}
 
 		// Notify phase change
 		e.notifyPhaseChange(gameState.gameID, map[string]interface{}{
@@ -1269,6 +1320,17 @@ func (e *MageEngine) resolveSpell(gameState *engineGameState, card *internalCard
 		// Per Java: controller.moveCards(card, Zone.GRAVEYARD, ability, game)
 		if err := e.moveCard(gameState, card, zoneGraveyard, ""); err != nil {
 			return fmt.Errorf("failed to move spell to graveyard: %w", err)
+		}
+	}
+
+	// Reset stored bookmark for the controller after spell resolves
+	// Per Java PlayerImpl line 1550: resetStoredBookmark(game) after spell resolution
+	// This makes the spell resolution irreversible
+	if player, exists := gameState.players[card.ControllerID]; exists {
+		if player.StoredBookmark != -1 {
+			gameState.mu.Unlock() // Temporarily unlock to call ResetPlayerStoredBookmark
+			e.ResetPlayerStoredBookmark(gameState.gameID, card.ControllerID)
+			gameState.mu.Lock() // Re-acquire lock
 		}
 	}
 
@@ -2829,25 +2891,26 @@ func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapsh
 	// Deep copy players
 	for id, player := range gameState.players {
 		playerCopy := &internalPlayer{
-			PlayerID:     player.PlayerID,
-			Name:         player.Name,
-			Life:         player.Life,
-			Poison:       player.Poison,
-			Energy:       player.Energy,
-			Library:      make([]*internalCard, len(player.Library)),
-			Hand:         make([]*internalCard, len(player.Hand)),
-			Graveyard:    make([]*internalCard, len(player.Graveyard)),
-			ManaPool:     player.ManaPool.Copy(),
-			HasPriority:  player.HasPriority,
-			Passed:       player.Passed,
-			StateOrdinal: player.StateOrdinal,
-			Lost:         player.Lost,
-			Left:         player.Left,
-			Wins:         player.Wins,
-			Quit:         player.Quit,
-			TimerTimeout: player.TimerTimeout,
-			IdleTimeout:  player.IdleTimeout,
-			Conceded:     player.Conceded,
+			PlayerID:       player.PlayerID,
+			Name:           player.Name,
+			Life:           player.Life,
+			Poison:         player.Poison,
+			Energy:         player.Energy,
+			Library:        make([]*internalCard, len(player.Library)),
+			Hand:           make([]*internalCard, len(player.Hand)),
+			Graveyard:      make([]*internalCard, len(player.Graveyard)),
+			ManaPool:       player.ManaPool.Copy(),
+			HasPriority:    player.HasPriority,
+			Passed:         player.Passed,
+			StateOrdinal:   player.StateOrdinal,
+			Lost:           player.Lost,
+			Left:           player.Left,
+			Wins:           player.Wins,
+			Quit:           player.Quit,
+			TimerTimeout:   player.TimerTimeout,
+			IdleTimeout:    player.IdleTimeout,
+			Conceded:       player.Conceded,
+			StoredBookmark: player.StoredBookmark,
 		}
 		snapshot.players[id] = playerCopy
 	}
@@ -3080,6 +3143,308 @@ func (e *MageEngine) ClearBookmarks(gameID string) {
 			zap.String("game_id", gameID),
 		)
 	}
+}
+
+// SetPlayerStoredBookmark sets a player's stored bookmark for undo
+// Per Java PlayerImpl.setStoredBookmark(): enables undo button for player
+func (e *MageEngine) SetPlayerStoredBookmark(gameID, playerID string, bookmarkID int) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+	
+	player.StoredBookmark = bookmarkID
+	
+	if e.logger != nil {
+		e.logger.Debug("set player stored bookmark",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.Int("bookmark_id", bookmarkID),
+		)
+	}
+	
+	return nil
+}
+
+// ResetPlayerStoredBookmark clears a player's stored bookmark and removes it from the bookmark list
+// Per Java PlayerImpl.resetStoredBookmark(): disables undo button for player
+func (e *MageEngine) ResetPlayerStoredBookmark(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	player, exists := gameState.players[playerID]
+	if !exists {
+		gameState.mu.Unlock()
+		return fmt.Errorf("player %s not found", playerID)
+	}
+	
+	bookmarkID := player.StoredBookmark
+	player.StoredBookmark = -1
+	gameState.mu.Unlock()
+	
+	// Remove the bookmark if it exists
+	if bookmarkID != -1 {
+		e.RemoveBookmark(gameID, bookmarkID)
+	}
+	
+	if e.logger != nil {
+		e.logger.Debug("reset player stored bookmark",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.Int("old_bookmark_id", bookmarkID),
+		)
+	}
+	
+	return nil
+}
+
+// Undo performs a player-initiated undo operation
+// Per Java GameImpl.undo(): restores to player's stored bookmark if available
+func (e *MageEngine) Undo(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	player, exists := gameState.players[playerID]
+	if !exists {
+		gameState.mu.Unlock()
+		return fmt.Errorf("player %s not found", playerID)
+	}
+	
+	bookmarkID := player.StoredBookmark
+	gameState.mu.Unlock()
+	
+	if bookmarkID == -1 {
+		return fmt.Errorf("no undo available for player %s", playerID)
+	}
+	
+	// Restore to the stored bookmark
+	if err := e.RestoreState(gameID, bookmarkID, fmt.Sprintf("player %s undo", playerID)); err != nil {
+		return fmt.Errorf("failed to undo: %w", err)
+	}
+	
+	// Clear the stored bookmark
+	if err := e.SetPlayerStoredBookmark(gameID, playerID, -1); err != nil {
+		return fmt.Errorf("failed to clear stored bookmark: %w", err)
+	}
+	
+	if e.logger != nil {
+		e.logger.Info("player undo",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.Int("bookmark_id", bookmarkID),
+		)
+	}
+	
+	// Notify players of the undo
+	e.notifyGameStateChange(gameID, map[string]interface{}{
+		"type":      "undo",
+		"player_id": playerID,
+	})
+	
+	return nil
+}
+
+// SaveTurnSnapshot saves a snapshot at the start of a turn for turn rollback
+// Per Java GameImpl.saveRollBackGameState(): keeps last N turns for rollback
+func (e *MageEngine) SaveTurnSnapshot(gameID string, turnNumber int) error {
+	if !e.rollbackAllowed {
+		return nil // Turn rollback disabled
+	}
+	
+	e.mu.Lock()
+	gameState, exists := e.games[gameID]
+	if !exists {
+		e.mu.Unlock()
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	e.mu.Unlock()
+	
+	gameState.mu.RLock()
+	snapshot := e.createSnapshot(gameState)
+	gameState.mu.RUnlock()
+	
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	
+	// Initialize turn snapshots map for this game if needed
+	if e.turnSnapshots[gameID] == nil {
+		e.turnSnapshots[gameID] = make(map[int]*gameStateSnapshot)
+	}
+	
+	// Save snapshot for this turn
+	e.turnSnapshots[gameID][turnNumber] = snapshot
+	
+	// Remove old snapshots beyond the max
+	toDelete := turnNumber - e.rollbackTurnsMax
+	if toDelete > 0 {
+		delete(e.turnSnapshots[gameID], toDelete)
+	}
+	
+	if e.logger != nil {
+		e.logger.Debug("saved turn snapshot",
+			zap.String("game_id", gameID),
+			zap.Int("turn", turnNumber),
+			zap.Int("snapshots_kept", len(e.turnSnapshots[gameID])),
+		)
+	}
+	
+	return nil
+}
+
+// CanRollbackTurns checks if it's possible to rollback N turns
+// Per Java GameImpl.canRollbackTurns(): validates rollback is possible
+func (e *MageEngine) CanRollbackTurns(gameID string, turnsToRollback int) (bool, error) {
+	if !e.rollbackAllowed {
+		return false, fmt.Errorf("turn rollback is disabled")
+	}
+	
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return false, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	currentTurn := gameState.turnManager.TurnNumber()
+	targetTurn := currentTurn - turnsToRollback
+	
+	if targetTurn < 1 {
+		return false, nil // Can't rollback before turn 1
+	}
+	
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	
+	turnSnaps := e.turnSnapshots[gameID]
+	if turnSnaps == nil {
+		return false, nil
+	}
+	
+	_, exists = turnSnaps[targetTurn]
+	return exists, nil
+}
+
+// RollbackTurns rolls back the game to N turns ago
+// Per Java GameImpl.rollbackTurns(): requires all players to agree (not implemented yet)
+func (e *MageEngine) RollbackTurns(gameID string, turnsToRollback int) error {
+	if !e.rollbackAllowed {
+		return fmt.Errorf("turn rollback is disabled")
+	}
+	
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	currentTurn := gameState.turnManager.TurnNumber()
+	targetTurn := currentTurn - turnsToRollback
+	
+	if targetTurn < 1 {
+		return fmt.Errorf("cannot rollback to turn %d (before game start)", targetTurn)
+	}
+	
+	e.mu.RLock()
+	turnSnaps := e.turnSnapshots[gameID]
+	snapshot, exists := turnSnaps[targetTurn]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("no snapshot available for turn %d", targetTurn)
+	}
+	
+	// Restore game state from turn snapshot
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Restore game state from snapshot
+	gameState.state = snapshot.state
+	gameState.gameType = snapshot.gameType
+	
+	// Restore players
+	gameState.players = make(map[string]*internalPlayer)
+	for id, player := range snapshot.players {
+		// Clear all player stored bookmarks on turn rollback
+		// Per Java: resetStoredBookmark for all players
+		player.StoredBookmark = -1
+		gameState.players[id] = player
+	}
+	gameState.playerOrder = append([]string(nil), snapshot.playerOrder...)
+	
+	// Restore cards
+	gameState.cards = make(map[string]*internalCard)
+	for id, card := range snapshot.cards {
+		gameState.cards[id] = card
+	}
+	
+	// Restore zones
+	gameState.battlefield = append([]*internalCard(nil), snapshot.battlefield...)
+	gameState.exile = append([]*internalCard(nil), snapshot.exile...)
+	gameState.command = append([]*internalCard(nil), snapshot.command...)
+	
+	// Restore stack
+	gameState.stack = rules.NewStackManager()
+	for _, item := range snapshot.stackItems {
+		gameState.stack.Push(item)
+	}
+	
+	// Restore messages and prompts
+	gameState.messages = append([]EngineMessage(nil), snapshot.messages...)
+	gameState.prompts = append([]EnginePrompt(nil), snapshot.prompts...)
+	
+	// Clear all action bookmarks (they're invalid after turn rollback)
+	// Per Java: savedStates.clear() and gameStates.clear()
+	e.mu.Lock()
+	delete(e.bookmarks, gameID)
+	e.bookmarks[gameID] = make([]*gameStateSnapshot, 0)
+	e.mu.Unlock()
+	
+	gameState.addMessage(fmt.Sprintf("Game rolled back to start of turn %d", targetTurn), "system")
+	
+	if e.logger != nil {
+		e.logger.Info("rolled back turns",
+			zap.String("game_id", gameID),
+			zap.Int("from_turn", currentTurn),
+			zap.Int("to_turn", targetTurn),
+			zap.Int("turns_rolled_back", turnsToRollback),
+		)
+	}
+	
+	// Notify players of the rollback
+	e.notifyGameStateChange(gameID, map[string]interface{}{
+		"type":              "turn_rollback",
+		"from_turn":         currentTurn,
+		"to_turn":           targetTurn,
+		"turns_rolled_back": turnsToRollback,
+	})
+	
+	return nil
 }
 
 // GameStateAccessor implementation for engineGameState
