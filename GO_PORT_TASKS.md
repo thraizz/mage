@@ -27,7 +27,7 @@ Status legend:
 - [x] Support counters (loyalty, +1/+1, poison, energy, experience) _(Counter and Counters data structures; counter operations (add/remove) with event emission; boost counters integrated with layer system for power/toughness; planeswalker loyalty SBA; player counters tracked for poison/energy/experience; counter views updated across all zones)_
 - [x] Provide deterministic UUID mapping for permanents, abilities, and triggers
 - [x] Call `checkStateBasedActions()` before each priority (per rule 117.5)
-- [ ] Fix `resetPassed()` to preserve lost/left player state (`passed = loses || hasLeft()`)
+- [x] Fix `resetPassed()` to preserve lost/left player state (`passed = loses || hasLeft()`)
 - [ ] Add `canRespond()` checking in pass logic (only consider responding players in `allPassed()`)
 - [ ] Ensure proper zone tracking after stack resolution (cards moved to correct zones with events)
 

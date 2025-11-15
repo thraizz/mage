@@ -494,10 +494,8 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		phase, step := gameState.turnManager.AdvanceStep(nextPlayer)
 		gameState.addMessage(fmt.Sprintf("Game advances to %s - %s", phase.String(), step.String()), "action")
 
-		// Reset pass flags
-		for _, p := range gameState.players {
-			p.Passed = false
-		}
+		// Reset pass flags (preserves lost/left player state)
+		gameState.resetPassed()
 
 		// Set priority to active player
 		activePlayerID := gameState.turnManager.ActivePlayer()
@@ -526,10 +524,8 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 			nextPlayer := e.getNextPlayer(gameState)
 			phase, step := gameState.turnManager.AdvanceStep(nextPlayer)
 			gameState.addMessage(fmt.Sprintf("Game advances to %s - %s", phase.String(), step.String()), "action")
-			// Reset pass flags
-			for _, p := range gameState.players {
-				p.Passed = false
-			}
+			// Reset pass flags (preserves lost/left player state)
+			gameState.resetPassed()
 			// Set priority to active player
 			activePlayerID := gameState.turnManager.ActivePlayer()
 			
@@ -651,17 +647,8 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 	// Per MTG rules 117.3c: After a player casts a spell, activates an ability, or takes a special action,
 	// that player retains priority and may take another action. Priority only passes when the player
 	// explicitly passes or when a spell/ability resolves.
-	// Reset all players' passed flags (except lost/left players) - matches Java's resetPassed() behavior
-	for _, pid := range gameState.playerOrder {
-		p := gameState.players[pid]
-		// Only reset passed flag if player hasn't lost or left
-		if !p.Lost && !p.Left {
-			p.Passed = false
-		} else {
-			// Preserve passed state for lost/left players
-			p.Passed = true
-		}
-	}
+	// Reset all players' passed flags (preserves lost/left player state)
+	gameState.resetPassed()
 
 	// Per rule 117.5: Check state-based actions before priority
 	// Repeat until no more state-based actions occur
@@ -936,10 +923,8 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 		e.checkStateAndTriggeredAfterResolution(gameState)
 	}
 
-	// Reset pass flags after stack resolution
-	for _, p := range gameState.players {
-		p.Passed = false
-	}
+	// Reset pass flags after stack resolution (preserves lost/left player state)
+	gameState.resetPassed()
 
 	// Priority returns to active player
 	activePlayerID := gameState.turnManager.ActivePlayer()
@@ -1623,6 +1608,17 @@ func (e *MageEngine) getNextPlayerWithPriority(gameState *engineGameState, curre
 
 	// All players have lost or left
 	return ""
+}
+
+// resetPassed resets all players' passed flags, preserving the state for lost/left players.
+// Per Java implementation: passed = loses || hasLeft()
+// This ensures lost/left players remain passed and don't receive priority.
+func (gameState *engineGameState) resetPassed() {
+	for _, pid := range gameState.playerOrder {
+		p := gameState.players[pid]
+		// Set passed = true if player has lost or left, false otherwise
+		p.Passed = p.Lost || p.Left
+	}
 }
 
 func (e *MageEngine) removeCardFromSlice(cards []*internalCard, cardID string) []*internalCard {
