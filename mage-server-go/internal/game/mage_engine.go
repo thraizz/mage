@@ -456,11 +456,9 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		return fmt.Errorf("player %s does not have priority", playerID)
 	}
 
-	// Per rule 117.5: Check state-based actions before priority
-	// Repeat until no more state-based actions occur
-	for e.checkStateBasedActions(gameState) {
-		// Continue checking until stable
-	}
+	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
+	// Repeat until stable (SBA → triggers → repeat)
+	e.checkStateAndTriggered(gameState)
 
 	player.Passed = true
 	gameState.addMessage(fmt.Sprintf("%s passes", playerID), "action")
@@ -563,11 +561,9 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 		return fmt.Errorf("player %s does not have priority", playerID)
 	}
 
-	// Per rule 117.5: Check state-based actions before priority
-	// Repeat until no more state-based actions occur
-	for e.checkStateBasedActions(gameState) {
-		// Continue checking until stable
-	}
+	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
+	// Repeat until stable (SBA → triggers → repeat)
+	e.checkStateAndTriggered(gameState)
 
 	// Find card in hand
 	var card *internalCard
@@ -634,11 +630,9 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 	// Reset all players' passed flags (preserves lost/left player state)
 	gameState.resetPassed()
 
-	// Per rule 117.5: Check state-based actions before priority
-	// Repeat until no more state-based actions occur
-	for e.checkStateBasedActions(gameState) {
-		// Continue checking until stable
-	}
+	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
+	// Repeat until stable (SBA → triggers → repeat)
+	e.checkStateAndTriggered(gameState)
 
 	// Caster retains priority after casting
 	player.HasPriority = true
@@ -724,11 +718,9 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 		return fmt.Errorf("player %s does not have priority", playerID)
 	}
 
-	// Per rule 117.5: Check state-based actions before priority
-	// Repeat until no more state-based actions occur
-	for e.checkStateBasedActions(gameState) {
-		// Continue checking until stable
-	}
+	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
+	// Repeat until stable (SBA → triggers → repeat)
+	e.checkStateAndTriggered(gameState)
 
 	// Check if UUID refers to a spell on the stack that can be countered
 	stackItems := gameState.stack.List()
@@ -913,11 +905,9 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 	// Priority returns to active player
 	activePlayerID := gameState.turnManager.ActivePlayer()
 	
-	// Per rule 117.5: Check state-based actions before priority
-	// Repeat until no more state-based actions occur
-	for e.checkStateBasedActions(gameState) {
-		// Continue checking until stable
-	}
+	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
+	// Repeat until stable (SBA → triggers → repeat)
+	e.checkStateAndTriggered(gameState)
 	
 	gameState.turnManager.SetPriority(activePlayerID)
 	gameState.players[activePlayerID].HasPriority = true
@@ -1307,14 +1297,19 @@ func (e *MageEngine) ResumeGame(gameID string) error {
 	return nil
 }
 
-// checkStateAndTriggeredAfterResolution checks state-based actions and processes triggered
-// abilities after a stack item resolves. This is called after each resolution to ensure
-// SBAs and triggers are handled before the next item resolves.
-func (e *MageEngine) checkStateAndTriggeredAfterResolution(gameState *engineGameState) {
-	// Repeat until stable: check SBAs, then process triggers, repeat until nothing happens
+// checkStateAndTriggered checks state-based actions and processes triggered abilities
+// until the game state is stable. This is called before each priority per rule 117.5 and 603.3.
+// Per Java implementation: runs SBA → triggers → repeat until stable.
+// Returns true if anything happened (SBA or triggers processed).
+func (e *MageEngine) checkStateAndTriggered(gameState *engineGameState) bool {
+	somethingHappened := false
 	maxIterations := 100 // Safety limit to prevent infinite loops
+	
 	for i := 0; i < maxIterations; i++ {
+		// First check state-based actions
 		sbaHappened := e.checkStateBasedActions(gameState)
+		
+		// Then process triggered abilities
 		triggeredHappened := e.processTriggeredAbilities(gameState)
 		
 		// If nothing happened, we're stable
@@ -1322,15 +1317,27 @@ func (e *MageEngine) checkStateAndTriggeredAfterResolution(gameState *engineGame
 			break
 		}
 		
+		somethingHappened = true
+		
 		// If we hit the limit, log a warning
 		if i == maxIterations-1 {
 			if e.logger != nil {
-				e.logger.Warn("checkStateAndTriggeredAfterResolution hit iteration limit",
+				e.logger.Warn("checkStateAndTriggered hit iteration limit",
 					zap.Int("iterations", maxIterations),
 				)
 			}
 		}
 	}
+	
+	return somethingHappened
+}
+
+// checkStateAndTriggeredAfterResolution checks state-based actions and processes triggered
+// abilities after a stack item resolves. This is called after each resolution to ensure
+// SBAs and triggers are handled before the next item resolves.
+// This is a convenience wrapper around checkStateAndTriggered().
+func (e *MageEngine) checkStateAndTriggeredAfterResolution(gameState *engineGameState) {
+	e.checkStateAndTriggered(gameState)
 }
 
 // processTriggeredAbilities processes triggered abilities that should be put on the stack.
