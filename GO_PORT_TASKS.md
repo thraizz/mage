@@ -66,7 +66,7 @@ Status legend:
 - [x] Port watcher/listener infrastructure to track conditional abilities _(Watcher interface with Watch/Reset/ConditionMet methods; WatcherRegistry for managing watchers by scope (GAME/PLAYER/CARD); BaseWatcher helper; common watchers implemented: SpellsCastWatcher, CreaturesDiedWatcher, CardsDrawnWatcher, PermanentsEnteredWatcher; watchers wired to event bus; auto-reset on cleanup step; comprehensive integration tests covering event bus integration, multi-watcher scenarios, scope isolation, lifecycle management, thread safety, and real game flows)_
 - [ ] Provide hooks for UI/websocket notifications (combat updates, triggers, log lines)
 - [ ] Capture analytics/metrics for stack depth, actions per turn, average response time
-- [ ] Queue triggered abilities instead of immediately pushing to stack (process via `checkTriggered()` before priority)
+- [x] Queue triggered abilities instead of immediately pushing to stack (process via `checkTriggered()` before priority)
 
 ## Persistence, Replays & Recovery
 - [ ] Store game snapshots for reconnection and spectating
