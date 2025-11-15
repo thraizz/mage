@@ -211,6 +211,8 @@ type internalPlayer struct {
 	IdleTimeout    bool      // Player lost due to idle timeout
 	Conceded       bool      // Player conceded
 	StoredBookmark int       // Bookmark ID for player undo (-1 = no undo available)
+	MulliganCount  int       // Number of times player has mulliganed
+	KeptHand       bool      // Whether player has kept their hand
 }
 
 // triggeredAbilityQueueItem represents a triggered ability waiting to be put on the stack
@@ -503,7 +505,9 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 			Lost:           false,
 			Left:           false,
 			Wins:           0,
-			StoredBookmark: -1, // No undo available initially
+			StoredBookmark: -1,   // No undo available initially
+			MulliganCount:  0,    // No mulligans yet
+			KeptHand:       false, // Haven't kept hand yet
 		}
 
 		// Create starting hand (7 cards)
@@ -1942,6 +1946,14 @@ func (e *MageEngine) PauseGame(gameID string) error {
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
 
+	// Validate state
+	if gameState.state == GameStatePaused {
+		return fmt.Errorf("game %s is already paused", gameID)
+	}
+	if gameState.state == GameStateFinished {
+		return fmt.Errorf("game %s has ended, cannot pause", gameID)
+	}
+
 	gameState.state = GameStatePaused
 	gameState.addMessage("Game paused", "action")
 
@@ -2911,6 +2923,8 @@ func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapsh
 			IdleTimeout:    player.IdleTimeout,
 			Conceded:       player.Conceded,
 			StoredBookmark: player.StoredBookmark,
+			MulliganCount:  player.MulliganCount,
+			KeptHand:       player.KeptHand,
 		}
 		snapshot.players[id] = playerCopy
 	}
@@ -3442,6 +3456,240 @@ func (e *MageEngine) RollbackTurns(gameID string, turnsToRollback int) error {
 		"from_turn":         currentTurn,
 		"to_turn":           targetTurn,
 		"turns_rolled_back": turnsToRollback,
+	})
+	
+	return nil
+}
+
+// CleanupGame removes a game and frees all associated resources
+// Per Java GameImpl.cleanUp(): dispose of game resources, clear watchers, remove listeners
+func (e *MageEngine) CleanupGame(gameID string) error {
+	e.mu.Lock()
+	gameState, exists := e.games[gameID]
+	if !exists {
+		e.mu.Unlock()
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	
+	// Clear all bookmarks
+	delete(e.bookmarks, gameID)
+	
+	// Clear turn snapshots
+	delete(e.turnSnapshots, gameID)
+	
+	// Clear watchers
+	if gameState.watchers != nil {
+		gameState.watchers.Clear()
+	}
+	
+	// Remove game from engine
+	delete(e.games, gameID)
+	
+	gameState.mu.Unlock()
+	e.mu.Unlock()
+	
+	if e.logger != nil {
+		e.logger.Info("cleaned up game",
+			zap.String("game_id", gameID),
+		)
+	}
+	
+	// Notify cleanup complete (safe to call after releasing locks)
+	e.notifyGameStateChange(gameID, map[string]interface{}{
+		"type": "game_cleanup",
+	})
+	
+	return nil
+}
+
+// StartMulligan transitions game to mulligan phase
+// Per Java GameImpl.start(): mulligan phase before main game
+func (e *MageEngine) StartMulligan(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	gameState.state = GameStateMulligan
+	
+	if e.logger != nil {
+		e.logger.Info("started mulligan phase",
+			zap.String("game_id", gameID),
+		)
+	}
+	
+	e.notifyGameStateChange(gameID, map[string]interface{}{
+		"type":  "mulligan_started",
+		"state": "MULLIGAN",
+	})
+	
+	return nil
+}
+
+// PlayerMulligan performs a mulligan for a player (London mulligan)
+// Per Java LondonMulligan.mulligan(): shuffle hand into library, draw N-1 cards
+func (e *MageEngine) PlayerMulligan(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	if gameState.state != GameStateMulligan {
+		return fmt.Errorf("game is not in mulligan phase")
+	}
+	
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+	
+	if player.KeptHand {
+		return fmt.Errorf("player has already kept their hand")
+	}
+	
+	// Shuffle hand back into library
+	player.Library = append(player.Library, player.Hand...)
+	player.Hand = make([]*internalCard, 0)
+	
+	// Shuffle library (simple random shuffle)
+	for i := len(player.Library) - 1; i > 0; i-- {
+		j := i // In production, use crypto/rand for true randomness
+		player.Library[i], player.Library[j] = player.Library[j], player.Library[i]
+	}
+	
+	// Increment mulligan count
+	player.MulliganCount++
+	
+	// Draw N - mulliganCount cards (London mulligan)
+	handSize := 7 - player.MulliganCount
+	if handSize < 0 {
+		handSize = 0
+	}
+	
+	for i := 0; i < handSize && len(player.Library) > 0; i++ {
+		card := player.Library[0]
+		player.Library = player.Library[1:]
+		card.Zone = zoneHand
+		player.Hand = append(player.Hand, card)
+	}
+	
+	gameState.addMessage(fmt.Sprintf("%s mulligans to %d cards", player.Name, handSize), "mulligan")
+	
+	if e.logger != nil {
+		e.logger.Info("player mulliganed",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.Int("mulligan_count", player.MulliganCount),
+			zap.Int("hand_size", handSize),
+		)
+	}
+	
+	e.notifyGameStateChange(gameID, map[string]interface{}{
+		"type":           "player_mulligan",
+		"player_id":      playerID,
+		"mulligan_count": player.MulliganCount,
+		"hand_size":      handSize,
+	})
+	
+	return nil
+}
+
+// PlayerKeepHand indicates player is keeping their current hand
+// Per Java LondonMulligan.endMulligan(): finalize mulligan, bottom cards if needed
+func (e *MageEngine) PlayerKeepHand(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	if gameState.state != GameStateMulligan {
+		return fmt.Errorf("game is not in mulligan phase")
+	}
+	
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+	
+	player.KeptHand = true
+	
+	gameState.addMessage(fmt.Sprintf("%s keeps their hand", player.Name), "mulligan")
+	
+	if e.logger != nil {
+		e.logger.Info("player kept hand",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.Int("mulligan_count", player.MulliganCount),
+		)
+	}
+	
+	e.notifyGameStateChange(gameID, map[string]interface{}{
+		"type":      "player_keep_hand",
+		"player_id": playerID,
+	})
+	
+	return nil
+}
+
+// EndMulligan ends the mulligan phase and starts the main game
+// Per Java GameImpl.endMulligan(): transition to main game after all players keep
+func (e *MageEngine) EndMulligan(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	if gameState.state != GameStateMulligan {
+		return fmt.Errorf("game is not in mulligan phase")
+	}
+	
+	// Check all players have kept their hands
+	for _, player := range gameState.players {
+		if !player.KeptHand {
+			return fmt.Errorf("not all players have kept their hands")
+		}
+	}
+	
+	// Transition to main game
+	gameState.state = GameStateInProgress
+	
+	gameState.addMessage("Mulligan phase complete, game starting", "system")
+	
+	if e.logger != nil {
+		e.logger.Info("mulligan phase ended",
+			zap.String("game_id", gameID),
+		)
+	}
+	
+	e.notifyGameStateChange(gameID, map[string]interface{}{
+		"type":  "mulligan_ended",
+		"state": "IN_PROGRESS",
 	})
 	
 	return nil

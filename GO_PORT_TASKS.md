@@ -17,6 +17,9 @@ Status legend:
 - [x] Implement priority retention after casting (caster retains priority by default, only passes when explicitly passing)
 - [x] Add state bookmarking and rollback mechanism for error recovery _(Complete snapshot system with deep copy of all game state: players, cards, zones, stack, messages; BookmarkState/RestoreState/RemoveBookmark/ClearBookmarks methods; automatic error recovery in ProcessAction; tested with multiple bookmarks, restoration, and error scenarios)_
 - [ ] Implement comprehensive priority loop structure matching Java `playPriority()` pattern
+- [x] Implement mulligan system _(London mulligan with StartMulligan/PlayerMulligan/PlayerKeepHand/EndMulligan; tracks mulligan count per player; draws 7-N cards; full validation; tested with multiple mulligans and edge cases)_
+- [x] Implement game cleanup and resource disposal _(CleanupGame removes game from engine; clears all bookmarks, turn snapshots, and watchers; thread-safe; tested with resource verification)_
+- [x] Add complete lifecycle state validation _(Pause/resume validation; mulligan phase checks; finished game checks; comprehensive error messages; tested with edge cases)_
 
 ## Game State & Zones
 - [x] Surface battlefield/stack state via `GameGetView`

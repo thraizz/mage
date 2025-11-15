@@ -231,6 +231,15 @@ func (wr *WatcherRegistry) ResetWatchersByScope(scope WatcherScope) {
 	}
 }
 
+// Clear removes all watchers from the registry.
+// Used during game cleanup.
+func (wr *WatcherRegistry) Clear() {
+	wr.mu.Lock()
+	defer wr.mu.Unlock()
+	wr.watchers = make(map[string]Watcher)
+	wr.byScope = make(map[WatcherScope][]Watcher)
+}
+
 // generateKey generates a unique key for a watcher based on its scope.
 // Uses reflection to get the type name for better uniqueness.
 func (wr *WatcherRegistry) generateKey(watcher Watcher) string {

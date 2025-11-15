@@ -1684,6 +1684,353 @@ func TestCannotRollbackBeyondAvailableSnapshots(t *testing.T) {
 	}
 }
 
+// TestGameLifecycleComplete verifies the complete game lifecycle
+func TestGameLifecycleComplete(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "lifecycle-test"
+	players := []string{"Alice", "Bob"}
+
+	// 1. Start game
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Verify game is in progress
+	viewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view := viewRaw.(*game.EngineGameView)
+	if view.State != game.GameStateInProgress {
+		t.Errorf("expected state IN_PROGRESS, got %v", view.State)
+	}
+
+	// 2. Pause game
+	if err := engine.PauseGame(gameID); err != nil {
+		t.Fatalf("failed to pause game: %v", err)
+	}
+
+	viewRaw, err = engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view = viewRaw.(*game.EngineGameView)
+	if view.State != game.GameStatePaused {
+		t.Errorf("expected state PAUSED, got %v", view.State)
+	}
+
+	// 3. Resume game
+	if err := engine.ResumeGame(gameID); err != nil {
+		t.Fatalf("failed to resume game: %v", err)
+	}
+
+	viewRaw, err = engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view = viewRaw.(*game.EngineGameView)
+	if view.State != game.GameStateInProgress {
+		t.Errorf("expected state IN_PROGRESS after resume, got %v", view.State)
+	}
+
+	// 4. End game
+	if err := engine.EndGame(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to end game: %v", err)
+	}
+
+	viewRaw, err = engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view = viewRaw.(*game.EngineGameView)
+	if view.State != game.GameStateFinished {
+		t.Errorf("expected state FINISHED, got %v", view.State)
+	}
+
+	// 5. Cleanup game
+	if err := engine.CleanupGame(gameID); err != nil {
+		t.Fatalf("failed to cleanup game: %v", err)
+	}
+
+	// Verify game is removed
+	if _, err := engine.GetGameView(gameID, "Alice"); err == nil {
+		t.Error("expected error after cleanup, game should be removed")
+	}
+}
+
+// TestMulliganPhase verifies the mulligan system works correctly
+func TestMulliganPhase(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "mulligan-test"
+	players := []string{"Alice", "Bob"}
+
+	// Start game
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Get initial hand size
+	viewRaw, err := engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view := viewRaw.(*game.EngineGameView)
+	initialHandSize := len(view.Players[0].Hand)
+	if initialHandSize != 7 {
+		t.Errorf("expected 7 cards in starting hand, got %d", initialHandSize)
+	}
+
+	// Transition to mulligan phase
+	if err := engine.StartMulligan(gameID); err != nil {
+		t.Fatalf("failed to start mulligan: %v", err)
+	}
+
+	// Alice mulligans
+	if err := engine.PlayerMulligan(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to mulligan: %v", err)
+	}
+
+	// Verify Alice has 6 cards (7 - 1 mulligan)
+	viewRaw, err = engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view = viewRaw.(*game.EngineGameView)
+	if len(view.Players[0].Hand) != 6 {
+		t.Errorf("expected 6 cards after 1 mulligan, got %d", len(view.Players[0].Hand))
+	}
+
+	// Alice mulligans again
+	if err := engine.PlayerMulligan(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to mulligan again: %v", err)
+	}
+
+	// Verify Alice has 5 cards (7 - 2 mulligans)
+	viewRaw, err = engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view = viewRaw.(*game.EngineGameView)
+	if len(view.Players[0].Hand) != 5 {
+		t.Errorf("expected 5 cards after 2 mulligans, got %d", len(view.Players[0].Hand))
+	}
+
+	// Alice keeps
+	if err := engine.PlayerKeepHand(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to keep hand: %v", err)
+	}
+
+	// Bob keeps (no mulligans)
+	if err := engine.PlayerKeepHand(gameID, "Bob"); err != nil {
+		t.Fatalf("failed to keep hand: %v", err)
+	}
+
+	// End mulligan phase
+	if err := engine.EndMulligan(gameID); err != nil {
+		t.Fatalf("failed to end mulligan: %v", err)
+	}
+
+	// Verify game is in progress
+	viewRaw, err = engine.GetGameView(gameID, "Alice")
+	if err != nil {
+		t.Fatalf("failed to get view: %v", err)
+	}
+	view = viewRaw.(*game.EngineGameView)
+	if view.State != game.GameStateInProgress {
+		t.Errorf("expected state IN_PROGRESS, got %v", view.State)
+	}
+}
+
+// TestMulliganValidation verifies mulligan validation rules
+func TestMulliganValidation(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "mulligan-validation-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Can't mulligan before mulligan phase
+	if err := engine.PlayerMulligan(gameID, "Alice"); err == nil {
+		t.Error("expected error mulliganing outside mulligan phase")
+	}
+
+	// Start mulligan
+	if err := engine.StartMulligan(gameID); err != nil {
+		t.Fatalf("failed to start mulligan: %v", err)
+	}
+
+	// Alice keeps
+	if err := engine.PlayerKeepHand(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to keep hand: %v", err)
+	}
+
+	// Alice can't mulligan after keeping
+	if err := engine.PlayerMulligan(gameID, "Alice"); err == nil {
+		t.Error("expected error mulliganing after keeping hand")
+	}
+
+	// Can't end mulligan until all players keep
+	if err := engine.EndMulligan(gameID); err == nil {
+		t.Error("expected error ending mulligan before all players keep")
+	}
+
+	// Bob keeps
+	if err := engine.PlayerKeepHand(gameID, "Bob"); err != nil {
+		t.Fatalf("failed to keep hand: %v", err)
+	}
+
+	// Now can end mulligan
+	if err := engine.EndMulligan(gameID); err != nil {
+		t.Fatalf("failed to end mulligan: %v", err)
+	}
+}
+
+// TestCleanupGame verifies game cleanup removes all resources
+func TestCleanupGame(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "cleanup-test"
+	players := []string{"Alice", "Bob"}
+
+	// Start and end game
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Create some bookmarks
+	bookmark1, _ := engine.BookmarkState(gameID)
+	bookmark2, _ := engine.BookmarkState(gameID)
+
+	// Save turn snapshot
+	engine.SaveTurnSnapshot(gameID, 2)
+
+	// End game
+	if err := engine.EndGame(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to end game: %v", err)
+	}
+
+	// Cleanup
+	if err := engine.CleanupGame(gameID); err != nil {
+		t.Fatalf("failed to cleanup: %v", err)
+	}
+
+	// Verify game is removed
+	if _, err := engine.GetGameView(gameID, "Alice"); err == nil {
+		t.Error("expected error after cleanup")
+	}
+
+	// Verify bookmarks are removed
+	if err := engine.RestoreState(gameID, bookmark1, "should fail"); err == nil {
+		t.Error("expected error restoring bookmark after cleanup")
+	}
+	if err := engine.RestoreState(gameID, bookmark2, "should fail"); err == nil {
+		t.Error("expected error restoring bookmark after cleanup")
+	}
+}
+
+// TestPlayerLossConditions verifies all player loss conditions
+func TestPlayerLossConditions(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	tests := []struct {
+		name     string
+		lossFunc func(string, string) error
+	}{
+		{"concede", engine.PlayerConcede},
+		{"timer_timeout", engine.PlayerTimerTimeout},
+		{"idle_timeout", engine.PlayerIdleTimeout},
+		{"quit", engine.PlayerQuit},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gameID := "loss-test-" + tt.name
+			players := []string{"Alice", "Bob"}
+
+			if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+				t.Fatalf("failed to start game: %v", err)
+			}
+
+			// Alice loses
+			if err := tt.lossFunc(gameID, "Alice"); err != nil {
+				t.Fatalf("failed to trigger loss: %v", err)
+			}
+
+			// Verify Alice is marked as lost
+			viewRaw, err := engine.GetGameView(gameID, "Bob")
+			if err != nil {
+				t.Fatalf("failed to get view: %v", err)
+			}
+			view := viewRaw.(*game.EngineGameView)
+
+			aliceView := view.Players[0]
+			if aliceView.PlayerID == "Alice" {
+				if !aliceView.Lost {
+					t.Error("expected Alice to be marked as lost")
+				}
+			}
+
+			// Verify game ended (only 1 player left)
+			if view.State != game.GameStateFinished {
+				t.Errorf("expected game to end, got state %v", view.State)
+			}
+		})
+	}
+}
+
+// TestPauseResumeValidation verifies pause/resume validation
+func TestPauseResumeValidation(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	gameID := "pause-validation-test"
+	players := []string{"Alice", "Bob"}
+
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Pause game
+	if err := engine.PauseGame(gameID); err != nil {
+		t.Fatalf("failed to pause: %v", err)
+	}
+
+	// Can't pause already paused game
+	if err := engine.PauseGame(gameID); err == nil {
+		t.Error("expected error pausing already paused game")
+	}
+
+	// Resume game
+	if err := engine.ResumeGame(gameID); err != nil {
+		t.Fatalf("failed to resume: %v", err)
+	}
+
+	// Can't resume non-paused game
+	if err := engine.ResumeGame(gameID); err == nil {
+		t.Error("expected error resuming non-paused game")
+	}
+
+	// End game
+	if err := engine.EndGame(gameID, "Alice"); err != nil {
+		t.Fatalf("failed to end game: %v", err)
+	}
+
+	// Can't pause finished game
+	if err := engine.PauseGame(gameID); err == nil {
+		t.Error("expected error pausing finished game")
+	}
+}
+
 // TestNotificationDeadlock reproduces the deadlock bug where a notification handler
 // tries to call GetGameView() while the engine is holding gameState.mu lock.
 // This test documents the broken state before the fix.
