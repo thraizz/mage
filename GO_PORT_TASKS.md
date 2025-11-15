@@ -10,24 +10,24 @@ Status legend:
 - [x] Provide `MageEngine` core skeleton that tracks games, players, and actions
 - [x] Implement `TurnManager` mirroring MTG phase/step progression and priority handoff
 - [x] Introduce `StackManager` with basic push/pop mechanics and simple resolution hooks
-- [~] Extend stack resolution to support triggered abilities, replacement effects, and modal choices _(trigger queue with APNAP ordering implemented; triggered abilities queued and processed before priority; replacement/modal hooks pending)_
+- [~] Extend stack resolution to support triggered abilities, replacement effects, and modal choices
 - [ ] Implement priority windows for casting during stack resolution (e.g., mana abilities, nested responses)
 - [ ] Persist stack/game events for replay and spectator synchronization
-- [x] Add comprehensive error handling and rollback when resolution fails _(ProcessAction creates automatic bookmark before each action; on error, state is restored to bookmark; successful actions remove bookmark; comprehensive logging of recovery operations)_
+- [x] Add comprehensive error handling and rollback when resolution fails
 - [x] Implement priority retention after casting (caster retains priority by default, only passes when explicitly passing)
-- [x] Add state bookmarking and rollback mechanism for error recovery _(Complete snapshot system with deep copy of all game state: players, cards, zones, stack, messages; BookmarkState/RestoreState/RemoveBookmark/ClearBookmarks methods; automatic error recovery in ProcessAction; tested with multiple bookmarks, restoration, and error scenarios)_
+- [x] Add state bookmarking and rollback mechanism for error recovery
 - [ ] Implement comprehensive priority loop structure matching Java `playPriority()` pattern
-- [x] Implement mulligan system _(London mulligan with StartMulligan/PlayerMulligan/PlayerKeepHand/EndMulligan; tracks mulligan count per player; draws 7-N cards; full validation; tested with multiple mulligans and edge cases)_
-- [x] Implement game cleanup and resource disposal _(CleanupGame removes game from engine; clears all bookmarks, turn snapshots, and watchers; thread-safe; tested with resource verification)_
-- [x] Add complete lifecycle state validation _(Pause/resume validation; mulligan phase checks; finished game checks; comprehensive error messages; tested with edge cases)_
+- [x] Implement mulligan system
+- [x] Implement game cleanup and resource disposal
+- [x] Add complete lifecycle state validation
 
 ## Game State & Zones
 - [x] Surface battlefield/stack state via `GameGetView`
-- [x] Synchronize graveyard, exile, command, and hidden zones with engine updates _(unified `moveCard` system handles all zone transitions with proper removal/addition; graveyard/exile/command zones tracked; zone change events emitted)_
-- [x] Track card ownership/controller changes (gain control, copying, phasing, etc.) _(ChangeControl method implemented to change controller of permanents; emits GAIN_CONTROL and LOSE_CONTROL events; validates new controller is in game; comprehensive error handling; ownership tracked separately from control; tested with error cases)_
-- [~] Implement continuous effects layer system (layers 1-7 per Comprehensive Rules) _(layer manager in place for basic power/toughness buffs; additional layers forthcoming)_
-- [x] Handle state-based actions (lethal damage, zero loyalty, legend rule, etc.) _(life ≤ 0 auto-loss; zero/less toughness deaths; planeswalker 0 loyalty; lethal damage (damage >= toughness); legend rule (multiple legendary permanents with same name); world rule (multiple world enchantments); planeswalker uniqueness (multiple planeswalkers with same type); damage tracking system implemented)_
-- [x] Support counters (loyalty, +1/+1, poison, energy, experience) _(Counter and Counters data structures; counter operations (add/remove) with event emission; boost counters integrated with layer system for power/toughness; planeswalker loyalty SBA; player counters tracked for poison/energy/experience; counter views updated across all zones)_
+- [x] Synchronize graveyard, exile, command, and hidden zones with engine updates
+- [x] Track card ownership/controller changes (gain control, copying, phasing, etc.)
+- [~] Implement continuous effects layer system (layers 1-7 per Comprehensive Rules)
+- [x] Handle state-based actions (lethal damage, zero loyalty, legend rule, etc.)
+- [x] Support counters (loyalty, +1/+1, poison, energy, experience)
 - [x] Provide deterministic UUID mapping for permanents, abilities, and triggers
 - [x] Call `checkStateBasedActions()` before each priority (per rule 117.5)
 - [x] Fix `resetPassed()` to preserve lost/left player state (`passed = loses || hasLeft()`)
@@ -40,9 +40,9 @@ Status legend:
 - [x] Allow triggered abilities to be queued automatically when conditions are met
 - [ ] Support casting spells/activating abilities while another object is resolving (linked abilities)
 - [ ] Implement replacement/prevention effects that modify or negate stack resolution
-- [x] Ensure stack legality checks (targets available, costs paid) prior to resolution _(LegalityChecker validates controller status, source card zones, target validity, timing restrictions, and cost payment; illegal items automatically removed from stack with events; GameStateAccessor interface implemented for state queries; comprehensive unit tests)_
-- [ ] Implement target selection flow for spells/abilities requiring targets _(server must prompt for target selection before adding to stack; validate target requirements match spell/ability rules; handle multi-targeting; ensure targets are selected before casting completes)_
-- [x] Add exhaustive integration tests covering multi-object stacks, counterspells, and priority loops _(Comprehensive test suite: multi-object stack resolution (LIFO order), counterspell interactions, nested responses, priority loops with multiple players, stack legality checks, complex scenarios with multiple spells/responses; tests account for triggered abilities and verify proper resolution order)_
+- [x] Ensure stack legality checks (targets available, costs paid) prior to resolution
+- [ ] Implement target selection flow for spells/abilities requiring targets
+- [x] Add exhaustive integration tests covering multi-object stacks, counterspells, and priority loops
 - [x] Resolve stack one item at a time with state-based action and triggered ability checks between each resolution
 - [x] Implement triggered ability queue processing before priority (APNAP order: Active Player, Non-Active Player)
 - [x] Add `checkStateAndTriggered()` method that runs before each priority (SBA → triggers → repeat until stable)
@@ -50,22 +50,22 @@ Status legend:
 
 ## Combat System 🚧 IN PROGRESS (~5% coverage, ~2,500 lines needed)
 ### Core Combat Infrastructure (P0 - Critical)
-- [x] Implement `combatState` struct tracking attackers, blockers, groups, defenders, tapped creatures _(complete with all tracking maps)_
-- [x] Implement `combatGroup` struct for attacker-blocker-defender groupings with damage ordering _(complete with attacker/blocker lists, orders, blocked status)_
-- [x] Add combat fields to `internalCard`: `Attacking`, `Blocking`, `AttackingWhat`, `BlockingWhat` _(all fields added)_
-- [x] Add `combat *combatState` to `engineGameState` _(initialized in StartGame)_
-- [x] Implement `ResetCombat(gameID)` - clear combat state at beginning of combat _(clears all combat state and card flags)_
-- [x] Implement `SetAttacker(gameID, playerID)` - set attacking player _(sets attackingPlayerID)_
-- [x] Implement `SetDefenders(gameID)` - identify all valid defenders (players, planeswalkers, battles) _(adds opponent players; TODO: planeswalkers/battles)_
+- [x] Implement `combatState` struct tracking attackers, blockers, groups, defenders, tapped creatures
+- [x] Implement `combatGroup` struct for attacker-blocker-defender groupings with damage ordering
+- [x] Add combat fields to `internalCard`: `Attacking`, `Blocking`, `AttackingWhat`, `BlockingWhat`
+- [x] Add `combat *combatState` to `engineGameState`
+- [x] Implement `ResetCombat(gameID)` - clear combat state at beginning of combat
+- [x] Implement `SetAttacker(gameID, playerID)` - set attacking player
+- [x] Implement `SetDefenders(gameID)` - identify all valid defenders (players, planeswalkers, battles)
 
 ### Attacker Declaration (P0 - Critical)
-- [x] Implement `DeclareAttacker(gameID, creatureID, defenderID, playerID)` - declare single attacker _(complete with validation, tapping, group creation, events)_
-- [~] Implement `CanAttack(gameID, creatureID)` - validate creature can attack (summoning sickness, tapped, restrictions) _(tapped check done; TODO: summoning sickness, restrictions)_
+- [x] Implement `DeclareAttacker(gameID, creatureID, defenderID, playerID)` - declare single attacker
+- [~] Implement `CanAttack(gameID, creatureID)` - validate creature can attack (summoning sickness, tapped, restrictions)
 - [ ] Implement `CanAttackDefender(gameID, creatureID, defenderID)` - validate can attack specific defender
-- [~] Implement attacker tapping logic (tap unless vigilance) _(taps creature; TODO: check vigilance ability)_
-- [x] Create/update combat groups when attackers declared _(creates group per defender, adds attackers)_
+- [~] Implement attacker tapping logic (tap unless vigilance)
+- [x] Create/update combat groups when attackers declared
 - [ ] Implement `RemoveAttacker(gameID, attackerID)` - undo attacker declaration
-- [x] Fire `EventAttackerDeclared` per attacker and `EventDeclaredAttackers` when complete _(EventAttackerDeclared fired per attacker)_
+- [x] Fire `EventAttackerDeclared` per attacker and `EventDeclaredAttackers` when complete
 
 ### Blocker Declaration (P0 - Critical)
 - [ ] Implement `DeclareBlocker(gameID, blockerID, attackerID, playerID)` - declare single blocker
@@ -224,8 +224,8 @@ Status legend:
 
 ## Player Interaction & Prompts
 - [x] Emit prompts when priority passes require player response
-- [ ] Support multi-choice prompts (choose mode, targets, numbers, colors) _(target selection prompts covered by "target selection flow" task in Stack & Trigger System)_
-- [x] Implement mana payment flow (floating mana, cost reductions, hybrid costs) _(mana pool with regular/floating mana; cost parsing for generic, colored, X, hybrid; payment calculation and execution; cost reduction effects; floating mana empties at end of step; integrated with spell casting; comprehensive tests)_
+- [ ] Support multi-choice prompts (choose mode, targets, numbers, colors)
+- [x] Implement mana payment flow (floating mana, cost reductions, hybrid costs)
 - [x] Add concession, timeout, and match result handling aligned with rules
 
 ## Card Database & Ability Port
@@ -237,22 +237,22 @@ Status legend:
 - [ ] Build automated verification to compare Java vs Go card behavior for representative samples
 
 ## Event System & Watchers
-- [x] Mirror Java event bus for game events _(Complete event bus implementation with all 200+ event types from Java GameEvent.EventType enum; typed subscriptions, batch events, helper functions; events wired for spell cast, zone changes, life changes, mana, phase/step transitions, stack resolution, permanent entry/dies)_
-- [x] Port watcher/listener infrastructure to track conditional abilities _(Watcher interface with Watch/Reset/ConditionMet methods; WatcherRegistry for managing watchers by scope (GAME/PLAYER/CARD); BaseWatcher helper; common watchers implemented: SpellsCastWatcher, CreaturesDiedWatcher, CardsDrawnWatcher, PermanentsEnteredWatcher; watchers wired to event bus; auto-reset on cleanup step; comprehensive integration tests covering event bus integration, multi-watcher scenarios, scope isolation, lifecycle management, thread safety, and real game flows)_
+- [x] Mirror Java event bus for game events
+- [x] Port watcher/listener infrastructure to track conditional abilities
 - [x] Provide hooks for UI/websocket notifications (combat updates, triggers, log lines)
 - [x] Capture analytics/metrics for stack depth, actions per turn, average response time
 - [x] Queue triggered abilities instead of immediately pushing to stack (process via `checkTriggered()` before priority)
 
 ## Undo/Redo & State Management
-- [x] Implement per-player stored bookmarks for action undo _(StoredBookmark field on internalPlayer; SetPlayerStoredBookmark/ResetPlayerStoredBookmark methods; bookmark set automatically in ProcessAction; preserved until action completes or becomes irreversible)_
-- [x] Add player-initiated undo command _(Undo(gameID, playerID) method; restores to player's stored bookmark; clears bookmark after undo; comprehensive error handling; tested with spell casting undo)_
-- [x] Implement strategic bookmark placement in game flow _(Automatic bookmark creation in ProcessAction before each action; bookmarks set as player's stored bookmark; covers spell casting, mana payment, combat declarations)_
-- [x] Add bookmark invalidation rules _(Bookmarks cleared when spell resolves, phase changes, turn rollback occurs; ResetPlayerStoredBookmark called at appropriate times; tested with resolution invalidation)_
-- [x] Implement turn rollback system with turn-level snapshots _(Separate turnSnapshots map; SaveTurnSnapshot at start of each turn; keeps last 4 turns; CanRollbackTurns/RollbackTurns methods; clears all player bookmarks on rollback; tested with snapshot limits)_
-- [x] Integrate undo/redo with error recovery system _(ProcessAction creates bookmark before action; on error, auto-restores; on success, checks if bookmark in use by player before removing; seamless integration with player undo)_
+- [x] Implement per-player stored bookmarks for action undo
+- [x] Add player-initiated undo command
+- [x] Implement strategic bookmark placement in game flow
+- [x] Add bookmark invalidation rules
+- [x] Implement turn rollback system with turn-level snapshots
+- [x] Integrate undo/redo with error recovery system
 
 ## Persistence, Replays & Recovery
-- [x] Store game snapshots for reconnection and spectating _(gameStateSnapshot structure with complete deep copy of all game state; used for both undo/redo and turn rollback; efficient memory management with automatic cleanup)_
+- [x] Store game snapshots for reconnection and spectating
 - [ ] Implement replay recording/playback (step-by-step action logs)
 - [ ] Ensure deterministic serialization for saved games and tournaments
 - [ ] Add checksum/validation to guard against divergent game state
