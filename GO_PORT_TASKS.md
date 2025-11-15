@@ -13,9 +13,9 @@ Status legend:
 - [~] Extend stack resolution to support triggered abilities, replacement effects, and modal choices _(trigger queue with APNAP ordering implemented; triggered abilities queued and processed before priority; replacement/modal hooks pending)_
 - [ ] Implement priority windows for casting during stack resolution (e.g., mana abilities, nested responses)
 - [ ] Persist stack/game events for replay and spectator synchronization
-- [ ] Add comprehensive error handling and rollback when resolution fails
+- [x] Add comprehensive error handling and rollback when resolution fails _(ProcessAction creates automatic bookmark before each action; on error, state is restored to bookmark; successful actions remove bookmark; comprehensive logging of recovery operations)_
 - [x] Implement priority retention after casting (caster retains priority by default, only passes when explicitly passing)
-- [ ] Add state bookmarking and rollback mechanism for error recovery
+- [x] Add state bookmarking and rollback mechanism for error recovery _(Complete snapshot system with deep copy of all game state: players, cards, zones, stack, messages; BookmarkState/RestoreState/RemoveBookmark/ClearBookmarks methods; automatic error recovery in ProcessAction; tested with multiple bookmarks, restoration, and error scenarios)_
 - [ ] Implement comprehensive priority loop structure matching Java `playPriority()` pattern
 
 ## Game State & Zones
