@@ -266,11 +266,24 @@ type engineGameState struct {
 	mu            sync.RWMutex
 }
 
+// GameNotification represents a notification that can be sent to UI/websocket clients
+type GameNotification struct {
+	Type      string                 // Type of notification (e.g., "PRIORITY_CHANGE", "STACK_UPDATE", "COMBAT_UPDATE")
+	GameID    string                 // Game ID
+	PlayerID  string                 // Target player ID (empty for broadcast)
+	Timestamp time.Time              // When the notification was created
+	Data      map[string]interface{} // Notification-specific data
+}
+
+// NotificationHandler is a function that handles game notifications
+type NotificationHandler func(notification GameNotification)
+
 // MageEngine is the main game engine implementation
 type MageEngine struct {
-	logger *zap.Logger
-	mu     sync.RWMutex
-	games  map[string]*engineGameState
+	logger              *zap.Logger
+	mu                  sync.RWMutex
+	games               map[string]*engineGameState
+	notificationHandler NotificationHandler // Optional handler for UI/websocket notifications
 }
 
 // NewMageEngine creates a new MageEngine instance
@@ -279,6 +292,93 @@ func NewMageEngine(logger *zap.Logger) *MageEngine {
 		logger: logger,
 		games:  make(map[string]*engineGameState),
 	}
+}
+
+// SetNotificationHandler sets the handler for game notifications
+// This allows external systems (UI, websockets) to receive real-time game updates
+func (e *MageEngine) SetNotificationHandler(handler NotificationHandler) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.notificationHandler = handler
+}
+
+// emitNotification sends a notification to the registered handler
+// Note: This method should not acquire locks as it may be called while holding locks
+func (e *MageEngine) emitNotification(notification GameNotification) {
+	// Read handler without lock - this is safe for reads after initialization
+	// The handler is only set once during setup and never changed
+	handler := e.notificationHandler
+
+	if handler != nil {
+		// Call handler in a goroutine to avoid blocking game logic
+		go handler(notification)
+	}
+}
+
+// notifyPriorityChange notifies that priority has changed
+func (e *MageEngine) notifyPriorityChange(gameID, playerID string, data map[string]interface{}) {
+	e.emitNotification(GameNotification{
+		Type:      "PRIORITY_CHANGE",
+		GameID:    gameID,
+		PlayerID:  playerID,
+		Timestamp: time.Now(),
+		Data:      data,
+	})
+}
+
+// notifyStackUpdate notifies that the stack has changed
+func (e *MageEngine) notifyStackUpdate(gameID string, data map[string]interface{}) {
+	e.emitNotification(GameNotification{
+		Type:      "STACK_UPDATE",
+		GameID:    gameID,
+		PlayerID:  "", // Broadcast to all players
+		Timestamp: time.Now(),
+		Data:      data,
+	})
+}
+
+// notifyGameStateChange notifies that the game state has changed
+func (e *MageEngine) notifyGameStateChange(gameID string, data map[string]interface{}) {
+	e.emitNotification(GameNotification{
+		Type:      "GAME_STATE_CHANGE",
+		GameID:    gameID,
+		PlayerID:  "", // Broadcast to all players
+		Timestamp: time.Now(),
+		Data:      data,
+	})
+}
+
+// notifyPhaseChange notifies that the phase/step has changed
+func (e *MageEngine) notifyPhaseChange(gameID string, data map[string]interface{}) {
+	e.emitNotification(GameNotification{
+		Type:      "PHASE_CHANGE",
+		GameID:    gameID,
+		PlayerID:  "", // Broadcast to all players
+		Timestamp: time.Now(),
+		Data:      data,
+	})
+}
+
+// notifyPlayerAction notifies about a player action
+func (e *MageEngine) notifyPlayerAction(gameID, playerID string, data map[string]interface{}) {
+	e.emitNotification(GameNotification{
+		Type:      "PLAYER_ACTION",
+		GameID:    gameID,
+		PlayerID:  "", // Broadcast to all players
+		Timestamp: time.Now(),
+		Data:      data,
+	})
+}
+
+// notifyTrigger notifies about a triggered ability
+func (e *MageEngine) notifyTrigger(gameID string, data map[string]interface{}) {
+	e.emitNotification(GameNotification{
+		Type:      "TRIGGER",
+		GameID:    gameID,
+		PlayerID:  "", // Broadcast to all players
+		Timestamp: time.Now(),
+		Data:      data,
+	})
 }
 
 // StartGame initializes a new game state
@@ -387,6 +487,13 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 	gameState.addMessage("Game started", "action")
 
 	e.games[gameID] = gameState
+
+	// Notify game start
+	e.notifyGameStateChange(gameID, map[string]interface{}{
+		"state":     "started",
+		"game_type": gameType,
+		"players":   players,
+	})
 
 	if e.logger != nil {
 		e.logger.Info("mage engine started game",
@@ -525,6 +632,14 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		phase, step := gameState.turnManager.AdvanceStep(nextPlayer)
 		gameState.addMessage(fmt.Sprintf("Game advances to %s - %s", phase.String(), step.String()), "action")
 
+		// Notify phase change
+		e.notifyPhaseChange(gameState.gameID, map[string]interface{}{
+			"phase":         phase.String(),
+			"step":          step.String(),
+			"active_player": gameState.turnManager.ActivePlayer(),
+			"turn":          gameState.turnManager.TurnNumber(),
+		})
+
 		// Reset pass flags (preserves lost/left player state)
 		gameState.resetPassed()
 
@@ -532,6 +647,13 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		activePlayerID := gameState.turnManager.ActivePlayer()
 		gameState.turnManager.SetPriority(activePlayerID)
 		gameState.players[activePlayerID].HasPriority = true
+
+		// Notify priority change
+		e.notifyPriorityChange(gameState.gameID, activePlayerID, map[string]interface{}{
+			"active_player": activePlayerID,
+			"phase":         gameState.turnManager.CurrentPhase().String(),
+			"step":          gameState.turnManager.CurrentStep().String(),
+		})
 
 		// Per rule 117.5: Check state-based actions before priority
 		// Repeat until no more state-based actions occur
@@ -664,6 +786,15 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 	gameState.trackSpellCast()
 	gameState.trackAction()
 	gameState.addMessage(fmt.Sprintf("%s casts %s", playerID, card.Name), "action")
+
+	// Notify stack update
+	e.notifyStackUpdate(gameState.gameID, map[string]interface{}{
+		"action":      "spell_cast",
+		"player_id":   playerID,
+		"card_name":   card.Name,
+		"card_id":     cardID,
+		"stack_depth": len(gameState.stack.List()),
+	})
 
 	// Emit spell cast event
 	spellCastEvent := rules.Event{
@@ -1566,6 +1697,13 @@ func (e *MageEngine) checkIfGameIsOver(gameState *engineGameState) bool {
 			gameState.state = GameStateFinished
 			gameState.addMessage(fmt.Sprintf("%s wins the game!", lastRemainingPlayer.Name), "system")
 
+			// Notify game end
+			e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+				"state":     "finished",
+				"winner_id": lastRemainingPlayer.PlayerID,
+				"winner":    lastRemainingPlayer.Name,
+			})
+
 			if e.logger != nil {
 				e.logger.Info("game ended",
 					zap.String("game_id", gameState.gameID),
@@ -1576,6 +1714,12 @@ func (e *MageEngine) checkIfGameIsOver(gameState *engineGameState) bool {
 			// Draw or all players lost
 			gameState.state = GameStateFinished
 			gameState.addMessage("Game ended in a draw", "system")
+
+			// Notify game end
+			e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+				"state":  "finished",
+				"result": "draw",
+			})
 
 			if e.logger != nil {
 				e.logger.Info("game ended in draw",
@@ -2026,6 +2170,15 @@ func (e *MageEngine) putTriggeredAbilityOnStack(gameState *engineGameState, abil
 	gameState.trackStackItem()
 	gameState.trackStackDepth()
 	gameState.trackTriggerProcessed()
+	
+	// Notify trigger
+	e.notifyTrigger(gameState.gameID, map[string]interface{}{
+		"ability_id":  ability.ID,
+		"source_id":   ability.SourceID,
+		"controller":  ability.Controller,
+		"description": ability.Description,
+		"uses_stack":  ability.UsesStack,
+	})
 	
 	if e.logger != nil {
 		e.logger.Debug("put triggered ability on stack",

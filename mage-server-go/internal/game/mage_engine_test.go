@@ -1016,3 +1016,46 @@ func TestTimerTimeout(t *testing.T) {
 		t.Errorf("expected Bob to have 1 win, got %d", bobView.Wins)
 	}
 }
+
+// TestNotificationSystem verifies that game notifications are emitted correctly
+func TestNotificationSystem(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	engine := game.NewMageEngine(logger)
+
+	// Track received notifications
+	notifications := make(chan game.GameNotification, 10)
+
+	// Set up notification handler
+	engine.SetNotificationHandler(func(notification game.GameNotification) {
+		select {
+		case notifications <- notification:
+		default:
+			// Channel full, skip
+		}
+	})
+
+	gameID := "notification-test"
+	players := []string{"Alice", "Bob"}
+
+	// Start game
+	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
+		t.Fatalf("failed to start game: %v", err)
+	}
+
+	// Wait for game start notification with timeout
+	select {
+	case n := <-notifications:
+		if n.Type != "GAME_STATE_CHANGE" {
+			t.Errorf("expected GAME_STATE_CHANGE, got %s", n.Type)
+		}
+		if n.Data["state"] != "started" {
+			t.Errorf("expected state 'started', got %v", n.Data["state"])
+		}
+		if n.GameID != gameID {
+			t.Errorf("expected game_id %s, got %s", gameID, n.GameID)
+		}
+		t.Logf("Received notification: Type=%s, GameID=%s, Data=%v", n.Type, n.GameID, n.Data)
+	case <-time.After(1 * time.Second):
+		t.Fatal("timeout waiting for game start notification")
+	}
+}
