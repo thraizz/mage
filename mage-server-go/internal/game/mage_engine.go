@@ -465,25 +465,8 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 	player.Passed = true
 	gameState.addMessage(fmt.Sprintf("%s passes", playerID), "action")
 
-	// Check if all players have passed
-	allPassed := true
-	activePlayers := 0
-	for _, pid := range gameState.playerOrder {
-		p := gameState.players[pid]
-		if !p.Lost && !p.Left {
-			activePlayers++
-			if !p.Passed {
-				allPassed = false
-			}
-		}
-	}
-
-	// If only one active player, they can't pass to themselves
-	if activePlayers <= 1 {
-		allPassed = false
-	}
-
-	if allPassed {
+	// Check if all players who can respond have passed
+	if gameState.allPassed() {
 		// Resolve stack if not empty
 		if !gameState.stack.IsEmpty() {
 			return e.resolveStack(gameState)
@@ -515,10 +498,11 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		// Pass priority to next player
 		nextPlayerID := e.getNextPlayerWithPriority(gameState, playerID)
 		if nextPlayerID == "" {
-			// No valid next player, all must have passed
-			allPassed = true
-			if !gameState.stack.IsEmpty() {
-				return e.resolveStack(gameState)
+			// No valid next player, all players who can respond have passed
+			if gameState.allPassed() {
+				if !gameState.stack.IsEmpty() {
+					return e.resolveStack(gameState)
+				}
 			}
 			// Advance step/phase
 			nextPlayer := e.getNextPlayer(gameState)
@@ -1619,6 +1603,28 @@ func (gameState *engineGameState) resetPassed() {
 		// Set passed = true if player has lost or left, false otherwise
 		p.Passed = p.Lost || p.Left
 	}
+}
+
+// canRespond checks if a player can respond to game actions.
+// Per Java implementation: returns true if player is in game (not lost, not left).
+// In Java: isInGame() && !abort && !Thread.currentThread().isInterrupted()
+// For now, we check Lost and Left; can be extended with Won, Drew, Quit, Abort fields if needed.
+func (p *internalPlayer) canRespond() bool {
+	return !p.Lost && !p.Left
+}
+
+// allPassed checks if all players who can respond have passed.
+// Per Java implementation: only considers players who canRespond().
+// Returns true if all responding players have passed, false otherwise.
+func (gameState *engineGameState) allPassed() bool {
+	for _, pid := range gameState.playerOrder {
+		p := gameState.players[pid]
+		// Only consider players who can respond
+		if !p.Passed && p.canRespond() {
+			return false
+		}
+	}
+	return true
 }
 
 func (e *MageEngine) removeCardFromSlice(cards []*internalCard, cardID string) []*internalCard {
