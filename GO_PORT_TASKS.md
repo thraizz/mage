@@ -88,10 +88,12 @@ Status legend:
 - [ ] Fire `EventCombatDamageAssigned` and `EventCombatDamageApplied` events
 
 ### Combat Cleanup (P0 - Critical)
-- [ ] Implement `EndCombat(gameID)` - move groups to formerGroups, clear current combat
-- [ ] Clear `Attacking` and `Blocking` flags on all creatures
-- [ ] Keep attacker tracking for "attacked this turn" queries
-- [ ] Fire `EventEndCombat` event
+- [x] Implement `EndCombat(gameID)` - move groups to formerGroups, clear current combat
+- [x] Clear `Attacking` and `Blocking` flags on all creatures
+- [x] Keep attacker tracking for "attacked this turn" queries
+- [x] Fire `EventEndCombat` event
+- [x] Implement `GetAttackedThisTurn(gameID, creatureID)` - check if creature attacked this turn
+- [x] Clear damage tracking on creatures after combat
 
 ### First Strike & Double Strike (P1 - High Priority)
 - [ ] Implement `HasFirstOrDoubleStrike(gameID)` - check if any creature has first/double strike
