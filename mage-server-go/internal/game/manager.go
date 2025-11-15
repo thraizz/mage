@@ -14,6 +14,7 @@ type GameState int
 
 const (
 	GameStateStarting GameState = iota
+	GameStateMulligan
 	GameStateInProgress
 	GameStatePaused
 	GameStateFinished
@@ -23,6 +24,8 @@ func (s GameState) String() string {
 	switch s {
 	case GameStateStarting:
 		return "STARTING"
+	case GameStateMulligan:
+		return "MULLIGAN"
 	case GameStateInProgress:
 		return "IN_PROGRESS"
 	case GameStatePaused:
