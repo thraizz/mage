@@ -42,7 +42,7 @@ Status legend:
 - [x] Add exhaustive integration tests covering multi-object stacks, counterspells, and priority loops _(Comprehensive test suite: multi-object stack resolution (LIFO order), counterspell interactions, nested responses, priority loops with multiple players, stack legality checks, complex scenarios with multiple spells/responses; tests account for triggered abilities and verify proper resolution order)_
 - [x] Resolve stack one item at a time with state-based action and triggered ability checks between each resolution
 - [ ] Implement triggered ability queue processing before priority (APNAP order: Active Player, Non-Active Player)
-- [ ] Add `checkStateAndTriggered()` method that runs before each priority (SBA → triggers → repeat until stable)
+- [x] Add `checkStateAndTriggered()` method that runs before each priority (SBA → triggers → repeat until stable)
 - [ ] Handle simultaneous events between stack resolutions (process events after each resolution)
 
 ## Player Interaction & Prompts
