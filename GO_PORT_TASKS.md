@@ -20,7 +20,7 @@ Status legend:
 
 ## Game State & Zones
 - [x] Surface battlefield/stack state via `GameGetView`
-- [~] Synchronize graveyard, exile, command, and hidden zones with engine updates _(unified `moveCard` system handles all zone transitions with proper removal/addition; graveyard/exile/command zones tracked; zone change events emitted)_
+- [x] Synchronize graveyard, exile, command, and hidden zones with engine updates _(unified `moveCard` system handles all zone transitions with proper removal/addition; graveyard/exile/command zones tracked; zone change events emitted)_
 - [ ] Track card ownership/controller changes (gain control, copying, phasing, etc.)
 - [~] Implement continuous effects layer system (layers 1-7 per Comprehensive Rules) _(layer manager in place for basic power/toughness buffs; additional layers forthcoming)_
 - [x] Handle state-based actions (lethal damage, zero loyalty, legend rule, etc.) _(life ≤ 0 auto-loss; zero/less toughness deaths; planeswalker 0 loyalty; lethal damage (damage >= toughness); legend rule (multiple legendary permanents with same name); world rule (multiple world enchantments); planeswalker uniqueness (multiple planeswalkers with same type); damage tracking system implemented)_
