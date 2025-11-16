@@ -4217,7 +4217,8 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	gameState.combat.attackers[creatureID] = true
 	
 	// Tap creature (unless it has vigilance)
-	hasVigilance := e.hasAbility(creature, abilityVigilance)
+	// Check both base and granted vigilance
+	hasVigilance := e.hasAbilityWithEffects(gameState, creature, abilityVigilance)
 	if !hasVigilance && !creature.Tapped {
 		creature.Tapped = true
 		gameState.combat.attackersTapped[creatureID] = true
@@ -4400,8 +4401,9 @@ func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error
 	
 	// Flying restriction: creatures with flying can only be blocked by creatures with flying or reach
 	// Exception: Dragons can be blocked by non-flying creatures with special abilities (AsThoughEffectType.BLOCK_DRAGON)
-	if e.hasAbility(attacker, abilityFlying) {
-		if !e.hasAbility(blocker, abilityFlying) && !e.hasAbility(blocker, abilityReach) {
+	// Check both base and granted abilities
+	if e.hasAbilityWithEffects(gameState, attacker, abilityFlying) {
+		if !e.hasAbilityWithEffects(gameState, blocker, abilityFlying) && !e.hasAbilityWithEffects(gameState, blocker, abilityReach) {
 			// TODO: Check for AsThoughEffectType.BLOCK_DRAGON and attacker.hasSubtype(SubType.DRAGON)
 			// This requires implementing:
 			// 1. Subtype checking system
@@ -5177,7 +5179,7 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 	}
 	
 	// Record first striker if dealing damage in first strike step
-	if firstStrike && e.hasFirstOrDoubleStrike(attacker) {
+	if firstStrike && e.hasFirstOrDoubleStrikeWithEffects(gameState, attacker) {
 		e.recordFirstStrikingCreature(gameState, attackerID)
 	}
 	
@@ -5305,7 +5307,7 @@ func (e *MageEngine) assignDamageToAttackers(gameState *engineGameState, group *
 		}
 		
 		// Record first striker if dealing damage in first strike step
-		if firstStrike && e.hasFirstOrDoubleStrike(blocker) {
+		if firstStrike && e.hasFirstOrDoubleStrikeWithEffects(gameState, blocker) {
 			e.recordFirstStrikingCreature(gameState, blockerID)
 		}
 		
@@ -5505,7 +5507,7 @@ func (e *MageEngine) HasFirstOrDoubleStrike(gameID string) (bool, error) {
 		// Check attackers
 		for _, attackerID := range group.attackers {
 			if attacker, exists := gameState.cards[attackerID]; exists {
-				if e.hasFirstOrDoubleStrike(attacker) {
+				if e.hasFirstOrDoubleStrikeWithEffects(gameState, attacker) {
 					return true, nil
 				}
 			}
@@ -5514,7 +5516,7 @@ func (e *MageEngine) HasFirstOrDoubleStrike(gameID string) (bool, error) {
 		// Check blockers
 		for _, blockerID := range group.blockers {
 			if blocker, exists := gameState.cards[blockerID]; exists {
-				if e.hasFirstOrDoubleStrike(blocker) {
+				if e.hasFirstOrDoubleStrikeWithEffects(gameState, blocker) {
 					return true, nil
 				}
 			}
@@ -5655,19 +5657,34 @@ func (e *MageEngine) getMinBlockedBy(creature *internalCard) int {
 	return 1
 }
 
-// hasFirstStrike checks if a creature has first strike
+// hasFirstStrike checks if a creature has first strike (base abilities only)
 func (e *MageEngine) hasFirstStrike(creature *internalCard) bool {
 	return e.hasAbility(creature, abilityFirstStrike)
 }
 
-// hasDoubleStrike checks if a creature has double strike
+// hasDoubleStrike checks if a creature has double strike (base abilities only)
 func (e *MageEngine) hasDoubleStrike(creature *internalCard) bool {
 	return e.hasAbility(creature, abilityDoubleStrike)
 }
 
-// hasFirstOrDoubleStrike checks if a creature has first strike or double strike
+// hasFirstOrDoubleStrike checks if a creature has first strike or double strike (base abilities only)
 func (e *MageEngine) hasFirstOrDoubleStrike(creature *internalCard) bool {
 	return e.hasFirstStrike(creature) || e.hasDoubleStrike(creature)
+}
+
+// hasFirstStrikeWithEffects checks if a creature has first strike (including granted)
+func (e *MageEngine) hasFirstStrikeWithEffects(gameState *engineGameState, creature *internalCard) bool {
+	return e.hasAbilityWithEffects(gameState, creature, abilityFirstStrike)
+}
+
+// hasDoubleStrikeWithEffects checks if a creature has double strike (including granted)
+func (e *MageEngine) hasDoubleStrikeWithEffects(gameState *engineGameState, creature *internalCard) bool {
+	return e.hasAbilityWithEffects(gameState, creature, abilityDoubleStrike)
+}
+
+// hasFirstOrDoubleStrikeWithEffects checks if a creature has first strike or double strike (including granted)
+func (e *MageEngine) hasFirstOrDoubleStrikeWithEffects(gameState *engineGameState, creature *internalCard) bool {
+	return e.hasFirstStrikeWithEffects(gameState, creature) || e.hasDoubleStrikeWithEffects(gameState, creature)
 }
 
 // recordFirstStrikingCreature records that a creature dealt damage in first strike step
