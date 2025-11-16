@@ -154,7 +154,7 @@ Status legend:
 - [x] Queue triggers on blocker declared (e.g., "Whenever ~ blocks")
 - [x] Queue triggers on creature becomes blocked (e.g., "Whenever ~ becomes blocked")
 - [x] Queue triggers on combat damage dealt (e.g., "Whenever ~ deals combat damage")
-- [ ] Queue triggers on creature dies in combat
+- [x] Queue triggers on creature dies in combat
 - [x] Process triggers via existing `checkStateAndTriggered()` system
 
 ### Special Combat Mechanics (P2 - Medium Priority)
