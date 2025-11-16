@@ -60,6 +60,7 @@ const (
 	abilityDeathtouch    = "DeathtouchAbility"
 	abilityDefender      = "DefenderAbility"
 	abilityLifelink      = "LifelinkAbility"
+	abilityMenace        = "MenaceAbility"
 )
 
 // EngineGameView represents the complete game state view for a player
@@ -4792,6 +4793,44 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
 	
+	// Validate menace and other blocking restrictions
+	// Per Java CombatGroup.acceptBlockers() lines 710-718
+	for _, group := range gameState.combat.groups {
+		if len(group.attackers) == 0 {
+			continue
+		}
+		
+		for _, attackerID := range group.attackers {
+			attacker, exists := gameState.cards[attackerID]
+			if !exists {
+				continue
+			}
+			
+			minBlockedBy := e.getMinBlockedBy(attacker)
+			if minBlockedBy > 1 && len(group.blockers) > 0 && len(group.blockers) < minBlockedBy {
+				// Menace violation - remove all blockers from this attacker
+				if e.logger != nil {
+					e.logger.Debug("menace violation - removing blockers",
+						zap.String("attacker_id", attackerID),
+						zap.Int("blockers", len(group.blockers)),
+						zap.Int("min_required", minBlockedBy),
+					)
+				}
+				
+				// Remove all blockers from this group
+				for _, blockerID := range group.blockers {
+					delete(gameState.combat.blockers, blockerID)
+					if blocker, exists := gameState.cards[blockerID]; exists {
+						blocker.Blocking = false
+						blocker.BlockingWhat = []string{}
+					}
+				}
+				group.blockers = []string{}
+				group.blocked = false
+			}
+		}
+	}
+	
 	// Fire BLOCKER_DECLARED events for each blocker-attacker pair
 	// Per Java CombatGroup.acceptBlockers()
 	for _, group := range gameState.combat.groups {
@@ -5514,6 +5553,16 @@ func (e *MageEngine) hasAbility(creature *internalCard, abilityID string) bool {
 	// - Check if any active effects grant this ability to this card
 	
 	return false
+}
+
+// getMinBlockedBy returns the minimum number of blockers required to block this creature
+// Per Java: Permanent.getMinBlockedBy() - default 1, menace sets to 2
+func (e *MageEngine) getMinBlockedBy(creature *internalCard) int {
+	if e.hasAbility(creature, abilityMenace) {
+		return 2
+	}
+	// TODO: Support other effects that modify minBlockedBy (e.g., "can't be blocked except by 3 or more creatures")
+	return 1
 }
 
 // hasFirstStrike checks if a creature has first strike
