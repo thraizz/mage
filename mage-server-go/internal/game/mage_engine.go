@@ -4622,6 +4622,9 @@ func (e *MageEngine) AssignCombatDamage(gameID string, firstStrike bool) error {
 		}
 	}
 	
+	// Fire combat damage assigned event
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageAssigned, "", "", ""))
+	
 	if e.logger != nil {
 		e.logger.Debug("combat damage assigned",
 			zap.String("game_id", gameID),

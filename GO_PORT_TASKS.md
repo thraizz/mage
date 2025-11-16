@@ -85,7 +85,7 @@ Status legend:
 - [x] Implement `ApplyCombatDamage(gameID)` - apply all assigned damage
 - [x] Implement `combatGroup.applyDamage()` - mark damage on creatures and players
 - [x] Handle unblocked attacker damage to defending player/permanent
-- [ ] Fire `EventCombatDamageAssigned` and `EventCombatDamageApplied` events
+- [x] Fire `EventCombatDamageAssigned` and `EventCombatDamageApplied` events
 
 ### Combat Cleanup (P0 - Critical)
 - [x] Implement `EndCombat(gameID)` - move groups to formerGroups, clear current combat
