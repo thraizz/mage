@@ -4413,6 +4413,85 @@ func (e *MageEngine) RemoveBlocker(gameID, blockerID string) error {
 	return nil
 }
 
+// RemoveAttacker removes an attacker from combat
+// Per Java Combat.removeAttacker()
+func (e *MageEngine) RemoveAttacker(gameID, attackerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Check if creature is actually attacking
+	if !gameState.combat.attackers[attackerID] {
+		return fmt.Errorf("creature %s is not attacking", attackerID)
+	}
+	
+	// Find and remove from combat group
+	var groupToRemove *combatGroup
+	for _, group := range gameState.combat.groups {
+		for i, aid := range group.attackers {
+			if aid == attackerID {
+				// Remove attacker from group
+				group.attackers = append(group.attackers[:i], group.attackers[i+1:]...)
+				
+				// If group is now empty, mark for removal
+				if len(group.attackers) == 0 {
+					groupToRemove = group
+				}
+				break
+			}
+		}
+	}
+	
+	// Remove empty group
+	if groupToRemove != nil {
+		// Move to former groups
+		gameState.combat.formerGroups = append(gameState.combat.formerGroups, groupToRemove)
+		
+		// Remove from active groups
+		for i, g := range gameState.combat.groups {
+			if g == groupToRemove {
+				gameState.combat.groups = append(gameState.combat.groups[:i], gameState.combat.groups[i+1:]...)
+				break
+			}
+		}
+	}
+	
+	// Remove from global attackers set
+	delete(gameState.combat.attackers, attackerID)
+	
+	// Update attacker card state
+	attacker, exists := gameState.cards[attackerID]
+	if exists {
+		attacker.Attacking = false
+		attacker.AttackingWhat = ""
+		
+		// Untap if it was tapped by attack (Java: attackersTappedByAttack check)
+		if gameState.combat.attackersTapped[attackerID] {
+			attacker.Tapped = false
+			delete(gameState.combat.attackersTapped, attackerID)
+		}
+	}
+	
+	// Fire REMOVED_FROM_COMBAT event (Java: Combat.removeFromCombat)
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventRemovedFromCombat, attackerID, "", ""))
+	
+	if e.logger != nil {
+		e.logger.Debug("attacker removed",
+			zap.String("game_id", gameID),
+			zap.String("attacker_id", attackerID),
+		)
+	}
+	
+	return nil
+}
+
 // AcceptBlockers finalizes the blocker declarations and fires events
 // Per Java Combat.acceptBlockers()
 func (e *MageEngine) AcceptBlockers(gameID string) error {
