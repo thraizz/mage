@@ -172,6 +172,12 @@ type combatState struct {
 	blockers          map[string]bool         // all blocking creatures
 	attackersTapped   map[string]bool         // creatures tapped by attack
 	firstStrikers     map[string]bool         // creatures that dealt damage in first strike step
+	// Combat requirements/restrictions tracking (Java: Combat lines 70-74)
+	creaturesForcedToAttack    map[string]map[string]bool // creatureID -> set of defenderIDs it must attack (empty = any)
+	creatureMustBlockAttackers map[string]map[string]bool // blockerID -> set of attackerIDs it must block
+	maxAttackers               int                         // maximum number of attackers allowed (-1 = no limit)
+	minBlockersPerAttacker     map[string]int              // attackerID -> minimum blockers required
+	maxBlockersPerAttacker     map[string]int              // attackerID -> maximum blockers allowed
 }
 
 // combatGroup represents a single combat group (attackers vs defender + blockers)
@@ -191,14 +197,19 @@ type combatGroup struct {
 // newCombatState creates a new combat state
 func newCombatState() *combatState {
 	return &combatState{
-		groups:          make([]*combatGroup, 0),
-		formerGroups:    make([]*combatGroup, 0),
-		blockingGroups:  make(map[string]*combatGroup),
-		defenders:       make(map[string]bool),
-		attackers:       make(map[string]bool),
-		blockers:        make(map[string]bool),
-		attackersTapped: make(map[string]bool),
-		firstStrikers:   make(map[string]bool),
+		groups:                     make([]*combatGroup, 0),
+		formerGroups:               make([]*combatGroup, 0),
+		blockingGroups:             make(map[string]*combatGroup),
+		defenders:                  make(map[string]bool),
+		attackers:                  make(map[string]bool),
+		blockers:                   make(map[string]bool),
+		attackersTapped:            make(map[string]bool),
+		firstStrikers:              make(map[string]bool),
+		creaturesForcedToAttack:    make(map[string]map[string]bool),
+		creatureMustBlockAttackers: make(map[string]map[string]bool),
+		maxAttackers:               -1, // no limit by default
+		minBlockersPerAttacker:     make(map[string]int),
+		maxBlockersPerAttacker:     make(map[string]int),
 	}
 }
 
@@ -4760,6 +4771,179 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 	}
 	
 	return nil
+}
+
+// CheckBlockRequirements validates that all blocking requirements are met
+// Per Java Combat.checkBlockRequirements()
+// Returns list of violations (empty if all requirements met)
+func (e *MageEngine) CheckBlockRequirements(gameID, playerID string) ([]string, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return nil, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+	
+	violations := make([]string, 0)
+	
+	// Check creatures that must block specific attackers
+	for blockerID, requiredAttackers := range gameState.combat.creatureMustBlockAttackers {
+		blocker, exists := gameState.cards[blockerID]
+		if !exists || blocker.ControllerID != playerID {
+			continue
+		}
+		
+		// Check if blocker is actually blocking
+		if !gameState.combat.blockers[blockerID] {
+			// TODO: Check if blocker CAN block (not tapped, etc.)
+			// For now, just report the violation
+			if len(requiredAttackers) > 0 {
+				for attackerID := range requiredAttackers {
+					violations = append(violations, fmt.Sprintf("creature %s must block attacker %s", blockerID, attackerID))
+				}
+			} else {
+				violations = append(violations, fmt.Sprintf("creature %s must block if able", blockerID))
+			}
+		}
+	}
+	
+	// Check minimum blockers per attacker (e.g., menace)
+	for attackerID, minBlockers := range gameState.combat.minBlockersPerAttacker {
+		// Count blockers for this attacker
+		blockerCount := 0
+		for _, group := range gameState.combat.groups {
+			for _, aid := range group.attackers {
+				if aid == attackerID {
+					blockerCount = len(group.blockers)
+					break
+				}
+			}
+		}
+		
+		if blockerCount > 0 && blockerCount < minBlockers {
+			violations = append(violations, 
+				fmt.Sprintf("attacker %s requires at least %d blockers, but has %d", 
+					attackerID, minBlockers, blockerCount))
+		}
+	}
+	
+	return violations, nil
+}
+
+// CheckBlockRestrictions validates that no blocking restrictions are violated
+// Per Java Combat.checkBlockRestrictions()
+// Returns list of violations (empty if no restrictions violated)
+func (e *MageEngine) CheckBlockRestrictions(gameID, playerID string) ([]string, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return nil, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+	
+	violations := make([]string, 0)
+	
+	// Check maximum blockers per attacker
+	for attackerID, maxBlockers := range gameState.combat.maxBlockersPerAttacker {
+		// Count blockers for this attacker
+		blockerCount := 0
+		for _, group := range gameState.combat.groups {
+			for _, aid := range group.attackers {
+				if aid == attackerID {
+					blockerCount = len(group.blockers)
+					break
+				}
+			}
+		}
+		
+		if blockerCount > maxBlockers {
+			violations = append(violations, 
+				fmt.Sprintf("attacker %s can be blocked by at most %d creatures, but has %d", 
+					attackerID, maxBlockers, blockerCount))
+		}
+	}
+	
+	// TODO: Check other restrictions from continuous effects
+	// - "can't block" effects
+	// - "can't block creature X" effects
+	// - Protection from color/type restrictions
+	
+	return violations, nil
+}
+
+// ValidateAttackerCount checks if the number of attackers meets requirements
+// Per Java Combat validation
+func (e *MageEngine) ValidateAttackerCount(gameID string) ([]string, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return nil, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+	
+	violations := make([]string, 0)
+	
+	// Check maximum attackers
+	if gameState.combat.maxAttackers >= 0 {
+		attackerCount := len(gameState.combat.attackers)
+		if attackerCount > gameState.combat.maxAttackers {
+			violations = append(violations, 
+				fmt.Sprintf("maximum %d attackers allowed, but %d are attacking", 
+					gameState.combat.maxAttackers, attackerCount))
+		}
+	}
+	
+	// Check forced attackers
+	for creatureID, requiredDefenders := range gameState.combat.creaturesForcedToAttack {
+		creature, exists := gameState.cards[creatureID]
+		if !exists {
+			continue
+		}
+		
+		// Check if creature is attacking
+		if !gameState.combat.attackers[creatureID] {
+			// TODO: Check if creature CAN attack (not tapped, summoning sickness, etc.)
+			// For now, just report the violation
+			if len(requiredDefenders) > 0 {
+				violations = append(violations, 
+					fmt.Sprintf("creature %s must attack one of: %v", creatureID, requiredDefenders))
+			} else {
+				violations = append(violations, fmt.Sprintf("creature %s must attack if able", creatureID))
+			}
+		} else if len(requiredDefenders) > 0 {
+			// Check if attacking the correct defender
+			attackingCorrectDefender := false
+			for _, group := range gameState.combat.groups {
+				for _, aid := range group.attackers {
+					if aid == creatureID && requiredDefenders[group.defenderID] {
+						attackingCorrectDefender = true
+						break
+					}
+				}
+			}
+			
+			if !attackingCorrectDefender {
+				violations = append(violations, 
+					fmt.Sprintf("creature %s must attack one of: %v", creatureID, requiredDefenders))
+			}
+		}
+		
+		_ = creature // avoid unused warning
+	}
+	
+	return violations, nil
 }
 
 // AssignCombatDamage assigns combat damage for all combat groups

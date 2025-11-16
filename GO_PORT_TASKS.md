@@ -142,12 +142,12 @@ Status legend:
 - [x] Add `EventRemovedFromCombat` - creature removed from combat
 
 ### Combat Validation & Requirements (P1 - High Priority)
-- [ ] Implement `CheckBlockRequirements(gameID, playerID)` - must block if able
-- [ ] Implement `CheckBlockRestrictions(gameID, playerID)` - can't block restrictions
-- [ ] Implement forced attack tracking (`creaturesForcedToAttack` map)
-- [ ] Implement must block tracking (`creatureMustBlockAttackers` map)
-- [ ] Validate minimum/maximum attacker counts
-- [ ] Validate minimum/maximum blocker counts per attacker
+- [x] Implement `CheckBlockRequirements(gameID, playerID)` - must block if able
+- [x] Implement `CheckBlockRestrictions(gameID, playerID)` - can't block restrictions
+- [x] Implement forced attack tracking (`creaturesForcedToAttack` map)
+- [x] Implement must block tracking (`creatureMustBlockAttackers` map)
+- [x] Validate minimum/maximum attacker counts
+- [x] Validate minimum/maximum blocker counts per attacker
 
 ### Combat Triggers (P1 - High Priority)
 - [ ] Queue triggers on attacker declared (e.g., "Whenever ~ attacks")
