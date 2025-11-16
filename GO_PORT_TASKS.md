@@ -113,8 +113,8 @@ Status legend:
 - [ ] Support "trample over planeswalkers" rule
 
 ### Vigilance (P1 - High Priority)
-- [ ] Check for vigilance ability before tapping attacker
-- [ ] Track which attackers were tapped by attack in `attackersTappedByAttack`
+- [x] Check for vigilance ability before tapping attacker
+- [x] Track which attackers were tapped by attack in `attackersTappedByAttack`
 - [ ] Support effects that grant vigilance during combat
 
 ### Flying & Reach (P1 - High Priority)
