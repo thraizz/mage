@@ -117,14 +117,14 @@ Status legend:
 ### Vigilance (P1 - High Priority)
 - [x] Check for vigilance ability before tapping attacker
 - [x] Track which attackers were tapped by attack in `attackersTappedByAttack`
-- [ ] Support effects that grant vigilance during combat
+- [x] Support effects that grant vigilance during combat
 
 ### Flying & Reach (P1 - High Priority)
 - [x] Implement flying restriction (can only be blocked by flying/reach)
 - [x] Implement reach ability (can block flying)
 - [x] Add `CanBlock` validation for flying/reach interactions
 - [ ] Implement dragon blocking exception (requires subtype system and AsThough effects)
-- [ ] Support effects that grant/remove flying during combat (requires continuous effects)
+- [x] Support effects that grant/remove flying during combat
 
 ### Combat Events (P1 - High Priority)
 - [x] Add `EventBeginCombat` - beginning of combat step
