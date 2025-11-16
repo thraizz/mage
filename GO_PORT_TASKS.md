@@ -62,8 +62,8 @@ Status legend:
 
 ### Attacker Declaration (P0 - Critical)
 - [x] Implement `DeclareAttacker(gameID, creatureID, defenderID, playerID)` - declare single attacker
-- [~] Implement `CanAttack(gameID, creatureID)` - validate creature can attack (summoning sickness, tapped, restrictions)
-- [ ] Implement `CanAttackDefender(gameID, creatureID, defenderID)` - validate can attack specific defender
+- [x] Implement `CanAttack(gameID, creatureID)` - validate creature can attack (summoning sickness, tapped, restrictions)
+- [x] Implement `CanAttackDefender(gameID, creatureID, defenderID)` - validate can attack specific defender
 - [~] Implement attacker tapping logic (tap unless vigilance)
 - [x] Create/update combat groups when attackers declared
 - [x] Implement `RemoveAttacker(gameID, attackerID)` - undo attacker declaration

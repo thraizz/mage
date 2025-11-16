@@ -267,6 +267,8 @@ type internalCard struct {
 	// Damage tracking
 	Damage        int      // Damage marked on this creature
 	DamageSources map[string]int // Damage by source ID
+	// Status fields
+	SummoningSickness bool // Does this creature have summoning sickness
 }
 
 // internalPlayer represents a player in the game state
@@ -3907,6 +3909,111 @@ func (e *MageEngine) SetDefenders(gameID string) error {
 	}
 	
 	return nil
+}
+
+// CanAttack checks if a creature can attack (any defender)
+// Per Java Permanent.canAttack(null, game) and canAttackInPrinciple(null, game)
+func (e *MageEngine) CanAttack(gameID, creatureID string) (bool, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return false, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+	
+	creature, exists := gameState.cards[creatureID]
+	if !exists {
+		return false, fmt.Errorf("creature %s not found", creatureID)
+	}
+	
+	// Basic checks (Java: Permanent.canAttack line 1485)
+	if creature.Tapped {
+		return false, nil
+	}
+	
+	// Check if can attack in principle (Java: canAttackInPrinciple line 1504)
+	// Check summoning sickness
+	// TODO: Implement AsThoughEffectType.ATTACK_AS_HASTE for haste effects
+	if creature.SummoningSickness {
+		return false, nil
+	}
+	
+	// Check defender ability (Java: line 1527)
+	// TODO: Implement AsThoughEffectType.ATTACK for effects that allow defender to attack
+	if e.hasAbility(creature, abilityDefender) {
+		return false, nil
+	}
+	
+	// Check if can attack at least one defender (Java: line 1516-1522)
+	// If no specific defender, check if can attack ANY defender
+	for defenderID := range gameState.combat.defenders {
+		canAttack, _ := e.canAttackDefenderInternal(gameState, creature, defenderID)
+		if canAttack {
+			return true, nil
+		}
+	}
+	
+	return false, nil
+}
+
+// CanAttackDefender checks if a creature can attack a specific defender
+// Per Java Permanent.canAttack(defenderId, game) and canAttackInPrinciple(defenderId, game)
+func (e *MageEngine) CanAttackDefender(gameID, creatureID, defenderID string) (bool, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return false, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+	
+	creature, exists := gameState.cards[creatureID]
+	if !exists {
+		return false, fmt.Errorf("creature %s not found", creatureID)
+	}
+	
+	// Basic checks (Java: Permanent.canAttack line 1485)
+	if creature.Tapped {
+		return false, nil
+	}
+	
+	return e.canAttackDefenderInternal(gameState, creature, defenderID)
+}
+
+// canAttackDefenderInternal checks if a creature can attack a specific defender (internal helper)
+// Per Java Permanent.canAttackInPrinciple(defenderId, game)
+func (e *MageEngine) canAttackDefenderInternal(gameState *engineGameState, creature *internalCard, defenderID string) (bool, error) {
+	// Check summoning sickness
+	// TODO: Implement AsThoughEffectType.ATTACK_AS_HASTE for haste effects
+	if creature.SummoningSickness {
+		return false, nil
+	}
+	
+	// Check defender ability (Java: line 1527)
+	// TODO: Implement AsThoughEffectType.ATTACK for effects that allow defender to attack
+	if e.hasAbility(creature, abilityDefender) {
+		return false, nil
+	}
+	
+	// Check if defender is valid
+	if !gameState.combat.defenders[defenderID] {
+		return false, fmt.Errorf("defender %s is not a valid defender", defenderID)
+	}
+	
+	// TODO: Implement restriction effects (Java: canAttackCheckRestrictionEffects line 1531)
+	// This requires the continuous effects system to check:
+	// - RestrictionEffect.canAttack(game, true)
+	// - RestrictionEffect.canAttack(creature, defenderId, ability, game, true)
+	// Examples: "can't attack", "can only attack if X", "can't attack player Y"
+	
+	return true, nil
 }
 
 // DeclareAttacker declares a creature as an attacker
