@@ -5663,6 +5663,21 @@ func (e *MageEngine) markDamageWithLifelink(gameState *engineGameState, creature
 			}
 		}
 	}
+	
+	// Fire damaged permanent event for triggers
+	// Per Java: DAMAGED_PERMANENT event with flag=true for combat damage
+	damagedEvent := rules.Event{
+		Type:       rules.EventDamagedPermanent,
+		TargetID:   creature.ID,
+		SourceID:   sourceID,
+		Amount:     amount,
+		Controller: creature.ControllerID,
+		Flag:       true, // Combat damage
+	}
+	gameState.eventBus.Publish(damagedEvent)
+	
+	// Check for combat damage triggers (e.g., "Whenever ~ deals combat damage to a creature")
+	e.checkCombatTriggers(gameState, damagedEvent)
 }
 
 // dealDamageToDefender deals damage to a defending player or permanent
@@ -5704,7 +5719,7 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 		}
 	}
 	
-	// Fire damage event
+	// Fire damage event (before damage is dealt)
 	gameState.eventBus.Publish(rules.Event{
 		Type:       rules.EventDamagePlayer,
 		TargetID:   defenderID,
@@ -5712,6 +5727,21 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 		Amount:     amount,
 		Controller: attacker.ControllerID,
 	})
+	
+	// Fire damaged event (after damage is dealt) for triggers
+	// Per Java: DAMAGED_PLAYER event with flag=true for combat damage
+	damagedEvent := rules.Event{
+		Type:       rules.EventDamagedPlayer,
+		TargetID:   defenderID,
+		SourceID:   attacker.ID,
+		Amount:     amount,
+		Controller: attacker.ControllerID,
+		Flag:       true, // Combat damage
+	}
+	gameState.eventBus.Publish(damagedEvent)
+	
+	// Check for combat damage triggers (e.g., "Whenever ~ deals combat damage")
+	e.checkCombatTriggers(gameState, damagedEvent)
 	
 	return nil
 }
