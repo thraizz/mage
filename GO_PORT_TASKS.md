@@ -158,7 +158,7 @@ Status legend:
 - [x] Process triggers via existing `checkStateAndTriggered()` system
 
 ### Special Combat Mechanics (P2 - Medium Priority)
-- [ ] Implement menace (must be blocked by 2+ creatures)
+- [x] Implement menace (must be blocked by 2+ creatures)
 - [x] Implement deathtouch (any damage is lethal) - integrated with trample
 - [x] Implement lifelink (gain life equal to damage dealt)
 - [x] Implement defender (can't attack)
