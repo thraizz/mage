@@ -161,7 +161,7 @@ Status legend:
 - [ ] Implement menace (must be blocked by 2+ creatures)
 - [x] Implement deathtouch (any damage is lethal) - integrated with trample
 - [ ] Implement lifelink (gain life equal to damage dealt)
-- [ ] Implement defender (can't attack)
+- [x] Implement defender (can't attack)
 - [ ] Implement "can't be blocked" effects
 - [ ] Implement "must be blocked if able" effects
 - [ ] Implement "attacks each combat if able" effects
