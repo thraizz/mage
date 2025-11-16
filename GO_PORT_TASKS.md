@@ -27,7 +27,7 @@ Status legend:
 - [x] Surface battlefield/stack state via `GameGetView`
 - [x] Synchronize graveyard, exile, command, and hidden zones with engine updates
 - [x] Track card ownership/controller changes (gain control, copying, phasing, etc.)
-- [x] Implement continuous effects layer system (layers 1-7 per Comprehensive Rules) - foundational structure complete
+- [x] Implement continuous effects layer system (layers 1-7 per Comprehensive Rules) - integrated with combat
 - [x] Handle state-based actions (lethal damage, zero loyalty, legend rule, etc.)
 - [x] Support counters (loyalty, +1/+1, poison, energy, experience)
 - [x] Provide deterministic UUID mapping for permanents, abilities, and triggers

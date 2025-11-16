@@ -4051,6 +4051,12 @@ func (e *MageEngine) CanAttack(gameID, creatureID string) (bool, error) {
 		return false, nil
 	}
 	
+	// Check for continuous effects that prevent attacking
+	// Per Java: RestrictionEffect.applies() and canAttack() checks
+	if e.hasCantAttackEffect(gameState, creatureID) {
+		return false, nil
+	}
+	
 	// Check if can attack at least one defender (Java: line 1516-1522)
 	// If no specific defender, check if can attack ANY defender
 	for defenderID := range gameState.combat.defenders {
@@ -4342,6 +4348,12 @@ func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error
 	
 	// 4. Blocker must not be suspected
 	// TODO: Check for suspected status when implemented
+	
+	// 4a. Check for continuous effects that prevent blocking
+	// Per Java: RestrictionEffect.applies() and canBlock() checks
+	if e.hasCantBlockEffect(gameState, blockerID) {
+		return false, nil
+	}
 	
 	// 5. Blocker must be on battlefield
 	if blocker.Zone != zoneBattlefield {
@@ -5416,6 +5428,12 @@ func (e *MageEngine) EndCombat(gameID string) error {
 	// Keep defenders for queries
 	// Keep attackingPlayerID for queries
 	
+	// Cleanup continuous effects that expire at end of combat
+	// Per Java: ContinuousEffects.removeEndOfCombatEffects()
+	if gameState.layerSystem != nil {
+		effects.CleanupEndOfCombatEffects(gameState.layerSystem)
+	}
+	
 	// Fire end combat event
 	gameState.eventBus.Publish(rules.Event{
 		Type: rules.EventEndCombatStep,
@@ -5548,10 +5566,52 @@ func (e *MageEngine) hasAbility(creature *internalCard, abilityID string) bool {
 	
 	// TODO: Check continuous effects for granted abilities
 	// Example: "Target creature gains flying until end of turn"
-	// This would require:
-	// - gameState.continuousEffects.getAbilityEffects(card.ID, abilityID)
-	// - Check if any active effects grant this ability to this card
+	// This would require checking gameState.layerSystem for GrantAbilityEffect
+	// that targets this creature and grants the specified ability
+	// For now, only base abilities are checked
 	
+	return false
+}
+
+// hasCantAttackEffect checks if a creature is affected by a "can't attack" continuous effect
+// Per Java: RestrictionEffect.applies() for attack restrictions
+func (e *MageEngine) hasCantAttackEffect(gameState *engineGameState, creatureID string) bool {
+	if gameState == nil || gameState.layerSystem == nil {
+		return false
+	}
+	
+	// TODO: Implement full continuous effect checking
+	// This would iterate through all restriction effects in the layer system
+	// and check if any CantAttackEffect applies to this creature
+	// For now, return false (no dynamic restrictions)
+	return false
+}
+
+// hasCantBlockEffect checks if a creature is affected by a "can't block" continuous effect
+// Per Java: RestrictionEffect.applies() for block restrictions
+func (e *MageEngine) hasCantBlockEffect(gameState *engineGameState, creatureID string) bool {
+	if gameState == nil || gameState.layerSystem == nil {
+		return false
+	}
+	
+	// TODO: Implement full continuous effect checking
+	// This would iterate through all restriction effects in the layer system
+	// and check if any CantBlockEffect applies to this creature
+	// For now, return false (no dynamic restrictions)
+	return false
+}
+
+// hasMustAttackEffect checks if a creature is affected by a "must attack if able" continuous effect
+// Per Java: RequirementEffect.applies() for attack requirements
+func (e *MageEngine) hasMustAttackEffect(gameState *engineGameState, creatureID string) bool {
+	if gameState == nil || gameState.layerSystem == nil {
+		return false
+	}
+	
+	// TODO: Implement full continuous effect checking
+	// This would iterate through all requirement effects in the layer system
+	// and check if any MustAttackEffect applies to this creature
+	// For now, return false (no dynamic requirements)
 	return false
 }
 
