@@ -150,12 +150,12 @@ Status legend:
 - [x] Validate minimum/maximum blocker counts per attacker
 
 ### Combat Triggers (P1 - High Priority)
-- [ ] Queue triggers on attacker declared (e.g., "Whenever ~ attacks")
-- [ ] Queue triggers on blocker declared (e.g., "Whenever ~ blocks")
-- [ ] Queue triggers on creature becomes blocked (e.g., "Whenever ~ becomes blocked")
+- [x] Queue triggers on attacker declared (e.g., "Whenever ~ attacks")
+- [x] Queue triggers on blocker declared (e.g., "Whenever ~ blocks")
+- [x] Queue triggers on creature becomes blocked (e.g., "Whenever ~ becomes blocked")
 - [ ] Queue triggers on combat damage dealt (e.g., "Whenever ~ deals combat damage")
 - [ ] Queue triggers on creature dies in combat
-- [ ] Process triggers via existing `checkStateAndTriggered()` system
+- [x] Process triggers via existing `checkStateAndTriggered()` system
 
 ### Special Combat Mechanics (P2 - Medium Priority)
 - [ ] Implement menace (must be blocked by 2+ creatures)
