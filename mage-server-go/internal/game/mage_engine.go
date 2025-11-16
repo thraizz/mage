@@ -36,6 +36,7 @@ const (
 	abilityReach         = "ReachAbility"
 	abilityTrample       = "TrampleAbility"
 	abilityDeathtouch    = "DeathtouchAbility"
+	abilityDefender      = "DefenderAbility"
 )
 
 // EngineGameView represents the complete game state view for a player
@@ -3945,6 +3946,13 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	// Validate creature can attack (not tapped, not summoning sick)
 	if creature.Tapped {
 		return fmt.Errorf("creature %s is tapped", creatureID)
+	}
+	
+	// Check for defender ability (Java: PermanentImpl.canAttackInPrinciple line 1527)
+	// Creatures with defender can't attack unless they have an effect allowing them to
+	if e.hasAbility(creature, abilityDefender) {
+		// TODO: Check for AsThoughEffectType.ATTACK effects that allow defender to attack
+		return fmt.Errorf("creature %s has defender and cannot attack", creatureID)
 	}
 	
 	// TODO: Check summoning sickness when we track turn entered
