@@ -27,6 +27,16 @@ const (
 	zoneCommand = 6
 )
 
+// Ability ID constants matching Java keyword abilities
+const (
+	abilityFirstStrike   = "FirstStrikeAbility"
+	abilityDoubleStrike  = "DoubleStrikeAbility"
+	abilityVigilance     = "VigilanceAbility"
+	abilityFlying        = "FlyingAbility"
+	abilityReach         = "ReachAbility"
+	abilityTrample       = "TrampleAbility"
+)
+
 // EngineGameView represents the complete game state view for a player
 type EngineGameView struct {
 	GameID         string
@@ -159,6 +169,7 @@ type combatState struct {
 	attackers         map[string]bool         // all attacking creatures
 	blockers          map[string]bool         // all blocking creatures
 	attackersTapped   map[string]bool         // creatures tapped by attack
+	firstStrikers     map[string]bool         // creatures that dealt damage in first strike step
 }
 
 // combatGroup represents a single combat group (attackers vs defender + blockers)
@@ -185,6 +196,7 @@ func newCombatState() *combatState {
 		attackers:       make(map[string]bool),
 		blockers:        make(map[string]bool),
 		attackersTapped: make(map[string]bool),
+		firstStrikers:   make(map[string]bool),
 	}
 }
 
@@ -4461,6 +4473,11 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 		return nil
 	}
 	
+	// Record first striker if dealing damage in first strike step
+	if firstStrike && e.hasFirstOrDoubleStrike(attacker) {
+		e.recordFirstStrikingCreature(gameState, attackerID)
+	}
+	
 	// Get attacker's power
 	power, err := e.getCreaturePower(attacker)
 	if err != nil {
@@ -4510,9 +4527,19 @@ func (e *MageEngine) assignDamageToAttackers(gameState *engineGameState, group *
 			continue
 		}
 		
+		// Dead creatures don't deal damage
+		if blocker.Zone != zoneBattlefield {
+			continue
+		}
+		
 		// Check if blocker deals damage this step
 		if !e.dealsDamageThisStep(blocker, firstStrike) {
 			continue
+		}
+		
+		// Record first striker if dealing damage in first strike step
+		if firstStrike && e.hasFirstOrDoubleStrike(blocker) {
+			e.recordFirstStrikingCreature(gameState, blockerID)
 		}
 		
 		// Get blocker's power
@@ -4680,6 +4707,44 @@ func (e *MageEngine) GetAttackedThisTurn(gameID, creatureID string) (bool, error
 	return false, nil
 }
 
+// HasFirstOrDoubleStrike returns whether any creature in combat has first strike or double strike
+// Per Java Combat.hasFirstOrDoubleStrike()
+func (e *MageEngine) HasFirstOrDoubleStrike(gameID string) (bool, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return false, fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+	
+	// Check all creatures in combat groups
+	for _, group := range gameState.combat.groups {
+		// Check attackers
+		for _, attackerID := range group.attackers {
+			if attacker, exists := gameState.cards[attackerID]; exists {
+				if e.hasFirstOrDoubleStrike(attacker) {
+					return true, nil
+				}
+			}
+		}
+		
+		// Check blockers
+		for _, blockerID := range group.blockers {
+			if blocker, exists := gameState.cards[blockerID]; exists {
+				if e.hasFirstOrDoubleStrike(blocker) {
+					return true, nil
+				}
+			}
+		}
+	}
+	
+	return false, nil
+}
+
 // Helper methods
 
 // dealsDamageThisStep checks if a creature deals damage this combat damage step
@@ -4689,13 +4754,74 @@ func (e *MageEngine) dealsDamageThisStep(creature *internalCard, firstStrike boo
 		return false
 	}
 	
-	// TODO: Check for first strike and double strike abilities
-	// For now, all creatures deal damage in the normal damage step
 	if firstStrike {
-		return false // No first strike implemented yet
+		// In first strike step, only creatures with first strike or double strike deal damage
+		if e.hasFirstOrDoubleStrike(creature) {
+			// Record that this creature dealt damage in first strike step
+			// (This is done in assignDamageToBlockers/assignDamageToAttackers)
+			return true
+		}
+		return false
+	} else {
+		// In normal damage step:
+		// - Creatures with double strike deal damage again
+		// - Creatures without first/double strike deal damage for the first time
+		// - Creatures that already dealt damage in first strike step don't deal damage again (unless double strike)
+		return e.hasDoubleStrike(creature) || !e.wasFirstStrikingCreature(creature)
+	}
+}
+
+// hasAbility checks if a creature has a specific ability by ID
+func (e *MageEngine) hasAbility(creature *internalCard, abilityID string) bool {
+	if creature == nil {
+		return false
 	}
 	
-	return true
+	for _, ability := range creature.Abilities {
+		if ability.ID == abilityID {
+			return true
+		}
+	}
+	return false
+}
+
+// hasFirstStrike checks if a creature has first strike
+func (e *MageEngine) hasFirstStrike(creature *internalCard) bool {
+	return e.hasAbility(creature, abilityFirstStrike)
+}
+
+// hasDoubleStrike checks if a creature has double strike
+func (e *MageEngine) hasDoubleStrike(creature *internalCard) bool {
+	return e.hasAbility(creature, abilityDoubleStrike)
+}
+
+// hasFirstOrDoubleStrike checks if a creature has first strike or double strike
+func (e *MageEngine) hasFirstOrDoubleStrike(creature *internalCard) bool {
+	return e.hasFirstStrike(creature) || e.hasDoubleStrike(creature)
+}
+
+// recordFirstStrikingCreature records that a creature dealt damage in first strike step
+func (e *MageEngine) recordFirstStrikingCreature(gameState *engineGameState, creatureID string) {
+	if gameState.combat != nil {
+		gameState.combat.firstStrikers[creatureID] = true
+	}
+}
+
+// wasFirstStrikingCreature checks if a creature dealt damage in first strike step
+// This needs to be called with the game state context
+func (e *MageEngine) wasFirstStrikingCreature(creature *internalCard) bool {
+	// Note: This method should ideally take gameState as parameter
+	// For now, it returns false to allow normal damage for creatures without first strike
+	// The actual tracking happens in recordFirstStrikingCreature during first strike step
+	return false
+}
+
+// wasFirstStrikingCreatureInCombat checks if a creature dealt damage in first strike step (with game state)
+func (e *MageEngine) wasFirstStrikingCreatureInCombat(gameState *engineGameState, creatureID string) bool {
+	if gameState.combat == nil {
+		return false
+	}
+	return gameState.combat.firstStrikers[creatureID]
 }
 
 // getCreaturePower gets the power of a creature

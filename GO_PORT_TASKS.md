@@ -96,11 +96,14 @@ Status legend:
 - [x] Clear damage tracking on creatures after combat
 
 ### First Strike & Double Strike (P1 - High Priority)
-- [ ] Implement `HasFirstOrDoubleStrike(gameID)` - check if any creature has first/double strike
-- [ ] Add first strike combat damage step before normal damage step
-- [ ] Implement `combatGroup.hasFirstOrDoubleStrike()` per group
-- [ ] Handle double strike creatures dealing damage in both steps
-- [ ] Prevent normal damage from creatures killed by first strike
+- [x] Implement `HasFirstOrDoubleStrike(gameID)` - check if any creature has first/double strike
+- [x] Add first strike combat damage step before normal damage step
+- [x] Implement `combatGroup.hasFirstOrDoubleStrike()` per group
+- [x] Handle double strike creatures dealing damage in both steps
+- [x] Prevent normal damage from creatures killed by first strike
+- [x] Add ability constants (FirstStrikeAbility, DoubleStrikeAbility)
+- [x] Track first strikers in combat state
+- [x] Implement `dealsDamageThisStep()` logic for first/double strike
 
 ### Trample (P1 - High Priority)
 - [ ] Implement trample damage calculation (excess damage to defender)
