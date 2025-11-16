@@ -66,7 +66,7 @@ Status legend:
 - [ ] Implement `CanAttackDefender(gameID, creatureID, defenderID)` - validate can attack specific defender
 - [~] Implement attacker tapping logic (tap unless vigilance)
 - [x] Create/update combat groups when attackers declared
-- [ ] Implement `RemoveAttacker(gameID, attackerID)` - undo attacker declaration
+- [x] Implement `RemoveAttacker(gameID, attackerID)` - undo attacker declaration
 - [x] Fire `EventAttackerDeclared` per attacker and `EventDeclaredAttackers` when complete
 
 ### Blocker Declaration (P0 - Critical)
