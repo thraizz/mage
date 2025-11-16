@@ -922,6 +922,12 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 			e.SaveTurnSnapshot(gameState.gameID, newTurn)
 			gameState.mu.Lock() // Re-acquire lock
 		}
+		
+		// Cleanup continuous effects at end of turn
+		// Per Java: ContinuousEffects.removeEndOfTurnEffects() in cleanup step
+		if step == rules.StepCleanup && gameState.layerSystem != nil {
+			effects.CleanupEndOfTurnEffects(gameState.layerSystem)
+		}
 
 		// Notify phase change
 		e.notifyPhaseChange(gameState.gameID, map[string]interface{}{
@@ -5564,11 +5570,35 @@ func (e *MageEngine) hasAbility(creature *internalCard, abilityID string) bool {
 		}
 	}
 	
-	// TODO: Check continuous effects for granted abilities
-	// Example: "Target creature gains flying until end of turn"
-	// This would require checking gameState.layerSystem for GrantAbilityEffect
-	// that targets this creature and grants the specified ability
-	// For now, only base abilities are checked
+	return false
+}
+
+// hasAbilityWithEffects checks if a creature has a specific ability, including granted abilities
+// This version checks both base abilities and abilities granted by continuous effects
+// Per Java: permanent.getAbilities(game).containsKey(abilityId)
+func (e *MageEngine) hasAbilityWithEffects(gameState *engineGameState, creature *internalCard, abilityID string) bool {
+	if creature == nil {
+		return false
+	}
+	
+	// Check base abilities
+	if e.hasAbility(creature, abilityID) {
+		return true
+	}
+	
+	// Check continuous effects for granted abilities
+	// Per Java: GainAbilityTargetEffect in Layer 6
+	if gameState != nil && gameState.layerSystem != nil {
+		hasGranted := gameState.layerSystem.HasEffectType(creature.ID, func(effect effects.ContinuousEffect) bool {
+			if grantEffect, ok := effect.(*effects.GrantAbilityEffect); ok {
+				return grantEffect.GetAbilityID() == abilityID
+			}
+			return false
+		})
+		if hasGranted {
+			return true
+		}
+	}
 	
 	return false
 }
@@ -5580,11 +5610,11 @@ func (e *MageEngine) hasCantAttackEffect(gameState *engineGameState, creatureID 
 		return false
 	}
 	
-	// TODO: Implement full continuous effect checking
-	// This would iterate through all restriction effects in the layer system
-	// and check if any CantAttackEffect applies to this creature
-	// For now, return false (no dynamic restrictions)
-	return false
+	// Check if any CantAttackEffect applies to this creature
+	return gameState.layerSystem.HasEffectType(creatureID, func(effect effects.ContinuousEffect) bool {
+		_, isCantAttack := effect.(*effects.CantAttackEffect)
+		return isCantAttack
+	})
 }
 
 // hasCantBlockEffect checks if a creature is affected by a "can't block" continuous effect
@@ -5594,11 +5624,11 @@ func (e *MageEngine) hasCantBlockEffect(gameState *engineGameState, creatureID s
 		return false
 	}
 	
-	// TODO: Implement full continuous effect checking
-	// This would iterate through all restriction effects in the layer system
-	// and check if any CantBlockEffect applies to this creature
-	// For now, return false (no dynamic restrictions)
-	return false
+	// Check if any CantBlockEffect applies to this creature
+	return gameState.layerSystem.HasEffectType(creatureID, func(effect effects.ContinuousEffect) bool {
+		_, isCantBlock := effect.(*effects.CantBlockEffect)
+		return isCantBlock
+	})
 }
 
 // hasMustAttackEffect checks if a creature is affected by a "must attack if able" continuous effect
@@ -5608,11 +5638,11 @@ func (e *MageEngine) hasMustAttackEffect(gameState *engineGameState, creatureID 
 		return false
 	}
 	
-	// TODO: Implement full continuous effect checking
-	// This would iterate through all requirement effects in the layer system
-	// and check if any MustAttackEffect applies to this creature
-	// For now, return false (no dynamic requirements)
-	return false
+	// Check if any MustAttackEffect applies to this creature
+	return gameState.layerSystem.HasEffectType(creatureID, func(effect effects.ContinuousEffect) bool {
+		_, isMustAttack := effect.(*effects.MustAttackEffect)
+		return isMustAttack
+	})
 }
 
 // getMinBlockedBy returns the minimum number of blockers required to block this creature

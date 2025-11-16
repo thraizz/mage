@@ -169,3 +169,49 @@ func (ls *LayerSystem) Apply(snapshot *Snapshot) {
 		}
 	}
 }
+
+// GetEffectsForCard returns all effects that apply to a specific card
+func (ls *LayerSystem) GetEffectsForCard(cardID string) []ContinuousEffect {
+	if ls == nil || cardID == "" {
+		return nil
+	}
+	
+	ls.mu.RLock()
+	defer ls.mu.RUnlock()
+	
+	var result []ContinuousEffect
+	snapshot := &Snapshot{CardID: cardID}
+	
+	for _, layerMap := range ls.effects {
+		for _, effect := range layerMap {
+			if effect.AppliesTo(snapshot) {
+				result = append(result, effect)
+			}
+		}
+	}
+	
+	return result
+}
+
+// HasEffectType checks if a card is affected by a specific effect type
+// This is a helper for checking restrictions, requirements, etc.
+func (ls *LayerSystem) HasEffectType(cardID string, checkFunc func(ContinuousEffect) bool) bool {
+	if ls == nil || cardID == "" || checkFunc == nil {
+		return false
+	}
+	
+	ls.mu.RLock()
+	defer ls.mu.RUnlock()
+	
+	snapshot := &Snapshot{CardID: cardID}
+	
+	for _, layerMap := range ls.effects {
+		for _, effect := range layerMap {
+			if effect.AppliesTo(snapshot) && checkFunc(effect) {
+				return true
+			}
+		}
+	}
+	
+	return false
+}

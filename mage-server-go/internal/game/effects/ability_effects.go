@@ -14,11 +14,11 @@ type GrantAbilityEffect struct {
 	sourceID     string
 	abilityID    string // The ability being granted (e.g., "FlyingAbility")
 	targetIDs    []string // IDs of affected permanents
-	duration     string // "EndOfTurn", "WhileOnBattlefield", etc.
+	duration     Duration // How long the effect lasts
 }
 
 // NewGrantAbilityEffect creates a new ability-granting effect
-func NewGrantAbilityEffect(sourceID, abilityID string, targetIDs []string, duration string) *GrantAbilityEffect {
+func NewGrantAbilityEffect(sourceID, abilityID string, targetIDs []string, duration Duration) *GrantAbilityEffect {
 	source := strings.TrimSpace(sourceID)
 	ability := strings.TrimSpace(abilityID)
 	seed := fmt.Sprintf("%s|%s|%v|%s", source, ability, targetIDs, duration)
@@ -31,6 +31,16 @@ func NewGrantAbilityEffect(sourceID, abilityID string, targetIDs []string, durat
 		targetIDs: targetIDs,
 		duration:  duration,
 	}
+}
+
+// GetDuration returns the duration of the effect
+func (e *GrantAbilityEffect) GetDuration() Duration {
+	return e.duration
+}
+
+// GetSourceID returns the source ID of the effect
+func (e *GrantAbilityEffect) GetSourceID() string {
+	return e.sourceID
 }
 
 // ID returns the unique identifier
@@ -83,11 +93,11 @@ type CantAttackEffect struct {
 	id        string
 	sourceID  string
 	targetIDs []string
-	duration  string
+	duration  Duration
 }
 
 // NewCantAttackEffect creates a new can't attack effect
-func NewCantAttackEffect(sourceID string, targetIDs []string, duration string) *CantAttackEffect {
+func NewCantAttackEffect(sourceID string, targetIDs []string, duration Duration) *CantAttackEffect {
 	source := strings.TrimSpace(sourceID)
 	seed := fmt.Sprintf("%s|cant-attack|%v|%s", source, targetIDs, duration)
 	id := uuid.NewSHA1(uuid.NameSpaceOID, []byte(seed)).String()
@@ -98,6 +108,16 @@ func NewCantAttackEffect(sourceID string, targetIDs []string, duration string) *
 		targetIDs: targetIDs,
 		duration:  duration,
 	}
+}
+
+// GetDuration returns the duration of the effect
+func (e *CantAttackEffect) GetDuration() Duration {
+	return e.duration
+}
+
+// GetSourceID returns the source ID of the effect
+func (e *CantAttackEffect) GetSourceID() string {
+	return e.sourceID
 }
 
 // ID returns the unique identifier
@@ -143,11 +163,11 @@ type CantBlockEffect struct {
 	id        string
 	sourceID  string
 	targetIDs []string
-	duration  string
+	duration  Duration
 }
 
 // NewCantBlockEffect creates a new can't block effect
-func NewCantBlockEffect(sourceID string, targetIDs []string, duration string) *CantBlockEffect {
+func NewCantBlockEffect(sourceID string, targetIDs []string, duration Duration) *CantBlockEffect {
 	source := strings.TrimSpace(sourceID)
 	seed := fmt.Sprintf("%s|cant-block|%v|%s", source, targetIDs, duration)
 	id := uuid.NewSHA1(uuid.NameSpaceOID, []byte(seed)).String()
@@ -158,6 +178,16 @@ func NewCantBlockEffect(sourceID string, targetIDs []string, duration string) *C
 		targetIDs: targetIDs,
 		duration:  duration,
 	}
+}
+
+// GetDuration returns the duration of the effect
+func (e *CantBlockEffect) GetDuration() Duration {
+	return e.duration
+}
+
+// GetSourceID returns the source ID of the effect
+func (e *CantBlockEffect) GetSourceID() string {
+	return e.sourceID
 }
 
 // ID returns the unique identifier
@@ -202,11 +232,11 @@ type MustAttackEffect struct {
 	id        string
 	sourceID  string
 	targetIDs []string
-	duration  string
+	duration  Duration
 }
 
 // NewMustAttackEffect creates a new must attack effect
-func NewMustAttackEffect(sourceID string, targetIDs []string, duration string) *MustAttackEffect {
+func NewMustAttackEffect(sourceID string, targetIDs []string, duration Duration) *MustAttackEffect {
 	source := strings.TrimSpace(sourceID)
 	seed := fmt.Sprintf("%s|must-attack|%v|%s", source, targetIDs, duration)
 	id := uuid.NewSHA1(uuid.NameSpaceOID, []byte(seed)).String()
@@ -217,6 +247,16 @@ func NewMustAttackEffect(sourceID string, targetIDs []string, duration string) *
 		targetIDs: targetIDs,
 		duration:  duration,
 	}
+}
+
+// GetDuration returns the duration of the effect
+func (e *MustAttackEffect) GetDuration() Duration {
+	return e.duration
+}
+
+// GetSourceID returns the source ID of the effect
+func (e *MustAttackEffect) GetSourceID() string {
+	return e.sourceID
 }
 
 // ID returns the unique identifier
