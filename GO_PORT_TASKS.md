@@ -74,7 +74,7 @@ Status legend:
 - [x] Implement `CanBlock(gameID, blockerID, attackerID)` - validate creature can block (tapped, flying, restrictions)
 - [x] Add blocker to combat group, update blocked status
 - [x] Implement `AcceptBlockers(gameID)` - finalize blockers, check requirements/restrictions
-- [ ] Implement blocker ordering for multiple blockers on same attacker
+- [x] Implement blocker ordering for multiple blockers on same attacker
 - [x] Implement `RemoveBlocker(gameID, blockerID)` - undo blocker declaration
 - [x] Fire `EventBlockerDeclared` per blocker and `EventDeclaredBlockers` when complete
 

@@ -4599,6 +4599,72 @@ func (e *MageEngine) RemoveAttacker(gameID, attackerID string) error {
 	return nil
 }
 
+// OrderBlockers sets the damage assignment order for blockers on a specific attacker
+// Per Java: The attacking player chooses the order in which damage is assigned to blockers
+// This is typically done during the declare blockers step, before damage assignment
+func (e *MageEngine) OrderBlockers(gameID, attackerID string, blockerOrder []string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Find the combat group for this attacker
+	var targetGroup *combatGroup
+	for _, group := range gameState.combat.groups {
+		for _, aid := range group.attackers {
+			if aid == attackerID {
+				targetGroup = group
+				break
+			}
+		}
+		if targetGroup != nil {
+			break
+		}
+	}
+	
+	if targetGroup == nil {
+		return fmt.Errorf("attacker %s not found in combat", attackerID)
+	}
+	
+	// Validate that all blockers in the order are actually blocking this attacker
+	if len(blockerOrder) != len(targetGroup.blockers) {
+		return fmt.Errorf("blocker order length (%d) does not match actual blocker count (%d)", 
+			len(blockerOrder), len(targetGroup.blockers))
+	}
+	
+	// Create a set of current blockers for validation
+	currentBlockers := make(map[string]bool)
+	for _, bid := range targetGroup.blockers {
+		currentBlockers[bid] = true
+	}
+	
+	// Validate that all provided blockers are actually blocking
+	for _, bid := range blockerOrder {
+		if !currentBlockers[bid] {
+			return fmt.Errorf("blocker %s is not blocking attacker %s", bid, attackerID)
+		}
+	}
+	
+	// Update the blocker order
+	targetGroup.blockers = blockerOrder
+	
+	if e.logger != nil {
+		e.logger.Debug("blocker order set",
+			zap.String("game_id", gameID),
+			zap.String("attacker_id", attackerID),
+			zap.Strings("blocker_order", blockerOrder),
+		)
+	}
+	
+	return nil
+}
+
 // AcceptBlockers finalizes the blocker declarations and fires events
 // Per Java Combat.acceptBlockers()
 func (e *MageEngine) AcceptBlockers(gameID string) error {
