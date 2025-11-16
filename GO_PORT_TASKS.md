@@ -160,7 +160,7 @@ Status legend:
 ### Special Combat Mechanics (P2 - Medium Priority)
 - [ ] Implement menace (must be blocked by 2+ creatures)
 - [x] Implement deathtouch (any damage is lethal) - integrated with trample
-- [ ] Implement lifelink (gain life equal to damage dealt)
+- [x] Implement lifelink (gain life equal to damage dealt)
 - [x] Implement defender (can't attack)
 - [ ] Implement "can't be blocked" effects
 - [ ] Implement "must be blocked if able" effects

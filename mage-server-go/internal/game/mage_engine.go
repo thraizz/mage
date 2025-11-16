@@ -37,6 +37,7 @@ const (
 	abilityTrample       = "TrampleAbility"
 	abilityDeathtouch    = "DeathtouchAbility"
 	abilityDefender      = "DefenderAbility"
+	abilityLifelink      = "LifelinkAbility"
 )
 
 // EngineGameView represents the complete game state view for a player
@@ -5076,8 +5077,8 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 				damageToAssign = remainingDamage
 			}
 			
-			// Mark damage on blocker
-			e.markDamage(blocker, damageToAssign, attackerID)
+			// Mark damage on blocker (with lifelink check)
+			e.markDamageWithLifelink(gameState, blocker, damageToAssign, attackerID)
 			remainingDamage -= damageToAssign
 			
 			if remainingDamage <= 0 {
@@ -5107,8 +5108,8 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 				damage += remainingDamage // Give remainder to first blocker
 			}
 			
-			// Mark damage on blocker
-			e.markDamage(blocker, damage, attackerID)
+			// Mark damage on blocker (with lifelink check)
+			e.markDamageWithLifelink(gameState, blocker, damage, attackerID)
 		}
 	}
 	
@@ -5157,7 +5158,7 @@ func (e *MageEngine) assignDamageToAttackers(gameState *engineGameState, group *
 			attackerID := group.attackers[0]
 			attacker, exists := gameState.cards[attackerID]
 			if exists {
-				e.markDamage(attacker, power, blockerID)
+				e.markDamageWithLifelink(gameState, attacker, power, blockerID)
 			}
 		}
 	}
@@ -5550,6 +5551,35 @@ func (e *MageEngine) markDamage(creature *internalCard, amount int, sourceID str
 	creature.DamageSources[sourceID] += amount
 }
 
+// markDamageWithLifelink marks damage and handles lifelink
+// Per Java PermanentImpl.markDamage() lines 1119-1126
+func (e *MageEngine) markDamageWithLifelink(gameState *engineGameState, creature *internalCard, amount int, sourceID string) {
+	if amount <= 0 {
+		return
+	}
+	
+	// Mark the damage
+	e.markDamage(creature, amount, sourceID)
+	
+	// Check if source has lifelink
+	source, exists := gameState.cards[sourceID]
+	if exists && e.hasAbility(source, abilityLifelink) {
+		// Gain life equal to damage dealt
+		controller, exists := gameState.players[source.ControllerID]
+		if exists {
+			controller.Life += amount
+			
+			if e.logger != nil {
+				e.logger.Debug("lifelink triggered",
+					zap.String("source_id", sourceID),
+					zap.String("controller", source.ControllerID),
+					zap.Int("life_gained", amount),
+				)
+			}
+		}
+	}
+}
+
 // dealDamageToDefender deals damage to a defending player or permanent
 // Per Java CombatGroup.defenderDamage()
 func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *internalCard, defenderID string, amount int) error {
@@ -5560,7 +5590,7 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 	// Check if defender is a permanent (planeswalker/battle) or player
 	if defender, exists := gameState.cards[defenderID]; exists {
 		// Defender is a permanent
-		e.markDamage(defender, amount, attacker.ID)
+		e.markDamageWithLifelink(gameState, defender, amount, attacker.ID)
 		return nil
 	}
 	
@@ -5572,6 +5602,22 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 	
 	// Deal damage to player
 	player.Life -= amount
+	
+	// Handle lifelink
+	if e.hasAbility(attacker, abilityLifelink) {
+		controller, exists := gameState.players[attacker.ControllerID]
+		if exists {
+			controller.Life += amount
+			
+			if e.logger != nil {
+				e.logger.Debug("lifelink triggered on player damage",
+					zap.String("attacker_id", attacker.ID),
+					zap.String("controller", attacker.ControllerID),
+					zap.Int("life_gained", amount),
+				)
+			}
+		}
+	}
 	
 	// Fire damage event
 	gameState.eventBus.Publish(rules.Event{
