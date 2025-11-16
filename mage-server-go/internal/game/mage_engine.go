@@ -319,6 +319,15 @@ type triggeredAbilityQueueItem struct {
 	UsesStack   bool // If false, executes immediately without going on stack
 }
 
+// combatTrigger represents a combat-related trigger condition
+// Per Java TriggeredAbility pattern (checkEventType + checkTrigger)
+type combatTrigger struct {
+	SourceID    string                                         // Card with the trigger
+	TriggerType string                                         // Type of trigger (attacks, blocks, etc.)
+	Condition   func(*engineGameState, rules.Event) bool      // Check if trigger should fire
+	CreateAbility func(*engineGameState, rules.Event) *triggeredAbilityQueueItem // Create the triggered ability
+}
+
 // gameAnalytics tracks metrics for a game
 type gameAnalytics struct {
 	maxStackDepth      int           // Maximum stack depth reached
@@ -354,6 +363,7 @@ type engineGameState struct {
 	targetValidator *targeting.TargetValidator
 	layerSystem   *effects.LayerSystem
 	triggeredQueue []*triggeredAbilityQueueItem // Queue of triggered abilities waiting to be put on stack
+	combatTriggers []*combatTrigger             // Registered combat triggers (for cards with combat-related abilities)
 	simultaneousEvents []rules.Event             // Queue of events that happened simultaneously
 	concedingPlayers   []string                  // Queue of players requesting concession
 	analytics     *gameAnalytics                 // Game metrics and analytics
@@ -2444,6 +2454,64 @@ func (e *MageEngine) removeTriggeredAbility(gameState *engineGameState, abilityI
 	}
 }
 
+// RegisterCombatTrigger registers a combat trigger for a card
+// Per Java: Cards add TriggeredAbilities to their abilities list
+func (e *MageEngine) RegisterCombatTrigger(gameID string, trigger *combatTrigger) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	gameState.combatTriggers = append(gameState.combatTriggers, trigger)
+	
+	if e.logger != nil {
+		e.logger.Debug("registered combat trigger",
+			zap.String("game_id", gameID),
+			zap.String("source_id", trigger.SourceID),
+			zap.String("trigger_type", trigger.TriggerType),
+		)
+	}
+	
+	return nil
+}
+
+// checkCombatTriggers checks all registered combat triggers for a given event
+// Per Java: TriggeredAbilities.checkTriggers() called when events fire
+func (e *MageEngine) checkCombatTriggers(gameState *engineGameState, event rules.Event) {
+	for _, trigger := range gameState.combatTriggers {
+		// Check if the source card still exists and is on battlefield
+		source, exists := gameState.cards[trigger.SourceID]
+		if !exists || source.Zone != zoneBattlefield {
+			continue
+		}
+		
+		// Check if the trigger condition is met
+		if trigger.Condition != nil && trigger.Condition(gameState, event) {
+			// Create and queue the triggered ability
+			if trigger.CreateAbility != nil {
+				ability := trigger.CreateAbility(gameState, event)
+				if ability != nil {
+					gameState.triggeredQueue = append(gameState.triggeredQueue, ability)
+					
+					if e.logger != nil {
+						e.logger.Debug("combat trigger fired",
+							zap.String("source_id", trigger.SourceID),
+							zap.String("trigger_type", trigger.TriggerType),
+							zap.String("ability_id", ability.ID),
+						)
+					}
+				}
+			}
+		}
+	}
+}
+
 // putTriggeredAbilityOnStack puts a triggered ability on the stack
 func (e *MageEngine) putTriggeredAbilityOnStack(gameState *engineGameState, ability *triggeredAbilityQueueItem) error {
 	// Wrap the resolve function to match StackItem signature
@@ -4129,6 +4197,9 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	event.Metadata["defender_id"] = defenderID
 	gameState.eventBus.Publish(event)
 	
+	// Check for combat triggers (e.g., "Whenever ~ attacks")
+	e.checkCombatTriggers(gameState, event)
+	
 	// Fire defender attacked event
 	defenderEvent := rules.NewEvent(rules.EventDefenderAttacked, defenderID, creatureID, playerID)
 	defenderEvent.Metadata["attacker_id"] = creatureID
@@ -4162,7 +4233,11 @@ func (e *MageEngine) FinishDeclaringAttackers(gameID string) error {
 	defer gameState.mu.Unlock()
 	
 	// Fire DECLARED_ATTACKERS event
-	gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclaredAttackers, "", "", gameState.combat.attackingPlayerID))
+	declaredEvent := rules.NewEvent(rules.EventDeclaredAttackers, "", "", gameState.combat.attackingPlayerID)
+	gameState.eventBus.Publish(declaredEvent)
+	
+	// Check for combat triggers (e.g., "Whenever one or more creatures attack")
+	e.checkCombatTriggers(gameState, declaredEvent)
 	
 	return nil
 }
@@ -4385,13 +4460,17 @@ func (e *MageEngine) DeclareBlocker(gameID, blockerID, attackerID, playerID stri
 	gameState.combat.blockingGroups[blockerID] = group
 	
 	// Fire BLOCKER_DECLARED event
-	gameState.eventBus.Publish(rules.Event{
+	blockerEvent := rules.Event{
 		Type:       rules.EventBlockerDeclared,
 		SourceID:   blockerID,
 		TargetID:   attackerID,
 		PlayerID:   playerID,
 		Controller: playerID,
-	})
+	}
+	gameState.eventBus.Publish(blockerEvent)
+	
+	// Check for combat triggers (e.g., "Whenever ~ blocks")
+	e.checkCombatTriggers(gameState, blockerEvent)
 	
 	if e.logger != nil {
 		e.logger.Debug("blocker declared",
@@ -4718,10 +4797,13 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 		// Fire CREATURE_BLOCKED event for each attacker that is blocked
 		if len(group.blockers) > 0 {
 			for _, attackerID := range group.attackers {
-				gameState.eventBus.Publish(rules.Event{
+				blockedEvent := rules.Event{
 					Type:       rules.EventCreatureBlocked,
 					SourceID:   attackerID,
-				})
+				}
+				gameState.eventBus.Publish(blockedEvent)
+				// Check for combat triggers (e.g., "Whenever ~ becomes blocked")
+				e.checkCombatTriggers(gameState, blockedEvent)
 			}
 		}
 	}
@@ -4729,10 +4811,13 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 	// Fire CREATURE_BLOCKS event for each blocker
 	// Per Java Combat.acceptBlockers()
 	for blockerID := range gameState.combat.blockers {
-		gameState.eventBus.Publish(rules.Event{
+		blocksEvent := rules.Event{
 			Type:       rules.EventCreatureBlocks,
 			SourceID:   blockerID,
-		})
+		}
+		gameState.eventBus.Publish(blocksEvent)
+		// Check for combat triggers (e.g., "Whenever ~ blocks")
+		e.checkCombatTriggers(gameState, blocksEvent)
 	}
 	
 	// Fire DECLARED_BLOCKERS event for each defending player
