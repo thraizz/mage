@@ -124,18 +124,17 @@ Status legend:
 - [ ] Support effects that grant/remove flying during combat
 
 ### Combat Events (P1 - High Priority)
-- [ ] Add `EventBeginCombat` - beginning of combat step
-- [ ] Add `EventDeclareAttackersStepPre` - before attacker declaration
-- [ ] Add `EventAttackerDeclared` - per attacker declared
-- [ ] Add `EventDeclaredAttackers` - all attackers declared
-- [ ] Add `EventDeclareBlockersStepPre` - before blocker declaration
-- [ ] Add `EventBlockerDeclared` - per blocker declared
-- [ ] Add `EventDeclaredBlockers` - all blockers declared
-- [ ] Add `EventCombatDamageStepPre` - before damage assignment
-- [ ] Add `EventCombatDamageAssigned` - damage assigned
-- [ ] Add `EventCombatDamageApplied` - damage applied
-- [ ] Add `EventEndCombatStepPre` - before end of combat
-- [ ] Add `EventEndCombat` - combat ended
+- [x] Add `EventBeginCombat` - beginning of combat step
+- [x] Add `EventDeclareAttackersStepPre` - before attacker declaration
+- [x] Add `EventAttackerDeclared` - per attacker declared
+- [x] Add `EventDeclaredAttackers` - all attackers declared
+- [x] Add `EventDeclareBlockersStepPre` - before blocker declaration
+- [x] Add `EventBlockerDeclared` - per blocker declared
+- [x] Add `EventDeclaredBlockers` - all blockers declared
+- [x] Add `EventCombatDamageStepPre` - before damage assignment
+- [x] Add `EventCombatDamageApplied` - damage applied
+- [x] Add `EventEndCombatStepPre` - before end of combat
+- [x] Add `EventEndCombat` - combat ended
 
 ### Combat Validation & Requirements (P1 - High Priority)
 - [ ] Implement `CheckBlockRequirements(gameID, playerID)` - must block if able

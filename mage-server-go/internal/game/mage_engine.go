@@ -3828,6 +3828,9 @@ func (e *MageEngine) ResetCombat(gameID string) error {
 		e.logger.Debug("reset combat", zap.String("game_id", gameID))
 	}
 	
+	// Fire begin combat event
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventBeginCombatStep, "", "", ""))
+	
 	return nil
 }
 
@@ -3947,6 +3950,11 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	// TODO: Check for "can't attack" restrictions
 	// TODO: Check for "must attack" requirements
 	
+	// Fire declare attackers step pre event (before first attacker)
+	if len(gameState.combat.attackers) == 0 {
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareAttackersStepPre, "", "", playerID))
+	}
+	
 	// Validate defender exists
 	if !gameState.combat.defenders[defenderID] {
 		return fmt.Errorf("invalid defender %s", defenderID)
@@ -3993,6 +4001,11 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	event.Metadata["defender_id"] = defenderID
 	gameState.eventBus.Publish(event)
 	
+	// Fire defender attacked event
+	defenderEvent := rules.NewEvent(rules.EventDefenderAttacked, defenderID, creatureID, playerID)
+	defenderEvent.Metadata["attacker_id"] = creatureID
+	gameState.eventBus.Publish(defenderEvent)
+	
 	gameState.addMessage(fmt.Sprintf("%s attacks", creature.Name), "combat")
 	
 	if e.logger != nil {
@@ -4002,6 +4015,26 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 			zap.String("defender_id", defenderID),
 		)
 	}
+	
+	return nil
+}
+
+// FinishDeclaringAttackers signals that all attackers have been declared
+// Fires the DECLARED_ATTACKERS event
+func (e *MageEngine) FinishDeclaringAttackers(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+	
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+	
+	// Fire DECLARED_ATTACKERS event
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclaredAttackers, "", "", gameState.combat.attackingPlayerID))
 	
 	return nil
 }
@@ -4143,6 +4176,17 @@ func (e *MageEngine) DeclareBlocker(gameID, blockerID, attackerID, playerID stri
 	
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
+	}
+	
+	// Fire declare blockers step pre event (before first blocker)
+	gameState.mu.RLock()
+	hasBlockers := len(gameState.combat.blockers) > 0
+	gameState.mu.RUnlock()
+	
+	if !hasBlockers {
+		gameState.mu.Lock()
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareBlockersStepPre, "", "", playerID))
+		gameState.mu.Unlock()
 	}
 	
 	gameState.mu.Lock()
@@ -4446,6 +4490,9 @@ func (e *MageEngine) AssignCombatDamage(gameID string, firstStrike bool) error {
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
 	
+	// Fire combat damage step pre event
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageStepPre, "", "", ""))
+	
 	// Assign damage to blockers (attackers dealing damage)
 	for _, group := range gameState.combat.groups {
 		if err := e.assignDamageToBlockers(gameState, group, firstStrike); err != nil {
@@ -4679,6 +4726,9 @@ func (e *MageEngine) ApplyCombatDamage(gameID string) error {
 		)
 	}
 	
+	// Fire combat damage applied event
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageApplied, "", "", ""))
+	
 	return nil
 }
 
@@ -4695,6 +4745,9 @@ func (e *MageEngine) EndCombat(gameID string) error {
 	
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
+	
+	// Fire end combat step pre event
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventEndCombatStepPre, "", "", ""))
 	
 	// Clear combat flags on all creatures in combat
 	for _, group := range gameState.combat.groups {
