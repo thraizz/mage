@@ -118,9 +118,9 @@ Status legend:
 - [ ] Support effects that grant vigilance during combat
 
 ### Flying & Reach (P1 - High Priority)
-- [ ] Implement flying restriction (can only be blocked by flying/reach)
-- [ ] Implement reach ability (can block flying)
-- [ ] Add `CanBlock` validation for flying/reach interactions
+- [x] Implement flying restriction (can only be blocked by flying/reach)
+- [x] Implement reach ability (can block flying)
+- [x] Add `CanBlock` validation for flying/reach interactions
 - [ ] Support effects that grant/remove flying during combat
 
 ### Combat Events (P1 - High Priority)
