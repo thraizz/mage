@@ -4118,8 +4118,17 @@ func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error
 		return false, nil
 	}
 	
-	// TODO: Check restriction effects (can't block, can only block creatures with flying, etc.)
-	// TODO: Check attacker's evasion abilities (flying, shadow, etc.)
+	// Get attacker for evasion checks
+	attacker := gameState.cards[attackerID]
+	
+	// Flying restriction: creatures with flying can only be blocked by creatures with flying or reach
+	if e.hasAbility(attacker, abilityFlying) {
+		if !e.hasAbility(blocker, abilityFlying) && !e.hasAbility(blocker, abilityReach) {
+			return false, nil
+		}
+	}
+	
+	// TODO: Check other restriction effects (can't block, shadow, etc.)
 	// TODO: Check protection
 	
 	return true, nil
@@ -4270,6 +4279,16 @@ func (e *MageEngine) canBlockInternal(gameState *engineGameState, blockerID, att
 	
 	if blocker.ControllerID != defendingPlayerID {
 		return false, nil
+	}
+	
+	// Get attacker for evasion checks
+	attacker := gameState.cards[attackerID]
+	
+	// Flying restriction: creatures with flying can only be blocked by creatures with flying or reach
+	if e.hasAbility(attacker, abilityFlying) {
+		if !e.hasAbility(blocker, abilityFlying) && !e.hasAbility(blocker, abilityReach) {
+			return false, nil
+		}
 	}
 	
 	return true, nil
