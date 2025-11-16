@@ -35,6 +35,7 @@ const (
 	abilityFlying        = "FlyingAbility"
 	abilityReach         = "ReachAbility"
 	abilityTrample       = "TrampleAbility"
+	abilityDeathtouch    = "DeathtouchAbility"
 )
 
 // EngineGameView represents the complete game state view for a player
@@ -4155,8 +4156,13 @@ func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error
 	attacker := gameState.cards[attackerID]
 	
 	// Flying restriction: creatures with flying can only be blocked by creatures with flying or reach
+	// Exception: Dragons can be blocked by non-flying creatures with special abilities (AsThoughEffectType.BLOCK_DRAGON)
 	if e.hasAbility(attacker, abilityFlying) {
 		if !e.hasAbility(blocker, abilityFlying) && !e.hasAbility(blocker, abilityReach) {
+			// TODO: Check for AsThoughEffectType.BLOCK_DRAGON and attacker.hasSubtype(SubType.DRAGON)
+			// This requires implementing:
+			// 1. Subtype checking system
+			// 2. AsThough effects / continuous effects system
 			return false, nil
 		}
 	}
@@ -4329,8 +4335,10 @@ func (e *MageEngine) canBlockInternal(gameState *engineGameState, blockerID, att
 	attacker := gameState.cards[attackerID]
 	
 	// Flying restriction: creatures with flying can only be blocked by creatures with flying or reach
+	// Exception: Dragons can be blocked by non-flying creatures with special abilities (AsThoughEffectType.BLOCK_DRAGON)
 	if e.hasAbility(attacker, abilityFlying) {
 		if !e.hasAbility(blocker, abilityFlying) && !e.hasAbility(blocker, abilityReach) {
+			// TODO: Check for AsThoughEffectType.BLOCK_DRAGON and attacker.hasSubtype(SubType.DRAGON)
 			return false, nil
 		}
 	}
@@ -4383,6 +4391,9 @@ func (e *MageEngine) RemoveBlocker(gameID, blockerID string) error {
 		blocker.Blocking = false
 		blocker.BlockingWhat = nil
 	}
+	
+	// Fire REMOVED_FROM_COMBAT event (Java: Combat.removeFromCombat)
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventRemovedFromCombat, blockerID, "", ""))
 	
 	if e.logger != nil {
 		e.logger.Debug("blocker removed",
@@ -4464,6 +4475,21 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 			PlayerID:   playerID,
 			Controller: playerID,
 		})
+	}
+	
+	// Fire UNBLOCKED_ATTACKER event for each unblocked attacker
+	// Per Java Combat.acceptBlockers() - fires after blockers are declared
+	for _, group := range gameState.combat.groups {
+		if len(group.attackers) > 0 && !group.blocked {
+			for _, attackerID := range group.attackers {
+				gameState.eventBus.Publish(rules.Event{
+					Type:       rules.EventUnblockedAttacker,
+					SourceID:   attackerID,
+					PlayerID:   gameState.combat.attackingPlayerID,
+					Controller: gameState.combat.attackingPlayerID,
+				})
+			}
+		}
 	}
 	
 	if e.logger != nil {
@@ -4580,6 +4606,8 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 	
 	if hasTrample {
 		// Trample: assign lethal damage to each blocker, remainder to defender
+		// TODO: Implement player choice for damage assignment (Java: getMultiAmountWithIndividualConstraints)
+		// For now, we automatically assign lethal damage to each blocker in order
 		remainingDamage := power
 		
 		for _, blockerID := range group.blockers {
@@ -4594,7 +4622,8 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 			}
 			
 			// Calculate lethal damage (toughness - damage already marked)
-			lethalDamage := e.getLethalDamage(blocker)
+			// With deathtouch, only 1 damage is lethal
+			lethalDamage := e.getLethalDamageWithAttacker(gameState, blocker, attackerID)
 			damageToAssign := lethalDamage
 			if damageToAssign > remainingDamage {
 				damageToAssign = remainingDamage
@@ -4904,16 +4933,31 @@ func (e *MageEngine) dealsDamageThisStep(gameState *engineGameState, creature *i
 }
 
 // hasAbility checks if a creature has a specific ability by ID
+// hasAbility checks if a card has a specific ability
+// TODO: This should also check for abilities granted by continuous effects
+// Java equivalent: permanent.getAbilities(game).containsKey(abilityId)
+// Requires implementing:
+// 1. ContinuousEffects system to track temporary ability grants
+// 2. Layer system for effect ordering (Layer 6 for abilities)
+// 3. Effect duration tracking (until end of turn, until end of combat, etc.)
 func (e *MageEngine) hasAbility(creature *internalCard, abilityID string) bool {
 	if creature == nil {
 		return false
 	}
 	
+	// Check base abilities
 	for _, ability := range creature.Abilities {
 		if ability.ID == abilityID {
 			return true
 		}
 	}
+	
+	// TODO: Check continuous effects for granted abilities
+	// Example: "Target creature gains flying until end of turn"
+	// This would require:
+	// - gameState.continuousEffects.getAbilityEffects(card.ID, abilityID)
+	// - Check if any active effects grant this ability to this card
+	
 	return false
 }
 
@@ -4996,7 +5040,8 @@ func (e *MageEngine) getCreatureToughness(creature *internalCard) (int, error) {
 
 // getLethalDamage calculates the amount of damage needed to destroy a creature
 // This is toughness minus damage already marked on the creature
-func (e *MageEngine) getLethalDamage(creature *internalCard) int {
+// Deprecated: Use getLethalDamageWithAttacker instead
+func (e *MageEngine) getLethalDamage(creature *internalCard, attackerID string) int {
 	toughness, err := e.getCreatureToughness(creature)
 	if err != nil {
 		return 0
@@ -5005,6 +5050,38 @@ func (e *MageEngine) getLethalDamage(creature *internalCard) int {
 	lethal := toughness - creature.Damage
 	if lethal < 0 {
 		lethal = 0
+	}
+	
+	return lethal
+}
+
+// getLethalDamageWithAttacker calculates the amount of damage needed to destroy a creature
+// considering deathtouch on the attacker. Per Java PermanentImpl.getLethalDamage()
+// TODO: Add planeswalker support (loyalty counters) and battle support (defense counters)
+func (e *MageEngine) getLethalDamageWithAttacker(gameState *engineGameState, creature *internalCard, attackerID string) int {
+	toughness, err := e.getCreatureToughness(creature)
+	if err != nil {
+		return 0
+	}
+	
+	lethal := toughness - creature.Damage
+	if lethal < 0 {
+		lethal = 0
+	}
+	
+	// TODO: For planeswalkers, lethal = min(lethal, loyalty counters)
+	// TODO: For battles, lethal = min(lethal, defense counters)
+	
+	// Check for deathtouch on attacker (Java: attacker.getAbilities(game).containsKey(DeathtouchAbility.getInstance().getId()))
+	if attackerID != "" {
+		if attacker, exists := gameState.cards[attackerID]; exists {
+			if e.hasAbility(attacker, abilityDeathtouch) {
+				// With deathtouch, any amount of damage is lethal
+				if lethal > 1 {
+					lethal = 1
+				}
+			}
+		}
 	}
 	
 	return lethal

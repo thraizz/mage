@@ -109,7 +109,9 @@ Status legend:
 - [x] Implement trample damage calculation (excess damage to defender)
 - [x] Add `canDamageDefenderDirectly` flag to combat groups
 - [x] Validate lethal damage assigned to blockers before overflow
-- [ ] Handle trample damage to planeswalkers/battles
+- [x] Implement deathtouch + trample interaction (1 damage is lethal)
+- [ ] Implement player damage assignment choice (requires UI system)
+- [ ] Handle trample damage to planeswalkers/battles (requires planeswalker system)
 - [ ] Support "trample over planeswalkers" rule
 
 ### Vigilance (P1 - High Priority)
@@ -121,7 +123,8 @@ Status legend:
 - [x] Implement flying restriction (can only be blocked by flying/reach)
 - [x] Implement reach ability (can block flying)
 - [x] Add `CanBlock` validation for flying/reach interactions
-- [ ] Support effects that grant/remove flying during combat
+- [ ] Implement dragon blocking exception (requires subtype system and AsThough effects)
+- [ ] Support effects that grant/remove flying during combat (requires continuous effects)
 
 ### Combat Events (P1 - High Priority)
 - [x] Add `EventBeginCombat` - beginning of combat step
@@ -135,6 +138,8 @@ Status legend:
 - [x] Add `EventCombatDamageApplied` - damage applied
 - [x] Add `EventEndCombatStepPre` - before end of combat
 - [x] Add `EventEndCombat` - combat ended
+- [x] Add `EventUnblockedAttacker` - unblocked attacker after blockers declared
+- [x] Add `EventRemovedFromCombat` - creature removed from combat
 
 ### Combat Validation & Requirements (P1 - High Priority)
 - [ ] Implement `CheckBlockRequirements(gameID, playerID)` - must block if able
@@ -154,7 +159,7 @@ Status legend:
 
 ### Special Combat Mechanics (P2 - Medium Priority)
 - [ ] Implement menace (must be blocked by 2+ creatures)
-- [ ] Implement deathtouch (any damage is lethal)
+- [x] Implement deathtouch (any damage is lethal) - integrated with trample
 - [ ] Implement lifelink (gain life equal to damage dealt)
 - [ ] Implement defender (can't attack)
 - [ ] Implement "can't be blocked" effects
