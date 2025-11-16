@@ -106,9 +106,9 @@ Status legend:
 - [x] Implement `dealsDamageThisStep()` logic for first/double strike
 
 ### Trample (P1 - High Priority)
-- [ ] Implement trample damage calculation (excess damage to defender)
-- [ ] Add `canDamageDefenderDirectly` flag to combat groups
-- [ ] Validate lethal damage assigned to blockers before overflow
+- [x] Implement trample damage calculation (excess damage to defender)
+- [x] Add `canDamageDefenderDirectly` flag to combat groups
+- [x] Validate lethal damage assigned to blockers before overflow
 - [ ] Handle trample damage to planeswalkers/battles
 - [ ] Support "trample over planeswalkers" rule
 

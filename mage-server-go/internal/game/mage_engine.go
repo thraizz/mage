@@ -4487,7 +4487,7 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 	}
 	
 	// Check if attacker deals damage this step (first strike check)
-	if !e.dealsDamageThisStep(attacker, firstStrike) {
+	if !e.dealsDamageThisStep(gameState, attacker, firstStrike) {
 		return nil
 	}
 	
@@ -4502,30 +4502,91 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 		power = 0
 	}
 	
+	hasTrample := e.hasAbility(attacker, abilityTrample)
+	
+	// Check if there are any live blockers
+	liveBlockers := 0
+	for _, blockerID := range group.blockers {
+		if blocker, exists := gameState.cards[blockerID]; exists && blocker.Zone == zoneBattlefield {
+			liveBlockers++
+		}
+	}
+	
 	if len(group.blockers) == 0 {
-		// Unblocked - deal damage to defender
+		// Never blocked - deal damage to defender
 		return e.dealDamageToDefender(gameState, attacker, group.defenderID, power)
 	}
 	
-	// Blocked - assign damage to blockers
-	// For now, we'll do simple damage assignment (divide evenly)
-	// TODO: Implement proper damage ordering and player choice
-	damagePerBlocker := power / len(group.blockers)
-	remainingDamage := power % len(group.blockers)
+	if liveBlockers == 0 {
+		// Was blocked but all blockers are dead (e.g., from first strike)
+		// With trample, remaining damage goes through
+		// Without trample, no damage goes through
+		if hasTrample {
+			return e.dealDamageToDefender(gameState, attacker, group.defenderID, power)
+		}
+		return nil
+	}
 	
-	for i, blockerID := range group.blockers {
-		blocker, exists := gameState.cards[blockerID]
-		if !exists {
-			continue
+	// Blocked - assign damage to blockers
+	// With trample, assign lethal damage to blockers, excess goes to defender
+	// Without trample, all damage goes to blockers
+	
+	if hasTrample {
+		// Trample: assign lethal damage to each blocker, remainder to defender
+		remainingDamage := power
+		
+		for _, blockerID := range group.blockers {
+			blocker, exists := gameState.cards[blockerID]
+			if !exists {
+				continue
+			}
+			
+			// Skip dead blockers (already in graveyard from first strike, etc.)
+			if blocker.Zone != zoneBattlefield {
+				continue
+			}
+			
+			// Calculate lethal damage (toughness - damage already marked)
+			lethalDamage := e.getLethalDamage(blocker)
+			damageToAssign := lethalDamage
+			if damageToAssign > remainingDamage {
+				damageToAssign = remainingDamage
+			}
+			
+			// Mark damage on blocker
+			e.markDamage(blocker, damageToAssign, attackerID)
+			remainingDamage -= damageToAssign
+			
+			if remainingDamage <= 0 {
+				break
+			}
 		}
 		
-		damage := damagePerBlocker
-		if i == 0 {
-			damage += remainingDamage // Give remainder to first blocker
+		// Trample damage to defender
+		if remainingDamage > 0 {
+			return e.dealDamageToDefender(gameState, attacker, group.defenderID, remainingDamage)
 		}
+	} else {
+		// No trample: divide damage among blockers
+		// For now, we'll do simple damage assignment (divide evenly)
+		// TODO: Implement proper damage ordering and player choice
+		damagePerBlocker := power / len(group.blockers)
+		remainingDamage := power % len(group.blockers)
 		
-		// Mark damage on blocker
-		e.markDamage(blocker, damage, attackerID)
+		for i, blockerID := range group.blockers {
+			blocker, exists := gameState.cards[blockerID]
+			if !exists {
+				continue
+			}
+			
+			damage := damagePerBlocker
+			if i == 0 {
+				damage += remainingDamage // Give remainder to first blocker
+			}
+			
+			// Mark damage on blocker
+			e.markDamage(blocker, damage, attackerID)
+		}
 	}
 	
 	return nil
@@ -4551,7 +4612,7 @@ func (e *MageEngine) assignDamageToAttackers(gameState *engineGameState, group *
 		}
 		
 		// Check if blocker deals damage this step
-		if !e.dealsDamageThisStep(blocker, firstStrike) {
+		if !e.dealsDamageThisStep(gameState, blocker, firstStrike) {
 			continue
 		}
 		
@@ -4767,7 +4828,7 @@ func (e *MageEngine) HasFirstOrDoubleStrike(gameID string) (bool, error) {
 
 // dealsDamageThisStep checks if a creature deals damage this combat damage step
 // Per Java CombatGroup.dealsDamageThisStep()
-func (e *MageEngine) dealsDamageThisStep(creature *internalCard, firstStrike bool) bool {
+func (e *MageEngine) dealsDamageThisStep(gameState *engineGameState, creature *internalCard, firstStrike bool) bool {
 	if creature == nil {
 		return false
 	}
@@ -4785,7 +4846,7 @@ func (e *MageEngine) dealsDamageThisStep(creature *internalCard, firstStrike boo
 		// - Creatures with double strike deal damage again
 		// - Creatures without first/double strike deal damage for the first time
 		// - Creatures that already dealt damage in first strike step don't deal damage again (unless double strike)
-		return e.hasDoubleStrike(creature) || !e.wasFirstStrikingCreature(creature)
+		return e.hasDoubleStrike(creature) || !e.wasFirstStrikingCreatureInCombat(gameState, creature.ID)
 	}
 }
 
@@ -4878,6 +4939,22 @@ func (e *MageEngine) getCreatureToughness(creature *internalCard) (int, error) {
 	}
 	
 	return toughness, nil
+}
+
+// getLethalDamage calculates the amount of damage needed to destroy a creature
+// This is toughness minus damage already marked on the creature
+func (e *MageEngine) getLethalDamage(creature *internalCard) int {
+	toughness, err := e.getCreatureToughness(creature)
+	if err != nil {
+		return 0
+	}
+	
+	lethal := toughness - creature.Damage
+	if lethal < 0 {
+		lethal = 0
+	}
+	
+	return lethal
 }
 
 // markDamage marks damage on a creature from a source
