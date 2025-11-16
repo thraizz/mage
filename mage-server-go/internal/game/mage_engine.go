@@ -27,6 +27,28 @@ const (
 	zoneCommand = 6
 )
 
+// zoneToString converts a zone constant to a string
+func zoneToString(zone int) string {
+	switch zone {
+	case zoneLibrary:
+		return "LIBRARY"
+	case zoneHand:
+		return "HAND"
+	case zoneBattlefield:
+		return "BATTLEFIELD"
+	case zoneGraveyard:
+		return "GRAVEYARD"
+	case zoneStack:
+		return "STACK"
+	case zoneExile:
+		return "EXILE"
+	case zoneCommand:
+		return "COMMAND"
+	default:
+		return "UNKNOWN"
+	}
+}
+
 // Ability ID constants matching Java keyword abilities
 const (
 	abilityFirstStrike   = "FirstStrikeAbility"
@@ -5763,20 +5785,44 @@ func (e *MageEngine) applyDamageToCreature(gameState *engineGameState, creatureI
 		toughness = 0
 	}
 	
-	// Check if creature dies (damage >= toughness)
-	if creature.Damage >= toughness && toughness > 0 {
+	// Check if any damage source has deathtouch
+	hasDeathtouch := false
+	for sourceID := range creature.DamageSources {
+		if source, exists := gameState.cards[sourceID]; exists {
+			if e.hasAbility(source, abilityDeathtouch) {
+				hasDeathtouch = true
+				break
+			}
+		}
+	}
+	
+	// Check if creature dies (damage >= toughness OR any deathtouch damage)
+	shouldDie := (creature.Damage >= toughness && toughness > 0) || (hasDeathtouch && creature.Damage > 0)
+	
+	if shouldDie {
 		// Creature dies - move to graveyard
+		previousZone := creature.Zone
 		if err := e.moveCard(gameState, creature, zoneGraveyard, ""); err != nil {
 			return err
 		}
 		
-		// Fire death event
-		gameState.eventBus.Publish(rules.Event{
+		// Fire death event (zone change from battlefield to graveyard)
+		// Per Java: ZONE_CHANGE event where isDiesEvent() checks fromZone==BATTLEFIELD && toZone==GRAVEYARD
+		deathEvent := rules.Event{
 			Type:       rules.EventZoneChange,
+			TargetID:   creatureID,
 			SourceID:   creatureID,
 			Controller: creature.ControllerID,
 			Zone:       zoneGraveyard,
-		})
+			Metadata: map[string]string{
+				"fromZone": zoneToString(previousZone),
+				"toZone":   zoneToString(zoneGraveyard),
+			},
+		}
+		gameState.eventBus.Publish(deathEvent)
+		
+		// Check for death triggers (e.g., "Whenever ~ dies" or "Whenever a creature dies")
+		e.checkCombatTriggers(gameState, deathEvent)
 	}
 	
 	return nil
