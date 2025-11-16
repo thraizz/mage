@@ -3978,9 +3978,8 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	gameState.combat.attackers[creatureID] = true
 	
 	// Tap creature (unless it has vigilance)
-	// TODO: Check for vigilance ability
-	hasVigilance := false // Placeholder
-	if !hasVigilance {
+	hasVigilance := e.hasAbility(creature, abilityVigilance)
+	if !hasVigilance && !creature.Tapped {
 		creature.Tapped = true
 		gameState.combat.attackersTapped[creatureID] = true
 	}
