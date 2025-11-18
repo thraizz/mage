@@ -929,11 +929,18 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 			effects.CleanupEndOfTurnEffects(gameState.layerSystem)
 		}
 
+		// Get active player
+		activePlayerID := gameState.turnManager.ActivePlayer()
+
+		// Handle combat step initialization
+		// Per Java BeginCombatStep.beginStep() and DeclareAttackersStep.beginStep()
+		e.handleCombatStepBegin(gameState, step, activePlayerID)
+
 		// Notify phase change
 		e.notifyPhaseChange(gameState.gameID, map[string]interface{}{
 			"phase":         phase.String(),
 			"step":          step.String(),
-			"active_player": gameState.turnManager.ActivePlayer(),
+			"active_player": activePlayerID,
 			"turn":          gameState.turnManager.TurnNumber(),
 		})
 
@@ -941,7 +948,6 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		gameState.resetPassed()
 
 		// Set priority to active player
-		activePlayerID := gameState.turnManager.ActivePlayer()
 		gameState.turnManager.SetPriority(activePlayerID)
 		gameState.players[activePlayerID].HasPriority = true
 
@@ -985,6 +991,10 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		gameState.resetPassed()
 			// Set priority to active player
 			activePlayerID := gameState.turnManager.ActivePlayer()
+			
+			// Handle combat step initialization
+			// Per Java BeginCombatStep.beginStep() and DeclareAttackersStep.beginStep()
+			e.handleCombatStepBegin(gameState, step, activePlayerID)
 			
 			// Per rule 117.5: Check state-based actions before priority
 			// Repeat until no more state-based actions occur
@@ -3911,6 +3921,158 @@ func (e *MageEngine) EndMulligan(gameID string) error {
 
 // Combat System Implementation
 // Per Java Combat class
+
+// handleCombatStepBegin handles combat initialization when entering combat steps
+// Per Java BeginCombatStep.beginStep() and DeclareAttackersStep.beginStep()
+func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rules.Step, activePlayerID string) {
+	switch step {
+	case rules.StepBeginCombat:
+		// Per Java BeginCombatStep.beginStep() (line 28-33)
+		// 507.1: At the start of the combat phase, if an opponent controls a permanent with
+		// "At the beginning of combat" triggered ability, or if a turn-based action of a player
+		// other than the active player occurs at the beginning of combat, the active player gets priority
+		
+		// Create new combat state (equivalent to game.getCombat().clear())
+		gameState.combat = newCombatState()
+		
+		// Clear combat flags on all cards
+		for _, card := range gameState.cards {
+			card.Attacking = false
+			card.Blocking = false
+			card.AttackingWhat = ""
+			card.BlockingWhat = nil
+		}
+		
+		// Set the attacking player (equivalent to game.getCombat().setAttacker(activePlayerId))
+		gameState.combat.attackingPlayerID = activePlayerID
+		
+		// Set defenders (equivalent to game.getCombat().setDefenders(game))
+		// Clear previous defenders
+		gameState.combat.defenders = make(map[string]bool)
+		
+		// Add all opponents as defenders
+		for playerID := range gameState.players {
+			if playerID != activePlayerID {
+				gameState.combat.defenders[playerID] = true
+			}
+		}
+		
+		// Fire begin combat event
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventBeginCombatStep, "", "", ""))
+		
+		if e.logger != nil {
+			e.logger.Debug("begin combat step initialized",
+				zap.String("game_id", gameState.gameID),
+				zap.String("attacker", activePlayerID),
+				zap.Int("defenders", len(gameState.combat.defenders)),
+			)
+		}
+		
+	case rules.StepDeclareAttackers:
+		// Per Java DeclareAttackersStep.beginStep() (line 33-36)
+		// This is where selectAttackers() would be called in Java
+		// In our implementation, attacker selection is handled via player actions
+		// So we just fire the pre-step event here
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareAttackersStepPre, "", "", activePlayerID))
+		
+		if e.logger != nil {
+			e.logger.Debug("declare attackers step initialized",
+				zap.String("game_id", gameState.gameID),
+				zap.String("active_player", activePlayerID),
+			)
+		}
+		
+	case rules.StepDeclareBlockers:
+		// Fire the pre-step event for declare blockers
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareBlockersStepPre, "", "", activePlayerID))
+
+		// After blockers are declared, check if there are creatures with first/double strike
+		// If so, update the turn sequence to include the first strike damage step
+		if hasFirstStrike, err := e.HasFirstOrDoubleStrike(gameState.gameID); err == nil && hasFirstStrike {
+			gameState.turnManager.SetHasFirstStrike(true)
+			if e.logger != nil {
+				e.logger.Debug("first strike damage step added to turn sequence",
+					zap.String("game_id", gameState.gameID),
+				)
+			}
+		}
+
+		if e.logger != nil {
+			e.logger.Debug("declare blockers step initialized",
+				zap.String("game_id", gameState.gameID),
+			)
+		}
+
+	case rules.StepFirstStrikeDamage:
+		// First strike damage step
+		// Fire the pre-step event for first strike combat damage
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageStepPre, "", "", activePlayerID))
+
+		// Automatically assign and apply first strike damage
+		if err := e.AssignCombatDamage(gameState.gameID, true); err == nil {
+			if err := e.ApplyCombatDamage(gameState.gameID); err != nil && e.logger != nil {
+				e.logger.Error("failed to apply first strike damage",
+					zap.String("game_id", gameState.gameID),
+					zap.Error(err),
+				)
+			}
+		} else if e.logger != nil {
+			e.logger.Error("failed to assign first strike damage",
+				zap.String("game_id", gameState.gameID),
+				zap.Error(err),
+			)
+		}
+
+		if e.logger != nil {
+			e.logger.Debug("first strike damage step initialized and executed",
+				zap.String("game_id", gameState.gameID),
+			)
+		}
+
+	case rules.StepCombatDamage:
+		// Fire the pre-step event for combat damage
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageStepPre, "", "", activePlayerID))
+
+		// Automatically assign and apply normal damage
+		if err := e.AssignCombatDamage(gameState.gameID, false); err == nil {
+			if err := e.ApplyCombatDamage(gameState.gameID); err != nil && e.logger != nil {
+				e.logger.Error("failed to apply normal combat damage",
+					zap.String("game_id", gameState.gameID),
+					zap.Error(err),
+				)
+			}
+		} else if e.logger != nil {
+			e.logger.Error("failed to assign normal combat damage",
+				zap.String("game_id", gameState.gameID),
+				zap.Error(err),
+			)
+		}
+
+		if e.logger != nil {
+			e.logger.Debug("combat damage step initialized and executed",
+				zap.String("game_id", gameState.gameID),
+			)
+		}
+
+	case rules.StepEndCombat:
+		// Fire the pre-step event for end of combat
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventEndCombatStepPre, "", "", activePlayerID))
+
+		// End combat and clean up combat state
+		if err := e.EndCombat(gameState.gameID); err != nil && e.logger != nil {
+			e.logger.Error("failed to end combat",
+				zap.String("game_id", gameState.gameID),
+				zap.Error(err),
+			)
+		}
+
+		if e.logger != nil {
+			e.logger.Debug("end combat step initialized",
+				zap.String("game_id", gameState.gameID),
+			)
+		}
+	}
+}
 
 // ResetCombat clears all combat state at the beginning of combat
 // Per Java Combat.reset()

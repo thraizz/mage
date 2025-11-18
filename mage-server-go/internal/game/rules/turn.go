@@ -42,6 +42,7 @@ const (
 	StepBeginCombat
 	StepDeclareAttackers
 	StepDeclareBlockers
+	StepFirstStrikeDamage
 	StepCombatDamage
 	StepEndCombat
 	StepMain2
@@ -50,18 +51,19 @@ const (
 )
 
 var stepNames = map[Step]string{
-	StepUntap:            "UNTAP",
-	StepUpkeep:           "UPKEEP",
-	StepDraw:             "DRAW",
-	StepMain1:            "MAIN1",
-	StepBeginCombat:      "BEGIN_COMBAT",
-	StepDeclareAttackers: "DECLARE_ATTACKERS",
-	StepDeclareBlockers:  "DECLARE_BLOCKERS",
-	StepCombatDamage:     "COMBAT_DAMAGE",
-	StepEndCombat:        "END_COMBAT",
-	StepMain2:            "MAIN2",
-	StepEnd:              "END",
-	StepCleanup:          "CLEANUP",
+	StepUntap:             "UNTAP",
+	StepUpkeep:            "UPKEEP",
+	StepDraw:              "DRAW",
+	StepMain1:             "MAIN1",
+	StepBeginCombat:       "BEGIN_COMBAT",
+	StepDeclareAttackers:  "DECLARE_ATTACKERS",
+	StepDeclareBlockers:   "DECLARE_BLOCKERS",
+	StepFirstStrikeDamage: "FIRST_STRIKE_DAMAGE",
+	StepCombatDamage:      "COMBAT_DAMAGE",
+	StepEndCombat:         "END_COMBAT",
+	StepMain2:             "MAIN2",
+	StepEnd:               "END",
+	StepCleanup:           "CLEANUP",
 }
 
 func (s Step) String() string {
@@ -76,7 +78,8 @@ type turnEntry struct {
 	step  Step
 }
 
-var turnSequence = []turnEntry{
+// baseTurnSequence is the default turn structure without first strike damage step
+var baseTurnSequence = []turnEntry{
 	{PhaseBeginning, StepUntap},
 	{PhaseBeginning, StepUpkeep},
 	{PhaseBeginning, StepDraw},
@@ -91,12 +94,48 @@ var turnSequence = []turnEntry{
 	{PhaseEnding, StepCleanup},
 }
 
+// buildTurnSequence creates the turn sequence, optionally including StepFirstStrikeDamage
+// if hasFirstStrike is true
+func buildTurnSequence(hasFirstStrike bool) []turnEntry {
+	sequence := make([]turnEntry, len(baseTurnSequence))
+	copy(sequence, baseTurnSequence)
+
+	if !hasFirstStrike {
+		return sequence
+	}
+
+	// Insert StepFirstStrikeDamage before StepCombatDamage
+	// Find the index of StepCombatDamage
+	damageIdx := -1
+	for i, entry := range sequence {
+		if entry.step == StepCombatDamage {
+			damageIdx = i
+			break
+		}
+	}
+
+	if damageIdx == -1 {
+		// Shouldn't happen, return as-is
+		return sequence
+	}
+
+	// Create a new sequence with space for the first strike step
+	newSequence := make([]turnEntry, len(sequence)+1)
+	copy(newSequence, sequence[:damageIdx])
+	newSequence[damageIdx] = turnEntry{PhaseCombat, StepFirstStrikeDamage}
+	copy(newSequence[damageIdx+1:], sequence[damageIdx:])
+
+	return newSequence
+}
+
 // TurnManager tracks active/priority player and turn progression.
 type TurnManager struct {
-	orderIndex     int
-	turnNumber     int
-	activePlayer   string
-	priorityPlayer string
+	orderIndex      int
+	turnNumber      int
+	activePlayer    string
+	priorityPlayer  string
+	sequence        []turnEntry // Dynamic turn sequence
+	hasFirstStrike  bool         // Whether current turn sequence includes first strike step
 }
 
 // NewTurnManager creates a new turn manager initialized at turn 1, untap step.
@@ -107,17 +146,19 @@ func NewTurnManager(activePlayer string) *TurnManager {
 		turnNumber:     1,
 		activePlayer:   active,
 		priorityPlayer: active,
+		sequence:       buildTurnSequence(false), // Start without first strike step
+		hasFirstStrike: false,
 	}
 }
 
 // CurrentPhase returns the phase currently in progress.
 func (tm *TurnManager) CurrentPhase() Phase {
-	return turnSequence[tm.orderIndex].phase
+	return tm.sequence[tm.orderIndex].phase
 }
 
 // CurrentStep returns the step currently in progress.
 func (tm *TurnManager) CurrentStep() Step {
-	return turnSequence[tm.orderIndex].step
+	return tm.sequence[tm.orderIndex].step
 }
 
 // TurnNumber returns the current turn number (1-based).
@@ -145,16 +186,64 @@ func (tm *TurnManager) SetPriority(player string) {
 // and the active player is rotated to nextActivePlayer if provided.
 func (tm *TurnManager) AdvanceStep(nextActivePlayer string) (Phase, Step) {
 	tm.orderIndex++
-	if tm.orderIndex >= len(turnSequence) {
+	if tm.orderIndex >= len(tm.sequence) {
 		tm.orderIndex = 0
 		tm.turnNumber++
 		if next := strings.TrimSpace(nextActivePlayer); next != "" {
 			tm.activePlayer = next
 		}
+		// Reset sequence for new turn (no first strike by default)
+		tm.sequence = buildTurnSequence(false)
+		tm.hasFirstStrike = false
 	}
 
 	// Priority always reverts to active player at the start of a step.
 	tm.priorityPlayer = tm.activePlayer
 
 	return tm.CurrentPhase(), tm.CurrentStep()
+}
+
+// SetHasFirstStrike updates the turn sequence to include/exclude first strike damage step.
+// This should be called after StepBeginCombat when creatures with first strike are declared.
+func (tm *TurnManager) SetHasFirstStrike(hasFirstStrike bool) {
+	if tm.hasFirstStrike == hasFirstStrike {
+		return // No change
+	}
+
+	// We're currently at StepDeclareBlockers, need to rebuild sequence
+	// First, save current state
+	oldOrderIndex := tm.orderIndex
+
+	// Rebuild the sequence
+	newSequence := buildTurnSequence(hasFirstStrike)
+
+	if !tm.hasFirstStrike && hasFirstStrike {
+		// Going from no-first-strike to first-strike: orderIndex stays same
+		// (the first strike step will be inserted AFTER current declare blockers)
+		tm.orderIndex = oldOrderIndex
+	} else if tm.hasFirstStrike && !hasFirstStrike {
+		// Going from first-strike to no-first-strike: need to adjust orderIndex
+		// if we're at or past the first strike step
+		if oldOrderIndex >= len(newSequence) {
+			tm.orderIndex = len(newSequence) - 1
+		}
+	}
+
+	tm.sequence = newSequence
+	tm.hasFirstStrike = hasFirstStrike
+}
+
+// GetSequence returns the current turn sequence for testing/inspection
+func (tm *TurnManager) GetSequence() []turnEntry {
+	return tm.sequence
+}
+
+// turnEntry needs Step() method for testing
+type turnEntryWrapper interface {
+	Step() Step
+}
+
+// Implement Step() on turnEntry
+func (te turnEntry) Step() Step {
+	return te.step
 }

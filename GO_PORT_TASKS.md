@@ -197,14 +197,14 @@ Status legend:
 - [ ] Handle phase out during combat
 
 ### Combat Integration with Turn Structure (P0 - Critical)
-- [ ] Wire `ResetCombat()` to beginning of combat step
-- [ ] Wire `SetAttacker()` and `SetDefenders()` to beginning of combat
+- [x] Wire `ResetCombat()` to beginning of combat step
+- [x] Wire `SetAttacker()` and `SetDefenders()` to beginning of combat
 - [ ] Wire attacker declaration to declare attackers step
 - [ ] Wire blocker declaration to declare blockers step
-- [ ] Wire first strike damage to first strike damage step
-- [ ] Wire normal damage to combat damage step
-- [ ] Wire `EndCombat()` to end of combat step
-- [ ] Add combat damage steps to turn structure if first strike exists
+- [x] Wire first strike damage to first strike damage step
+- [x] Wire normal damage to combat damage step
+- [x] Wire `EndCombat()` to end of combat step
+- [x] Add combat damage steps to turn structure if first strike exists
 
 ### Combat Testing (P0 - Critical)
 - [ ] Test single attacker, no blockers (damage to player)
