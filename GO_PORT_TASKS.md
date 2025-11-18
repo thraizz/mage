@@ -50,7 +50,7 @@ Status legend:
 - [x] Add `checkStateAndTriggered()` method that runs before each priority (SBA → triggers → repeat until stable)
 - [x] Handle simultaneous events between stack resolutions (process events after each resolution)
 
-## Combat System 🚧 IN PROGRESS (~5% coverage, ~2,500 lines needed)
+## Combat System
 ### Core Combat Infrastructure (P0 - Critical)
 - [x] Implement `combatState` struct tracking attackers, blockers, groups, defenders, tapped creatures
 - [x] Implement `combatGroup` struct for attacker-blocker-defender groupings with damage ordering
@@ -199,8 +199,8 @@ Status legend:
 ### Combat Integration with Turn Structure (P0 - Critical)
 - [x] Wire `ResetCombat()` to beginning of combat step
 - [x] Wire `SetAttacker()` and `SetDefenders()` to beginning of combat
-- [ ] Wire attacker declaration to declare attackers step
-- [ ] Wire blocker declaration to declare blockers step
+- [x] Wire attacker declaration to declare attackers step
+- [x] Wire blocker declaration to declare blockers step
 - [x] Wire first strike damage to first strike damage step
 - [x] Wire normal damage to combat damage step
 - [x] Wire `EndCombat()` to end of combat step

@@ -2918,6 +2918,89 @@ func (s *engineGameState) addPrompt(playerID, text string, options []string) {
 	})
 }
 
+// buildAttackerPromptOptions builds prompt options for declaring attackers
+// Returns options in format: ["ATTACK:creatureID:defenderID", ..., "DONE_ATTACKING"]
+func (e *MageEngine) buildAttackerPromptOptions(gameState *engineGameState) []string {
+	options := make([]string, 0)
+	attackingPlayerID := gameState.combat.attackingPlayerID
+
+	// Find all creatures controlled by attacking player
+	for _, card := range gameState.cards {
+		if card.Zone != zoneBattlefield {
+			continue
+		}
+		if card.ControllerID != attackingPlayerID {
+			continue
+		}
+		if !e.isCreature(card) {
+			continue
+		}
+
+		// Skip creatures already declared as attackers
+		if card.Attacking {
+			continue
+		}
+
+		// Check if creature can attack
+		canAttack, _ := e.CanAttack(gameState.gameID, card.ID)
+		if !canAttack {
+			continue
+		}
+
+		// For each valid defender, add an option
+		for defenderID := range gameState.combat.defenders {
+			canAttackDefender, _ := e.CanAttackDefender(gameState.gameID, card.ID, defenderID)
+			if canAttackDefender {
+				option := fmt.Sprintf("ATTACK:%s:%s", card.ID, defenderID)
+				options = append(options, option)
+			}
+		}
+	}
+
+	// Always add option to finish declaring attackers
+	options = append(options, "DONE_ATTACKING")
+
+	return options
+}
+
+// buildBlockerPromptOptions builds prompt options for declaring blockers
+// Returns options in format: ["BLOCK:blockerID:attackerID", ..., "DONE_BLOCKING"]
+func (e *MageEngine) buildBlockerPromptOptions(gameState *engineGameState, defendingPlayerID string) []string {
+	options := make([]string, 0)
+
+	// Find all creatures controlled by defending player
+	for _, card := range gameState.cards {
+		if card.Zone != zoneBattlefield {
+			continue
+		}
+		if card.ControllerID != defendingPlayerID {
+			continue
+		}
+		if !e.isCreature(card) {
+			continue
+		}
+
+		// Skip creatures already declared as blockers
+		if card.Blocking {
+			continue
+		}
+
+		// For each attacker, check if this creature can block it
+		for attackerID := range gameState.combat.attackers {
+			canBlock, _ := e.CanBlock(gameState.gameID, card.ID, attackerID)
+			if canBlock {
+				option := fmt.Sprintf("BLOCK:%s:%s", card.ID, attackerID)
+				options = append(options, option)
+			}
+		}
+	}
+
+	// Always add option to finish declaring blockers
+	options = append(options, "DONE_BLOCKING")
+
+	return options
+}
+
 func (e *MageEngine) getNextPlayer(gameState *engineGameState) string {
 	if len(gameState.playerOrder) == 0 {
 		return ""
@@ -3972,19 +4055,40 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		// Per Java DeclareAttackersStep.beginStep() (line 33-36)
 		// This is where selectAttackers() would be called in Java
 		// In our implementation, attacker selection is handled via player actions
-		// So we just fire the pre-step event here
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareAttackersStepPre, "", "", activePlayerID))
-		
+
+		// Generate prompt for attacking player to declare attackers
+		options := e.buildAttackerPromptOptions(gameState)
+		if len(options) > 1 {  // More than just "DONE_ATTACKING"
+			gameState.addPrompt(activePlayerID, "Declare attackers (select creatures to attack)", options)
+		} else {
+			gameState.addPrompt(activePlayerID, "No creatures can attack", []string{"DONE_ATTACKING"})
+		}
+
 		if e.logger != nil {
 			e.logger.Debug("declare attackers step initialized",
 				zap.String("game_id", gameState.gameID),
 				zap.String("active_player", activePlayerID),
+				zap.Int("available_options", len(options)),
 			)
 		}
-		
+
 	case rules.StepDeclareBlockers:
 		// Fire the pre-step event for declare blockers
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareBlockersStepPre, "", "", activePlayerID))
+
+		// Generate prompts for each defending player to declare blockers
+		// Defending players are all opponents of the active player
+		for playerID := range gameState.players {
+			if playerID != activePlayerID {
+				options := e.buildBlockerPromptOptions(gameState, playerID)
+				if len(options) > 1 {  // More than just "DONE_BLOCKING"
+					gameState.addPrompt(playerID, "Declare blockers (select creatures to block)", options)
+				} else {
+					gameState.addPrompt(playerID, "No creatures can block or no attackers", []string{"DONE_BLOCKING"})
+				}
+			}
+		}
 
 		// After blockers are declared, check if there are creatures with first/double strike
 		// If so, update the turn sequence to include the first strike damage step
@@ -5722,18 +5826,25 @@ func (e *MageEngine) dealsDamageThisStep(gameState *engineGameState, creature *i
 // 1. ContinuousEffects system to track temporary ability grants
 // 2. Layer system for effect ordering (Layer 6 for abilities)
 // 3. Effect duration tracking (until end of turn, until end of combat, etc.)
+func (e *MageEngine) isCreature(card *internalCard) bool {
+	if card == nil {
+		return false
+	}
+	return strings.Contains(card.Type, "Creature")
+}
+
 func (e *MageEngine) hasAbility(creature *internalCard, abilityID string) bool {
 	if creature == nil {
 		return false
 	}
-	
+
 	// Check base abilities
 	for _, ability := range creature.Abilities {
 		if ability.ID == abilityID {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
