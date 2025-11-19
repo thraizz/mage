@@ -4006,6 +4006,158 @@ func (e *MageEngine) EndMulligan(gameID string) error {
 // Combat System Implementation
 // Per Java Combat class
 
+// processForcedAttackers processes "attacks if able" effects and automatically declares forced attackers
+// Per Java Combat.checkAttackRequirements() (lines 474-591)
+func (e *MageEngine) processForcedAttackers(gameState *engineGameState) error {
+	activePlayerID := gameState.combat.attackingPlayerID
+
+	// Find all creatures that must attack
+	for _, card := range gameState.cards {
+		if card.Zone != zoneBattlefield {
+			continue
+		}
+		if card.ControllerID != activePlayerID {
+			continue
+		}
+		if !e.isCreature(card) {
+			continue
+		}
+		if card.Attacking {
+			continue // Already attacking
+		}
+
+		// Check if creature has "attacks if able" effect
+		if !e.hasMustAttackEffect(gameState, card.ID) {
+			continue
+		}
+
+		// Check if creature can attack
+		canAttack, _ := e.CanAttack(gameState.gameID, card.ID)
+		if !canAttack {
+			continue // Can't attack due to restrictions (tapped, summoning sickness, etc.)
+		}
+
+		// Find valid defenders this creature can attack
+		validDefenders := make([]string, 0)
+		for defenderID := range gameState.combat.defenders {
+			canAttackDefender, _ := e.CanAttackDefender(gameState.gameID, card.ID, defenderID)
+			if canAttackDefender {
+				validDefenders = append(validDefenders, defenderID)
+			}
+		}
+
+		if len(validDefenders) == 0 {
+			continue // No valid targets
+		}
+
+		// Pick the first valid defender (in a real implementation, player would choose)
+		// For now, just attack the first defender in the map
+		defenderID := validDefenders[0]
+
+		// Declare the attacker
+		if err := e.DeclareAttacker(gameState.gameID, card.ID, defenderID, activePlayerID); err != nil {
+			if e.logger != nil {
+				e.logger.Warn("failed to declare forced attacker",
+					zap.String("game_id", gameState.gameID),
+					zap.String("creature_id", card.ID),
+					zap.Error(err),
+				)
+			}
+			continue
+		}
+
+		// Track this as a forced attack
+		if gameState.combat.creaturesForcedToAttack[card.ID] == nil {
+			gameState.combat.creaturesForcedToAttack[card.ID] = make(map[string]bool)
+		}
+		gameState.combat.creaturesForcedToAttack[card.ID][defenderID] = true
+
+		if e.logger != nil {
+			e.logger.Debug("declared forced attacker",
+				zap.String("game_id", gameState.gameID),
+				zap.String("creature_id", card.ID),
+				zap.String("defender_id", defenderID),
+			)
+		}
+	}
+
+	return nil
+}
+
+// processMustBeBlockedRequirements processes "must be blocked if able" effects
+// Per Java Combat.retrieveMustBlockAttackerRequirements() (lines 848-891)
+func (e *MageEngine) processMustBeBlockedRequirements(gameState *engineGameState) error {
+	// For each attacker, check if it has a "must be blocked" effect
+	for attackerID := range gameState.combat.attackers {
+		attacker, exists := gameState.cards[attackerID]
+		if !exists || !attacker.Attacking {
+			continue
+		}
+
+		// Get all "must be blocked" effects on this attacker
+		mbEffects := e.getMustBeBlockedEffects(gameState, attackerID)
+		if len(mbEffects) == 0 {
+			continue
+		}
+
+		// Find the defender being attacked
+		defenderID := attacker.AttackingWhat
+		if defenderID == "" {
+			continue
+		}
+
+		// Determine defending player
+		defendingPlayerID := ""
+		if defender, exists := gameState.players[defenderID]; exists {
+			defendingPlayerID = defender.PlayerID
+		} else {
+			// Defender is a permanent (planeswalker/battle), find its controller
+			if defenderCard, exists := gameState.cards[defenderID]; exists {
+				defendingPlayerID = defenderCard.ControllerID
+			}
+		}
+
+		if defendingPlayerID == "" {
+			continue
+		}
+
+		// Find all potential blockers controlled by defending player
+		for _, blocker := range gameState.cards {
+			if blocker.Zone != zoneBattlefield {
+				continue
+			}
+			if blocker.ControllerID != defendingPlayerID {
+				continue
+			}
+			if !e.isCreature(blocker) {
+				continue
+			}
+
+			// Check if this blocker can block the attacker
+			canBlock, _ := e.CanBlock(gameState.gameID, blocker.ID, attackerID)
+			if !canBlock {
+				continue
+			}
+
+			// Add this blocker to the must-block list for this attacker
+			if gameState.combat.creatureMustBlockAttackers[blocker.ID] == nil {
+				gameState.combat.creatureMustBlockAttackers[blocker.ID] = make(map[string]bool)
+			}
+			gameState.combat.creatureMustBlockAttackers[blocker.ID][attackerID] = true
+
+			if e.logger != nil {
+				e.logger.Debug("creature must block attacker",
+					zap.String("game_id", gameState.gameID),
+					zap.String("blocker_id", blocker.ID),
+					zap.String("attacker_id", attackerID),
+				)
+			}
+		}
+	}
+
+	return nil
+}
+
 // handleCombatStepBegin handles combat initialization when entering combat steps
 // Per Java BeginCombatStep.beginStep() and DeclareAttackersStep.beginStep()
 func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rules.Step, activePlayerID string) {
@@ -4058,6 +4210,15 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		// In our implementation, attacker selection is handled via player actions
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareAttackersStepPre, "", "", activePlayerID))
 
+		// Process forced attackers ("attacks if able" effects)
+		// Per Java Combat.checkAttackRequirements()
+		if err := e.processForcedAttackers(gameState); err != nil && e.logger != nil {
+			e.logger.Error("failed to process forced attackers",
+				zap.String("game_id", gameState.gameID),
+				zap.Error(err),
+			)
+		}
+
 		// Generate prompt for attacking player to declare attackers
 		options := e.buildAttackerPromptOptions(gameState)
 		if len(options) > 1 {  // More than just "DONE_ATTACKING"
@@ -4077,6 +4238,15 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 	case rules.StepDeclareBlockers:
 		// Fire the pre-step event for declare blockers
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareBlockersStepPre, "", "", activePlayerID))
+
+		// Process "must be blocked if able" requirements
+		// Per Java Combat.retrieveMustBlockAttackerRequirements()
+		if err := e.processMustBeBlockedRequirements(gameState); err != nil && e.logger != nil {
+			e.logger.Error("failed to process must-be-blocked requirements",
+				zap.String("game_id", gameState.gameID),
+				zap.Error(err),
+			)
+		}
 
 		// Generate prompts for each defending player to declare blockers
 		// Defending players are all opponents of the active player
@@ -6024,12 +6194,44 @@ func (e *MageEngine) hasMustAttackEffect(gameState *engineGameState, creatureID 
 	if gameState == nil || gameState.layerSystem == nil {
 		return false
 	}
-	
+
 	// Check if any MustAttackEffect applies to this creature
 	return gameState.layerSystem.HasEffectType(creatureID, func(effect effects.ContinuousEffect) bool {
 		_, isMustAttack := effect.(*effects.MustAttackEffect)
 		return isMustAttack
 	})
+}
+
+// hasMustBeBlockedEffect checks if an attacker is affected by a "must be blocked if able" continuous effect
+// Per Java: RequirementEffect.applies() with mustBlock() returning true
+func (e *MageEngine) hasMustBeBlockedEffect(gameState *engineGameState, attackerID string) bool {
+	if gameState == nil || gameState.layerSystem == nil {
+		return false
+	}
+
+	// Check if any MustBeBlockedEffect applies to this attacker
+	return gameState.layerSystem.HasEffectType(attackerID, func(effect effects.ContinuousEffect) bool {
+		_, isMustBeBlocked := effect.(*effects.MustBeBlockedEffect)
+		return isMustBeBlocked
+	})
+}
+
+// getMustBeBlockedEffects returns all MustBeBlockedEffects for an attacker
+// Per Java: ContinuousEffects.getApplicableRequirementEffects() filtering for mustBlock
+func (e *MageEngine) getMustBeBlockedEffects(gameState *engineGameState, attackerID string) []*effects.MustBeBlockedEffect {
+	if gameState == nil || gameState.layerSystem == nil {
+		return nil
+	}
+
+	result := make([]*effects.MustBeBlockedEffect, 0)
+	allEffects := gameState.layerSystem.GetEffectsForCard(attackerID)
+	for _, effect := range allEffects {
+		if mbEffect, ok := effect.(*effects.MustBeBlockedEffect); ok {
+			result = append(result, mbEffect)
+		}
+	}
+
+	return result
 }
 
 // getMinBlockedBy returns the minimum number of blockers required to block this creature
