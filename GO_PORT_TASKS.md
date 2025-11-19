@@ -207,18 +207,18 @@ Status legend:
 - [x] Add combat damage steps to turn structure if first strike exists
 
 ### Combat Testing (P0 - Critical)
-- [ ] Test single attacker, no blockers (damage to player)
-- [ ] Test single attacker, single blocker (damage to creatures)
-- [ ] Test multiple attackers, no blockers
-- [ ] Test multiple attackers, multiple blockers
+- [x] Test single attacker, no blockers (damage to player)
+- [x] Test single attacker, single blocker (damage to creatures)
+- [x] Test multiple attackers, no blockers
+- [x] Test multiple attackers, multiple blockers
 - [ ] Test multiple blockers on single attacker (damage ordering)
-- [ ] Test creature death from combat damage
-- [ ] Test player death from combat damage
-- [ ] Test vigilance (no tap on attack)
-- [ ] Test first strike damage (kill before normal damage)
-- [ ] Test double strike damage (damage in both steps)
-- [ ] Test trample damage (overflow to player)
-- [ ] Test flying/reach restrictions
+- [x] Test creature death from combat damage
+- [x] Test player death from combat damage
+- [x] Test vigilance (no tap on attack)
+- [x] Test first strike damage (kill before normal damage)
+- [x] Test double strike damage (damage in both steps)
+- [x] Test trample damage (overflow to player)
+- [x] Test flying/reach restrictions
 - [ ] Test combat triggers firing
 - [ ] Test combat events firing
 - [ ] Test removal during combat (all phases)
