@@ -194,8 +194,8 @@ Status legend:
 - [x] Implement lifelink (gain life equal to damage dealt)
 - [x] Implement defender (can't attack)
 - [x] Implement "can't be blocked" effects
-- [ ] Implement "must be blocked if able" effects
-- [ ] Implement "attacks each combat if able" effects
+- [x] Implement "must be blocked if able" effects (lure)
+- [x] Implement "attacks each combat if able" effects
 
 ### Planeswalker & Battle Combat (P2 - Medium Priority)
 - [ ] Support attacking planeswalkers (redirect from player)

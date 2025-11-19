@@ -294,3 +294,91 @@ func (e *MustAttackEffect) Apply(snapshot *Snapshot) {
 func (e *MustAttackEffect) GetTargetIDs() []string {
 	return e.targetIDs
 }
+
+// MustBeBlockedEffect requires all able blockers to block an attacker
+// Per Java MustBeBlockedByAllSourceEffect / RequirementEffect
+type MustBeBlockedEffect struct {
+	id         string
+	sourceID   string   // ID of creature that must be blocked
+	attackerID string   // Optional: specific attacker that must be blocked (empty = source itself)
+	targetIDs  []string // IDs of potential blockers (empty = all able blockers)
+	duration   Duration
+}
+
+// NewMustBeBlockedEffect creates a new must be blocked effect
+// If attackerID is empty, the source creature must be blocked
+// If targetIDs is empty, all able blockers must block
+func NewMustBeBlockedEffect(sourceID, attackerID string, targetIDs []string, duration Duration) *MustBeBlockedEffect {
+	source := strings.TrimSpace(sourceID)
+	attacker := strings.TrimSpace(attackerID)
+	seed := fmt.Sprintf("%s|must-be-blocked|%s|%v|%s", source, attacker, targetIDs, duration)
+	id := uuid.NewSHA1(uuid.NameSpaceOID, []byte(seed)).String()
+
+	return &MustBeBlockedEffect{
+		id:         id,
+		sourceID:   source,
+		attackerID: attacker,
+		targetIDs:  targetIDs,
+		duration:   duration,
+	}
+}
+
+// GetDuration returns the duration of the effect
+func (e *MustBeBlockedEffect) GetDuration() Duration {
+	return e.duration
+}
+
+// GetSourceID returns the source ID of the effect
+func (e *MustBeBlockedEffect) GetSourceID() string {
+	return e.sourceID
+}
+
+// ID returns the unique identifier
+func (e *MustBeBlockedEffect) ID() string {
+	return e.id
+}
+
+// Layer identifies the layer (Rules Effects)
+func (e *MustBeBlockedEffect) Layer() Layer {
+	return LayerPowerToughness // Using PT layer as placeholder
+}
+
+// AppliesTo determines whether the snapshot is affected (for blockers)
+func (e *MustBeBlockedEffect) AppliesTo(snapshot *Snapshot) bool {
+	if snapshot == nil {
+		return false
+	}
+
+	// If no specific targets, applies to all potential blockers
+	if len(e.targetIDs) == 0 {
+		return true
+	}
+
+	// Check if this snapshot is one of the target blockers
+	for _, targetID := range e.targetIDs {
+		if snapshot.CardID == targetID {
+			return true
+		}
+	}
+
+	return false
+}
+
+// Apply is a no-op for requirement effects
+func (e *MustBeBlockedEffect) Apply(snapshot *Snapshot) {
+	// Requirement effects don't modify the snapshot
+	// They're checked by the combat system when declaring blockers
+}
+
+// GetTargetIDs returns the target blocker IDs (empty = all able blockers)
+func (e *MustBeBlockedEffect) GetTargetIDs() []string {
+	return e.targetIDs
+}
+
+// GetAttackerID returns the attacker that must be blocked (empty = source itself)
+func (e *MustBeBlockedEffect) GetAttackerID() string {
+	if e.attackerID == "" {
+		return e.sourceID
+	}
+	return e.attackerID
+}
