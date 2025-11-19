@@ -4988,6 +4988,116 @@ func (e *MageEngine) RemoveAttacker(gameID, attackerID string) error {
 	return nil
 }
 
+// RemoveFromCombat removes a creature from combat completely, clearing both attacking and blocking state
+// This is a general-purpose removal that handles both attackers and blockers
+// Per Java Combat.removeFromCombat() - used for effects like regeneration, control changes, and phasing
+func (e *MageEngine) RemoveFromCombat(gameID, creatureID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	creature, exists := gameState.cards[creatureID]
+	if !exists {
+		return fmt.Errorf("creature %s not found", creatureID)
+	}
+
+	removed := false
+
+	// Remove as attacker if attacking
+	if gameState.combat.attackers[creatureID] {
+		// Find and remove from combat group
+		var groupToRemove *combatGroup
+		for _, group := range gameState.combat.groups {
+			for i, aid := range group.attackers {
+				if aid == creatureID {
+					// Remove attacker from group
+					group.attackers = append(group.attackers[:i], group.attackers[i+1:]...)
+
+					// If group is now empty, mark for removal
+					if len(group.attackers) == 0 {
+						groupToRemove = group
+					}
+					removed = true
+					break
+				}
+			}
+		}
+
+		// Remove empty group
+		if groupToRemove != nil {
+			// Move to former groups
+			gameState.combat.formerGroups = append(gameState.combat.formerGroups, groupToRemove)
+
+			// Remove from active groups
+			for i, g := range gameState.combat.groups {
+				if g == groupToRemove {
+					gameState.combat.groups = append(gameState.combat.groups[:i], gameState.combat.groups[i+1:]...)
+					break
+				}
+			}
+		}
+
+		// Remove from global attackers set
+		delete(gameState.combat.attackers, creatureID)
+
+		// Clear attacking state (do NOT untap - that's specific to RemoveAttacker)
+		creature.Attacking = false
+		creature.AttackingWhat = ""
+	}
+
+	// Remove as blocker if blocking
+	if gameState.combat.blockers[creatureID] {
+		// Find the combat group this blocker is in
+		group, exists := gameState.combat.blockingGroups[creatureID]
+		if exists {
+			// Remove blocker from group
+			for i, bid := range group.blockers {
+				if bid == creatureID {
+					group.blockers = append(group.blockers[:i], group.blockers[i+1:]...)
+					break
+				}
+			}
+
+			// Update blocked status
+			if len(group.blockers) == 0 {
+				group.blocked = false
+			}
+
+			// Remove from blocking groups map
+			delete(gameState.combat.blockingGroups, creatureID)
+			removed = true
+		}
+
+		// Remove from global blockers set
+		delete(gameState.combat.blockers, creatureID)
+
+		// Clear blocking state
+		creature.Blocking = false
+		creature.BlockingWhat = nil
+	}
+
+	// Fire REMOVED_FROM_COMBAT event only if creature was actually in combat
+	if removed {
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventRemovedFromCombat, creatureID, "", ""))
+
+		if e.logger != nil {
+			e.logger.Debug("creature removed from combat",
+				zap.String("game_id", gameID),
+				zap.String("creature_id", creatureID),
+			)
+		}
+	}
+
+	return nil
+}
+
 // OrderBlockers sets the damage assignment order for blockers on a specific attacker
 // Per Java: The attacking player chooses the order in which damage is assigned to blockers
 // This is typically done during the declare blockers step, before damage assignment
