@@ -13,7 +13,38 @@ Status legend:
 - [x] Implement `TurnManager` mirroring MTG phase/step progression and priority handoff
 - [x] Introduce `StackManager` with basic push/pop mechanics and simple resolution hooks
 - [~] Extend stack resolution to support triggered abilities, replacement effects, and modal choices
-- [ ] Implement priority windows for casting during stack resolution (e.g., mana abilities, nested responses)
+- [x] Implement priority windows for casting during stack resolution (e.g., mana abilities, nested responses)
+  - [x] Implement mana ability activation during spell/ability resolution (Rule 117.1d, 605.3a)
+    - [x] Add `ActivateManaAbility()` method that can be called during resolution
+    - [x] Track resolution context (which spell/ability is currently resolving)
+    - [x] Allow mana abilities when: (1) player has priority, (2) casting spell/activating ability that needs mana, (3) rule/effect asks for mana
+    - [x] Ensure mana abilities resolve immediately without going on stack (Rule 605.3b)
+    - [x] Implement triggered mana abilities that resolve immediately after triggering mana ability (Rule 605.4a)
+    - [x] Prevent mana ability re-activation until current activation resolves (Rule 605.3c)
+  - [x] Implement special actions during resolution (Rule 116, 117.1c)
+    - [x] Track which special actions are allowed during resolution vs. only during main phase
+    - [x] Implement special action execution that doesn't use the stack
+    - [x] Grant priority to player after special action (Rule 116.3)
+    - [x] Handle special actions that can be taken "any time you have priority": face-down creatures (116.2b), ending effects (116.2c), ignoring static abilities (116.2d)
+    - [x] Handle special actions restricted to main phase + empty stack: playing lands (116.2a), companion (116.2g), plot (116.2k), unlock (116.2m)
+  - [x] Implement nested spell/ability casting during resolution (Rule 117.2e, 608.2)
+    - [x] Support casting copies of spells during resolution (Rule 707.12 - "cast while another spell or ability is resolving")
+    - [x] Implement linked abilities that allow casting/activating during resolution
+    - [x] Track nested resolution depth to prevent infinite recursion
+    - [x] Ensure proper priority handling within nested resolution context
+    - [x] Handle mana payment flow during nested casting (allow mana abilities)
+  - [x] Implement resolution payment/choice windows
+    - [x] Add player choice prompts during resolution (modes, targets, X values, etc.) per Rule 608.2
+    - [x] Implement APNAP order for multi-player choices during resolution (Rule 608.2e)
+    - [x] Allow mana ability activation during cost payment within resolution
+    - [x] Support special action activation for cost payment (e.g., Convoke, delve)
+    - [x] Track payment state (which costs paid, which remain) during resolution
+  - [x] Add comprehensive testing for priority windows
+    - [x] Test mana ability activation while paying for spell during another spell's resolution
+    - [x] Test special actions (morph, etc.) during priority windows
+    - [x] Test nested spell casting (copy effects like Isochron Sceptron)
+    - [x] Test linked abilities that cast during resolution
+    - [x] Test priority retention and passing during nested resolution
 - [ ] Persist stack/game events for replay and spectator synchronization
 - [x] Add comprehensive error handling and rollback when resolution fails
 - [x] Implement priority retention after casting (caster retains priority by default, only passes when explicitly passing)
@@ -162,7 +193,7 @@ Status legend:
 - [x] Implement deathtouch (any damage is lethal) - integrated with trample
 - [x] Implement lifelink (gain life equal to damage dealt)
 - [x] Implement defender (can't attack)
-- [ ] Implement "can't be blocked" effects
+- [x] Implement "can't be blocked" effects
 - [ ] Implement "must be blocked if able" effects
 - [ ] Implement "attacks each combat if able" effects
 
