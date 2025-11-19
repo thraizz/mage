@@ -4458,28 +4458,17 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	}
 	
 	// TODO: Validate can attack this specific defender (protection, etc.)
-	
-	// Find or create combat group for this defender
-	var group *combatGroup
-	for _, g := range gameState.combat.groups {
-		if g.defenderID == defenderID {
-			group = g
-			break
-		}
-	}
-	
-	if group == nil {
-		// Determine if defender is a permanent (planeswalker/battle) or player
-		defenderIsPermanent := false
-		defendingPlayerID := defenderID
-		// TODO: Check if defender is a permanent when planeswalkers/battles added
-		
-		group = newCombatGroup(defenderID, defenderIsPermanent, defendingPlayerID)
-		gameState.combat.groups = append(gameState.combat.groups, group)
-	}
-	
-	// Add attacker to group
+
+	// Create a new combat group for this attacker
+	// Per MTG rules and Java implementation: each attacking creature gets its own combat group
+	// Blockers may later be assigned to this group during declare blockers step
+	defenderIsPermanent := false
+	defendingPlayerID := defenderID
+	// TODO: Check if defender is a permanent when planeswalkers/battles added
+
+	group := newCombatGroup(defenderID, defenderIsPermanent, defendingPlayerID)
 	group.attackers = append(group.attackers, creatureID)
+	gameState.combat.groups = append(gameState.combat.groups, group)
 	gameState.combat.attackers[creatureID] = true
 	
 	// Tap creature (unless it has vigilance)
