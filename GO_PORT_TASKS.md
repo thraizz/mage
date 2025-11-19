@@ -246,6 +246,7 @@ Status legend:
 - [ ] Port keyword ability handlers (flying, deathtouch, scry, etc.)
 - [ ] Implement effect infrastructure (replacement effects, static ability watchers, continuous effects)
 - [ ] Build automated verification to compare Java vs Go card behavior for representative samples
+- [ ] **Re-enable disabled integration tests** that expect specific cards (8 tests disabled - see comments in test files for details)
 
 ## Event System & Watchers
 - [x] Mirror Java event bus for game events

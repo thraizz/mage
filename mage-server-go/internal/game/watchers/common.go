@@ -1,12 +1,15 @@
 package watchers
 
 import (
+	"sync"
+
 	"github.com/magefree/mage-server-go/internal/game/rules"
 )
 
 // SpellsCastWatcher tracks spells cast by players.
 type SpellsCastWatcher struct {
 	*rules.BaseWatcher
+	mu         sync.RWMutex
 	spellsCast map[string][]string // playerID -> list of spell IDs
 }
 
@@ -39,23 +42,31 @@ func (w *SpellsCastWatcher) Watch(event rules.Event) {
 	if spellID == "" {
 		return
 	}
+	w.mu.Lock()
 	w.spellsCast[playerID] = append(w.spellsCast[playerID], spellID)
+	w.mu.Unlock()
 	w.SetCondition(true)
 }
 
 // Reset clears the watcher's state.
 func (w *SpellsCastWatcher) Reset() {
 	w.BaseWatcher.Reset()
+	w.mu.Lock()
 	w.spellsCast = make(map[string][]string)
+	w.mu.Unlock()
 }
 
 // GetSpellsCast returns the list of spell IDs cast by a player.
 func (w *SpellsCastWatcher) GetSpellsCast(playerID string) []string {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
 	return w.spellsCast[playerID]
 }
 
 // GetCount returns the number of spells cast by a player.
 func (w *SpellsCastWatcher) GetCount(playerID string) int {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
 	return len(w.spellsCast[playerID])
 }
 
@@ -66,16 +77,19 @@ func (w *SpellsCastWatcher) Copy() rules.Watcher {
 	copy.SetSourceID(w.GetSourceID())
 	copy.SetCondition(w.ConditionMet())
 	// Deep copy spells cast map
+	w.mu.RLock()
 	copy.spellsCast = make(map[string][]string)
 	for k, v := range w.spellsCast {
 		copy.spellsCast[k] = append([]string(nil), v...)
 	}
+	w.mu.RUnlock()
 	return copy
 }
 
 // CreaturesDiedWatcher tracks creatures that died (went to graveyard from battlefield).
 type CreaturesDiedWatcher struct {
 	*rules.BaseWatcher
+	mu                        sync.RWMutex
 	creaturesDiedByController map[string]int // controllerID -> count
 	creaturesDiedByOwner      map[string]int // ownerID -> count
 }
@@ -103,34 +117,44 @@ func (w *CreaturesDiedWatcher) Watch(event rules.Event) {
 	if ownerID == "" {
 		ownerID = controllerID
 	}
+	w.mu.Lock()
 	if controllerID != "" {
 		w.creaturesDiedByController[controllerID]++
 	}
 	if ownerID != "" {
 		w.creaturesDiedByOwner[ownerID]++
 	}
+	w.mu.Unlock()
 	w.SetCondition(true)
 }
 
 // Reset clears the watcher's state.
 func (w *CreaturesDiedWatcher) Reset() {
 	w.BaseWatcher.Reset()
+	w.mu.Lock()
 	w.creaturesDiedByController = make(map[string]int)
 	w.creaturesDiedByOwner = make(map[string]int)
+	w.mu.Unlock()
 }
 
 // GetAmountByController returns the number of creatures that died for a controller.
 func (w *CreaturesDiedWatcher) GetAmountByController(controllerID string) int {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
 	return w.creaturesDiedByController[controllerID]
 }
 
 // GetAmountByOwner returns the number of creatures that died for an owner.
 func (w *CreaturesDiedWatcher) GetAmountByOwner(ownerID string) int {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
 	return w.creaturesDiedByOwner[ownerID]
 }
 
 // GetTotalAmount returns the total number of creatures that died.
 func (w *CreaturesDiedWatcher) GetTotalAmount() int {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
 	total := 0
 	for _, count := range w.creaturesDiedByController {
 		total += count
@@ -145,6 +169,7 @@ func (w *CreaturesDiedWatcher) Copy() rules.Watcher {
 	copy.SetSourceID(w.GetSourceID())
 	copy.SetCondition(w.ConditionMet())
 	// Deep copy maps
+	w.mu.RLock()
 	copy.creaturesDiedByController = make(map[string]int)
 	for k, v := range w.creaturesDiedByController {
 		copy.creaturesDiedByController[k] = v
@@ -153,12 +178,14 @@ func (w *CreaturesDiedWatcher) Copy() rules.Watcher {
 	for k, v := range w.creaturesDiedByOwner {
 		copy.creaturesDiedByOwner[k] = v
 	}
+	w.mu.RUnlock()
 	return copy
 }
 
 // CardsDrawnWatcher tracks cards drawn by players.
 type CardsDrawnWatcher struct {
 	*rules.BaseWatcher
+	mu         sync.RWMutex
 	cardsDrawn map[string]int // playerID -> count
 }
 
@@ -184,18 +211,24 @@ func (w *CardsDrawnWatcher) Watch(event rules.Event) {
 	if playerID == "" {
 		return
 	}
+	w.mu.Lock()
 	w.cardsDrawn[playerID]++
+	w.mu.Unlock()
 	w.SetCondition(true)
 }
 
 // Reset clears the watcher's state.
 func (w *CardsDrawnWatcher) Reset() {
 	w.BaseWatcher.Reset()
+	w.mu.Lock()
 	w.cardsDrawn = make(map[string]int)
+	w.mu.Unlock()
 }
 
 // GetCount returns the number of cards drawn by a player.
 func (w *CardsDrawnWatcher) GetCount(playerID string) int {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
 	return w.cardsDrawn[playerID]
 }
 
@@ -206,16 +239,19 @@ func (w *CardsDrawnWatcher) Copy() rules.Watcher {
 	copy.SetSourceID(w.GetSourceID())
 	copy.SetCondition(w.ConditionMet())
 	// Deep copy map
+	w.mu.RLock()
 	copy.cardsDrawn = make(map[string]int)
 	for k, v := range w.cardsDrawn {
 		copy.cardsDrawn[k] = v
 	}
+	w.mu.RUnlock()
 	return copy
 }
 
 // PermanentsEnteredWatcher tracks permanents that entered the battlefield.
 type PermanentsEnteredWatcher struct {
 	*rules.BaseWatcher
+	mu                sync.RWMutex
 	permanentsEntered map[string][]string // controllerID -> list of permanent IDs
 }
 
@@ -245,18 +281,24 @@ func (w *PermanentsEnteredWatcher) Watch(event rules.Event) {
 	if permanentID == "" {
 		return
 	}
+	w.mu.Lock()
 	w.permanentsEntered[controllerID] = append(w.permanentsEntered[controllerID], permanentID)
+	w.mu.Unlock()
 	w.SetCondition(true)
 }
 
 // Reset clears the watcher's state.
 func (w *PermanentsEnteredWatcher) Reset() {
 	w.BaseWatcher.Reset()
+	w.mu.Lock()
 	w.permanentsEntered = make(map[string][]string)
+	w.mu.Unlock()
 }
 
 // GetPermanentsEntered returns the list of permanent IDs that entered for a controller.
 func (w *PermanentsEnteredWatcher) GetPermanentsEntered(controllerID string) []string {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
 	return w.permanentsEntered[controllerID]
 }
 
@@ -267,9 +309,11 @@ func (w *PermanentsEnteredWatcher) Copy() rules.Watcher {
 	copy.SetSourceID(w.GetSourceID())
 	copy.SetCondition(w.ConditionMet())
 	// Deep copy map
+	w.mu.RLock()
 	copy.permanentsEntered = make(map[string][]string)
 	for k, v := range w.permanentsEntered {
 		copy.permanentsEntered[k] = append([]string(nil), v...)
 	}
+	w.mu.RUnlock()
 	return copy
 }

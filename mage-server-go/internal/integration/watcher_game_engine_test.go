@@ -365,7 +365,7 @@ func TestWatcherRealGameFlow(t *testing.T) {
 
 	now := time.Now()
 
-	// 1. Cast a spell
+	// 1. Alice casts a spell
 	castAction := game.PlayerAction{
 		PlayerID:   "Alice",
 		ActionType: "SEND_STRING",
@@ -377,27 +377,28 @@ func TestWatcherRealGameFlow(t *testing.T) {
 		t.Fatalf("Failed to cast spell: %v", err)
 	}
 
-	// 2. Pass to resolve
+	// 2. Alice passes priority (per MTG rule 117.3c, Alice retains priority after casting)
 	passAction1 := game.PlayerAction{
-		PlayerID:   "Bob",
+		PlayerID:   "Alice",
 		ActionType: "PLAYER_ACTION",
 		Data:       "PASS",
 		Timestamp:  now.Add(time.Second),
 	}
 	err = engine.ProcessAction(gameID, passAction1)
 	if err != nil {
-		t.Fatalf("Failed to pass: %v", err)
+		t.Fatalf("Failed to pass (Alice): %v", err)
 	}
 
+	// 3. Bob passes priority
 	passAction2 := game.PlayerAction{
-		PlayerID:   "Alice",
+		PlayerID:   "Bob",
 		ActionType: "PLAYER_ACTION",
 		Data:       "PASS",
 		Timestamp:  now.Add(2 * time.Second),
 	}
 	err = engine.ProcessAction(gameID, passAction2)
 	if err != nil {
-		t.Fatalf("Failed to pass: %v", err)
+		t.Fatalf("Failed to pass (Bob): %v", err)
 	}
 
 	// 3. Verify game state
@@ -437,9 +438,10 @@ func TestWatcherRealGameFlow(t *testing.T) {
 		t.Errorf("Expected empty stack after resolution, got %d items", len(view.Stack))
 	}
 
-	// Verify spell is on battlefield
-	if len(view.Battlefield) == 0 {
-		t.Error("Expected spell to resolve to battlefield")
+	// Lightning Bolt is an instant, so it goes to graveyard, not battlefield
+	// Just verify the spell resolved (stack is empty and we got resolution messages)
+	if !spellCastFound {
+		t.Error("Expected to see spell cast event tracked by watchers")
 	}
 }
 

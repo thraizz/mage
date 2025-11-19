@@ -173,7 +173,7 @@ func TestWatcherIntegration_EndToEnd(t *testing.T) {
 	// Simulate a game flow with multiple events
 	now := time.Now()
 
-	// 1. Cast a spell
+	// 1. Alice casts a spell
 	castAction := game.PlayerAction{
 		PlayerID:   "Alice",
 		ActionType: "SEND_STRING",
@@ -185,23 +185,34 @@ func TestWatcherIntegration_EndToEnd(t *testing.T) {
 		t.Fatalf("Failed to cast spell: %v", err)
 	}
 
-	// 2. Pass priority
-	passAction := game.PlayerAction{
-		PlayerID:   "Bob",
+	// 2. Alice passes priority (per MTG rule 117.3c, Alice retains priority after casting)
+	passAction1 := game.PlayerAction{
+		PlayerID:   "Alice",
 		ActionType: "PLAYER_ACTION",
 		Data:       "PASS",
 		Timestamp:  now.Add(time.Second),
 	}
-	err = engine.ProcessAction(gameID, passAction)
+	err = engine.ProcessAction(gameID, passAction1)
 	if err != nil {
-		t.Fatalf("Failed to pass: %v", err)
+		t.Fatalf("Failed to pass (Alice): %v", err)
 	}
 
-	// 3. Spell resolves (should enter battlefield)
+	// 3. Bob passes priority
+	passAction2 := game.PlayerAction{
+		PlayerID:   "Bob",
+		ActionType: "PLAYER_ACTION",
+		Data:       "PASS",
+		Timestamp:  now.Add(2 * time.Second),
+	}
+	err = engine.ProcessAction(gameID, passAction2)
+	if err != nil {
+		t.Fatalf("Failed to pass (Bob): %v", err)
+	}
+
+	// 4. Spell resolves (Lightning Bolt is an instant, goes to graveyard not battlefield)
 	// The watchers should have tracked:
 	// - Spell cast event
-	// - Permanent enters battlefield
-	// - Zone change events
+	// - Zone change events (hand -> stack -> graveyard)
 
 	// Verify game state
 	viewRaw, err := engine.GetGameView(gameID, "Alice")
@@ -221,28 +232,19 @@ func TestWatcherIntegration_EndToEnd(t *testing.T) {
 
 	// Verify spell was cast (check messages)
 	spellCastFound := false
-	entersBattlefieldFound := false
 	for _, msg := range view.Messages {
 		textLower := strings.ToLower(msg.Text)
 		if strings.Contains(textLower, "cast") || strings.Contains(textLower, "lightning bolt") {
 			spellCastFound = true
 		}
-		if strings.Contains(textLower, "enters") || strings.Contains(textLower, "battlefield") {
-			entersBattlefieldFound = true
-		}
 	}
 	if !spellCastFound {
 		t.Error("Expected spell cast message")
 	}
-	// Note: Enters battlefield message may not always be present depending on resolution path
-	// Check battlefield instead
-	if !entersBattlefieldFound && len(view.Battlefield) == 0 {
-		t.Error("Expected spell to resolve to battlefield or enters battlefield message")
-	}
 
-	// Verify spell resolved to battlefield
-	if len(view.Battlefield) == 0 {
-		t.Error("Expected spell to resolve to battlefield")
+	// Verify stack is empty (spell resolved)
+	if len(view.Stack) != 0 {
+		t.Errorf("Expected empty stack after resolution, got %d items", len(view.Stack))
 	}
 }
 
