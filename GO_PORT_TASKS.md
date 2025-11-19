@@ -226,12 +226,12 @@ Status legend:
 - [x] Test attacker requirements/restrictions
 
 ### Combat View & Display (P1 - High Priority)
-- [ ] Populate `EngineCombatView` with actual combat state
-- [ ] Populate `EngineCombatGroupView` for each combat group
-- [ ] Show attacking creatures in game view
-- [ ] Show blocking creatures in game view
-- [ ] Show damage assignments in game view
-- [ ] Update combat view after each declaration/assignment
+- [x] Populate `EngineCombatView` with actual combat state
+- [x] Populate `EngineCombatGroupView` for each combat group
+- [x] Show attacking creatures in game view
+- [x] Show blocking creatures in game view
+- [x] Show damage assignments in game view
+- [x] Update combat view after each declaration/assignment
 
 ## Player Interaction & Prompts
 - [x] Emit prompts when priority passes require player response
