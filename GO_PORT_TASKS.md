@@ -64,7 +64,7 @@ Status legend:
 - [x] Implement `DeclareAttacker(gameID, creatureID, defenderID, playerID)` - declare single attacker
 - [x] Implement `CanAttack(gameID, creatureID)` - validate creature can attack (summoning sickness, tapped, restrictions)
 - [x] Implement `CanAttackDefender(gameID, creatureID, defenderID)` - validate can attack specific defender
-- [~] Implement attacker tapping logic (tap unless vigilance)
+- [x] Implement attacker tapping logic (tap unless vigilance)
 - [x] Create/update combat groups when attackers declared
 - [x] Implement `RemoveAttacker(gameID, attackerID)` - undo attacker declaration
 - [x] Fire `EventAttackerDeclared` per attacker and `EventDeclaredAttackers` when complete
