@@ -188,7 +188,7 @@ Status legend:
 - [ ] Handle banding restrictions and requirements
 
 ### Combat Removal & Interruption (P2 - Medium Priority)
-- [ ] Implement `RemoveFromCombat(gameID, creatureID)` - remove during combat
+- [x] Implement `RemoveFromCombat(gameID, creatureID)` - remove during combat
 - [ ] Handle creature removal during attacker declaration
 - [ ] Handle creature removal during blocker declaration
 - [ ] Handle creature removal during damage assignment
