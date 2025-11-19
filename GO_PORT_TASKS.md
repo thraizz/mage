@@ -211,7 +211,7 @@ Status legend:
 - [x] Test single attacker, single blocker (damage to creatures)
 - [x] Test multiple attackers, no blockers
 - [x] Test multiple attackers, multiple blockers
-- [ ] Test multiple blockers on single attacker (damage ordering)
+- [x] Test multiple blockers on single attacker (damage ordering)
 - [x] Test creature death from combat damage
 - [x] Test player death from combat damage
 - [x] Test vigilance (no tap on attack)
@@ -219,11 +219,11 @@ Status legend:
 - [x] Test double strike damage (damage in both steps)
 - [x] Test trample damage (overflow to player)
 - [x] Test flying/reach restrictions
-- [ ] Test combat triggers firing
-- [ ] Test combat events firing
-- [ ] Test removal during combat (all phases)
-- [ ] Test blocker requirements/restrictions
-- [ ] Test attacker requirements/restrictions
+- [x] Test combat triggers firing
+- [x] Test combat events firing
+- [x] Test removal during combat (all phases)
+- [x] Test blocker requirements/restrictions
+- [x] Test attacker requirements/restrictions
 
 ### Combat View & Display (P1 - High Priority)
 - [ ] Populate `EngineCombatView` with actual combat state
