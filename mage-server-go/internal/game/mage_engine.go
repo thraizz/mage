@@ -61,6 +61,7 @@ const (
 	abilityDefender      = "DefenderAbility"
 	abilityLifelink      = "LifelinkAbility"
 	abilityMenace        = "MenaceAbility"
+	abilityUnblockable   = "CantBeBlockedSourceAbility"
 )
 
 // EngineGameView represents the complete game state view for a player
@@ -4654,6 +4655,12 @@ func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error
 	// Get attacker for evasion checks
 	attacker := gameState.cards[attackerID]
 	
+	// Unblockable check: If attacker has "can't be blocked" ability, it cannot be blocked by any creature
+	// Per Rule 509.1b and Java CantBeBlockedSourceEffect.canBeBlocked() which returns false
+	if e.hasAbilityWithEffects(gameState, attacker, abilityUnblockable) {
+		return false, nil
+	}
+
 	// Flying restriction: creatures with flying can only be blocked by creatures with flying or reach
 	// Exception: Dragons can be blocked by non-flying creatures with special abilities (AsThoughEffectType.BLOCK_DRAGON)
 	// Check both base and granted abilities
@@ -4666,8 +4673,8 @@ func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error
 			return false, nil
 		}
 	}
-	
-	// TODO: Check other restriction effects (can't block, shadow, etc.)
+
+	// TODO: Check other restriction effects (shadow, intimidate, etc.)
 	// TODO: Check protection
 	
 	return true, nil
@@ -4837,7 +4844,13 @@ func (e *MageEngine) canBlockInternal(gameState *engineGameState, blockerID, att
 	
 	// Get attacker for evasion checks
 	attacker := gameState.cards[attackerID]
-	
+
+	// Unblockable check: If attacker has "can't be blocked" ability, it cannot be blocked by any creature
+	// Per Rule 509.1b and Java CantBeBlockedSourceEffect.canBeBlocked() which returns false
+	if e.hasAbility(attacker, abilityUnblockable) {
+		return false, nil
+	}
+
 	// Flying restriction: creatures with flying can only be blocked by creatures with flying or reach
 	// Exception: Dragons can be blocked by non-flying creatures with special abilities (AsThoughEffectType.BLOCK_DRAGON)
 	if e.hasAbility(attacker, abilityFlying) {
@@ -4846,7 +4859,7 @@ func (e *MageEngine) canBlockInternal(gameState *engineGameState, blockerID, att
 			return false, nil
 		}
 	}
-	
+
 	return true, nil
 }
 
