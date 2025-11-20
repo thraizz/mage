@@ -80,7 +80,7 @@ func TestDamageDivision_AttackerCustomAssignment(t *testing.T) {
 		blocker2: 1,
 		blocker3: 1,
 	}
-	err = h.engine.AssignAttackerDamage(h.gameID, attackerID, damageMap)
+	err = h.engine.AssignAttackerDamage(h.gameID, attackerID, "Alice", damageMap)
 	require.NoError(t, err)
 
 	// Apply combat damage
@@ -132,7 +132,7 @@ func TestDamageDivision_TrampleCustomAssignment(t *testing.T) {
 		blocker1: 2,
 		blocker2: 1,
 	}
-	err = h.engine.AssignAttackerDamage(h.gameID, attackerID, damageMap)
+	err = h.engine.AssignAttackerDamage(h.gameID, attackerID, "Alice", damageMap)
 	require.NoError(t, err)
 
 	// Apply combat damage
@@ -177,7 +177,7 @@ func TestDamageDivision_ValidationTotalMismatch(t *testing.T) {
 		blocker1: 3,
 		blocker2: 2,
 	}
-	err = h.engine.AssignAttackerDamage(h.gameID, attackerID, damageMap)
+	err = h.engine.AssignAttackerDamage(h.gameID, attackerID, "Alice", damageMap)
 	assert.Error(t, err, "should reject assignment that doesn't total to power")
 	assert.Contains(t, err.Error(), "must assign all damage")
 }
@@ -214,7 +214,7 @@ func TestDamageDivision_ValidationInvalidTarget(t *testing.T) {
 		blocker2:     2,
 		nonBlockerID: 2,
 	}
-	err = h.engine.AssignAttackerDamage(h.gameID, attackerID, damageMap)
+	err = h.engine.AssignAttackerDamage(h.gameID, attackerID, "Alice", damageMap)
 	assert.Error(t, err, "should reject assignment to non-blocker")
 	assert.Contains(t, err.Error(), "is not blocking this attacker")
 }
@@ -259,7 +259,7 @@ func TestDamageDivision_BlockerMultipleAttackers(t *testing.T) {
 		attacker2: 1,
 		attacker3: 1,
 	}
-	err = h.engine.AssignBlockerDamage(h.gameID, blockerID, damageMap)
+	err = h.engine.AssignBlockerDamage(h.gameID, blockerID, "Bob", damageMap)
 	require.NoError(t, err)
 
 	// Apply combat damage
@@ -308,7 +308,7 @@ func TestDamageDivision_BlockerValidationTotal(t *testing.T) {
 		attacker1: 2,
 		attacker2: 2,
 	}
-	err = h.engine.AssignBlockerDamage(h.gameID, blockerID, damageMap)
+	err = h.engine.AssignBlockerDamage(h.gameID, blockerID, "Bob", damageMap)
 	assert.Error(t, err, "should reject assignment that doesn't total to power")
 	assert.Contains(t, err.Error(), "must assign all damage")
 }
