@@ -203,6 +203,9 @@ type combatState struct {
 	maxAttackers               int                         // maximum number of attackers allowed (-1 = no limit)
 	minBlockersPerAttacker     map[string]int              // attackerID -> minimum blockers required
 	maxBlockersPerAttacker     map[string]int              // attackerID -> maximum blockers allowed
+	// Attack tracking for triggers (Java: PlayersAttackedThisTurnWatcher)
+	playersAttackedThisTurn              map[string]map[string]bool // attackingPlayerID -> set of playerIDs attacked
+	planeswalkerControllersAttackedThisTurn map[string]map[string]bool // attackingPlayerID -> set of playerIDs whose planeswalkers were attacked
 }
 
 // combatGroup represents a single combat group (attackers vs defender + blockers)
@@ -235,6 +238,8 @@ func newCombatState() *combatState {
 		maxAttackers:               -1, // no limit by default
 		minBlockersPerAttacker:     make(map[string]int),
 		maxBlockersPerAttacker:     make(map[string]int),
+		playersAttackedThisTurn:              make(map[string]map[string]bool),
+		planeswalkerControllersAttackedThisTurn: make(map[string]map[string]bool),
 	}
 }
 
@@ -4697,7 +4702,27 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	defenderEvent := rules.NewEvent(rules.EventDefenderAttacked, defenderID, creatureID, playerID)
 	defenderEvent.Metadata["attacker_id"] = creatureID
 	gameState.eventBus.Publish(defenderEvent)
-	
+
+	// Track attacks for "attacked this turn" queries
+	// Per Java PlayersAttackedThisTurnWatcher (lines 62-73)
+	attackingPlayerID := gameState.combat.attackingPlayerID
+	if defenderIsPermanent {
+		// Attacking a planeswalker - track the controller
+		if defenderCard, exists := gameState.cards[defenderID]; exists && e.isPlaneswalker(defenderCard) {
+			controllerID := defenderCard.ControllerID
+			if gameState.combat.planeswalkerControllersAttackedThisTurn[attackingPlayerID] == nil {
+				gameState.combat.planeswalkerControllersAttackedThisTurn[attackingPlayerID] = make(map[string]bool)
+			}
+			gameState.combat.planeswalkerControllersAttackedThisTurn[attackingPlayerID][controllerID] = true
+		}
+	} else {
+		// Attacking a player directly
+		if gameState.combat.playersAttackedThisTurn[attackingPlayerID] == nil {
+			gameState.combat.playersAttackedThisTurn[attackingPlayerID] = make(map[string]bool)
+		}
+		gameState.combat.playersAttackedThisTurn[attackingPlayerID][defenderID] = true
+	}
+
 	gameState.addMessage(fmt.Sprintf("%s attacks", creature.Name), "combat")
 	
 	if e.logger != nil {
@@ -6153,6 +6178,38 @@ func (e *MageEngine) isPlaneswalker(card *internalCard) bool {
 	return strings.Contains(card.Type, "Planeswalker")
 }
 
+// HasPlayerAttackedPlayerOrPlaneswalker checks if a player attacked another player or their planeswalkers this turn
+// Per Java PlayersAttackedThisTurnWatcher.hasPlayerAttackedPlayerOrControlledPlaneswalker()
+// Returns true if attacker attacked defender directly OR attacked a planeswalker controlled by defender
+func (e *MageEngine) HasPlayerAttackedPlayerOrPlaneswalker(gameID, attackingPlayerID, defendingPlayerID string) (bool, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return false, fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	// Check if attacker attacked the player directly
+	if playerSet, ok := gameState.combat.playersAttackedThisTurn[attackingPlayerID]; ok {
+		if playerSet[defendingPlayerID] {
+			return true, nil
+		}
+	}
+
+	// Check if attacker attacked a planeswalker controlled by the defender
+	if controllerSet, ok := gameState.combat.planeswalkerControllersAttackedThisTurn[attackingPlayerID]; ok {
+		if controllerSet[defendingPlayerID] {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 func (e *MageEngine) hasAbility(creature *internalCard, abilityID string) bool {
 	if creature == nil {
 		return false
@@ -6554,10 +6611,18 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 		return nil
 	}
 	
-	// Defender is a player
+	// Defender is a player (or was a permanent that has left the battlefield)
 	player, exists := gameState.players[defenderID]
 	if !exists {
-		return fmt.Errorf("defender %s not found", defenderID)
+		// Defender not found - likely a permanent that left the battlefield during combat
+		// This is legal; damage simply isn't dealt
+		if e.logger != nil {
+			e.logger.Debug("defender not found (likely removed from battlefield)",
+				zap.String("defender_id", defenderID),
+				zap.String("attacker_id", attacker.ID),
+			)
+		}
+		return nil
 	}
 	
 	// Deal damage to player

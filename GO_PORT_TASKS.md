@@ -204,10 +204,10 @@ Status legend:
 - [x] Support lifelink with planeswalker damage
 - [x] Support deathtouch with planeswalker damage
 - [x] Block attacks on own planeswalkers
+- [x] Track which planeswalkers are attacked for triggers (PlayersAttackedThisTurnWatcher)
+- [x] Handle planeswalker removal during combat (graceful damage handling)
 - [ ] Support attacking battles
-- [ ] Implement planeswalker damage redirection rules (pre-2018 rules)
-- [ ] Track which planeswalkers/battles are attacked for triggers
-- [ ] Handle planeswalker removal during combat
+- [ ] Implement planeswalker damage redirection rules (pre-2018 deprecated rules)
 
 ### Damage Ordering (P2 - Medium Priority)
 - [ ] Implement attacker damage ordering for multiple blockers
