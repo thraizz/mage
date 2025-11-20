@@ -220,12 +220,24 @@ Status legend:
 - [ ] UI for damage division prompts (multi-amount dialog)
 - [ ] Support "you choose damage order" effects (Defensive Formation, etc.)
 
-### Banding (P3 - Low Priority, Complex)
-- [ ] Implement banding ability detection
-- [ ] Implement "bands with other" ability
-- [ ] Allow banded creatures to attack as group
-- [ ] Implement banding damage assignment rules (defending player assigns)
-- [ ] Handle banding restrictions and requirements
+### Banding (P3 - Low Priority, Complex) - NOT IMPLEMENTED
+Banding is one of MTG's most complex mechanics (40-55 hours estimated). Rarely used (~50 cards, mostly early sets).
+See BANDING_NOTES.md for detailed analysis and implementation requirements.
+
+**Status:** Documented but not implemented. Recommend implementing only if specifically needed for a card.
+
+**What would be needed:**
+- [ ] Band formation during attack declaration (bidirectional tracking)
+- [ ] Block propagation across band members (Rule 702.22h)
+- [ ] Damage assignment control - defending player assigns (Rule 702.22j)
+- [ ] Damage assignment control - attacking player assigns (Rule 702.22k)
+- [ ] "Bands with other" variants (by subtype/supertype/name)
+- [ ] Edge cases (removal, banding lost mid-combat, multiple bands)
+
+**Minimum viable (if needed):**
+- [ ] Add ability constant for banding detection
+- [ ] Implement damage assignment control only (skip band formation)
+- [ ] Skip "bands with other" entirely
 
 ### Combat Removal & Interruption (P2 - Medium Priority)
 - [x] Implement `RemoveFromCombat(gameID, creatureID)` - remove during combat
