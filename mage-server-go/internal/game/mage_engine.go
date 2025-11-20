@@ -218,8 +218,11 @@ type combatGroup struct {
 	formerAttackers    []string // historical attackers (for "attacked this turn")
 	blockers           []string // blocking creature IDs
 	blocked            bool     // is this group blocked
-	attackerOrder      map[string]int // damage assignment order for attackers
-	blockerOrder       map[string]int // damage assignment order for blockers
+	attackerOrder      map[string]int // damage assignment order for attackers (deprecated - kept for compatibility)
+	blockerOrder       map[string]int // damage assignment order for blockers (deprecated - kept for compatibility)
+	// Modern damage division (Rule 510.1c-d: players divide damage as they choose, no ordering required)
+	attackerDamageAssignments map[string]map[string]int // attackerID -> (blockerID -> damage)
+	blockerDamageAssignments  map[string]map[string]int // blockerID -> (attackerID -> damage)
 }
 
 // newCombatState creates a new combat state
@@ -246,15 +249,17 @@ func newCombatState() *combatState {
 // newCombatGroup creates a new combat group
 func newCombatGroup(defenderID string, defenderIsPermanent bool, defendingPlayerID string) *combatGroup {
 	return &combatGroup{
-		defenderID:         defenderID,
-		defenderIsPermanent: defenderIsPermanent,
-		defendingPlayerID:  defendingPlayerID,
-		attackers:          make([]string, 0),
-		formerAttackers:    make([]string, 0),
-		blockers:           make([]string, 0),
-		blocked:            false,
-		attackerOrder:      make(map[string]int),
-		blockerOrder:       make(map[string]int),
+		defenderID:                defenderID,
+		defenderIsPermanent:       defenderIsPermanent,
+		defendingPlayerID:         defendingPlayerID,
+		attackers:                 make([]string, 0),
+		formerAttackers:           make([]string, 0),
+		blockers:                  make([]string, 0),
+		blocked:                   false,
+		attackerOrder:             make(map[string]int),
+		blockerOrder:              make(map[string]int),
+		attackerDamageAssignments: make(map[string]map[string]int),
+		blockerDamageAssignments:  make(map[string]map[string]int),
 	}
 }
 
@@ -5740,11 +5745,13 @@ func (e *MageEngine) AssignCombatDamage(gameID string, firstStrike bool) error {
 			return err
 		}
 	}
-	
+
 	// Assign damage to attackers (blockers dealing damage)
+	// Track which blockers have already dealt damage (since a blocker can be in multiple groups)
+	processedBlockers := make(map[string]bool)
 	for _, group := range gameState.combat.groups {
 		if len(group.blockers) > 0 {
-			if err := e.assignDamageToAttackers(gameState, group, firstStrike); err != nil {
+			if err := e.assignDamageToAttackers(gameState, group, firstStrike, processedBlockers); err != nil {
 				return err
 			}
 		}
@@ -5819,67 +5826,36 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 	}
 	
 	// Blocked - assign damage to blockers
-	// With trample, assign lethal damage to blockers, excess goes to defender
-	// Without trample, all damage goes to blockers
-	
-	if hasTrample {
-		// Trample: assign lethal damage to each blocker, remainder to defender
-		// TODO: Implement player choice for damage assignment (Java: getMultiAmountWithIndividualConstraints)
-		// For now, we automatically assign lethal damage to each blocker in order
-		remainingDamage := power
-		
-		for _, blockerID := range group.blockers {
-			blocker, exists := gameState.cards[blockerID]
-			if !exists {
-				continue
-			}
-			
-			// Skip dead blockers (already in graveyard from first strike, etc.)
-			if blocker.Zone != zoneBattlefield {
-				continue
-			}
-			
-			// Calculate lethal damage (toughness - damage already marked)
-			// With deathtouch, only 1 damage is lethal
-			lethalDamage := e.getLethalDamageWithAttacker(gameState, blocker, attackerID)
-			damageToAssign := lethalDamage
-			if damageToAssign > remainingDamage {
-				damageToAssign = remainingDamage
-			}
-			
-			// Mark damage on blocker (with lifelink check)
-			e.markDamageWithLifelink(gameState, blocker, damageToAssign, attackerID)
-			remainingDamage -= damageToAssign
-			
-			if remainingDamage <= 0 {
-				break
-			}
-		}
-		
-		// Trample damage to defender
-		if remainingDamage > 0 {
-			return e.dealDamageToDefender(gameState, attacker, group.defenderID, remainingDamage)
-		}
+	// Rule 510.1c: Player divides damage as they choose among blockers
+	// Use stored damage assignment or compute default
+
+	var damageAssignment map[string]int
+	if assignment, exists := group.attackerDamageAssignments[attackerID]; exists {
+		damageAssignment = assignment
 	} else {
-		// No trample: divide damage among blockers
-		// For now, we'll do simple damage assignment (divide evenly)
-		// TODO: Implement proper damage ordering and player choice
-		damagePerBlocker := power / len(group.blockers)
-		remainingDamage := power % len(group.blockers)
-		
-		for i, blockerID := range group.blockers {
-			blocker, exists := gameState.cards[blockerID]
-			if !exists {
-				continue
-			}
-			
-			damage := damagePerBlocker
-			if i == 0 {
-				damage += remainingDamage // Give remainder to first blocker
-			}
-			
-			// Mark damage on blocker (with lifelink check)
+		// No explicit assignment - use default
+		damageAssignment = e.computeDefaultAttackerDamageAssignment(gameState, attackerID, group.blockers)
+	}
+
+	// Apply the damage assignment
+	totalAssigned := 0
+	for blockerID, damage := range damageAssignment {
+		blocker, exists := gameState.cards[blockerID]
+		if !exists || blocker.Zone != zoneBattlefield {
+			continue
+		}
+
+		if damage > 0 {
 			e.markDamageWithLifelink(gameState, blocker, damage, attackerID)
+			totalAssigned += damage
+		}
+	}
+
+	// With trample, excess damage goes to defender
+	if hasTrample {
+		trampleDamage := power - totalAssigned
+		if trampleDamage > 0 {
+			return e.dealDamageToDefender(gameState, attacker, group.defenderID, trampleDamage)
 		}
 	}
 	
@@ -5888,51 +5864,72 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 
 // assignDamageToAttackers handles blocker damage to attackers
 // Per Java CombatGroup.assignDamageToAttackers()
-func (e *MageEngine) assignDamageToAttackers(gameState *engineGameState, group *combatGroup, firstStrike bool) error {
+func (e *MageEngine) assignDamageToAttackers(gameState *engineGameState, group *combatGroup, firstStrike bool, processedBlockers map[string]bool) error {
 	if len(group.blockers) == 0 {
 		return nil
 	}
-	
+
 	// For each blocker, deal damage to the attacker(s) it's blocking
 	for _, blockerID := range group.blockers {
+		// Skip if we've already processed this blocker (can be in multiple groups)
+		if processedBlockers[blockerID] {
+			continue
+		}
+
 		blocker, exists := gameState.cards[blockerID]
 		if !exists {
 			continue
 		}
-		
+
 		// Dead creatures don't deal damage
 		if blocker.Zone != zoneBattlefield {
 			continue
 		}
-		
+
 		// Check if blocker deals damage this step
 		if !e.dealsDamageThisStep(gameState, blocker, firstStrike) {
 			continue
 		}
-		
+
 		// Record first striker if dealing damage in first strike step
 		if firstStrike && e.hasFirstOrDoubleStrikeWithEffects(gameState, blocker) {
 			e.recordFirstStrikingCreature(gameState, blockerID)
 		}
-		
-		// Get blocker's power
-		power, err := e.getCreaturePower(blocker)
-		if err != nil {
-			power = 0
+
+		// Rule 510.1d: Blocker divides damage as controller chooses among attackers
+		// If blocker blocks multiple attackers, get assignment from any group (should be same in all)
+		var damageAssignment map[string]int
+		if assignment, exists := group.blockerDamageAssignments[blockerID]; exists {
+			damageAssignment = assignment
+		} else {
+			// No explicit assignment - collect all attackers this blocker is blocking
+			blockingAttackers := make([]string, 0)
+			for _, g := range gameState.combat.groups {
+				for _, bid := range g.blockers {
+					if bid == blockerID {
+						blockingAttackers = append(blockingAttackers, g.attackers...)
+					}
+				}
+			}
+			damageAssignment = e.computeDefaultBlockerDamageAssignment(gameState, blockerID, blockingAttackers)
 		}
-		
-		// Deal damage to attacker(s)
-		// For now, simple assignment to first attacker
-		// TODO: Handle multiple attackers (banding)
-		if len(group.attackers) > 0 {
-			attackerID := group.attackers[0]
+
+		// Apply the damage assignment
+		for attackerID, damage := range damageAssignment {
 			attacker, exists := gameState.cards[attackerID]
-			if exists {
-				e.markDamageWithLifelink(gameState, attacker, power, blockerID)
+			if !exists || attacker.Zone != zoneBattlefield {
+				continue
+			}
+
+			if damage > 0 {
+				e.markDamageWithLifelink(gameState, attacker, damage, blockerID)
 			}
 		}
+
+		// Mark this blocker as processed
+		processedBlockers[blockerID] = true
 	}
-	
+
 	return nil
 }
 
@@ -5975,8 +5972,286 @@ func (e *MageEngine) ApplyCombatDamage(gameID string) error {
 	
 	// Fire combat damage applied event
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageApplied, "", "", ""))
-	
+
 	return nil
+}
+
+// AssignAttackerDamage assigns how an attacker divides its damage among blockers
+// Rule 510.1c: A blocked creature assigns its combat damage divided as its controller chooses among blockers
+// Per Java CombatGroup.blockerDamage() multi-amount dialog
+func (e *MageEngine) AssignAttackerDamage(gameID, attackerID string, damageMap map[string]int) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	// Find the combat group for this attacker
+	var group *combatGroup
+	for _, g := range gameState.combat.groups {
+		for _, aID := range g.attackers {
+			if aID == attackerID {
+				group = g
+				break
+			}
+		}
+		if group != nil {
+			break
+		}
+	}
+
+	if group == nil {
+		return fmt.Errorf("attacker %s not found in combat", attackerID)
+	}
+
+	// Validate the damage assignment
+	attacker, exists := gameState.cards[attackerID]
+	if !exists {
+		return fmt.Errorf("attacker %s not found", attackerID)
+	}
+
+	power, err := e.getCreaturePower(attacker)
+	if err != nil {
+		power = 0
+	}
+
+	// Validate total damage equals power
+	totalAssigned := 0
+	for _, damage := range damageMap {
+		totalAssigned += damage
+	}
+
+	// With trample, player can assign less than full power (excess tramples through)
+	hasTrample := e.hasAbility(attacker, abilityTrample)
+	if hasTrample {
+		if totalAssigned > power {
+			return fmt.Errorf("cannot assign more damage (%d) than creature's power (%d)", totalAssigned, power)
+		}
+	} else {
+		if totalAssigned != power {
+			return fmt.Errorf("must assign all damage (%d) to blockers, assigned %d", power, totalAssigned)
+		}
+	}
+
+	// Validate all targets are valid blockers
+	for blockerID := range damageMap {
+		found := false
+		for _, bid := range group.blockers {
+			if bid == blockerID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf("creature %s is not blocking this attacker", blockerID)
+		}
+	}
+
+	// Store the assignment
+	group.attackerDamageAssignments[attackerID] = damageMap
+
+	if e.logger != nil {
+		e.logger.Debug("attacker damage assigned",
+			zap.String("attacker_id", attackerID),
+			zap.Any("damage_map", damageMap),
+		)
+	}
+
+	return nil
+}
+
+// AssignBlockerDamage assigns how a blocker divides its damage among attackers it's blocking
+// Rule 510.1d: A blocking creature assigns its combat damage divided as its controller chooses among attackers
+// Per Java CombatGroup.attackerDamage() multi-amount dialog
+func (e *MageEngine) AssignBlockerDamage(gameID, blockerID string, damageMap map[string]int) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	// Validate the blocker exists
+	blocker, exists := gameState.cards[blockerID]
+	if !exists {
+		return fmt.Errorf("blocker %s not found", blockerID)
+	}
+
+	power, err := e.getCreaturePower(blocker)
+	if err != nil {
+		power = 0
+	}
+
+	// Validate total damage equals power
+	totalAssigned := 0
+	for _, damage := range damageMap {
+		totalAssigned += damage
+	}
+
+	if totalAssigned != power {
+		return fmt.Errorf("must assign all damage (%d), assigned %d", power, totalAssigned)
+	}
+
+	// Collect all attackers this blocker is blocking (may be in multiple groups)
+	blockingAttackers := make(map[string]bool)
+	for _, group := range gameState.combat.groups {
+		for _, bid := range group.blockers {
+			if bid == blockerID {
+				for _, aid := range group.attackers {
+					blockingAttackers[aid] = true
+				}
+			}
+		}
+	}
+
+	// Validate all targets are valid attackers being blocked
+	for attackerID := range damageMap {
+		if !blockingAttackers[attackerID] {
+			return fmt.Errorf("creature %s is not being blocked by this blocker", attackerID)
+		}
+	}
+
+	// Store the assignment in all groups this blocker is in
+	for _, group := range gameState.combat.groups {
+		for _, bid := range group.blockers {
+			if bid == blockerID {
+				group.blockerDamageAssignments[blockerID] = damageMap
+				break
+			}
+		}
+	}
+
+	if e.logger != nil {
+		e.logger.Debug("blocker damage assigned",
+			zap.String("blocker_id", blockerID),
+			zap.Any("damage_map", damageMap),
+		)
+	}
+
+	return nil
+}
+
+// computeDefaultAttackerDamageAssignment computes the default damage assignment for an attacker
+// Rule 510.1c: With trample, assign lethal to each blocker (excess tramples); without, divide among blockers
+// Per Java CombatGroup.blockerDamage() defaultDamage calculation
+func (e *MageEngine) computeDefaultAttackerDamageAssignment(gameState *engineGameState, attackerID string, blockers []string) map[string]int {
+	attacker, exists := gameState.cards[attackerID]
+	if !exists {
+		return make(map[string]int)
+	}
+
+	power, err := e.getCreaturePower(attacker)
+	if err != nil {
+		power = 0
+	}
+
+	hasTrample := e.hasAbility(attacker, abilityTrample)
+	assignment := make(map[string]int)
+
+	if hasTrample {
+		// With trample: assign lethal damage to each blocker in order
+		remainingDamage := power
+		for _, blockerID := range blockers {
+			blocker, exists := gameState.cards[blockerID]
+			if !exists || blocker.Zone != zoneBattlefield {
+				continue
+			}
+
+			lethalDamage := e.getLethalDamageWithAttacker(gameState, blocker, attackerID)
+			damageToAssign := lethalDamage
+			if damageToAssign > remainingDamage {
+				damageToAssign = remainingDamage
+			}
+
+			if damageToAssign > 0 {
+				assignment[blockerID] = damageToAssign
+				remainingDamage -= damageToAssign
+			}
+
+			if remainingDamage <= 0 {
+				break
+			}
+		}
+		// Remaining damage tramples through (not part of blocker assignment)
+	} else {
+		// Without trample: divide damage evenly among blockers
+		if len(blockers) == 0 {
+			return assignment
+		}
+
+		damagePerBlocker := power / len(blockers)
+		remainingDamage := power % len(blockers)
+
+		for i, blockerID := range blockers {
+			_, exists := gameState.cards[blockerID]
+			if !exists {
+				continue
+			}
+
+			damage := damagePerBlocker
+			if i == 0 {
+				damage += remainingDamage // Give remainder to first blocker
+			}
+
+			if damage > 0 {
+				assignment[blockerID] = damage
+			}
+		}
+	}
+
+	return assignment
+}
+
+// computeDefaultBlockerDamageAssignment computes the default damage assignment for a blocker
+// Rule 510.1d: Blocker assigns damage divided among attackers it's blocking
+// Per Java CombatGroup.attackerDamage() defaultDamage calculation
+func (e *MageEngine) computeDefaultBlockerDamageAssignment(gameState *engineGameState, blockerID string, attackers []string) map[string]int {
+	blocker, exists := gameState.cards[blockerID]
+	if !exists {
+		return make(map[string]int)
+	}
+
+	power, err := e.getCreaturePower(blocker)
+	if err != nil {
+		power = 0
+	}
+
+	assignment := make(map[string]int)
+
+	if len(attackers) == 0 {
+		return assignment
+	}
+
+	// Divide damage evenly among attackers
+	damagePerAttacker := power / len(attackers)
+	remainingDamage := power % len(attackers)
+
+	for i, attackerID := range attackers {
+		_, exists := gameState.cards[attackerID]
+		if !exists {
+			continue
+		}
+
+		damage := damagePerAttacker
+		if i == 0 {
+			damage += remainingDamage // Give remainder to first attacker
+		}
+
+		if damage > 0 {
+			assignment[attackerID] = damage
+		}
+	}
+
+	return assignment
 }
 
 // EndCombat ends combat phase, clearing combat flags and moving to former groups

@@ -209,12 +209,16 @@ Status legend:
 - [ ] Support attacking battles
 - [ ] Implement planeswalker damage redirection rules (pre-2018 deprecated rules)
 
-### Damage Ordering (P2 - Medium Priority)
-- [ ] Implement attacker damage ordering for multiple blockers
-- [ ] Implement blocker damage ordering for multiple attackers
-- [ ] Prompt players to order blockers/attackers
-- [ ] Validate damage assignment follows ordering
-- [ ] Support "you choose damage order" effects
+### Damage Division (P2 - Medium Priority) - Modern Rules (No Ordering)
+- [x] Implement damage division for attacker with multiple blockers (Rule 510.1c)
+- [x] Implement damage division for blocker blocking multiple attackers (Rule 510.1d)
+- [x] Add AssignAttackerDamage() API for player damage choices
+- [x] Add AssignBlockerDamage() API for player damage choices
+- [x] Implement default damage division (even split, lethal for trample)
+- [x] Validate damage assignments (total equals power, valid targets)
+- [x] Handle blockers in multiple combat groups correctly
+- [ ] UI for damage division prompts (multi-amount dialog)
+- [ ] Support "you choose damage order" effects (Defensive Formation, etc.)
 
 ### Banding (P3 - Low Priority, Complex)
 - [ ] Implement banding ability detection
