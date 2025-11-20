@@ -1,8 +1,37 @@
 # Banding Implementation Notes
 
-## Status: Not Implemented (P3 - Low Priority)
+## Status: Partially Implemented (P3 - Low Priority)
 
-Banding is one of Magic's most complex and rarely-used mechanics. This document outlines what would be needed for full implementation.
+**Implemented:** Damage assignment control (Rules 702.22j-k) - the most gameplay-relevant part of banding.
+
+**Not Implemented:** Band formation, block propagation, "bands with other" variants.
+
+Banding is one of Magic's most complex and rarely-used mechanics. This document outlines what has been implemented and what would be needed for full implementation.
+
+## What's Implemented
+
+### Damage Assignment Control (Rules 702.22j-k)
+
+**✅ Rule 702.22j**: When an attacker is blocked by a creature with banding, the **defending player** assigns the attacker's damage (instead of attacking player).
+
+**✅ Rule 702.22k**: When a blocker is blocking a creature with banding, the **attacking player** assigns the blocker's damage (instead of defending player).
+
+**Implementation:**
+- `abilityBanding` constant for detection
+- `hasBanding()` helper method
+- `defenderControlsDamageAssignment()` checks if defender controls attacker damage assignment
+- `attackerControlsDamageAssignment()` checks if attacker controls blocker damage assignment
+- `AssignAttackerDamage()` validates correct player based on banding
+- `AssignBlockerDamage()` validates correct player based on banding
+- `BandedCards []string` field on internalCard (for future use)
+
+**Tests:**
+- `TestBanding_DefenderAssignsDamage` - Verifies Rule 702.22j
+- `TestBanding_AttackerAssignsDamage` - Verifies Rule 702.22k
+- `TestBanding_NormalCombatWithoutBanding` - Ensures normal combat still works
+- `TestBanding_OnlyOneBandingNeeded` - Only one creature needs banding
+
+All tests passing!
 
 ## Rules Summary
 

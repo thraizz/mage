@@ -220,24 +220,26 @@ Status legend:
 - [ ] UI for damage division prompts (multi-amount dialog)
 - [ ] Support "you choose damage order" effects (Defensive Formation, etc.)
 
-### Banding (P3 - Low Priority, Complex) - NOT IMPLEMENTED
-Banding is one of MTG's most complex mechanics (40-55 hours estimated). Rarely used (~50 cards, mostly early sets).
-See BANDING_NOTES.md for detailed analysis and implementation requirements.
+### Banding (P3 - Low Priority, Complex) - PARTIALLY IMPLEMENTED
+Banding is one of MTG's most complex mechanics. Core damage assignment control implemented.
+See BANDING_NOTES.md for detailed analysis and future implementation requirements.
 
-**Status:** Documented but not implemented. Recommend implementing only if specifically needed for a card.
+**Status:** Damage assignment control (Rules 702.22j-k) implemented and tested.
 
-**What would be needed:**
+**Implemented (Rules 702.22j-k):**
+- [x] Add ability constant for banding detection
+- [x] Add band tracking fields to internalCard (BandedCards)
+- [x] Damage assignment control - defending player assigns (Rule 702.22j)
+- [x] Damage assignment control - attacking player assigns (Rule 702.22k)
+- [x] Update AssignAttackerDamage/AssignBlockerDamage APIs with player validation
+- [x] Comprehensive tests for damage assignment control
+
+**Not Yet Implemented (Future work):**
 - [ ] Band formation during attack declaration (bidirectional tracking)
 - [ ] Block propagation across band members (Rule 702.22h)
-- [ ] Damage assignment control - defending player assigns (Rule 702.22j)
-- [ ] Damage assignment control - attacking player assigns (Rule 702.22k)
 - [ ] "Bands with other" variants (by subtype/supertype/name)
 - [ ] Edge cases (removal, banding lost mid-combat, multiple bands)
-
-**Minimum viable (if needed):**
-- [ ] Add ability constant for banding detection
-- [ ] Implement damage assignment control only (skip band formation)
-- [ ] Skip "bands with other" entirely
+- [ ] Band formation UI/API
 
 ### Combat Removal & Interruption (P2 - Medium Priority)
 - [x] Implement `RemoveFromCombat(gameID, creatureID)` - remove during combat

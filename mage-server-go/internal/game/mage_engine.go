@@ -62,6 +62,7 @@ const (
 	abilityLifelink      = "LifelinkAbility"
 	abilityMenace        = "MenaceAbility"
 	abilityUnblockable   = "CantBeBlockedSourceAbility"
+	abilityBanding       = "BandingAbility"
 )
 
 // EngineGameView represents the complete game state view for a player
@@ -310,6 +311,8 @@ type internalCard struct {
 	Blocking      bool     // Is this creature blocking
 	AttackingWhat string   // ID of what this creature is attacking (player/planeswalker/battle)
 	BlockingWhat  []string // IDs of creatures this creature is blocking
+	// Banding fields (Rule 702.22)
+	BandedCards   []string // IDs of creatures in the same attacking band (bidirectional)
 	// Damage tracking
 	Damage        int      // Damage marked on this creature
 	DamageSources map[string]int // Damage by source ID
@@ -5978,8 +5981,9 @@ func (e *MageEngine) ApplyCombatDamage(gameID string) error {
 
 // AssignAttackerDamage assigns how an attacker divides its damage among blockers
 // Rule 510.1c: A blocked creature assigns its combat damage divided as its controller chooses among blockers
+// Rule 702.22j: When blocked by banding creature, DEFENDING player assigns (not attacking player)
 // Per Java CombatGroup.blockerDamage() multi-amount dialog
-func (e *MageEngine) AssignAttackerDamage(gameID, attackerID string, damageMap map[string]int) error {
+func (e *MageEngine) AssignAttackerDamage(gameID, attackerID, playerID string, damageMap map[string]int) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
@@ -6007,6 +6011,19 @@ func (e *MageEngine) AssignAttackerDamage(gameID, attackerID string, damageMap m
 
 	if group == nil {
 		return fmt.Errorf("attacker %s not found in combat", attackerID)
+	}
+
+	// Rule 702.22j: When blocked by banding creature, defending player controls damage assignment
+	if e.defenderControlsDamageAssignment(gameState, group) {
+		// Defending player must assign damage, not attacking player
+		if playerID != group.defendingPlayerID {
+			return fmt.Errorf("defending player must assign damage (blocked by banding creature)")
+		}
+	} else {
+		// Normal case: attacking player assigns damage
+		if playerID != gameState.combat.attackingPlayerID {
+			return fmt.Errorf("attacking player must assign damage")
+		}
 	}
 
 	// Validate the damage assignment
@@ -6067,8 +6084,9 @@ func (e *MageEngine) AssignAttackerDamage(gameID, attackerID string, damageMap m
 
 // AssignBlockerDamage assigns how a blocker divides its damage among attackers it's blocking
 // Rule 510.1d: A blocking creature assigns its combat damage divided as its controller chooses among attackers
+// Rule 702.22k: When blocking banding attacker, ATTACKING player assigns (not defending player)
 // Per Java CombatGroup.attackerDamage() multi-amount dialog
-func (e *MageEngine) AssignBlockerDamage(gameID, blockerID string, damageMap map[string]int) error {
+func (e *MageEngine) AssignBlockerDamage(gameID, blockerID, playerID string, damageMap map[string]int) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
@@ -6084,6 +6102,33 @@ func (e *MageEngine) AssignBlockerDamage(gameID, blockerID string, damageMap map
 	blocker, exists := gameState.cards[blockerID]
 	if !exists {
 		return fmt.Errorf("blocker %s not found", blockerID)
+	}
+
+	// Find a combat group this blocker is in (to check for banding attackers)
+	var checkGroup *combatGroup
+	for _, group := range gameState.combat.groups {
+		for _, bid := range group.blockers {
+			if bid == blockerID {
+				checkGroup = group
+				break
+			}
+		}
+		if checkGroup != nil {
+			break
+		}
+	}
+
+	// Rule 702.22k: When blocking banding attacker, attacking player controls damage assignment
+	if checkGroup != nil && e.attackerControlsDamageAssignment(gameState, checkGroup) {
+		// Attacking player must assign damage, not defending player
+		if playerID != gameState.combat.attackingPlayerID {
+			return fmt.Errorf("attacking player must assign damage (blocking banding attacker)")
+		}
+	} else {
+		// Normal case: defending player assigns damage
+		if playerID != blocker.ControllerID {
+			return fmt.Errorf("blocker's controller must assign damage")
+		}
 	}
 
 	power, err := e.getCreaturePower(blocker)
@@ -6453,6 +6498,15 @@ func (e *MageEngine) isPlaneswalker(card *internalCard) bool {
 	return strings.Contains(card.Type, "Planeswalker")
 }
 
+// hasBanding checks if a creature has the banding ability
+// Per Java CombatGroup.hasBanding()
+func (e *MageEngine) hasBanding(card *internalCard) bool {
+	if card == nil {
+		return false
+	}
+	return e.hasAbility(card, abilityBanding)
+}
+
 // HasPlayerAttackedPlayerOrPlaneswalker checks if a player attacked another player or their planeswalkers this turn
 // Per Java PlayersAttackedThisTurnWatcher.hasPlayerAttackedPlayerOrControlledPlaneswalker()
 // Returns true if attacker attacked defender directly OR attacked a planeswalker controlled by defender
@@ -6483,6 +6537,36 @@ func (e *MageEngine) HasPlayerAttackedPlayerOrPlaneswalker(gameID, attackingPlay
 	}
 
 	return false, nil
+}
+
+// defenderControlsDamageAssignment checks if the defending player controls damage assignment
+// Rule 702.22j: When blocked by creature with banding, defending player assigns attacker's damage
+// Per Java CombatGroup.defenderAssignsCombatDamage()
+func (e *MageEngine) defenderControlsDamageAssignment(gameState *engineGameState, group *combatGroup) bool {
+	// Check if any blocker has banding
+	for _, blockerID := range group.blockers {
+		if blocker, exists := gameState.cards[blockerID]; exists {
+			if e.hasBanding(blocker) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// attackerControlsDamageAssignment checks if the attacking player controls damage assignment
+// Rule 702.22k: When blocking creature with banding, attacking player assigns blocker's damage
+// Per Java CombatGroup.attackerAssignsCombatDamage()
+func (e *MageEngine) attackerControlsDamageAssignment(gameState *engineGameState, group *combatGroup) bool {
+	// Check if any attacker has banding
+	for _, attackerID := range group.attackers {
+		if attacker, exists := gameState.cards[attackerID]; exists {
+			if e.hasBanding(attacker) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (e *MageEngine) hasAbility(creature *internalCard, abilityID string) bool {
