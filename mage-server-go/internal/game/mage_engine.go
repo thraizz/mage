@@ -2680,10 +2680,14 @@ func (e *MageEngine) checkStateBasedActions(gameState *engineGameState) bool {
 			// For now, we'll skip this as it requires damage tracking infrastructure.
 		}
 
-		// 704.5j: If a planeswalker has loyalty 0, it's put into its owner's graveyard
-		if strings.Contains(strings.ToLower(card.Type), "planeswalker") {
-			loyalty, err := e.parseLoyalty(card.Loyalty)
-			if err == nil && loyalty <= 0 {
+		// 704.5i: If a planeswalker has loyalty 0, it's put into its owner's graveyard
+		// Per Rule 306.5c: The loyalty of a planeswalker on the battlefield is equal to the number of loyalty counters on it
+		if e.isPlaneswalker(card) {
+			loyalty := 0
+			if card.Counters != nil {
+				loyalty = card.Counters.GetCount("loyalty")
+			}
+			if loyalty <= 0 {
 				planeswalkersToRemove = append(planeswalkersToRemove, card)
 				gameState.addMessage(fmt.Sprintf("%s dies (loyalty <= 0)", card.Name), "action")
 				somethingHappened = true
@@ -4442,10 +4446,29 @@ func (e *MageEngine) SetDefenders(gameID string) error {
 			gameState.combat.defenders[playerID] = true
 		}
 	}
-	
-	// Add planeswalkers controlled by opponents
-	// Add battles that can be attacked
-	// TODO: Implement when planeswalkers and battles are added
+
+	// Add planeswalkers controlled by opponents (Rule 306.6, 508.1b)
+	// Per Java Combat.setDefenders() - adds planeswalkers to defenders map
+	for _, card := range gameState.cards {
+		if card.Zone != zoneBattlefield {
+			continue
+		}
+
+		// Check if this is a planeswalker
+		if !e.isPlaneswalker(card) {
+			continue
+		}
+
+		// Check if controlled by an opponent
+		if card.ControllerID == attackingPlayerID {
+			continue // Can't attack your own planeswalkers
+		}
+
+		// Add planeswalker as a defender
+		gameState.combat.defenders[card.ID] = true
+	}
+
+	// TODO: Add battles that can be attacked when battle system is implemented
 	
 	if e.logger != nil {
 		e.logger.Debug("set defenders",
@@ -4633,9 +4656,17 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	// Create a new combat group for this attacker
 	// Per MTG rules and Java implementation: each attacking creature gets its own combat group
 	// Blockers may later be assigned to this group during declare blockers step
+
+	// Determine if defender is a permanent (planeswalker/battle) or player
+	// Rule 508.1b, 306.6: Creatures can attack players, planeswalkers, or battles
 	defenderIsPermanent := false
 	defendingPlayerID := defenderID
-	// TODO: Check if defender is a permanent when planeswalkers/battles added
+
+	// Check if defender is a planeswalker or battle
+	if defenderCard, exists := gameState.cards[defenderID]; exists {
+		defenderIsPermanent = true
+		defendingPlayerID = defenderCard.ControllerID
+	}
 
 	group := newCombatGroup(defenderID, defenderIsPermanent, defendingPlayerID)
 	group.attackers = append(group.attackers, creatureID)
@@ -6115,6 +6146,13 @@ func (e *MageEngine) isCreature(card *internalCard) bool {
 	return strings.Contains(card.Type, "Creature")
 }
 
+func (e *MageEngine) isPlaneswalker(card *internalCard) bool {
+	if card == nil {
+		return false
+	}
+	return strings.Contains(card.Type, "Planeswalker")
+}
+
 func (e *MageEngine) hasAbility(creature *internalCard, abilityID string) bool {
 	if creature == nil {
 		return false
@@ -6353,23 +6391,42 @@ func (e *MageEngine) getLethalDamage(creature *internalCard, attackerID string) 
 	return lethal
 }
 
-// getLethalDamageWithAttacker calculates the amount of damage needed to destroy a creature
+// getLethalDamageWithAttacker calculates the amount of damage needed to destroy a creature/planeswalker
 // considering deathtouch on the attacker. Per Java PermanentImpl.getLethalDamage()
-// TODO: Add planeswalker support (loyalty counters) and battle support (defense counters)
 func (e *MageEngine) getLethalDamageWithAttacker(gameState *engineGameState, creature *internalCard, attackerID string) int {
+	// For planeswalkers, lethal damage = current loyalty (Rule 306.9)
+	// Planeswalkers have no toughness, damage removes loyalty counters
+	if e.isPlaneswalker(creature) {
+		if creature.Counters == nil {
+			return 0
+		}
+		loyalty := creature.Counters.GetCount("loyalty")
+
+		// With deathtouch, 1 damage is enough to remove all loyalty
+		if attackerID != "" {
+			if attacker, exists := gameState.cards[attackerID]; exists {
+				if e.hasAbility(attacker, abilityDeathtouch) && loyalty > 1 {
+					return 1
+				}
+			}
+		}
+
+		return loyalty
+	}
+
+	// For creatures, calculate based on toughness
 	toughness, err := e.getCreatureToughness(creature)
 	if err != nil {
 		return 0
 	}
-	
+
 	lethal := toughness - creature.Damage
 	if lethal < 0 {
 		lethal = 0
 	}
-	
-	// TODO: For planeswalkers, lethal = min(lethal, loyalty counters)
+
 	// TODO: For battles, lethal = min(lethal, defense counters)
-	
+
 	// Check for deathtouch on attacker (Java: attacker.getAbilities(game).containsKey(DeathtouchAbility.getInstance().getId()))
 	if attackerID != "" {
 		if attacker, exists := gameState.cards[attackerID]; exists {
@@ -6381,7 +6438,7 @@ func (e *MageEngine) getLethalDamageWithAttacker(gameState *engineGameState, cre
 			}
 		}
 	}
-	
+
 	return lethal
 }
 
@@ -6451,11 +6508,49 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 	if amount <= 0 {
 		return nil
 	}
-	
+
 	// Check if defender is a permanent (planeswalker/battle) or player
 	if defender, exists := gameState.cards[defenderID]; exists {
 		// Defender is a permanent
-		e.markDamageWithLifelink(gameState, defender, amount, attacker.ID)
+
+		// Rule 306.8, 120.3c: Damage dealt to planeswalker removes loyalty counters
+		if e.isPlaneswalker(defender) {
+			// Remove loyalty counters equal to damage
+			if defender.Counters != nil {
+				defender.Counters.RemoveCounter("loyalty", amount)
+			}
+
+			// Handle lifelink
+			if e.hasAbility(attacker, abilityLifelink) {
+				controller, exists := gameState.players[attacker.ControllerID]
+				if exists {
+					controller.Life += amount
+				}
+			}
+
+			// Fire damaged permanent event for triggers
+			damagedEvent := rules.Event{
+				Type:       rules.EventDamagedPermanent,
+				TargetID:   defender.ID,
+				SourceID:   attacker.ID,
+				Amount:     amount,
+				Controller: defender.ControllerID,
+				Flag:       true, // Combat damage
+			}
+			gameState.eventBus.Publish(damagedEvent)
+
+			if e.logger != nil {
+				e.logger.Debug("damage dealt to planeswalker",
+					zap.String("planeswalker_id", defender.ID),
+					zap.String("attacker_id", attacker.ID),
+					zap.Int("damage", amount),
+					zap.Int("loyalty_remaining", defender.Counters.GetCount("loyalty")),
+				)
+			}
+		} else {
+			// For other permanents (battles, creatures), mark damage normally
+			e.markDamageWithLifelink(gameState, defender, amount, attacker.ID)
+		}
 		return nil
 	}
 	

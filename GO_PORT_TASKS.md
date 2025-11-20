@@ -198,10 +198,15 @@ Status legend:
 - [x] Implement "attacks each combat if able" effects
 
 ### Planeswalker & Battle Combat (P2 - Medium Priority)
-- [ ] Support attacking planeswalkers (redirect from player)
+- [x] Support attacking planeswalkers (planeswalkers added to defenders)
+- [x] Implement damage-to-loyalty conversion (Rule 306.8, 120.3c)
+- [x] Update lethal damage calculation for planeswalkers (loyalty-based)
+- [x] Support lifelink with planeswalker damage
+- [x] Support deathtouch with planeswalker damage
+- [x] Block attacks on own planeswalkers
 - [ ] Support attacking battles
-- [ ] Implement planeswalker damage redirection rules
-- [ ] Track which planeswalkers/battles are attacked
+- [ ] Implement planeswalker damage redirection rules (pre-2018 rules)
+- [ ] Track which planeswalkers/battles are attacked for triggers
 - [ ] Handle planeswalker removal during combat
 
 ### Damage Ordering (P2 - Medium Priority)
