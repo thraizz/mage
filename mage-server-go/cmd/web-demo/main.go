@@ -17,19 +17,19 @@ var upgrader = websocket.Upgrader{
 }
 
 type Card struct {
-	ID          string     `json:"id"`
-	Name        string     `json:"name"`
-	Type        string     `json:"type"`
-	Power       string     `json:"power,omitempty"`
-	Toughness   string     `json:"toughness,omitempty"`
-	Zone        string     `json:"zone"`
-	Tapped      bool       `json:"tapped"`
-	Attacking   bool       `json:"attacking"`
-	Blocking    bool       `json:"blocking"`
-	Damage      int        `json:"damage"`
-	Controller  string     `json:"controller"`
-	Owner       string     `json:"owner"`
-	Abilities   []Ability  `json:"abilities"`
+	ID         string    `json:"id"`
+	Name       string    `json:"name"`
+	Type       string    `json:"type"`
+	Power      string    `json:"power,omitempty"`
+	Toughness  string    `json:"toughness,omitempty"`
+	Zone       string    `json:"zone"`
+	Tapped     bool      `json:"tapped"`
+	Attacking  bool      `json:"attacking"`
+	Blocking   bool      `json:"blocking"`
+	Damage     int       `json:"damage"`
+	Controller string    `json:"controller"`
+	Owner      string    `json:"owner"`
+	Abilities  []Ability `json:"abilities"`
 }
 
 type Ability struct {
@@ -47,19 +47,19 @@ type Player struct {
 }
 
 type GameState struct {
-	GameID         string  `json:"game_id"`
-	CurrentPlayer  string  `json:"current_player"`
-	ActivePlayer   string  `json:"active_player"`
-	PriorityPlayer string  `json:"priority_player"`
-	Phase          string  `json:"phase"`
-	Step           string  `json:"step"`
-	Turn           int     `json:"turn"`
+	GameID         string   `json:"game_id"`
+	CurrentPlayer  string   `json:"current_player"`
+	ActivePlayer   string   `json:"active_player"`
+	PriorityPlayer string   `json:"priority_player"`
+	Phase          string   `json:"phase"`
+	Step           string   `json:"step"`
+	Turn           int      `json:"turn"`
 	Players        []Player `json:"players"`
-	Battlefield    []Card  `json:"battlefield"`
-	Hand           []Card  `json:"hand"`
-	Graveyard      []Card  `json:"graveyard"`
-	Exile          []Card  `json:"exile"`
-	Stack          []any   `json:"stack"`
+	Battlefield    []Card   `json:"battlefield"`
+	Hand           []Card   `json:"hand"`
+	Graveyard      []Card   `json:"graveyard"`
+	Exile          []Card   `json:"exile"`
+	Stack          []any    `json:"stack"`
 }
 
 type WSMessage struct {
