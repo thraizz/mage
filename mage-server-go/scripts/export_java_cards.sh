@@ -1,49 +1,51 @@
 #!/bin/bash
-# Export card data from Java MAGE server's H2 database to CSV
-# This script extracts card metadata for import into PostgreSQL
+#
+# Export card metadata from Java source files to CSV
+#
+# This script parses Java card files and extracts metadata without
+# needing to run the Java server or access an H2 database.
+#
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-JAVA_DB_PATH="${PROJECT_ROOT}/../Mage.Server/db/cards.h2.mv.db"
-OUTPUT_CSV="${PROJECT_ROOT}/data/cards_export.csv"
+JAVA_CARDS_DIR="$PROJECT_ROOT/../Mage.Sets/src/mage/cards"
+OUTPUT_FILE="$PROJECT_ROOT/data/cards_export.csv"
 
-echo "=== MAGE Card Data Export ==="
-echo "Java DB path: $JAVA_DB_PATH"
-echo "Output CSV: $OUTPUT_CSV"
+echo "=== MAGE Card Metadata Exporter ==="
+echo "Java cards directory: $JAVA_CARDS_DIR"
+echo "Output file: $OUTPUT_FILE"
+echo ""
 
-# Check if H2 database exists
-if [ ! -f "$JAVA_DB_PATH" ]; then
-    echo "ERROR: Java H2 database not found at $JAVA_DB_PATH"
-    echo "Please run the Java MAGE server at least once to generate the card database."
+# Check if Java cards directory exists
+if [ ! -d "$JAVA_CARDS_DIR" ]; then
+    echo "Error: Java cards directory not found: $JAVA_CARDS_DIR"
+    echo "Please ensure Mage.Sets is checked out in the parent directory"
     exit 1
 fi
 
-# Create output directory
-mkdir -p "$(dirname "$OUTPUT_CSV")"
+# Count total cards
+TOTAL_CARDS=$(find "$JAVA_CARDS_DIR" -name "*.java" | wc -l | tr -d ' ')
+echo "Found $TOTAL_CARDS Java card files"
+echo ""
 
-# Download H2 JAR if not present
-H2_JAR="${PROJECT_ROOT}/scripts/h2.jar"
-if [ ! -f "$H2_JAR" ]; then
-    echo "Downloading H2 database JAR..."
-    curl -L -o "$H2_JAR" "https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar"
-fi
+# Create CSV header
+echo "Creating CSV with metadata..."
+echo "name,set_code,card_number,class_name,power,toughness,starting_loyalty,starting_defense,mana_value,rarity,types,subtypes,supertypes,mana_costs,rules,black,blue,green,red,white,frame_color,frame_style,various_art" > "$OUTPUT_FILE"
 
-# Export cards table to CSV
-echo "Exporting cards from H2 database..."
-java -cp "$H2_JAR" org.h2.tools.Csv \
-    -url "jdbc:h2:${PROJECT_ROOT}/../Mage.Server/db/cards" \
-    -user "sa" \
-    -password "" \
-    -sql "SELECT name, setCode, cardNumber, className, power, toughness, startingLoyalty, startingDefense, manaValue, rarity, types, subtypes, supertypes, manaCosts, rules, black, blue, green, red, white, frameColor, frameStyle, variousArt FROM card" \
-    -charset "UTF-8" \
-    > "$OUTPUT_CSV"
+# Use Python to parse Java files (more reliable than bash regex)
+python3 "$SCRIPT_DIR/parse_java_cards.py" "$JAVA_CARDS_DIR" >> "$OUTPUT_FILE"
 
-echo "✓ Export complete: $OUTPUT_CSV"
-echo "Total cards exported: $(wc -l < "$OUTPUT_CSV")"
+# Count exported cards
+EXPORTED=$(wc -l < "$OUTPUT_FILE" | tr -d ' ')
+EXPORTED=$((EXPORTED - 1))  # Subtract header
+
+echo ""
+echo "=== Export Complete ==="
+echo "✓ Exported: $EXPORTED cards"
+echo "✓ Output: $OUTPUT_FILE"
 echo ""
 echo "Next steps:"
-echo "  1. Review the exported CSV file"
-echo "  2. Run: go run scripts/import_cards.go"
-echo "  3. Verify: PAGER=cat psql -d mage -c 'SELECT COUNT(*) FROM cards;'"
+echo "  1. Review: head -20 $OUTPUT_FILE"
+echo "  2. Import: cd mage-server-go && go run scripts/import_cards.go"

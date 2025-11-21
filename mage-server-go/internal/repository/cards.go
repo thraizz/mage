@@ -185,6 +185,32 @@ func (r *CardRepository) GetBySetCode(ctx context.Context, setCode string) ([]*C
 	return cards, nil
 }
 
+// GetByClassName retrieves a card by its Java class name
+func (r *CardRepository) GetByClassName(ctx context.Context, className string) (*Card, error) {
+	query := `
+		SELECT id, card_number, set_code, name, card_type, mana_cost,
+		       power, toughness, rules_text, flavor_text, original_text,
+		       original_type, cn, card_name, rarity, card_class_name, created_at
+		FROM cards
+		WHERE card_class_name = $1
+		LIMIT 1
+	`
+
+	card := &Card{}
+	err := r.db.Pool.QueryRow(ctx, query, className).Scan(
+		&card.ID, &card.CardNumber, &card.SetCode, &card.Name, &card.CardType,
+		&card.ManaCost, &card.Power, &card.Toughness, &card.RulesText,
+		&card.FlavorText, &card.OriginalText, &card.OriginalType, &card.CN,
+		&card.CardName, &card.Rarity, &card.CardClassName, &card.CreatedAt,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get card by class name: %w", err)
+	}
+
+	return card, nil
+}
+
 // Create creates a new card
 func (r *CardRepository) Create(ctx context.Context, card *Card) error {
 	query := `
