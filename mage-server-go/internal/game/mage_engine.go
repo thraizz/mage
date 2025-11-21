@@ -4227,6 +4227,16 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		// In our implementation, attacker selection is handled via player actions
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareAttackersStepPre, "", "", activePlayerID))
 
+		// Check for creatures that lost creature type (Per Java Combat.checkForRemoveFromCombat())
+		gameState.mu.Unlock()
+		if err := e.CheckForRemoveFromCombat(gameState.gameID); err != nil && e.logger != nil {
+			e.logger.Error("failed to check for removal from combat",
+				zap.String("game_id", gameState.gameID),
+				zap.Error(err),
+			)
+		}
+		gameState.mu.Lock()
+
 		// Process forced attackers ("attacks if able" effects)
 		// Per Java Combat.checkAttackRequirements()
 		if err := e.processForcedAttackers(gameState); err != nil && e.logger != nil {
@@ -4255,6 +4265,16 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 	case rules.StepDeclareBlockers:
 		// Fire the pre-step event for declare blockers
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareBlockersStepPre, "", "", activePlayerID))
+
+		// Check for creatures that lost creature type (Per Java Combat.checkForRemoveFromCombat())
+		gameState.mu.Unlock()
+		if err := e.CheckForRemoveFromCombat(gameState.gameID); err != nil && e.logger != nil {
+			e.logger.Error("failed to check for removal from combat",
+				zap.String("game_id", gameState.gameID),
+				zap.Error(err),
+			)
+		}
+		gameState.mu.Lock()
 
 		// Process "must be blocked if able" requirements
 		// Per Java Combat.retrieveMustBlockAttackerRequirements()
@@ -4300,6 +4320,16 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		// Fire the pre-step event for first strike combat damage
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageStepPre, "", "", activePlayerID))
 
+		// Check for creatures that lost creature type (Per Java Combat.checkForRemoveFromCombat())
+		gameState.mu.Unlock()
+		if err := e.CheckForRemoveFromCombat(gameState.gameID); err != nil && e.logger != nil {
+			e.logger.Error("failed to check for removal from combat",
+				zap.String("game_id", gameState.gameID),
+				zap.Error(err),
+			)
+		}
+		gameState.mu.Lock()
+
 		// Automatically assign and apply first strike damage
 		if err := e.AssignCombatDamage(gameState.gameID, true); err == nil {
 			if err := e.ApplyCombatDamage(gameState.gameID); err != nil && e.logger != nil {
@@ -4324,6 +4354,16 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 	case rules.StepCombatDamage:
 		// Fire the pre-step event for combat damage
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageStepPre, "", "", activePlayerID))
+
+		// Check for creatures that lost creature type (Per Java Combat.checkForRemoveFromCombat())
+		gameState.mu.Unlock()
+		if err := e.CheckForRemoveFromCombat(gameState.gameID); err != nil && e.logger != nil {
+			e.logger.Error("failed to check for removal from combat",
+				zap.String("game_id", gameState.gameID),
+				zap.Error(err),
+			)
+		}
+		gameState.mu.Lock()
 
 		// Automatically assign and apply normal damage
 		if err := e.AssignCombatDamage(gameState.gameID, false); err == nil {
@@ -5341,6 +5381,57 @@ func (e *MageEngine) RemoveFromCombat(gameID, creatureID string) error {
 			)
 		}
 	}
+
+	return nil
+}
+
+// CheckForRemoveFromCombat checks all attacking and blocking creatures and removes those that are no longer creatures
+// Per Java Combat.checkForRemoveFromCombat() - called during combat steps to enforce rule that non-creatures can't attack/block
+func (e *MageEngine) CheckForRemoveFromCombat(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	// Collect all attackers and blockers that need to be removed
+	// We collect first, then remove, to avoid modifying maps while iterating
+	toRemove := make([]string, 0)
+
+	// Check all attackers
+	for creatureID := range gameState.combat.attackers {
+		creature, exists := gameState.cards[creatureID]
+		if exists && !e.isCreature(creature) {
+			toRemove = append(toRemove, creatureID)
+		}
+	}
+
+	// Check all blockers
+	for creatureID := range gameState.combat.blockers {
+		creature, exists := gameState.cards[creatureID]
+		if exists && !e.isCreature(creature) {
+			toRemove = append(toRemove, creatureID)
+		}
+	}
+
+	// Remove all non-creatures from combat
+	// We need to temporarily unlock to call RemoveFromCombat which takes its own lock
+	gameState.mu.Unlock()
+	for _, creatureID := range toRemove {
+		if err := e.RemoveFromCombat(gameID, creatureID); err != nil && e.logger != nil {
+			e.logger.Warn("failed to remove non-creature from combat",
+				zap.String("game_id", gameID),
+				zap.String("creature_id", creatureID),
+				zap.Error(err),
+			)
+		}
+	}
+	gameState.mu.Lock()
 
 	return nil
 }

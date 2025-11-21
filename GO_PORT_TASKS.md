@@ -5,14 +5,15 @@ Minimal tracker for the tasks of migrating the Java Mage MTG server to Go. This 
 Status legend:
 - `[x]` Completed
 - `[ ]` Pending / not yet started
-- `[~]` In progress or partially implemented
+- `[-]` In progress or partially implemented
+- `[~]` Canceled
 
 ## Engine Scaffolding & Lifecycle
 - [x] Wire gRPC server to `MageEngine` via `EngineAdapter`
 - [x] Provide `MageEngine` core skeleton that tracks games, players, and actions
 - [x] Implement `TurnManager` mirroring MTG phase/step progression and priority handoff
 - [x] Introduce `StackManager` with basic push/pop mechanics and simple resolution hooks
-- [~] Extend stack resolution to support triggered abilities, replacement effects, and modal choices
+- [-] Extend stack resolution to support triggered abilities, replacement effects, and modal choices
 - [x] Implement priority windows for casting during stack resolution (e.g., mana abilities, nested responses)
   - [x] Implement mana ability activation during spell/ability resolution (Rule 117.1d, 605.3a)
     - [x] Add `ActivateManaAbility()` method that can be called during resolution
@@ -181,10 +182,10 @@ Status legend:
 - [x] Validate minimum/maximum blocker counts per attacker
 
 ### Combat Triggers (P1 - High Priority)
-- [x] Queue triggers on attacker declared (e.g., "Whenever ~ attacks")
-- [x] Queue triggers on blocker declared (e.g., "Whenever ~ blocks")
-- [x] Queue triggers on creature becomes blocked (e.g., "Whenever ~ becomes blocked")
-- [x] Queue triggers on combat damage dealt (e.g., "Whenever ~ deals combat damage")
+- [x] Queue triggers on attacker declared (e.g., "Whenever - attacks")
+- [x] Queue triggers on blocker declared (e.g., "Whenever - blocks")
+- [x] Queue triggers on creature becomes blocked (e.g., "Whenever - becomes blocked")
+- [x] Queue triggers on combat damage dealt (e.g., "Whenever - deals combat damage")
 - [x] Queue triggers on creature dies in combat
 - [x] Process triggers via existing `checkStateAndTriggered()` system
 
@@ -220,33 +221,29 @@ Status legend:
 - [ ] UI for damage division prompts (multi-amount dialog)
 - [ ] Support "you choose damage order" effects (Defensive Formation, etc.)
 
-### Banding (P3 - Low Priority, Complex) - PARTIALLY IMPLEMENTED
-Banding is one of MTG's most complex mechanics. Core damage assignment control implemented.
-See BANDING_NOTES.md for detailed analysis and future implementation requirements.
+### Banding (P3 - Low Priority, Complex)
 
-**Status:** Damage assignment control (Rules 702.22j-k) implemented and tested.
-
-**Implemented (Rules 702.22j-k):**
 - [x] Add ability constant for banding detection
 - [x] Add band tracking fields to internalCard (BandedCards)
 - [x] Damage assignment control - defending player assigns (Rule 702.22j)
 - [x] Damage assignment control - attacking player assigns (Rule 702.22k)
 - [x] Update AssignAttackerDamage/AssignBlockerDamage APIs with player validation
 - [x] Comprehensive tests for damage assignment control
-
-**Not Yet Implemented (Future work):**
-- [ ] Band formation during attack declaration (bidirectional tracking)
-- [ ] Block propagation across band members (Rule 702.22h)
-- [ ] "Bands with other" variants (by subtype/supertype/name)
-- [ ] Edge cases (removal, banding lost mid-combat, multiple bands)
-- [ ] Band formation UI/API
+- [~] Band formation during attack declaration (bidirectional tracking)
+- [~] Block propagation across band members (Rule 702.22h)
+- [~] "Bands with other" variants (by subtype/supertype/name)
+- [~] Edge cases (removal, banding lost mid-combat, multiple bands)
+- [~] Band formation UI/API
 
 ### Combat Removal & Interruption (P2 - Medium Priority)
 - [x] Implement `RemoveFromCombat(gameID, creatureID)` - remove during combat
-- [ ] Handle creature removal during attacker declaration
-- [ ] Handle creature removal during blocker declaration
-- [ ] Handle creature removal during damage assignment
-- [ ] Update combat groups when creatures removed
+- [x] Handle creature removal during attacker declaration
+- [x] Handle creature removal during blocker declaration
+- [x] Handle creature removal during damage assignment
+- [x] Update combat groups when creatures removed
+- [x] Implement `CheckForRemoveFromCombat()` - automatic removal when creatures lose creature type
+- [x] Integrate CheckForRemoveFromCombat into all combat steps (declare attackers, declare blockers, damage steps)
+- [x] Add comprehensive tests for automatic type-loss removal (6 tests)
 - [ ] Handle blink/flicker during combat (removed and returns as new object)
 - [ ] Handle phase out during combat
 
@@ -295,12 +292,14 @@ See BANDING_NOTES.md for detailed analysis and future implementation requirement
 
 ## Card Database & Ability Port
 - [ ] Inventory Java ability/card modules and map to Go packages
-- [ ] Generate Go card definitions from existing Java card data (expansions, tokens, abilities)
+- [ ] Create complete list of all cards and abilities we have to port
+- [ ] Generate Go card definitions from existing Java card data (expansions, tokens, abilities) based off the list, one by one
 - [ ] Translate ability scripts (activated, triggered, static) into Go equivalents
-- [ ] Port keyword ability handlers (flying, deathtouch, scry, etc.)
+- [ ] Port keyword ability handlers (flying, deathtouch, scry, etc., check RULES.txt and Java implementation)
 - [ ] Implement effect infrastructure (replacement effects, static ability watchers, continuous effects)
 - [ ] Build automated verification to compare Java vs Go card behavior for representative samples
 - [ ] **Re-enable disabled integration tests** that expect specific cards (8 tests disabled - see comments in test files for details)
+- [ ] Add abilities that are missing in the java implementation, e.g. face-down cards
 
 ## Event System & Watchers
 - [x] Mirror Java event bus for game events
@@ -333,8 +332,7 @@ See BANDING_NOTES.md for detailed analysis and future implementation requirement
 - [ ] Implement fuzz/invariant tests for state-based actions and stack integrity
 
 ## Migration & Compatibility
-- [ ] Provide compatibility layer for existing Java client callbacks (message equivalence)
 - [ ] Translate Java replay/log formats to Go for client consumption
 - [ ] Document protocol changes and migration steps for server operators
-- [ ] Benchmark Go engine against Java baseline (latency, throughput, memory)
+- [ ] Benchmark Go engine against Java baseline (latency, throughput, memory, stability)
 
