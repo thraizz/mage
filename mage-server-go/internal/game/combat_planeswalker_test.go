@@ -372,3 +372,301 @@ func TestPlaneswalkerCombat_WithBlocker(t *testing.T) {
 	assert.Equal(t, 3, attacker.Damage, "attacker should have 3 damage")
 	assert.Equal(t, 4, blocker.Damage, "blocker should have 4 damage (lethal)")
 }
+
+// TestPlaneswalkerCombat_TrampleOver tests trample over planeswalkers ability
+func TestPlaneswalkerCombat_TrampleOver(t *testing.T) {
+	h := NewCombatTestHarness(t, "game-8", []string{"Alice", "Bob"})
+	gameState := h.GetGameState()
+
+	// Create planeswalker with 4 loyalty
+	planeswalkerID := "garruk"
+	gameState.mu.Lock()
+	planeswalker := &internalCard{
+		ID:           planeswalkerID,
+		Name:         "Garruk Wildspeaker",
+		Type:         "Planeswalker",
+		Zone:         zoneBattlefield,
+		OwnerID:      "Bob",
+		ControllerID: "Bob",
+		Loyalty:      "4",
+		Counters:     counters.NewCounters(),
+	}
+	planeswalker.Counters.AddCounter(counters.NewCounter("loyalty", 4))
+	gameState.cards[planeswalkerID] = planeswalker
+
+	// Set Bob's life to 20
+	gameState.players["Bob"].Life = 20
+	gameState.mu.Unlock()
+
+	// Create 7/7 attacker with trample over planeswalkers (like Thrasta)
+	attackerID := h.CreateCreature(CreatureSpec{
+		ID:         "attacker",
+		Name:       "Thrasta, Tempest's Roar",
+		Power:      "7",
+		Toughness:  "7",
+		Controller: "Alice",
+		Abilities:  []string{abilityTrample, abilityTrampleOverPlaneswalkers},
+	})
+
+	// Setup combat
+	err := h.engine.SetAttacker(h.gameID, "Alice")
+	require.NoError(t, err)
+	err = h.engine.SetDefenders(h.gameID)
+	require.NoError(t, err)
+
+	// Attack planeswalker
+	err = h.engine.DeclareAttacker(h.gameID, attackerID, planeswalkerID, "Alice")
+	require.NoError(t, err)
+
+	// Apply damage
+	err = h.engine.AssignCombatDamage(h.gameID, false)
+	require.NoError(t, err)
+	err = h.engine.ApplyCombatDamage(h.gameID)
+	require.NoError(t, err)
+
+	// Verify planeswalker took 4 damage (all loyalty counters)
+	assert.Equal(t, 0, planeswalker.Counters.GetCount("loyalty"), "planeswalker should have 0 loyalty")
+
+	// Verify Bob took 3 excess damage (7 power - 4 loyalty = 3)
+	assert.Equal(t, 17, gameState.players["Bob"].Life, "Bob should have 17 life (20-3 from trample over)")
+}
+
+// TestPlaneswalkerCombat_TrampleOverLessThanLethal tests trample over planeswalkers with less than lethal damage
+func TestPlaneswalkerCombat_TrampleOverLessThanLethal(t *testing.T) {
+	h := NewCombatTestHarness(t, "game-9", []string{"Alice", "Bob"})
+	gameState := h.GetGameState()
+
+	// Create planeswalker with 5 loyalty
+	planeswalkerID := "jace"
+	gameState.mu.Lock()
+	planeswalker := &internalCard{
+		ID:           planeswalkerID,
+		Name:         "Jace, the Mind Sculptor",
+		Type:         "Planeswalker",
+		Zone:         zoneBattlefield,
+		OwnerID:      "Bob",
+		ControllerID: "Bob",
+		Loyalty:      "5",
+		Counters:     counters.NewCounters(),
+	}
+	planeswalker.Counters.AddCounter(counters.NewCounter("loyalty", 5))
+	gameState.cards[planeswalkerID] = planeswalker
+
+	// Set Bob's life to 20
+	gameState.players["Bob"].Life = 20
+	gameState.mu.Unlock()
+
+	// Create 3/3 attacker with trample over planeswalkers (less than lethal)
+	attackerID := h.CreateCreature(CreatureSpec{
+		ID:         "attacker",
+		Name:       "Trampler",
+		Power:      "3",
+		Toughness:  "3",
+		Controller: "Alice",
+		Abilities:  []string{abilityTrampleOverPlaneswalkers},
+	})
+
+	// Setup combat
+	err := h.engine.SetAttacker(h.gameID, "Alice")
+	require.NoError(t, err)
+	err = h.engine.SetDefenders(h.gameID)
+	require.NoError(t, err)
+
+	// Attack planeswalker
+	err = h.engine.DeclareAttacker(h.gameID, attackerID, planeswalkerID, "Alice")
+	require.NoError(t, err)
+
+	// Apply damage
+	err = h.engine.AssignCombatDamage(h.gameID, false)
+	require.NoError(t, err)
+	err = h.engine.ApplyCombatDamage(h.gameID)
+	require.NoError(t, err)
+
+	// Verify planeswalker took 3 damage (not lethal)
+	assert.Equal(t, 2, planeswalker.Counters.GetCount("loyalty"), "planeswalker should have 2 loyalty (5-3)")
+
+	// Verify Bob took NO damage (not enough to kill planeswalker)
+	assert.Equal(t, 20, gameState.players["Bob"].Life, "Bob should still have 20 life (no excess)")
+}
+
+// TestPlaneswalkerCombat_TrampleOverWithLifelink tests trample over planeswalkers with lifelink
+func TestPlaneswalkerCombat_TrampleOverWithLifelink(t *testing.T) {
+	h := NewCombatTestHarness(t, "game-10", []string{"Alice", "Bob"})
+	gameState := h.GetGameState()
+
+	// Create planeswalker with 3 loyalty
+	planeswalkerID := "liliana"
+	gameState.mu.Lock()
+	planeswalker := &internalCard{
+		ID:           planeswalkerID,
+		Name:         "Liliana of the Veil",
+		Type:         "Planeswalker",
+		Zone:         zoneBattlefield,
+		OwnerID:      "Bob",
+		ControllerID: "Bob",
+		Loyalty:      "3",
+		Counters:     counters.NewCounters(),
+	}
+	planeswalker.Counters.AddCounter(counters.NewCounter("loyalty", 3))
+	gameState.cards[planeswalkerID] = planeswalker
+
+	// Set players' life
+	gameState.players["Alice"].Life = 15
+	gameState.players["Bob"].Life = 20
+	gameState.mu.Unlock()
+
+	// Create 6/6 attacker with trample over planeswalkers and lifelink
+	attackerID := h.CreateCreature(CreatureSpec{
+		ID:         "attacker",
+		Name:       "Lifelink Trampler",
+		Power:      "6",
+		Toughness:  "6",
+		Controller: "Alice",
+		Abilities:  []string{abilityTrampleOverPlaneswalkers, abilityLifelink},
+	})
+
+	// Setup combat
+	err := h.engine.SetAttacker(h.gameID, "Alice")
+	require.NoError(t, err)
+	err = h.engine.SetDefenders(h.gameID)
+	require.NoError(t, err)
+
+	// Attack planeswalker
+	err = h.engine.DeclareAttacker(h.gameID, attackerID, planeswalkerID, "Alice")
+	require.NoError(t, err)
+
+	// Apply damage
+	err = h.engine.AssignCombatDamage(h.gameID, false)
+	require.NoError(t, err)
+	err = h.engine.ApplyCombatDamage(h.gameID)
+	require.NoError(t, err)
+
+	// Verify planeswalker took 3 damage
+	assert.Equal(t, 0, planeswalker.Counters.GetCount("loyalty"), "planeswalker should have 0 loyalty")
+
+	// Verify Bob took 3 excess damage
+	assert.Equal(t, 17, gameState.players["Bob"].Life, "Bob should have 17 life (20-3)")
+
+	// Verify Alice gained 6 life from lifelink (full damage dealt, both to planeswalker and player)
+	assert.Equal(t, 21, gameState.players["Alice"].Life, "Alice should have 21 life (15+6 from lifelink)")
+}
+
+// TestPlaneswalkerCombat_RegularTrampleDoesNotCarryOver tests that regular trample doesn't work on planeswalkers
+func TestPlaneswalkerCombat_RegularTrampleDoesNotCarryOver(t *testing.T) {
+	h := NewCombatTestHarness(t, "game-11", []string{"Alice", "Bob"})
+	gameState := h.GetGameState()
+
+	// Create planeswalker with 3 loyalty
+	planeswalkerID := "chandra"
+	gameState.mu.Lock()
+	planeswalker := &internalCard{
+		ID:           planeswalkerID,
+		Name:         "Chandra, Torch of Defiance",
+		Type:         "Planeswalker",
+		Zone:         zoneBattlefield,
+		OwnerID:      "Bob",
+		ControllerID: "Bob",
+		Loyalty:      "3",
+		Counters:     counters.NewCounters(),
+	}
+	planeswalker.Counters.AddCounter(counters.NewCounter("loyalty", 3))
+	gameState.cards[planeswalkerID] = planeswalker
+
+	// Set Bob's life to 20
+	gameState.players["Bob"].Life = 20
+	gameState.mu.Unlock()
+
+	// Create 7/7 attacker with ONLY regular trample (not trample over planeswalkers)
+	attackerID := h.CreateCreature(CreatureSpec{
+		ID:         "attacker",
+		Name:       "Colossal Dreadmaw",
+		Power:      "7",
+		Toughness:  "7",
+		Controller: "Alice",
+		Abilities:  []string{abilityTrample}, // Only regular trample
+	})
+
+	// Setup combat
+	err := h.engine.SetAttacker(h.gameID, "Alice")
+	require.NoError(t, err)
+	err = h.engine.SetDefenders(h.gameID)
+	require.NoError(t, err)
+
+	// Attack planeswalker
+	err = h.engine.DeclareAttacker(h.gameID, attackerID, planeswalkerID, "Alice")
+	require.NoError(t, err)
+
+	// Apply damage
+	err = h.engine.AssignCombatDamage(h.gameID, false)
+	require.NoError(t, err)
+	err = h.engine.ApplyCombatDamage(h.gameID)
+	require.NoError(t, err)
+
+	// Verify planeswalker took only 3 damage (reduced to 0 loyalty)
+	assert.Equal(t, 0, planeswalker.Counters.GetCount("loyalty"), "planeswalker should have 0 loyalty")
+
+	// Verify Bob took NO damage (regular trample doesn't carry over to planeswalker controller)
+	assert.Equal(t, 20, gameState.players["Bob"].Life, "Bob should still have 20 life (regular trample doesn't work)")
+}
+
+// TestPlaneswalkerCombat_TrampleOverWithDeathtouch tests trample over planeswalkers with deathtouch
+func TestPlaneswalkerCombat_TrampleOverWithDeathtouch(t *testing.T) {
+	h := NewCombatTestHarness(t, "game-12", []string{"Alice", "Bob"})
+	gameState := h.GetGameState()
+
+	// Create planeswalker with 5 loyalty
+	planeswalkerID := "teferi"
+	gameState.mu.Lock()
+	planeswalker := &internalCard{
+		ID:           planeswalkerID,
+		Name:         "Teferi, Time Raveler",
+		Type:         "Planeswalker",
+		Zone:         zoneBattlefield,
+		OwnerID:      "Bob",
+		ControllerID: "Bob",
+		Loyalty:      "5",
+		Counters:     counters.NewCounters(),
+	}
+	planeswalker.Counters.AddCounter(counters.NewCounter("loyalty", 5))
+	gameState.cards[planeswalkerID] = planeswalker
+
+	// Set Bob's life to 20
+	gameState.players["Bob"].Life = 20
+	gameState.mu.Unlock()
+
+	// Create 3/3 attacker with trample over planeswalkers and deathtouch
+	attackerID := h.CreateCreature(CreatureSpec{
+		ID:         "attacker",
+		Name:       "Deathtouch Trampler",
+		Power:      "3",
+		Toughness:  "3",
+		Controller: "Alice",
+		Abilities:  []string{abilityTrampleOverPlaneswalkers, abilityDeathtouch},
+	})
+
+	// Setup combat
+	err := h.engine.SetAttacker(h.gameID, "Alice")
+	require.NoError(t, err)
+	err = h.engine.SetDefenders(h.gameID)
+	require.NoError(t, err)
+
+	// Attack planeswalker
+	err = h.engine.DeclareAttacker(h.gameID, attackerID, planeswalkerID, "Alice")
+	require.NoError(t, err)
+
+	// Verify lethal damage calculation with deathtouch
+	lethal := h.engine.getLethalDamageWithAttacker(gameState, planeswalker, attackerID)
+	assert.Equal(t, 1, lethal, "with deathtouch, 1 damage should be lethal to planeswalker")
+
+	// Apply damage
+	err = h.engine.AssignCombatDamage(h.gameID, false)
+	require.NoError(t, err)
+	err = h.engine.ApplyCombatDamage(h.gameID)
+	require.NoError(t, err)
+
+	// Verify planeswalker took 1 damage (lethal with deathtouch)
+	assert.Equal(t, 4, planeswalker.Counters.GetCount("loyalty"), "planeswalker should have 4 loyalty (5-1)")
+
+	// Verify Bob took 2 excess damage (3 power - 1 lethal = 2 trample over)
+	assert.Equal(t, 18, gameState.players["Bob"].Life, "Bob should have 18 life (20-2 from trample over)")
+}

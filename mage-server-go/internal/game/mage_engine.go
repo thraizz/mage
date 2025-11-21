@@ -51,18 +51,19 @@ func zoneToString(zone int) string {
 
 // Ability ID constants matching Java keyword abilities
 const (
-	abilityFirstStrike   = "FirstStrikeAbility"
-	abilityDoubleStrike  = "DoubleStrikeAbility"
-	abilityVigilance     = "VigilanceAbility"
-	abilityFlying        = "FlyingAbility"
-	abilityReach         = "ReachAbility"
-	abilityTrample       = "TrampleAbility"
-	abilityDeathtouch    = "DeathtouchAbility"
-	abilityDefender      = "DefenderAbility"
-	abilityLifelink      = "LifelinkAbility"
-	abilityMenace        = "MenaceAbility"
-	abilityUnblockable   = "CantBeBlockedSourceAbility"
-	abilityBanding       = "BandingAbility"
+	abilityFirstStrike              = "FirstStrikeAbility"
+	abilityDoubleStrike             = "DoubleStrikeAbility"
+	abilityVigilance                = "VigilanceAbility"
+	abilityFlying                   = "FlyingAbility"
+	abilityReach                    = "ReachAbility"
+	abilityTrample                  = "TrampleAbility"
+	abilityTrampleOverPlaneswalkers = "TrampleOverPlaneswalkersAbility"
+	abilityDeathtouch               = "DeathtouchAbility"
+	abilityDefender                 = "DefenderAbility"
+	abilityLifelink                 = "LifelinkAbility"
+	abilityMenace                   = "MenaceAbility"
+	abilityUnblockable              = "CantBeBlockedSourceAbility"
+	abilityBanding                  = "BandingAbility"
 )
 
 // EngineGameView represents the complete game state view for a player
@@ -425,30 +426,30 @@ type NotificationHandler func(notification GameNotification)
 // gameStateSnapshot represents a complete snapshot of game state for rollback
 type gameStateSnapshot struct {
 	// Core game state
-	gameID        string
-	gameType      string
-	state         GameState
-	turnNumber    int
-	activePlayer  string
-	priorityPlayer string
-	
+	GameID        string
+	GameType      string
+	State         GameState
+	TurnNumber    int
+	ActivePlayer  string
+	PriorityPlayer string
+
 	// Players - deep copy of all player data
-	players       map[string]*internalPlayer
-	playerOrder   []string
-	
+	Players       map[string]*internalPlayer
+	PlayerOrder   []string
+
 	// Cards - deep copy of all cards
-	cards         map[string]*internalCard
-	battlefield   []*internalCard
-	exile         []*internalCard
-	command       []*internalCard
-	
+	Cards         map[string]*internalCard
+	Battlefield   []*internalCard
+	Exile         []*internalCard
+	Command       []*internalCard
+
 	// Stack state
-	stackItems    []rules.StackItem
-	
+	StackItems    []rules.StackItem
+
 	// Other state
-	messages      []EngineMessage
-	prompts       []EnginePrompt
-	timestamp     time.Time
+	Messages      []EngineMessage
+	Prompts       []EnginePrompt
+	Timestamp     time.Time
 }
 
 // MageEngine is the main game engine implementation
@@ -457,17 +458,21 @@ type MageEngine struct {
 	mu                  sync.RWMutex
 	games               map[string]*engineGameState
 	notificationHandler NotificationHandler // Optional handler for UI/websocket notifications
-	
+
 	// State bookmarking for rollback/undo
 	// Maps gameID -> list of bookmarked states
 	bookmarks           map[string][]*gameStateSnapshot
-	
+
 	// Turn rollback system (separate from action bookmarks)
 	// Maps gameID -> map[turnNumber -> snapshot]
 	// Keeps last 4 turns for player-requested rollback
 	turnSnapshots       map[string]map[int]*gameStateSnapshot
 	rollbackTurnsMax    int  // Maximum turns to keep for rollback (default 4)
 	rollbackAllowed     bool // Whether turn rollback is enabled (default true)
+
+	// Replay recording system
+	// Records step-by-step game state for replay and spectator synchronization
+	replayRecorder      *ReplayRecorder
 }
 
 // NewMageEngine creates a new MageEngine instance
@@ -479,6 +484,7 @@ func NewMageEngine(logger *zap.Logger) *MageEngine {
 		turnSnapshots:    make(map[string]map[int]*gameStateSnapshot),
 		rollbackTurnsMax: 4,    // Keep last 4 turns
 		rollbackAllowed:  true, // Enable turn rollback by default
+		replayRecorder:   NewReplayRecorder(logger, "replays"), // Default replay directory
 	}
 }
 
@@ -600,15 +606,15 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 
 	// Create game state
 	gameState := &engineGameState{
-		gameID:      gameID,
-		gameType:    gameType,
-		state:       GameStateInProgress,
-		players:     make(map[string]*internalPlayer),
-		playerOrder: make([]string, len(players)),
-		cards:       make(map[string]*internalCard),
-		battlefield: make([]*internalCard, 0),
-		exile:       make([]*internalCard, 0),
-		command:     make([]*internalCard, 0),
+		GameID:      gameID,
+		GameType:    gameType,
+		State:       GameStateInProgress,
+		Players:     make(map[string]*internalPlayer),
+		PlayerOrder: make([]string, len(players)),
+		Cards:       make(map[string]*internalCard),
+		Battlefield: make([]*internalCard, 0),
+		Exile:       make([]*internalCard, 0),
+		Command:     make([]*internalCard, 0),
 		revealed:    make([]EngineRevealedView, 0),
 		lookedAt:    make([]EngineLookedAtView, 0),
 		combat:      newCombatState(),
@@ -617,8 +623,8 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 			turnStartTimes: make(map[int]time.Time),
 			gameStartTime:  time.Now(),
 		},
-		messages:    make([]EngineMessage, 0),
-		prompts:     make([]EnginePrompt, 0),
+		Messages:    make([]EngineMessage, 0),
+		Prompts:     make([]EnginePrompt, 0),
 		startedAt:   time.Now(),
 	}
 
@@ -696,6 +702,12 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 	// Release lock before sending notifications to avoid deadlock
 	// Notifications may trigger callbacks that need to acquire locks
 	e.mu.Unlock()
+
+	// Record initial replay state
+	// Per Java GameImpl.init() line 1246: saveState(false) after initialization
+	gameState.mu.RLock()
+	e.recordReplayState(gameState)
+	gameState.mu.RUnlock()
 
 	// Save initial turn snapshot (turn 1)
 	// Per Java: save state at start of each turn
@@ -903,6 +915,10 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
 	// Repeat until stable (SBA → triggers → repeat)
 	e.checkStateAndTriggered(gameState)
+
+	// Record replay state before priority
+	// Per Java GameImpl.playPriority() line 1740: saveState(false) before each priority
+	e.recordReplayState(gameState)
 
 	player.Passed = true
 	gameState.trackPriorityPass()
@@ -1465,7 +1481,7 @@ func (e *MageEngine) resolveSpell(gameState *engineGameState, card *internalCard
 		// Move to battlefield
 		// Per Java: controller.moveCards(card, Zone.BATTLEFIELD, ability, game)
 		if err := e.moveCard(gameState, card, zoneBattlefield, card.ControllerID); err != nil {
-			return fmt.Errorf("failed to move permanent to battlefield: %w", err)
+			return fmt.Errorf("failed to move permanent to Battlefield: %w", err)
 		}
 		
 		// Apply layer system for power/toughness if it's a creature
@@ -3204,26 +3220,26 @@ func (e *MageEngine) ChangeControl(gameID, cardID, newControllerID string) error
 // This is used for bookmarking and rollback functionality
 func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapshot {
 	snapshot := &gameStateSnapshot{
-		gameID:         gameState.gameID,
-		gameType:       gameState.gameType,
-		state:          gameState.state,
-		turnNumber:     gameState.turnManager.TurnNumber(),
-		activePlayer:   gameState.turnManager.ActivePlayer(),
-		priorityPlayer: gameState.turnManager.PriorityPlayer(),
-		playerOrder:    make([]string, len(gameState.playerOrder)),
-		players:        make(map[string]*internalPlayer),
-		cards:          make(map[string]*internalCard),
-		battlefield:    make([]*internalCard, 0, len(gameState.battlefield)),
-		exile:          make([]*internalCard, 0, len(gameState.exile)),
-		command:        make([]*internalCard, 0, len(gameState.command)),
-		stackItems:     make([]rules.StackItem, 0),
-		messages:       make([]EngineMessage, len(gameState.messages)),
-		prompts:        make([]EnginePrompt, len(gameState.prompts)),
-		timestamp:      time.Now(),
+		GameID:         gameState.gameID,
+		GameType:       gameState.gameType,
+		State:          gameState.state,
+		TurnNumber:     gameState.turnManager.TurnNumber(),
+		ActivePlayer:   gameState.turnManager.ActivePlayer(),
+		PriorityPlayer: gameState.turnManager.PriorityPlayer(),
+		PlayerOrder:    make([]string, len(gameState.playerOrder)),
+		Players:        make(map[string]*internalPlayer),
+		Cards:          make(map[string]*internalCard),
+		Battlefield:    make([]*internalCard, 0, len(gameState.battlefield)),
+		Exile:          make([]*internalCard, 0, len(gameState.exile)),
+		Command:        make([]*internalCard, 0, len(gameState.command)),
+		StackItems:     make([]rules.StackItem, 0),
+		Messages:       make([]EngineMessage, len(gameState.messages)),
+		Prompts:        make([]EnginePrompt, len(gameState.prompts)),
+		Timestamp:      time.Now(),
 	}
 	
 	// Copy player order
-	copy(snapshot.playerOrder, gameState.playerOrder)
+	copy(snapshot.PlayerOrder, gameState.playerOrder)
 	
 	// Deep copy players
 	for id, player := range gameState.players {
@@ -3251,16 +3267,16 @@ func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapsh
 			MulliganCount:  player.MulliganCount,
 			KeptHand:       player.KeptHand,
 		}
-		snapshot.players[id] = playerCopy
+		snapshot.Players[id] = playerCopy
 	}
 	
 	// Deep copy all cards
 	for id, card := range gameState.cards {
 		cardCopy := e.copyCard(card)
-		snapshot.cards[id] = cardCopy
+		snapshot.Cards[id] = cardCopy
 		
 		// Update player zone references
-		if player, exists := snapshot.players[card.OwnerID]; exists {
+		if player, exists := snapshot.Players[card.OwnerID]; exists {
 			switch card.Zone {
 			case zoneLibrary:
 				for i, c := range gameState.players[card.OwnerID].Library {
@@ -3284,23 +3300,23 @@ func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapsh
 					}
 				}
 			case zoneBattlefield:
-				snapshot.battlefield = append(snapshot.battlefield, cardCopy)
+				snapshot.Battlefield = append(snapshot.Battlefield, cardCopy)
 			case zoneExile:
-				snapshot.exile = append(snapshot.exile, cardCopy)
+				snapshot.Exile = append(snapshot.Exile, cardCopy)
 			case zoneCommand:
-				snapshot.command = append(snapshot.command, cardCopy)
+				snapshot.Command = append(snapshot.Command, cardCopy)
 			}
 		}
 	}
 	
 	// Copy stack items
 	if gameState.stack != nil {
-		snapshot.stackItems = append(snapshot.stackItems, gameState.stack.List()...)
+		snapshot.StackItems = append(snapshot.StackItems, gameState.stack.List()...)
 	}
 	
 	// Copy messages and prompts
-	copy(snapshot.messages, gameState.messages)
-	copy(snapshot.prompts, gameState.prompts)
+	copy(snapshot.Messages, gameState.messages)
+	copy(snapshot.Prompts, gameState.prompts)
 	
 	return snapshot
 }
@@ -3367,7 +3383,7 @@ func (e *MageEngine) BookmarkState(gameID string) (int, error) {
 		e.logger.Debug("bookmarked game state",
 			zap.String("game_id", gameID),
 			zap.Int("bookmark_id", bookmarkID),
-			zap.Int("turn", snapshot.turnNumber),
+			zap.Int("turn", snapshot.TurnNumber),
 		)
 	}
 	
@@ -3398,46 +3414,46 @@ func (e *MageEngine) RestoreState(gameID string, bookmarkID int, context string)
 	
 	// Restore game state from snapshot
 	gameState.state = snapshot.state
-	gameState.gameType = snapshot.gameType
+	gameState.gameType = snapshot.GameType
 	
 	// Restore players
 	gameState.players = make(map[string]*internalPlayer)
-	for id, player := range snapshot.players {
+	for id, player := range snapshot.Players {
 		gameState.players[id] = player
 	}
-	gameState.playerOrder = append([]string(nil), snapshot.playerOrder...)
+	gameState.playerOrder = append([]string(nil), snapshot.PlayerOrder...)
 	
 	// Restore cards
 	gameState.cards = make(map[string]*internalCard)
-	for id, card := range snapshot.cards {
+	for id, card := range snapshot.Cards {
 		gameState.cards[id] = card
 	}
 	
 	// Restore zones
-	gameState.battlefield = append([]*internalCard(nil), snapshot.battlefield...)
-	gameState.exile = append([]*internalCard(nil), snapshot.exile...)
-	gameState.command = append([]*internalCard(nil), snapshot.command...)
+	gameState.battlefield = append([]*internalCard(nil), snapshot.Battlefield...)
+	gameState.exile = append([]*internalCard(nil), snapshot.Exile...)
+	gameState.command = append([]*internalCard(nil), snapshot.Command...)
 	
 	// Restore stack
 	gameState.stack = rules.NewStackManager()
-	for _, item := range snapshot.stackItems {
+	for _, item := range snapshot.StackItems {
 		gameState.stack.Push(item)
 	}
 	
 	// Restore messages and prompts
-	gameState.messages = append([]EngineMessage(nil), snapshot.messages...)
-	gameState.prompts = append([]EnginePrompt(nil), snapshot.prompts...)
+	gameState.messages = append([]EngineMessage(nil), snapshot.Messages...)
+	gameState.prompts = append([]EnginePrompt(nil), snapshot.Prompts...)
 	
 	// Remove this bookmark and all newer bookmarks
 	e.bookmarks[gameID] = bookmarks[:bookmarkID-1]
 	
-	gameState.addMessage(fmt.Sprintf("Game restored to turn %d (%s)", snapshot.turnNumber, context), "system")
+	gameState.addMessage(fmt.Sprintf("Game restored to turn %d (%s)", snapshot.TurnNumber, context), "system")
 	
 	if e.logger != nil {
 		e.logger.Info("restored game state",
 			zap.String("game_id", gameID),
 			zap.Int("bookmark_id", bookmarkID),
-			zap.Int("turn", snapshot.turnNumber),
+			zap.Int("turn", snapshot.TurnNumber),
 			zap.String("context", context),
 		)
 	}
@@ -3724,38 +3740,38 @@ func (e *MageEngine) RollbackTurns(gameID string, turnsToRollback int) error {
 	
 	// Restore game state from snapshot
 	gameState.state = snapshot.state
-	gameState.gameType = snapshot.gameType
+	gameState.gameType = snapshot.GameType
 	
 	// Restore players
 	gameState.players = make(map[string]*internalPlayer)
-	for id, player := range snapshot.players {
+	for id, player := range snapshot.Players {
 		// Clear all player stored bookmarks on turn rollback
 		// Per Java: resetStoredBookmark for all players
 		player.StoredBookmark = -1
 		gameState.players[id] = player
 	}
-	gameState.playerOrder = append([]string(nil), snapshot.playerOrder...)
+	gameState.playerOrder = append([]string(nil), snapshot.PlayerOrder...)
 	
 	// Restore cards
 	gameState.cards = make(map[string]*internalCard)
-	for id, card := range snapshot.cards {
+	for id, card := range snapshot.Cards {
 		gameState.cards[id] = card
 	}
 	
 	// Restore zones
-	gameState.battlefield = append([]*internalCard(nil), snapshot.battlefield...)
-	gameState.exile = append([]*internalCard(nil), snapshot.exile...)
-	gameState.command = append([]*internalCard(nil), snapshot.command...)
+	gameState.battlefield = append([]*internalCard(nil), snapshot.Battlefield...)
+	gameState.exile = append([]*internalCard(nil), snapshot.Exile...)
+	gameState.command = append([]*internalCard(nil), snapshot.Command...)
 	
 	// Restore stack
 	gameState.stack = rules.NewStackManager()
-	for _, item := range snapshot.stackItems {
+	for _, item := range snapshot.StackItems {
 		gameState.stack.Push(item)
 	}
 	
 	// Restore messages and prompts
-	gameState.messages = append([]EngineMessage(nil), snapshot.messages...)
-	gameState.prompts = append([]EnginePrompt(nil), snapshot.prompts...)
+	gameState.messages = append([]EngineMessage(nil), snapshot.Messages...)
+	gameState.prompts = append([]EnginePrompt(nil), snapshot.Prompts...)
 	
 	// Clear all action bookmarks (they're invalid after turn rollback)
 	// Per Java: savedStates.clear() and gameStates.clear()
@@ -3795,26 +3811,29 @@ func (e *MageEngine) CleanupGame(gameID string) error {
 		e.mu.Unlock()
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
-	
+
 	// Clear all bookmarks
 	delete(e.bookmarks, gameID)
-	
+
 	// Clear turn snapshots
 	delete(e.turnSnapshots, gameID)
-	
+
 	// Clear watchers
 	if gameState.watchers != nil {
 		gameState.watchers.Clear()
 	}
-	
+
 	// Remove game from engine
 	delete(e.games, gameID)
-	
+
 	gameState.mu.Unlock()
 	e.mu.Unlock()
-	
+
+	// Clear replay from memory (saves should be done before cleanup)
+	e.replayRecorder.ClearReplay(gameID)
+
 	if e.logger != nil {
 		e.logger.Info("cleaned up game",
 			zap.String("game_id", gameID),
@@ -7022,38 +7041,124 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 
 		// Rule 306.8, 120.3c: Damage dealt to planeswalker removes loyalty counters
 		if e.isPlaneswalker(defender) {
-			// Remove loyalty counters equal to damage
-			if defender.Counters != nil {
-				defender.Counters.RemoveCounter("loyalty", amount)
-			}
+			// Apply excess damage from "trample over planeswalkers" ability (Rule 702.19d)
+			// Example: Thrasta, Tempest's Roar
+			if e.hasAbility(attacker, abilityTrampleOverPlaneswalkers) {
+				lethalDamage := e.getLethalDamageWithAttacker(gameState, defender, attacker.ID)
 
-			// Handle lifelink
-			if e.hasAbility(attacker, abilityLifelink) {
-				controller, exists := gameState.players[attacker.ControllerID]
-				if exists {
-					controller.Life += amount
+				if lethalDamage >= amount {
+					// Normal damage - all damage to planeswalker
+					if defender.Counters != nil {
+						defender.Counters.RemoveCounter("loyalty", amount)
+					}
+
+					// Handle lifelink for the full amount
+					if e.hasAbility(attacker, abilityLifelink) {
+						controller, exists := gameState.players[attacker.ControllerID]
+						if exists {
+							controller.Life += amount
+						}
+					}
+
+					// Fire damaged permanent event
+					gameState.eventBus.Publish(rules.Event{
+						Type:       rules.EventDamagedPermanent,
+						TargetID:   defender.ID,
+						SourceID:   attacker.ID,
+						Amount:     amount,
+						Controller: defender.ControllerID,
+						Flag:       true, // Combat damage
+					})
+
+					if e.logger != nil {
+						e.logger.Debug("damage dealt to planeswalker",
+							zap.String("planeswalker_id", defender.ID),
+							zap.String("attacker_id", attacker.ID),
+							zap.Int("damage", amount),
+							zap.Int("loyalty_remaining", defender.Counters.GetCount("loyalty")),
+						)
+					}
+				} else {
+					// Damage with excess - lethal to planeswalker, excess to controller
+					if defender.Counters != nil {
+						defender.Counters.RemoveCounter("loyalty", lethalDamage)
+					}
+
+					// Handle lifelink for lethal damage to planeswalker
+					if e.hasAbility(attacker, abilityLifelink) {
+						controller, exists := gameState.players[attacker.ControllerID]
+						if exists {
+							controller.Life += lethalDamage
+						}
+					}
+
+					// Fire damaged permanent event for planeswalker
+					gameState.eventBus.Publish(rules.Event{
+						Type:       rules.EventDamagedPermanent,
+						TargetID:   defender.ID,
+						SourceID:   attacker.ID,
+						Amount:     lethalDamage,
+						Controller: defender.ControllerID,
+						Flag:       true, // Combat damage
+					})
+
+					if e.logger != nil {
+						e.logger.Debug("trample over planeswalkers: lethal damage to planeswalker",
+							zap.String("planeswalker_id", defender.ID),
+							zap.String("attacker_id", attacker.ID),
+							zap.Int("lethal_damage", lethalDamage),
+							zap.Int("loyalty_remaining", defender.Counters.GetCount("loyalty")),
+						)
+					}
+
+					// Recursively deal excess damage to planeswalker's controller
+					excessDamage := amount - lethalDamage
+					if excessDamage > 0 {
+						controllerID := defender.ControllerID
+						if e.logger != nil {
+							e.logger.Debug("trample over planeswalkers: excess damage to controller",
+								zap.String("controller_id", controllerID),
+								zap.Int("excess_damage", excessDamage),
+							)
+						}
+						return e.dealDamageToDefender(gameState, attacker, controllerID, excessDamage)
+					}
+				}
+			} else {
+				// Normal damage to planeswalker (no trample over)
+				if defender.Counters != nil {
+					defender.Counters.RemoveCounter("loyalty", amount)
+				}
+
+				// Handle lifelink
+				if e.hasAbility(attacker, abilityLifelink) {
+					controller, exists := gameState.players[attacker.ControllerID]
+					if exists {
+						controller.Life += amount
+					}
+				}
+
+				// Fire damaged permanent event for triggers
+				damagedEvent := rules.Event{
+					Type:       rules.EventDamagedPermanent,
+					TargetID:   defender.ID,
+					SourceID:   attacker.ID,
+					Amount:     amount,
+					Controller: defender.ControllerID,
+					Flag:       true, // Combat damage
+				}
+				gameState.eventBus.Publish(damagedEvent)
+
+				if e.logger != nil {
+					e.logger.Debug("damage dealt to planeswalker",
+						zap.String("planeswalker_id", defender.ID),
+						zap.String("attacker_id", attacker.ID),
+						zap.Int("damage", amount),
+						zap.Int("loyalty_remaining", defender.Counters.GetCount("loyalty")),
+					)
 				}
 			}
-
-			// Fire damaged permanent event for triggers
-			damagedEvent := rules.Event{
-				Type:       rules.EventDamagedPermanent,
-				TargetID:   defender.ID,
-				SourceID:   attacker.ID,
-				Amount:     amount,
-				Controller: defender.ControllerID,
-				Flag:       true, // Combat damage
-			}
-			gameState.eventBus.Publish(damagedEvent)
-
-			if e.logger != nil {
-				e.logger.Debug("damage dealt to planeswalker",
-					zap.String("planeswalker_id", defender.ID),
-					zap.String("attacker_id", attacker.ID),
-					zap.Int("damage", amount),
-					zap.Int("loyalty_remaining", defender.Counters.GetCount("loyalty")),
-				)
-			}
+			return nil
 		} else {
 			// For other permanents (battles, creatures), mark damage normally
 			e.markDamageWithLifelink(gameState, defender, amount, attacker.ID)
@@ -7277,4 +7382,60 @@ func (s *engineGameState) GetStackItemsForTarget() []targeting.TargetStackItem {
 		}
 	}
 	return result
+}
+
+// ====================================
+// Replay Recording System
+// ====================================
+
+// StartReplayRecording enables replay recording for a game
+// Per Java GameImpl.saveState(): recording can be enabled/disabled
+func (e *MageEngine) StartReplayRecording(gameID string) error {
+	e.mu.RLock()
+	_, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	e.replayRecorder.StartRecording(gameID)
+	return nil
+}
+
+// StopReplayRecording disables replay recording for a game
+func (e *MageEngine) StopReplayRecording(gameID string) {
+	e.replayRecorder.StopRecording(gameID)
+}
+
+// SaveReplayToFile saves the recorded replay to disk
+// Per Java ReplayManager: saves replay for later playback
+func (e *MageEngine) SaveReplayToFile(gameID string) error {
+	return e.replayRecorder.SaveReplay(gameID)
+}
+
+// LoadReplayFromFile loads a previously saved replay
+func (e *MageEngine) LoadReplayFromFile(gameID string) (*Replay, error) {
+	return e.replayRecorder.LoadReplay(gameID)
+}
+
+// GetReplay returns the current replay for a game (if recording)
+func (e *MageEngine) GetReplay(gameID string) (*Replay, bool) {
+	return e.replayRecorder.GetReplay(gameID)
+}
+
+// IsRecordingReplay checks if a game is being recorded
+func (e *MageEngine) IsRecordingReplay(gameID string) bool {
+	return e.replayRecorder.IsRecording(gameID)
+}
+
+// recordReplayState records the current game state to replay if recording is enabled
+// Per Java GameImpl.saveState(): saves state at key points
+func (e *MageEngine) recordReplayState(gameState *engineGameState) {
+	if !e.replayRecorder.IsRecording(gameState.gameID) {
+		return
+	}
+
+	snapshot := e.createSnapshot(gameState)
+	e.replayRecorder.RecordState(gameState.gameID, snapshot)
 }

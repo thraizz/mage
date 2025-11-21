@@ -101,18 +101,22 @@
   - Java: Checks `getActivePowerInsteadOfToughnessForDamageLethalityFilters()`
   - Go: Always uses toughness
   - **Impact**: Low - very rare edge case
-  
-- ❌ **No planeswalker/battle trample support**
+
+- ✅ **Trample over planeswalkers support** (IMPLEMENTED)
   - Java: `getLethalDamage()` handles loyalty counters and defense counters
-  - Go: Only handles creatures
-  - **Impact**: Medium - trample over planeswalkers is a real rule
-  
-- ❌ **No TrampleOverPlaneswalkersAbility**
-  - Separate ability that allows trampling over planeswalkers
-  - **Impact**: Low - rare ability
+  - Go: Now handles planeswalkers correctly in `getLethalDamageWithAttacker()`
+  - **Status**: Fully implemented with comprehensive tests
+
+- ✅ **TrampleOverPlaneswalkersAbility** (IMPLEMENTED)
+  - Separate ability that allows trampling over planeswalkers (Rule 702.19d)
+  - Implemented in `dealDamageToDefender()` with recursive excess damage handling
+  - Correctly calculates lethal damage to planeswalker and deals excess to controller
+  - Properly handles lifelink and deathtouch interactions
+  - **Tests**: 6 new comprehensive tests covering all edge cases
+  - **Status**: Fully implemented matching Java behavior
 
 ### 📊 Assessment
-**Decent implementation with significant gaps.** The automatic damage assignment is a major simplification. Deathtouch interaction is important and should be added.
+**Good implementation with key improvements.** Trample over planeswalkers now fully implemented. The automatic damage assignment is a major simplification. Deathtouch interaction for regular combat is important and should be added.
 
 ---
 

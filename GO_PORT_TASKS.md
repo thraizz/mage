@@ -318,7 +318,7 @@ Status legend:
 
 ## Persistence, Replays & Recovery
 - [x] Store game snapshots for reconnection and spectating
-- [ ] Implement replay recording/playback (step-by-step action logs)
+- [ ] Implement replay recording (step-by-step action logs)
 - [ ] Ensure deterministic serialization for saved games and tournaments
 - [ ] Add checksum/validation to guard against divergent game state
 
