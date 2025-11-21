@@ -6,15 +6,15 @@ import (
 
 // User represents a user account
 type User struct {
-	ID               int64
-	Name             string
-	Password         string // Argon2id hash
-	Email            string
-	Active           bool
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
-	LockEndTime      *time.Time
-	ChatLockEndTime  *time.Time
+	ID              int64
+	Name            string
+	Password        string // Argon2id hash
+	Email           string
+	Active          bool
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	LockEndTime     *time.Time
+	ChatLockEndTime *time.Time
 }
 
 // IsLocked checks if the user account is locked

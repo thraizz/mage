@@ -22,9 +22,9 @@ func TestCombatFlow_SingleAttackerNoBlockers(t *testing.T) {
 
 	// Verify results
 	h.AssertPlayerLife("Bob", initialBobLife-3) // Bob should lose 3 life
-	h.AssertCreatureDamage(attacker, 0)          // Attacker should have no damage
-	h.AssertCreatureAlive(attacker)              // Attacker should still be alive
-	h.AssertCreatureTapped(attacker, true)       // Attacker should be tapped
+	h.AssertCreatureDamage(attacker, 0)         // Attacker should have no damage
+	h.AssertCreatureAlive(attacker)             // Attacker should still be alive
+	h.AssertCreatureTapped(attacker, true)      // Attacker should be tapped
 }
 
 // TestCombatFlow_SingleAttackerSingleBlocker tests combat with one attacker blocked by one blocker
@@ -49,10 +49,10 @@ func TestCombatFlow_SingleAttackerSingleBlocker(t *testing.T) {
 	})
 
 	// Verify results
-	h.AssertPlayerLife("Bob", initialBobLife)   // Bob should take no damage (blocked)
+	h.AssertPlayerLife("Bob", initialBobLife) // Bob should take no damage (blocked)
 	// Note: damage is cleared after EndCombat, so we can't check attacker damage here
-	h.AssertCreatureDead(blocker)               // Blocker should be dead (2 toughness, 3 damage)
-	h.AssertCreatureAlive(attacker)             // Attacker should still be alive (3 toughness, 2 damage)
+	h.AssertCreatureDead(blocker)   // Blocker should be dead (2 toughness, 3 damage)
+	h.AssertCreatureAlive(attacker) // Attacker should still be alive (3 toughness, 2 damage)
 }
 
 // TestCombatFlow_MultipleAttackersNoBlockers tests multiple attackers with no blockers
@@ -140,7 +140,7 @@ func TestCombatFlow_LethalDamage(t *testing.T) {
 	})
 
 	// Verify results
-	h.AssertCreatureDead(blocker)  // Blocker dies (3 toughness, 6 damage)
+	h.AssertCreatureDead(blocker)   // Blocker dies (3 toughness, 6 damage)
 	h.AssertCreatureAlive(attacker) // Attacker survives (4 toughness, 3 damage)
 }
 

@@ -6,11 +6,11 @@ import (
 
 // Glicko-2 rating system constants
 const (
-	DefaultRating          = 1500.0
-	DefaultDeviation       = 350.0
-	DefaultVolatility      = 0.06
-	Tau                    = 0.5 // System constant (volatility change)
-	ConvergenceTolerance   = 0.000001
+	DefaultRating        = 1500.0
+	DefaultDeviation     = 350.0
+	DefaultVolatility    = 0.06
+	Tau                  = 0.5 // System constant (volatility change)
+	ConvergenceTolerance = 0.000001
 )
 
 // Player represents a player's rating data

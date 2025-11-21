@@ -55,25 +55,25 @@ func TestReplayNavigation(t *testing.T) {
 	// Test Next
 	state := replay.Next()
 	assert.NotNil(t, state)
-	assert.Equal(t, 1, state.turnNumber)
+	assert.Equal(t, 1, state.TurnNumber)
 	assert.Equal(t, 1, replay.CurrentIndex)
 
 	state = replay.Next()
 	assert.NotNil(t, state)
-	assert.Equal(t, 2, state.turnNumber)
+	assert.Equal(t, 2, state.TurnNumber)
 	assert.Equal(t, 2, replay.CurrentIndex)
 
 	// Test Previous
 	// After next() twice, CurrentIndex is 2. Previous() should decrement to 1 and return state[1] (turn 2)
 	state = replay.Previous()
 	assert.NotNil(t, state)
-	assert.Equal(t, 2, state.turnNumber)
+	assert.Equal(t, 2, state.TurnNumber)
 	assert.Equal(t, 1, replay.CurrentIndex)
 
 	// Call Previous() again to get turn 1
 	state = replay.Previous()
 	assert.NotNil(t, state)
-	assert.Equal(t, 1, state.turnNumber)
+	assert.Equal(t, 1, state.TurnNumber)
 	assert.Equal(t, 0, replay.CurrentIndex)
 
 	// Test Previous at beginning
@@ -109,31 +109,31 @@ func TestReplaySkip(t *testing.T) {
 	// Skip forward 3
 	state := replay.Skip(3)
 	assert.NotNil(t, state)
-	assert.Equal(t, 4, state.turnNumber) // Index 3 = turn 4
+	assert.Equal(t, 4, state.TurnNumber) // Index 3 = turn 4
 	assert.Equal(t, 3, replay.CurrentIndex)
 
 	// Skip forward 5 more
 	state = replay.Skip(5)
 	assert.NotNil(t, state)
-	assert.Equal(t, 9, state.turnNumber)
+	assert.Equal(t, 9, state.TurnNumber)
 	assert.Equal(t, 8, replay.CurrentIndex)
 
 	// Skip forward beyond end
 	state = replay.Skip(100)
 	assert.NotNil(t, state)
-	assert.Equal(t, 10, state.turnNumber)
+	assert.Equal(t, 10, state.TurnNumber)
 	assert.Equal(t, 9, replay.CurrentIndex)
 
 	// Skip backward
 	state = replay.Skip(-5)
 	assert.NotNil(t, state)
-	assert.Equal(t, 5, state.turnNumber)
+	assert.Equal(t, 5, state.TurnNumber)
 	assert.Equal(t, 4, replay.CurrentIndex)
 
 	// Skip backward beyond beginning
 	state = replay.Skip(-100)
 	assert.NotNil(t, state)
-	assert.Equal(t, 1, state.turnNumber)
+	assert.Equal(t, 1, state.TurnNumber)
 	assert.Equal(t, 0, replay.CurrentIndex)
 }
 
@@ -153,11 +153,11 @@ func TestReplayGetStateAt(t *testing.T) {
 	// Valid indices
 	state := replay.GetStateAt(0)
 	assert.NotNil(t, state)
-	assert.Equal(t, 1, state.turnNumber)
+	assert.Equal(t, 1, state.TurnNumber)
 
 	state = replay.GetStateAt(4)
 	assert.NotNil(t, state)
-	assert.Equal(t, 5, state.turnNumber)
+	assert.Equal(t, 5, state.TurnNumber)
 
 	// Invalid indices
 	state = replay.GetStateAt(-1)
@@ -206,10 +206,10 @@ func TestReplaySaveAndLoad(t *testing.T) {
 		originalState := replay.GetStateAt(i)
 		loadedState := loadedReplay.GetStateAt(i)
 
-		assert.Equal(t, originalState.gameID, loadedState.gameID)
-		assert.Equal(t, originalState.gameType, loadedState.gameType)
-		assert.Equal(t, originalState.turnNumber, loadedState.turnNumber)
-		assert.Equal(t, originalState.state, loadedState.state)
+		assert.Equal(t, originalState.GameID, loadedState.GameID)
+		assert.Equal(t, originalState.GameType, loadedState.GameType)
+		assert.Equal(t, originalState.TurnNumber, loadedState.TurnNumber)
+		assert.Equal(t, originalState.State, loadedState.State)
 	}
 }
 

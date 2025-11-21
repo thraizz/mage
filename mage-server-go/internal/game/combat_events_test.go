@@ -11,19 +11,19 @@ import (
 func TestCombatEventsBeginCombat(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-begin-combat"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Subscribe to begin combat event
 	eventFired := false
 	gameState.mu.Lock()
@@ -31,10 +31,10 @@ func TestCombatEventsBeginCombat(t *testing.T) {
 		eventFired = true
 	})
 	gameState.mu.Unlock()
-	
+
 	// Reset combat (should fire event)
 	engine.ResetCombat(gameID)
-	
+
 	if !eventFired {
 		t.Error("EventBeginCombatStep should have been fired")
 	}
@@ -44,23 +44,23 @@ func TestCombatEventsBeginCombat(t *testing.T) {
 func TestCombatEventsDeclareAttackers(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-declare-attackers"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Attacker
 	gameState.mu.Lock()
 	attackerID := "attacker-1"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Grizzly Bears",
@@ -73,13 +73,13 @@ func TestCombatEventsDeclareAttackers(t *testing.T) {
 		Tapped:       false,
 	}
 	gameState.mu.Unlock()
-	
+
 	// Subscribe to events
 	preEventFired := false
 	attackerDeclaredFired := false
 	defenderAttackedFired := false
 	declaredAttackersFired := false
-	
+
 	gameState.mu.Lock()
 	gameState.eventBus.SubscribeTyped(rules.EventDeclareAttackersStepPre, func(event rules.Event) {
 		preEventFired = true
@@ -100,14 +100,14 @@ func TestCombatEventsDeclareAttackers(t *testing.T) {
 		declaredAttackersFired = true
 	})
 	gameState.mu.Unlock()
-	
+
 	// Combat flow
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
 	engine.FinishDeclaringAttackers(gameID)
-	
+
 	// Verify events
 	if !preEventFired {
 		t.Error("EventDeclareAttackersStepPre should have been fired")
@@ -127,24 +127,24 @@ func TestCombatEventsDeclareAttackers(t *testing.T) {
 func TestCombatEventsDeclareBlockers(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-declare-blockers"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Attacker and blocker
 	gameState.mu.Lock()
 	attackerID := "attacker-1"
 	blockerID := "blocker-1"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Grizzly Bears",
@@ -156,7 +156,7 @@ func TestCombatEventsDeclareBlockers(t *testing.T) {
 		Toughness:    "2",
 		Tapped:       false,
 	}
-	
+
 	gameState.cards[blockerID] = &internalCard{
 		ID:           blockerID,
 		Name:         "Runeclaw Bear",
@@ -169,12 +169,12 @@ func TestCombatEventsDeclareBlockers(t *testing.T) {
 		Tapped:       false,
 	}
 	gameState.mu.Unlock()
-	
+
 	// Subscribe to events
 	preEventFired := false
 	blockerDeclaredFired := false
 	declaredBlockersFired := false
-	
+
 	gameState.mu.Lock()
 	gameState.eventBus.SubscribeTyped(rules.EventDeclareBlockersStepPre, func(event rules.Event) {
 		preEventFired = true
@@ -189,7 +189,7 @@ func TestCombatEventsDeclareBlockers(t *testing.T) {
 		declaredBlockersFired = true
 	})
 	gameState.mu.Unlock()
-	
+
 	// Combat flow
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -197,7 +197,7 @@ func TestCombatEventsDeclareBlockers(t *testing.T) {
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
 	engine.DeclareBlocker(gameID, blockerID, attackerID, "Bob")
 	engine.AcceptBlockers(gameID)
-	
+
 	// Verify events
 	if !preEventFired {
 		t.Error("EventDeclareBlockersStepPre should have been fired")
@@ -214,23 +214,23 @@ func TestCombatEventsDeclareBlockers(t *testing.T) {
 func TestCombatEventsCombatDamage(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-combat-damage"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Attacker
 	gameState.mu.Lock()
 	attackerID := "attacker-1"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Grizzly Bears",
@@ -243,11 +243,11 @@ func TestCombatEventsCombatDamage(t *testing.T) {
 		Tapped:       false,
 	}
 	gameState.mu.Unlock()
-	
+
 	// Subscribe to events
 	preEventFired := false
 	appliedEventFired := false
-	
+
 	gameState.mu.Lock()
 	gameState.eventBus.SubscribeTyped(rules.EventCombatDamageStepPre, func(event rules.Event) {
 		preEventFired = true
@@ -256,7 +256,7 @@ func TestCombatEventsCombatDamage(t *testing.T) {
 		appliedEventFired = true
 	})
 	gameState.mu.Unlock()
-	
+
 	// Combat flow
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -265,7 +265,7 @@ func TestCombatEventsCombatDamage(t *testing.T) {
 	engine.AcceptBlockers(gameID)
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Verify events
 	if !preEventFired {
 		t.Error("EventCombatDamageStepPre should have been fired")
@@ -279,23 +279,23 @@ func TestCombatEventsCombatDamage(t *testing.T) {
 func TestCombatEventsEndCombat(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-end-combat"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Attacker
 	gameState.mu.Lock()
 	attackerID := "attacker-1"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Grizzly Bears",
@@ -308,11 +308,11 @@ func TestCombatEventsEndCombat(t *testing.T) {
 		Tapped:       false,
 	}
 	gameState.mu.Unlock()
-	
+
 	// Subscribe to events
 	preEventFired := false
 	endEventFired := false
-	
+
 	gameState.mu.Lock()
 	gameState.eventBus.SubscribeTyped(rules.EventEndCombatStepPre, func(event rules.Event) {
 		preEventFired = true
@@ -321,7 +321,7 @@ func TestCombatEventsEndCombat(t *testing.T) {
 		endEventFired = true
 	})
 	gameState.mu.Unlock()
-	
+
 	// Combat flow
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -331,7 +331,7 @@ func TestCombatEventsEndCombat(t *testing.T) {
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
 	engine.EndCombat(gameID)
-	
+
 	// Verify events
 	if !preEventFired {
 		t.Error("EventEndCombatStepPre should have been fired")
@@ -345,24 +345,24 @@ func TestCombatEventsEndCombat(t *testing.T) {
 func TestCombatEventsFullFlow(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-full-flow"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Attacker and blocker
 	gameState.mu.Lock()
 	attackerID := "attacker-1"
 	blockerID := "blocker-1"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Grizzly Bears",
@@ -374,7 +374,7 @@ func TestCombatEventsFullFlow(t *testing.T) {
 		Toughness:    "2",
 		Tapped:       false,
 	}
-	
+
 	gameState.cards[blockerID] = &internalCard{
 		ID:           blockerID,
 		Name:         "Runeclaw Bear",
@@ -387,10 +387,10 @@ func TestCombatEventsFullFlow(t *testing.T) {
 		Tapped:       false,
 	}
 	gameState.mu.Unlock()
-	
+
 	// Track all events
 	eventsFired := make(map[rules.EventType]bool)
-	
+
 	gameState.mu.Lock()
 	eventTypes := []rules.EventType{
 		rules.EventBeginCombatStep,
@@ -406,7 +406,7 @@ func TestCombatEventsFullFlow(t *testing.T) {
 		rules.EventEndCombatStepPre,
 		rules.EventEndCombatStep,
 	}
-	
+
 	for _, eventType := range eventTypes {
 		et := eventType // Capture for closure
 		gameState.eventBus.SubscribeTyped(et, func(event rules.Event) {
@@ -414,7 +414,7 @@ func TestCombatEventsFullFlow(t *testing.T) {
 		})
 	}
 	gameState.mu.Unlock()
-	
+
 	// Full combat flow
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -426,7 +426,7 @@ func TestCombatEventsFullFlow(t *testing.T) {
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
 	engine.EndCombat(gameID)
-	
+
 	// Verify all events fired
 	for _, eventType := range eventTypes {
 		if !eventsFired[eventType] {
