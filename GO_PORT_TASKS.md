@@ -73,7 +73,7 @@ Status legend:
 - [x] Auto-advance priority after resolution back to the active player
 - [x] Allow triggered abilities to be queued automatically when conditions are met
 - [ ] Support casting spells/activating abilities while another object is resolving (linked abilities)
-- [ ] Implement replacement/prevention effects that modify or negate stack resolution
+- [x] Implement replacement/prevention effects that modify or negate stack resolution
 - [x] Ensure stack legality checks (targets available, costs paid) prior to resolution
 - [ ] Implement target selection flow for spells/abilities requiring targets
 - [x] Add exhaustive integration tests covering multi-object stacks, counterspells, and priority loops
