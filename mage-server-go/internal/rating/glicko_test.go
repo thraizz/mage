@@ -111,7 +111,7 @@ func TestUpdateRatingMultipleMatches(t *testing.T) {
 
 	// Player plays multiple matches
 	results := []MatchResult{
-		{OpponentRating: 1400.0, OpponentDeviation: 30.0, Score: 1.0}, // Win
+		{OpponentRating: 1400.0, OpponentDeviation: 30.0, Score: 1.0},  // Win
 		{OpponentRating: 1550.0, OpponentDeviation: 100.0, Score: 0.0}, // Loss
 		{OpponentRating: 1700.0, OpponentDeviation: 300.0, Score: 0.0}, // Loss
 	}
@@ -166,8 +166,8 @@ func TestCalculateMatchRating(t *testing.T) {
 	// Simple win against equal opponent
 	newRating, newDeviation, newVolatility := calc.CalculateMatchRating(
 		1500.0, 350.0, 0.06, // Player
-		1500.0, 350.0,       // Opponent
-		1.0,                 // Win
+		1500.0, 350.0, // Opponent
+		1.0, // Win
 	)
 
 	// Rating should increase

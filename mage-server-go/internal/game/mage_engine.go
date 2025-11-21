@@ -18,13 +18,13 @@ import (
 
 // Zone constants matching Java implementation
 const (
-	zoneLibrary = 0
-	zoneHand    = 1
+	zoneLibrary     = 0
+	zoneHand        = 1
 	zoneBattlefield = 2
-	zoneGraveyard = 3
-	zoneStack   = 4
-	zoneExile   = 5
-	zoneCommand = 6
+	zoneGraveyard   = 3
+	zoneStack       = 4
+	zoneExile       = 5
+	zoneCommand     = 6
 )
 
 // zoneToString converts a zone constant to a string
@@ -69,23 +69,23 @@ const (
 // EngineGameView represents the complete game state view for a player
 type EngineGameView struct {
 	GameID         string
-	State         GameState
-	Phase         string
-	Step          string
-	Turn          int
+	State          GameState
+	Phase          string
+	Step           string
+	Turn           int
 	ActivePlayerID string
 	PriorityPlayer string
-	Players       []EnginePlayerView
-	Battlefield   []EngineCardView
-	Stack         []EngineCardView
-	Exile         []EngineCardView
-	Command       []EngineCardView
-	Revealed      []EngineRevealedView
-	LookedAt      []EngineLookedAtView
-	Combat        EngineCombatView
-	StartedAt     time.Time
-	Messages      []EngineMessage
-	Prompts       []EnginePrompt
+	Players        []EnginePlayerView
+	Battlefield    []EngineCardView
+	Stack          []EngineCardView
+	Exile          []EngineCardView
+	Command        []EngineCardView
+	Revealed       []EngineRevealedView
+	LookedAt       []EngineLookedAtView
+	Combat         EngineCombatView
+	StartedAt      time.Time
+	Messages       []EngineMessage
+	Prompts        []EnginePrompt
 }
 
 // EnginePlayerView represents a player's view in the game
@@ -120,7 +120,7 @@ type EngineCardView struct {
 	Color          string
 	Power          string
 	Toughness      string
-	Loyalty       string
+	Loyalty        string
 	CardNumber     int
 	ExpansionSet   string
 	Rarity         string
@@ -202,26 +202,26 @@ type combatState struct {
 	// Combat requirements/restrictions tracking (Java: Combat lines 70-74)
 	creaturesForcedToAttack    map[string]map[string]bool // creatureID -> set of defenderIDs it must attack (empty = any)
 	creatureMustBlockAttackers map[string]map[string]bool // blockerID -> set of attackerIDs it must block
-	maxAttackers               int                         // maximum number of attackers allowed (-1 = no limit)
-	minBlockersPerAttacker     map[string]int              // attackerID -> minimum blockers required
-	maxBlockersPerAttacker     map[string]int              // attackerID -> maximum blockers allowed
+	maxAttackers               int                        // maximum number of attackers allowed (-1 = no limit)
+	minBlockersPerAttacker     map[string]int             // attackerID -> minimum blockers required
+	maxBlockersPerAttacker     map[string]int             // attackerID -> maximum blockers allowed
 	// Attack tracking for triggers (Java: PlayersAttackedThisTurnWatcher)
-	playersAttackedThisTurn              map[string]map[string]bool // attackingPlayerID -> set of playerIDs attacked
+	playersAttackedThisTurn                 map[string]map[string]bool // attackingPlayerID -> set of playerIDs attacked
 	planeswalkerControllersAttackedThisTurn map[string]map[string]bool // attackingPlayerID -> set of playerIDs whose planeswalkers were attacked
 }
 
 // combatGroup represents a single combat group (attackers vs defender + blockers)
 // Per Java CombatGroup class
 type combatGroup struct {
-	defenderID         string   // player, planeswalker, or battle being attacked
-	defenderIsPermanent bool     // is defender a permanent (vs player)
-	defendingPlayerID  string   // controller of defending permanents
-	attackers          []string // attacking creature IDs
-	formerAttackers    []string // historical attackers (for "attacked this turn")
-	blockers           []string // blocking creature IDs
-	blocked            bool     // is this group blocked
-	attackerOrder      map[string]int // damage assignment order for attackers (deprecated - kept for compatibility)
-	blockerOrder       map[string]int // damage assignment order for blockers (deprecated - kept for compatibility)
+	defenderID          string         // player, planeswalker, or battle being attacked
+	defenderIsPermanent bool           // is defender a permanent (vs player)
+	defendingPlayerID   string         // controller of defending permanents
+	attackers           []string       // attacking creature IDs
+	formerAttackers     []string       // historical attackers (for "attacked this turn")
+	blockers            []string       // blocking creature IDs
+	blocked             bool           // is this group blocked
+	attackerOrder       map[string]int // damage assignment order for attackers (deprecated - kept for compatibility)
+	blockerOrder        map[string]int // damage assignment order for blockers (deprecated - kept for compatibility)
 	// Modern damage division (Rule 510.1c-d: players divide damage as they choose, no ordering required)
 	attackerDamageAssignments map[string]map[string]int // attackerID -> (blockerID -> damage)
 	blockerDamageAssignments  map[string]map[string]int // blockerID -> (attackerID -> damage)
@@ -230,20 +230,20 @@ type combatGroup struct {
 // newCombatState creates a new combat state
 func newCombatState() *combatState {
 	return &combatState{
-		groups:                     make([]*combatGroup, 0),
-		formerGroups:               make([]*combatGroup, 0),
-		blockingGroups:             make(map[string]*combatGroup),
-		defenders:                  make(map[string]bool),
-		attackers:                  make(map[string]bool),
-		blockers:                   make(map[string]bool),
-		attackersTapped:            make(map[string]bool),
-		firstStrikers:              make(map[string]bool),
-		creaturesForcedToAttack:    make(map[string]map[string]bool),
-		creatureMustBlockAttackers: make(map[string]map[string]bool),
-		maxAttackers:               -1, // no limit by default
-		minBlockersPerAttacker:     make(map[string]int),
-		maxBlockersPerAttacker:     make(map[string]int),
-		playersAttackedThisTurn:              make(map[string]map[string]bool),
+		groups:                                  make([]*combatGroup, 0),
+		formerGroups:                            make([]*combatGroup, 0),
+		blockingGroups:                          make(map[string]*combatGroup),
+		defenders:                               make(map[string]bool),
+		attackers:                               make(map[string]bool),
+		blockers:                                make(map[string]bool),
+		attackersTapped:                         make(map[string]bool),
+		firstStrikers:                           make(map[string]bool),
+		creaturesForcedToAttack:                 make(map[string]map[string]bool),
+		creatureMustBlockAttackers:              make(map[string]map[string]bool),
+		maxAttackers:                            -1, // no limit by default
+		minBlockersPerAttacker:                  make(map[string]int),
+		maxBlockersPerAttacker:                  make(map[string]int),
+		playersAttackedThisTurn:                 make(map[string]map[string]bool),
 		planeswalkerControllersAttackedThisTurn: make(map[string]map[string]bool),
 	}
 }
@@ -292,7 +292,7 @@ type internalCard struct {
 	Color          string
 	Power          string
 	Toughness      string
-	Loyalty       string
+	Loyalty        string
 	CardNumber     int
 	ExpansionSet   string
 	Rarity         string
@@ -313,9 +313,9 @@ type internalCard struct {
 	AttackingWhat string   // ID of what this creature is attacking (player/planeswalker/battle)
 	BlockingWhat  []string // IDs of creatures this creature is blocking
 	// Banding fields (Rule 702.22)
-	BandedCards   []string // IDs of creatures in the same attacking band (bidirectional)
+	BandedCards []string // IDs of creatures in the same attacking band (bidirectional)
 	// Damage tracking
-	Damage        int      // Damage marked on this creature
+	Damage        int            // Damage marked on this creature
 	DamageSources map[string]int // Damage by source ID
 	// Status fields
 	SummoningSickness bool // Does this creature have summoning sickness
@@ -338,13 +338,13 @@ type internalPlayer struct {
 	Lost           bool
 	Left           bool
 	Wins           int
-	Quit           bool      // Player quit the match
-	TimerTimeout   bool      // Player lost due to timer timeout
-	IdleTimeout    bool      // Player lost due to idle timeout
-	Conceded       bool      // Player conceded
-	StoredBookmark int       // Bookmark ID for player undo (-1 = no undo available)
-	MulliganCount  int       // Number of times player has mulliganed
-	KeptHand       bool      // Whether player has kept their hand
+	Quit           bool // Player quit the match
+	TimerTimeout   bool // Player lost due to timer timeout
+	IdleTimeout    bool // Player lost due to idle timeout
+	Conceded       bool // Player conceded
+	StoredBookmark int  // Bookmark ID for player undo (-1 = no undo available)
+	MulliganCount  int  // Number of times player has mulliganed
+	KeptHand       bool // Whether player has kept their hand
 }
 
 // triggeredAbilityQueueItem represents a triggered ability waiting to be put on the stack
@@ -360,55 +360,55 @@ type triggeredAbilityQueueItem struct {
 // combatTrigger represents a combat-related trigger condition
 // Per Java TriggeredAbility pattern (checkEventType + checkTrigger)
 type combatTrigger struct {
-	SourceID    string                                         // Card with the trigger
-	TriggerType string                                         // Type of trigger (attacks, blocks, etc.)
-	Condition   func(*engineGameState, rules.Event) bool      // Check if trigger should fire
+	SourceID      string                                                         // Card with the trigger
+	TriggerType   string                                                         // Type of trigger (attacks, blocks, etc.)
+	Condition     func(*engineGameState, rules.Event) bool                       // Check if trigger should fire
 	CreateAbility func(*engineGameState, rules.Event) *triggeredAbilityQueueItem // Create the triggered ability
 }
 
 // gameAnalytics tracks metrics for a game
 type gameAnalytics struct {
-	maxStackDepth      int           // Maximum stack depth reached
-	totalStackItems    int           // Total items put on stack
-	actionsPerTurn     map[int]int   // Actions taken per turn number
+	maxStackDepth      int               // Maximum stack depth reached
+	totalStackItems    int               // Total items put on stack
+	actionsPerTurn     map[int]int       // Actions taken per turn number
 	turnStartTimes     map[int]time.Time // Turn start times
-	priorityPassCount  int           // Total priority passes
-	spellsCast         int           // Total spells cast
-	abilitiesActivated int           // Total abilities activated
-	triggersProcessed  int           // Total triggered abilities processed
-	gameStartTime      time.Time     // When game started
+	priorityPassCount  int               // Total priority passes
+	spellsCast         int               // Total spells cast
+	abilitiesActivated int               // Total abilities activated
+	triggersProcessed  int               // Total triggered abilities processed
+	gameStartTime      time.Time         // When game started
 }
 
 // engineGameState represents the internal state of a game
 type engineGameState struct {
-	gameID        string
-	gameType      string
-	state         GameState
-	players       map[string]*internalPlayer
-	playerOrder   []string
-	cards         map[string]*internalCard
-	battlefield   []*internalCard
-	exile         []*internalCard
-	command       []*internalCard
-	revealed      []EngineRevealedView
-	lookedAt      []EngineLookedAtView
-	combat        *combatState // Internal combat state
-	turnManager   *rules.TurnManager
-	stack         *rules.StackManager
-	eventBus      *rules.EventBus
-	watchers      *rules.WatcherRegistry
-	legality      *rules.LegalityChecker
-	targetValidator *targeting.TargetValidator
-	layerSystem   *effects.LayerSystem
-	triggeredQueue []*triggeredAbilityQueueItem // Queue of triggered abilities waiting to be put on stack
-	combatTriggers []*combatTrigger             // Registered combat triggers (for cards with combat-related abilities)
-	simultaneousEvents []rules.Event             // Queue of events that happened simultaneously
-	concedingPlayers   []string                  // Queue of players requesting concession
-	analytics     *gameAnalytics                 // Game metrics and analytics
-	messages      []EngineMessage
-	prompts       []EnginePrompt
-	startedAt     time.Time
-	mu            sync.RWMutex
+	gameID             string
+	gameType           string
+	state              GameState
+	players            map[string]*internalPlayer
+	playerOrder        []string
+	cards              map[string]*internalCard
+	battlefield        []*internalCard
+	exile              []*internalCard
+	command            []*internalCard
+	revealed           []EngineRevealedView
+	lookedAt           []EngineLookedAtView
+	combat             *combatState // Internal combat state
+	turnManager        *rules.TurnManager
+	stack              *rules.StackManager
+	eventBus           *rules.EventBus
+	watchers           *rules.WatcherRegistry
+	legality           *rules.LegalityChecker
+	targetValidator    *targeting.TargetValidator
+	layerSystem        *effects.LayerSystem
+	triggeredQueue     []*triggeredAbilityQueueItem // Queue of triggered abilities waiting to be put on stack
+	combatTriggers     []*combatTrigger             // Registered combat triggers (for cards with combat-related abilities)
+	simultaneousEvents []rules.Event                // Queue of events that happened simultaneously
+	concedingPlayers   []string                     // Queue of players requesting concession
+	analytics          *gameAnalytics               // Game metrics and analytics
+	messages           []EngineMessage
+	prompts            []EnginePrompt
+	startedAt          time.Time
+	mu                 sync.RWMutex
 }
 
 // GameNotification represents a notification that can be sent to UI/websocket clients
@@ -426,30 +426,30 @@ type NotificationHandler func(notification GameNotification)
 // gameStateSnapshot represents a complete snapshot of game state for rollback
 type gameStateSnapshot struct {
 	// Core game state
-	GameID        string
-	GameType      string
-	State         GameState
-	TurnNumber    int
-	ActivePlayer  string
+	GameID         string
+	GameType       string
+	State          GameState
+	TurnNumber     int
+	ActivePlayer   string
 	PriorityPlayer string
 
 	// Players - deep copy of all player data
-	Players       map[string]*internalPlayer
-	PlayerOrder   []string
+	Players     map[string]*internalPlayer
+	PlayerOrder []string
 
 	// Cards - deep copy of all cards
-	Cards         map[string]*internalCard
-	Battlefield   []*internalCard
-	Exile         []*internalCard
-	Command       []*internalCard
+	Cards       map[string]*internalCard
+	Battlefield []*internalCard
+	Exile       []*internalCard
+	Command     []*internalCard
 
 	// Stack state
-	StackItems    []rules.StackItem
+	StackItems []rules.StackItem
 
 	// Other state
-	Messages      []EngineMessage
-	Prompts       []EnginePrompt
-	Timestamp     time.Time
+	Messages  []EngineMessage
+	Prompts   []EnginePrompt
+	Timestamp time.Time
 }
 
 // MageEngine is the main game engine implementation
@@ -461,18 +461,18 @@ type MageEngine struct {
 
 	// State bookmarking for rollback/undo
 	// Maps gameID -> list of bookmarked states
-	bookmarks           map[string][]*gameStateSnapshot
+	bookmarks map[string][]*gameStateSnapshot
 
 	// Turn rollback system (separate from action bookmarks)
 	// Maps gameID -> map[turnNumber -> snapshot]
 	// Keeps last 4 turns for player-requested rollback
-	turnSnapshots       map[string]map[int]*gameStateSnapshot
-	rollbackTurnsMax    int  // Maximum turns to keep for rollback (default 4)
-	rollbackAllowed     bool // Whether turn rollback is enabled (default true)
+	turnSnapshots    map[string]map[int]*gameStateSnapshot
+	rollbackTurnsMax int  // Maximum turns to keep for rollback (default 4)
+	rollbackAllowed  bool // Whether turn rollback is enabled (default true)
 
 	// Replay recording system
 	// Records step-by-step game state for replay and spectator synchronization
-	replayRecorder      *ReplayRecorder
+	replayRecorder *ReplayRecorder
 }
 
 // NewMageEngine creates a new MageEngine instance
@@ -482,8 +482,8 @@ func NewMageEngine(logger *zap.Logger) *MageEngine {
 		games:            make(map[string]*engineGameState),
 		bookmarks:        make(map[string][]*gameStateSnapshot),
 		turnSnapshots:    make(map[string]map[int]*gameStateSnapshot),
-		rollbackTurnsMax: 4,    // Keep last 4 turns
-		rollbackAllowed:  true, // Enable turn rollback by default
+		rollbackTurnsMax: 4,                                    // Keep last 4 turns
+		rollbackAllowed:  true,                                 // Enable turn rollback by default
 		replayRecorder:   NewReplayRecorder(logger, "replays"), // Default replay directory
 	}
 }
@@ -498,10 +498,10 @@ func (e *MageEngine) SetNotificationHandler(handler NotificationHandler) {
 
 // emitNotification sends a notification to the registered handler
 // This method is safe to call while holding gameState locks because:
-// 1. It only briefly acquires e.mu.RLock() to read the handler
-// 2. The handler is called in a separate goroutine, so it doesn't block
-// 3. The goroutine can safely call back into the engine (e.g., GetGameView)
-//    because it runs asynchronously after emitNotification returns
+//  1. It only briefly acquires e.mu.RLock() to read the handler
+//  2. The handler is called in a separate goroutine, so it doesn't block
+//  3. The goroutine can safely call back into the engine (e.g., GetGameView)
+//     because it runs asynchronously after emitNotification returns
 func (e *MageEngine) emitNotification(notification GameNotification) {
 	// Read handler with RLock to prevent data race with SetNotificationHandler
 	// This is safe even when called while holding gameState.mu because:
@@ -606,15 +606,15 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 
 	// Create game state
 	gameState := &engineGameState{
-		GameID:      gameID,
-		GameType:    gameType,
-		State:       GameStateInProgress,
-		Players:     make(map[string]*internalPlayer),
-		PlayerOrder: make([]string, len(players)),
-		Cards:       make(map[string]*internalCard),
-		Battlefield: make([]*internalCard, 0),
-		Exile:       make([]*internalCard, 0),
-		Command:     make([]*internalCard, 0),
+		gameID:      gameID,
+		gameType:    gameType,
+		state:       GameStateInProgress,
+		players:     make(map[string]*internalPlayer),
+		playerOrder: make([]string, len(players)),
+		cards:       make(map[string]*internalCard),
+		battlefield: make([]*internalCard, 0),
+		exile:       make([]*internalCard, 0),
+		command:     make([]*internalCard, 0),
 		revealed:    make([]EngineRevealedView, 0),
 		lookedAt:    make([]EngineLookedAtView, 0),
 		combat:      newCombatState(),
@@ -623,9 +623,9 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 			turnStartTimes: make(map[int]time.Time),
 			gameStartTime:  time.Now(),
 		},
-		Messages:    make([]EngineMessage, 0),
-		Prompts:     make([]EnginePrompt, 0),
-		startedAt:   time.Now(),
+		messages:  make([]EngineMessage, 0),
+		prompts:   make([]EnginePrompt, 0),
+		startedAt: time.Now(),
 	}
 
 	// Initialize supporting systems
@@ -653,8 +653,8 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 			Lost:           false,
 			Left:           false,
 			Wins:           0,
-			StoredBookmark: -1,   // No undo available initially
-			MulliganCount:  0,    // No mulligans yet
+			StoredBookmark: -1,    // No undo available initially
+			MulliganCount:  0,     // No mulligans yet
 			KeptHand:       false, // Haven't kept hand yet
 		}
 
@@ -743,7 +743,7 @@ func (e *MageEngine) createStarterCard(id, ownerID, cardName string) *internalCa
 	if cardName == "" {
 		cardName = "Lightning Bolt"
 	}
-	
+
 	return &internalCard{
 		ID:           id,
 		Name:         cardName,
@@ -795,7 +795,7 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 	gameState.mu.Unlock() // Temporarily unlock to call BookmarkState
 	bookmarkID, bookmarkErr := e.BookmarkState(gameID)
 	gameState.mu.Lock() // Re-acquire lock
-	
+
 	if bookmarkErr != nil {
 		if e.logger != nil {
 			e.logger.Warn("failed to create bookmark before action",
@@ -821,7 +821,7 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 			gameState.mu.Unlock() // Temporarily unlock to call RestoreState
 			restoreErr := e.RestoreState(gameID, bookmarkID, fmt.Sprintf("Error recovery: %v", err))
 			gameState.mu.Lock() // Re-acquire lock
-			
+
 			if restoreErr != nil {
 				if e.logger != nil {
 					e.logger.Error("failed to restore state after error",
@@ -853,7 +853,7 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 					break
 				}
 			}
-			
+
 			if !bookmarkInUse {
 				// Remove the bookmark since no player is using it
 				gameState.mu.Unlock() // Temporarily unlock to call RemoveBookmark
@@ -952,7 +952,7 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 			e.SaveTurnSnapshot(gameState.gameID, newTurn)
 			gameState.mu.Lock() // Re-acquire lock
 		}
-		
+
 		// Cleanup continuous effects at end of turn
 		// Per Java: ContinuousEffects.removeEndOfTurnEffects() in cleanup step
 		if step == rules.StepCleanup && gameState.layerSystem != nil {
@@ -993,7 +993,7 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		for e.checkStateBasedActions(gameState) {
 			// Continue checking until stable
 		}
-		
+
 		// Emit phase/step change events
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventChangePhase, "", "", activePlayerID))
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventChangeStep, "", "", activePlayerID))
@@ -1001,37 +1001,37 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		// Pass priority to next player
 		nextPlayerID := e.getNextPlayerWithPriority(gameState, playerID)
 		if nextPlayerID == "" {
-		// No valid next player, all players who can respond have passed
-		if gameState.allPassed() {
-			if !gameState.stack.IsEmpty() {
-				err := e.resolveStack(gameState)
-				// Check for concessions after stack resolution
-				e.checkConcede(gameState)
-				if e.checkIfGameIsOver(gameState) {
-					return nil
+			// No valid next player, all players who can respond have passed
+			if gameState.allPassed() {
+				if !gameState.stack.IsEmpty() {
+					err := e.resolveStack(gameState)
+					// Check for concessions after stack resolution
+					e.checkConcede(gameState)
+					if e.checkIfGameIsOver(gameState) {
+						return nil
+					}
+					return err
 				}
-				return err
 			}
-		}
-		// Advance step/phase
-		nextPlayer := e.getNextPlayer(gameState)
-		phase, step := gameState.turnManager.AdvanceStep(nextPlayer)
-		gameState.addMessage(fmt.Sprintf("Game advances to %s - %s", phase.String(), step.String()), "action")
-		// Reset pass flags (preserves lost/left player state)
-		gameState.resetPassed()
+			// Advance step/phase
+			nextPlayer := e.getNextPlayer(gameState)
+			phase, step := gameState.turnManager.AdvanceStep(nextPlayer)
+			gameState.addMessage(fmt.Sprintf("Game advances to %s - %s", phase.String(), step.String()), "action")
+			// Reset pass flags (preserves lost/left player state)
+			gameState.resetPassed()
 			// Set priority to active player
 			activePlayerID := gameState.turnManager.ActivePlayer()
-			
+
 			// Handle combat step initialization
 			// Per Java BeginCombatStep.beginStep() and DeclareAttackersStep.beginStep()
 			e.handleCombatStepBegin(gameState, step, activePlayerID)
-			
+
 			// Per rule 117.5: Check state-based actions before priority
 			// Repeat until no more state-based actions occur
 			for e.checkStateBasedActions(gameState) {
 				// Continue checking until stable
 			}
-			
+
 			gameState.turnManager.SetPriority(activePlayerID)
 			gameState.players[activePlayerID].HasPriority = true
 			return nil
@@ -1041,7 +1041,7 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		for e.checkStateBasedActions(gameState) {
 			// Continue checking until stable
 		}
-		
+
 		player.HasPriority = false
 		gameState.turnManager.SetPriority(nextPlayerID)
 		gameState.players[nextPlayerID].HasPriority = true
@@ -1258,7 +1258,7 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 			removedItem, found := gameState.stack.Remove(item.ID)
 			if found {
 				gameState.addMessage(fmt.Sprintf("%s counters %s", playerID, removedItem.Description), "action")
-				
+
 				// Move countered spell to graveyard
 				if card, found := gameState.cards[removedItem.SourceID]; found {
 					card.Zone = zoneGraveyard
@@ -1266,7 +1266,7 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 						controller.Graveyard = append(controller.Graveyard, card)
 					}
 				}
-				
+
 				// Emit counter event
 				gameState.eventBus.Publish(rules.Event{
 					Type:        rules.EventStackItemRemoved,
@@ -1277,7 +1277,7 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 					Timestamp:   time.Now(),
 					Description: fmt.Sprintf("%s counters %s", playerID, removedItem.Description),
 				})
-				
+
 				// Pass priority to next player
 				nextPlayerID := e.getNextPlayerWithPriority(gameState, playerID)
 				if nextPlayerID != "" && nextPlayerID != playerID {
@@ -1286,13 +1286,13 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 					for e.checkStateBasedActions(gameState) {
 						// Continue checking until stable
 					}
-					
+
 					player.HasPriority = false
 					gameState.turnManager.SetPriority(nextPlayerID)
 					gameState.players[nextPlayerID].HasPriority = true
 					gameState.players[nextPlayerID].Passed = false
 				}
-				
+
 				return nil
 			}
 		}
@@ -1304,7 +1304,7 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 // resolveStack resolves all items on the stack
 func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 	gameState.addMessage("Resolving stack", "action")
-	
+
 	// Log stack state before resolution
 	stackItems := gameState.stack.List()
 	if e.logger != nil {
@@ -1321,14 +1321,14 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 			)
 		}
 	}
-	
+
 	// Resolve items in LIFO order (top to bottom)
 	for !gameState.stack.IsEmpty() {
 		item, err := gameState.stack.Pop()
 		if err != nil {
 			return fmt.Errorf("failed to pop from stack: %w", err)
 		}
-		
+
 		if e.logger != nil {
 			e.logger.Debug("popped from stack",
 				zap.String("item_id", item.ID),
@@ -1377,7 +1377,7 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 				zap.Bool("has_resolve", item.Resolve != nil),
 			)
 		}
-		
+
 		if item.Resolve != nil {
 			if err := item.Resolve(); err != nil {
 				gameState.addMessage(fmt.Sprintf("Error resolving %s: %v", item.Description, err), "action")
@@ -1420,7 +1420,7 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 			Timestamp:   time.Now(),
 			Description: fmt.Sprintf("%s resolved", item.Description),
 		})
-		
+
 		// Per rule 117.5 and 603.3: After each stack item resolves, check state-based actions
 		// and process triggered abilities before resolving the next item.
 		// This ensures that SBAs and triggers are handled immediately after each resolution.
@@ -1432,17 +1432,17 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 
 	// Priority returns to active player
 	activePlayerID := gameState.turnManager.ActivePlayer()
-	
+
 	// Per Java GameImpl.resolve() lines 1857-1860: Process simultaneous events after stack resolution
 	// This handles events that occurred during resolution (e.g., multiple creatures dying)
 	for gameState.hasSimultaneousEvents() {
 		e.handleSimultaneousEvents(gameState)
 	}
-	
+
 	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
 	// Repeat until stable (SBA → triggers → repeat)
 	e.checkStateAndTriggered(gameState)
-	
+
 	gameState.turnManager.SetPriority(activePlayerID)
 	gameState.players[activePlayerID].HasPriority = true
 	gameState.addPrompt(activePlayerID, "You have priority. Pass?", []string{"PASS", "CAST"})
@@ -1456,7 +1456,7 @@ func (e *MageEngine) resolveSpell(gameState *engineGameState, card *internalCard
 	if card == nil {
 		return fmt.Errorf("card is nil")
 	}
-	
+
 	if e.logger != nil {
 		e.logger.Debug("resolving spell",
 			zap.String("card_id", card.ID),
@@ -1465,25 +1465,25 @@ func (e *MageEngine) resolveSpell(gameState *engineGameState, card *internalCard
 			zap.String("card_type", card.Type),
 		)
 	}
-	
+
 	// Determine where the card should go based on its type
 	// Per Java: instant/sorcery -> graveyard, permanents (creature, artifact, enchantment, planeswalker, land) -> battlefield
 	cardType := strings.ToLower(card.Type)
-	
+
 	// Check if it's a permanent type
 	isPermanent := strings.Contains(cardType, "creature") ||
 		strings.Contains(cardType, "artifact") ||
 		strings.Contains(cardType, "enchantment") ||
 		strings.Contains(cardType, "planeswalker") ||
 		strings.Contains(cardType, "land")
-	
+
 	if isPermanent {
 		// Move to battlefield
 		// Per Java: controller.moveCards(card, Zone.BATTLEFIELD, ability, game)
 		if err := e.moveCard(gameState, card, zoneBattlefield, card.ControllerID); err != nil {
 			return fmt.Errorf("failed to move permanent to Battlefield: %w", err)
 		}
-		
+
 		// Apply layer system for power/toughness if it's a creature
 		if strings.Contains(cardType, "creature") {
 			power, _ := e.parsePowerToughness(card.Power)
@@ -1524,7 +1524,7 @@ func (e *MageEngine) createTriggeredAbilityForSpell(gameState *engineGameState, 
 	cardNameLower := strings.ToLower(card.Name)
 	if strings.Contains(cardNameLower, "lightning bolt") {
 		triggerID := uuid.New().String()
-		
+
 		// Create triggered ability queue item
 		triggeredAbility := &triggeredAbilityQueueItem{
 			ID:          triggerID,
@@ -1540,7 +1540,7 @@ func (e *MageEngine) createTriggeredAbilityForSpell(gameState *engineGameState, 
 				oldLife := player.Life
 				player.Life += 1
 				gs.addMessage(fmt.Sprintf("%s gains 1 life (now %d)", casterID, player.Life), "life")
-				
+
 				// Emit life gain event
 				gs.eventBus.Publish(rules.Event{
 					Type:        rules.EventGainedLife,
@@ -1554,12 +1554,12 @@ func (e *MageEngine) createTriggeredAbilityForSpell(gameState *engineGameState, 
 				return nil
 			},
 		}
-		
+
 		// Add to triggered queue instead of directly to stack
 		// Per rule 603.3: triggered abilities are put on stack before priority
 		gameState.triggeredQueue = append(gameState.triggeredQueue, triggeredAbility)
 		gameState.addMessage(fmt.Sprintf("Triggered: %s gains 1 life (queued)", casterID), "action")
-		
+
 		if e.logger != nil {
 			e.logger.Debug("queued triggered ability",
 				zap.String("trigger_id", triggerID),
@@ -1592,16 +1592,16 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 		ActivePlayerID: gameState.turnManager.ActivePlayer(),
 		PriorityPlayer: gameState.turnManager.PriorityPlayer(),
 		Players:        e.buildPlayerViews(gameState, playerID),
-		Battlefield:     e.buildCardViews(gameState.battlefield),
-		Stack:           e.buildStackViews(gameState),
-		Exile:           e.buildCardViews(gameState.exile),
-		Command:         e.buildCardViews(gameState.command),
-		Revealed:        gameState.revealed,
-		LookedAt:        gameState.lookedAt,
-		Combat:          e.buildCombatView(gameState),
-		StartedAt:       gameState.startedAt,
-		Messages:        make([]EngineMessage, len(gameState.messages)),
-		Prompts:         make([]EnginePrompt, len(gameState.prompts)),
+		Battlefield:    e.buildCardViews(gameState.battlefield),
+		Stack:          e.buildStackViews(gameState),
+		Exile:          e.buildCardViews(gameState.exile),
+		Command:        e.buildCardViews(gameState.command),
+		Revealed:       gameState.revealed,
+		LookedAt:       gameState.lookedAt,
+		Combat:         e.buildCombatView(gameState),
+		StartedAt:      gameState.startedAt,
+		Messages:       make([]EngineMessage, len(gameState.messages)),
+		Prompts:        make([]EnginePrompt, len(gameState.prompts)),
 	}
 
 	copy(view.Messages, gameState.messages)
@@ -1648,9 +1648,9 @@ func (e *MageEngine) buildPlayerViews(gameState *engineGameState, requestingPlay
 			view.Hand = make([]EngineCardView, len(player.Hand))
 			for i := range player.Hand {
 				view.Hand[i] = EngineCardView{
-					ID:     player.Hand[i].ID,
+					ID:       player.Hand[i].ID,
 					FaceDown: true,
-					Zone:   zoneHand,
+					Zone:     zoneHand,
 				}
 			}
 		}
@@ -1708,10 +1708,10 @@ func (e *MageEngine) buildStackViews(gameState *engineGameState) []EngineCardVie
 		if item.Kind == "TRIGGERED" || item.Kind == rules.StackItemKindTriggered {
 			// Create a view for triggered ability using its description
 			views = append(views, EngineCardView{
-				ID:          item.ID,
-				Name:        item.Description,
-				DisplayName: item.Description,
-				Zone:        zoneStack,
+				ID:           item.ID,
+				Name:         item.Description,
+				DisplayName:  item.Description,
+				Zone:         zoneStack,
 				ControllerID: item.Controller,
 			})
 		} else {
@@ -1720,10 +1720,10 @@ func (e *MageEngine) buildStackViews(gameState *engineGameState) []EngineCardVie
 			if !found {
 				// Create a placeholder view if card not found
 				views = append(views, EngineCardView{
-					ID:          item.ID,
-					Name:        item.Description,
-					DisplayName: item.Description,
-					Zone:        zoneStack,
+					ID:           item.ID,
+					Name:         item.Description,
+					DisplayName:  item.Description,
+					Zone:         zoneStack,
 					ControllerID: item.Controller,
 				})
 			} else {
@@ -1743,7 +1743,7 @@ func (e *MageEngine) buildCombatView(gameState *engineGameState) EngineCombatVie
 		AttackingPlayerID: gameState.combat.attackingPlayerID,
 		Groups:            make([]EngineCombatGroupView, 0, len(gameState.combat.groups)),
 	}
-	
+
 	for _, group := range gameState.combat.groups {
 		groupView := EngineCombatGroupView{
 			Attackers:         make([]string, len(group.attackers)),
@@ -1756,7 +1756,7 @@ func (e *MageEngine) buildCombatView(gameState *engineGameState) EngineCombatVie
 		copy(groupView.Blockers, group.blockers)
 		view.Groups = append(view.Groups, groupView)
 	}
-	
+
 	return view
 }
 
@@ -2194,21 +2194,21 @@ func (e *MageEngine) ResumeGame(gameID string) error {
 func (e *MageEngine) checkStateAndTriggered(gameState *engineGameState) bool {
 	somethingHappened := false
 	maxIterations := 100 // Safety limit to prevent infinite loops
-	
+
 	for i := 0; i < maxIterations; i++ {
 		// First check state-based actions
 		sbaHappened := e.checkStateBasedActions(gameState)
-		
+
 		// Then process triggered abilities
 		triggeredHappened := e.processTriggeredAbilities(gameState)
-		
+
 		// If nothing happened, we're stable
 		if !sbaHappened && !triggeredHappened {
 			break
 		}
-		
+
 		somethingHappened = true
-		
+
 		// If we hit the limit, log a warning
 		if i == maxIterations-1 {
 			if e.logger != nil {
@@ -2218,7 +2218,7 @@ func (e *MageEngine) checkStateAndTriggered(gameState *engineGameState) bool {
 			}
 		}
 	}
-	
+
 	return somethingHappened
 }
 
@@ -2239,20 +2239,20 @@ func (e *MageEngine) processTriggeredAbilities(gameState *engineGameState) bool 
 	if len(gameState.triggeredQueue) == 0 {
 		return false
 	}
-	
+
 	played := false
 	activePlayerID := gameState.turnManager.ActivePlayer()
-	
+
 	// Process in APNAP order: Active Player first, then Non-Active Players in turn order
 	// Per Java GameImpl.checkTriggered() line 2332: for (UUID playerId : state.getPlayerList(state.getActivePlayerId()))
 	playerOrder := e.getPlayerListStartingWithActive(gameState, activePlayerID)
-	
+
 	for _, playerID := range playerOrder {
 		player := gameState.players[playerID]
 		if player == nil {
 			continue
 		}
-		
+
 		// Process all triggered abilities for this player
 		// Per Java: while (player.canRespond()) - player can die or win caused by triggered abilities
 		for player.canRespond() {
@@ -2261,7 +2261,7 @@ func (e *MageEngine) processTriggeredAbilities(gameState *engineGameState) bool 
 			if len(abilities) == 0 {
 				break
 			}
-			
+
 			// Per Java lines 2339-2347: Process non-stack abilities first
 			// (e.g., Banisher Priest return exiled creature)
 			for i := len(abilities) - 1; i >= 0; i-- {
@@ -2269,7 +2269,7 @@ func (e *MageEngine) processTriggeredAbilities(gameState *engineGameState) bool 
 				if !ability.UsesStack {
 					// Remove from queue
 					e.removeTriggeredAbility(gameState, ability.ID)
-					
+
 					// Execute immediately
 					if ability.Resolve != nil {
 						if err := ability.Resolve(gameState); err != nil {
@@ -2283,22 +2283,22 @@ func (e *MageEngine) processTriggeredAbilities(gameState *engineGameState) bool 
 							played = true
 						}
 					}
-					
+
 					// Remove from local list
 					abilities = append(abilities[:i], abilities[i+1:]...)
 				}
 			}
-			
+
 			if len(abilities) == 0 {
 				break
 			}
-			
+
 			// Per Java lines 2351-2360: If only one ability, put it on stack
 			// If multiple, player chooses order (for now, we process in queue order)
 			if len(abilities) == 1 {
 				ability := abilities[0]
 				e.removeTriggeredAbility(gameState, ability.ID)
-				
+
 				// Put on stack
 				if err := e.putTriggeredAbilityOnStack(gameState, ability); err != nil {
 					if e.logger != nil {
@@ -2315,7 +2315,7 @@ func (e *MageEngine) processTriggeredAbilities(gameState *engineGameState) bool 
 				// In full implementation, player would choose order
 				for _, ability := range abilities {
 					e.removeTriggeredAbility(gameState, ability.ID)
-					
+
 					if err := e.putTriggeredAbilityOnStack(gameState, ability); err != nil {
 						if e.logger != nil {
 							e.logger.Error("failed to put triggered ability on stack",
@@ -2331,7 +2331,7 @@ func (e *MageEngine) processTriggeredAbilities(gameState *engineGameState) bool 
 			}
 		}
 	}
-	
+
 	return played
 }
 
@@ -2353,18 +2353,18 @@ func (e *MageEngine) handleSimultaneousEvents(gameState *engineGameState) {
 	if !gameState.hasSimultaneousEvents() {
 		return
 	}
-	
+
 	// Copy events to process (new events might be added during processing)
 	eventsToHandle := make([]rules.Event, len(gameState.simultaneousEvents))
 	copy(eventsToHandle, gameState.simultaneousEvents)
 	gameState.simultaneousEvents = nil
-	
+
 	// Process each event through the event bus
 	// This allows watchers and triggers to respond to the events
 	for _, event := range eventsToHandle {
 		gameState.eventBus.Publish(event)
 	}
-	
+
 	if e.logger != nil && len(eventsToHandle) > 0 {
 		e.logger.Debug("processed simultaneous events",
 			zap.Int("count", len(eventsToHandle)),
@@ -2377,7 +2377,7 @@ func (gameState *engineGameState) trackStackDepth() {
 	if gameState.analytics == nil {
 		return
 	}
-	
+
 	currentDepth := len(gameState.stack.List())
 	if currentDepth > gameState.analytics.maxStackDepth {
 		gameState.analytics.maxStackDepth = currentDepth
@@ -2417,7 +2417,7 @@ func (gameState *engineGameState) trackAction() {
 	if gameState.analytics == nil {
 		return
 	}
-	
+
 	currentTurn := gameState.turnManager.TurnNumber()
 	gameState.analytics.actionsPerTurn[currentTurn]++
 }
@@ -2427,7 +2427,7 @@ func (gameState *engineGameState) trackTurnStart() {
 	if gameState.analytics == nil {
 		return
 	}
-	
+
 	currentTurn := gameState.turnManager.TurnNumber()
 	gameState.analytics.turnStartTimes[currentTurn] = time.Now()
 }
@@ -2437,12 +2437,12 @@ func (gameState *engineGameState) getAnalyticsSummary() map[string]interface{} {
 	if gameState.analytics == nil {
 		return nil
 	}
-	
+
 	// Calculate average response time per turn
 	var totalTurnTime time.Duration
 	turnCount := 0
 	currentTurn := gameState.turnManager.TurnNumber()
-	
+
 	for turn := 1; turn < currentTurn; turn++ {
 		if startTime, exists := gameState.analytics.turnStartTimes[turn]; exists {
 			if endTime, exists := gameState.analytics.turnStartTimes[turn+1]; exists {
@@ -2451,26 +2451,26 @@ func (gameState *engineGameState) getAnalyticsSummary() map[string]interface{} {
 			}
 		}
 	}
-	
+
 	var avgTurnTime float64
 	if turnCount > 0 {
 		avgTurnTime = totalTurnTime.Seconds() / float64(turnCount)
 	}
-	
+
 	// Calculate total game time
 	gameTime := time.Since(gameState.analytics.gameStartTime).Seconds()
-	
+
 	return map[string]interface{}{
-		"max_stack_depth":       gameState.analytics.maxStackDepth,
-		"total_stack_items":     gameState.analytics.totalStackItems,
-		"priority_pass_count":   gameState.analytics.priorityPassCount,
-		"spells_cast":           gameState.analytics.spellsCast,
-		"abilities_activated":   gameState.analytics.abilitiesActivated,
-		"triggers_processed":    gameState.analytics.triggersProcessed,
-		"actions_per_turn":      gameState.analytics.actionsPerTurn,
-		"avg_turn_time_seconds": avgTurnTime,
+		"max_stack_depth":         gameState.analytics.maxStackDepth,
+		"total_stack_items":       gameState.analytics.totalStackItems,
+		"priority_pass_count":     gameState.analytics.priorityPassCount,
+		"spells_cast":             gameState.analytics.spellsCast,
+		"abilities_activated":     gameState.analytics.abilitiesActivated,
+		"triggers_processed":      gameState.analytics.triggersProcessed,
+		"actions_per_turn":        gameState.analytics.actionsPerTurn,
+		"avg_turn_time_seconds":   avgTurnTime,
 		"total_game_time_seconds": gameTime,
-		"current_turn":          currentTurn,
+		"current_turn":            currentTurn,
 	}
 }
 
@@ -2478,7 +2478,7 @@ func (gameState *engineGameState) getAnalyticsSummary() map[string]interface{} {
 // and continuing in turn order. This is used for APNAP (Active Player, Non-Active Player) ordering.
 func (e *MageEngine) getPlayerListStartingWithActive(gameState *engineGameState, activePlayerID string) []string {
 	result := make([]string, 0, len(gameState.playerOrder))
-	
+
 	// Find active player index
 	activeIndex := -1
 	for i, pid := range gameState.playerOrder {
@@ -2487,18 +2487,18 @@ func (e *MageEngine) getPlayerListStartingWithActive(gameState *engineGameState,
 			break
 		}
 	}
-	
+
 	if activeIndex == -1 {
 		// Active player not found, return normal order
 		return gameState.playerOrder
 	}
-	
+
 	// Start with active player, then continue in turn order
 	for i := 0; i < len(gameState.playerOrder); i++ {
 		idx := (activeIndex + i) % len(gameState.playerOrder)
 		result = append(result, gameState.playerOrder[idx])
 	}
-	
+
 	return result
 }
 
@@ -2529,16 +2529,16 @@ func (e *MageEngine) RegisterCombatTrigger(gameID string, trigger *combatTrigger
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	gameState.combatTriggers = append(gameState.combatTriggers, trigger)
-	
+
 	if e.logger != nil {
 		e.logger.Debug("registered combat trigger",
 			zap.String("game_id", gameID),
@@ -2546,7 +2546,7 @@ func (e *MageEngine) RegisterCombatTrigger(gameID string, trigger *combatTrigger
 			zap.String("trigger_type", trigger.TriggerType),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -2559,7 +2559,7 @@ func (e *MageEngine) checkCombatTriggers(gameState *engineGameState, event rules
 		if !exists || source.Zone != zoneBattlefield {
 			continue
 		}
-		
+
 		// Check if the trigger condition is met
 		if trigger.Condition != nil && trigger.Condition(gameState, event) {
 			// Create and queue the triggered ability
@@ -2567,7 +2567,7 @@ func (e *MageEngine) checkCombatTriggers(gameState *engineGameState, event rules
 				ability := trigger.CreateAbility(gameState, event)
 				if ability != nil {
 					gameState.triggeredQueue = append(gameState.triggeredQueue, ability)
-					
+
 					if e.logger != nil {
 						e.logger.Debug("combat trigger fired",
 							zap.String("source_id", trigger.SourceID),
@@ -2590,7 +2590,7 @@ func (e *MageEngine) putTriggeredAbilityOnStack(gameState *engineGameState, abil
 		}
 		return nil
 	}
-	
+
 	// Create stack item for triggered ability
 	item := rules.StackItem{
 		ID:          ability.ID,
@@ -2600,13 +2600,13 @@ func (e *MageEngine) putTriggeredAbilityOnStack(gameState *engineGameState, abil
 		Kind:        "TRIGGERED",
 		Resolve:     resolveFunc,
 	}
-	
+
 	// Push to stack
 	gameState.stack.Push(item)
 	gameState.trackStackItem()
 	gameState.trackStackDepth()
 	gameState.trackTriggerProcessed()
-	
+
 	// Notify trigger
 	e.notifyTrigger(gameState.gameID, map[string]interface{}{
 		"ability_id":  ability.ID,
@@ -2615,7 +2615,7 @@ func (e *MageEngine) putTriggeredAbilityOnStack(gameState *engineGameState, abil
 		"description": ability.Description,
 		"uses_stack":  ability.UsesStack,
 	})
-	
+
 	if e.logger != nil {
 		e.logger.Debug("put triggered ability on stack",
 			zap.String("ability_id", ability.ID),
@@ -2624,7 +2624,7 @@ func (e *MageEngine) putTriggeredAbilityOnStack(gameState *engineGameState, abil
 			zap.String("description", ability.Description),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -2781,7 +2781,7 @@ func (e *MageEngine) moveCard(gameState *engineGameState, card *internalCard, ta
 	}
 
 	sourceZone := card.Zone
-	
+
 	// Remove from source zone
 	switch sourceZone {
 	case zoneStack:
@@ -2838,7 +2838,7 @@ func (e *MageEngine) moveCard(gameState *engineGameState, card *internalCard, ta
 	switch targetZone {
 	case zoneBattlefield:
 		gameState.battlefield = append(gameState.battlefield, card)
-		
+
 		// Emit enters battlefield event
 		gameState.eventBus.Publish(rules.Event{
 			Type:        rules.EventEntersTheBattlefield,
@@ -2856,7 +2856,7 @@ func (e *MageEngine) moveCard(gameState *engineGameState, card *internalCard, ta
 		if player, exists := gameState.players[card.OwnerID]; exists {
 			player.Graveyard = append(player.Graveyard, card)
 		}
-		
+
 		// If moving from battlefield, emit dies event
 		if sourceZone == zoneBattlefield {
 			gameState.eventBus.Publish(rules.Event{
@@ -3237,10 +3237,10 @@ func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapsh
 		Prompts:        make([]EnginePrompt, len(gameState.prompts)),
 		Timestamp:      time.Now(),
 	}
-	
+
 	// Copy player order
 	copy(snapshot.PlayerOrder, gameState.playerOrder)
-	
+
 	// Deep copy players
 	for id, player := range gameState.players {
 		playerCopy := &internalPlayer{
@@ -3269,12 +3269,12 @@ func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapsh
 		}
 		snapshot.Players[id] = playerCopy
 	}
-	
+
 	// Deep copy all cards
 	for id, card := range gameState.cards {
 		cardCopy := e.copyCard(card)
 		snapshot.Cards[id] = cardCopy
-		
+
 		// Update player zone references
 		if player, exists := snapshot.Players[card.OwnerID]; exists {
 			switch card.Zone {
@@ -3308,16 +3308,16 @@ func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapsh
 			}
 		}
 	}
-	
+
 	// Copy stack items
 	if gameState.stack != nil {
 		snapshot.StackItems = append(snapshot.StackItems, gameState.stack.List()...)
 	}
-	
+
 	// Copy messages and prompts
 	copy(snapshot.Messages, gameState.messages)
 	copy(snapshot.Prompts, gameState.prompts)
-	
+
 	return snapshot
 }
 
@@ -3326,7 +3326,7 @@ func (e *MageEngine) copyCard(card *internalCard) *internalCard {
 	if card == nil {
 		return nil
 	}
-	
+
 	return &internalCard{
 		ID:             card.ID,
 		Name:           card.Name,
@@ -3362,23 +3362,23 @@ func (e *MageEngine) copyCard(card *internalCard) *internalCard {
 func (e *MageEngine) BookmarkState(gameID string) (int, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	
+
 	gameState, exists := e.games[gameID]
 	if !exists {
 		return 0, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	snapshot := e.createSnapshot(gameState)
 	gameState.mu.RUnlock()
-	
+
 	// Add snapshot to bookmarks
 	if e.bookmarks[gameID] == nil {
 		e.bookmarks[gameID] = make([]*gameStateSnapshot, 0)
 	}
 	e.bookmarks[gameID] = append(e.bookmarks[gameID], snapshot)
 	bookmarkID := len(e.bookmarks[gameID])
-	
+
 	if e.logger != nil {
 		e.logger.Debug("bookmarked game state",
 			zap.String("game_id", gameID),
@@ -3386,7 +3386,7 @@ func (e *MageEngine) BookmarkState(gameID string) (int, error) {
 			zap.Int("turn", snapshot.TurnNumber),
 		)
 	}
-	
+
 	return bookmarkID, nil
 }
 
@@ -3396,59 +3396,59 @@ func (e *MageEngine) BookmarkState(gameID string) (int, error) {
 func (e *MageEngine) RestoreState(gameID string, bookmarkID int, context string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	
+
 	gameState, exists := e.games[gameID]
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	bookmarks := e.bookmarks[gameID]
 	if bookmarks == nil || bookmarkID < 1 || bookmarkID > len(bookmarks) {
 		return fmt.Errorf("bookmark %d not found for game %s", bookmarkID, gameID)
 	}
-	
+
 	snapshot := bookmarks[bookmarkID-1]
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Restore game state from snapshot
-	gameState.state = snapshot.state
+	gameState.state = snapshot.State
 	gameState.gameType = snapshot.GameType
-	
+
 	// Restore players
 	gameState.players = make(map[string]*internalPlayer)
 	for id, player := range snapshot.Players {
 		gameState.players[id] = player
 	}
 	gameState.playerOrder = append([]string(nil), snapshot.PlayerOrder...)
-	
+
 	// Restore cards
 	gameState.cards = make(map[string]*internalCard)
 	for id, card := range snapshot.Cards {
 		gameState.cards[id] = card
 	}
-	
+
 	// Restore zones
 	gameState.battlefield = append([]*internalCard(nil), snapshot.Battlefield...)
 	gameState.exile = append([]*internalCard(nil), snapshot.Exile...)
 	gameState.command = append([]*internalCard(nil), snapshot.Command...)
-	
+
 	// Restore stack
 	gameState.stack = rules.NewStackManager()
 	for _, item := range snapshot.StackItems {
 		gameState.stack.Push(item)
 	}
-	
+
 	// Restore messages and prompts
 	gameState.messages = append([]EngineMessage(nil), snapshot.Messages...)
 	gameState.prompts = append([]EnginePrompt(nil), snapshot.Prompts...)
-	
+
 	// Remove this bookmark and all newer bookmarks
 	e.bookmarks[gameID] = bookmarks[:bookmarkID-1]
-	
+
 	gameState.addMessage(fmt.Sprintf("Game restored to turn %d (%s)", snapshot.TurnNumber, context), "system")
-	
+
 	if e.logger != nil {
 		e.logger.Info("restored game state",
 			zap.String("game_id", gameID),
@@ -3457,7 +3457,7 @@ func (e *MageEngine) RestoreState(gameID string, bookmarkID int, context string)
 			zap.String("context", context),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -3466,22 +3466,22 @@ func (e *MageEngine) RestoreState(gameID string, bookmarkID int, context string)
 func (e *MageEngine) RemoveBookmark(gameID string, bookmarkID int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	
+
 	bookmarks := e.bookmarks[gameID]
 	if bookmarks == nil || bookmarkID < 1 || bookmarkID > len(bookmarks) {
 		return fmt.Errorf("bookmark %d not found for game %s", bookmarkID, gameID)
 	}
-	
+
 	// Remove this bookmark and all newer ones
 	e.bookmarks[gameID] = bookmarks[:bookmarkID-1]
-	
+
 	if e.logger != nil {
 		e.logger.Debug("removed bookmark",
 			zap.String("game_id", gameID),
 			zap.Int("bookmark_id", bookmarkID),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -3490,9 +3490,9 @@ func (e *MageEngine) RemoveBookmark(gameID string, bookmarkID int) error {
 func (e *MageEngine) ClearBookmarks(gameID string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	
+
 	delete(e.bookmarks, gameID)
-	
+
 	if e.logger != nil {
 		e.logger.Debug("cleared all bookmarks",
 			zap.String("game_id", gameID),
@@ -3506,21 +3506,21 @@ func (e *MageEngine) SetPlayerStoredBookmark(gameID, playerID string, bookmarkID
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	player, exists := gameState.players[playerID]
 	if !exists {
 		return fmt.Errorf("player %s not found", playerID)
 	}
-	
+
 	player.StoredBookmark = bookmarkID
-	
+
 	if e.logger != nil {
 		e.logger.Debug("set player stored bookmark",
 			zap.String("game_id", gameID),
@@ -3528,7 +3528,7 @@ func (e *MageEngine) SetPlayerStoredBookmark(gameID, playerID string, bookmarkID
 			zap.Int("bookmark_id", bookmarkID),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -3538,27 +3538,27 @@ func (e *MageEngine) ResetPlayerStoredBookmark(gameID, playerID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	player, exists := gameState.players[playerID]
 	if !exists {
 		gameState.mu.Unlock()
 		return fmt.Errorf("player %s not found", playerID)
 	}
-	
+
 	bookmarkID := player.StoredBookmark
 	player.StoredBookmark = -1
 	gameState.mu.Unlock()
-	
+
 	// Remove the bookmark if it exists
 	if bookmarkID != -1 {
 		e.RemoveBookmark(gameID, bookmarkID)
 	}
-	
+
 	if e.logger != nil {
 		e.logger.Debug("reset player stored bookmark",
 			zap.String("game_id", gameID),
@@ -3566,7 +3566,7 @@ func (e *MageEngine) ResetPlayerStoredBookmark(gameID, playerID string) error {
 			zap.Int("old_bookmark_id", bookmarkID),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -3576,35 +3576,35 @@ func (e *MageEngine) Undo(gameID, playerID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	player, exists := gameState.players[playerID]
 	if !exists {
 		gameState.mu.Unlock()
 		return fmt.Errorf("player %s not found", playerID)
 	}
-	
+
 	bookmarkID := player.StoredBookmark
 	gameState.mu.Unlock()
-	
+
 	if bookmarkID == -1 {
 		return fmt.Errorf("no undo available for player %s", playerID)
 	}
-	
+
 	// Restore to the stored bookmark
 	if err := e.RestoreState(gameID, bookmarkID, fmt.Sprintf("player %s undo", playerID)); err != nil {
 		return fmt.Errorf("failed to undo: %w", err)
 	}
-	
+
 	// Clear the stored bookmark
 	if err := e.SetPlayerStoredBookmark(gameID, playerID, -1); err != nil {
 		return fmt.Errorf("failed to clear stored bookmark: %w", err)
 	}
-	
+
 	if e.logger != nil {
 		e.logger.Info("player undo",
 			zap.String("game_id", gameID),
@@ -3612,13 +3612,13 @@ func (e *MageEngine) Undo(gameID, playerID string) error {
 			zap.Int("bookmark_id", bookmarkID),
 		)
 	}
-	
+
 	// Notify players of the undo
 	e.notifyGameStateChange(gameID, map[string]interface{}{
 		"type":      "undo",
 		"player_id": playerID,
 	})
-	
+
 	return nil
 }
 
@@ -3628,7 +3628,7 @@ func (e *MageEngine) SaveTurnSnapshot(gameID string, turnNumber int) error {
 	if !e.rollbackAllowed {
 		return nil // Turn rollback disabled
 	}
-	
+
 	e.mu.Lock()
 	gameState, exists := e.games[gameID]
 	if !exists {
@@ -3636,28 +3636,28 @@ func (e *MageEngine) SaveTurnSnapshot(gameID string, turnNumber int) error {
 		return fmt.Errorf("game %s not found", gameID)
 	}
 	e.mu.Unlock()
-	
+
 	gameState.mu.RLock()
 	snapshot := e.createSnapshot(gameState)
 	gameState.mu.RUnlock()
-	
+
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	
+
 	// Initialize turn snapshots map for this game if needed
 	if e.turnSnapshots[gameID] == nil {
 		e.turnSnapshots[gameID] = make(map[int]*gameStateSnapshot)
 	}
-	
+
 	// Save snapshot for this turn
 	e.turnSnapshots[gameID][turnNumber] = snapshot
-	
+
 	// Remove old snapshots beyond the max
 	toDelete := turnNumber - e.rollbackTurnsMax
 	if toDelete > 0 {
 		delete(e.turnSnapshots[gameID], toDelete)
 	}
-	
+
 	if e.logger != nil {
 		e.logger.Debug("saved turn snapshot",
 			zap.String("game_id", gameID),
@@ -3665,7 +3665,7 @@ func (e *MageEngine) SaveTurnSnapshot(gameID string, turnNumber int) error {
 			zap.Int("snapshots_kept", len(e.turnSnapshots[gameID])),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -3675,30 +3675,30 @@ func (e *MageEngine) CanRollbackTurns(gameID string, turnsToRollback int) (bool,
 	if !e.rollbackAllowed {
 		return false, fmt.Errorf("turn rollback is disabled")
 	}
-	
+
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return false, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	currentTurn := gameState.turnManager.TurnNumber()
 	targetTurn := currentTurn - turnsToRollback
-	
+
 	if targetTurn < 1 {
 		return false, nil // Can't rollback before turn 1
 	}
-	
+
 	e.mu.RLock()
 	defer e.mu.RUnlock()
-	
+
 	turnSnaps := e.turnSnapshots[gameID]
 	if turnSnaps == nil {
 		return false, nil
 	}
-	
+
 	_, exists = turnSnaps[targetTurn]
 	return exists, nil
 }
@@ -3709,39 +3709,39 @@ func (e *MageEngine) RollbackTurns(gameID string, turnsToRollback int) error {
 	if !e.rollbackAllowed {
 		return fmt.Errorf("turn rollback is disabled")
 	}
-	
+
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	currentTurn := gameState.turnManager.TurnNumber()
 	targetTurn := currentTurn - turnsToRollback
-	
+
 	if targetTurn < 1 {
 		return fmt.Errorf("cannot rollback to turn %d (before game start)", targetTurn)
 	}
-	
+
 	e.mu.RLock()
 	turnSnaps := e.turnSnapshots[gameID]
 	snapshot, exists := turnSnaps[targetTurn]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("no snapshot available for turn %d", targetTurn)
 	}
-	
+
 	// Restore game state from turn snapshot
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Restore game state from snapshot
-	gameState.state = snapshot.state
+	gameState.state = snapshot.State
 	gameState.gameType = snapshot.GameType
-	
+
 	// Restore players
 	gameState.players = make(map[string]*internalPlayer)
 	for id, player := range snapshot.Players {
@@ -3751,37 +3751,37 @@ func (e *MageEngine) RollbackTurns(gameID string, turnsToRollback int) error {
 		gameState.players[id] = player
 	}
 	gameState.playerOrder = append([]string(nil), snapshot.PlayerOrder...)
-	
+
 	// Restore cards
 	gameState.cards = make(map[string]*internalCard)
 	for id, card := range snapshot.Cards {
 		gameState.cards[id] = card
 	}
-	
+
 	// Restore zones
 	gameState.battlefield = append([]*internalCard(nil), snapshot.Battlefield...)
 	gameState.exile = append([]*internalCard(nil), snapshot.Exile...)
 	gameState.command = append([]*internalCard(nil), snapshot.Command...)
-	
+
 	// Restore stack
 	gameState.stack = rules.NewStackManager()
 	for _, item := range snapshot.StackItems {
 		gameState.stack.Push(item)
 	}
-	
+
 	// Restore messages and prompts
 	gameState.messages = append([]EngineMessage(nil), snapshot.Messages...)
 	gameState.prompts = append([]EnginePrompt(nil), snapshot.Prompts...)
-	
+
 	// Clear all action bookmarks (they're invalid after turn rollback)
 	// Per Java: savedStates.clear() and gameStates.clear()
 	e.mu.Lock()
 	delete(e.bookmarks, gameID)
 	e.bookmarks[gameID] = make([]*gameStateSnapshot, 0)
 	e.mu.Unlock()
-	
+
 	gameState.addMessage(fmt.Sprintf("Game rolled back to start of turn %d", targetTurn), "system")
-	
+
 	if e.logger != nil {
 		e.logger.Info("rolled back turns",
 			zap.String("game_id", gameID),
@@ -3790,7 +3790,7 @@ func (e *MageEngine) RollbackTurns(gameID string, turnsToRollback int) error {
 			zap.Int("turns_rolled_back", turnsToRollback),
 		)
 	}
-	
+
 	// Notify players of the rollback
 	e.notifyGameStateChange(gameID, map[string]interface{}{
 		"type":              "turn_rollback",
@@ -3798,7 +3798,7 @@ func (e *MageEngine) RollbackTurns(gameID string, turnsToRollback int) error {
 		"to_turn":           targetTurn,
 		"turns_rolled_back": turnsToRollback,
 	})
-	
+
 	return nil
 }
 
@@ -3839,12 +3839,12 @@ func (e *MageEngine) CleanupGame(gameID string) error {
 			zap.String("game_id", gameID),
 		)
 	}
-	
+
 	// Notify cleanup complete (safe to call after releasing locks)
 	e.notifyGameStateChange(gameID, map[string]interface{}{
 		"type": "game_cleanup",
 	})
-	
+
 	return nil
 }
 
@@ -3854,27 +3854,27 @@ func (e *MageEngine) StartMulligan(gameID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	gameState.state = GameStateMulligan
-	
+
 	if e.logger != nil {
 		e.logger.Info("started mulligan phase",
 			zap.String("game_id", gameID),
 		)
 	}
-	
+
 	e.notifyGameStateChange(gameID, map[string]interface{}{
 		"type":  "mulligan_started",
 		"state": "MULLIGAN",
 	})
-	
+
 	return nil
 }
 
@@ -3884,55 +3884,55 @@ func (e *MageEngine) PlayerMulligan(gameID, playerID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	if gameState.state != GameStateMulligan {
 		return fmt.Errorf("game is not in mulligan phase")
 	}
-	
+
 	player, exists := gameState.players[playerID]
 	if !exists {
 		return fmt.Errorf("player %s not found", playerID)
 	}
-	
+
 	if player.KeptHand {
 		return fmt.Errorf("player has already kept their hand")
 	}
-	
+
 	// Shuffle hand back into library
 	player.Library = append(player.Library, player.Hand...)
 	player.Hand = make([]*internalCard, 0)
-	
+
 	// Shuffle library (simple random shuffle)
 	for i := len(player.Library) - 1; i > 0; i-- {
 		j := i // In production, use crypto/rand for true randomness
 		player.Library[i], player.Library[j] = player.Library[j], player.Library[i]
 	}
-	
+
 	// Increment mulligan count
 	player.MulliganCount++
-	
+
 	// Draw N - mulliganCount cards (London mulligan)
 	handSize := 7 - player.MulliganCount
 	if handSize < 0 {
 		handSize = 0
 	}
-	
+
 	for i := 0; i < handSize && len(player.Library) > 0; i++ {
 		card := player.Library[0]
 		player.Library = player.Library[1:]
 		card.Zone = zoneHand
 		player.Hand = append(player.Hand, card)
 	}
-	
+
 	gameState.addMessage(fmt.Sprintf("%s mulligans to %d cards", player.Name, handSize), "mulligan")
-	
+
 	if e.logger != nil {
 		e.logger.Info("player mulliganed",
 			zap.String("game_id", gameID),
@@ -3941,14 +3941,14 @@ func (e *MageEngine) PlayerMulligan(gameID, playerID string) error {
 			zap.Int("hand_size", handSize),
 		)
 	}
-	
+
 	e.notifyGameStateChange(gameID, map[string]interface{}{
 		"type":           "player_mulligan",
 		"player_id":      playerID,
 		"mulligan_count": player.MulliganCount,
 		"hand_size":      handSize,
 	})
-	
+
 	return nil
 }
 
@@ -3958,27 +3958,27 @@ func (e *MageEngine) PlayerKeepHand(gameID, playerID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	if gameState.state != GameStateMulligan {
 		return fmt.Errorf("game is not in mulligan phase")
 	}
-	
+
 	player, exists := gameState.players[playerID]
 	if !exists {
 		return fmt.Errorf("player %s not found", playerID)
 	}
-	
+
 	player.KeptHand = true
-	
+
 	gameState.addMessage(fmt.Sprintf("%s keeps their hand", player.Name), "mulligan")
-	
+
 	if e.logger != nil {
 		e.logger.Info("player kept hand",
 			zap.String("game_id", gameID),
@@ -3986,12 +3986,12 @@ func (e *MageEngine) PlayerKeepHand(gameID, playerID string) error {
 			zap.Int("mulligan_count", player.MulliganCount),
 		)
 	}
-	
+
 	e.notifyGameStateChange(gameID, map[string]interface{}{
 		"type":      "player_keep_hand",
 		"player_id": playerID,
 	})
-	
+
 	return nil
 }
 
@@ -4001,41 +4001,41 @@ func (e *MageEngine) EndMulligan(gameID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	if gameState.state != GameStateMulligan {
 		return fmt.Errorf("game is not in mulligan phase")
 	}
-	
+
 	// Check all players have kept their hands
 	for _, player := range gameState.players {
 		if !player.KeptHand {
 			return fmt.Errorf("not all players have kept their hands")
 		}
 	}
-	
+
 	// Transition to main game
 	gameState.state = GameStateInProgress
-	
+
 	gameState.addMessage("Mulligan phase complete, game starting", "system")
-	
+
 	if e.logger != nil {
 		e.logger.Info("mulligan phase ended",
 			zap.String("game_id", gameID),
 		)
 	}
-	
+
 	e.notifyGameStateChange(gameID, map[string]interface{}{
 		"type":  "mulligan_ended",
 		"state": "IN_PROGRESS",
 	})
-	
+
 	return nil
 }
 
@@ -4203,10 +4203,10 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		// 507.1: At the start of the combat phase, if an opponent controls a permanent with
 		// "At the beginning of combat" triggered ability, or if a turn-based action of a player
 		// other than the active player occurs at the beginning of combat, the active player gets priority
-		
+
 		// Create new combat state (equivalent to game.getCombat().clear())
 		gameState.combat = newCombatState()
-		
+
 		// Clear combat flags on all cards
 		for _, card := range gameState.cards {
 			card.Attacking = false
@@ -4214,24 +4214,24 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 			card.AttackingWhat = ""
 			card.BlockingWhat = nil
 		}
-		
+
 		// Set the attacking player (equivalent to game.getCombat().setAttacker(activePlayerId))
 		gameState.combat.attackingPlayerID = activePlayerID
-		
+
 		// Set defenders (equivalent to game.getCombat().setDefenders(game))
 		// Clear previous defenders
 		gameState.combat.defenders = make(map[string]bool)
-		
+
 		// Add all opponents as defenders
 		for playerID := range gameState.players {
 			if playerID != activePlayerID {
 				gameState.combat.defenders[playerID] = true
 			}
 		}
-		
+
 		// Fire begin combat event
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventBeginCombatStep, "", "", ""))
-		
+
 		if e.logger != nil {
 			e.logger.Debug("begin combat step initialized",
 				zap.String("game_id", gameState.gameID),
@@ -4239,7 +4239,7 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 				zap.Int("defenders", len(gameState.combat.defenders)),
 			)
 		}
-		
+
 	case rules.StepDeclareAttackers:
 		// Per Java DeclareAttackersStep.beginStep() (line 33-36)
 		// This is where selectAttackers() would be called in Java
@@ -4267,7 +4267,7 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 
 		// Generate prompt for attacking player to declare attackers
 		options := e.buildAttackerPromptOptions(gameState)
-		if len(options) > 1 {  // More than just "DONE_ATTACKING"
+		if len(options) > 1 { // More than just "DONE_ATTACKING"
 			gameState.addPrompt(activePlayerID, "Declare attackers (select creatures to attack)", options)
 		} else {
 			gameState.addPrompt(activePlayerID, "No creatures can attack", []string{"DONE_ATTACKING"})
@@ -4309,7 +4309,7 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		for playerID := range gameState.players {
 			if playerID != activePlayerID {
 				options := e.buildBlockerPromptOptions(gameState, playerID)
-				if len(options) > 1 {  // More than just "DONE_BLOCKING"
+				if len(options) > 1 { // More than just "DONE_BLOCKING"
 					gameState.addPrompt(playerID, "Declare blockers (select creatures to block)", options)
 				} else {
 					gameState.addPrompt(playerID, "No creatures can block or no attackers", []string{"DONE_BLOCKING"})
@@ -4431,17 +4431,17 @@ func (e *MageEngine) ResetCombat(gameID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Create new combat state
 	gameState.combat = newCombatState()
-	
+
 	// Clear combat flags on all cards
 	for _, card := range gameState.cards {
 		card.Attacking = false
@@ -4449,14 +4449,14 @@ func (e *MageEngine) ResetCombat(gameID string) error {
 		card.AttackingWhat = ""
 		card.BlockingWhat = nil
 	}
-	
+
 	if e.logger != nil {
 		e.logger.Debug("reset combat", zap.String("game_id", gameID))
 	}
-	
+
 	// Fire begin combat event
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventBeginCombatStep, "", "", ""))
-	
+
 	return nil
 }
 
@@ -4466,27 +4466,27 @@ func (e *MageEngine) SetAttacker(gameID, playerID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	if _, exists := gameState.players[playerID]; !exists {
 		return fmt.Errorf("player %s not found", playerID)
 	}
-	
+
 	gameState.combat.attackingPlayerID = playerID
-	
+
 	if e.logger != nil {
 		e.logger.Debug("set attacking player",
 			zap.String("game_id", gameID),
 			zap.String("player_id", playerID),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -4496,22 +4496,22 @@ func (e *MageEngine) SetDefenders(gameID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	attackingPlayerID := gameState.combat.attackingPlayerID
 	if attackingPlayerID == "" {
 		return fmt.Errorf("no attacking player set")
 	}
-	
+
 	// Clear previous defenders
 	gameState.combat.defenders = make(map[string]bool)
-	
+
 	// Add all opponents as defenders
 	for playerID := range gameState.players {
 		if playerID != attackingPlayerID {
@@ -4541,14 +4541,14 @@ func (e *MageEngine) SetDefenders(gameID string) error {
 	}
 
 	// TODO: Add battles that can be attacked when battle system is implemented
-	
+
 	if e.logger != nil {
 		e.logger.Debug("set defenders",
 			zap.String("game_id", gameID),
 			zap.Int("defender_count", len(gameState.combat.defenders)),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -4558,43 +4558,43 @@ func (e *MageEngine) CanAttack(gameID, creatureID string) (bool, error) {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return false, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
-	
+
 	creature, exists := gameState.cards[creatureID]
 	if !exists {
 		return false, fmt.Errorf("creature %s not found", creatureID)
 	}
-	
+
 	// Basic checks (Java: Permanent.canAttack line 1485)
 	if creature.Tapped {
 		return false, nil
 	}
-	
+
 	// Check if can attack in principle (Java: canAttackInPrinciple line 1504)
 	// Check summoning sickness
 	// TODO: Implement AsThoughEffectType.ATTACK_AS_HASTE for haste effects
 	if creature.SummoningSickness {
 		return false, nil
 	}
-	
+
 	// Check defender ability (Java: line 1527)
 	// TODO: Implement AsThoughEffectType.ATTACK for effects that allow defender to attack
 	if e.hasAbility(creature, abilityDefender) {
 		return false, nil
 	}
-	
+
 	// Check for continuous effects that prevent attacking
 	// Per Java: RestrictionEffect.applies() and canAttack() checks
 	if e.hasCantAttackEffect(gameState, creatureID) {
 		return false, nil
 	}
-	
+
 	// Check if can attack at least one defender (Java: line 1516-1522)
 	// If no specific defender, check if can attack ANY defender
 	for defenderID := range gameState.combat.defenders {
@@ -4603,7 +4603,7 @@ func (e *MageEngine) CanAttack(gameID, creatureID string) (bool, error) {
 			return true, nil
 		}
 	}
-	
+
 	return false, nil
 }
 
@@ -4613,24 +4613,24 @@ func (e *MageEngine) CanAttackDefender(gameID, creatureID, defenderID string) (b
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return false, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
-	
+
 	creature, exists := gameState.cards[creatureID]
 	if !exists {
 		return false, fmt.Errorf("creature %s not found", creatureID)
 	}
-	
+
 	// Basic checks (Java: Permanent.canAttack line 1485)
 	if creature.Tapped {
 		return false, nil
 	}
-	
+
 	return e.canAttackDefenderInternal(gameState, creature, defenderID)
 }
 
@@ -4642,24 +4642,24 @@ func (e *MageEngine) canAttackDefenderInternal(gameState *engineGameState, creat
 	if creature.SummoningSickness {
 		return false, nil
 	}
-	
+
 	// Check defender ability (Java: line 1527)
 	// TODO: Implement AsThoughEffectType.ATTACK for effects that allow defender to attack
 	if e.hasAbility(creature, abilityDefender) {
 		return false, nil
 	}
-	
+
 	// Check if defender is valid
 	if !gameState.combat.defenders[defenderID] {
 		return false, fmt.Errorf("defender %s is not a valid defender", defenderID)
 	}
-	
+
 	// TODO: Implement restriction effects (Java: canAttackCheckRestrictionEffects line 1531)
 	// This requires the continuous effects system to check:
 	// - RestrictionEffect.canAttack(game, true)
 	// - RestrictionEffect.canAttack(creature, defenderId, ability, game, true)
 	// Examples: "can't attack", "can only attack if X", "can't attack player Y"
-	
+
 	return true, nil
 }
 
@@ -4669,60 +4669,60 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Validate player
 	if playerID != gameState.combat.attackingPlayerID {
 		return fmt.Errorf("player %s is not the attacking player", playerID)
 	}
-	
+
 	// Validate creature exists and is controlled by player
 	creature, exists := gameState.cards[creatureID]
 	if !exists {
 		return fmt.Errorf("creature %s not found", creatureID)
 	}
-	
+
 	if creature.ControllerID != playerID {
 		return fmt.Errorf("creature %s is not controlled by player %s", creatureID, playerID)
 	}
-	
+
 	// Validate creature is on battlefield
 	if creature.Zone != zoneBattlefield {
 		return fmt.Errorf("creature %s is not on battlefield", creatureID)
 	}
-	
+
 	// Validate creature can attack (not tapped, not summoning sick)
 	if creature.Tapped {
 		return fmt.Errorf("creature %s is tapped", creatureID)
 	}
-	
+
 	// Check for defender ability (Java: PermanentImpl.canAttackInPrinciple line 1527)
 	// Creatures with defender can't attack unless they have an effect allowing them to
 	if e.hasAbility(creature, abilityDefender) {
 		// TODO: Check for AsThoughEffectType.ATTACK effects that allow defender to attack
 		return fmt.Errorf("creature %s has defender and cannot attack", creatureID)
 	}
-	
+
 	// TODO: Check summoning sickness when we track turn entered
 	// TODO: Check for "can't attack" restrictions
 	// TODO: Check for "must attack" requirements
-	
+
 	// Fire declare attackers step pre event (before first attacker)
 	if len(gameState.combat.attackers) == 0 {
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareAttackersStepPre, "", "", playerID))
 	}
-	
+
 	// Validate defender exists
 	if !gameState.combat.defenders[defenderID] {
 		return fmt.Errorf("invalid defender %s", defenderID)
 	}
-	
+
 	// TODO: Validate can attack this specific defender (protection, etc.)
 
 	// Create a new combat group for this attacker
@@ -4744,7 +4744,7 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	group.attackers = append(group.attackers, creatureID)
 	gameState.combat.groups = append(gameState.combat.groups, group)
 	gameState.combat.attackers[creatureID] = true
-	
+
 	// Tap creature (unless it has vigilance)
 	// Check both base and granted vigilance
 	hasVigilance := e.hasAbilityWithEffects(gameState, creature, abilityVigilance)
@@ -4752,19 +4752,19 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 		creature.Tapped = true
 		gameState.combat.attackersTapped[creatureID] = true
 	}
-	
+
 	// Set creature combat state
 	creature.Attacking = true
 	creature.AttackingWhat = defenderID
-	
+
 	// Fire attacker declared event
 	event := rules.NewEvent(rules.EventAttackerDeclared, creatureID, creatureID, playerID)
 	event.Metadata["defender_id"] = defenderID
 	gameState.eventBus.Publish(event)
-	
+
 	// Check for combat triggers (e.g., "Whenever ~ attacks")
 	e.checkCombatTriggers(gameState, event)
-	
+
 	// Fire defender attacked event
 	defenderEvent := rules.NewEvent(rules.EventDefenderAttacked, defenderID, creatureID, playerID)
 	defenderEvent.Metadata["attacker_id"] = creatureID
@@ -4791,7 +4791,7 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 	}
 
 	gameState.addMessage(fmt.Sprintf("%s attacks", creature.Name), "combat")
-	
+
 	if e.logger != nil {
 		e.logger.Debug("declared attacker",
 			zap.String("game_id", gameID),
@@ -4799,7 +4799,7 @@ func (e *MageEngine) DeclareAttacker(gameID, creatureID, defenderID, playerID st
 			zap.String("defender_id", defenderID),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -4809,21 +4809,21 @@ func (e *MageEngine) FinishDeclaringAttackers(gameID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Fire DECLARED_ATTACKERS event
 	declaredEvent := rules.NewEvent(rules.EventDeclaredAttackers, "", "", gameState.combat.attackingPlayerID)
 	gameState.eventBus.Publish(declaredEvent)
-	
+
 	// Check for combat triggers (e.g., "Whenever one or more creatures attack")
 	e.checkCombatTriggers(gameState, declaredEvent)
-	
+
 	return nil
 }
 
@@ -4832,19 +4832,19 @@ func (e *MageEngine) GetCombatView(gameID string) (EngineCombatView, error) {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return EngineCombatView{}, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
-	
+
 	view := EngineCombatView{
 		AttackingPlayerID: gameState.combat.attackingPlayerID,
 		Groups:            make([]EngineCombatGroupView, 0, len(gameState.combat.groups)),
 	}
-	
+
 	for _, group := range gameState.combat.groups {
 		groupView := EngineCombatGroupView{
 			Attackers:         make([]string, len(group.attackers)),
@@ -4857,7 +4857,7 @@ func (e *MageEngine) GetCombatView(gameID string) (EngineCombatView, error) {
 		copy(groupView.Blockers, group.blockers)
 		view.Groups = append(view.Groups, groupView)
 	}
-	
+
 	return view, nil
 }
 
@@ -4867,60 +4867,60 @@ func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return false, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
-	
+
 	// Get blocker
 	blocker, exists := gameState.cards[blockerID]
 	if !exists {
 		return false, fmt.Errorf("blocker %s not found", blockerID)
 	}
-	
+
 	// Get attacker
 	_, exists = gameState.cards[attackerID]
 	if !exists {
 		return false, fmt.Errorf("attacker %s not found", attackerID)
 	}
-	
+
 	// Basic checks
 	// 1. Blocker must be untapped (or have ability to block while tapped)
 	if blocker.Tapped {
 		// TODO: Check for "can block while tapped" abilities
 		return false, nil
 	}
-	
+
 	// 2. Blocker must be a creature
 	if !strings.Contains(blocker.Type, "Creature") {
 		return false, nil
 	}
-	
+
 	// 3. Blocker must not be a battle
 	// TODO: Check for battle type when implemented
-	
+
 	// 4. Blocker must not be suspected
 	// TODO: Check for suspected status when implemented
-	
+
 	// 4a. Check for continuous effects that prevent blocking
 	// Per Java: RestrictionEffect.applies() and canBlock() checks
 	if e.hasCantBlockEffect(gameState, blockerID) {
 		return false, nil
 	}
-	
+
 	// 5. Blocker must be on battlefield
 	if blocker.Zone != zoneBattlefield {
 		return false, nil
 	}
-	
+
 	// 6. Attacker must be attacking
 	if !gameState.combat.attackers[attackerID] {
 		return false, nil
 	}
-	
+
 	// 7. Controller of blocker must be opponent of attacker's controller
 	// Find the group this attacker is in to get the defending player
 	var defendingPlayerID string
@@ -4935,19 +4935,19 @@ func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error
 			break
 		}
 	}
-	
+
 	if defendingPlayerID == "" {
 		return false, fmt.Errorf("attacker %s not found in any combat group", attackerID)
 	}
-	
+
 	// Blocker must be controlled by the defending player
 	if blocker.ControllerID != defendingPlayerID {
 		return false, nil
 	}
-	
+
 	// Get attacker for evasion checks
 	attacker := gameState.cards[attackerID]
-	
+
 	// Unblockable check: If attacker has "can't be blocked" ability, it cannot be blocked by any creature
 	// Per Rule 509.1b and Java CantBeBlockedSourceEffect.canBeBlocked() which returns false
 	if e.hasAbilityWithEffects(gameState, attacker, abilityUnblockable) {
@@ -4969,7 +4969,7 @@ func (e *MageEngine) CanBlock(gameID, blockerID, attackerID string) (bool, error
 
 	// TODO: Check other restriction effects (shadow, intimidate, etc.)
 	// TODO: Check protection
-	
+
 	return true, nil
 }
 
@@ -4979,25 +4979,25 @@ func (e *MageEngine) DeclareBlocker(gameID, blockerID, attackerID, playerID stri
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	// Fire declare blockers step pre event (before first blocker)
 	gameState.mu.RLock()
 	hasBlockers := len(gameState.combat.blockers) > 0
 	gameState.mu.RUnlock()
-	
+
 	if !hasBlockers {
 		gameState.mu.Lock()
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareBlockersStepPre, "", "", playerID))
 		gameState.mu.Unlock()
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Validate blocker can block this attacker
 	canBlock, err := e.canBlockInternal(gameState, blockerID, attackerID)
 	if err != nil {
@@ -5006,7 +5006,7 @@ func (e *MageEngine) DeclareBlocker(gameID, blockerID, attackerID, playerID stri
 	if !canBlock {
 		return fmt.Errorf("creature %s cannot block attacker %s", blockerID, attackerID)
 	}
-	
+
 	// Find the combat group for this attacker
 	var group *combatGroup
 	for _, g := range gameState.combat.groups {
@@ -5020,43 +5020,43 @@ func (e *MageEngine) DeclareBlocker(gameID, blockerID, attackerID, playerID stri
 			break
 		}
 	}
-	
+
 	if group == nil {
 		return fmt.Errorf("attacker %s not found in any combat group", attackerID)
 	}
-	
+
 	// Validate player controls the blocker
 	blocker, exists := gameState.cards[blockerID]
 	if !exists {
 		return fmt.Errorf("blocker %s not found", blockerID)
 	}
-	
+
 	if blocker.ControllerID != playerID {
 		return fmt.Errorf("player %s does not control blocker %s", playerID, blockerID)
 	}
-	
+
 	// Check if blocker is already blocking
 	if blocker.Blocking {
 		// In MTG, a creature can block multiple attackers in some cases
 		// For now, we'll allow it but track it properly
 		// TODO: Check for restrictions on multiple blocks
 	}
-	
+
 	// Add blocker to the group
 	group.blockers = append(group.blockers, blockerID)
 	group.blocked = true
 	gameState.combat.blockers[blockerID] = true
-	
+
 	// Update blocker's blocking status
 	blocker.Blocking = true
 	if blocker.BlockingWhat == nil {
 		blocker.BlockingWhat = []string{}
 	}
 	blocker.BlockingWhat = append(blocker.BlockingWhat, attackerID)
-	
+
 	// Add to blocking groups map (blocker -> group)
 	gameState.combat.blockingGroups[blockerID] = group
-	
+
 	// Fire BLOCKER_DECLARED event
 	blockerEvent := rules.Event{
 		Type:       rules.EventBlockerDeclared,
@@ -5066,10 +5066,10 @@ func (e *MageEngine) DeclareBlocker(gameID, blockerID, attackerID, playerID stri
 		Controller: playerID,
 	}
 	gameState.eventBus.Publish(blockerEvent)
-	
+
 	// Check for combat triggers (e.g., "Whenever ~ blocks")
 	e.checkCombatTriggers(gameState, blockerEvent)
-	
+
 	if e.logger != nil {
 		e.logger.Debug("blocker declared",
 			zap.String("game_id", gameID),
@@ -5078,7 +5078,7 @@ func (e *MageEngine) DeclareBlocker(gameID, blockerID, attackerID, playerID stri
 			zap.String("player_id", playerID),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -5089,30 +5089,30 @@ func (e *MageEngine) canBlockInternal(gameState *engineGameState, blockerID, att
 	if !exists {
 		return false, fmt.Errorf("blocker %s not found", blockerID)
 	}
-	
+
 	// Get attacker
 	_, exists = gameState.cards[attackerID]
 	if !exists {
 		return false, fmt.Errorf("attacker %s not found", attackerID)
 	}
-	
+
 	// Basic checks (same as CanBlock)
 	if blocker.Tapped {
 		return false, nil
 	}
-	
+
 	if !strings.Contains(blocker.Type, "Creature") {
 		return false, nil
 	}
-	
+
 	if blocker.Zone != zoneBattlefield {
 		return false, nil
 	}
-	
+
 	if !gameState.combat.attackers[attackerID] {
 		return false, nil
 	}
-	
+
 	// Find defending player
 	var defendingPlayerID string
 	for _, group := range gameState.combat.groups {
@@ -5126,15 +5126,15 @@ func (e *MageEngine) canBlockInternal(gameState *engineGameState, blockerID, att
 			break
 		}
 	}
-	
+
 	if defendingPlayerID == "" {
 		return false, fmt.Errorf("attacker %s not found in any combat group", attackerID)
 	}
-	
+
 	if blocker.ControllerID != defendingPlayerID {
 		return false, nil
 	}
-	
+
 	// Get attacker for evasion checks
 	attacker := gameState.cards[attackerID]
 
@@ -5162,20 +5162,20 @@ func (e *MageEngine) RemoveBlocker(gameID, blockerID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Find the combat group this blocker is in
 	group, exists := gameState.combat.blockingGroups[blockerID]
 	if !exists {
 		return fmt.Errorf("blocker %s is not blocking", blockerID)
 	}
-	
+
 	// Remove blocker from group
 	for i, bid := range group.blockers {
 		if bid == blockerID {
@@ -5183,35 +5183,35 @@ func (e *MageEngine) RemoveBlocker(gameID, blockerID string) error {
 			break
 		}
 	}
-	
+
 	// Update blocked status
 	if len(group.blockers) == 0 {
 		group.blocked = false
 	}
-	
+
 	// Remove from blocking groups map
 	delete(gameState.combat.blockingGroups, blockerID)
-	
+
 	// Remove from global blockers set
 	delete(gameState.combat.blockers, blockerID)
-	
+
 	// Update blocker card state
 	blocker, exists := gameState.cards[blockerID]
 	if exists {
 		blocker.Blocking = false
 		blocker.BlockingWhat = nil
 	}
-	
+
 	// Fire REMOVED_FROM_COMBAT event (Java: Combat.removeFromCombat)
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventRemovedFromCombat, blockerID, "", ""))
-	
+
 	if e.logger != nil {
 		e.logger.Debug("blocker removed",
 			zap.String("game_id", gameID),
 			zap.String("blocker_id", blockerID),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -5221,19 +5221,19 @@ func (e *MageEngine) RemoveAttacker(gameID, attackerID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Check if creature is actually attacking
 	if !gameState.combat.attackers[attackerID] {
 		return fmt.Errorf("creature %s is not attacking", attackerID)
 	}
-	
+
 	// Find and remove from combat group
 	var groupToRemove *combatGroup
 	for _, group := range gameState.combat.groups {
@@ -5241,7 +5241,7 @@ func (e *MageEngine) RemoveAttacker(gameID, attackerID string) error {
 			if aid == attackerID {
 				// Remove attacker from group
 				group.attackers = append(group.attackers[:i], group.attackers[i+1:]...)
-				
+
 				// If group is now empty, mark for removal
 				if len(group.attackers) == 0 {
 					groupToRemove = group
@@ -5250,12 +5250,12 @@ func (e *MageEngine) RemoveAttacker(gameID, attackerID string) error {
 			}
 		}
 	}
-	
+
 	// Remove empty group
 	if groupToRemove != nil {
 		// Move to former groups
 		gameState.combat.formerGroups = append(gameState.combat.formerGroups, groupToRemove)
-		
+
 		// Remove from active groups
 		for i, g := range gameState.combat.groups {
 			if g == groupToRemove {
@@ -5264,33 +5264,33 @@ func (e *MageEngine) RemoveAttacker(gameID, attackerID string) error {
 			}
 		}
 	}
-	
+
 	// Remove from global attackers set
 	delete(gameState.combat.attackers, attackerID)
-	
+
 	// Update attacker card state
 	attacker, exists := gameState.cards[attackerID]
 	if exists {
 		attacker.Attacking = false
 		attacker.AttackingWhat = ""
-		
+
 		// Untap if it was tapped by attack (Java: attackersTappedByAttack check)
 		if gameState.combat.attackersTapped[attackerID] {
 			attacker.Tapped = false
 			delete(gameState.combat.attackersTapped, attackerID)
 		}
 	}
-	
+
 	// Fire REMOVED_FROM_COMBAT event (Java: Combat.removeFromCombat)
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventRemovedFromCombat, attackerID, "", ""))
-	
+
 	if e.logger != nil {
 		e.logger.Debug("attacker removed",
 			zap.String("game_id", gameID),
 			zap.String("attacker_id", attackerID),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -5462,14 +5462,14 @@ func (e *MageEngine) OrderBlockers(gameID, attackerID string, blockerOrder []str
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Find the combat group for this attacker
 	var targetGroup *combatGroup
 	for _, group := range gameState.combat.groups {
@@ -5483,33 +5483,33 @@ func (e *MageEngine) OrderBlockers(gameID, attackerID string, blockerOrder []str
 			break
 		}
 	}
-	
+
 	if targetGroup == nil {
 		return fmt.Errorf("attacker %s not found in combat", attackerID)
 	}
-	
+
 	// Validate that all blockers in the order are actually blocking this attacker
 	if len(blockerOrder) != len(targetGroup.blockers) {
-		return fmt.Errorf("blocker order length (%d) does not match actual blocker count (%d)", 
+		return fmt.Errorf("blocker order length (%d) does not match actual blocker count (%d)",
 			len(blockerOrder), len(targetGroup.blockers))
 	}
-	
+
 	// Create a set of current blockers for validation
 	currentBlockers := make(map[string]bool)
 	for _, bid := range targetGroup.blockers {
 		currentBlockers[bid] = true
 	}
-	
+
 	// Validate that all provided blockers are actually blocking
 	for _, bid := range blockerOrder {
 		if !currentBlockers[bid] {
 			return fmt.Errorf("blocker %s is not blocking attacker %s", bid, attackerID)
 		}
 	}
-	
+
 	// Update the blocker order
 	targetGroup.blockers = blockerOrder
-	
+
 	if e.logger != nil {
 		e.logger.Debug("blocker order set",
 			zap.String("game_id", gameID),
@@ -5517,7 +5517,7 @@ func (e *MageEngine) OrderBlockers(gameID, attackerID string, blockerOrder []str
 			zap.Strings("blocker_order", blockerOrder),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -5527,27 +5527,27 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Validate menace and other blocking restrictions
 	// Per Java CombatGroup.acceptBlockers() lines 710-718
 	for _, group := range gameState.combat.groups {
 		if len(group.attackers) == 0 {
 			continue
 		}
-		
+
 		for _, attackerID := range group.attackers {
 			attacker, exists := gameState.cards[attackerID]
 			if !exists {
 				continue
 			}
-			
+
 			minBlockedBy := e.getMinBlockedBy(attacker)
 			if minBlockedBy > 1 && len(group.blockers) > 0 && len(group.blockers) < minBlockedBy {
 				// Menace violation - remove all blockers from this attacker
@@ -5558,7 +5558,7 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 						zap.Int("min_required", minBlockedBy),
 					)
 				}
-				
+
 				// Remove all blockers from this group
 				for _, blockerID := range group.blockers {
 					delete(gameState.combat.blockers, blockerID)
@@ -5572,20 +5572,20 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 			}
 		}
 	}
-	
+
 	// Fire BLOCKER_DECLARED events for each blocker-attacker pair
 	// Per Java CombatGroup.acceptBlockers()
 	for _, group := range gameState.combat.groups {
 		if len(group.attackers) == 0 {
 			continue
 		}
-		
+
 		for _, blockerID := range group.blockers {
 			blocker, exists := gameState.cards[blockerID]
 			if !exists {
 				continue
 			}
-			
+
 			for _, attackerID := range group.attackers {
 				gameState.eventBus.Publish(rules.Event{
 					Type:       rules.EventBlockerDeclared,
@@ -5596,13 +5596,13 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 				})
 			}
 		}
-		
+
 		// Fire CREATURE_BLOCKED event for each attacker that is blocked
 		if len(group.blockers) > 0 {
 			for _, attackerID := range group.attackers {
 				blockedEvent := rules.Event{
-					Type:       rules.EventCreatureBlocked,
-					SourceID:   attackerID,
+					Type:     rules.EventCreatureBlocked,
+					SourceID: attackerID,
 				}
 				gameState.eventBus.Publish(blockedEvent)
 				// Check for combat triggers (e.g., "Whenever ~ becomes blocked")
@@ -5610,25 +5610,25 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 			}
 		}
 	}
-	
+
 	// Fire CREATURE_BLOCKS event for each blocker
 	// Per Java Combat.acceptBlockers()
 	for blockerID := range gameState.combat.blockers {
 		blocksEvent := rules.Event{
-			Type:       rules.EventCreatureBlocks,
-			SourceID:   blockerID,
+			Type:     rules.EventCreatureBlocks,
+			SourceID: blockerID,
 		}
 		gameState.eventBus.Publish(blocksEvent)
 		// Check for combat triggers (e.g., "Whenever ~ blocks")
 		e.checkCombatTriggers(gameState, blocksEvent)
 	}
-	
+
 	// Fire DECLARED_BLOCKERS event for each defending player
 	defendingPlayers := make(map[string]bool)
 	for _, group := range gameState.combat.groups {
 		defendingPlayers[group.defendingPlayerID] = true
 	}
-	
+
 	for playerID := range defendingPlayers {
 		gameState.eventBus.Publish(rules.Event{
 			Type:       rules.EventDeclaredBlockers,
@@ -5636,7 +5636,7 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 			Controller: playerID,
 		})
 	}
-	
+
 	// Fire UNBLOCKED_ATTACKER event for each unblocked attacker
 	// Per Java Combat.acceptBlockers() - fires after blockers are declared
 	for _, group := range gameState.combat.groups {
@@ -5651,14 +5651,14 @@ func (e *MageEngine) AcceptBlockers(gameID string) error {
 			}
 		}
 	}
-	
+
 	if e.logger != nil {
 		e.logger.Debug("blockers accepted",
 			zap.String("game_id", gameID),
 			zap.Int("blocker_count", len(gameState.combat.blockers)),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -5669,23 +5669,23 @@ func (e *MageEngine) CheckBlockRequirements(gameID, playerID string) ([]string, 
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return nil, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
-	
+
 	violations := make([]string, 0)
-	
+
 	// Check creatures that must block specific attackers
 	for blockerID, requiredAttackers := range gameState.combat.creatureMustBlockAttackers {
 		blocker, exists := gameState.cards[blockerID]
 		if !exists || blocker.ControllerID != playerID {
 			continue
 		}
-		
+
 		// Check if blocker is actually blocking
 		if !gameState.combat.blockers[blockerID] {
 			// TODO: Check if blocker CAN block (not tapped, etc.)
@@ -5699,7 +5699,7 @@ func (e *MageEngine) CheckBlockRequirements(gameID, playerID string) ([]string, 
 			}
 		}
 	}
-	
+
 	// Check minimum blockers per attacker (e.g., menace)
 	for attackerID, minBlockers := range gameState.combat.minBlockersPerAttacker {
 		// Count blockers for this attacker
@@ -5712,14 +5712,14 @@ func (e *MageEngine) CheckBlockRequirements(gameID, playerID string) ([]string, 
 				}
 			}
 		}
-		
+
 		if blockerCount > 0 && blockerCount < minBlockers {
-			violations = append(violations, 
-				fmt.Sprintf("attacker %s requires at least %d blockers, but has %d", 
+			violations = append(violations,
+				fmt.Sprintf("attacker %s requires at least %d blockers, but has %d",
 					attackerID, minBlockers, blockerCount))
 		}
 	}
-	
+
 	return violations, nil
 }
 
@@ -5730,16 +5730,16 @@ func (e *MageEngine) CheckBlockRestrictions(gameID, playerID string) ([]string, 
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return nil, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
-	
+
 	violations := make([]string, 0)
-	
+
 	// Check maximum blockers per attacker
 	for attackerID, maxBlockers := range gameState.combat.maxBlockersPerAttacker {
 		// Count blockers for this attacker
@@ -5752,19 +5752,19 @@ func (e *MageEngine) CheckBlockRestrictions(gameID, playerID string) ([]string, 
 				}
 			}
 		}
-		
+
 		if blockerCount > maxBlockers {
-			violations = append(violations, 
-				fmt.Sprintf("attacker %s can be blocked by at most %d creatures, but has %d", 
+			violations = append(violations,
+				fmt.Sprintf("attacker %s can be blocked by at most %d creatures, but has %d",
 					attackerID, maxBlockers, blockerCount))
 		}
 	}
-	
+
 	// TODO: Check other restrictions from continuous effects
 	// - "can't block" effects
 	// - "can't block creature X" effects
 	// - Protection from color/type restrictions
-	
+
 	return violations, nil
 }
 
@@ -5774,39 +5774,39 @@ func (e *MageEngine) ValidateAttackerCount(gameID string) ([]string, error) {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return nil, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
-	
+
 	violations := make([]string, 0)
-	
+
 	// Check maximum attackers
 	if gameState.combat.maxAttackers >= 0 {
 		attackerCount := len(gameState.combat.attackers)
 		if attackerCount > gameState.combat.maxAttackers {
-			violations = append(violations, 
-				fmt.Sprintf("maximum %d attackers allowed, but %d are attacking", 
+			violations = append(violations,
+				fmt.Sprintf("maximum %d attackers allowed, but %d are attacking",
 					gameState.combat.maxAttackers, attackerCount))
 		}
 	}
-	
+
 	// Check forced attackers
 	for creatureID, requiredDefenders := range gameState.combat.creaturesForcedToAttack {
 		creature, exists := gameState.cards[creatureID]
 		if !exists {
 			continue
 		}
-		
+
 		// Check if creature is attacking
 		if !gameState.combat.attackers[creatureID] {
 			// TODO: Check if creature CAN attack (not tapped, summoning sickness, etc.)
 			// For now, just report the violation
 			if len(requiredDefenders) > 0 {
-				violations = append(violations, 
+				violations = append(violations,
 					fmt.Sprintf("creature %s must attack one of: %v", creatureID, requiredDefenders))
 			} else {
 				violations = append(violations, fmt.Sprintf("creature %s must attack if able", creatureID))
@@ -5822,16 +5822,16 @@ func (e *MageEngine) ValidateAttackerCount(gameID string) ([]string, error) {
 					}
 				}
 			}
-			
+
 			if !attackingCorrectDefender {
-				violations = append(violations, 
+				violations = append(violations,
 					fmt.Sprintf("creature %s must attack one of: %v", creatureID, requiredDefenders))
 			}
 		}
-		
+
 		_ = creature // avoid unused warning
 	}
-	
+
 	return violations, nil
 }
 
@@ -5841,17 +5841,17 @@ func (e *MageEngine) AssignCombatDamage(gameID string, firstStrike bool) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Fire combat damage step pre event
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageStepPre, "", "", ""))
-	
+
 	// Assign damage to blockers (attackers dealing damage)
 	for _, group := range gameState.combat.groups {
 		if err := e.assignDamageToBlockers(gameState, group, firstStrike); err != nil {
@@ -5869,17 +5869,17 @@ func (e *MageEngine) AssignCombatDamage(gameID string, firstStrike bool) error {
 			}
 		}
 	}
-	
+
 	// Fire combat damage assigned event
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageAssigned, "", "", ""))
-	
+
 	if e.logger != nil {
 		e.logger.Debug("combat damage assigned",
 			zap.String("game_id", gameID),
 			zap.Bool("first_strike", firstStrike),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -5889,32 +5889,32 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 	if len(group.attackers) == 0 {
 		return nil
 	}
-	
+
 	// Get the attacker (should only be one per group)
 	attackerID := group.attackers[0]
 	attacker, exists := gameState.cards[attackerID]
 	if !exists {
 		return nil
 	}
-	
+
 	// Check if attacker deals damage this step (first strike check)
 	if !e.dealsDamageThisStep(gameState, attacker, firstStrike) {
 		return nil
 	}
-	
+
 	// Record first striker if dealing damage in first strike step
 	if firstStrike && e.hasFirstOrDoubleStrikeWithEffects(gameState, attacker) {
 		e.recordFirstStrikingCreature(gameState, attackerID)
 	}
-	
+
 	// Get attacker's power
 	power, err := e.getCreaturePower(attacker)
 	if err != nil {
 		power = 0
 	}
-	
+
 	hasTrample := e.hasAbility(attacker, abilityTrample)
-	
+
 	// Check if there are any live blockers
 	liveBlockers := 0
 	for _, blockerID := range group.blockers {
@@ -5922,12 +5922,12 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 			liveBlockers++
 		}
 	}
-	
+
 	if len(group.blockers) == 0 {
 		// Never blocked - deal damage to defender
 		return e.dealDamageToDefender(gameState, attacker, group.defenderID, power)
 	}
-	
+
 	if liveBlockers == 0 {
 		// Was blocked but all blockers are dead (e.g., from first strike)
 		// With trample, remaining damage goes through
@@ -5937,7 +5937,7 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 		}
 		return nil
 	}
-	
+
 	// Blocked - assign damage to blockers
 	// Rule 510.1c: Player divides damage as they choose among blockers
 	// Use stored damage assignment or compute default
@@ -5971,7 +5971,7 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 			return e.dealDamageToDefender(gameState, attacker, group.defenderID, trampleDamage)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -6052,14 +6052,14 @@ func (e *MageEngine) ApplyCombatDamage(gameID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Apply damage to all creatures in combat
 	for _, group := range gameState.combat.groups {
 		// Apply damage to attackers
@@ -6068,7 +6068,7 @@ func (e *MageEngine) ApplyCombatDamage(gameID string) error {
 				return err
 			}
 		}
-		
+
 		// Apply damage to blockers
 		for _, blockerID := range group.blockers {
 			if err := e.applyDamageToCreature(gameState, blockerID); err != nil {
@@ -6076,13 +6076,13 @@ func (e *MageEngine) ApplyCombatDamage(gameID string) error {
 			}
 		}
 	}
-	
+
 	if e.logger != nil {
 		e.logger.Debug("combat damage applied",
 			zap.String("game_id", gameID),
 		)
 	}
-	
+
 	// Fire combat damage applied event
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageApplied, "", "", ""))
 
@@ -6415,17 +6415,17 @@ func (e *MageEngine) EndCombat(gameID string) error {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
-	
+
 	// Fire end combat step pre event
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventEndCombatStepPre, "", "", ""))
-	
+
 	// Clear combat flags on all creatures in combat
 	for _, group := range gameState.combat.groups {
 		// Clear attacker flags
@@ -6440,7 +6440,7 @@ func (e *MageEngine) EndCombat(gameID string) error {
 				creature.DamageSources = nil
 			}
 		}
-		
+
 		// Clear blocker flags
 		for _, blockerID := range group.blockers {
 			if creature, exists := gameState.cards[blockerID]; exists {
@@ -6453,14 +6453,14 @@ func (e *MageEngine) EndCombat(gameID string) error {
 				creature.DamageSources = nil
 			}
 		}
-		
+
 		// Move attackers to formerAttackers for "attacked this turn" queries
 		group.formerAttackers = append([]string{}, group.attackers...)
 	}
-	
+
 	// Move current groups to former groups (for historical queries)
 	gameState.combat.formerGroups = append([]*combatGroup{}, gameState.combat.groups...)
-	
+
 	// Clear current combat state
 	gameState.combat.groups = nil
 	gameState.combat.blockingGroups = make(map[string]*combatGroup)
@@ -6469,25 +6469,25 @@ func (e *MageEngine) EndCombat(gameID string) error {
 	gameState.combat.attackersTapped = make(map[string]bool)
 	// Keep defenders for queries
 	// Keep attackingPlayerID for queries
-	
+
 	// Cleanup continuous effects that expire at end of combat
 	// Per Java: ContinuousEffects.removeEndOfCombatEffects()
 	if gameState.layerSystem != nil {
 		effects.CleanupEndOfCombatEffects(gameState.layerSystem)
 	}
-	
+
 	// Fire end combat event
 	gameState.eventBus.Publish(rules.Event{
 		Type: rules.EventEndCombatStep,
 	})
-	
+
 	if e.logger != nil {
 		e.logger.Debug("ended combat",
 			zap.String("game_id", gameID),
 			zap.Int("former_groups", len(gameState.combat.formerGroups)),
 		)
 	}
-	
+
 	return nil
 }
 
@@ -6497,19 +6497,19 @@ func (e *MageEngine) GetAttackedThisTurn(gameID, creatureID string) (bool, error
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return false, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
-	
+
 	// Check current combat
 	if gameState.combat.attackers[creatureID] {
 		return true, nil
 	}
-	
+
 	// Check former groups
 	for _, group := range gameState.combat.formerGroups {
 		for _, attackerID := range group.formerAttackers {
@@ -6518,7 +6518,7 @@ func (e *MageEngine) GetAttackedThisTurn(gameID, creatureID string) (bool, error
 			}
 		}
 	}
-	
+
 	return false, nil
 }
 
@@ -6528,14 +6528,14 @@ func (e *MageEngine) HasFirstOrDoubleStrike(gameID string) (bool, error) {
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
-	
+
 	if !exists {
 		return false, fmt.Errorf("game %s not found", gameID)
 	}
-	
+
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
-	
+
 	// Check all creatures in combat groups
 	for _, group := range gameState.combat.groups {
 		// Check attackers
@@ -6546,7 +6546,7 @@ func (e *MageEngine) HasFirstOrDoubleStrike(gameID string) (bool, error) {
 				}
 			}
 		}
-		
+
 		// Check blockers
 		for _, blockerID := range group.blockers {
 			if blocker, exists := gameState.cards[blockerID]; exists {
@@ -6556,7 +6556,7 @@ func (e *MageEngine) HasFirstOrDoubleStrike(gameID string) (bool, error) {
 			}
 		}
 	}
-	
+
 	return false, nil
 }
 
@@ -6568,7 +6568,7 @@ func (e *MageEngine) dealsDamageThisStep(gameState *engineGameState, creature *i
 	if creature == nil {
 		return false
 	}
-	
+
 	if firstStrike {
 		// In first strike step, only creatures with first strike or double strike deal damage
 		if e.hasFirstOrDoubleStrike(creature) {
@@ -6701,12 +6701,12 @@ func (e *MageEngine) hasAbilityWithEffects(gameState *engineGameState, creature 
 	if creature == nil {
 		return false
 	}
-	
+
 	// Check base abilities
 	if e.hasAbility(creature, abilityID) {
 		return true
 	}
-	
+
 	// Check continuous effects for granted abilities
 	// Per Java: GainAbilityTargetEffect in Layer 6
 	if gameState != nil && gameState.layerSystem != nil {
@@ -6720,7 +6720,7 @@ func (e *MageEngine) hasAbilityWithEffects(gameState *engineGameState, creature 
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -6730,7 +6730,7 @@ func (e *MageEngine) hasCantAttackEffect(gameState *engineGameState, creatureID 
 	if gameState == nil || gameState.layerSystem == nil {
 		return false
 	}
-	
+
 	// Check if any CantAttackEffect applies to this creature
 	return gameState.layerSystem.HasEffectType(creatureID, func(effect effects.ContinuousEffect) bool {
 		_, isCantAttack := effect.(*effects.CantAttackEffect)
@@ -6744,7 +6744,7 @@ func (e *MageEngine) hasCantBlockEffect(gameState *engineGameState, creatureID s
 	if gameState == nil || gameState.layerSystem == nil {
 		return false
 	}
-	
+
 	// Check if any CantBlockEffect applies to this creature
 	return gameState.layerSystem.HasEffectType(creatureID, func(effect effects.ContinuousEffect) bool {
 		_, isCantBlock := effect.(*effects.CantBlockEffect)
@@ -6867,17 +6867,17 @@ func (e *MageEngine) getCreaturePower(creature *internalCard) (int, error) {
 	if creature.Power == "" {
 		return 0, nil
 	}
-	
+
 	// Parse power (handle X, *, etc.)
 	if creature.Power == "*" || creature.Power == "X" {
 		return 0, nil // TODO: Calculate dynamic power
 	}
-	
+
 	power, err := strconv.Atoi(creature.Power)
 	if err != nil {
 		return 0, err
 	}
-	
+
 	return power, nil
 }
 
@@ -6886,17 +6886,17 @@ func (e *MageEngine) getCreatureToughness(creature *internalCard) (int, error) {
 	if creature.Toughness == "" {
 		return 0, nil
 	}
-	
+
 	// Parse toughness (handle X, *, etc.)
 	if creature.Toughness == "*" || creature.Toughness == "X" {
 		return 0, nil // TODO: Calculate dynamic toughness
 	}
-	
+
 	toughness, err := strconv.Atoi(creature.Toughness)
 	if err != nil {
 		return 0, err
 	}
-	
+
 	return toughness, nil
 }
 
@@ -6908,12 +6908,12 @@ func (e *MageEngine) getLethalDamage(creature *internalCard, attackerID string) 
 	if err != nil {
 		return 0
 	}
-	
+
 	lethal := toughness - creature.Damage
 	if lethal < 0 {
 		lethal = 0
 	}
-	
+
 	return lethal
 }
 
@@ -6973,12 +6973,12 @@ func (e *MageEngine) markDamage(creature *internalCard, amount int, sourceID str
 	if amount <= 0 {
 		return
 	}
-	
+
 	// Initialize damage sources map if needed
 	if creature.DamageSources == nil {
 		creature.DamageSources = make(map[string]int)
 	}
-	
+
 	// Add damage
 	creature.Damage += amount
 	creature.DamageSources[sourceID] += amount
@@ -6990,10 +6990,10 @@ func (e *MageEngine) markDamageWithLifelink(gameState *engineGameState, creature
 	if amount <= 0 {
 		return
 	}
-	
+
 	// Mark the damage
 	e.markDamage(creature, amount, sourceID)
-	
+
 	// Check if source has lifelink
 	source, exists := gameState.cards[sourceID]
 	if exists && e.hasAbility(source, abilityLifelink) {
@@ -7001,7 +7001,7 @@ func (e *MageEngine) markDamageWithLifelink(gameState *engineGameState, creature
 		controller, exists := gameState.players[source.ControllerID]
 		if exists {
 			controller.Life += amount
-			
+
 			if e.logger != nil {
 				e.logger.Debug("lifelink triggered",
 					zap.String("source_id", sourceID),
@@ -7011,7 +7011,7 @@ func (e *MageEngine) markDamageWithLifelink(gameState *engineGameState, creature
 			}
 		}
 	}
-	
+
 	// Fire damaged permanent event for triggers
 	// Per Java: DAMAGED_PERMANENT event with flag=true for combat damage
 	damagedEvent := rules.Event{
@@ -7023,7 +7023,7 @@ func (e *MageEngine) markDamageWithLifelink(gameState *engineGameState, creature
 		Flag:       true, // Combat damage
 	}
 	gameState.eventBus.Publish(damagedEvent)
-	
+
 	// Check for combat damage triggers (e.g., "Whenever ~ deals combat damage to a creature")
 	e.checkCombatTriggers(gameState, damagedEvent)
 }
@@ -7165,7 +7165,7 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 		}
 		return nil
 	}
-	
+
 	// Defender is a player (or was a permanent that has left the battlefield)
 	player, exists := gameState.players[defenderID]
 	if !exists {
@@ -7179,16 +7179,16 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 		}
 		return nil
 	}
-	
+
 	// Deal damage to player
 	player.Life -= amount
-	
+
 	// Handle lifelink
 	if e.hasAbility(attacker, abilityLifelink) {
 		controller, exists := gameState.players[attacker.ControllerID]
 		if exists {
 			controller.Life += amount
-			
+
 			if e.logger != nil {
 				e.logger.Debug("lifelink triggered on player damage",
 					zap.String("attacker_id", attacker.ID),
@@ -7198,7 +7198,7 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 			}
 		}
 	}
-	
+
 	// Fire damage event (before damage is dealt)
 	gameState.eventBus.Publish(rules.Event{
 		Type:       rules.EventDamagePlayer,
@@ -7207,7 +7207,7 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 		Amount:     amount,
 		Controller: attacker.ControllerID,
 	})
-	
+
 	// Fire damaged event (after damage is dealt) for triggers
 	// Per Java: DAMAGED_PLAYER event with flag=true for combat damage
 	damagedEvent := rules.Event{
@@ -7219,10 +7219,10 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 		Flag:       true, // Combat damage
 	}
 	gameState.eventBus.Publish(damagedEvent)
-	
+
 	// Check for combat damage triggers (e.g., "Whenever ~ deals combat damage")
 	e.checkCombatTriggers(gameState, damagedEvent)
-	
+
 	return nil
 }
 
@@ -7232,17 +7232,17 @@ func (e *MageEngine) applyDamageToCreature(gameState *engineGameState, creatureI
 	if !exists {
 		return nil
 	}
-	
+
 	if creature.Damage == 0 {
 		return nil
 	}
-	
+
 	// Get creature's toughness
 	toughness, err := e.getCreatureToughness(creature)
 	if err != nil {
 		toughness = 0
 	}
-	
+
 	// Check if any damage source has deathtouch
 	hasDeathtouch := false
 	for sourceID := range creature.DamageSources {
@@ -7253,17 +7253,17 @@ func (e *MageEngine) applyDamageToCreature(gameState *engineGameState, creatureI
 			}
 		}
 	}
-	
+
 	// Check if creature dies (damage >= toughness OR any deathtouch damage)
 	shouldDie := (creature.Damage >= toughness && toughness > 0) || (hasDeathtouch && creature.Damage > 0)
-	
+
 	if shouldDie {
 		// Creature dies - move to graveyard
 		previousZone := creature.Zone
 		if err := e.moveCard(gameState, creature, zoneGraveyard, ""); err != nil {
 			return err
 		}
-		
+
 		// Fire death event (zone change from battlefield to graveyard)
 		// Per Java: ZONE_CHANGE event where isDiesEvent() checks fromZone==BATTLEFIELD && toZone==GRAVEYARD
 		deathEvent := rules.Event{
@@ -7278,11 +7278,11 @@ func (e *MageEngine) applyDamageToCreature(gameState *engineGameState, creatureI
 			},
 		}
 		gameState.eventBus.Publish(deathEvent)
-		
+
 		// Check for death triggers (e.g., "Whenever ~ dies" or "Whenever a creature dies")
 		e.checkCombatTriggers(gameState, deathEvent)
 	}
-	
+
 	return nil
 }
 

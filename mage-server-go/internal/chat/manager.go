@@ -18,10 +18,10 @@ type Message struct {
 
 // ChatRoom represents a chat room
 type ChatRoom struct {
-	ID       string
-	messages []Message
-	users    map[string]bool // username -> present
-	mu       sync.RWMutex
+	ID          string
+	messages    []Message
+	users       map[string]bool // username -> present
+	mu          sync.RWMutex
 	maxMessages int
 }
 

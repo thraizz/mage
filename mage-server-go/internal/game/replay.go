@@ -15,17 +15,17 @@ import (
 // Replay represents a recorded game with sequential state snapshots
 // Per Java mage.game.GameReplay: stores list of GameState snapshots for playback
 type Replay struct {
-	GameID      string
-	States      []*gameStateSnapshot
+	GameID       string
+	States       []*gameStateSnapshot
 	CurrentIndex int
-	mu          sync.RWMutex
+	mu           sync.RWMutex
 }
 
 // NewReplay creates a new replay instance
 func NewReplay(gameID string) *Replay {
 	return &Replay{
-		GameID:      gameID,
-		States:      make([]*gameStateSnapshot, 0),
+		GameID:       gameID,
+		States:       make([]*gameStateSnapshot, 0),
 		CurrentIndex: 0,
 	}
 }
@@ -143,9 +143,9 @@ func (r *Replay) SaveToFile(directory string) error {
 
 	// Encode metadata
 	metadata := replayMetadata{
-		GameID:    r.GameID,
-		Timestamp: time.Now(),
-		Version:   1,
+		GameID:     r.GameID,
+		Timestamp:  time.Now(),
+		Version:    1,
 		StateCount: len(r.States),
 	}
 	if err := encoder.Encode(&metadata); err != nil {
@@ -211,19 +211,19 @@ func LoadReplayFromFile(directory, gameID string) (*Replay, error) {
 
 // replayMetadata contains information about a saved replay
 type replayMetadata struct {
-	GameID    string
-	Timestamp time.Time
-	Version   int
+	GameID     string
+	Timestamp  time.Time
+	Version    int
 	StateCount int
 }
 
 // ReplayRecorder manages replay recording for the engine
 type ReplayRecorder struct {
-	logger   *zap.Logger
-	mu       sync.RWMutex
-	replays  map[string]*Replay // gameID -> Replay
-	enabled  map[string]bool    // gameID -> whether recording is enabled
-	saveDir  string             // Directory to save replay files
+	logger  *zap.Logger
+	mu      sync.RWMutex
+	replays map[string]*Replay // gameID -> Replay
+	enabled map[string]bool    // gameID -> whether recording is enabled
+	saveDir string             // Directory to save replay files
 }
 
 // NewReplayRecorder creates a new replay recorder

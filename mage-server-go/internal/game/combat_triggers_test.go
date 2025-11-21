@@ -12,22 +12,22 @@ import (
 func TestCombatTriggerAttacks(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-attack-trigger"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Create attacker with attack trigger
 	gameState.mu.Lock()
 	attackerID := "attacker"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Attack Trigger Creature",
@@ -38,10 +38,10 @@ func TestCombatTriggerAttacks(t *testing.T) {
 		Power:        "2",
 		Toughness:    "2",
 	}
-	
+
 	// Track if trigger fired
 	triggerFired := false
-	
+
 	// Register combat trigger: "Whenever ~ attacks, draw a card"
 	trigger := &combatTrigger{
 		SourceID:    attackerID,
@@ -65,36 +65,36 @@ func TestCombatTriggerAttacks(t *testing.T) {
 			}
 		},
 	}
-	
+
 	gameState.combatTriggers = append(gameState.combatTriggers, trigger)
 	gameState.mu.Unlock()
-	
+
 	// Setup combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
-	
+
 	// Declare attacker - should trigger
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
-	
+
 	// Check that trigger was queued
 	gameState.mu.RLock()
 	queuedTriggers := len(gameState.triggeredQueue)
 	gameState.mu.RUnlock()
-	
+
 	if queuedTriggers != 1 {
 		t.Errorf("Expected 1 triggered ability in queue, got %d", queuedTriggers)
 	}
-	
+
 	// Process triggers (puts them on stack)
 	gameState.mu.Lock()
 	processed := engine.processTriggeredAbilities(gameState)
 	gameState.mu.Unlock()
-	
+
 	if !processed {
 		t.Error("Expected triggers to be processed")
 	}
-	
+
 	// Resolve the stack
 	gameState.mu.Lock()
 	for !gameState.stack.IsEmpty() {
@@ -109,11 +109,11 @@ func TestCombatTriggerAttacks(t *testing.T) {
 		}
 	}
 	gameState.mu.Unlock()
-	
+
 	if !triggerFired {
 		t.Error("Expected attack trigger to fire")
 	}
-	
+
 	engine.EndCombat(gameID)
 }
 
@@ -121,23 +121,23 @@ func TestCombatTriggerAttacks(t *testing.T) {
 func TestCombatTriggerBlocks(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-block-trigger"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Create attacker and blocker with block trigger
 	gameState.mu.Lock()
 	attackerID := "attacker"
 	blockerID := "blocker"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Attacker",
@@ -148,7 +148,7 @@ func TestCombatTriggerBlocks(t *testing.T) {
 		Power:        "2",
 		Toughness:    "2",
 	}
-	
+
 	gameState.cards[blockerID] = &internalCard{
 		ID:           blockerID,
 		Name:         "Block Trigger Creature",
@@ -159,10 +159,10 @@ func TestCombatTriggerBlocks(t *testing.T) {
 		Power:        "2",
 		Toughness:    "2",
 	}
-	
+
 	// Track if trigger fired
 	triggerFired := false
-	
+
 	// Register combat trigger: "Whenever ~ blocks, gain 1 life"
 	trigger := &combatTrigger{
 		SourceID:    blockerID,
@@ -171,7 +171,7 @@ func TestCombatTriggerBlocks(t *testing.T) {
 			// Check if this is a blocker declared event for our creature
 			return event.Type == rules.EventBlockerDeclared && event.SourceID == blockerID
 		},
-		CreateAbility: func(gs *engineGameState, event rules.Event) *triggeredAbilityQueueItem{
+		CreateAbility: func(gs *engineGameState, event rules.Event) *triggeredAbilityQueueItem {
 			return &triggeredAbilityQueueItem{
 				ID:          fmt.Sprintf("%s-block-trigger", blockerID),
 				SourceID:    blockerID,
@@ -186,37 +186,37 @@ func TestCombatTriggerBlocks(t *testing.T) {
 			}
 		},
 	}
-	
+
 	gameState.combatTriggers = append(gameState.combatTriggers, trigger)
 	gameState.mu.Unlock()
-	
+
 	// Setup combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
-	
+
 	// Declare blocker - should trigger
 	engine.DeclareBlocker(gameID, blockerID, attackerID, "Bob")
-	
+
 	// Check that trigger was queued
 	gameState.mu.RLock()
 	queuedTriggers := len(gameState.triggeredQueue)
 	gameState.mu.RUnlock()
-	
+
 	if queuedTriggers != 1 {
 		t.Errorf("Expected 1 triggered ability in queue, got %d", queuedTriggers)
 	}
-	
+
 	// Process triggers (puts them on stack)
 	gameState.mu.Lock()
 	processed := engine.processTriggeredAbilities(gameState)
 	gameState.mu.Unlock()
-	
+
 	if !processed {
 		t.Error("Expected triggers to be processed")
 	}
-	
+
 	// Resolve the stack
 	gameState.mu.Lock()
 	for !gameState.stack.IsEmpty() {
@@ -231,11 +231,11 @@ func TestCombatTriggerBlocks(t *testing.T) {
 		}
 	}
 	gameState.mu.Unlock()
-	
+
 	if !triggerFired {
 		t.Error("Expected block trigger to fire")
 	}
-	
+
 	engine.EndCombat(gameID)
 }
 
@@ -243,23 +243,23 @@ func TestCombatTriggerBlocks(t *testing.T) {
 func TestCombatTriggerBecomesBlocked(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-becomes-blocked-trigger"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Create attacker with "becomes blocked" trigger and blocker
 	gameState.mu.Lock()
 	attackerID := "attacker"
 	blockerID := "blocker"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Becomes Blocked Trigger Creature",
@@ -270,7 +270,7 @@ func TestCombatTriggerBecomesBlocked(t *testing.T) {
 		Power:        "2",
 		Toughness:    "2",
 	}
-	
+
 	gameState.cards[blockerID] = &internalCard{
 		ID:           blockerID,
 		Name:         "Blocker",
@@ -281,10 +281,10 @@ func TestCombatTriggerBecomesBlocked(t *testing.T) {
 		Power:        "2",
 		Toughness:    "2",
 	}
-	
+
 	// Track if trigger fired
 	triggerFired := false
-	
+
 	// Register combat trigger: "Whenever ~ becomes blocked, it gets +1/+1"
 	trigger := &combatTrigger{
 		SourceID:    attackerID,
@@ -308,38 +308,38 @@ func TestCombatTriggerBecomesBlocked(t *testing.T) {
 			}
 		},
 	}
-	
+
 	gameState.combatTriggers = append(gameState.combatTriggers, trigger)
 	gameState.mu.Unlock()
-	
+
 	// Setup combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
 	engine.DeclareBlocker(gameID, blockerID, attackerID, "Bob")
-	
+
 	// Accept blockers - should trigger "becomes blocked"
 	engine.AcceptBlockers(gameID)
-	
+
 	// Check that trigger was queued
 	gameState.mu.RLock()
 	queuedTriggers := len(gameState.triggeredQueue)
 	gameState.mu.RUnlock()
-	
+
 	if queuedTriggers != 1 {
 		t.Errorf("Expected 1 triggered ability in queue, got %d", queuedTriggers)
 	}
-	
+
 	// Process triggers (puts them on stack)
 	gameState.mu.Lock()
 	processed := engine.processTriggeredAbilities(gameState)
 	gameState.mu.Unlock()
-	
+
 	if !processed {
 		t.Error("Expected triggers to be processed")
 	}
-	
+
 	// Resolve the stack
 	gameState.mu.Lock()
 	for !gameState.stack.IsEmpty() {
@@ -354,11 +354,11 @@ func TestCombatTriggerBecomesBlocked(t *testing.T) {
 		}
 	}
 	gameState.mu.Unlock()
-	
+
 	if !triggerFired {
 		t.Error("Expected becomes blocked trigger to fire")
 	}
-	
+
 	engine.EndCombat(gameID)
 }
 
@@ -366,23 +366,23 @@ func TestCombatTriggerBecomesBlocked(t *testing.T) {
 func TestCombatTriggerMultiple(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-multiple-triggers"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Create two attackers with attack triggers
 	gameState.mu.Lock()
 	attacker1ID := "attacker1"
 	attacker2ID := "attacker2"
-	
+
 	gameState.cards[attacker1ID] = &internalCard{
 		ID:           attacker1ID,
 		Name:         "Attacker 1",
@@ -393,7 +393,7 @@ func TestCombatTriggerMultiple(t *testing.T) {
 		Power:        "2",
 		Toughness:    "2",
 	}
-	
+
 	gameState.cards[attacker2ID] = &internalCard{
 		ID:           attacker2ID,
 		Name:         "Attacker 2",
@@ -404,7 +404,7 @@ func TestCombatTriggerMultiple(t *testing.T) {
 		Power:        "2",
 		Toughness:    "2",
 	}
-	
+
 	// Register triggers for both attackers
 	for _, attackerID := range []string{attacker1ID, attacker2ID} {
 		trigger := &combatTrigger{
@@ -429,24 +429,24 @@ func TestCombatTriggerMultiple(t *testing.T) {
 		gameState.combatTriggers = append(gameState.combatTriggers, trigger)
 	}
 	gameState.mu.Unlock()
-	
+
 	// Setup combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
-	
+
 	// Declare both attackers
 	engine.DeclareAttacker(gameID, attacker1ID, "Bob", "Alice")
 	engine.DeclareAttacker(gameID, attacker2ID, "Bob", "Alice")
-	
+
 	// Check that both triggers were queued
 	gameState.mu.RLock()
 	queuedTriggers := len(gameState.triggeredQueue)
 	gameState.mu.RUnlock()
-	
+
 	if queuedTriggers != 2 {
 		t.Errorf("Expected 2 triggered abilities in queue, got %d", queuedTriggers)
 	}
-	
+
 	engine.EndCombat(gameID)
 }

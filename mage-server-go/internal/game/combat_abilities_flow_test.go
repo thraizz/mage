@@ -34,8 +34,8 @@ func TestCombatFlow_FirstStrikeDamage(t *testing.T) {
 
 	// Verify results
 	h.AssertPlayerLife("Bob", initialBobLife) // Bob takes no damage (blocked)
-	h.AssertCreatureDead(blocker)              // Blocker dies from first strike damage
-	h.AssertCreatureAlive(attacker)            // Attacker survives (takes no damage - blocker died before dealing damage)
+	h.AssertCreatureDead(blocker)             // Blocker dies from first strike damage
+	h.AssertCreatureAlive(attacker)           // Attacker survives (takes no damage - blocker died before dealing damage)
 }
 
 // TestCombatFlow_DoubleStrike tests double strike damage in both steps
@@ -169,8 +169,8 @@ func TestCombatFlow_Deathtouch(t *testing.T) {
 	})
 
 	// Verify deathtouch killed the large creature with just 1 damage
-	h.AssertCreatureDead(blocker)   // Dies from deathtouch
-	h.AssertCreatureDead(attacker)  // Dies from blocker's damage
+	h.AssertCreatureDead(blocker)  // Dies from deathtouch
+	h.AssertCreatureDead(attacker) // Dies from blocker's damage
 }
 
 // TestCombatFlow_Lifelink tests lifelink grants life equal to damage dealt
@@ -355,5 +355,5 @@ func TestCombatFlow_TrampleBlocked(t *testing.T) {
 	// 2 damage to kill blocker, 4 damage tramples over to Bob
 	h.AssertCreatureDead(blocker)
 	h.AssertPlayerLife("Bob", initialBobLife-4) // Trample overflow
-	h.AssertCreatureAlive(attacker)              // Attacker survives
+	h.AssertCreatureAlive(attacker)             // Attacker survives
 }

@@ -104,21 +104,21 @@ func TestReplayPlayback(t *testing.T) {
 	// Navigate forward
 	state1 := replay.Next()
 	require.NotNil(t, state1)
-	assert.Equal(t, gameID, state1.gameID)
+	assert.Equal(t, gameID, state1.GameID)
 
 	state2 := replay.Next()
 	require.NotNil(t, state2)
-	assert.Equal(t, gameID, state2.gameID)
+	assert.Equal(t, gameID, state2.GameID)
 
 	// Navigate backward
 	statePrev := replay.Previous()
 	require.NotNil(t, statePrev)
-	assert.Equal(t, state1.gameID, statePrev.gameID)
+	assert.Equal(t, state1.GameID, statePrev.GameID)
 
 	// Skip forward
 	stateSkip := replay.Skip(3)
 	require.NotNil(t, stateSkip)
-	assert.Equal(t, gameID, stateSkip.gameID)
+	assert.Equal(t, gameID, stateSkip.GameID)
 }
 
 func TestReplaySaveAndLoadFullGame(t *testing.T) {
@@ -176,7 +176,7 @@ func TestReplaySaveAndLoadFullGame(t *testing.T) {
 	loadedReplay.Start()
 	state := loadedReplay.Next()
 	require.NotNil(t, state)
-	assert.Equal(t, gameID, state.gameID)
+	assert.Equal(t, gameID, state.GameID)
 }
 
 func TestReplayRecordingDisabledByDefault(t *testing.T) {

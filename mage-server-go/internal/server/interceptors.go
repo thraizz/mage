@@ -75,12 +75,12 @@ func RecoveryInterceptor(logger *zap.Logger) grpc.UnaryServerInterceptor {
 func SessionValidationInterceptor(sessionMgr session.Manager) grpc.UnaryServerInterceptor {
 	// Methods that don't require session validation
 	publicMethods := map[string]bool{
-		"/mage.v1.MageServer/AuthRegister":          true,
-		"/mage.v1.MageServer/AuthSendTokenToEmail":  true,
-		"/mage.v1.MageServer/AuthResetPassword":     true,
-		"/mage.v1.MageServer/ConnectUser":           true,
-		"/mage.v1.MageServer/ConnectAdmin":          true,
-		"/mage.v1.MageServer/GetServerState":        true,
+		"/mage.v1.MageServer/AuthRegister":               true,
+		"/mage.v1.MageServer/AuthSendTokenToEmail":       true,
+		"/mage.v1.MageServer/AuthResetPassword":          true,
+		"/mage.v1.MageServer/ConnectUser":                true,
+		"/mage.v1.MageServer/ConnectAdmin":               true,
+		"/mage.v1.MageServer/GetServerState":             true,
 		"/mage.v1.MageServer/ServerGetPromotionMessages": true,
 	}
 
@@ -127,15 +127,15 @@ func extractSessionID(req interface{}) string {
 func AdminInterceptor(sessionMgr session.Manager) grpc.UnaryServerInterceptor {
 	// Admin-only methods
 	adminMethods := map[string]bool{
-		"/mage.v1.MageServer/AdminGetUsers":              true,
-		"/mage.v1.MageServer/AdminDisconnectUser":        true,
-		"/mage.v1.MageServer/AdminMuteUser":              true,
-		"/mage.v1.MageServer/AdminLockUser":              true,
-		"/mage.v1.MageServer/AdminActivateUser":          true,
-		"/mage.v1.MageServer/AdminToggleActivateUser":    true,
-		"/mage.v1.MageServer/AdminEndUserSession":        true,
-		"/mage.v1.MageServer/AdminTableRemove":           true,
-		"/mage.v1.MageServer/AdminSendBroadcastMessage":  true,
+		"/mage.v1.MageServer/AdminGetUsers":             true,
+		"/mage.v1.MageServer/AdminDisconnectUser":       true,
+		"/mage.v1.MageServer/AdminMuteUser":             true,
+		"/mage.v1.MageServer/AdminLockUser":             true,
+		"/mage.v1.MageServer/AdminActivateUser":         true,
+		"/mage.v1.MageServer/AdminToggleActivateUser":   true,
+		"/mage.v1.MageServer/AdminEndUserSession":       true,
+		"/mage.v1.MageServer/AdminTableRemove":          true,
+		"/mage.v1.MageServer/AdminSendBroadcastMessage": true,
 	}
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {

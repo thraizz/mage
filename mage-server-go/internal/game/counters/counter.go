@@ -106,13 +106,13 @@ func formatInt(value int) string {
 // Counters manages a collection of counters.
 // Mirrors Java Counters class.
 type Counters struct {
-	counters map[string]*Counter
+	Counters map[string]*Counter
 }
 
 // NewCounters creates a new Counters collection.
 func NewCounters() *Counters {
 	return &Counters{
-		counters: make(map[string]*Counter),
+		Counters: make(map[string]*Counter),
 	}
 }
 
@@ -122,10 +122,10 @@ func (cs *Counters) AddCounter(counter *Counter) {
 	if counter == nil {
 		return
 	}
-	if existing, ok := cs.counters[counter.Name]; ok {
+	if existing, ok := cs.Counters[counter.Name]; ok {
 		existing.Add(counter.Count)
 	} else {
-		cs.counters[counter.Name] = counter.Copy()
+		cs.Counters[counter.Name] = counter.Copy()
 	}
 }
 
@@ -135,10 +135,10 @@ func (cs *Counters) RemoveCounter(name string, amount int) bool {
 	if amount <= 0 {
 		return false
 	}
-	if counter, ok := cs.counters[name]; ok {
+	if counter, ok := cs.Counters[name]; ok {
 		counter.Remove(amount)
 		if counter.Count == 0 {
-			delete(cs.counters, name)
+			delete(cs.Counters, name)
 		}
 		return true
 	}
@@ -147,7 +147,7 @@ func (cs *Counters) RemoveCounter(name string, amount int) bool {
 
 // GetCount returns the count of counters with the given name.
 func (cs *Counters) GetCount(name string) int {
-	if counter, ok := cs.counters[name]; ok {
+	if counter, ok := cs.Counters[name]; ok {
 		return counter.Count
 	}
 	return 0
@@ -161,7 +161,7 @@ func (cs *Counters) HasCounter(name string) bool {
 // GetTotalCount returns the total number of all counters.
 func (cs *Counters) GetTotalCount() int {
 	total := 0
-	for _, counter := range cs.counters {
+	for _, counter := range cs.Counters {
 		total += counter.Count
 	}
 	return total
@@ -170,7 +170,7 @@ func (cs *Counters) GetTotalCount() int {
 // GetAll returns all counters as a map.
 func (cs *Counters) GetAll() map[string]*Counter {
 	result := make(map[string]*Counter)
-	for name, counter := range cs.counters {
+	for name, counter := range cs.Counters {
 		result[name] = counter.Copy()
 	}
 	return result
@@ -180,7 +180,7 @@ func (cs *Counters) GetAll() map[string]*Counter {
 // Checks counter names for boost counter patterns (e.g., "+1/+1", "-1/-1").
 func (cs *Counters) GetBoostCounters() []*BoostCounter {
 	var boostCounters []*BoostCounter
-	for _, counter := range cs.counters {
+	for _, counter := range cs.Counters {
 		// Check if counter name matches boost counter pattern (e.g., "+1/+1", "-1/-1")
 		if power, toughness, ok := parseBoostCounterName(counter.Name); ok {
 			boostCounters = append(boostCounters, NewBoostCounter(power, toughness, counter.Count))
@@ -258,8 +258,8 @@ func parseBoostValue(s string) (int, bool) {
 // Copy creates a deep copy of the Counters collection.
 func (cs *Counters) Copy() *Counters {
 	copy := NewCounters()
-	for name, counter := range cs.counters {
-		copy.counters[name] = counter.Copy()
+	for name, counter := range cs.Counters {
+		copy.Counters[name] = counter.Copy()
 	}
 	return copy
 }
@@ -267,7 +267,7 @@ func (cs *Counters) Copy() *Counters {
 // ToView converts counters to the view format.
 func (cs *Counters) ToView() []CounterView {
 	var views []CounterView
-	for name, counter := range cs.counters {
+	for name, counter := range cs.Counters {
 		views = append(views, CounterView{
 			Name:  name,
 			Count: counter.Count,

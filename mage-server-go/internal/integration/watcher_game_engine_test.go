@@ -152,9 +152,9 @@ func TestWatcherMultipleEventsPerTurn(t *testing.T) {
 	// Simulate a turn with multiple events
 	// Player draws cards
 	for i := 0; i < 2; i++ {
-		event := rules.NewEvent(rules.EventDrewCard, 
-			"card"+string(rune('1'+i)), 
-			"card"+string(rune('1'+i)), 
+		event := rules.NewEvent(rules.EventDrewCard,
+			"card"+string(rune('1'+i)),
+			"card"+string(rune('1'+i)),
 			"player1")
 		eventBus.Publish(event)
 	}
@@ -296,12 +296,12 @@ func TestWatcherEventFiltering(t *testing.T) {
 
 	// Publish creature dies event
 	dieEvent := rules.Event{
-		Type:        rules.EventPermanentDies,
-		TargetID:    "creature1",
-		SourceID:    "creature1",
-		Controller:  "player1",
-		PlayerID:    "player1",
-		Timestamp:   time.Now(),
+		Type:       rules.EventPermanentDies,
+		TargetID:   "creature1",
+		SourceID:   "creature1",
+		Controller: "player1",
+		PlayerID:   "player1",
+		Timestamp:  time.Now(),
 		Metadata: map[string]string{
 			"owner_id": "player1",
 		},
@@ -479,9 +479,9 @@ func TestWatcherRegistryThreadSafety(t *testing.T) {
 	// Publish events concurrently
 	for i := 0; i < 10; i++ {
 		go func(idx int) {
-			event := rules.NewEvent(rules.EventSpellCast, 
-				"spell"+string(rune('0'+idx)), 
-				"spell"+string(rune('0'+idx)), 
+			event := rules.NewEvent(rules.EventSpellCast,
+				"spell"+string(rune('0'+idx)),
+				"spell"+string(rune('0'+idx)),
 				"player1")
 			eventBus.Publish(event)
 			done <- true

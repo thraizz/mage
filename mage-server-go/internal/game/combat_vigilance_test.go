@@ -10,23 +10,23 @@ import (
 func TestCombatVigilance(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-vigilance"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Creature with vigilance
 	gameState.mu.Lock()
 	attackerID := "attacker-1"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Vigilant Knight",
@@ -42,28 +42,28 @@ func TestCombatVigilance(t *testing.T) {
 		},
 	}
 	gameState.mu.Unlock()
-	
+
 	// Setup combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
-	
+
 	// Declare attacker
 	if err := engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice"); err != nil {
 		t.Fatalf("failed to declare attacker: %v", err)
 	}
-	
+
 	// Verify creature is attacking but NOT tapped
 	gameState.mu.RLock()
 	attacker := gameState.cards[attackerID]
-	
+
 	if !attacker.Attacking {
 		t.Error("creature should be attacking")
 	}
 	if attacker.Tapped {
 		t.Error("vigilance creature should not be tapped when attacking")
 	}
-	
+
 	// Verify not tracked as tapped by attack
 	if gameState.combat.attackersTapped[attackerID] {
 		t.Error("vigilance creature should not be in attackersTapped map")
@@ -75,23 +75,23 @@ func TestCombatVigilance(t *testing.T) {
 func TestCombatNoVigilance(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-no-vigilance"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Normal creature without vigilance
 	gameState.mu.Lock()
 	attackerID := "attacker-1"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Normal Knight",
@@ -104,28 +104,28 @@ func TestCombatNoVigilance(t *testing.T) {
 		Tapped:       false,
 	}
 	gameState.mu.Unlock()
-	
+
 	// Setup combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
-	
+
 	// Declare attacker
 	if err := engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice"); err != nil {
 		t.Fatalf("failed to declare attacker: %v", err)
 	}
-	
+
 	// Verify creature is attacking AND tapped
 	gameState.mu.RLock()
 	attacker := gameState.cards[attackerID]
-	
+
 	if !attacker.Attacking {
 		t.Error("creature should be attacking")
 	}
 	if !attacker.Tapped {
 		t.Error("normal creature should be tapped when attacking")
 	}
-	
+
 	// Verify tracked as tapped by attack
 	if !gameState.combat.attackersTapped[attackerID] {
 		t.Error("normal creature should be in attackersTapped map")
@@ -137,24 +137,24 @@ func TestCombatNoVigilance(t *testing.T) {
 func TestCombatVigilanceCanBlock(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-vigilance-block"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Vigilance creature and opponent's attacker
 	gameState.mu.Lock()
 	vigilantID := "vigilant-1"
 	opponentAttackerID := "opponent-attacker"
-	
+
 	gameState.cards[vigilantID] = &internalCard{
 		ID:           vigilantID,
 		Name:         "Vigilant Knight",
@@ -169,7 +169,7 @@ func TestCombatVigilanceCanBlock(t *testing.T) {
 			{ID: abilityVigilance, Text: "Vigilance"},
 		},
 	}
-	
+
 	gameState.cards[opponentAttackerID] = &internalCard{
 		ID:           opponentAttackerID,
 		Name:         "Opponent Bear",
@@ -182,13 +182,13 @@ func TestCombatVigilanceCanBlock(t *testing.T) {
 		Tapped:       false,
 	}
 	gameState.mu.Unlock()
-	
+
 	// Alice's turn: Attack with vigilance creature
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
 	engine.DeclareAttacker(gameID, vigilantID, "Bob", "Alice")
-	
+
 	// Verify vigilant creature is untapped
 	gameState.mu.RLock()
 	vigilant := gameState.cards[vigilantID]
@@ -196,16 +196,16 @@ func TestCombatVigilanceCanBlock(t *testing.T) {
 		t.Error("vigilance creature should be untapped after attacking")
 	}
 	gameState.mu.RUnlock()
-	
+
 	// End Alice's combat
 	engine.EndCombat(gameID)
-	
+
 	// Bob's turn: Attack with opponent creature
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Bob")
 	engine.SetDefenders(gameID)
 	engine.DeclareAttacker(gameID, opponentAttackerID, "Alice", "Bob")
-	
+
 	// Alice can block with vigilant creature (it's untapped)
 	canBlock, err := engine.CanBlock(gameID, vigilantID, opponentAttackerID)
 	if err != nil {
@@ -214,12 +214,12 @@ func TestCombatVigilanceCanBlock(t *testing.T) {
 	if !canBlock {
 		t.Error("vigilance creature should be able to block (it's untapped)")
 	}
-	
+
 	// Actually declare the block
 	if err := engine.DeclareBlocker(gameID, vigilantID, opponentAttackerID, "Alice"); err != nil {
 		t.Fatalf("failed to declare blocker: %v", err)
 	}
-	
+
 	// Verify block was successful
 	gameState.mu.RLock()
 	vigilant = gameState.cards[vigilantID]
@@ -233,24 +233,24 @@ func TestCombatVigilanceCanBlock(t *testing.T) {
 func TestCombatNoVigilanceCannotBlock(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-no-vigilance-block"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Normal creature and opponent's attacker
 	gameState.mu.Lock()
 	normalID := "normal-1"
 	opponentAttackerID := "opponent-attacker"
-	
+
 	gameState.cards[normalID] = &internalCard{
 		ID:           normalID,
 		Name:         "Normal Knight",
@@ -262,7 +262,7 @@ func TestCombatNoVigilanceCannotBlock(t *testing.T) {
 		Toughness:    "2",
 		Tapped:       false,
 	}
-	
+
 	gameState.cards[opponentAttackerID] = &internalCard{
 		ID:           opponentAttackerID,
 		Name:         "Opponent Bear",
@@ -275,13 +275,13 @@ func TestCombatNoVigilanceCannotBlock(t *testing.T) {
 		Tapped:       false,
 	}
 	gameState.mu.Unlock()
-	
+
 	// Alice's turn: Attack with normal creature
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
 	engine.DeclareAttacker(gameID, normalID, "Bob", "Alice")
-	
+
 	// Verify normal creature is tapped
 	gameState.mu.RLock()
 	normal := gameState.cards[normalID]
@@ -289,16 +289,16 @@ func TestCombatNoVigilanceCannotBlock(t *testing.T) {
 		t.Error("normal creature should be tapped after attacking")
 	}
 	gameState.mu.RUnlock()
-	
+
 	// End Alice's combat
 	engine.EndCombat(gameID)
-	
+
 	// Bob's turn: Attack with opponent creature
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Bob")
 	engine.SetDefenders(gameID)
 	engine.DeclareAttacker(gameID, opponentAttackerID, "Alice", "Bob")
-	
+
 	// Alice cannot block with tapped creature
 	canBlock, err := engine.CanBlock(gameID, normalID, opponentAttackerID)
 	if err != nil {
@@ -313,23 +313,23 @@ func TestCombatNoVigilanceCannotBlock(t *testing.T) {
 func TestCombatVigilanceFullFlow(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-vigilance-full"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Vigilance attacker
 	gameState.mu.Lock()
 	attackerID := "attacker-1"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Serra Angel",
@@ -345,27 +345,27 @@ func TestCombatVigilanceFullFlow(t *testing.T) {
 			{ID: abilityFlying, Text: "Flying"},
 		},
 	}
-	
+
 	initialBobLife := gameState.players["Bob"].Life
 	gameState.mu.Unlock()
-	
+
 	// Full combat flow
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
-	
+
 	// Verify untapped
 	gameState.mu.RLock()
 	if gameState.cards[attackerID].Tapped {
 		t.Error("vigilance creature should be untapped")
 	}
 	gameState.mu.RUnlock()
-	
+
 	// Damage (unblocked)
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Verify damage dealt
 	gameState.mu.RLock()
 	bobLife := gameState.players["Bob"].Life
@@ -373,10 +373,10 @@ func TestCombatVigilanceFullFlow(t *testing.T) {
 		t.Errorf("expected Bob to lose 4 life, lost %d", initialBobLife-bobLife)
 	}
 	gameState.mu.RUnlock()
-	
+
 	// End combat
 	engine.EndCombat(gameID)
-	
+
 	// Verify still untapped after combat
 	gameState.mu.RLock()
 	attacker := gameState.cards[attackerID]

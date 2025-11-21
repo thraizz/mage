@@ -177,7 +177,7 @@ func TestStateBasedActionsBeforePriority(t *testing.T) {
 		// Since we don't have a direct API, we'll use the internal structure
 		// For now, let's test that the check exists by checking the code path
 		// In a real scenario, poison would be added through card effects
-		
+
 		// The test verifies the infrastructure is in place
 		// Actual poison counter addition would happen through card abilities
 	})
@@ -189,12 +189,12 @@ func TestStateBasedActionsBeforePriority(t *testing.T) {
 		// 1. Cast a creature spell
 		// 2. Apply a toughness-reducing effect
 		// 3. Verify the creature dies before priority is passed
-		
+
 		// For now, we skip this test as it requires:
 		// - Creature card definitions
 		// - Toughness-reducing effects
 		// - Full SBA implementation for 0 toughness
-		
+
 		// The infrastructure is in place via checkStateBasedActions()
 		// which is called before each priority per rule 117.5
 		t.Skip("Skipping until creature cards and toughness-reducing effects are implemented")
@@ -266,7 +266,7 @@ func TestStateBasedActionsBetweenStackResolutions(t *testing.T) {
 	}); err != nil {
 		t.Fatalf("alice pass failed: %v", err)
 	}
-	
+
 	// After stack resolution, priority returns to active player (Alice)
 	// The test verifies that resolution completed successfully with SBA checks
 
@@ -495,7 +495,7 @@ func TestZoneTrackingAfterResolution(t *testing.T) {
 		t.Fatalf("failed to get view: %v", err)
 	}
 	view := viewRaw.(*game.EngineGameView)
-	
+
 	if len(view.Stack) == 0 {
 		t.Fatalf("expected spell on stack")
 	}
@@ -510,7 +510,7 @@ func TestZoneTrackingAfterResolution(t *testing.T) {
 	}); err != nil {
 		t.Fatalf("alice pass failed: %v", err)
 	}
-	
+
 	if err := engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Bob",
 		ActionType: "PLAYER_ACTION",
@@ -542,7 +542,7 @@ func TestZoneTrackingAfterResolution(t *testing.T) {
 			}
 		}
 	}
-	
+
 	if !foundInGraveyard {
 		t.Errorf("instant should be in graveyard after resolution")
 	}
@@ -638,12 +638,12 @@ func TestSimultaneousEventsProcessing(t *testing.T) {
 	// The infrastructure is in place for simultaneous event processing
 	// Events that occur during stack resolution are queued and processed together
 	// This allows triggers to see all events that happened "at the same time"
-	
+
 	// For now, we verify the infrastructure exists by checking that:
 	// 1. Games can be started
 	// 2. Stack resolution completes successfully
 	// 3. No errors occur during event processing
-	
+
 	// Cast a spell
 	if err := engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Alice",
@@ -663,7 +663,7 @@ func TestSimultaneousEventsProcessing(t *testing.T) {
 	}); err != nil {
 		t.Fatalf("alice pass failed: %v", err)
 	}
-	
+
 	if err := engine.ProcessAction(gameID, game.PlayerAction{
 		PlayerID:   "Bob",
 		ActionType: "PLAYER_ACTION",
@@ -1625,7 +1625,7 @@ func TestTurnRollbackClearsPlayerBookmarks(t *testing.T) {
 		t.Fatalf("failed to get view: %v", err)
 	}
 	view := viewRaw.(*game.EngineGameView)
-	
+
 	// Alice should be able to undo
 	if err := engine.Undo(gameID, "Alice"); err != nil {
 		t.Fatalf("expected undo to work before rollback: %v", err)
@@ -1645,12 +1645,12 @@ func TestTurnRollbackClearsPlayerBookmarks(t *testing.T) {
 	if err := engine.SaveTurnSnapshot(gameID, 2); err != nil {
 		t.Fatalf("failed to save turn 2 snapshot: %v", err)
 	}
-	
+
 	// Note: In a real game, turn would be 2, so rollback(1) would go to turn 1.
 	// Here we're still on turn 1, so we can't actually rollback.
 	// Instead, just verify the bookmark clearing logic works.
 	// The RollbackTurns method clears all bookmarks when it runs.
-	
+
 	// For this test, we'll just verify that the turn snapshot system is working
 	// The actual rollback clearing of bookmarks is tested implicitly in the
 	// RollbackTurns implementation.
@@ -2105,13 +2105,13 @@ func TestCombatBasicAttack(t *testing.T) {
 	// Get a creature from Alice's battlefield
 	viewRaw, _ := engine.GetGameView(gameID, "Alice")
 	view := viewRaw.(*game.EngineGameView)
-	
+
 	if len(view.Battlefield) == 0 {
 		t.Skip("no creatures on battlefield to test")
 	}
 
 	creatureID := view.Battlefield[0].ID
-	
+
 	// Declare attacker
 	if err := engine.DeclareAttacker(gameID, creatureID, "Bob", "Alice"); err != nil {
 		t.Fatalf("failed to declare attacker: %v", err)
@@ -2168,7 +2168,7 @@ func TestCombatMultipleAttackers(t *testing.T) {
 	// Get creatures from battlefield
 	viewRaw, _ := engine.GetGameView(gameID, "Alice")
 	view := viewRaw.(*game.EngineGameView)
-	
+
 	if len(view.Battlefield) < 2 {
 		t.Skip("need at least 2 creatures to test")
 	}
@@ -2226,7 +2226,7 @@ func TestCombatValidation(t *testing.T) {
 
 	viewRaw, _ := engine.GetGameView(gameID, "Alice")
 	view := viewRaw.(*game.EngineGameView)
-	
+
 	if len(view.Battlefield) == 0 {
 		t.Skip("no creatures on battlefield to test")
 	}
@@ -2247,7 +2247,7 @@ func TestCombatValidation(t *testing.T) {
 	if err := engine.DeclareAttacker(gameID, creatureID, "Bob", "Alice"); err != nil {
 		t.Fatalf("failed to declare attacker: %v", err)
 	}
-	
+
 	// Creature is now tapped, should fail
 	if err := engine.DeclareAttacker(gameID, creatureID, "Bob", "Alice"); err == nil {
 		t.Error("expected error declaring tapped creature as attacker")
@@ -2279,13 +2279,13 @@ func TestCombatReset(t *testing.T) {
 
 	viewRaw, _ := engine.GetGameView(gameID, "Alice")
 	view := viewRaw.(*game.EngineGameView)
-	
+
 	if len(view.Battlefield) == 0 {
 		t.Skip("no creatures on battlefield to test")
 	}
 
 	creatureID := view.Battlefield[0].ID
-	
+
 	// Declare attacker
 	if err := engine.DeclareAttacker(gameID, creatureID, "Bob", "Alice"); err != nil {
 		t.Fatalf("failed to declare attacker: %v", err)
@@ -2335,7 +2335,7 @@ func TestNotificationDeadlock(t *testing.T) {
 		if notification.Type == "STACK_UPDATE" {
 			t.Logf("Notification handler received STACK_UPDATE, attempting to get game view...")
 			handlerStarted <- true
-			
+
 			// Try to get game view synchronously (blocking call)
 			// This will deadlock if ProcessAction is still holding gameState.mu
 			done := make(chan bool, 1)

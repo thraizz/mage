@@ -10,23 +10,23 @@ import (
 func TestCombatTrampleUnblocked(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-trample-unblocked"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: Trample attacker
 	gameState.mu.Lock()
 	attackerID := "trample-attacker"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Colossal Dreadmaw",
@@ -41,23 +41,23 @@ func TestCombatTrampleUnblocked(t *testing.T) {
 			{ID: abilityTrample, Text: "Trample"},
 		},
 	}
-	
+
 	initialBobLife := gameState.players["Bob"].Life
 	gameState.mu.Unlock()
-	
+
 	// Full combat flow
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
 	engine.SetDefenders(gameID)
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
-	
+
 	// No blockers
 	engine.AcceptBlockers(gameID)
-	
+
 	// Damage
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Verify damage dealt to Bob
 	gameState.mu.RLock()
 	bobLife := gameState.players["Bob"].Life
@@ -65,7 +65,7 @@ func TestCombatTrampleUnblocked(t *testing.T) {
 		t.Errorf("expected Bob to lose 6 life, lost %d", initialBobLife-bobLife)
 	}
 	gameState.mu.RUnlock()
-	
+
 	engine.EndCombat(gameID)
 }
 
@@ -73,24 +73,24 @@ func TestCombatTrampleUnblocked(t *testing.T) {
 func TestCombatTrampleOverBlocker(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-trample-over"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: 6/6 trample attacker vs 2/2 blocker
 	gameState.mu.Lock()
 	attackerID := "trample-attacker"
 	blockerID := "small-blocker"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Colossal Dreadmaw",
@@ -105,7 +105,7 @@ func TestCombatTrampleOverBlocker(t *testing.T) {
 			{ID: abilityTrample, Text: "Trample"},
 		},
 	}
-	
+
 	gameState.cards[blockerID] = &internalCard{
 		ID:           blockerID,
 		Name:         "Grizzly Bears",
@@ -117,10 +117,10 @@ func TestCombatTrampleOverBlocker(t *testing.T) {
 		Toughness:    "2",
 		Tapped:       false,
 	}
-	
+
 	initialBobLife := gameState.players["Bob"].Life
 	gameState.mu.Unlock()
-	
+
 	// Combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -128,28 +128,28 @@ func TestCombatTrampleOverBlocker(t *testing.T) {
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
 	engine.DeclareBlocker(gameID, blockerID, attackerID, "Bob")
 	engine.AcceptBlockers(gameID)
-	
+
 	// Damage
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Verify:
 	// - Blocker takes 2 damage (lethal) and dies
 	// - Remaining 4 damage tramples through to Bob
 	gameState.mu.RLock()
 	blocker := gameState.cards[blockerID]
 	bobLife := gameState.players["Bob"].Life
-	
+
 	if blocker.Zone != zoneGraveyard {
 		t.Error("blocker should be in graveyard")
 	}
-	
+
 	expectedDamage := 4 // 6 power - 2 lethal to blocker = 4 trample
 	if bobLife != initialBobLife-expectedDamage {
 		t.Errorf("expected Bob to lose %d life from trample, lost %d", expectedDamage, initialBobLife-bobLife)
 	}
 	gameState.mu.RUnlock()
-	
+
 	engine.EndCombat(gameID)
 }
 
@@ -157,24 +157,24 @@ func TestCombatTrampleOverBlocker(t *testing.T) {
 func TestCombatTrampleExactLethal(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-trample-exact"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: 2/2 trample attacker vs 2/2 blocker (exact lethal, no trample through)
 	gameState.mu.Lock()
 	attackerID := "trample-attacker"
 	blockerID := "equal-blocker"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Trample Bear",
@@ -189,7 +189,7 @@ func TestCombatTrampleExactLethal(t *testing.T) {
 			{ID: abilityTrample, Text: "Trample"},
 		},
 	}
-	
+
 	gameState.cards[blockerID] = &internalCard{
 		ID:           blockerID,
 		Name:         "Grizzly Bears",
@@ -201,10 +201,10 @@ func TestCombatTrampleExactLethal(t *testing.T) {
 		Toughness:    "2",
 		Tapped:       false,
 	}
-	
+
 	initialBobLife := gameState.players["Bob"].Life
 	gameState.mu.Unlock()
-	
+
 	// Combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -212,11 +212,11 @@ func TestCombatTrampleExactLethal(t *testing.T) {
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
 	engine.DeclareBlocker(gameID, blockerID, attackerID, "Bob")
 	engine.AcceptBlockers(gameID)
-	
+
 	// Damage
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Verify:
 	// - Blocker takes 2 damage (lethal) and dies
 	// - No trample damage (all damage was lethal)
@@ -224,20 +224,20 @@ func TestCombatTrampleExactLethal(t *testing.T) {
 	blocker := gameState.cards[blockerID]
 	attacker := gameState.cards[attackerID]
 	bobLife := gameState.players["Bob"].Life
-	
+
 	if blocker.Zone != zoneGraveyard {
 		t.Error("blocker should be in graveyard")
 	}
-	
+
 	if attacker.Zone != zoneGraveyard {
 		t.Error("attacker should be in graveyard (took 2 damage)")
 	}
-	
+
 	if bobLife != initialBobLife {
 		t.Errorf("Bob should not lose life (no trample through), lost %d", initialBobLife-bobLife)
 	}
 	gameState.mu.RUnlock()
-	
+
 	engine.EndCombat(gameID)
 }
 
@@ -245,25 +245,25 @@ func TestCombatTrampleExactLethal(t *testing.T) {
 func TestCombatTrampleMultipleBlockers(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-trample-multi"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: 10/10 trample attacker vs two 2/2 blockers
 	gameState.mu.Lock()
 	attackerID := "trample-attacker"
 	blocker1ID := "blocker-1"
 	blocker2ID := "blocker-2"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Giant Trampler",
@@ -278,7 +278,7 @@ func TestCombatTrampleMultipleBlockers(t *testing.T) {
 			{ID: abilityTrample, Text: "Trample"},
 		},
 	}
-	
+
 	gameState.cards[blocker1ID] = &internalCard{
 		ID:           blocker1ID,
 		Name:         "Grizzly Bears",
@@ -290,7 +290,7 @@ func TestCombatTrampleMultipleBlockers(t *testing.T) {
 		Toughness:    "2",
 		Tapped:       false,
 	}
-	
+
 	gameState.cards[blocker2ID] = &internalCard{
 		ID:           blocker2ID,
 		Name:         "Runeclaw Bear",
@@ -302,10 +302,10 @@ func TestCombatTrampleMultipleBlockers(t *testing.T) {
 		Toughness:    "2",
 		Tapped:       false,
 	}
-	
+
 	initialBobLife := gameState.players["Bob"].Life
 	gameState.mu.Unlock()
-	
+
 	// Combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -314,11 +314,11 @@ func TestCombatTrampleMultipleBlockers(t *testing.T) {
 	engine.DeclareBlocker(gameID, blocker1ID, attackerID, "Bob")
 	engine.DeclareBlocker(gameID, blocker2ID, attackerID, "Bob")
 	engine.AcceptBlockers(gameID)
-	
+
 	// Damage
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Verify:
 	// - Both blockers take 2 damage (lethal) and die
 	// - Remaining 6 damage tramples through to Bob (10 - 2 - 2 = 6)
@@ -326,21 +326,21 @@ func TestCombatTrampleMultipleBlockers(t *testing.T) {
 	blocker1 := gameState.cards[blocker1ID]
 	blocker2 := gameState.cards[blocker2ID]
 	bobLife := gameState.players["Bob"].Life
-	
+
 	if blocker1.Zone != zoneGraveyard {
 		t.Error("blocker 1 should be in graveyard")
 	}
-	
+
 	if blocker2.Zone != zoneGraveyard {
 		t.Error("blocker 2 should be in graveyard")
 	}
-	
+
 	expectedDamage := 6 // 10 power - 2 - 2 = 6 trample
 	if bobLife != initialBobLife-expectedDamage {
 		t.Errorf("expected Bob to lose %d life from trample, lost %d", expectedDamage, initialBobLife-bobLife)
 	}
 	gameState.mu.RUnlock()
-	
+
 	engine.EndCombat(gameID)
 }
 
@@ -348,24 +348,24 @@ func TestCombatTrampleMultipleBlockers(t *testing.T) {
 func TestCombatNoTrampleBlocked(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-no-trample"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: 6/6 normal attacker vs 2/2 blocker (no trample)
 	gameState.mu.Lock()
 	attackerID := "normal-attacker"
 	blockerID := "small-blocker"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Big Creature",
@@ -377,7 +377,7 @@ func TestCombatNoTrampleBlocked(t *testing.T) {
 		Toughness:    "6",
 		Tapped:       false,
 	}
-	
+
 	gameState.cards[blockerID] = &internalCard{
 		ID:           blockerID,
 		Name:         "Grizzly Bears",
@@ -389,10 +389,10 @@ func TestCombatNoTrampleBlocked(t *testing.T) {
 		Toughness:    "2",
 		Tapped:       false,
 	}
-	
+
 	initialBobLife := gameState.players["Bob"].Life
 	gameState.mu.Unlock()
-	
+
 	// Combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -400,27 +400,27 @@ func TestCombatNoTrampleBlocked(t *testing.T) {
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
 	engine.DeclareBlocker(gameID, blockerID, attackerID, "Bob")
 	engine.AcceptBlockers(gameID)
-	
+
 	// Damage
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Verify:
 	// - Blocker takes damage and dies
 	// - Bob takes NO damage (no trample)
 	gameState.mu.RLock()
 	blocker := gameState.cards[blockerID]
 	bobLife := gameState.players["Bob"].Life
-	
+
 	if blocker.Zone != zoneGraveyard {
 		t.Error("blocker should be in graveyard")
 	}
-	
+
 	if bobLife != initialBobLife {
 		t.Errorf("Bob should not lose life (no trample), lost %d", initialBobLife-bobLife)
 	}
 	gameState.mu.RUnlock()
-	
+
 	engine.EndCombat(gameID)
 }
 
@@ -428,24 +428,24 @@ func TestCombatNoTrampleBlocked(t *testing.T) {
 func TestCombatTrampleWithFirstStrike(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-trample-first-strike"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: 4/4 trample + first strike attacker vs 2/2 blocker
 	gameState.mu.Lock()
 	attackerID := "trample-first-strike"
 	blockerID := "normal-blocker"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Elite Trampler",
@@ -461,7 +461,7 @@ func TestCombatTrampleWithFirstStrike(t *testing.T) {
 			{ID: abilityFirstStrike, Text: "First strike"},
 		},
 	}
-	
+
 	gameState.cards[blockerID] = &internalCard{
 		ID:           blockerID,
 		Name:         "Grizzly Bears",
@@ -473,10 +473,10 @@ func TestCombatTrampleWithFirstStrike(t *testing.T) {
 		Toughness:    "2",
 		Tapped:       false,
 	}
-	
+
 	initialBobLife := gameState.players["Bob"].Life
 	gameState.mu.Unlock()
-	
+
 	// Combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -484,15 +484,15 @@ func TestCombatTrampleWithFirstStrike(t *testing.T) {
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
 	engine.DeclareBlocker(gameID, blockerID, attackerID, "Bob")
 	engine.AcceptBlockers(gameID)
-	
+
 	// First strike damage
 	engine.AssignCombatDamage(gameID, true)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Normal damage (blocker is dead, so no damage back)
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Verify:
 	// - Blocker dies in first strike step
 	// - 2 trample damage goes through to Bob in first strike step
@@ -501,25 +501,25 @@ func TestCombatTrampleWithFirstStrike(t *testing.T) {
 	blocker := gameState.cards[blockerID]
 	attacker := gameState.cards[attackerID]
 	bobLife := gameState.players["Bob"].Life
-	
+
 	if blocker.Zone != zoneGraveyard {
 		t.Error("blocker should be in graveyard")
 	}
-	
+
 	if attacker.Zone != zoneBattlefield {
 		t.Error("attacker should still be on battlefield")
 	}
-	
+
 	if attacker.Damage != 0 {
 		t.Errorf("attacker should have no damage, has %d", attacker.Damage)
 	}
-	
+
 	expectedDamage := 2 // 4 power - 2 lethal = 2 trample
 	if bobLife != initialBobLife-expectedDamage {
 		t.Errorf("expected Bob to lose %d life from trample, lost %d", expectedDamage, initialBobLife-bobLife)
 	}
 	gameState.mu.RUnlock()
-	
+
 	engine.EndCombat(gameID)
 }
 
@@ -527,24 +527,24 @@ func TestCombatTrampleWithFirstStrike(t *testing.T) {
 func TestCombatTrampleInsufficientPower(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 	engine := NewMageEngine(logger)
-	
+
 	gameID := "test-trample-insufficient"
 	players := []string{"Alice", "Bob"}
-	
+
 	if err := engine.StartGame(gameID, players, "Duel"); err != nil {
 		t.Fatalf("failed to start game: %v", err)
 	}
-	
+
 	// Get game state
 	engine.mu.RLock()
 	gameState := engine.games[gameID]
 	engine.mu.RUnlock()
-	
+
 	// Setup: 2/2 trample attacker vs 5/5 blocker
 	gameState.mu.Lock()
 	attackerID := "weak-trampler"
 	blockerID := "big-blocker"
-	
+
 	gameState.cards[attackerID] = &internalCard{
 		ID:           attackerID,
 		Name:         "Small Trampler",
@@ -559,7 +559,7 @@ func TestCombatTrampleInsufficientPower(t *testing.T) {
 			{ID: abilityTrample, Text: "Trample"},
 		},
 	}
-	
+
 	gameState.cards[blockerID] = &internalCard{
 		ID:           blockerID,
 		Name:         "Big Wall",
@@ -571,10 +571,10 @@ func TestCombatTrampleInsufficientPower(t *testing.T) {
 		Toughness:    "5",
 		Tapped:       false,
 	}
-	
+
 	initialBobLife := gameState.players["Bob"].Life
 	gameState.mu.Unlock()
-	
+
 	// Combat
 	engine.ResetCombat(gameID)
 	engine.SetAttacker(gameID, "Alice")
@@ -582,30 +582,30 @@ func TestCombatTrampleInsufficientPower(t *testing.T) {
 	engine.DeclareAttacker(gameID, attackerID, "Bob", "Alice")
 	engine.DeclareBlocker(gameID, blockerID, attackerID, "Bob")
 	engine.AcceptBlockers(gameID)
-	
+
 	// Damage
 	engine.AssignCombatDamage(gameID, false)
 	engine.ApplyCombatDamage(gameID)
-	
+
 	// Verify:
 	// - Blocker takes 2 damage (not lethal, survives)
 	// - No trample damage (all damage assigned to blocker)
 	gameState.mu.RLock()
 	blocker := gameState.cards[blockerID]
 	bobLife := gameState.players["Bob"].Life
-	
+
 	if blocker.Zone != zoneBattlefield {
 		t.Error("blocker should still be on battlefield")
 	}
-	
+
 	if blocker.Damage != 2 {
 		t.Errorf("blocker should have 2 damage, has %d", blocker.Damage)
 	}
-	
+
 	if bobLife != initialBobLife {
 		t.Errorf("Bob should not lose life (no trample through), lost %d", initialBobLife-bobLife)
 	}
 	gameState.mu.RUnlock()
-	
+
 	engine.EndCombat(gameID)
 }

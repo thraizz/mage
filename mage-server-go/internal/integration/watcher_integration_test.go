@@ -112,12 +112,12 @@ func TestWatcherIntegration_MultipleWatchers(t *testing.T) {
 
 	// Publish creature dies event
 	dieEvent := rules.Event{
-		Type:        rules.EventPermanentDies,
-		TargetID:    "creature1",
-		SourceID:    "creature1",
-		Controller:  "player1",
-		PlayerID:    "player1",
-		Timestamp:   time.Now(),
+		Type:       rules.EventPermanentDies,
+		TargetID:   "creature1",
+		SourceID:   "creature1",
+		Controller: "player1",
+		PlayerID:   "player1",
+		Timestamp:  time.Now(),
 		Metadata: map[string]string{
 			"owner_id": "player1",
 		},
@@ -314,12 +314,12 @@ func TestWatcherIntegration_CreatureDies(t *testing.T) {
 
 	// Creature dies (goes to graveyard from battlefield)
 	dieEvent := rules.Event{
-		Type:        rules.EventPermanentDies,
-		TargetID:    "creature1",
-		SourceID:    "creature1",
-		Controller:  "player1",
-		PlayerID:    "player1",
-		Timestamp:   time.Now(),
+		Type:       rules.EventPermanentDies,
+		TargetID:   "creature1",
+		SourceID:   "creature1",
+		Controller: "player1",
+		PlayerID:   "player1",
+		Timestamp:  time.Now(),
 		Metadata: map[string]string{
 			"owner_id": "player1",
 		},
@@ -342,12 +342,12 @@ func TestWatcherIntegration_CreatureDies(t *testing.T) {
 
 	// Test multiple creatures dying
 	dieEvent2 := rules.Event{
-		Type:        rules.EventPermanentDies,
-		TargetID:    "creature2",
-		SourceID:    "creature2",
-		Controller:  "player1",
-		PlayerID:    "player1",
-		Timestamp:   time.Now(),
+		Type:       rules.EventPermanentDies,
+		TargetID:   "creature2",
+		SourceID:   "creature2",
+		Controller: "player1",
+		PlayerID:   "player1",
+		Timestamp:  time.Now(),
 		Metadata: map[string]string{
 			"owner_id": "player1",
 		},
@@ -396,12 +396,12 @@ func TestWatcherIntegration_EventBusWatcherIntegration(t *testing.T) {
 
 	// Publish creature dies event
 	dieEvent := rules.Event{
-		Type:        rules.EventPermanentDies,
-		TargetID:    "creature1",
-		SourceID:    "creature1",
-		Controller:  "player1",
-		PlayerID:    "player1",
-		Timestamp:   time.Now(),
+		Type:       rules.EventPermanentDies,
+		TargetID:   "creature1",
+		SourceID:   "creature1",
+		Controller: "player1",
+		PlayerID:   "player1",
+		Timestamp:  time.Now(),
 		Metadata: map[string]string{
 			"owner_id": "player1",
 		},
@@ -598,12 +598,12 @@ func TestWatcherIntegration_ConcurrentWatchers(t *testing.T) {
 	eventBus.Publish(drawEvent)
 
 	dieEvent := rules.Event{
-		Type:        rules.EventPermanentDies,
-		TargetID:    "creature1",
-		SourceID:    "creature1",
-		Controller:  "player1",
-		PlayerID:    "player1",
-		Timestamp:   time.Now(),
+		Type:       rules.EventPermanentDies,
+		TargetID:   "creature1",
+		SourceID:   "creature1",
+		Controller: "player1",
+		PlayerID:   "player1",
+		Timestamp:  time.Now(),
 		Metadata: map[string]string{
 			"owner_id": "player1",
 		},
