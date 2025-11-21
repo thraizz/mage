@@ -6,21 +6,27 @@ type Duration string
 const (
 	// DurationEndOfTurn - Effect expires at end of turn
 	DurationEndOfTurn Duration = "EndOfTurn"
-	
+
+	// DurationUntilEndOfTurn - Alias for DurationEndOfTurn (compatibility)
+	DurationUntilEndOfTurn Duration = "UntilEndOfTurn"
+
 	// DurationEndOfCombat - Effect expires at end of combat
 	DurationEndOfCombat Duration = "EndOfCombat"
-	
+
 	// DurationWhileOnBattlefield - Effect lasts while source is on battlefield
 	DurationWhileOnBattlefield Duration = "WhileOnBattlefield"
-	
+
 	// DurationWhileControlled - Effect lasts while you control the source
 	DurationWhileControlled Duration = "WhileControlled"
-	
+
 	// DurationUntilSourceLeaves - Effect lasts until source leaves battlefield
 	DurationUntilSourceLeaves Duration = "UntilSourceLeaves"
-	
+
 	// DurationPermanent - Effect lasts indefinitely
 	DurationPermanent Duration = "Permanent"
+
+	// DurationOneUse - Effect is used once and then removed
+	DurationOneUse Duration = "OneUse"
 )
 
 // EffectWithDuration represents an effect that has a duration
