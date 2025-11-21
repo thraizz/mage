@@ -298,12 +298,13 @@ Status legend:
   - [x] Build Registry system for card builders (self-registering)
   - [x] Add CardInfo helper with type checking methods
   - [x] Write unit tests (12 tests passing)
-- [-] **Phase 2: Ability Framework** (IN PROGRESS)
-  - [ ] Define core ability interfaces (Effect, Cost, Target, Ability)
-  - [ ] Implement 20+ common effects (damage, draw, destroy, counter, boost)
-  - [ ] Implement cost system (mana, tap, sacrifice, discard)
-  - [ ] Implement targeting system (creatures, players, any, spells)
-  - [ ] Write builder API for fluent ability construction
+- [x] **Phase 2 Complete: Ability Framework**
+  - [x] Define core ability interfaces (Effect, Cost, Target, Ability)
+  - [x] Implement 10 common effects (damage, draw, destroy, counter, boost, tap, mana)
+  - [x] Implement 7 cost types (mana, tap, sacrifice, discard, pay life, composite)
+  - [x] Implement 10+ target filters (any, creature, player, permanent, spell, etc.)
+  - [x] Write builder API for fluent ability construction
+  - [x] Write 24 unit tests (all passing)
 - [ ] **Phase 3: Manual Test Cards** (20 cards)
   - [ ] Implement 5 basic lands
   - [ ] Implement 3 vanilla creatures
