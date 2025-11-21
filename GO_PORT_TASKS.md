@@ -291,12 +291,34 @@ Status legend:
 - [x] Add concession, timeout, and match result handling aligned with rules
 
 ## Card Database & Ability Port
-- [ ] Inventory Java ability/card modules and map to Go packages
-- [ ] Create complete list of all cards and abilities we have to port
-- [ ] Generate Go card definitions from existing Java card data (expansions, tokens, abilities) based off the list, one by one
-- [ ] Translate ability scripts (activated, triggered, static) into Go equivalents
-- [ ] Port keyword ability handlers (flying, deathtouch, scry, etc., check RULES.txt and Java implementation)
-- [ ] Implement effect infrastructure (replacement effects, static ability watchers, continuous effects)
+- [x] **Phase 1 Complete: Card Factory Infrastructure**
+  - [x] Export 30,459 cards from Java source files to CSV
+  - [x] Implement Card type with full game state
+  - [x] Create CardFactory interface and implementation
+  - [x] Build Registry system for card builders (self-registering)
+  - [x] Add CardInfo helper with type checking methods
+  - [x] Write unit tests (12 tests passing)
+- [-] **Phase 2: Ability Framework** (IN PROGRESS)
+  - [ ] Define core ability interfaces (Effect, Cost, Target, Ability)
+  - [ ] Implement 20+ common effects (damage, draw, destroy, counter, boost)
+  - [ ] Implement cost system (mana, tap, sacrifice, discard)
+  - [ ] Implement targeting system (creatures, players, any, spells)
+  - [ ] Write builder API for fluent ability construction
+- [ ] **Phase 3: Manual Test Cards** (20 cards)
+  - [ ] Implement 5 basic lands
+  - [ ] Implement 3 vanilla creatures
+  - [ ] Implement 6 simple spells (Lightning Bolt, Murder, etc.)
+  - [ ] Implement 3 keyword creatures (flying, vigilance, etc.)
+  - [ ] Implement 3 activated abilities (Llanowar Elves, etc.)
+  - [ ] Write 60+ integration tests for manual cards
+- [ ] **Phase 4: Transpiler Development** (8 weeks)
+  - [ ] Build Java AST parser for card files
+  - [ ] Create ability mapper (Java effects → Go effects, 1000+ mappings)
+  - [ ] Implement Go code generator from AST
+  - [ ] Create batch generation pipeline
+  - [ ] Generate all 30,439 remaining cards
+  - [ ] Fix unmapped effects (estimated 1000-2000 cards)
+  - [ ] Manually implement complex cards (planeswalkers, transforming)
 - [ ] Build automated verification to compare Java vs Go card behavior for representative samples
 - [ ] **Re-enable disabled integration tests** that expect specific cards (8 tests disabled - see comments in test files for details)
 - [ ] Add abilities that are missing in the java implementation, e.g. face-down cards
