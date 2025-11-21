@@ -319,8 +319,8 @@ Status legend:
 ## Persistence, Replays & Recovery
 - [x] Store game snapshots for reconnection and spectating
 - [x] Implement replay recording (step-by-step action logs)
-- [ ] Ensure deterministic serialization for saved games and tournaments
-- [ ] Add checksum/validation to guard against divergent game state
+- [x] Ensure deterministic serialization for saved games and tournaments
+- [x] Add checksum/validation to guard against divergent game state
 
 ## Testing & Parity Validation
 - [x] Add unit tests for `TurnManager` sequencing and wraparound behavior
