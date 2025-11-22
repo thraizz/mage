@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package mage.lobby;
+
+// Lobby service for managing game tables
+service LobbyService {
+  // List all active tables
+  rpc ListTables(ListTablesRequest) returns (ListTablesResponse);
+
+  // Stream lobby updates
+  rpc StreamLobbyUpdates(LobbyStreamRequest) returns (stream LobbyUpdate);
+
+  // Create a new table
+  rpc CreateTable(CreateTableRequest) returns (CreateTableResponse);
+
+  // Join an existing table
+  rpc JoinTable(JoinTableRequest) returns (JoinTableResponse);
+
+  // Leave a table
+  rpc LeaveTable(LeaveTableRequest) returns (LeaveTableResponse);
+
+  // Send chat message
+  rpc SendMessage(ChatMessageRequest) returns (ChatMessageResponse);
+}
+
+// List tables request
+message ListTablesRequest {
+  string format_filter = 1;
+  bool open_only = 2;
+}
+
+// List tables response
+message ListTablesResponse {
+  repeated Table tables = 1;
+}
+
+// Table information
+message Table {
+  string table_id = 1;
+  string format = 2;
+  string host_username = 3;
+  string host_id = 4;
+  int32 current_players = 5;
+  int32 max_players = 6;
+  TableStatus status = 7;
+  bool password_protected = 8;
+  repeated TablePlayer players = 9;
+}
+
+enum TableStatus {
+  WAITING = 0;
+  STARTING = 1;
+  IN_PROGRESS = 2;
+  FINISHED = 3;
+}
+
+// Table player
+message TablePlayer {
+  string player_id = 1;
+  string username = 2;
+  bool is_ready = 3;
+  bool is_host = 4;
+}
+
+// Lobby stream request
+message LobbyStreamRequest {
+  string player_id = 1;
+}
+
+// Lobby update
+message LobbyUpdate {
+  LobbyUpdateType type = 1;
+  Table table = 2;
+  ChatMessage chat_message = 3;
+  OnlinePlayersUpdate online_players = 4;
+}
+
+enum LobbyUpdateType {
+  TABLE_CREATED = 0;
+  TABLE_UPDATED = 1;
+  TABLE_DELETED = 2;
+  CHAT_MESSAGE = 3;
+  PLAYERS_UPDATED = 4;
+}
+
+// Online players update
+message OnlinePlayersUpdate {
+  repeated OnlinePlayer players = 1;
+}
+
+message OnlinePlayer {
+  string player_id = 1;
+  string username = 2;
+  bool online = 3;
+}
+
+// Create table request
+message CreateTableRequest {
+  string player_id = 1;
+  string format = 2;
+  int32 max_players = 3;
+  string password = 4;
+  string deck_id = 5;
+}
+
+// Create table response
+message CreateTableResponse {
+  bool success = 1;
+  string message = 2;
+  Table table = 3;
+}
+
+// Join table request
+message JoinTableRequest {
+  string player_id = 1;
+  string table_id = 2;
+  string password = 3;
+  string deck_id = 4;
+}
+
+// Join table response
+message JoinTableResponse {
+  bool success = 1;
+  string message = 2;
+  Table table = 3;
+}
+
+// Leave table request
+message LeaveTableRequest {
+  string player_id = 1;
+  string table_id = 2;
+}
+
+// Leave table response
+message LeaveTableResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Chat message request
+message ChatMessageRequest {
+  string player_id = 1;
+  string message = 2;
+  string table_id = 3;
+  bool is_whisper = 4;
+  string whisper_target_id = 5;
+}
+
+// Chat message response
+message ChatMessageResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Chat message
+message ChatMessage {
+  string message_id = 1;
+  string player_id = 2;
+  string username = 3;
+  string message = 4;
+  int64 timestamp = 5;
+  bool is_system = 6;
+  bool is_whisper = 7;
+  string whisper_target = 8;
+}

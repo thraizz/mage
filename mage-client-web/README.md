@@ -148,6 +148,7 @@ mage-client-web/
 ## 🎨 Card Component
 
 Cards display:
+
 - ✅ Name and type
 - ✅ Power/Toughness
 - ✅ Abilities (Flying, Vigilance, etc.)
@@ -170,11 +171,58 @@ Cards display:
 # Type checking
 bun run check
 
-# Format code
-bun run format
+# Lint code
+npm run lint
+npm run lint:fix  # Auto-fix issues
 
-# Lint
-bun run lint
+# Format code
+npm run format
+npm run format:check  # Check without modifying
+
+# Generate TypeScript types from proto files
+npm run proto:generate
+```
+
+### gRPC/Protobuf Development
+
+The project uses gRPC for client-server communication. Protocol buffer definitions are in the `proto/` directory.
+
+**Regenerating TypeScript types from .proto files:**
+
+```bash
+npm run proto:generate
+```
+
+This will:
+1. Read all `.proto` files from `proto/` directory
+2. Generate TypeScript types and service clients
+3. Output to `src/lib/generated/`
+
+**Available proto files:**
+- `proto/game.proto` - Game service (game state, actions, streaming updates)
+- `proto/lobby.proto` - Lobby service (tables, chat, matchmaking)
+
+**Generated files:**
+- `src/lib/generated/game.ts` - Game service types and client
+- `src/lib/generated/lobby.ts` - Lobby service types and client
+
+**Using gRPC clients:**
+
+```typescript
+import { createGameServiceClient, createLobbyServiceClient } from '$lib/grpc/client';
+
+// Create clients
+const gameClient = createGameServiceClient();
+const lobbyClient = createLobbyServiceClient();
+
+// Make RPC calls
+lobbyClient.listTables({ formatFilter: '', openOnly: false }, (err, response) => {
+  if (err) {
+    console.error('Error:', err);
+  } else {
+    console.log('Tables:', response.tables);
+  }
+});
 ```
 
 ## 🚀 Production Deployment
