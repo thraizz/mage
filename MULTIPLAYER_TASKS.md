@@ -106,23 +106,34 @@ Install and configure gRPC-Web client library and set up TypeScript type generat
 ---
 
 ## T005: Basic Routing Structure
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T001
 
-**Description:**  
+**Description:**
 Set up the basic routing structure with placeholder pages for main sections.
 
 **Acceptance Criteria:**
-- [ ] Route for `/` (home/landing)
-- [ ] Route for `/login`
-- [ ] Route for `/register`
-- [ ] Route for `/lobby`
-- [ ] Route for `/table/[id]`
-- [ ] Route for `/game/[id]`
-- [ ] Route for `/profile`
-- [ ] Route for `/decks`
-- [ ] Each route has a placeholder component with page title
-- [ ] Navigation between routes works
+- [x] Route for `/` (home/landing)
+- [x] Route for `/login`
+- [x] Route for `/register`
+- [x] Route for `/lobby`
+- [x] Route for `/table/[id]`
+- [x] Route for `/game/[id]`
+- [x] Route for `/profile`
+- [x] Route for `/decks`
+- [x] Each route has a placeholder component with page title
+- [x] Navigation between routes works
+
+**Files Created:**
+- `src/routes/+page.svelte` - Home/landing page with navigation grid
+- `src/routes/login/+page.svelte` - Login page placeholder
+- `src/routes/register/+page.svelte` - Registration page placeholder
+- `src/routes/lobby/+page.svelte` - Lobby page placeholder with table list
+- `src/routes/table/[id]/+page.svelte` - Table lobby page placeholder
+- `src/routes/game/[id]/+page.svelte` - Game view page placeholder
+- `src/routes/profile/+page.svelte` - Profile page placeholder with stats
+- `src/routes/decks/+page.svelte` - Deck management page placeholder
+- All routes tested and working via dev server
 
 ---
 

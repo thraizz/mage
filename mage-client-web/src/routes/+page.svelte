@@ -1,297 +1,155 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { game, myCards, opponentCards, myPlayer, opponent, isMyTurn } from '$lib/stores/game';
-	import Battlefield from '$lib/components/Battlefield.svelte';
-	import PlayerInfo from '$lib/components/PlayerInfo.svelte';
-	import type { Card } from '$lib/types';
-
-	let connected = $state(false);
-	let gameId = $state('test-game-1');
-	let playerId = $state('player1');
-	let selectedCard: Card | null = $state(null);
-
-	onMount(async () => {
-		try {
-			await game.connect('ws://localhost:8080/ws');
-			connected = true;
-		} catch (error) {
-			console.error('Failed to connect:', error);
-		}
-	});
-
-	function handleCreateGame() {
-		game.createGame(playerId, 'Duel');
-	}
-
-	function handleJoinGame() {
-		game.joinGame(gameId, playerId);
-	}
-
-	function handleCardClick(card: Card) {
-		selectedCard = card;
-		console.log('Selected card:', card);
-	}
-
-	function handleDeclareAttacker(card: Card) {
-		// Find opponent player ID
-		const opp = $opponent;
-		if (opp) {
-			game.declareAttacker(card.id, opp.id);
-		}
-	}
-
-	function handlePassPriority() {
-		game.passPriority();
-	}
+	// Home/Landing page with navigation
 </script>
 
 <svelte:head>
-	<title>Mage - Web Client</title>
+	<title>MAGE - Magic: The Gathering Online</title>
 </svelte:head>
 
-<div class="game-container">
-	<header>
-		<h1>⚔️ Mage - Magic: The Gathering</h1>
-		<div class="connection-status" class:connected>
-			{connected ? '🟢 Connected' : '🔴 Disconnected'}
-		</div>
-	</header>
+<div class="container">
+	<div class="hero">
+		<h1>🎮 MAGE</h1>
+		<p>Magic: The Gathering Online - Play, Compete, Collect</p>
+	</div>
 
-	{#if !connected}
-		<div class="connecting">
-			<p>Connecting to game server...</p>
-			<p class="hint">Make sure the Go server is running on localhost:8080</p>
-		</div>
-	{:else if !$game.game_id}
-		<div class="lobby">
-			<h2>Game Lobby</h2>
-			
-			<div class="lobby-section">
-				<input type="text" bind:value={playerId} placeholder="Your player ID" />
-			</div>
+	<div class="nav-grid">
+		<a href="/login" class="nav-card">
+			<div class="icon">🔐</div>
+			<h2>Login</h2>
+			<p>Sign in to your account</p>
+		</a>
 
-			<div class="lobby-section">
-				<button onclick={handleCreateGame} class="primary">Create New Game</button>
-			</div>
+		<a href="/register" class="nav-card">
+			<div class="icon">📝</div>
+			<h2>Register</h2>
+			<p>Create a new account</p>
+		</a>
 
-			<div class="lobby-section">
-				<input type="text" bind:value={gameId} placeholder="Game ID" />
-				<button onclick={handleJoinGame}>Join Game</button>
-			</div>
-		</div>
-	{:else}
-		<div class="game-board">
-			<!-- Opponent Info -->
-			<div class="opponent-section">
-				<PlayerInfo player={$opponent} isActive={!$isMyTurn} />
-			</div>
+		<a href="/lobby" class="nav-card">
+			<div class="icon">🎯</div>
+			<h2>Lobby</h2>
+			<p>Find and join games</p>
+		</a>
 
-			<!-- Opponent Battlefield -->
-			<Battlefield 
-				cards={$opponentCards} 
-				title="Opponent's Battlefield"
-				onCardClick={handleCardClick}
-			/>
+		<a href="/decks" class="nav-card">
+			<div class="icon">🎴</div>
+			<h2>My Decks</h2>
+			<p>Manage your deck collection</p>
+		</a>
 
-			<!-- Game Info -->
-			<div class="game-info">
-				<div class="turn-info">
-					<span>Turn {$game.turn}</span>
-					<span>{$game.phase} - {$game.step}</span>
-					<span class:active={$isMyTurn}>
-						{$isMyTurn ? '🎯 Your Turn' : '⏳ Opponent\'s Turn'}
-					</span>
-				</div>
-				
-				{#if selectedCard}
-					<div class="selected-card">
-						<strong>Selected:</strong> {selectedCard.name}
-						{#if $isMyTurn && !selectedCard.attacking}
-							<button onclick={() => selectedCard && handleDeclareAttacker(selectedCard)}>
-								⚔️ Attack
-							</button>
-						{/if}
-					</div>
-				{/if}
+		<a href="/profile" class="nav-card">
+			<div class="icon">👤</div>
+			<h2>Profile</h2>
+			<p>View your stats and settings</p>
+		</a>
 
-				<div class="actions">
-					<button onclick={handlePassPriority} disabled={!$isMyTurn}>
-						Pass Priority
-					</button>
-				</div>
-			</div>
+		<a href="/table/demo" class="nav-card">
+			<div class="icon">🪑</div>
+			<h2>Table (Demo)</h2>
+			<p>Pre-game table lobby</p>
+		</a>
 
-			<!-- My Battlefield -->
-			<Battlefield 
-				cards={$myCards} 
-				title="Your Battlefield"
-				onCardClick={handleCardClick}
-			/>
+		<a href="/game/demo" class="nav-card">
+			<div class="icon">⚔️</div>
+			<h2>Game (Demo)</h2>
+			<p>Active game view</p>
+		</a>
+	</div>
 
-			<!-- My Info -->
-			<div class="player-section">
-				<PlayerInfo player={$myPlayer} isActive={$isMyTurn} />
-			</div>
-		</div>
-	{/if}
+	<div class="footer">
+		<p>All routes are placeholder pages - full functionality coming soon!</p>
+	</div>
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-		padding: 0;
-		font-family: system-ui, -apple-system, sans-serif;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	.container {
 		min-height: 100vh;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		padding: 2rem;
 	}
 
-	.game-container {
-		max-width: 1400px;
-		margin: 0 auto;
-		padding: 20px;
-	}
-
-	header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		background: white;
-		padding: 16px 24px;
-		border-radius: 8px;
-		margin-bottom: 20px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	.hero {
+		text-align: center;
+		margin-bottom: 3rem;
+		color: white;
 	}
 
 	h1 {
+		font-size: 4rem;
+		margin: 0 0 1rem 0;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	}
+
+	.hero p {
+		font-size: 1.5rem;
 		margin: 0;
-		font-size: 28px;
-		color: #333;
+		opacity: 0.9;
 	}
 
-	.connection-status {
-		font-weight: bold;
-		color: #e74c3c;
-	}
-
-	.connection-status.connected {
-		color: #27ae60;
-	}
-
-	.connecting {
-		background: white;
-		padding: 64px;
-		border-radius: 8px;
-		text-align: center;
-	}
-
-	.hint {
-		color: #999;
-		font-size: 14px;
-		margin-top: 8px;
-	}
-
-	.lobby {
-		background: white;
-		padding: 48px;
-		border-radius: 8px;
-		max-width: 500px;
+	.nav-grid {
+		max-width: 1200px;
 		margin: 0 auto;
-	}
-
-	.lobby h2 {
-		margin-top: 0;
-	}
-
-	.lobby-section {
-		margin-bottom: 24px;
-	}
-
-	input {
-		width: 100%;
-		padding: 12px;
-		border: 2px solid #ddd;
-		border-radius: 4px;
-		font-size: 16px;
-		box-sizing: border-box;
-	}
-
-	button {
-		padding: 12px 24px;
-		border: none;
-		border-radius: 4px;
-		font-size: 16px;
-		cursor: pointer;
-		background: #667eea;
-		color: white;
-		font-weight: bold;
-		transition: all 0.2s ease;
-	}
-
-	button:hover:not(:disabled) {
-		background: #5568d3;
-		transform: translateY(-2px);
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	}
-
-	button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	button.primary {
-		width: 100%;
-		background: #27ae60;
-	}
-
-	button.primary:hover {
-		background: #229954;
-	}
-
-	.game-board {
 		display: grid;
-		gap: 20px;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 1.5rem;
 	}
 
-	.opponent-section,
-	.player-section {
+	.nav-card {
 		background: white;
-		border-radius: 8px;
-		padding: 16px;
+		border-radius: 12px;
+		padding: 2rem;
+		text-align: center;
+		text-decoration: none;
+		color: #333;
+		transition: all 0.3s;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	}
 
-	.game-info {
-		background: white;
-		border-radius: 8px;
-		padding: 16px;
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
+	.nav-card:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 	}
 
-	.turn-info {
-		display: flex;
-		justify-content: space-around;
-		align-items: center;
-		font-size: 18px;
-		font-weight: bold;
+	.icon {
+		font-size: 3rem;
+		margin-bottom: 1rem;
 	}
 
-	.turn-info .active {
-		color: #27ae60;
+	.nav-card h2 {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.5rem;
+		color: #667eea;
 	}
 
-	.selected-card {
-		padding: 12px;
-		background: #f0f0f0;
-		border-radius: 4px;
-		display: flex;
-		gap: 12px;
-		align-items: center;
+	.nav-card p {
+		margin: 0;
+		color: #666;
+		font-size: 0.875rem;
 	}
 
-	.actions {
-		display: flex;
-		gap: 12px;
-		justify-content: center;
+	.footer {
+		text-align: center;
+		margin-top: 3rem;
+		color: white;
+		opacity: 0.8;
+	}
+
+	.footer p {
+		margin: 0;
+		font-size: 0.875rem;
+	}
+
+	@media (max-width: 768px) {
+		h1 {
+			font-size: 2.5rem;
+		}
+
+		.hero p {
+			font-size: 1.125rem;
+		}
+
+		.nav-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 </style>
