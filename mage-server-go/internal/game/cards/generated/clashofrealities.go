@@ -1,0 +1,47 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
+)
+
+func init() {
+	cards.Register("Clash Of Realities", NewClashOfRealities)
+}
+
+// NewClashOfRealities creates a Clash Of Realities
+// {3}{R} - ENCHANTMENT
+func NewClashOfRealities(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Clash Of Realities")
+	card.ManaCost = "{3}{R}"
+	card.Types = []string{"ENCHANTMENT"}
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDamageEffect(3)).
+		AddEffect(abilities.NewDamageEffect(3)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewGrantAbilityEffect(ability1, filterSpiritWhen permanent enters the battlefield, you may have it deal 3 damage to target non-Spirit creature.\"")).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewGrantAbilityEffect(ability2, filterNotSpiritWhen creature enters the battlefield, you may have it deal 3 damage to target Spirit creature.\"")).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability2)
+	return card, nil
+}

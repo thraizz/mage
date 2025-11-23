@@ -1,0 +1,46 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/token"
+)
+
+func init() {
+	cards.Register("Murder Investigation", NewMurderInvestigation)
+}
+
+// NewMurderInvestigation creates a Murder Investigation
+// {1}{W} - ENCHANTMENT
+func NewMurderInvestigation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Murder Investigation")
+	card.ManaCost = "{1}{W}"
+	card.Types = []string{"ENCHANTMENT"}
+	card.Subtypes = []string{"AURA"}
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
+	token2_0, err := token.GetToken("SoldierToken")
+	if err != nil {
+		return nil, err
+	}
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0, AttachedPermanentPowerCount.instance)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability2)
+	return card, nil
+}

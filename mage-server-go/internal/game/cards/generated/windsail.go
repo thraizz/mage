@@ -1,0 +1,32 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
+)
+
+func init() {
+	cards.Register("Wind Sail", NewWindSail)
+}
+
+// NewWindSail creates a Wind Sail
+// {1}{U} - SORCERY
+func NewWindSail(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Wind Sail")
+	card.ManaCost = "{1}{U}"
+	card.Types = []string{"SORCERY"}
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
+	return card, nil
+}

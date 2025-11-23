@@ -1,0 +1,33 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
+)
+
+func init() {
+	cards.Register("Rune Snag", NewRuneSnag)
+}
+
+// NewRuneSnag creates a Rune Snag
+// {1}{U} - INSTANT
+func NewRuneSnag(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Rune Snag")
+	card.ManaCost = "{1}{U}"
+	card.Types = []string{"INSTANT"}
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCounterSpellEffect(new IntPlusDynamicValue(2, new MultipliedValue(, 2)))).
+		AddTarget(abilities.NewSpellTargetFilter()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
+	return card, nil
+}

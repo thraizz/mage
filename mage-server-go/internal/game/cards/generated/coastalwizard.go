@@ -1,0 +1,27 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+)
+
+func init() {
+	cards.Register("Coastal Wizard", NewCoastalWizard)
+}
+
+// NewCoastalWizard creates a Coastal Wizard
+// {2}{U}{U} - CREATURE
+func NewCoastalWizard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Coastal Wizard")
+	card.ManaCost = "{2}{U}{U}"
+	card.Types = []string{"CREATURE"}
+	card.Subtypes = []string{"HUMAN", "WIZARD"}
+	card.Power = "1"
+	card.Toughness = "1"
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	return card, nil
+}

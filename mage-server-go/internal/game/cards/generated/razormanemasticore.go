@@ -1,0 +1,37 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+)
+
+func init() {
+	cards.Register("Razormane Masticore", NewRazormaneMasticore)
+}
+
+// NewRazormaneMasticore creates a Razormane Masticore
+// {5} - ARTIFACT CREATURE
+// FirstStrike
+func NewRazormaneMasticore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Razormane Masticore")
+	card.ManaCost = "{5}"
+	card.Types = []string{"ARTIFACT", "CREATURE"}
+	card.Subtypes = []string{"MASTICORE"}
+	card.Power = "5"
+	card.Toughness = "5"
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDamageEffect(3)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
+	return card, nil
+}

@@ -1,0 +1,48 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
+	"github.com/magefree/mage-server-go/internal/game/token"
+)
+
+func init() {
+	cards.Register("Phylath World Sculptor", NewPhylathWorldSculptor)
+}
+
+// NewPhylathWorldSculptor creates a Phylath World Sculptor
+// {4}{R}{G} - CREATURE
+func NewPhylathWorldSculptor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Phylath World Sculptor")
+	card.ManaCost = "{4}{R}{G}"
+	card.Types = []string{"CREATURE"}
+	card.Subtypes = []string{"ELEMENTAL"}
+	card.Supertypes = []string{"LEGENDARY"}
+	card.Power = "5"
+	card.Toughness = "5"
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(4))).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
+	token1_0, err := token.GetToken("PlantToken")
+	if err != nil {
+		return nil, err
+	}
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0, xValue)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
+	return card, nil
+}

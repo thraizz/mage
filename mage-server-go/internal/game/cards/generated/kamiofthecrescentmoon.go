@@ -1,0 +1,35 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+)
+
+func init() {
+	cards.Register("Kami Of The Crescent Moon", NewKamiOfTheCrescentMoon)
+}
+
+// NewKamiOfTheCrescentMoon creates a Kami Of The Crescent Moon
+// {U}{U} - CREATURE
+func NewKamiOfTheCrescentMoon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Kami Of The Crescent Moon")
+	card.ManaCost = "{U}{U}"
+	card.Types = []string{"CREATURE"}
+	card.Subtypes = []string{"SPIRIT"}
+	card.Supertypes = []string{"LEGENDARY"}
+	card.Power = "1"
+	card.Toughness = "3"
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
+	return card, nil
+}

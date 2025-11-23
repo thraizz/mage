@@ -1,0 +1,27 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+)
+
+func init() {
+	cards.Register("Lamplighter Of Selhoff", NewLamplighterOfSelhoff)
+}
+
+// NewLamplighterOfSelhoff creates a Lamplighter Of Selhoff
+// {4}{U} - CREATURE
+func NewLamplighterOfSelhoff(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Lamplighter Of Selhoff")
+	card.ManaCost = "{4}{U}"
+	card.Types = []string{"CREATURE"}
+	card.Subtypes = []string{"ZOMBIE", "HORROR"}
+	card.Power = "3"
+	card.Toughness = "5"
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	return card, nil
+}

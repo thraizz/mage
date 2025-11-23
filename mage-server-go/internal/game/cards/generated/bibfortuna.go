@@ -1,0 +1,34 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+)
+
+func init() {
+	cards.Register("Bib Fortuna", NewBibFortuna)
+}
+
+// NewBibFortuna creates a Bib Fortuna
+// {1}{B} - CREATURE
+func NewBibFortuna(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Bib Fortuna")
+	card.ManaCost = "{1}{B}"
+	card.Types = []string{"CREATURE"}
+	card.Supertypes = []string{"LEGENDARY"}
+	card.Power = "2"
+	card.Toughness = "1"
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewSearchLibraryPutOnTopEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), false)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
+	return card, nil
+}

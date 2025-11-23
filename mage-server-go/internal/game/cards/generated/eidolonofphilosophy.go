@@ -1,0 +1,32 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+)
+
+func init() {
+	cards.Register("Eidolon Of Philosophy", NewEidolonOfPhilosophy)
+}
+
+// NewEidolonOfPhilosophy creates a Eidolon Of Philosophy
+// {U} - ENCHANTMENT CREATURE
+func NewEidolonOfPhilosophy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Eidolon Of Philosophy")
+	card.ManaCost = "{U}"
+	card.Types = []string{"ENCHANTMENT", "CREATURE"}
+	card.Subtypes = []string{"SPIRIT"}
+	card.Power = "1"
+	card.Toughness = "2"
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddSacrificeSourceCost().
+		AddEffect(abilities.NewDrawCardsEffect(3)).
+		Build()
+	card.AddAbility(ability0)
+	return card, nil
+}

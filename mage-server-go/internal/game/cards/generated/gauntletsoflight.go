@@ -1,0 +1,49 @@
+package generated
+
+import (
+	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+)
+
+func init() {
+	cards.Register("Gauntlets Of Light", NewGauntletsOfLight)
+}
+
+// NewGauntletsOfLight creates a Gauntlets Of Light
+// {2}{W} - ENCHANTMENT
+func NewGauntletsOfLight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+	card := game.NewCard(ownerID, "Gauntlets Of Light")
+	card.ManaCost = "{2}{W}"
+	card.Types = []string{"ENCHANTMENT"}
+	card.Subtypes = []string{"AURA"}
+	card.SetCode = "M21"
+	card.Rarity = "common"
+
+	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewBoostEnchantedEffect(0, 2)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewUntapEffect()).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(new SimpleActivatedAbility( new UntapSourceEffect().setText("Untap creature"), new ManaCostsImpl<>("{2}{W}") ), AttachmentType.AURA)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
+	return card, nil
+}
