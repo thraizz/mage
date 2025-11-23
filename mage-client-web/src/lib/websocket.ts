@@ -8,7 +8,7 @@ export class MageWebSocket {
 	private reconnectAttempts = 0;
 	private maxReconnectAttempts = 5;
 	private reconnectDelay = 1000;
-	private messageHandlers: Map<string, (data: any) => void> = new Map();
+	private messageHandlers: Map<string, (data: unknown) => void> = new Map();
 	private onConnectCallbacks: (() => void)[] = [];
 	private onDisconnectCallbacks: (() => void)[] = [];
 
@@ -24,7 +24,7 @@ export class MageWebSocket {
 				this.ws.onopen = () => {
 					console.log('WebSocket connected');
 					this.reconnectAttempts = 0;
-					this.onConnectCallbacks.forEach(cb => cb());
+					this.onConnectCallbacks.forEach((cb) => cb());
 					resolve();
 				};
 
@@ -47,7 +47,7 @@ export class MageWebSocket {
 
 				this.ws.onclose = () => {
 					console.log('WebSocket disconnected');
-					this.onDisconnectCallbacks.forEach(cb => cb());
+					this.onDisconnectCallbacks.forEach((cb) => cb());
 					this.attemptReconnect();
 				};
 			} catch (error) {
@@ -74,7 +74,7 @@ export class MageWebSocket {
 		}
 	}
 
-	on(type: string, handler: (data: any) => void) {
+	on(type: string, handler: (data: unknown) => void) {
 		this.messageHandlers.set(type, handler);
 	}
 

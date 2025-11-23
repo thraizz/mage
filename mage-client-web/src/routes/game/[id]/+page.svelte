@@ -198,7 +198,9 @@
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		transition: transform 0.2s, border-color 0.2s;
+		transition:
+			transform 0.2s,
+			border-color 0.2s;
 	}
 
 	.card-placeholder:hover {

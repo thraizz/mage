@@ -103,6 +103,12 @@ func (b *ActivatedAbilityBuilder) AddTapCost() *ActivatedAbilityBuilder {
 	return b
 }
 
+// AddSacrificeSourceCost adds a cost to sacrifice the source permanent
+func (b *ActivatedAbilityBuilder) AddSacrificeSourceCost() *ActivatedAbilityBuilder {
+	b.costs = append(b.costs, NewSacrificeSourceCost())
+	return b
+}
+
 // AddEffect adds an effect to this ability
 func (b *ActivatedAbilityBuilder) AddEffect(effect Effect) *ActivatedAbilityBuilder {
 	b.effects = append(b.effects, effect)

@@ -51,7 +51,9 @@ export function createLobbyServiceClient(config?: Partial<GrpcClientConfig>): Lo
  * @param client Any gRPC client
  * @returns Promise that resolves if connection is successful
  */
-export async function testConnection(client: GameServiceClient | LobbyServiceClient): Promise<boolean> {
+export async function testConnection(
+	client: GameServiceClient | LobbyServiceClient
+): Promise<boolean> {
 	return new Promise((resolve) => {
 		// Use waitForReady to test connection
 		const deadline = new Date();

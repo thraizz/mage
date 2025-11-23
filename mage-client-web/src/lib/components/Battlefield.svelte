@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Card as CardType } from '../types';
 	import Card from './Card.svelte';
-	import { game } from '../stores/game';
 
 	interface Props {
 		cards: CardType[];
@@ -14,13 +13,13 @@
 
 <div class="battlefield">
 	<h2>{title} ({cards.length} creatures)</h2>
-	
+
 	<div class="cards-grid">
 		{#each cards as card (card.id)}
 			<Card {card} onclick={() => onCardClick?.(card)} />
 		{/each}
 	</div>
-	
+
 	{#if cards.length === 0}
 		<div class="empty">No creatures on battlefield</div>
 	{/if}

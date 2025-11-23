@@ -3,11 +3,13 @@
 Svelte-based web client for the Go XMage port. Organized by priority and dependencies.
 
 Status legend:
+
 - `[x]` Completed
 - `[ ]` Pending / not yet started
 - `[~]` In progress or partially implemented
 
 ## Project Setup & Infrastructure (P0)
+
 - [ ] Initialize SvelteKit project with TypeScript
 - [ ] Configure Vite with appropriate build settings
 - [ ] Set up Tailwind CSS (or CSS framework of choice)
@@ -20,6 +22,7 @@ Status legend:
 - [ ] Configure build for production deployment
 
 ## Authentication & Session Management (P0)
+
 - [ ] Create login page (username/password)
 - [ ] Implement login form with validation
 - [ ] Create registration page (username, email, password)
@@ -36,6 +39,7 @@ Status legend:
 - [ ] Add loading states during authentication
 
 ## gRPC Client Setup (P0)
+
 - [ ] Initialize gRPC-Web transport layer
 - [ ] Create gRPC service client instances
 - [ ] Implement error handling wrapper for gRPC calls
@@ -48,6 +52,7 @@ Status legend:
 - [ ] Add network status detection (online/offline)
 
 ## Layout & Navigation (P0)
+
 - [ ] Create main app layout component
 - [ ] Implement top navigation bar (logo, username, logout)
 - [ ] Add connection status indicator (online/reconnecting/offline)
@@ -60,6 +65,7 @@ Status legend:
 - [ ] Add page transition animations
 
 ## Lobby View (P0)
+
 - [ ] Create lobby page component
 - [ ] Implement table list display (scrollable grid/list)
 - [ ] Add table card component (format, players, status, host)
@@ -75,6 +81,7 @@ Status legend:
 - [ ] Add lobby connection error handling
 
 ## Create Table Modal (P0)
+
 - [ ] Create table creation modal component
 - [ ] Add format selection dropdown (Standard, Commander, Modern, etc.)
 - [ ] Implement player count selector (2, 3, 4, etc.)
@@ -88,6 +95,7 @@ Status legend:
 - [ ] Close modal on success and navigate to table view
 
 ## Table View (Pre-Game) (P0)
+
 - [ ] Create table lobby component (waiting room)
 - [ ] Display table info header (format, host, player count)
 - [ ] Show player list with ready status indicators
@@ -104,6 +112,7 @@ Status legend:
 - [ ] Handle table transition to game (navigate to game view)
 
 ## Chat System (P0)
+
 - [ ] Create reusable chat component
 - [ ] Implement message list (scrollable, auto-scroll to bottom)
 - [ ] Add message input field with send button
@@ -120,6 +129,7 @@ Status legend:
 - [ ] Handle long messages (word wrap, max length)
 
 ## Deck Management (P0)
+
 - [ ] Create "My Decks" page
 - [ ] Display saved deck list (one per format)
 - [ ] Add deck card component (format, card count, last modified)
@@ -136,6 +146,7 @@ Status legend:
 - [ ] Handle empty state (no decks yet)
 
 ## Deck Upload & Validation (P0)
+
 - [ ] Create deck import text area (support plain text lists)
 - [ ] Add format selector for validation
 - [ ] Implement client-side deck parsing (quantity, card name)
@@ -150,6 +161,7 @@ Status legend:
 - [ ] Clear form after successful save
 
 ## Game View - Basic Structure (P0)
+
 - [ ] Create game page component (main game container)
 - [ ] Implement game board layout (opponent area, battlefield, player area)
 - [ ] Add game info header (format, turn count, timer)
@@ -167,6 +179,7 @@ Status legend:
 - [ ] Create game action log (scrollable event list)
 
 ## Game View - Card Rendering (P0)
+
 - [ ] Create card component (display card image)
 - [ ] Implement card hover preview (enlarged view)
 - [ ] Add card tooltip (show oracle text)
@@ -181,6 +194,7 @@ Status legend:
 - [ ] Show card legality indicator (grayed out if unplayable)
 
 ## Game View - Player Interactions (P0)
+
 - [ ] Implement priority system (wait for priority, show indicator)
 - [ ] Add "Pass Priority" button
 - [ ] Create target selection mode (click to target)
@@ -197,6 +211,7 @@ Status legend:
 - [ ] Implement stack visualization (cards on stack)
 
 ## Game State Synchronization (P0)
+
 - [ ] Set up gRPC streaming for game updates
 - [ ] Parse incoming game state messages
 - [ ] Update Svelte stores with game state
@@ -209,6 +224,7 @@ Status legend:
 - [ ] Handle simultaneous updates (queue actions)
 
 ## Reconnection & Error Handling (P0)
+
 - [ ] Detect disconnection (WebSocket/gRPC connection lost)
 - [ ] Show reconnection overlay (modal with spinner)
 - [ ] Implement automatic reconnection attempts
@@ -222,6 +238,7 @@ Status legend:
 - [ ] Handle game ended while disconnected
 
 ## User Profile (P0)
+
 - [ ] Create user profile page
 - [ ] Display username and email
 - [ ] Show basic stats (games played, wins, losses, win rate)
@@ -235,6 +252,7 @@ Status legend:
 - [ ] Implement simple settings section (future expansion)
 
 ## Settings & Preferences (P1)
+
 - [ ] Create settings page
 - [ ] Add audio settings (enable/disable sound effects)
 - [ ] Implement volume slider for sounds
@@ -248,6 +266,7 @@ Status legend:
 - [ ] Implement settings persistence (localStorage)
 
 ## Responsive Design (P1)
+
 - [ ] Test and fix mobile layout (lobby, table, game)
 - [ ] Add touch-friendly controls (larger buttons)
 - [ ] Implement swipe gestures for mobile (optional)
@@ -260,6 +279,7 @@ Status legend:
 - [ ] Test on Android Chrome
 
 ## Error Handling & User Feedback (P1)
+
 - [ ] Create error boundary component
 - [ ] Add global error handler (catch unhandled errors)
 - [ ] Implement retry logic for failed requests
@@ -272,6 +292,7 @@ Status legend:
 - [ ] Show progress indicators for long operations
 
 ## Performance Optimization (P2)
+
 - [ ] Implement lazy loading for routes
 - [ ] Add code splitting (separate chunks per route)
 - [ ] Optimize card image loading (lazy load, CDN)
@@ -284,6 +305,7 @@ Status legend:
 - [ ] Profile and optimize render performance
 
 ## Testing (P2)
+
 - [ ] Set up Vitest for unit tests
 - [ ] Add component tests for key components
 - [ ] Implement integration tests for user flows
@@ -296,6 +318,7 @@ Status legend:
 - [ ] Implement visual regression tests
 
 ## Accessibility (P2)
+
 - [ ] Add ARIA labels to interactive elements
 - [ ] Implement keyboard navigation (tab through UI)
 - [ ] Add keyboard shortcuts (space to pass priority, etc.)
@@ -308,6 +331,7 @@ Status legend:
 - [ ] Add reduced motion option (disable animations)
 
 ## Documentation (P2)
+
 - [ ] Write README with setup instructions
 - [ ] Document project structure and conventions
 - [ ] Add component documentation (Storybook or similar)
@@ -324,6 +348,7 @@ Status legend:
 ## Phase 2: Post-MVP Feature Packages
 
 ### Package A: Enhanced Deck Management
+
 - [ ] Multiple saved decks per format
 - [ ] Deck naming and tagging
 - [ ] Import from MTGO/Arena formats
@@ -332,6 +357,7 @@ Status legend:
 - [ ] Deck archetypes/colors display
 
 ### Package B: Spectating
+
 - [ ] Spectator mode UI (join as observer)
 - [ ] Spectator list display
 - [ ] Hide hidden information (hands) in spectator view
@@ -339,6 +365,7 @@ Status legend:
 - [ ] Leave spectate button
 
 ### Package C: Matchmaking Queue
+
 - [ ] Matchmaking queue page
 - [ ] Queue join button (by format)
 - [ ] Show queue position and wait time
@@ -347,6 +374,7 @@ Status legend:
 - [ ] ELO display
 
 ### Package D: Friend System
+
 - [ ] Friends list page
 - [ ] Friend request system (send, accept, decline)
 - [ ] Online status indicators
@@ -354,6 +382,7 @@ Status legend:
 - [ ] Private messaging interface
 
 ### Package E: Match History & Replays
+
 - [ ] Match history page (paginated)
 - [ ] Filter by opponent, format, date
 - [ ] Replay viewer (step through game)
@@ -361,6 +390,7 @@ Status legend:
 - [ ] Share replay link
 
 ### Package F: Tournaments
+
 - [ ] Tournament list page
 - [ ] Tournament details view (brackets, standings)
 - [ ] Tournament registration flow

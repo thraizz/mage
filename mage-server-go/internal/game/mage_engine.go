@@ -319,6 +319,7 @@ type internalCard struct {
 	DamageSources map[string]int // Damage by source ID
 	// Status fields
 	SummoningSickness bool // Does this creature have summoning sickness
+	IsToken           bool // Is this a token (doesn't go to graveyard when destroyed)
 }
 
 // internalPlayer represents a player in the game state

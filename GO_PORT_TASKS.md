@@ -312,13 +312,22 @@ Status legend:
   - [ ] Implement 3 keyword creatures (flying, vigilance, etc.)
   - [ ] Implement 3 activated abilities (Llanowar Elves, etc.)
   - [ ] Write 60+ integration tests for manual cards
-- [ ] **Phase 4: Transpiler Development** (8 weeks)
-  - [ ] Build Java AST parser for card files
-  - [ ] Create ability mapper (Java effects → Go effects, 1000+ mappings)
-  - [ ] Implement Go code generator from AST
+- [-] **Phase 4: Transpiler Development** (8 weeks)
+  - [x] Build Java AST parser for card files
+  - [x] Create ability mapper (Java effects → Go effects, 150+ effect mappings, 70+ counter types, 711 token types)
+  - [x] Implement Go code generator from AST
+  - [x] Add counter support (AddCountersSourceEffect, AddCountersTargetEffect, RemoveCounterTargetEffect)
+  - [x] Add token support (CreateTokenEffect with 711 token types via registry)
+  - [x] Add triggered ability extraction (EntersBattlefieldAbility, EntersBattlefieldControlledTriggeredAbility)
+  - [x] Implement balanced parentheses parser for nested function calls
+  - [x] Add smart import detection (auto-add counters/token packages when needed)
+  - [x] Test transpiler with complex cards (Yorvo Lord of Garenbrig, Regisaur Alpha) - ✅ Both transpile without TODOs
   - [ ] Create batch generation pipeline
   - [ ] Generate all 30,439 remaining cards
   - [ ] Fix unmapped effects (estimated 1000-2000 cards)
+  - [ ] Add more triggered ability types (DiesTriggeredAbility, AttacksTriggeredAbility, etc.)
+  - [ ] Add static ability support (GainAbilityControlledEffect, BoostControlledEffect, etc.)
+  - [ ] Add activated ability support (SimpleActivatedAbility with costs)
   - [ ] Manually implement complex cards (planeswalkers, transforming)
 - [ ] Build automated verification to compare Java vs Go card behavior for representative samples
 - [ ] **Re-enable disabled integration tests** that expect specific cards (8 tests disabled - see comments in test files for details)

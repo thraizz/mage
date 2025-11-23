@@ -43,7 +43,7 @@ export interface GameState {
 	hand: Card[];
 	graveyard: Card[];
 	exile: Card[];
-	stack: any[];
+	stack: unknown[];
 	combat?: CombatState;
 }
 
@@ -58,5 +58,5 @@ export interface WSMessage {
 	type: string;
 	game_id?: string;
 	player_id?: string;
-	data?: any;
+	data?: unknown;
 }

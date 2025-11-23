@@ -35,7 +35,7 @@
 	}
 
 	.player-info.active {
-		border-color: #4CAF50;
+		border-color: #4caf50;
 		box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
 	}
 

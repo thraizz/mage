@@ -14,26 +14,26 @@
 	class:tapped={card.tapped}
 	class:attacking={card.attacking}
 	class:blocking={card.blocking}
-	onclick={onclick}
+	{onclick}
 >
 	<div class="card-header">
 		<span class="card-name">{card.name}</span>
 	</div>
-	
+
 	<div class="card-type">{card.type}</div>
-	
+
 	{#if card.power && card.toughness}
 		<div class="card-pt">
 			{card.power}/{card.toughness}
 		</div>
 	{/if}
-	
+
 	{#if card.damage > 0}
 		<div class="card-damage">
 			💔 {card.damage}
 		</div>
 	{/if}
-	
+
 	{#if card.abilities.length > 0}
 		<div class="card-abilities">
 			{#each card.abilities as ability}
@@ -57,7 +57,10 @@
 		flex-direction: column;
 		position: relative;
 		color: white;
-		font-family: system-ui, -apple-system, sans-serif;
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
 	}
 
 	.card:hover {

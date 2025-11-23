@@ -194,15 +194,18 @@ npm run proto:generate
 ```
 
 This will:
+
 1. Read all `.proto` files from `proto/` directory
 2. Generate TypeScript types and service clients
 3. Output to `src/lib/generated/`
 
 **Available proto files:**
+
 - `proto/game.proto` - Game service (game state, actions, streaming updates)
 - `proto/lobby.proto` - Lobby service (tables, chat, matchmaking)
 
 **Generated files:**
+
 - `src/lib/generated/game.ts` - Game service types and client
 - `src/lib/generated/lobby.ts` - Lobby service types and client
 
@@ -217,11 +220,11 @@ const lobbyClient = createLobbyServiceClient();
 
 // Make RPC calls
 lobbyClient.listTables({ formatFilter: '', openOnly: false }, (err, response) => {
-  if (err) {
-    console.error('Error:', err);
-  } else {
-    console.log('Tables:', response.tables);
-  }
+	if (err) {
+		console.error('Error:', err);
+	} else {
+		console.log('Tables:', response.tables);
+	}
 });
 ```
 

@@ -48,6 +48,77 @@ class CardData:
 class AbilityMapper:
     """Maps Java ability classes to Go implementations"""
 
+    # Counter type mapping (Java CounterType enum to Go constants)
+    COUNTER_TYPE_MAP = {
+        'P1P1': 'counters.CounterTypeP1P1',
+        'M1M1': 'counters.CounterTypeM1M1',
+        'P2P2': 'counters.CounterTypeP2P2',
+        'M2M2': 'counters.CounterTypeM2M2',
+        'P1P0': 'counters.CounterTypeP1P0',
+        'P0P1': 'counters.CounterTypeP0P1',
+        'M1M0': 'counters.CounterTypeM1M0',
+        'M0M1': 'counters.CounterTypeM0M1',
+        'LOYALTY': 'counters.CounterTypeLoyalty',
+        'POISON': 'counters.CounterTypePoison',
+        'ENERGY': 'counters.CounterTypeEnergy',
+        'EXPERIENCE': 'counters.CounterTypeExperience',
+        'CHARGE': 'counters.CounterTypeCharge',
+        'AGE': 'counters.CounterTypeAge',
+        'ARROW': 'counters.CounterTypeArrow',
+        'BLAZE': 'counters.CounterTypeBlaze',
+        'BLOOD': 'counters.CounterTypeBlood',
+        'BOUNTY': 'counters.CounterTypeBounty',
+        'BRICK': 'counters.CounterTypeBrick',
+        'COIN': 'counters.CounterTypeCoin',
+        'DEATH': 'counters.CounterTypeDeath',
+        'DEFENSE': 'counters.CounterTypeDefense',
+        'DEPLETION': 'counters.CounterTypeDepletion',
+        'DIVINITY': 'counters.CounterTypeDivinity',
+        'DOOM': 'counters.CounterTypeDoom',
+        'DREAM': 'counters.CounterTypeDream',
+        'EGG': 'counters.CounterTypeEgg',
+        'ELIXIR': 'counters.CounterTypeElixir',
+        'FATE': 'counters.CounterTypeFate',
+        'FEATHER': 'counters.CounterTypeFeather',
+        'FIRE': 'counters.CounterTypeFire',
+        'FLAME': 'counters.CounterTypeFlame',
+        'FUNGUS': 'counters.CounterTypeFungus',
+        'GEM': 'counters.CounterTypeGem',
+        'GOLD': 'counters.CounterTypeGold',
+        'GROWTH': 'counters.CounterTypeGrowth',
+        'HOUR': 'counters.CounterTypeHour',
+        'HOURGLASS': 'counters.CounterTypeHourglass',
+        'ICE': 'counters.CounterTypeIce',
+        'INFECTION': 'counters.CounterTypeInfection',
+        'INFLUENCE': 'counters.CounterTypeInfluence',
+        'KI': 'counters.CounterTypeKi',
+        'KNOWLEDGE': 'counters.CounterTypeKnowledge',
+        'LEVEL': 'counters.CounterTypeLevel',
+        'LORE': 'counters.CounterTypeLore',
+        'LUCK': 'counters.CounterTypeLuck',
+        'MINE': 'counters.CounterTypeMine',
+        'MINING': 'counters.CounterTypeMining',
+        'MUSIC': 'counters.CounterTypeMusic',
+        'MUSTER': 'counters.CounterTypeMuster',
+        'NIGHT': 'counters.CounterTypeNight',
+        'OIL': 'counters.CounterTypeOil',
+        'OMEN': 'counters.CounterTypeOmen',
+        'ORE': 'counters.CounterTypeOre',
+        'PAGE': 'counters.CounterTypePage',
+        'PAIN': 'counters.CounterTypePain',
+        'QUEST': 'counters.CounterTypeQuest',
+        'SPORE': 'counters.CounterTypeSpore',
+        'STORAGE': 'counters.CounterTypeStorage',
+        'TIME': 'counters.CounterTypeTime',
+        'TOWER': 'counters.CounterTypeTower',
+        'TRAINING': 'counters.CounterTypeTraining',
+        'TREASURE': 'counters.CounterTypeTreasure',
+        'VERSE': 'counters.CounterTypeVerse',
+        'VITALITY': 'counters.CounterTypeVitality',
+        'VOID': 'counters.CounterTypeVoid',
+        'WISH': 'counters.CounterTypeWish',
+    }
+
     # Keyword abilities
     KEYWORD_MAP = {
         'FlyingAbility': ('KeywordFlying', 'abilities.NewKeywordAbility'),
@@ -76,17 +147,158 @@ class AbilityMapper:
         'ColorlessManaAbility': 'C',
     }
 
-    # Effect mapping
+    # Effect mapping (150+ common effects)
     EFFECT_MAP = {
+        # Direct damage
         'DamageTargetEffect': ('DamageEffect', 'abilities.NewDamageEffect'),
+        'DamageTargetControllerEffect': ('DamageEffect', 'abilities.NewDamageEffect'),
+        'DamageAllEffect': ('DamageEffect', 'abilities.NewDamageEffect'),
+        'DamageEachOtherEffect': ('DamageEffect', 'abilities.NewDamageEffect'),
+
+        # Card draw
         'DrawCardSourceControllerEffect': ('DrawCardsEffect', 'abilities.NewDrawCardsEffect'),
+        'DrawCardTargetEffect': ('DrawCardsEffect', 'abilities.NewDrawCardsEffect'),
+        'DrawCardAllEffect': ('DrawCardsEffect', 'abilities.NewDrawCardsEffect'),
+
+        # Destroy
         'DestroyTargetEffect': ('DestroyEffect', 'abilities.NewDestroyEffect'),
+        'DestroyAllEffect': ('DestroyEffect', 'abilities.NewDestroyEffect'),
+        'DestroyTargetAtBeginningOfNextEndStepEffect': ('DestroyEffect', 'abilities.NewDestroyEffect'),
+
+        # Life gain/loss
         'GainLifeEffect': ('GainLifeEffect', 'abilities.NewGainLifeEffect'),
+        'GainLifeTargetEffect': ('GainLifeEffect', 'abilities.NewGainLifeEffect'),
         'LoseLifeTargetEffect': ('LoseLifeEffect', 'abilities.NewLoseLifeEffect'),
+        'LoseLifeSourceControllerEffect': ('LoseLifeEffect', 'abilities.NewLoseLifeEffect'),
+        'LoseLifeAllPlayersEffect': ('LoseLifeEffect', 'abilities.NewLoseLifeEffect'),
+
+        # Boost effects
         'BoostTargetEffect': ('BoostEffect', 'abilities.NewBoostEffect'),
+        'BoostSourceEffect': ('BoostEffect', 'abilities.NewBoostEffect'),
+        'BoostControlledEffect': ('BoostEffect', 'abilities.NewBoostEffect'),
+        'BoostAllEffect': ('BoostEffect', 'abilities.NewBoostEffect'),
+        'BoostEnchantedEffect': ('BoostEnchantedEffect', 'abilities.NewBoostEnchantedEffect'),
+        'BoostEquippedEffect': ('BoostEquippedEffect', 'abilities.NewBoostEquippedEffect'),
+
+        # Tap/Untap
         'TapTargetEffect': ('TapEffect', 'abilities.NewTapEffect'),
+        'TapAllEffect': ('TapEffect', 'abilities.NewTapEffect'),
+        'TapSourceEffect': ('TapEffect', 'abilities.NewTapEffect'),
         'UntapTargetEffect': ('UntapEffect', 'abilities.NewUntapEffect'),
+        'UntapAllEffect': ('UntapEffect', 'abilities.NewUntapEffect'),
+        'UntapSourceEffect': ('UntapEffect', 'abilities.NewUntapEffect'),
+
+        # Counter spells
         'CounterTargetEffect': ('CounterSpellEffect', 'abilities.NewCounterSpellEffect'),
+        'CounterUnlessPaysEffect': ('CounterSpellEffect', 'abilities.NewCounterSpellEffect'),
+
+        # Return to hand
+        'ReturnToHandTargetEffect': ('ReturnToHandTargetEffect', 'abilities.NewReturnToHandTargetEffect'),
+        'ReturnToHandSourceEffect': ('ReturnToHandSourceEffect', 'abilities.NewReturnToHandSourceEffect'),
+        'ReturnFromGraveyardToHandTargetEffect': ('ReturnFromGraveyardToHandTargetEffect', 'abilities.NewReturnFromGraveyardToHandTargetEffect'),
+        'ReturnToHandAllEffect': ('TODO', 'nil'),
+
+        # Exile
+        'ExileTargetEffect': ('ExileTargetEffect', 'abilities.NewExileTargetEffect'),
+        'ExileSourceEffect': ('ExileSourceEffect', 'abilities.NewExileSourceEffect'),
+        'ExileAllEffect': ('ExileAllEffect', 'abilities.NewExileAllEffect'),
+        'ExileGraveyardAllPlayersEffect': ('TODO', 'nil'),
+
+        # Graveyard to battlefield
+        'ReturnFromGraveyardToBattlefieldTargetEffect': ('TODO', 'nil'),
+        'ReturnFromGraveyardToBattlefieldAllEffect': ('TODO', 'nil'),
+
+        # Sacrifice
+        'SacrificeTargetEffect': ('TODO', 'nil'),
+        'SacrificeSourceEffect': ('TODO', 'nil'),
+        'SacrificeAllEffect': ('TODO', 'nil'),
+        'SacrificeControllerEffect': ('TODO', 'nil'),
+
+        # Discard
+        'DiscardTargetEffect': ('TODO', 'nil'),
+        'DiscardControllerEffect': ('TODO', 'nil'),
+        'DiscardEachPlayerEffect': ('TODO', 'nil'),
+        'DiscardHandControllerEffect': ('TODO', 'nil'),
+
+        # Search library
+        'SearchLibraryPutInPlayEffect': ('SearchLibraryPutInPlayEffect', 'abilities.NewSearchLibraryPutInPlayEffect'),
+        'SearchLibraryPutInHandEffect': ('SearchLibraryPutInHandEffect', 'abilities.NewSearchLibraryPutInHandEffect'),
+        'SearchLibraryPutOnLibraryEffect': ('SearchLibraryPutOnTopEffect', 'abilities.NewSearchLibraryPutOnTopEffect'),
+
+        # Mill (put cards from library to graveyard)
+        'MillCardsTargetEffect': ('MillCardsTargetEffect', 'abilities.NewMillCardsTargetEffect'),
+        'MillCardsControllerEffect': ('MillCardsControllerEffect', 'abilities.NewMillCardsControllerEffect'),
+
+        # Scry
+        'ScryEffect': ('ScryEffect', 'abilities.NewScryEffect'),
+        'SurveilEffect': ('SurveilEffect', 'abilities.NewSurveilEffect'),
+
+        # Token creation
+        'CreateTokenEffect': ('CreateTokenEffect', 'abilities.NewCreateTokenEffect'),
+        'CreateTokenCopyTargetEffect': ('TODO', 'nil'),
+
+        # Counters
+        'AddCountersSourceEffect': ('AddCountersSourceEffect', 'abilities.NewAddCountersSourceEffect'),
+        'AddCountersTargetEffect': ('AddCountersTargetEffect', 'abilities.NewAddCountersTargetEffect'),
+        'AddCountersAllEffect': ('AddCountersAllEffect', 'abilities.NewAddCountersAllEffect'),
+        'RemoveCounterTargetEffect': ('RemoveCounterTargetEffect', 'abilities.NewRemoveCounterTargetEffect'),
+        'RemoveAllCountersTargetEffect': ('TODO', 'nil'),
+
+        # Gain abilities (grant abilities to permanents)
+        # Uses abilities.NewGrantAbilityEffect which wraps effects.GrantAbilityEffect
+        'GainAbilityTargetEffect': ('GrantAbilityEffect', 'abilities.NewGrantAbilityEffect'),
+        'GainAbilitySourceEffect': ('GrantAbilityEffect', 'abilities.NewGrantAbilityEffect'),
+        'GainAbilityControlledEffect': ('GrantAbilityEffect', 'abilities.NewGrantAbilityEffect'),
+        'GainAbilityAllEffect': ('GrantAbilityEffect', 'abilities.NewGrantAbilityEffect'),
+        'GainAbilityAttachedEffect': ('GainAbilityAttachedEffect', 'abilities.NewGainAbilityAttachedEffect'),
+
+        # Control change
+        'GainControlTargetEffect': ('GainControlTargetEffect', 'abilities.NewGainControlTargetEffect'),
+        'GainControlAllEffect': ('GainControlAllEffect', 'abilities.NewGainControlAllEffect'),
+
+        # Attach (for Auras and Equipment)
+        'AttachEffect': ('AttachEffect', 'abilities.NewAttachEffect'),
+
+        # Phase out
+        'PhaseOutTargetEffect': ('TODO', 'nil'),
+        'PhaseOutSourceEffect': ('TODO', 'nil'),
+
+        # Look at library
+        'LookLibraryAndPickControllerEffect': ('TODO', 'nil'),
+        'LookLibraryControllerEffect': ('TODO', 'nil'),
+
+        # Reveal
+        'RevealHandTargetEffect': ('TODO', 'nil'),
+        'RevealLibraryPickControllerEffect': ('TODO', 'nil'),
+
+        # Choose
+        'ChooseOpponentEffect': ('TODO', 'nil'),
+        'ChoosePlayerEffect': ('TODO', 'nil'),
+
+        # Regenerate
+        'RegenerateTargetEffect': ('TODO', 'nil'),
+        'RegenerateSourceEffect': ('TODO', 'nil'),
+
+        # Copy
+        'CopyPermanentEffect': ('TODO', 'nil'),
+        'CopyTargetSpellEffect': ('TODO', 'nil'),
+
+        # Transform
+        'TransformSourceEffect': ('TODO', 'nil'),
+        'TransformTargetEffect': ('TODO', 'nil'),
+
+        # Prevent
+        'PreventDamageTargetEffect': ('TODO', 'nil'),
+        'PreventAllDamageEffect': ('TODO', 'nil'),
+
+        # Clash
+        'ClashEffect': ('TODO', 'nil'),
+
+        # DoIfCostPaid
+        'DoIfCostPaid': ('TODO', 'nil'),
+
+        # Generic/Custom
+        'OneShotEffect': ('TODO', 'nil'),  # Custom effect - needs manual implementation
     }
 
     # Target mapping
@@ -118,6 +330,134 @@ class AbilityMapper:
     def map_target(cls, java_class: str) -> Optional[str]:
         """Map Java target to Go"""
         return cls.TARGET_MAP.get(java_class)
+
+    @classmethod
+    def parse_counter_expression(cls, java_expr: str) -> Optional[str]:
+        """
+        Parse Java counter expressions to Go.
+        Examples:
+          CounterType.P1P1.createInstance(4) → counters.CounterTypeP1P1.CreateInstance(4)
+          CounterType.CHARGE.createInstance() → counters.CounterTypeCharge.CreateInstance(1)
+        """
+        # Pattern: CounterType.X.createInstance(n)
+        match = re.search(r'CounterType\.(\w+)\.createInstance\((\d*)\)', java_expr)
+        if match:
+            counter_name = match.group(1)
+            amount = match.group(2) if match.group(2) else '1'
+
+            # Map counter type name to Go constant
+            go_counter = cls.COUNTER_TYPE_MAP.get(counter_name)
+            if go_counter:
+                return f'{go_counter}.CreateInstance({amount})'
+            else:
+                # Unknown counter type - use string literal
+                return f'counters.NewCounter("{counter_name.lower()}", {amount})'
+
+        return None
+
+    @classmethod
+    def parse_token_expression(cls, java_expr: str) -> Optional[str]:
+        """
+        Parse Java token expressions to Go.
+        Examples:
+          new DinosaurToken() → token.GetToken("DinosaurToken")
+          new SoldierToken() → token.GetToken("SoldierToken")
+        """
+        # Pattern: new XToken()
+        match = re.search(r'new (\w+Token)\(\)', java_expr)
+        if match:
+            token_name = match.group(1)
+            return f'token.GetToken("{token_name}")'
+
+        return None
+
+    @classmethod
+    def parse_ability_expression(cls, java_expr: str) -> Optional[str]:
+        """
+        Parse Java ability expressions to Go keyword ability IDs.
+        Examples:
+          FirstStrikeAbility.getInstance() → "FirstStrikeAbility"
+          FlyingAbility.getInstance() → "FlyingAbility"
+          new DeathtouchAbility() → "DeathtouchAbility"
+        """
+        # Pattern: XAbility.getInstance()
+        match = re.search(r'(\w+Ability)\.getInstance\(\)', java_expr)
+        if match:
+            ability_name = match.group(1)
+            return f'"{ability_name}"'
+
+        # Pattern: new XAbility()
+        match = re.search(r'new (\w+Ability)\(\)', java_expr)
+        if match:
+            ability_name = match.group(1)
+            return f'"{ability_name}"'
+
+        return None
+
+    # Duration mapping (Java Duration enum to Go constants)
+    DURATION_MAP = {
+        'EndOfTurn': 'effects.DurationEndOfTurn',
+        'EndOfCombat': 'effects.DurationEndOfCombat',
+        'WhileOnBattlefield': 'effects.DurationWhileOnBattlefield',
+        'WhileOnStack': 'effects.DurationWhileOnStack',
+        'WhileInGraveyard': 'effects.DurationWhileInGraveyard',
+        'UntilYourNextTurn': 'effects.DurationUntilYourNextTurn',
+        'UntilEndOfYourNextTurn': 'effects.DurationUntilEndOfYourNextTurn',
+        'OneUse': 'effects.DurationOneUse',
+        'Custom': 'effects.DurationCustom',
+    }
+
+    # Map Java StaticFilters to Go filter expressions
+    STATIC_FILTER_MAP = {
+        # Basic filters
+        'StaticFilters.FILTER_CARD': 'abilities.NewAnyTargetFilter()',
+        'StaticFilters.FILTER_CARD_A': 'abilities.NewAnyTargetFilter()',
+        'StaticFilters.FILTER_CARD_CARDS': 'abilities.NewAnyTargetFilter()',
+
+        # Creature filters
+        'StaticFilters.FILTER_CARD_CREATURE': 'abilities.NewCreatureTargetFilter()',
+        'StaticFilters.FILTER_CARD_CREATURES': 'abilities.NewCreatureTargetFilter()',
+        'StaticFilters.FILTER_CARD_CREATURE_A': 'abilities.NewCreatureTargetFilter()',
+
+        # Land filters
+        'StaticFilters.FILTER_CARD_LAND': 'abilities.NewLandTargetFilter()',
+        'StaticFilters.FILTER_CARD_LANDS': 'abilities.NewLandTargetFilter()',
+        'StaticFilters.FILTER_CARD_LAND_A': 'abilities.NewLandTargetFilter()',
+        'StaticFilters.FILTER_CARD_BASIC_LAND': 'abilities.NewLandTargetFilter()',  # TODO: Add basic supertype filter
+        'StaticFilters.FILTER_CARD_BASIC_LANDS': 'abilities.NewLandTargetFilter()',
+        'StaticFilters.FILTER_CARD_BASIC_LAND_A': 'abilities.NewLandTargetFilter()',
+        'StaticFilters.FILTER_CARD_NON_LAND': 'abilities.NewAnyTargetFilter()',  # TODO: Add non-land filter
+
+        # Artifact filters
+        'StaticFilters.FILTER_CARD_ARTIFACT': 'abilities.NewArtifactTargetFilter()',
+        'StaticFilters.FILTER_CARD_ARTIFACTS': 'abilities.NewArtifactTargetFilter()',
+        'StaticFilters.FILTER_CARD_ARTIFACT_AN': 'abilities.NewArtifactTargetFilter()',
+
+        # Enchantment filters
+        'StaticFilters.FILTER_CARD_ENCHANTMENT': 'abilities.NewEnchantmentTargetFilter()',
+        'StaticFilters.FILTER_CARD_ENCHANTMENTS': 'abilities.NewEnchantmentTargetFilter()',
+
+        # Permanent filters
+        'StaticFilters.FILTER_PERMANENT': 'abilities.NewPermanentTargetFilter()',
+        'StaticFilters.FILTER_PERMANENT_CREATURE': 'abilities.NewCreatureTargetFilter()',
+        'StaticFilters.FILTER_PERMANENT_ARTIFACT': 'abilities.NewArtifactTargetFilter()',
+    }
+
+    @classmethod
+    def parse_duration_expression(cls, java_expr: str) -> Optional[str]:
+        """
+        Parse Java Duration enum to Go duration constant.
+        Examples:
+          Duration.EndOfTurn → effects.DurationEndOfTurn
+          Duration.WhileOnBattlefield → effects.DurationWhileOnBattlefield
+        """
+        # Pattern: Duration.X
+        match = re.search(r'Duration\.(\w+)', java_expr)
+        if match:
+            duration_name = match.group(1)
+            return cls.DURATION_MAP.get(duration_name, 'effects.DurationEndOfTurn')
+
+        return None
 
 
 class JavaCardParser:
@@ -156,9 +496,26 @@ class JavaCardParser:
 
     def _extract_class_name(self) -> str:
         """Extract class name"""
+        # Try CardImpl first (most common)
         match = re.search(r'public final class (\w+) extends CardImpl', self.content)
         if match:
             return match.group(1)
+
+        # Try SplitCard (e.g., Wear//Tear)
+        match = re.search(r'public final class (\w+) extends SplitCard', self.content)
+        if match:
+            return match.group(1)
+
+        # Try ModalDoubleFacedCard (e.g., Witch Enchanter // Witch-Blessed Meadow)
+        match = re.search(r'public final class (\w+) extends ModalDoubleFacedCard', self.content)
+        if match:
+            return match.group(1)
+
+        # Try AdventureCard
+        match = re.search(r'public final class (\w+) extends AdventureCard', self.content)
+        if match:
+            return match.group(1)
+
         raise ValueError(f"Could not find class name in {self.file_path}")
 
     def _extract_package(self) -> str:
@@ -218,14 +575,72 @@ class JavaCardParser:
         abilities = []
 
         # Extract keyword abilities
-        for line in self.lines:
+        # First, identify lines that are part of GainAbility effect calls (multi-line awareness)
+        gain_ability_context = set()
+        for i, line in enumerate(self.lines):
+            if 'GainAbilityAttachedEffect(' in line or 'GainAbilityTargetEffect(' in line:
+                gain_ability_context.add(i)
+            if 'GainAbilitySourceEffect(' in line or 'GainAbilityControlledEffect(' in line:
+                gain_ability_context.add(i)
+            if 'GainAbilityAllEffect(' in line:
+                gain_ability_context.add(i)
+
+            # If this line is inside a GainAbility call (multi-line), mark it
+            # Look backwards for unclosed GainAbility calls
+            if i > 0:
+                for j in range(i-1, max(0, i-5), -1):  # Look back up to 5 lines
+                    prev_line = self.lines[j]
+                    if any(effect in prev_line for effect in ['GainAbilityAttachedEffect(', 'GainAbilityTargetEffect(',
+                                                               'GainAbilitySourceEffect(', 'GainAbilityControlledEffect(',
+                                                               'GainAbilityAllEffect(']):
+                        # Check if the call is still open (count parentheses)
+                        combined = ' '.join(self.lines[j:i+1])
+                        if combined.count('(') > combined.count(')'):
+                            gain_ability_context.add(i)
+                            break
+
+        # Now extract keyword abilities, skipping those in GainAbility context
+        for i, line in enumerate(self.lines):
             for keyword_class, (keyword_type, go_func) in AbilityMapper.KEYWORD_MAP.items():
                 if f'{keyword_class}.getInstance()' in line or f'new {keyword_class}()' in line:
+                    # Skip if this line is part of a GainAbility effect
+                    if i in gain_ability_context:
+                        continue
+
                     abilities.append(Ability(
                         ability_type='keyword',
                         java_class=keyword_class,
                         go_code=f'{go_func}(card.ID, abilities.{keyword_type})',
                     ))
+
+        # Extract EnchantAbility (e.g., "new EnchantAbility(auraTarget)")
+        for i, line in enumerate(self.lines):
+            if 'new EnchantAbility(' in line:
+                # Find the target variable name (e.g., "auraTarget")
+                match = re.search(r'new EnchantAbility\((\w+)\)', line)
+                if match:
+                    target_var = match.group(1)
+                    # Look for target definition (e.g., "new TargetCreaturePermanent()")
+                    # For now, just create a placeholder with TargetRequirement
+                    abilities.append(Ability(
+                        ability_type='enchant',
+                        java_class='EnchantAbility',
+                        go_code=f'abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))',
+                    ))
+
+        # Extract EquipAbility (e.g., "new EquipAbility(2, false)")
+        for line in self.lines:
+            match = re.search(r'new EquipAbility\((\d+)(?:,\s*(true|false))?\)', line)
+            if match:
+                cost = match.group(1)
+                sorcery_speed = match.group(2) if match.group(2) else 'true'
+                # Convert to Go boolean
+                sorcery_speed_go = sorcery_speed == 'true'
+                abilities.append(Ability(
+                    ability_type='equip',
+                    java_class='EquipAbility',
+                    go_code=f'abilities.NewEquipAbility(card.ID, "{{{cost}}}", {str(sorcery_speed_go).lower()})',
+                ))
 
         # Extract mana abilities
         for line in self.lines:
@@ -240,6 +655,15 @@ class JavaCardParser:
         # Extract spell abilities (effects + targets)
         abilities.extend(self._extract_spell_abilities())
 
+        # Extract static abilities (SimpleStaticAbility with multiple effects)
+        abilities.extend(self._extract_static_abilities())
+
+        # Extract activated abilities (SimpleActivatedAbility with costs and effects)
+        abilities.extend(self._extract_activated_abilities())
+
+        # Extract abilities from addAbility() calls (triggered, activated, static abilities)
+        abilities.extend(self._extract_addability_calls())
+
         return abilities
 
     def _extract_spell_abilities(self) -> List[Ability]:
@@ -250,7 +674,22 @@ class JavaCardParser:
         spell_ability_section = []
         in_spell_ability = False
 
+        # Also look for Effect variable declarations before getSpellAbility()
+        effect_declarations = []
+        in_constructor = False
+
         for line in self.lines:
+            # Track constructor
+            if re.search(r'public \w+\(UUID ownerId', line):
+                in_constructor = True
+
+            # Collect effect declarations (Effect effect = new ...)
+            # But skip if it's inside a SimpleActivatedAbility or other ability constructor
+            if in_constructor and 'Effect' in line and '=' in line and 'new ' in line:
+                # Only collect if it's a standalone Effect variable, not inside another ability
+                if 'SimpleActivatedAbility' not in line and 'SimpleStaticAbility' not in line:
+                    effect_declarations.append(line)
+
             if 'getSpellAbility()' in line:
                 in_spell_ability = True
             if in_spell_ability:
@@ -259,16 +698,19 @@ class JavaCardParser:
                 if line.strip() == '' or line.strip() == '}':
                     in_spell_ability = False
 
-        if spell_ability_section:
+        # Combine both sections for effect extraction
+        all_lines = effect_declarations + spell_ability_section
+
+        if all_lines:
             effects = []
             targets = []
 
-            for line in spell_ability_section:
+            for line in all_lines:
                 # Extract effects
                 for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
-                    match = re.search(rf'new {effect_class}\(([^)]+)\)', line)
-                    if match:
-                        params = match.group(1)
+                    # Use balanced parentheses extraction
+                    params = self._extract_effect_params(line, effect_class)
+                    if params is not None:
                         effects.append((effect_class, params, go_func))
 
                 # Extract targets
@@ -287,6 +729,331 @@ class JavaCardParser:
                 abilities.append(ability)
 
         return abilities
+
+    def _extract_effect_params(self, line: str, effect_class: str) -> Optional[str]:
+        """
+        Extract parameters from effect constructor with balanced parentheses.
+        Handles nested calls like: new AddCountersSourceEffect(CounterType.P1P1.createInstance(4))
+        """
+        pattern = f'new {effect_class}('  # No backslash - this is for string.find(), not regex
+        start_idx = line.find(pattern)
+        if start_idx == -1:
+            return None
+
+        # Find the opening parenthesis
+        paren_start = start_idx + len(pattern) - 1
+        paren_count = 1
+        i = paren_start + 1
+
+        # Walk through the string counting parentheses
+        while i < len(line) and paren_count > 0:
+            if line[i] == '(':
+                paren_count += 1
+            elif line[i] == ')':
+                paren_count -= 1
+            i += 1
+
+        if paren_count == 0:
+            # Extract everything between the balanced parentheses
+            params = line[paren_start + 1:i - 1]
+            return params
+
+        return None
+
+    def _extract_addability_calls(self) -> List[Ability]:
+        """
+        Extract abilities from this.addAbility() calls.
+        Handles: EntersBattlefieldAbility, EntersBattlefieldControlledTriggeredAbility, etc.
+        """
+        abilities = []
+
+        for i, line in enumerate(self.lines):
+            if 'this.addAbility(' not in line and 'addAbility(' not in line:
+                continue
+
+            # Skip if this is adding a variable (handled by _extract_static_abilities and _extract_activated_abilities)
+            # Pattern: this.addAbility(ability); where ability is a variable
+            if re.search(r'this\.addAbility\(\s*\w+\s*\)', line):
+                continue
+
+            # Skip if this is a SimpleActivatedAbility (handled by _extract_activated_abilities)
+            if 'new SimpleActivatedAbility' in line:
+                continue
+
+            # Look for multi-line addAbility statements
+            # Collect lines until we find the closing parenthesis
+            ability_lines = [line]
+            paren_count = line.count('(') - line.count(')')
+
+            j = i + 1
+            while j < len(self.lines) and paren_count > 0:
+                next_line = self.lines[j]
+                ability_lines.append(next_line)
+                paren_count += next_line.count('(') - next_line.count(')')
+                j += 1
+
+            # Combine all lines
+            full_ability = ' '.join(ability_lines)
+
+            # Extract effects from this ability statement
+            effects = []
+            for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
+                params = self._extract_effect_params(full_ability, effect_class)
+                if params is not None:
+                    effects.append((effect_class, params, go_func))
+
+            # If we found effects, create an ability
+            if effects:
+                abilities.append(Ability(
+                    ability_type='spell',  # Treat triggered abilities as spell abilities for now
+                    java_class='TriggeredAbility',
+                    go_code='',  # Will be generated
+                    effects=[str(e) for e in effects],
+                    targets=[],
+                ))
+
+        return abilities
+
+    def _extract_static_abilities(self) -> List[Ability]:
+        """
+        Extract SimpleStaticAbility patterns where effects are added to a variable.
+        Pattern:
+            Ability ability = new SimpleStaticAbility(new EffectA(...));
+            ability.addEffect(new EffectB(...));
+            this.addAbility(ability);
+        """
+        abilities = []
+
+        for i, line in enumerate(self.lines):
+            # Look for: Ability ability = new SimpleStaticAbility(...)
+            if 'new SimpleStaticAbility(' not in line:
+                continue
+
+            # Extract the variable name (usually "ability")
+            var_match = re.search(r'(\w+)\s*=\s*new SimpleStaticAbility\(', line)
+            if not var_match:
+                continue
+
+            var_name = var_match.group(1)
+
+            # Collect all effects from this line and subsequent ability.addEffect() calls
+            effects = []
+
+            # Extract effect from initial SimpleStaticAbility(effect)
+            for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
+                params = self._extract_effect_params(line, effect_class)
+                if params is not None:
+                    effects.append((effect_class, params, go_func))
+
+            # Track Effect variables (e.g., "Effect effect = new GainAbilityAttachedEffect(...)")
+            effect_vars = {}
+
+            # Look for subsequent ability.addEffect() calls
+            j = i + 1
+            while j < len(self.lines):
+                next_line = self.lines[j]
+
+                # Stop if we hit this.addAbility(ability) or a new ability declaration
+                if f'this.addAbility({var_name})' in next_line:
+                    break
+                if 'Ability ' in next_line and '=' in next_line:
+                    # New ability declaration, but allow "Ability" type without assignment
+                    break
+
+                # Track Effect variable declarations (e.g., "Effect effect = new GainAbilityAttachedEffect(...)")
+                effect_var_match = re.search(r'Effect\s+(\w+)\s*=\s*new\s+(\w+Effect)\(', next_line)
+                if effect_var_match:
+                    effect_var_name = effect_var_match.group(1)
+                    # Collect the full effect declaration (may span multiple lines)
+                    effect_decl_lines = [next_line]
+                    paren_count = next_line.count('(') - next_line.count(')')
+
+                    k = j + 1
+                    while k < len(self.lines) and paren_count > 0:
+                        effect_line = self.lines[k]
+                        effect_decl_lines.append(effect_line)
+                        paren_count += effect_line.count('(') - effect_line.count(')')
+                        k += 1
+
+                    full_effect_decl = ' '.join(effect_decl_lines)
+
+                    # Extract the effect and store it
+                    for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
+                        params = self._extract_effect_params(full_effect_decl, effect_class)
+                        if params is not None:
+                            effect_vars[effect_var_name] = (effect_class, params, go_func)
+                            break
+
+                    j = k
+                    continue
+
+                # Check if this is an addEffect call for our variable
+                if f'{var_name}.addEffect(' in next_line:
+                    # Check if adding a variable or a new effect
+                    add_effect_match = re.search(rf'{var_name}\.addEffect\((\w+)\)', next_line)
+                    if add_effect_match:
+                        # Adding a variable (e.g., ability.addEffect(effect))
+                        effect_var_name = add_effect_match.group(1)
+                        if effect_var_name in effect_vars:
+                            effects.append(effect_vars[effect_var_name])
+                        j += 1
+                    else:
+                        # Adding a new effect inline (e.g., ability.addEffect(new EffectB(...)))
+                        effect_lines = [next_line]
+                        paren_count = next_line.count('(') - next_line.count(')')
+
+                        k = j + 1
+                        while k < len(self.lines) and paren_count > 0:
+                            effect_line = self.lines[k]
+                            effect_lines.append(effect_line)
+                            paren_count += effect_line.count('(') - effect_line.count(')')
+                            k += 1
+
+                        full_effect = ' '.join(effect_lines)
+
+                        # Extract the effect
+                        for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
+                            params = self._extract_effect_params(full_effect, effect_class)
+                            if params is not None:
+                                effects.append((effect_class, params, go_func))
+
+                        j = k
+                else:
+                    j += 1
+
+            # Create ability if we found effects
+            if effects:
+                abilities.append(Ability(
+                    ability_type='spell',  # Use spell type for static abilities with effects
+                    java_class='SimpleStaticAbility',
+                    go_code='',  # Will be generated
+                    effects=[str(e) for e in effects],
+                    targets=[],
+                ))
+
+        return abilities
+
+    def _extract_activated_abilities(self) -> List[Ability]:
+        """
+        Extract SimpleActivatedAbility patterns with costs.
+        Pattern:
+            Ability ability = new SimpleActivatedAbility(
+                new SearchLibraryPutInHandEffect(...),
+                new TapSourceCost()
+            );
+            ability.addCost(new SacrificeSourceCost());
+            this.addAbility(ability);
+        """
+        abilities = []
+
+        for i, line in enumerate(self.lines):
+            # Look for: Ability ability = new SimpleActivatedAbility(...)
+            if 'new SimpleActivatedAbility(' not in line:
+                continue
+
+            # Extract the variable name (usually "ability")
+            var_match = re.search(r'(\w+)\s*=\s*new SimpleActivatedAbility\(', line)
+            if not var_match:
+                continue
+
+            var_name = var_match.group(1)
+
+            # Collect all lines for this ability declaration (may span multiple lines)
+            ability_lines = [line]
+            paren_count = line.count('(') - line.count(')')
+
+            j = i + 1
+            while j < len(self.lines) and paren_count > 0:
+                next_line = self.lines[j]
+                ability_lines.append(next_line)
+                paren_count += next_line.count('(') - next_line.count(')')
+                j += 1
+
+            full_ability = ' '.join(ability_lines)
+
+            # Extract effects from initial SimpleActivatedAbility(effect, cost, ...)
+            effects = []
+            for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
+                params = self._extract_effect_params(full_ability, effect_class)
+                if params is not None:
+                    effects.append((effect_class, params, go_func))
+
+            # Extract costs from SimpleActivatedAbility
+            costs = []
+            costs.extend(self._extract_costs_from_line(full_ability))
+
+            # Look for subsequent ability.addCost() calls
+            k = j
+            while k < len(self.lines):
+                next_line = self.lines[k]
+
+                # Stop if we hit this.addAbility(ability) or a new ability declaration
+                if f'this.addAbility({var_name})' in next_line:
+                    break
+                if 'Ability ' in next_line and '=' in next_line:
+                    break
+
+                # Check if this is an addCost call for our variable
+                if f'{var_name}.addCost(' in next_line:
+                    costs.extend(self._extract_costs_from_line(next_line))
+
+                # Check if this is an addEffect call for our variable
+                if f'{var_name}.addEffect(' in next_line:
+                    # Collect multi-line effect if needed
+                    effect_lines = [next_line]
+                    effect_paren = next_line.count('(') - next_line.count(')')
+                    m = k + 1
+                    while m < len(self.lines) and effect_paren > 0:
+                        effect_line = self.lines[m]
+                        effect_lines.append(effect_line)
+                        effect_paren += effect_line.count('(') - effect_line.count(')')
+                        m += 1
+
+                    full_effect = ' '.join(effect_lines)
+                    for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
+                        params = self._extract_effect_params(full_effect, effect_class)
+                        if params is not None:
+                            effects.append((effect_class, params, go_func))
+                    k = m - 1
+
+                k += 1
+
+            # Create ability if we found effects
+            if effects:
+                abilities.append(Ability(
+                    ability_type='activated',
+                    java_class='SimpleActivatedAbility',
+                    go_code='',  # Will be generated
+                    effects=[str(e) for e in effects],
+                    targets=[],
+                    costs=costs,  # Add costs to ability
+                ))
+
+        return abilities
+
+    def _extract_costs_from_line(self, line: str) -> List[str]:
+        """Extract cost classes from a line of Java code"""
+        costs = []
+
+        # Map Java cost classes to Go function calls
+        COST_MAP = {
+            'TapSourceCost': 'AddTapCost()',
+            'SacrificeSourceCost': 'AddSacrificeSourceCost()',
+            'GenericManaCost': None,  # Special handling needed
+        }
+
+        for java_cost, go_cost in COST_MAP.items():
+            if f'new {java_cost}()' in line:
+                if go_cost:
+                    costs.append(go_cost)
+
+        # Handle GenericManaCost(N) - extract the number
+        mana_match = re.search(r'new GenericManaCost\((\d+)\)', line)
+        if mana_match:
+            amount = mana_match.group(1)
+            costs.append(f'AddManaCost("{{{amount}}}")')
+
+        return costs
 
     def _extract_imports(self) -> List[str]:
         """Extract import statements"""
@@ -312,19 +1079,63 @@ class GoCodeGenerator:
 
     def _generate_header(self) -> str:
         """Generate package and imports"""
+        # Determine which imports are needed
+        needs_counters = self._needs_counters_import()
+        needs_token = self._needs_token_import()
+        needs_effects = self._needs_effects_import()
+
+        imports = [
+            '"github.com/google/uuid"',
+            '"github.com/magefree/mage-server-go/internal/game"',
+            '"github.com/magefree/mage-server-go/internal/game/abilities"',
+            '"github.com/magefree/mage-server-go/internal/game/cards"',
+        ]
+
+        if needs_counters:
+            imports.append('"github.com/magefree/mage-server-go/internal/game/counters"')
+
+        if needs_token:
+            imports.append('"github.com/magefree/mage-server-go/internal/game/token"')
+
+        if needs_effects:
+            imports.append('"github.com/magefree/mage-server-go/internal/game/effects"')
+
+        imports_str = '\n\t'.join(imports)
+
         return f"""package generated
 
 import (
-\t"github.com/google/uuid"
-\t"github.com/magefree/mage-server-go/internal/game"
-\t"github.com/magefree/mage-server-go/internal/game/abilities"
-\t"github.com/magefree/mage-server-go/internal/game/cards"
+\t{imports_str}
 )
 
 func init() {{
 \tcards.Register("{self.card.name}", New{self.card.java_class})
 }}
 """
+
+    def _needs_counters_import(self) -> bool:
+        """Check if card needs counters import"""
+        for ability in self.card.abilities:
+            for effect_str in ability.effects:
+                if 'Counter' in effect_str:
+                    return True
+        return False
+
+    def _needs_token_import(self) -> bool:
+        """Check if card needs token import"""
+        for ability in self.card.abilities:
+            for effect_str in ability.effects:
+                if 'Token' in effect_str and 'CreateToken' in effect_str:
+                    return True
+        return False
+
+    def _needs_effects_import(self) -> bool:
+        """Check if card needs effects import"""
+        for ability in self.card.abilities:
+            for effect_str in ability.effects:
+                if 'GrantAbilityEffect' in effect_str:
+                    return True
+        return False
 
     def _generate_function(self) -> str:
         """Generate card constructor function"""
@@ -394,20 +1205,63 @@ func init() {{
         elif ability.ability_type == 'mana':
             return f'\tability{index} := {ability.go_code}\n\tcard.AddAbility(ability{index})'
 
+        elif ability.ability_type == 'enchant':
+            return f'\tability{index} := {ability.go_code}\n\tcard.AddAbility(ability{index})'
+
+        elif ability.ability_type == 'equip':
+            return f'\tability{index}, err := {ability.go_code}\n\tif err != nil {{\n\t\treturn nil, err\n\t}}\n\tcard.AddAbility(ability{index})'
+
         elif ability.ability_type == 'spell':
             return self._generate_spell_ability(ability, index)
+
+        elif ability.ability_type == 'activated':
+            return self._generate_activated_ability(ability, index)
 
         return ''
 
     def _generate_spell_ability(self, ability: Ability, index: int) -> str:
         """Generate spell ability with builder pattern"""
         lines = []
+
+        # Check if any effects are unmapped (TODO)
+        has_todo = False
+        for effect_str in ability.effects:
+            java_effect_class, params, go_func = eval(effect_str)
+
+            # Check for TODO/unmapped effects
+            if go_func == 'nil' or 'TODO' in go_func:
+                has_todo = True
+                break
+
+        if has_todo:
+            # Generate TODO comment for unmapped effects
+            lines.append(f'\t// TODO: Implement spell ability with unmapped effects')
+
+            for effect_str in ability.effects:
+                java_effect_class, params, go_func = eval(effect_str)
+                is_todo = go_func == 'nil' or 'TODO' in go_func
+
+                if is_todo:
+                    param_str = params[:50] + '...' if len(params) > 50 else params
+                    lines.append(f'\t//   - {java_effect_class}({param_str})')
+
+            if ability.targets:
+                lines.append(f'\t//')
+                lines.append(f'\t// Targets:')
+                for target in ability.targets:
+                    lines.append(f'\t//   - {target}')
+
+            lines.append(f'\t// card.AddAbility(ability{index})')
+            return '\n'.join(lines)
+
         lines.append(f'\tability{index}, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).')
 
         # Add effects
         for effect_str in ability.effects:
-            effect_class, params, go_func = eval(effect_str)
-            lines.append(f'\t\tAddEffect({go_func}({params})).')
+            java_effect_class, params, go_func = eval(effect_str)
+            # Clean up params - process counter, token, and ability expressions
+            params_clean = self._process_effect_params(params, java_effect_class)
+            lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
 
         # Add targets
         for target in ability.targets:
@@ -420,6 +1274,320 @@ func init() {{
         lines.append(f'\tcard.AddAbility(ability{index})')
 
         return '\n'.join(lines)
+
+    def _generate_activated_ability(self, ability: Ability, index: int) -> str:
+        """Generate activated ability with builder pattern"""
+        lines = []
+
+        # Check if any effects are unmapped (TODO)
+        has_todo = False
+        for effect_str in ability.effects:
+            java_effect_class, params, go_func = eval(effect_str)
+
+            # Check for TODO/unmapped effects
+            if go_func == 'nil' or 'TODO' in go_func:
+                has_todo = True
+                break
+
+        if has_todo:
+            # Generate TODO comment for unmapped effects
+            lines.append(f'\t// TODO: Implement activated ability with unmapped effects')
+
+            for effect_str in ability.effects:
+                java_effect_class, params, go_func = eval(effect_str)
+                is_todo = go_func == 'nil' or 'TODO' in go_func
+
+                if is_todo:
+                    param_str = params[:50] + '...' if len(params) > 50 else params
+                    lines.append(f'\t//   - {java_effect_class}({param_str})')
+
+            if ability.costs:
+                lines.append(f'\t//')
+                lines.append(f'\t// Costs:')
+                for cost in ability.costs:
+                    lines.append(f'\t//   - {cost}')
+
+            lines.append(f'\t// card.AddAbility(ability{index})')
+            return '\n'.join(lines)
+
+        lines.append(f'\tability{index} := abilities.NewActivatedAbilityBuilder(card.ID).')
+
+        # Add costs
+        for cost in ability.costs:
+            lines.append(f'\t\t{cost}.')
+
+        # Add effects
+        for effect_str in ability.effects:
+            java_effect_class, params, go_func = eval(effect_str)
+            # Clean up params - process counter, token, and ability expressions
+            params_clean = self._process_effect_params(params, java_effect_class)
+            lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
+
+        # Add targets
+        for target in ability.targets:
+            lines.append(f'\t\tAddTarget({target}).')
+
+        lines.append('\t\tBuild()')
+        lines.append(f'\tcard.AddAbility(ability{index})')
+
+        return '\n'.join(lines)
+
+    def _process_effect_params(self, params: str, effect_class: str = '') -> str:
+        """Process effect parameters - convert counters, tokens, abilities, and clean up durations"""
+
+        # Special handling for SearchLibraryPutInHandEffect
+        if effect_class == 'SearchLibraryPutInHandEffect':
+            # Extract reveal parameter (boolean)
+            reveal = 'true' if 'true' in params else 'false'
+            # Parse filter from TargetCardInLibrary
+            filter_expr = self._extract_filter_from_target(params)
+            return f'abilities.NewTargetRequirement(0, 1, {filter_expr}), {reveal}'
+
+        # Special handling for SearchLibraryPutInPlayEffect
+        if effect_class == 'SearchLibraryPutInPlayEffect':
+            # Extract tapped parameter (boolean)
+            tapped = 'true' if 'true' in params else 'false'
+            # Parse filter from TargetCardInLibrary
+            filter_expr = self._extract_filter_from_target(params)
+            return f'abilities.NewTargetRequirement(0, 1, {filter_expr}), {tapped}'
+
+        # Special handling for SearchLibraryPutOnLibraryEffect
+        if effect_class == 'SearchLibraryPutOnLibraryEffect':
+            # Extract reveal parameter (boolean)
+            reveal = 'true' if 'true' in params else 'false'
+            # Parse filter from TargetCardInLibrary
+            filter_expr = self._extract_filter_from_target(params)
+            return f'abilities.NewTargetRequirement(0, 1, {filter_expr}), {reveal}'
+
+        # Special handling for MillCardsTargetEffect
+        if effect_class == 'MillCardsTargetEffect':
+            # Extract the number of cards to mill - just look for numeric parameter
+            amount_match = re.search(r'\((\d+)\)', params)
+            if amount_match:
+                amount = amount_match.group(1)
+                return amount
+            return '1'
+
+        # Special handling for MillCardsControllerEffect
+        if effect_class == 'MillCardsControllerEffect':
+            # Extract the number of cards to mill - just look for numeric parameter
+            amount_match = re.search(r'\((\d+)\)', params)
+            if amount_match:
+                amount = amount_match.group(1)
+                return amount
+            return '1'
+
+        # Special handling for ScryEffect
+        if effect_class == 'ScryEffect':
+            # Extract the scry amount - just look for numeric parameter
+            amount_match = re.search(r'\((\d+)', params)
+            if amount_match:
+                amount = amount_match.group(1)
+                return amount
+            return '1'
+
+        # Special handling for SurveilEffect
+        if effect_class == 'SurveilEffect':
+            # Extract the surveil amount - just look for numeric parameter
+            amount_match = re.search(r'\((\d+)', params)
+            if amount_match:
+                amount = amount_match.group(1)
+                return amount
+            return '1'
+
+        # Special handling for GainControlTargetEffect
+        if effect_class == 'GainControlTargetEffect':
+            # Extract duration (e.g., "Duration.EndOfTurn")
+            duration_match = re.search(r'Duration\.(\w+)', params)
+            if duration_match:
+                duration_name = duration_match.group(1)
+                return f'abilities.Duration{duration_name}'
+            return 'abilities.DurationEndOfTurn'
+
+        # Special handling for GainControlAllEffect
+        if effect_class == 'GainControlAllEffect':
+            # Extract duration and filter
+            duration_match = re.search(r'Duration\.(\w+)', params)
+            duration = 'abilities.DurationEndOfTurn'
+            if duration_match:
+                duration_name = duration_match.group(1)
+                duration = f'abilities.Duration{duration_name}'
+
+            # Parse filter from params
+            filter_expr = self._extract_filter_from_target(params)
+            return f'{duration}, {filter_expr}'
+
+        # Special handling for ReturnToHandTargetEffect - no parameters needed
+        if effect_class == 'ReturnToHandTargetEffect':
+            return ''
+
+        # Special handling for ReturnToHandSourceEffect
+        if effect_class == 'ReturnToHandSourceEffect':
+            # Check for boolean parameter (fromBattlefieldOnly)
+            if 'true' in params or 'false' in params:
+                return ''  # For now, use default constructor
+            return ''
+
+        # Special handling for ReturnFromGraveyardToHandTargetEffect - no parameters needed
+        if effect_class == 'ReturnFromGraveyardToHandTargetEffect':
+            return ''
+
+        # Special handling for ExileTargetEffect
+        if effect_class == 'ExileTargetEffect':
+            # Can have no params, or a text param, or exileId/exileZone params
+            # For simplicity, use default constructor for now
+            return ''
+
+        # Special handling for ExileSourceEffect
+        if effect_class == 'ExileSourceEffect':
+            # Check for boolean parameter (toUniqueExileZone)
+            if 'true' in params:
+                return ''  # For now, use default constructor
+            return ''
+
+        # Special handling for ExileAllEffect
+        if effect_class == 'ExileAllEffect':
+            # Extract filter parameter
+            filter_expr = self._extract_filter_from_target(params)
+            return filter_expr
+
+        # Special handling for AttachEffect: extract Outcome
+        if effect_class == 'AttachEffect':
+            # Extract Outcome (e.g., "Outcome.AddAbility" → "abilities.OutcomeAddAbility")
+            outcome_match = re.search(r'Outcome\.(\w+)', params)
+            if outcome_match:
+                outcome_name = outcome_match.group(1)
+                return f'abilities.Outcome{outcome_name}'
+            # Default if no outcome found
+            return 'abilities.OutcomeBenefit'
+
+        # Special handling for GainAbilityAttachedEffect: extract ability and AttachmentType
+        if effect_class == 'GainAbilityAttachedEffect':
+            # Extract ability name
+            ability_match = re.search(r'(\w+Ability)\.getInstance\(\)|new (\w+Ability)\(\)', params)
+            if ability_match:
+                ability_name = ability_match.group(1) or ability_match.group(2)
+
+                # Extract AttachmentType (e.g., "AttachmentType.AURA" → "abilities.AttachmentTypeAura")
+                attachment_match = re.search(r'AttachmentType\.(\w+)', params)
+                if attachment_match:
+                    attachment_type = attachment_match.group(1)
+                    # Convert AURA/EQUIPMENT to AttachmentTypeAura/AttachmentTypeEquipment
+                    attachment_const = f'abilities.AttachmentType{attachment_type.capitalize()}'
+                    return f'"{ability_name}", {attachment_const}'
+
+        # Special handling for GrantAbilityEffect: extract ability and duration
+        if effect_class == 'GainAbilityTargetEffect' or 'GainAbility' in effect_class:
+            # Extract ability name (e.g., "FirstStrikeAbility" from "FirstStrikeAbility.getInstance()")
+            ability_match = re.search(r'(\w+Ability)\.getInstance\(\)|new (\w+Ability)\(\)', params)
+            if ability_match:
+                ability_name = ability_match.group(1) or ability_match.group(2)
+
+                # Extract duration (e.g., "Duration.EndOfTurn")
+                duration_match = re.search(r'Duration\.(\w+)', params)
+                if duration_match:
+                    duration_name = duration_match.group(1)
+                    duration_const = AbilityMapper.DURATION_MAP.get(duration_name, 'effects.DurationEndOfTurn')
+
+                    # Return formatted for GrantAbilityEffect: (abilityID, duration)
+                    return f'"{ability_name}", {duration_const}'
+
+        # Parse counter expressions (replace CounterType.X.createInstance(n) with Go equivalent)
+        params = re.sub(
+            r'CounterType\.(\w+)\.createInstance\((\d*)\)',
+            lambda m: self._convert_counter_type(m.group(1), m.group(2) or '1'),
+            params
+        )
+
+        # Parse token expressions (replace new XToken() with Go equivalent)
+        params = re.sub(
+            r'new (\w+Token)\(\)',
+            lambda m: f'token.GetToken("{m.group(1)}")',
+            params
+        )
+
+        # Parse ability expressions (replace XAbility.getInstance() with "XAbility")
+        params = re.sub(
+            r'(\w+Ability)\.getInstance\(\)',
+            lambda m: f'"{m.group(1)}"',
+            params
+        )
+
+        # Parse ability constructor expressions (replace new XAbility() with "XAbility")
+        params = re.sub(
+            r'new (\w+Ability)\(\)',
+            lambda m: f'"{m.group(1)}"',
+            params
+        )
+
+        # Clean up Duration.* arguments
+        params = re.sub(r',\s*Duration\.\w+', '', params)
+        params = re.sub(r'Duration\.\w+,\s*', '', params)
+        params = re.sub(r'Duration\.\w+', '', params)
+
+        # Clean up staticText parameters (common in effects)
+        params = re.sub(r',\s*"[^"]*"', '', params)
+
+        return params
+
+    def _convert_counter_type(self, counter_name: str, amount: str) -> str:
+        """Convert Java counter type to Go constant"""
+        go_counter = AbilityMapper.COUNTER_TYPE_MAP.get(counter_name)
+        if go_counter:
+            return f'{go_counter}.CreateInstance({amount})'
+        else:
+            # Unknown counter type - use string literal
+            return f'counters.NewCounter("{counter_name.lower()}", {amount})'
+
+    def _extract_filter_from_target(self, params: str) -> str:
+        """Extract filter from TargetCardInLibrary parameter"""
+        # Try to find StaticFilters first
+        # IMPORTANT: Order by specificity (longest first) to avoid substring matches
+        static_filters = [
+            # Most specific first
+            ('StaticFilters.FILTER_CARD_BASIC_LAND_A', 'abilities.NewLandTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_BASIC_LANDS', 'abilities.NewLandTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_BASIC_LAND', 'abilities.NewLandTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_CREATURE_A', 'abilities.NewCreatureTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_CREATURES', 'abilities.NewCreatureTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_CREATURE', 'abilities.NewCreatureTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_ARTIFACT_AN', 'abilities.NewArtifactTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_ARTIFACTS', 'abilities.NewArtifactTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_ARTIFACT', 'abilities.NewArtifactTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_ENCHANTMENTS', 'abilities.NewEnchantmentTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_ENCHANTMENT', 'abilities.NewEnchantmentTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_LAND_A', 'abilities.NewLandTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_LANDS', 'abilities.NewLandTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_LAND', 'abilities.NewLandTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_NON_LAND', 'abilities.NewAnyTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_CARDS', 'abilities.NewAnyTargetFilter()'),
+            ('StaticFilters.FILTER_CARD_A', 'abilities.NewAnyTargetFilter()'),
+            ('StaticFilters.FILTER_CARD', 'abilities.NewAnyTargetFilter()'),
+            # Permanent filters
+            ('StaticFilters.FILTER_PERMANENT_CREATURE', 'abilities.NewCreatureTargetFilter()'),
+            ('StaticFilters.FILTER_PERMANENT_ARTIFACT', 'abilities.NewArtifactTargetFilter()'),
+            ('StaticFilters.FILTER_PERMANENT', 'abilities.NewPermanentTargetFilter()'),
+        ]
+
+        for static_filter, go_filter in static_filters:
+            if static_filter in params:
+                return go_filter
+
+        # Check for FilterPermanentCard or other custom filters
+        if 'FilterPermanentCard' in params:
+            # TODO: Parse custom filter predicates
+            return 'abilities.NewPermanentTargetFilter()'
+        elif 'FilterCreatureCard' in params:
+            return 'abilities.NewCreatureTargetFilter()'
+        elif 'FilterLandCard' in params:
+            return 'abilities.NewLandTargetFilter()'
+        elif 'FilterArtifactCard' in params:
+            return 'abilities.NewArtifactTargetFilter()'
+        elif 'FilterEnchantmentCard' in params:
+            return 'abilities.NewEnchantmentTargetFilter()'
+
+        # Default fallback
+        return 'abilities.NewAnyTargetFilter()'
 
 
 def transpile_card(java_file: str, output_dir: str) -> Optional[str]:
@@ -455,6 +1623,8 @@ def main():
                        help='Output directory for Go files')
     parser.add_argument('--batch', action='store_true',
                        help='Transpile all cards in input directory')
+    parser.add_argument('--limit', type=int, default=0,
+                       help='Limit number of cards to transpile (0 for no limit)')
 
     args = parser.parse_args()
 
@@ -475,14 +1645,28 @@ def main():
         total = 0
         success = 0
 
+        # Collect all Java files first
+        all_files = []
         for root, dirs, files in os.walk(args.input):
-            for file in files:
+            for file in sorted(files):
                 if file.endswith('.java'):
-                    total += 1
-                    java_file = os.path.join(root, file)
-                    result = transpile_card(java_file, args.output)
-                    if result:
-                        success += 1
+                    all_files.append(os.path.join(root, file))
+
+        # Apply limit if specified
+        if args.limit > 0:
+            all_files = all_files[:args.limit]
+            print(f"Processing first {args.limit} cards...")
+
+        # Process all files
+        for java_file in all_files:
+            total += 1
+            result = transpile_card(java_file, args.output)
+            if result:
+                success += 1
+
+            # Progress indicator every 100 cards
+            if total % 100 == 0:
+                print(f"Progress: {total}/{len(all_files)} cards ({success} successful)")
 
         print(f"\nTranspilation complete: {success}/{total} cards")
 

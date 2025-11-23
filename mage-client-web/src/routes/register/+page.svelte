@@ -15,13 +15,7 @@
 		<form class="register-form">
 			<div class="form-group">
 				<label for="username">Username</label>
-				<input
-					type="text"
-					id="username"
-					name="username"
-					placeholder="Choose a username"
-					required
-				/>
+				<input type="text" id="username" name="username" placeholder="Choose a username" required />
 			</div>
 
 			<div class="form-group">

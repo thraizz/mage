@@ -1,7 +1,7 @@
 // Game state store with WebSocket integration
 
 import { writable, derived } from 'svelte/store';
-import type { GameState, Card, Player } from '../types';
+import type { GameState } from '../types';
 import { MageWebSocket } from '../websocket';
 
 // WebSocket connection
@@ -30,31 +30,32 @@ function createGameStore() {
 
 	return {
 		subscribe,
-		
+
 		// Connect to game server
 		connect: async (url: string = 'ws://localhost:8080/ws') => {
 			ws = new MageWebSocket(url);
-			
+
 			// Handle game state updates
 			ws.on('game_state', (data: GameState) => {
 				set(data);
 			});
-			
+
 			// Handle incremental updates
-			ws.on('card_moved', (data: any) => {
-				update(state => {
+			ws.on('card_moved', (data: unknown) => {
+				update((state) => {
 					// Update card zone
-					const card = state.battlefield.find(c => c.id === data.card_id);
+					const cardData = data as { card_id: string; to_zone: string };
+					const card = state.battlefield.find((c) => c.id === cardData.card_id);
 					if (card) {
-						card.zone = data.to_zone;
+						card.zone = cardData.to_zone;
 					}
 					return state;
 				});
 			});
-			
+
 			await ws.connect();
 		},
-		
+
 		// Join a game
 		joinGame: (gameId: string, playerId: string) => {
 			ws?.send({
@@ -63,7 +64,7 @@ function createGameStore() {
 				player_id: playerId
 			});
 		},
-		
+
 		// Create a new game
 		createGame: (playerId: string, gameType: string = 'Duel') => {
 			ws?.send({
@@ -72,7 +73,7 @@ function createGameStore() {
 				data: { game_type: gameType }
 			});
 		},
-		
+
 		// Play a card from hand
 		playCard: (cardId: string) => {
 			ws?.send({
@@ -80,7 +81,7 @@ function createGameStore() {
 				data: { card_id: cardId }
 			});
 		},
-		
+
 		// Declare attacker
 		declareAttacker: (cardId: string, defenderId: string) => {
 			ws?.send({
@@ -88,7 +89,7 @@ function createGameStore() {
 				data: { card_id: cardId, defender_id: defenderId }
 			});
 		},
-		
+
 		// Declare blocker
 		declareBlocker: (blockerId: string, attackerId: string) => {
 			ws?.send({
@@ -96,14 +97,14 @@ function createGameStore() {
 				data: { blocker_id: blockerId, attacker_id: attackerId }
 			});
 		},
-		
+
 		// Pass priority
 		passPriority: () => {
 			ws?.send({
 				type: 'pass_priority'
 			});
 		},
-		
+
 		// Disconnect
 		disconnect: () => {
 			ws?.disconnect();
@@ -116,22 +117,16 @@ function createGameStore() {
 export const game = createGameStore();
 
 // Derived stores for convenience
-export const myCards = derived(game, $game => 
-	$game.battlefield.filter(c => c.controller === 'player1')
+export const myCards = derived(game, ($game) =>
+	$game.battlefield.filter((c) => c.controller === 'player1')
 );
 
-export const opponentCards = derived(game, $game => 
-	$game.battlefield.filter(c => c.controller !== 'player1')
+export const opponentCards = derived(game, ($game) =>
+	$game.battlefield.filter((c) => c.controller !== 'player1')
 );
 
-export const myPlayer = derived(game, $game => 
-	$game.players.find(p => p.id === 'player1')
-);
+export const myPlayer = derived(game, ($game) => $game.players.find((p) => p.id === 'player1'));
 
-export const opponent = derived(game, $game => 
-	$game.players.find(p => p.id !== 'player1')
-);
+export const opponent = derived(game, ($game) => $game.players.find((p) => p.id !== 'player1'));
 
-export const isMyTurn = derived(game, $game => 
-	$game.current_player === 'player1'
-);
+export const isMyTurn = derived(game, ($game) => $game.current_player === 'player1');

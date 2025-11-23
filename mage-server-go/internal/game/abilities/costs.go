@@ -158,6 +158,14 @@ func NewSacrificeCost(amount int, filter string) *SacrificeCost {
 	}
 }
 
+// NewSacrificeSourceCost creates a cost for sacrificing the source permanent
+func NewSacrificeSourceCost() *SacrificeCost {
+	return &SacrificeCost{
+		Amount: 1,
+		Filter: "source",
+	}
+}
+
 func (c *SacrificeCost) CanPay(ctx context.Context, game GameContext, playerID uuid.UUID) bool {
 	// TODO: Check if player has enough permanents to sacrifice
 	return true
@@ -170,6 +178,9 @@ func (c *SacrificeCost) Pay(ctx context.Context, game GameContext, playerID uuid
 
 func (c *SacrificeCost) String() string {
 	if c.Amount == 1 {
+		if c.Filter == "source" {
+			return "Sacrifice this permanent"
+		}
 		if c.Filter != "" {
 			return fmt.Sprintf("Sacrifice a %s", c.Filter)
 		}

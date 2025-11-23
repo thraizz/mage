@@ -18,6 +18,10 @@ func NewATATToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ATATToken", NewATATToken)
+}
+
 // ========================================
 // NewAetherbornToken
 // ========================================
@@ -29,6 +33,10 @@ func NewAetherbornToken() *Token {
 	tok.AddSubtype("AETHERBORN")
 	tok.SetColor(Color{Black: true})
 	return tok
+}
+
+func init() {
+	Register("AetherbornToken", NewAetherbornToken)
 }
 
 // ========================================
@@ -46,6 +54,10 @@ func NewAjanisPridemateToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AjanisPridemateToken", NewAjanisPridemateToken)
+}
+
 // ========================================
 // NewAkroanSoldierToken
 // ========================================
@@ -61,6 +73,10 @@ func NewAkroanSoldierToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AkroanSoldierToken", NewAkroanSoldierToken)
+}
+
 // ========================================
 // NewAlien00Token
 // ========================================
@@ -73,6 +89,10 @@ func NewAlien00Token() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(0, 0)
 	return tok
+}
+
+func init() {
+	Register("Alien00Token", NewAlien00Token)
 }
 
 // ========================================
@@ -93,6 +113,10 @@ func NewAlienAngelToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AlienAngelToken", NewAlienAngelToken)
+}
+
 // ========================================
 // NewAlienInsectToken
 // ========================================
@@ -107,6 +131,10 @@ func NewAlienInsectToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("AlienInsectToken", NewAlienInsectToken)
 }
 
 // ========================================
@@ -124,6 +152,10 @@ func NewAlienRhinoToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AlienRhinoToken", NewAlienRhinoToken)
+}
+
 // ========================================
 // NewAlienSalamanderToken
 // ========================================
@@ -139,6 +171,10 @@ func NewAlienSalamanderToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AlienSalamanderToken", NewAlienSalamanderToken)
+}
+
 // ========================================
 // NewAlienToken
 // ========================================
@@ -151,6 +187,10 @@ func NewAlienToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("AlienToken", NewAlienToken)
 }
 
 // ========================================
@@ -168,6 +208,10 @@ func NewAlienWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AlienWarriorToken", NewAlienWarriorToken)
+}
+
 // ========================================
 // NewAllyToken
 // ========================================
@@ -180,6 +224,10 @@ func NewAllyToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("AllyToken", NewAllyToken)
 }
 
 // ========================================
@@ -197,6 +245,10 @@ func NewAngel33Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Angel33Token", NewAngel33Token)
+}
+
 // ========================================
 // NewAngelToken
 // ========================================
@@ -210,6 +262,10 @@ func NewAngelToken() *Token {
 	tok.SetPowerToughness(4, 4)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("AngelToken", NewAngelToken)
 }
 
 // ========================================
@@ -228,6 +284,10 @@ func NewAngelVigilanceToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AngelVigilanceToken", NewAngelVigilanceToken)
+}
+
 // ========================================
 // NewAngelWarriorToken
 // ========================================
@@ -242,6 +302,10 @@ func NewAngelWarriorToken() *Token {
 	tok.SetPowerToughness(4, 4)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("AngelWarriorToken", NewAngelWarriorToken)
 }
 
 // ========================================
@@ -261,6 +325,10 @@ func NewAngelWarriorVigilanceToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AngelWarriorVigilanceToken", NewAngelWarriorVigilanceToken)
+}
+
 // ========================================
 // NewAngeloToken
 // ========================================
@@ -273,6 +341,10 @@ func NewAngeloToken() *Token {
 	tok.SetColor(Color{White: true, Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("AngeloToken", NewAngeloToken)
 }
 
 // ========================================
@@ -290,6 +362,10 @@ func NewAnotherSpiritToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AnotherSpiritToken", NewAnotherSpiritToken)
+}
+
 // ========================================
 // NewApeToken
 // ========================================
@@ -304,6 +380,10 @@ func NewApeToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ApeToken", NewApeToken)
+}
+
 // ========================================
 // NewArchitectOfTheUntamedBeastToken
 // ========================================
@@ -316,6 +396,10 @@ func NewArchitectOfTheUntamedBeastToken() *Token {
 	tok.AddSubtype("BEAST")
 	tok.SetPowerToughness(6, 6)
 	return tok
+}
+
+func init() {
+	Register("ArchitectOfTheUntamedBeastToken", NewArchitectOfTheUntamedBeastToken)
 }
 
 // ========================================
@@ -333,6 +417,10 @@ func NewArtifactWallToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ArtifactWallToken", NewArtifactWallToken)
+}
+
 // ========================================
 // NewAshiokNightmareMuseToken
 // ========================================
@@ -345,6 +433,10 @@ func NewAshiokNightmareMuseToken() *Token {
 	tok.SetColor(Color{Blue: true, Black: true})
 	tok.SetPowerToughness(2, 3)
 	return tok
+}
+
+func init() {
+	Register("AshiokNightmareMuseToken", NewAshiokNightmareMuseToken)
 }
 
 // ========================================
@@ -361,6 +453,10 @@ func NewAshiokWickedManipulatorNightmareToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AshiokWickedManipulatorNightmareToken", NewAshiokWickedManipulatorNightmareToken)
+}
+
 // ========================================
 // NewAshnodZombieToken
 // ========================================
@@ -373,6 +469,10 @@ func NewAshnodZombieToken() *Token {
 	tok.AddSubtype("ZOMBIE")
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("AshnodZombieToken", NewAshnodZombieToken)
 }
 
 // ========================================
@@ -389,6 +489,10 @@ func NewAssassinMenaceToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AssassinMenaceToken", NewAssassinMenaceToken)
+}
+
 // ========================================
 // NewAssassinToken
 // ========================================
@@ -401,6 +505,10 @@ func NewAssassinToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("AssassinToken", NewAssassinToken)
 }
 
 // ========================================
@@ -417,6 +525,10 @@ func NewAssemblyWorkerToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AssemblyWorkerToken", NewAssemblyWorkerToken)
+}
+
 // ========================================
 // NewAtlaPalaniToken
 // ========================================
@@ -430,6 +542,10 @@ func NewAtlaPalaniToken() *Token {
 	tok.SetPowerToughness(0, 1)
 	tok.AddAbility("defender")
 	return tok
+}
+
+func init() {
+	Register("AtlaPalaniToken", NewAtlaPalaniToken)
 }
 
 // ========================================
@@ -449,6 +565,10 @@ func NewAvacynToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("AvacynToken", NewAvacynToken)
+}
+
 // ========================================
 // NewAvatarToken
 // ========================================
@@ -460,6 +580,10 @@ func NewAvatarToken() *Token {
 	tok.AddSubtype("AVATAR")
 	tok.SetColor(Color{White: true})
 	return tok
+}
+
+func init() {
+	Register("AvatarToken", NewAvatarToken)
 }
 
 // ========================================
@@ -475,6 +599,10 @@ func NewBadgerToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BadgerToken", NewBadgerToken)
+}
+
 // ========================================
 // NewBananaToken
 // ========================================
@@ -484,6 +612,10 @@ func NewBananaToken() *Token {
 	tok := NewToken("BananaToken", "")
 	tok.AddCardType(CardTypeArtifact)
 	return tok
+}
+
+func init() {
+	Register("BananaToken", NewBananaToken)
 }
 
 // ========================================
@@ -497,6 +629,10 @@ func NewBaruFistOfKrosaToken() *Token {
 	tok.AddSubtype("WURM")
 	tok.SetColor(Color{Green: true})
 	return tok
+}
+
+func init() {
+	Register("BaruFistOfKrosaToken", NewBaruFistOfKrosaToken)
 }
 
 // ========================================
@@ -514,6 +650,10 @@ func NewBat21Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Bat21Token", NewBat21Token)
+}
+
 // ========================================
 // NewBatToken
 // ========================================
@@ -527,6 +667,10 @@ func NewBatToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("BatToken", NewBatToken)
 }
 
 // ========================================
@@ -543,6 +687,10 @@ func NewBearToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BearToken", NewBearToken)
+}
+
 // ========================================
 // NewBearsCompanionBearToken
 // ========================================
@@ -555,6 +703,10 @@ func NewBearsCompanionBearToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("BearsCompanionBearToken", NewBearsCompanionBearToken)
 }
 
 // ========================================
@@ -571,6 +723,10 @@ func NewBeastToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BeastToken", NewBeastToken)
+}
+
 // ========================================
 // NewBeastieToken
 // ========================================
@@ -583,6 +739,10 @@ func NewBeastieToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("BeastieToken", NewBeastieToken)
 }
 
 // ========================================
@@ -599,6 +759,10 @@ func NewBeauToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BeauToken", NewBeauToken)
+}
+
 // ========================================
 // NewBelzenlokClericToken
 // ========================================
@@ -611,6 +775,10 @@ func NewBelzenlokClericToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("BelzenlokClericToken", NewBelzenlokClericToken)
 }
 
 // ========================================
@@ -629,6 +797,10 @@ func NewBelzenlokDemonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BelzenlokDemonToken", NewBelzenlokDemonToken)
+}
+
 // ========================================
 // NewBiogenicOozeToken
 // ========================================
@@ -641,6 +813,10 @@ func NewBiogenicOozeToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("BiogenicOozeToken", NewBiogenicOozeToken)
 }
 
 // ========================================
@@ -659,6 +835,10 @@ func NewBirdIllusionToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BirdIllusionToken", NewBirdIllusionToken)
+}
+
 // ========================================
 // NewBirdSoldierToken
 // ========================================
@@ -674,6 +854,10 @@ func NewBirdSoldierToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BirdSoldierToken", NewBirdSoldierToken)
+}
+
 // ========================================
 // NewBirdToken
 // ========================================
@@ -687,6 +871,10 @@ func NewBirdToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("BirdToken", NewBirdToken)
 }
 
 // ========================================
@@ -705,6 +893,10 @@ func NewBirdVigilanceToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BirdVigilanceToken", NewBirdVigilanceToken)
+}
+
 // ========================================
 // NewBlack22BirdToken
 // ========================================
@@ -718,6 +910,10 @@ func NewBlack22BirdToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("Black22BirdToken", NewBlack22BirdToken)
 }
 
 // ========================================
@@ -735,6 +931,10 @@ func NewBlackAstartesWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BlackAstartesWarriorToken", NewBlackAstartesWarriorToken)
+}
+
 // ========================================
 // NewBlackBirdToken
 // ========================================
@@ -748,6 +948,10 @@ func NewBlackBirdToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("BlackBirdToken", NewBlackBirdToken)
 }
 
 // ========================================
@@ -764,6 +968,10 @@ func NewBlackGreenWormToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BlackGreenWormToken", NewBlackGreenWormToken)
+}
+
 // ========================================
 // NewBlackWizardToken
 // ========================================
@@ -776,6 +984,10 @@ func NewBlackWizardToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("BlackWizardToken", NewBlackWizardToken)
 }
 
 // ========================================
@@ -793,6 +1005,10 @@ func NewBloodAvatarToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BloodAvatarToken", NewBloodAvatarToken)
+}
+
 // ========================================
 // NewBloodToken
 // ========================================
@@ -803,6 +1019,10 @@ func NewBloodToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("BLOOD")
 	return tok
+}
+
+func init() {
+	Register("BloodToken", NewBloodToken)
 }
 
 // ========================================
@@ -820,6 +1040,10 @@ func NewBlueBirdToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BlueBirdToken", NewBlueBirdToken)
+}
+
 // ========================================
 // NewBlueHorrorToken
 // ========================================
@@ -833,6 +1057,10 @@ func NewBlueHorrorToken() *Token {
 	tok.SetColor(Color{Blue: true, Red: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("BlueHorrorToken", NewBlueHorrorToken)
 }
 
 // ========================================
@@ -849,6 +1077,10 @@ func NewBoar2Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Boar2Token", NewBoar2Token)
+}
+
 // ========================================
 // NewBoar3Token
 // ========================================
@@ -863,6 +1095,10 @@ func NewBoar3Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Boar3Token", NewBoar3Token)
+}
+
 // ========================================
 // NewBoarToken
 // ========================================
@@ -875,6 +1111,10 @@ func NewBoarToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("BoarToken", NewBoarToken)
 }
 
 // ========================================
@@ -893,6 +1133,10 @@ func NewBooToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BooToken", NewBooToken)
+}
+
 // ========================================
 // NewBrainiacToken
 // ========================================
@@ -905,6 +1149,10 @@ func NewBrainiacToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("BrainiacToken", NewBrainiacToken)
 }
 
 // ========================================
@@ -921,6 +1169,10 @@ func NewBreedingPitThrullToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BreedingPitThrullToken", NewBreedingPitThrullToken)
+}
+
 // ========================================
 // NewBrokenVisageSpiritToken
 // ========================================
@@ -932,6 +1184,10 @@ func NewBrokenVisageSpiritToken() *Token {
 	tok.AddSubtype("SPIRIT")
 	tok.SetColor(Color{Black: true})
 	return tok
+}
+
+func init() {
+	Register("BrokenVisageSpiritToken", NewBrokenVisageSpiritToken)
 }
 
 // ========================================
@@ -950,6 +1206,10 @@ func NewBrudicladTelchorMyrToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("BrudicladTelchorMyrToken", NewBrudicladTelchorMyrToken)
+}
+
 // ========================================
 // NewButterflyToken
 // ========================================
@@ -963,6 +1223,10 @@ func NewButterflyToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("ButterflyToken", NewButterflyToken)
 }
 
 // ========================================
@@ -980,6 +1244,10 @@ func NewCallTheSkyBreakerElementalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CallTheSkyBreakerElementalToken", NewCallTheSkyBreakerElementalToken)
+}
+
 // ========================================
 // NewCamaridToken
 // ========================================
@@ -992,6 +1260,10 @@ func NewCamaridToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("CamaridToken", NewCamaridToken)
 }
 
 // ========================================
@@ -1008,6 +1280,10 @@ func NewCaribouToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CaribouToken", NewCaribouToken)
+}
+
 // ========================================
 // NewCarnivoreToken
 // ========================================
@@ -1020,6 +1296,10 @@ func NewCarnivoreToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(3, 1)
 	return tok
+}
+
+func init() {
+	Register("CarnivoreToken", NewCarnivoreToken)
 }
 
 // ========================================
@@ -1036,6 +1316,10 @@ func NewCarrionBlackInsectToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CarrionBlackInsectToken", NewCarrionBlackInsectToken)
+}
+
 // ========================================
 // NewCatBeastToken
 // ========================================
@@ -1049,6 +1333,10 @@ func NewCatBeastToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("CatBeastToken", NewCatBeastToken)
 }
 
 // ========================================
@@ -1067,6 +1355,10 @@ func NewCatBirdToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CatBirdToken", NewCatBirdToken)
+}
+
 // ========================================
 // NewCatHasteToken
 // ========================================
@@ -1080,6 +1372,10 @@ func NewCatHasteToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("CatHasteToken", NewCatHasteToken)
 }
 
 // ========================================
@@ -1098,6 +1394,10 @@ func NewCatSoldierCreatureToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CatSoldierCreatureToken", NewCatSoldierCreatureToken)
+}
+
 // ========================================
 // NewCatToken
 // ========================================
@@ -1110,6 +1410,10 @@ func NewCatToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("CatToken", NewCatToken)
 }
 
 // ========================================
@@ -1127,6 +1431,10 @@ func NewCatWarrior21Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("CatWarrior21Token", NewCatWarrior21Token)
+}
+
 // ========================================
 // NewCatWarriorToken
 // ========================================
@@ -1140,6 +1448,10 @@ func NewCatWarriorToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("CatWarriorToken", NewCatWarriorToken)
 }
 
 // ========================================
@@ -1157,6 +1469,10 @@ func NewCentaurEnchantmentCreatureToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CentaurEnchantmentCreatureToken", NewCentaurEnchantmentCreatureToken)
+}
+
 // ========================================
 // NewCentaurToken
 // ========================================
@@ -1171,6 +1487,10 @@ func NewCentaurToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CentaurToken", NewCentaurToken)
+}
+
 // ========================================
 // NewChainersTormentNightmareToken
 // ========================================
@@ -1183,6 +1503,10 @@ func NewChainersTormentNightmareToken() *Token {
 	tok.AddSubtype("HORROR")
 	tok.SetColor(Color{Black: true})
 	return tok
+}
+
+func init() {
+	Register("ChainersTormentNightmareToken", NewChainersTormentNightmareToken)
 }
 
 // ========================================
@@ -1200,6 +1524,10 @@ func NewCherubaelToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CherubaelToken", NewCherubaelToken)
+}
+
 // ========================================
 // NewChocoboToken
 // ========================================
@@ -1212,6 +1540,10 @@ func NewChocoboToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("ChocoboToken", NewChocoboToken)
 }
 
 // ========================================
@@ -1228,6 +1560,10 @@ func NewCitizenGreenWhiteToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CitizenGreenWhiteToken", NewCitizenGreenWhiteToken)
+}
+
 // ========================================
 // NewCitizenToken
 // ========================================
@@ -1240,6 +1576,10 @@ func NewCitizenToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("CitizenToken", NewCitizenToken)
 }
 
 // ========================================
@@ -1255,6 +1595,10 @@ func NewCloudSpriteToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("CloudSpriteToken", NewCloudSpriteToken)
 }
 
 // ========================================
@@ -1273,6 +1617,10 @@ func NewClownRobotToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ClownRobotToken", NewClownRobotToken)
+}
+
 // ========================================
 // NewClueArtifactToken
 // ========================================
@@ -1283,6 +1631,10 @@ func NewClueArtifactToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("CLUE")
 	return tok
+}
+
+func init() {
+	Register("ClueArtifactToken", NewClueArtifactToken)
 }
 
 // ========================================
@@ -1299,6 +1651,10 @@ func NewCommodoreGuffToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CommodoreGuffToken", NewCommodoreGuffToken)
+}
+
 // ========================================
 // NewConstruct2Token
 // ========================================
@@ -1313,6 +1669,10 @@ func NewConstruct2Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Construct2Token", NewConstruct2Token)
+}
+
 // ========================================
 // NewConstruct4Token
 // ========================================
@@ -1325,6 +1685,10 @@ func NewConstruct4Token() *Token {
 	tok.AddSubtype("CONSTRUCT")
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("Construct4Token", NewConstruct4Token)
 }
 
 // ========================================
@@ -1343,6 +1707,10 @@ func NewConstructRedToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ConstructRedToken", NewConstructRedToken)
+}
+
 // ========================================
 // NewConstructToken
 // ========================================
@@ -1357,6 +1725,10 @@ func NewConstructToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ConstructToken", NewConstructToken)
+}
+
 // ========================================
 // NewConsumingBlobOozeToken
 // ========================================
@@ -1369,6 +1741,10 @@ func NewConsumingBlobOozeToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("ConsumingBlobOozeToken", NewConsumingBlobOozeToken)
 }
 
 // ========================================
@@ -1386,6 +1762,10 @@ func NewCordycepsInfectedToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CordycepsInfectedToken", NewCordycepsInfectedToken)
+}
+
 // ========================================
 // NewCorpseweftZombieToken
 // ========================================
@@ -1398,6 +1778,10 @@ func NewCorpseweftZombieToken() *Token {
 	tok.AddSubtype("HORROR")
 	tok.SetColor(Color{Black: true})
 	return tok
+}
+
+func init() {
+	Register("CorpseweftZombieToken", NewCorpseweftZombieToken)
 }
 
 // ========================================
@@ -1414,6 +1798,10 @@ func NewCorruptedZendikonOozeToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CorruptedZendikonOozeToken", NewCorruptedZendikonOozeToken)
+}
+
 // ========================================
 // NewCrabToken
 // ========================================
@@ -1426,6 +1814,10 @@ func NewCrabToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(0, 3)
 	return tok
+}
+
+func init() {
+	Register("CrabToken", NewCrabToken)
 }
 
 // ========================================
@@ -1443,6 +1835,10 @@ func NewCragflameToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CragflameToken", NewCragflameToken)
+}
+
 // ========================================
 // NewCreatureToken
 // ========================================
@@ -1452,6 +1848,10 @@ func NewCreatureToken() *Token {
 	tok := NewToken("CreatureToken", "")
 	tok.AddCardType(CardTypeCreature)
 	return tok
+}
+
+func init() {
+	Register("CreatureToken", NewCreatureToken)
 }
 
 // ========================================
@@ -1468,6 +1868,10 @@ func NewCrestedSunmareToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CrestedSunmareToken", NewCrestedSunmareToken)
+}
+
 // ========================================
 // NewCribSwapShapeshifterWhiteToken
 // ========================================
@@ -1479,6 +1883,10 @@ func NewCribSwapShapeshifterWhiteToken() *Token {
 	tok.AddSubtype("SHAPESHIFTER")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("CribSwapShapeshifterWhiteToken", NewCribSwapShapeshifterWhiteToken)
 }
 
 // ========================================
@@ -1494,6 +1902,10 @@ func NewCursedRoleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("CursedRoleToken", NewCursedRoleToken)
+}
+
 // ========================================
 // NewCustomIllusionToken
 // ========================================
@@ -1505,6 +1917,10 @@ func NewCustomIllusionToken() *Token {
 	tok.AddSubtype("ILLUSION")
 	tok.SetColor(Color{Blue: true})
 	return tok
+}
+
+func init() {
+	Register("CustomIllusionToken", NewCustomIllusionToken)
 }
 
 // ========================================
@@ -1522,6 +1938,10 @@ func NewDalekToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DalekToken", NewDalekToken)
+}
+
 // ========================================
 // NewDarettiConstructToken
 // ========================================
@@ -1537,6 +1957,10 @@ func NewDarettiConstructToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DarettiConstructToken", NewDarettiConstructToken)
+}
+
 // ========================================
 // NewDarkstarToken
 // ========================================
@@ -1549,6 +1973,10 @@ func NewDarkstarToken() *Token {
 	tok.SetColor(Color{White: true, Black: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("DarkstarToken", NewDarkstarToken)
 }
 
 // ========================================
@@ -1566,6 +1994,10 @@ func NewDaxosSpiritToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DaxosSpiritToken", NewDaxosSpiritToken)
+}
+
 // ========================================
 // NewDeadlyGrubInsectToken
 // ========================================
@@ -1580,6 +2012,10 @@ func NewDeadlyGrubInsectToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DeadlyGrubInsectToken", NewDeadlyGrubInsectToken)
+}
+
 // ========================================
 // NewDeathpactAngelToken
 // ========================================
@@ -1592,6 +2028,10 @@ func NewDeathpactAngelToken() *Token {
 	tok.SetColor(Color{White: true, Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("DeathpactAngelToken", NewDeathpactAngelToken)
 }
 
 // ========================================
@@ -1609,6 +2049,10 @@ func NewDeathtouchRatToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DeathtouchRatToken", NewDeathtouchRatToken)
+}
+
 // ========================================
 // NewDeathtouchSnakeToken
 // ========================================
@@ -1622,6 +2066,10 @@ func NewDeathtouchSnakeToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("deathtouch")
 	return tok
+}
+
+func init() {
+	Register("DeathtouchSnakeToken", NewDeathtouchSnakeToken)
 }
 
 // ========================================
@@ -1639,6 +2087,10 @@ func NewDefenderPlantToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DefenderPlantToken", NewDefenderPlantToken)
+}
+
 // ========================================
 // NewDemon33Token
 // ========================================
@@ -1651,6 +2103,10 @@ func NewDemon33Token() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("Demon33Token", NewDemon33Token)
 }
 
 // ========================================
@@ -1668,6 +2124,10 @@ func NewDemon66Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Demon66Token", NewDemon66Token)
+}
+
 // ========================================
 // NewDemonBerserkerToken
 // ========================================
@@ -1683,6 +2143,10 @@ func NewDemonBerserkerToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DemonBerserkerToken", NewDemonBerserkerToken)
+}
+
 // ========================================
 // NewDemonFlyingToken
 // ========================================
@@ -1695,6 +2159,10 @@ func NewDemonFlyingToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("DemonFlyingToken", NewDemonFlyingToken)
 }
 
 // ========================================
@@ -1712,6 +2180,10 @@ func NewDemonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DemonToken", NewDemonToken)
+}
+
 // ========================================
 // NewDeserterToken
 // ========================================
@@ -1724,6 +2196,10 @@ func NewDeserterToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("DeserterToken", NewDeserterToken)
 }
 
 // ========================================
@@ -1740,6 +2216,10 @@ func NewDetectiveToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DetectiveToken", NewDetectiveToken)
+}
+
 // ========================================
 // NewDevastatingSummonsElementalToken
 // ========================================
@@ -1751,6 +2231,10 @@ func NewDevastatingSummonsElementalToken() *Token {
 	tok.AddSubtype("ELEMENTAL")
 	tok.SetColor(Color{Red: true})
 	return tok
+}
+
+func init() {
+	Register("DevastatingSummonsElementalToken", NewDevastatingSummonsElementalToken)
 }
 
 // ========================================
@@ -1765,6 +2249,10 @@ func NewDevilToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("DevilToken", NewDevilToken)
 }
 
 // ========================================
@@ -1783,6 +2271,10 @@ func NewDinDragonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DinDragonToken", NewDinDragonToken)
+}
+
 // ========================================
 // NewDinOfTheFireherdToken
 // ========================================
@@ -1797,6 +2289,10 @@ func NewDinOfTheFireherdToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DinOfTheFireherdToken", NewDinOfTheFireherdToken)
+}
+
 // ========================================
 // NewDinosaur31Token
 // ========================================
@@ -1809,6 +2305,10 @@ func NewDinosaur31Token() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(3, 1)
 	return tok
+}
+
+func init() {
+	Register("Dinosaur31Token", NewDinosaur31Token)
 }
 
 // ========================================
@@ -1826,6 +2326,10 @@ func NewDinosaurBeastToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DinosaurBeastToken", NewDinosaurBeastToken)
+}
+
 // ========================================
 // NewDinosaurCatToken
 // ========================================
@@ -1841,6 +2345,10 @@ func NewDinosaurCatToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DinosaurCatToken", NewDinosaurCatToken)
+}
+
 // ========================================
 // NewDinosaurEggToken
 // ========================================
@@ -1854,6 +2362,10 @@ func NewDinosaurEggToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("DinosaurEggToken", NewDinosaurEggToken)
 }
 
 // ========================================
@@ -1872,6 +2384,10 @@ func NewDinosaurFlyingHasteToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DinosaurFlyingHasteToken", NewDinosaurFlyingHasteToken)
+}
+
 // ========================================
 // NewDinosaurHasteToken
 // ========================================
@@ -1885,6 +2401,10 @@ func NewDinosaurHasteToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("DinosaurHasteToken", NewDinosaurHasteToken)
 }
 
 // ========================================
@@ -1902,6 +2422,10 @@ func NewDinosaurToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DinosaurToken", NewDinosaurToken)
+}
+
 // ========================================
 // NewDinosaurVanillaToken
 // ========================================
@@ -1916,6 +2440,10 @@ func NewDinosaurVanillaToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DinosaurVanillaToken", NewDinosaurVanillaToken)
+}
+
 // ========================================
 // NewDinosaurXXToken
 // ========================================
@@ -1928,6 +2456,10 @@ func NewDinosaurXXToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.AddAbility("trample")
 	return tok
+}
+
+func init() {
+	Register("DinosaurXXToken", NewDinosaurXXToken)
 }
 
 // ========================================
@@ -1946,6 +2478,10 @@ func NewDjinnMonkToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DjinnMonkToken", NewDjinnMonkToken)
+}
+
 // ========================================
 // NewDjinnToken
 // ========================================
@@ -1959,6 +2495,10 @@ func NewDjinnToken() *Token {
 	tok.SetPowerToughness(5, 5)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("DjinnToken", NewDjinnToken)
 }
 
 // ========================================
@@ -1976,6 +2516,10 @@ func NewDogIllusionToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DogIllusionToken", NewDogIllusionToken)
+}
+
 // ========================================
 // NewDogVigilanceToken
 // ========================================
@@ -1989,6 +2533,10 @@ func NewDogVigilanceToken() *Token {
 	tok.SetPowerToughness(3, 1)
 	tok.AddAbility("vigilance")
 	return tok
+}
+
+func init() {
+	Register("DogVigilanceToken", NewDogVigilanceToken)
 }
 
 // ========================================
@@ -2005,6 +2553,10 @@ func NewDokaiWeaverofLifeToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DokaiWeaverofLifeToken", NewDokaiWeaverofLifeToken)
+}
+
 // ========================================
 // NewDoomedArtisanToken
 // ========================================
@@ -2017,6 +2569,10 @@ func NewDoomedArtisanToken() *Token {
 	tok.AddSubtype("SCULPTURE")
 	tok.SetPowerToughness(0, 0)
 	return tok
+}
+
+func init() {
+	Register("DoomedArtisanToken", NewDoomedArtisanToken)
 }
 
 // ========================================
@@ -2034,6 +2590,10 @@ func NewDorotheasRetributionSpiritToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DorotheasRetributionSpiritToken", NewDorotheasRetributionSpiritToken)
+}
+
 // ========================================
 // NewDoublestrikeSamuraiToken
 // ========================================
@@ -2047,6 +2607,10 @@ func NewDoublestrikeSamuraiToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("double strike")
 	return tok
+}
+
+func init() {
+	Register("DoublestrikeSamuraiToken", NewDoublestrikeSamuraiToken)
 }
 
 // ========================================
@@ -2064,6 +2628,10 @@ func NewDragonBroodmotherDragonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DragonBroodmotherDragonToken", NewDragonBroodmotherDragonToken)
+}
+
 // ========================================
 // NewDragonEggDragonToken
 // ========================================
@@ -2077,6 +2645,10 @@ func NewDragonEggDragonToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("DragonEggDragonToken", NewDragonEggDragonToken)
 }
 
 // ========================================
@@ -2095,6 +2667,10 @@ func NewDragonElementalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DragonElementalToken", NewDragonElementalToken)
+}
+
 // ========================================
 // NewDragonIllusionToken
 // ========================================
@@ -2111,6 +2687,10 @@ func NewDragonIllusionToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DragonIllusionToken", NewDragonIllusionToken)
+}
+
 // ========================================
 // NewDragonMenaceAndStealArtifactToken
 // ========================================
@@ -2124,6 +2704,10 @@ func NewDragonMenaceAndStealArtifactToken() *Token {
 	tok.SetPowerToughness(6, 6)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("DragonMenaceAndStealArtifactToken", NewDragonMenaceAndStealArtifactToken)
 }
 
 // ========================================
@@ -2142,6 +2726,10 @@ func NewDragonSpiritToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DragonSpiritToken", NewDragonSpiritToken)
+}
+
 // ========================================
 // NewDragonToken
 // ========================================
@@ -2155,6 +2743,10 @@ func NewDragonToken() *Token {
 	tok.SetPowerToughness(4, 4)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("DragonToken", NewDragonToken)
 }
 
 // ========================================
@@ -2172,6 +2764,10 @@ func NewDrakeToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DrakeToken", NewDrakeToken)
+}
+
 // ========================================
 // NewDroidToken
 // ========================================
@@ -2184,6 +2780,10 @@ func NewDroidToken() *Token {
 	tok.AddSubtype("DROID")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("DroidToken", NewDroidToken)
 }
 
 // ========================================
@@ -2201,6 +2801,10 @@ func NewDroneToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DroneToken", NewDroneToken)
+}
+
 // ========================================
 // NewDuneBroodNephilimToken
 // ========================================
@@ -2212,6 +2816,10 @@ func NewDuneBroodNephilimToken() *Token {
 	tok.AddSubtype("SAND")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("DuneBroodNephilimToken", NewDuneBroodNephilimToken)
 }
 
 // ========================================
@@ -2229,6 +2837,10 @@ func NewDwarfBerserkerToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DwarfBerserkerToken", NewDwarfBerserkerToken)
+}
+
 // ========================================
 // NewDwarfToken
 // ========================================
@@ -2243,6 +2855,10 @@ func NewDwarfToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("DwarfToken", NewDwarfToken)
+}
+
 // ========================================
 // NewEdgarMarkovToken
 // ========================================
@@ -2255,6 +2871,10 @@ func NewEdgarMarkovToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("EdgarMarkovToken", NewEdgarMarkovToken)
 }
 
 // ========================================
@@ -2272,6 +2892,10 @@ func NewEdgarMarkovsCoffinVampireToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("EdgarMarkovsCoffinVampireToken", NewEdgarMarkovsCoffinVampireToken)
+}
+
 // ========================================
 // NewEldraziAngelToken
 // ========================================
@@ -2286,6 +2910,10 @@ func NewEldraziAngelToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("EldraziAngelToken", NewEldraziAngelToken)
+}
+
 // ========================================
 // NewEldraziAnnihilatorToken
 // ========================================
@@ -2297,6 +2925,10 @@ func NewEldraziAnnihilatorToken() *Token {
 	tok.AddSubtype("ELDRAZI")
 	tok.SetPowerToughness(7, 7)
 	return tok
+}
+
+func init() {
+	Register("EldraziAnnihilatorToken", NewEldraziAnnihilatorToken)
 }
 
 // ========================================
@@ -2313,6 +2945,10 @@ func NewEldraziHorrorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("EldraziHorrorToken", NewEldraziHorrorToken)
+}
+
 // ========================================
 // NewEldraziScionToken
 // ========================================
@@ -2325,6 +2961,10 @@ func NewEldraziScionToken() *Token {
 	tok.AddSubtype("SCION")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("EldraziScionToken", NewEldraziScionToken)
 }
 
 // ========================================
@@ -2341,6 +2981,10 @@ func NewEldraziSliverToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("EldraziSliverToken", NewEldraziSliverToken)
+}
+
 // ========================================
 // NewEldraziSpawnToken
 // ========================================
@@ -2355,6 +2999,10 @@ func NewEldraziSpawnToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("EldraziSpawnToken", NewEldraziSpawnToken)
+}
+
 // ========================================
 // NewEldraziToken
 // ========================================
@@ -2366,6 +3014,10 @@ func NewEldraziToken() *Token {
 	tok.AddSubtype("ELDRAZI")
 	tok.SetPowerToughness(10, 10)
 	return tok
+}
+
+func init() {
+	Register("EldraziToken", NewEldraziToken)
 }
 
 // ========================================
@@ -2382,6 +3034,10 @@ func NewElemental11BlueRedToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("Elemental11BlueRedToken", NewElemental11BlueRedToken)
+}
+
 // ========================================
 // NewElemental11HasteToken
 // ========================================
@@ -2395,6 +3051,10 @@ func NewElemental11HasteToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("Elemental11HasteToken", NewElemental11HasteToken)
 }
 
 // ========================================
@@ -2413,6 +3073,10 @@ func NewElemental21TrampleHasteToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("Elemental21TrampleHasteToken", NewElemental21TrampleHasteToken)
+}
+
 // ========================================
 // NewElemental31TrampleHasteToken
 // ========================================
@@ -2429,6 +3093,10 @@ func NewElemental31TrampleHasteToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("Elemental31TrampleHasteToken", NewElemental31TrampleHasteToken)
+}
+
 // ========================================
 // NewElemental44GreenToken
 // ========================================
@@ -2441,6 +3109,10 @@ func NewElemental44GreenToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("Elemental44GreenToken", NewElemental44GreenToken)
 }
 
 // ========================================
@@ -2457,6 +3129,10 @@ func NewElemental44Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Elemental44Token", NewElemental44Token)
+}
+
 // ========================================
 // NewElemental44WUToken
 // ========================================
@@ -2471,6 +3147,10 @@ func NewElemental44WUToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("Elemental44WUToken", NewElemental44WUToken)
+}
+
 // ========================================
 // NewElementalAllColorsToken
 // ========================================
@@ -2483,6 +3163,10 @@ func NewElementalAllColorsToken() *Token {
 	tok.SetColor(Color{White: true, Blue: true, Black: true, Red: true, Green: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("ElementalAllColorsToken", NewElementalAllColorsToken)
 }
 
 // ========================================
@@ -2501,6 +3185,10 @@ func NewElementalCatToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ElementalCatToken", NewElementalCatToken)
+}
+
 // ========================================
 // NewElementalShamanToken
 // ========================================
@@ -2517,6 +3205,10 @@ func NewElementalShamanToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ElementalShamanToken", NewElementalShamanToken)
+}
+
 // ========================================
 // NewElementalXXGreenToken
 // ========================================
@@ -2528,6 +3220,10 @@ func NewElementalXXGreenToken() *Token {
 	tok.AddSubtype("ELEMENTAL")
 	tok.SetColor(Color{Green: true})
 	return tok
+}
+
+func init() {
+	Register("ElementalXXGreenToken", NewElementalXXGreenToken)
 }
 
 // ========================================
@@ -2544,6 +3240,10 @@ func NewElephant55Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Elephant55Token", NewElephant55Token)
+}
+
 // ========================================
 // NewElephantResurgenceToken
 // ========================================
@@ -2556,6 +3256,10 @@ func NewElephantResurgenceToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(0, 0)
 	return tok
+}
+
+func init() {
+	Register("ElephantResurgenceToken", NewElephantResurgenceToken)
 }
 
 // ========================================
@@ -2572,6 +3276,10 @@ func NewElephantToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ElephantToken", NewElephantToken)
+}
+
 // ========================================
 // NewElfDruidToken
 // ========================================
@@ -2585,6 +3293,10 @@ func NewElfDruidToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("ElfDruidToken", NewElfDruidToken)
 }
 
 // ========================================
@@ -2603,6 +3315,10 @@ func NewElfKnightToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ElfKnightToken", NewElfKnightToken)
+}
+
 // ========================================
 // NewElfWarriorToken
 // ========================================
@@ -2616,6 +3332,10 @@ func NewElfWarriorToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("ElfWarriorToken", NewElfWarriorToken)
 }
 
 // ========================================
@@ -2632,6 +3352,10 @@ func NewElkToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ElkToken", NewElkToken)
+}
+
 // ========================================
 // NewEmptyToken
 // ========================================
@@ -2640,6 +3364,10 @@ func NewElkToken() *Token {
 func NewEmptyToken() *Token {
 	tok := NewToken("EmptyToken", "")
 	return tok
+}
+
+func init() {
+	Register("EmptyToken", NewEmptyToken)
 }
 
 // ========================================
@@ -2658,6 +3386,10 @@ func NewEnchantmentBirdToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("EnchantmentBirdToken", NewEnchantmentBirdToken)
+}
+
 // ========================================
 // NewErrandOfDutyKnightToken
 // ========================================
@@ -2672,6 +3404,10 @@ func NewErrandOfDutyKnightToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ErrandOfDutyKnightToken", NewErrandOfDutyKnightToken)
+}
+
 // ========================================
 // NewEtheriumCellToken
 // ========================================
@@ -2683,6 +3419,10 @@ func NewEtheriumCellToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("EtheriumCellToken", NewEtheriumCellToken)
+}
+
 // ========================================
 // NewEverywhereToken
 // ========================================
@@ -2692,6 +3432,10 @@ func NewEverywhereToken() *Token {
 	tok := NewToken("EverywhereToken", "colorless land token named Everywhere that is every basic land type")
 	tok.AddCardType(CardTypeLand)
 	return tok
+}
+
+func init() {
+	Register("EverywhereToken", NewEverywhereToken)
 }
 
 // ========================================
@@ -2708,6 +3452,10 @@ func NewEwokToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("EwokToken", NewEwokToken)
+}
+
 // ========================================
 // NewExpansionSymbolToken
 // ========================================
@@ -2719,6 +3467,10 @@ func NewExpansionSymbolToken() *Token {
 	tok.AddSubtype("EXPANSION_SYMBOL")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("ExpansionSymbolToken", NewExpansionSymbolToken)
 }
 
 // ========================================
@@ -2736,6 +3488,10 @@ func NewFableOfTheMirrorBreakerToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FableOfTheMirrorBreakerToken", NewFableOfTheMirrorBreakerToken)
+}
+
 // ========================================
 // NewFaerieBlockFliersToken
 // ========================================
@@ -2749,6 +3505,10 @@ func NewFaerieBlockFliersToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("FaerieBlockFliersToken", NewFaerieBlockFliersToken)
 }
 
 // ========================================
@@ -2767,6 +3527,10 @@ func NewFaerieBlueBlackToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FaerieBlueBlackToken", NewFaerieBlueBlackToken)
+}
+
 // ========================================
 // NewFaerieDragonToken
 // ========================================
@@ -2781,6 +3545,10 @@ func NewFaerieDragonToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("FaerieDragonToken", NewFaerieDragonToken)
 }
 
 // ========================================
@@ -2799,6 +3567,10 @@ func NewFaerieRogueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FaerieRogueToken", NewFaerieRogueToken)
+}
+
 // ========================================
 // NewFaerieToken
 // ========================================
@@ -2814,6 +3586,10 @@ func NewFaerieToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FaerieToken", NewFaerieToken)
+}
+
 // ========================================
 // NewFeatherToken
 // ========================================
@@ -2824,6 +3600,10 @@ func NewFeatherToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.SetColor(Color{Red: true})
 	return tok
+}
+
+func init() {
+	Register("FeatherToken", NewFeatherToken)
 }
 
 // ========================================
@@ -2841,6 +3621,10 @@ func NewFesteringGoblinToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FesteringGoblinToken", NewFesteringGoblinToken)
+}
+
 // ========================================
 // NewFirstMateRagavanToken
 // ========================================
@@ -2854,6 +3638,10 @@ func NewFirstMateRagavanToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(2, 1)
 	return tok
+}
+
+func init() {
+	Register("FirstMateRagavanToken", NewFirstMateRagavanToken)
 }
 
 // ========================================
@@ -2870,6 +3658,10 @@ func NewFishNoAbilityToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FishNoAbilityToken", NewFishNoAbilityToken)
+}
+
 // ========================================
 // NewFishToken
 // ========================================
@@ -2884,6 +3676,10 @@ func NewFishToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FishToken", NewFishToken)
+}
+
 // ========================================
 // NewFoodToken
 // ========================================
@@ -2894,6 +3690,10 @@ func NewFoodToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("FOOD")
 	return tok
+}
+
+func init() {
+	Register("FoodToken", NewFoodToken)
 }
 
 // ========================================
@@ -2908,6 +3708,10 @@ func NewForestDryadToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("ForestDryadToken", NewForestDryadToken)
 }
 
 // ========================================
@@ -2925,6 +3729,10 @@ func NewForlornPseudammaZombieToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ForlornPseudammaZombieToken", NewForlornPseudammaZombieToken)
+}
+
 // ========================================
 // NewFox22VigilanceToken
 // ========================================
@@ -2938,6 +3746,10 @@ func NewFox22VigilanceToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("vigilance")
 	return tok
+}
+
+func init() {
+	Register("Fox22VigilanceToken", NewFox22VigilanceToken)
 }
 
 // ========================================
@@ -2954,6 +3766,10 @@ func NewFractalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FractalToken", NewFractalToken)
+}
+
 // ========================================
 // NewFrogGreenToken
 // ========================================
@@ -2966,6 +3782,10 @@ func NewFrogGreenToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("FrogGreenToken", NewFrogGreenToken)
 }
 
 // ========================================
@@ -2983,6 +3803,10 @@ func NewFrogLizardToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FrogLizardToken", NewFrogLizardToken)
+}
+
 // ========================================
 // NewFrogToken
 // ========================================
@@ -2995,6 +3819,10 @@ func NewFrogToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("FrogToken", NewFrogToken)
 }
 
 // ========================================
@@ -3013,6 +3841,10 @@ func NewFungusBeastToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FungusBeastToken", NewFungusBeastToken)
+}
+
 // ========================================
 // NewFungusCantBlockToken
 // ========================================
@@ -3027,6 +3859,10 @@ func NewFungusCantBlockToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("FungusCantBlockToken", NewFungusCantBlockToken)
+}
+
 // ========================================
 // NewFungusDinosaurToken
 // ========================================
@@ -3039,6 +3875,10 @@ func NewFungusDinosaurToken() *Token {
 	tok.AddSubtype("DINOSAUR")
 	tok.SetColor(Color{Green: true})
 	return tok
+}
+
+func init() {
+	Register("FungusDinosaurToken", NewFungusDinosaurToken)
 }
 
 // ========================================
@@ -3056,6 +3896,10 @@ func NewGargoyleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GargoyleToken", NewGargoyleToken)
+}
+
 // ========================================
 // NewGarrukApexPredatorBeastToken
 // ========================================
@@ -3069,6 +3913,10 @@ func NewGarrukApexPredatorBeastToken() *Token {
 	tok.SetPowerToughness(3, 3)
 	tok.AddAbility("deathtouch")
 	return tok
+}
+
+func init() {
+	Register("GarrukApexPredatorBeastToken", NewGarrukApexPredatorBeastToken)
 }
 
 // ========================================
@@ -3085,6 +3933,10 @@ func NewGarrukCursedHuntsmanToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GarrukCursedHuntsmanToken", NewGarrukCursedHuntsmanToken)
+}
+
 // ========================================
 // NewGeminiEngineTwinToken
 // ========================================
@@ -3096,6 +3948,10 @@ func NewGeminiEngineTwinToken() *Token {
 	tok.AddCardType(CardTypeCreature)
 	tok.AddSubtype("CONSTRUCT")
 	return tok
+}
+
+func init() {
+	Register("GeminiEngineTwinToken", NewGeminiEngineTwinToken)
 }
 
 // ========================================
@@ -3114,6 +3970,10 @@ func NewGiantBaitingGiantWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GiantBaitingGiantWarriorToken", NewGiantBaitingGiantWarriorToken)
+}
+
 // ========================================
 // NewGiantBirdToken
 // ========================================
@@ -3127,6 +3987,10 @@ func NewGiantBirdToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("GiantBirdToken", NewGiantBirdToken)
 }
 
 // ========================================
@@ -3143,6 +4007,10 @@ func NewGiantOpportunityToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GiantOpportunityToken", NewGiantOpportunityToken)
+}
+
 // ========================================
 // NewGiantToken
 // ========================================
@@ -3155,6 +4023,10 @@ func NewGiantToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("GiantToken", NewGiantToken)
 }
 
 // ========================================
@@ -3172,6 +4044,10 @@ func NewGiantWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GiantWarriorToken", NewGiantWarriorToken)
+}
+
 // ========================================
 // NewGiantWizardToken
 // ========================================
@@ -3185,6 +4061,10 @@ func NewGiantWizardToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("GiantWizardToken", NewGiantWizardToken)
 }
 
 // ========================================
@@ -3202,6 +4082,10 @@ func NewGlimmerToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GlimmerToken", NewGlimmerToken)
+}
+
 // ========================================
 // NewGnomeSoldierStarStarToken
 // ========================================
@@ -3215,6 +4099,10 @@ func NewGnomeSoldierStarStarToken() *Token {
 	tok.AddSubtype("SOLDIER")
 	tok.SetColor(Color{White: true})
 	return tok
+}
+
+func init() {
+	Register("GnomeSoldierStarStarToken", NewGnomeSoldierStarStarToken)
 }
 
 // ========================================
@@ -3231,6 +4119,10 @@ func NewGnomeToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GnomeToken", NewGnomeToken)
+}
+
 // ========================================
 // NewGoatToken
 // ========================================
@@ -3243,6 +4135,10 @@ func NewGoatToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("GoatToken", NewGoatToken)
 }
 
 // ========================================
@@ -3260,6 +4156,10 @@ func NewGoblinRogueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GoblinRogueToken", NewGoblinRogueToken)
+}
+
 // ========================================
 // NewGoblinScoutsToken
 // ========================================
@@ -3273,6 +4173,10 @@ func NewGoblinScoutsToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("GoblinScoutsToken", NewGoblinScoutsToken)
 }
 
 // ========================================
@@ -3290,6 +4194,10 @@ func NewGoblinSoldierToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GoblinSoldierToken", NewGoblinSoldierToken)
+}
+
 // ========================================
 // NewGoblinToken
 // ========================================
@@ -3303,6 +4211,10 @@ func NewGoblinToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("GoblinToken", NewGoblinToken)
 }
 
 // ========================================
@@ -3320,6 +4232,10 @@ func NewGoblinWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GoblinWarriorToken", NewGoblinWarriorToken)
+}
+
 // ========================================
 // NewGoblinWizardToken
 // ========================================
@@ -3333,6 +4249,10 @@ func NewGoblinWizardToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("GoblinWizardToken", NewGoblinWizardToken)
 }
 
 // ========================================
@@ -3351,6 +4271,10 @@ func NewGodEternalOketraToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GodEternalOketraToken", NewGodEternalOketraToken)
+}
+
 // ========================================
 // NewGodFavoredGeneralSoldierToken
 // ========================================
@@ -3364,6 +4288,10 @@ func NewGodFavoredGeneralSoldierToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("GodFavoredGeneralSoldierToken", NewGodFavoredGeneralSoldierToken)
 }
 
 // ========================================
@@ -3380,6 +4308,10 @@ func NewGodSireBeastToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GodSireBeastToken", NewGodSireBeastToken)
+}
+
 // ========================================
 // NewGoldForgeGarrisonGolemToken
 // ========================================
@@ -3394,6 +4326,10 @@ func NewGoldForgeGarrisonGolemToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GoldForgeGarrisonGolemToken", NewGoldForgeGarrisonGolemToken)
+}
+
 // ========================================
 // NewGoldToken
 // ========================================
@@ -3404,6 +4340,10 @@ func NewGoldToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("GOLD")
 	return tok
+}
+
+func init() {
+	Register("GoldToken", NewGoldToken)
 }
 
 // ========================================
@@ -3421,6 +4361,10 @@ func NewGoldmeadowHarrierToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GoldmeadowHarrierToken", NewGoldmeadowHarrierToken)
+}
+
 // ========================================
 // NewGolemFlyingToken
 // ========================================
@@ -3436,6 +4380,10 @@ func NewGolemFlyingToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GolemFlyingToken", NewGolemFlyingToken)
+}
+
 // ========================================
 // NewGolemToken
 // ========================================
@@ -3448,6 +4396,10 @@ func NewGolemToken() *Token {
 	tok.AddSubtype("GOLEM")
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("GolemToken", NewGolemToken)
 }
 
 // ========================================
@@ -3465,6 +4417,10 @@ func NewGolemTrampleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GolemTrampleToken", NewGolemTrampleToken)
+}
+
 // ========================================
 // NewGolemVigilanceToken
 // ========================================
@@ -3478,6 +4434,10 @@ func NewGolemVigilanceToken() *Token {
 	tok.SetPowerToughness(3, 3)
 	tok.AddAbility("vigilance")
 	return tok
+}
+
+func init() {
+	Register("GolemVigilanceToken", NewGolemVigilanceToken)
 }
 
 // ========================================
@@ -3495,6 +4455,10 @@ func NewGolemWhiteBlueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GolemWhiteBlueToken", NewGolemWhiteBlueToken)
+}
+
 // ========================================
 // NewGolemXXToken
 // ========================================
@@ -3508,6 +4472,10 @@ func NewGolemXXToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GolemXXToken", NewGolemXXToken)
+}
+
 // ========================================
 // NewGrakmawSkyclaveRavagerHydraToken
 // ========================================
@@ -3519,6 +4487,10 @@ func NewGrakmawSkyclaveRavagerHydraToken() *Token {
 	tok.AddSubtype("HYDRA")
 	tok.SetColor(Color{Black: true, Green: true})
 	return tok
+}
+
+func init() {
+	Register("GrakmawSkyclaveRavagerHydraToken", NewGrakmawSkyclaveRavagerHydraToken)
 }
 
 // ========================================
@@ -3536,6 +4508,10 @@ func NewGravebornToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GravebornToken", NewGravebornToken)
+}
+
 // ========================================
 // NewGreenAndWhiteElementalToken
 // ========================================
@@ -3549,6 +4525,10 @@ func NewGreenAndWhiteElementalToken() *Token {
 	tok.SetPowerToughness(8, 8)
 	tok.AddAbility("vigilance")
 	return tok
+}
+
+func init() {
+	Register("GreenAndWhiteElementalToken", NewGreenAndWhiteElementalToken)
 }
 
 // ========================================
@@ -3565,6 +4545,10 @@ func NewGreenCat2Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("GreenCat2Token", NewGreenCat2Token)
+}
+
 // ========================================
 // NewGreenCatToken
 // ========================================
@@ -3579,6 +4563,10 @@ func NewGreenCatToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GreenCatToken", NewGreenCatToken)
+}
+
 // ========================================
 // NewGreenDogToken
 // ========================================
@@ -3591,6 +4579,10 @@ func NewGreenDogToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("GreenDogToken", NewGreenDogToken)
 }
 
 // ========================================
@@ -3608,6 +4600,10 @@ func NewGreenWhiteElfWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GreenWhiteElfWarriorToken", NewGreenWhiteElfWarriorToken)
+}
+
 // ========================================
 // NewGremlin11Token
 // ========================================
@@ -3620,6 +4616,10 @@ func NewGremlin11Token() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("Gremlin11Token", NewGremlin11Token)
 }
 
 // ========================================
@@ -3637,6 +4637,10 @@ func NewGremlinArtifactToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GremlinArtifactToken", NewGremlinArtifactToken)
+}
+
 // ========================================
 // NewGremlinToken
 // ========================================
@@ -3649,6 +4653,10 @@ func NewGremlinToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("GremlinToken", NewGremlinToken)
 }
 
 // ========================================
@@ -3666,6 +4674,10 @@ func NewGriffinToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GriffinToken", NewGriffinToken)
+}
+
 // ========================================
 // NewGuenhwyvarToken
 // ========================================
@@ -3681,6 +4693,10 @@ func NewGuenhwyvarToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GuenhwyvarToken", NewGuenhwyvarToken)
+}
+
 // ========================================
 // NewGutterGrimeToken
 // ========================================
@@ -3693,6 +4709,10 @@ func NewGutterGrimeToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("GutterGrimeToken", NewGutterGrimeToken)
 }
 
 // ========================================
@@ -3710,6 +4730,10 @@ func NewGwaihirBirdToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("GwaihirBirdToken", NewGwaihirBirdToken)
+}
+
 // ========================================
 // NewHalflingToken
 // ========================================
@@ -3722,6 +4746,10 @@ func NewHalflingToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("HalflingToken", NewHalflingToken)
 }
 
 // ========================================
@@ -3739,6 +4767,10 @@ func NewHammerOfPurphorosGolemToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HammerOfPurphorosGolemToken", NewHammerOfPurphorosGolemToken)
+}
+
 // ========================================
 // NewHamsterToken
 // ========================================
@@ -3751,6 +4783,10 @@ func NewHamsterToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("HamsterToken", NewHamsterToken)
 }
 
 // ========================================
@@ -3768,6 +4804,10 @@ func NewHarpyToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HarpyToken", NewHarpyToken)
+}
+
 // ========================================
 // NewHasteGolemToken
 // ========================================
@@ -3780,6 +4820,10 @@ func NewHasteGolemToken() *Token {
 	tok.AddSubtype("GOLEM")
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("HasteGolemToken", NewHasteGolemToken)
 }
 
 // ========================================
@@ -3797,6 +4841,10 @@ func NewHauntedAngelToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HauntedAngelToken", NewHauntedAngelToken)
+}
+
 // ========================================
 // NewHeliodGodOfTheSunToken
 // ========================================
@@ -3810,6 +4858,10 @@ func NewHeliodGodOfTheSunToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 1)
 	return tok
+}
+
+func init() {
+	Register("HeliodGodOfTheSunToken", NewHeliodGodOfTheSunToken)
 }
 
 // ========================================
@@ -3827,6 +4879,10 @@ func NewHellionToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HellionToken", NewHellionToken)
+}
+
 // ========================================
 // NewHeroToken
 // ========================================
@@ -3838,6 +4894,10 @@ func NewHeroToken() *Token {
 	tok.AddSubtype("HERO")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("HeroToken", NewHeroToken)
 }
 
 // ========================================
@@ -3854,6 +4914,10 @@ func NewHippoToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HippoToken", NewHippoToken)
+}
+
 // ========================================
 // NewHomunculusToken
 // ========================================
@@ -3867,6 +4931,10 @@ func NewHomunculusToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("HomunculusToken", NewHomunculusToken)
 }
 
 // ========================================
@@ -3885,6 +4953,10 @@ func NewHornetToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HornetToken", NewHornetToken)
+}
+
 // ========================================
 // NewHorror2Token
 // ========================================
@@ -3899,6 +4971,10 @@ func NewHorror2Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Horror2Token", NewHorror2Token)
+}
+
 // ========================================
 // NewHorror3Token
 // ========================================
@@ -3911,6 +4987,10 @@ func NewHorror3Token() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("Horror3Token", NewHorror3Token)
 }
 
 // ========================================
@@ -3928,6 +5008,10 @@ func NewHorrorEnchantmentCreatureToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HorrorEnchantmentCreatureToken", NewHorrorEnchantmentCreatureToken)
+}
+
 // ========================================
 // NewHorrorToken
 // ========================================
@@ -3942,6 +5026,10 @@ func NewHorrorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HorrorToken", NewHorrorToken)
+}
+
 // ========================================
 // NewHorrorXXBlackToken
 // ========================================
@@ -3953,6 +5041,10 @@ func NewHorrorXXBlackToken() *Token {
 	tok.AddSubtype("HORROR")
 	tok.SetColor(Color{Black: true})
 	return tok
+}
+
+func init() {
+	Register("HorrorXXBlackToken", NewHorrorXXBlackToken)
 }
 
 // ========================================
@@ -3970,6 +5062,10 @@ func NewHourOfNeedSphinxToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HourOfNeedSphinxToken", NewHourOfNeedSphinxToken)
+}
+
 // ========================================
 // NewHuman11WithWard2Token
 // ========================================
@@ -3982,6 +5078,10 @@ func NewHuman11WithWard2Token() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("Human11WithWard2Token", NewHuman11WithWard2Token)
 }
 
 // ========================================
@@ -3999,6 +5099,10 @@ func NewHumanCitizenToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HumanCitizenToken", NewHumanCitizenToken)
+}
+
 // ========================================
 // NewHumanClericToken
 // ========================================
@@ -4012,6 +5116,10 @@ func NewHumanClericToken() *Token {
 	tok.SetColor(Color{White: true, Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("HumanClericToken", NewHumanClericToken)
 }
 
 // ========================================
@@ -4031,6 +5139,10 @@ func NewHumanKnightToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HumanKnightToken", NewHumanKnightToken)
+}
+
 // ========================================
 // NewHumanMonkToken
 // ========================================
@@ -4044,6 +5156,10 @@ func NewHumanMonkToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("HumanMonkToken", NewHumanMonkToken)
 }
 
 // ========================================
@@ -4061,6 +5177,10 @@ func NewHumanRogueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HumanRogueToken", NewHumanRogueToken)
+}
+
 // ========================================
 // NewHumanSoldierToken
 // ========================================
@@ -4074,6 +5194,10 @@ func NewHumanSoldierToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("HumanSoldierToken", NewHumanSoldierToken)
 }
 
 // ========================================
@@ -4091,6 +5215,10 @@ func NewHumanSoldierTrainingToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HumanSoldierTrainingToken", NewHumanSoldierTrainingToken)
+}
+
 // ========================================
 // NewHumanToken
 // ========================================
@@ -4103,6 +5231,10 @@ func NewHumanToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("HumanToken", NewHumanToken)
 }
 
 // ========================================
@@ -4120,6 +5252,10 @@ func NewHumanWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HumanWarriorToken", NewHumanWarriorToken)
+}
+
 // ========================================
 // NewHumanWizardToken
 // ========================================
@@ -4133,6 +5269,10 @@ func NewHumanWizardToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("HumanWizardToken", NewHumanWizardToken)
 }
 
 // ========================================
@@ -4152,6 +5292,10 @@ func NewHungryForMoreVampireToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HungryForMoreVampireToken", NewHungryForMoreVampireToken)
+}
+
 // ========================================
 // NewHuntedCentaurToken
 // ========================================
@@ -4164,6 +5308,10 @@ func NewHuntedCentaurToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("HuntedCentaurToken", NewHuntedCentaurToken)
 }
 
 // ========================================
@@ -4181,6 +5329,10 @@ func NewHuntedDragonKnightToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HuntedDragonKnightToken", NewHuntedDragonKnightToken)
+}
+
 // ========================================
 // NewHunterToken
 // ========================================
@@ -4193,6 +5345,10 @@ func NewHunterToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("HunterToken", NewHunterToken)
 }
 
 // ========================================
@@ -4208,6 +5364,10 @@ func NewHydraBroodmasterToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("HydraBroodmasterToken", NewHydraBroodmasterToken)
+}
+
 // ========================================
 // NewIcingdeathFrostTongueToken
 // ========================================
@@ -4221,6 +5381,10 @@ func NewIcingdeathFrostTongueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("IcingdeathFrostTongueToken", NewIcingdeathFrostTongueToken)
+}
+
 // ========================================
 // NewIcyManalithToken
 // ========================================
@@ -4230,6 +5394,10 @@ func NewIcyManalithToken() *Token {
 	tok := NewToken("IcyManalithToken", "")
 	tok.AddCardType(CardTypeArtifact)
 	return tok
+}
+
+func init() {
+	Register("IcyManalithToken", NewIcyManalithToken)
 }
 
 // ========================================
@@ -4244,6 +5412,10 @@ func NewIllusionToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("IllusionToken", NewIllusionToken)
 }
 
 // ========================================
@@ -4261,6 +5433,10 @@ func NewIllusionVillainToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("IllusionVillainToken", NewIllusionVillainToken)
+}
+
 // ========================================
 // NewImpToken
 // ========================================
@@ -4275,6 +5451,10 @@ func NewImpToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ImpToken", NewImpToken)
+}
+
 // ========================================
 // NewIncubatorToken
 // ========================================
@@ -4285,6 +5465,10 @@ func NewIncubatorToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("INCUBATOR")
 	return tok
+}
+
+func init() {
+	Register("IncubatorToken", NewIncubatorToken)
 }
 
 // ========================================
@@ -4299,6 +5483,10 @@ func NewInexorableBlobOozeToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("InexorableBlobOozeToken", NewInexorableBlobOozeToken)
 }
 
 // ========================================
@@ -4316,6 +5504,10 @@ func NewInklingToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("InklingToken", NewInklingToken)
+}
+
 // ========================================
 // NewInsectBlackGreenFlyingToken
 // ========================================
@@ -4331,6 +5523,10 @@ func NewInsectBlackGreenFlyingToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("InsectBlackGreenFlyingToken", NewInsectBlackGreenFlyingToken)
+}
+
 // ========================================
 // NewInsectColorlessArtifactToken
 // ========================================
@@ -4344,6 +5540,10 @@ func NewInsectColorlessArtifactToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("InsectColorlessArtifactToken", NewInsectColorlessArtifactToken)
 }
 
 // ========================================
@@ -4362,6 +5562,10 @@ func NewInsectDeathToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("InsectDeathToken", NewInsectDeathToken)
+}
+
 // ========================================
 // NewInsectInfectToken
 // ========================================
@@ -4377,6 +5581,10 @@ func NewInsectInfectToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("InsectInfectToken", NewInsectInfectToken)
+}
+
 // ========================================
 // NewInsectToken
 // ========================================
@@ -4389,6 +5597,10 @@ func NewInsectToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("InsectToken", NewInsectToken)
 }
 
 // ========================================
@@ -4406,6 +5618,10 @@ func NewInsectWhiteToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("InsectWhiteToken", NewInsectWhiteToken)
+}
+
 // ========================================
 // NewIxalanVampireToken
 // ========================================
@@ -4421,6 +5637,10 @@ func NewIxalanVampireToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("IxalanVampireToken", NewIxalanVampireToken)
+}
+
 // ========================================
 // NewIzoniInsectToken
 // ========================================
@@ -4433,6 +5653,10 @@ func NewIzoniInsectToken() *Token {
 	tok.SetColor(Color{Black: true, Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("IzoniInsectToken", NewIzoniInsectToken)
 }
 
 // ========================================
@@ -4450,6 +5674,10 @@ func NewIzoniSpiderToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("IzoniSpiderToken", NewIzoniSpiderToken)
+}
+
 // ========================================
 // NewJaceCunningCastawayIllusionToken
 // ========================================
@@ -4462,6 +5690,10 @@ func NewJaceCunningCastawayIllusionToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("JaceCunningCastawayIllusionToken", NewJaceCunningCastawayIllusionToken)
 }
 
 // ========================================
@@ -4479,6 +5711,10 @@ func NewJellyfishToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("JellyfishToken", NewJellyfishToken)
+}
+
 // ========================================
 // NewJoinTheRanksSoldierToken
 // ========================================
@@ -4492,6 +5728,10 @@ func NewJoinTheRanksSoldierToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("JoinTheRanksSoldierToken", NewJoinTheRanksSoldierToken)
 }
 
 // ========================================
@@ -4508,6 +5748,10 @@ func NewJumblebonesToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("JumblebonesToken", NewJumblebonesToken)
+}
+
 // ========================================
 // NewJunkToken
 // ========================================
@@ -4518,6 +5762,10 @@ func NewJunkToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("JUNK")
 	return tok
+}
+
+func init() {
+	Register("JunkToken", NewJunkToken)
 }
 
 // ========================================
@@ -4533,6 +5781,10 @@ func NewKaldraToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KaldraToken", NewKaldraToken)
+}
+
 // ========================================
 // NewKalitasVampireToken
 // ========================================
@@ -4544,6 +5796,10 @@ func NewKalitasVampireToken() *Token {
 	tok.AddSubtype("VAMPIRE")
 	tok.SetColor(Color{Black: true})
 	return tok
+}
+
+func init() {
+	Register("KalitasVampireToken", NewKalitasVampireToken)
 }
 
 // ========================================
@@ -4561,6 +5817,10 @@ func NewKalonianTwingroveTreefolkWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KalonianTwingroveTreefolkWarriorToken", NewKalonianTwingroveTreefolkWarriorToken)
+}
+
 // ========================================
 // NewKarnConstructToken
 // ========================================
@@ -4573,6 +5833,10 @@ func NewKarnConstructToken() *Token {
 	tok.AddSubtype("CONSTRUCT")
 	tok.SetPowerToughness(0, 0)
 	return tok
+}
+
+func init() {
+	Register("KarnConstructToken", NewKarnConstructToken)
 }
 
 // ========================================
@@ -4590,6 +5854,10 @@ func NewKaroxBladewingDragonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KaroxBladewingDragonToken", NewKaroxBladewingDragonToken)
+}
+
 // ========================================
 // NewKavuAllColorToken
 // ========================================
@@ -4605,6 +5873,10 @@ func NewKavuAllColorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KavuAllColorToken", NewKavuAllColorToken)
+}
+
 // ========================================
 // NewKeimiToken
 // ========================================
@@ -4617,6 +5889,10 @@ func NewKeimiToken() *Token {
 	tok.SetColor(Color{Black: true, Green: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("KeimiToken", NewKeimiToken)
 }
 
 // ========================================
@@ -4635,6 +5911,10 @@ func NewKelpToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KelpToken", NewKelpToken)
+}
+
 // ========================================
 // NewKherKeepKoboldToken
 // ========================================
@@ -4647,6 +5927,10 @@ func NewKherKeepKoboldToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("KherKeepKoboldToken", NewKherKeepKoboldToken)
 }
 
 // ========================================
@@ -4664,6 +5948,10 @@ func NewKithkinSoldierToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KithkinSoldierToken", NewKithkinSoldierToken)
+}
+
 // ========================================
 // NewKnight31RedToken
 // ========================================
@@ -4678,6 +5966,10 @@ func NewKnight31RedToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("Knight31RedToken", NewKnight31RedToken)
+}
+
 // ========================================
 // NewKnight33Token
 // ========================================
@@ -4690,6 +5982,10 @@ func NewKnight33Token() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("Knight33Token", NewKnight33Token)
 }
 
 // ========================================
@@ -4707,6 +6003,10 @@ func NewKnightAllyToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KnightAllyToken", NewKnightAllyToken)
+}
+
 // ========================================
 // NewKnightToken
 // ========================================
@@ -4720,6 +6020,10 @@ func NewKnightToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("vigilance")
 	return tok
+}
+
+func init() {
+	Register("KnightToken", NewKnightToken)
 }
 
 // ========================================
@@ -4737,6 +6041,10 @@ func NewKnightWhiteBlueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KnightWhiteBlueToken", NewKnightWhiteBlueToken)
+}
+
 // ========================================
 // NewKomasCoilToken
 // ========================================
@@ -4749,6 +6057,10 @@ func NewKomasCoilToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("KomasCoilToken", NewKomasCoilToken)
 }
 
 // ========================================
@@ -4766,6 +6078,10 @@ func NewKorAllyToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KorAllyToken", NewKorAllyToken)
+}
+
 // ========================================
 // NewKorSoldierToken
 // ========================================
@@ -4779,6 +6095,10 @@ func NewKorSoldierToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("KorSoldierToken", NewKorSoldierToken)
 }
 
 // ========================================
@@ -4796,6 +6116,10 @@ func NewKorWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KorWarriorToken", NewKorWarriorToken)
+}
+
 // ========================================
 // NewKraken11Token
 // ========================================
@@ -4811,6 +6135,10 @@ func NewKraken11Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Kraken11Token", NewKraken11Token)
+}
+
 // ========================================
 // NewKraken99Token
 // ========================================
@@ -4823,6 +6151,10 @@ func NewKraken99Token() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(9, 9)
 	return tok
+}
+
+func init() {
+	Register("Kraken99Token", NewKraken99Token)
 }
 
 // ========================================
@@ -4840,6 +6172,10 @@ func NewKrakenHexproofToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KrakenHexproofToken", NewKrakenHexproofToken)
+}
+
 // ========================================
 // NewKrakenToken
 // ========================================
@@ -4854,6 +6190,10 @@ func NewKrakenToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("KrakenToken", NewKrakenToken)
+}
+
 // ========================================
 // NewLandMineToken
 // ========================================
@@ -4863,6 +6203,10 @@ func NewLandMineToken() *Token {
 	tok := NewToken("LandMineToken", "")
 	tok.AddCardType(CardTypeArtifact)
 	return tok
+}
+
+func init() {
+	Register("LandMineToken", NewLandMineToken)
 }
 
 // ========================================
@@ -4875,6 +6219,10 @@ func NewLanderToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("LANDER")
 	return tok
+}
+
+func init() {
+	Register("LanderToken", NewLanderToken)
 }
 
 // ========================================
@@ -4890,6 +6238,10 @@ func NewLeafdrakeRoostDrakeToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("LeafdrakeRoostDrakeToken", NewLeafdrakeRoostDrakeToken)
 }
 
 // ========================================
@@ -4908,6 +6260,10 @@ func NewLightningRagerToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("LightningRagerToken", NewLightningRagerToken)
+}
+
 // ========================================
 // NewLizardToken
 // ========================================
@@ -4920,6 +6276,10 @@ func NewLizardToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("LizardToken", NewLizardToken)
 }
 
 // ========================================
@@ -4937,6 +6297,10 @@ func NewLlanowarElvesToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("LlanowarElvesToken", NewLlanowarElvesToken)
+}
+
 // ========================================
 // NewLolthSpiderToken
 // ========================================
@@ -4950,6 +6314,10 @@ func NewLolthSpiderToken() *Token {
 	tok.SetPowerToughness(2, 1)
 	tok.AddAbility("reach")
 	return tok
+}
+
+func init() {
+	Register("LolthSpiderToken", NewLolthSpiderToken)
 }
 
 // ========================================
@@ -4966,6 +6334,10 @@ func NewMagesAttendantToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MagesAttendantToken", NewMagesAttendantToken)
+}
+
 // ========================================
 // NewMapToken
 // ========================================
@@ -4976,6 +6348,10 @@ func NewMapToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("MAP")
 	return tok
+}
+
+func init() {
+	Register("MapToken", NewMapToken)
 }
 
 // ========================================
@@ -4990,6 +6366,10 @@ func NewMarduStrikeLeaderWarriorToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(2, 1)
 	return tok
+}
+
+func init() {
+	Register("MarduStrikeLeaderWarriorToken", NewMarduStrikeLeaderWarriorToken)
 }
 
 // ========================================
@@ -5008,6 +6388,10 @@ func NewMaritLageToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MaritLageToken", NewMaritLageToken)
+}
+
 // ========================================
 // NewMarkOfTheRaniToken
 // ========================================
@@ -5019,6 +6403,10 @@ func NewMarkOfTheRaniToken() *Token {
 	tok.AddSubtype("AURA")
 	tok.SetColor(Color{Red: true})
 	return tok
+}
+
+func init() {
+	Register("MarkOfTheRaniToken", NewMarkOfTheRaniToken)
 }
 
 // ========================================
@@ -5034,6 +6422,10 @@ func NewMaskToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MaskToken", NewMaskToken)
+}
+
 // ========================================
 // NewMasterOfWavesElementalToken
 // ========================================
@@ -5046,6 +6438,10 @@ func NewMasterOfWavesElementalToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(1, 0)
 	return tok
+}
+
+func init() {
+	Register("MasterOfWavesElementalToken", NewMasterOfWavesElementalToken)
 }
 
 // ========================================
@@ -5068,6 +6464,10 @@ func NewMechtitanToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MechtitanToken", NewMechtitanToken)
+}
+
 // ========================================
 // NewMelokuTheCloudedMirrorToken
 // ========================================
@@ -5083,6 +6483,10 @@ func NewMelokuTheCloudedMirrorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MelokuTheCloudedMirrorToken", NewMelokuTheCloudedMirrorToken)
+}
+
 // ========================================
 // NewMercenaryToken
 // ========================================
@@ -5095,6 +6499,10 @@ func NewMercenaryToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("MercenaryToken", NewMercenaryToken)
 }
 
 // ========================================
@@ -5112,6 +6520,10 @@ func NewMerfolkHexproofToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MerfolkHexproofToken", NewMerfolkHexproofToken)
+}
+
 // ========================================
 // NewMerfolkToken
 // ========================================
@@ -5124,6 +6536,10 @@ func NewMerfolkToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("MerfolkToken", NewMerfolkToken)
 }
 
 // ========================================
@@ -5141,6 +6557,10 @@ func NewMerfolkWizardToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MerfolkWizardToken", NewMerfolkWizardToken)
+}
+
 // ========================================
 // NewMesmerizingBenthidToken
 // ========================================
@@ -5153,6 +6573,10 @@ func NewMesmerizingBenthidToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(0, 2)
 	return tok
+}
+
+func init() {
+	Register("MesmerizingBenthidToken", NewMesmerizingBenthidToken)
 }
 
 // ========================================
@@ -5169,6 +6593,10 @@ func NewMetallicSliverToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MetallicSliverToken", NewMetallicSliverToken)
+}
+
 // ========================================
 // NewMetallurgicSummoningsConstructToken
 // ========================================
@@ -5182,6 +6610,10 @@ func NewMetallurgicSummoningsConstructToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MetallurgicSummoningsConstructToken", NewMetallurgicSummoningsConstructToken)
+}
+
 // ========================================
 // NewMeteoriteToken
 // ========================================
@@ -5191,6 +6623,10 @@ func NewMeteoriteToken() *Token {
 	tok := NewToken("MeteoriteToken", "")
 	tok.AddCardType(CardTypeArtifact)
 	return tok
+}
+
+func init() {
+	Register("MeteoriteToken", NewMeteoriteToken)
 }
 
 // ========================================
@@ -5207,6 +6643,10 @@ func NewMinionToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MinionToken", NewMinionToken)
+}
+
 // ========================================
 // NewMinnWilyIllusionistToken
 // ========================================
@@ -5219,6 +6659,10 @@ func NewMinnWilyIllusionistToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("MinnWilyIllusionistToken", NewMinnWilyIllusionistToken)
 }
 
 // ========================================
@@ -5235,6 +6679,10 @@ func NewMinorDemonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MinorDemonToken", NewMinorDemonToken)
+}
+
 // ========================================
 // NewMinotaurToken
 // ========================================
@@ -5247,6 +6695,10 @@ func NewMinotaurToken() *Token {
 	tok.SetPowerToughness(2, 3)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("MinotaurToken", NewMinotaurToken)
 }
 
 // ========================================
@@ -5263,6 +6715,10 @@ func NewMitoticSlimeOozeToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MitoticSlimeOozeToken", NewMitoticSlimeOozeToken)
+}
+
 // ========================================
 // NewMonasteryMentorToken
 // ========================================
@@ -5275,6 +6731,10 @@ func NewMonasteryMentorToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("MonasteryMentorToken", NewMonasteryMentorToken)
 }
 
 // ========================================
@@ -5291,6 +6751,10 @@ func NewMonkRedToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MonkRedToken", NewMonkRedToken)
+}
+
 // ========================================
 // NewMonkeyToken
 // ========================================
@@ -5305,6 +6769,10 @@ func NewMonkeyToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MonkeyToken", NewMonkeyToken)
+}
+
 // ========================================
 // NewMonsterRoleToken
 // ========================================
@@ -5317,6 +6785,10 @@ func NewMonsterRoleToken() *Token {
 	tok.AddSubtype("ROLE")
 	tok.AddAbility("trample")
 	return tok
+}
+
+func init() {
+	Register("MonsterRoleToken", NewMonsterRoleToken)
 }
 
 // ========================================
@@ -5334,6 +6806,10 @@ func NewMoogleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MoogleToken", NewMoogleToken)
+}
+
 // ========================================
 // NewMoonfolk12FlyingToken
 // ========================================
@@ -5347,6 +6823,10 @@ func NewMoonfolk12FlyingToken() *Token {
 	tok.SetPowerToughness(1, 2)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("Moonfolk12FlyingToken", NewMoonfolk12FlyingToken)
 }
 
 // ========================================
@@ -5363,6 +6843,10 @@ func NewMouseToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MouseToken", NewMouseToken)
+}
+
 // ========================================
 // NewMowuToken
 // ========================================
@@ -5375,6 +6859,10 @@ func NewMowuToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("MowuToken", NewMowuToken)
 }
 
 // ========================================
@@ -5393,6 +6881,10 @@ func NewMuYanlingSkyDancerToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MuYanlingSkyDancerToken", NewMuYanlingSkyDancerToken)
+}
+
 // ========================================
 // NewMunitionsToken
 // ========================================
@@ -5402,6 +6894,10 @@ func NewMunitionsToken() *Token {
 	tok := NewToken("MunitionsToken", "")
 	tok.AddCardType(CardTypeArtifact)
 	return tok
+}
+
+func init() {
+	Register("MunitionsToken", NewMunitionsToken)
 }
 
 // ========================================
@@ -5414,6 +6910,10 @@ func NewMutagenToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("MUTAGEN")
 	return tok
+}
+
+func init() {
+	Register("MutagenToken", NewMutagenToken)
 }
 
 // ========================================
@@ -5431,6 +6931,10 @@ func NewMutant33DeathtouchToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("Mutant33DeathtouchToken", NewMutant33DeathtouchToken)
+}
+
 // ========================================
 // NewMutavaultToken
 // ========================================
@@ -5440,6 +6944,10 @@ func NewMutavaultToken() *Token {
 	tok := NewToken("MutavaultToken", "Mutavault token")
 	tok.AddCardType(CardTypeLand)
 	return tok
+}
+
+func init() {
+	Register("MutavaultToken", NewMutavaultToken)
 }
 
 // ========================================
@@ -5456,6 +6964,10 @@ func NewMyrToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("MyrToken", NewMyrToken)
+}
+
 // ========================================
 // NewNahiriTheLithomancerEquipmentToken
 // ========================================
@@ -5470,6 +6982,10 @@ func NewNahiriTheLithomancerEquipmentToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("NahiriTheLithomancerEquipmentToken", NewNahiriTheLithomancerEquipmentToken)
+}
+
 // ========================================
 // NewNalaarAetherjetToken
 // ========================================
@@ -5481,6 +6997,10 @@ func NewNalaarAetherjetToken() *Token {
 	tok.AddSubtype("VEHICLE")
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("NalaarAetherjetToken", NewNalaarAetherjetToken)
 }
 
 // ========================================
@@ -5499,6 +7019,10 @@ func NewNecronWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("NecronWarriorToken", NewNecronWarriorToken)
+}
+
 // ========================================
 // NewNestOfScarabsBlackInsectToken
 // ========================================
@@ -5511,6 +7035,10 @@ func NewNestOfScarabsBlackInsectToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("NestOfScarabsBlackInsectToken", NewNestOfScarabsBlackInsectToken)
 }
 
 // ========================================
@@ -5529,6 +7057,10 @@ func NewNestingDragonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("NestingDragonToken", NewNestingDragonToken)
+}
+
 // ========================================
 // NewNettlingNuisancePirateToken
 // ========================================
@@ -5541,6 +7073,10 @@ func NewNettlingNuisancePirateToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(4, 2)
 	return tok
+}
+
+func init() {
+	Register("NettlingNuisancePirateToken", NewNettlingNuisancePirateToken)
 }
 
 // ========================================
@@ -5558,6 +7094,10 @@ func NewNightwingHorrorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("NightwingHorrorToken", NewNightwingHorrorToken)
+}
+
 // ========================================
 // NewNinjaToken
 // ========================================
@@ -5570,6 +7110,10 @@ func NewNinjaToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("NinjaToken", NewNinjaToken)
 }
 
 // ========================================
@@ -5586,6 +7130,10 @@ func NewNissaSageAnimistToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("NissaSageAnimistToken", NewNissaSageAnimistToken)
+}
+
 // ========================================
 // NewNoFlyingSpiritWhiteToken
 // ========================================
@@ -5598,6 +7146,10 @@ func NewNoFlyingSpiritWhiteToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("NoFlyingSpiritWhiteToken", NewNoFlyingSpiritWhiteToken)
 }
 
 // ========================================
@@ -5615,6 +7167,10 @@ func NewNymphToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("NymphToken", NewNymphToken)
+}
+
 // ========================================
 // NewOctopusToken
 // ========================================
@@ -5629,6 +7185,10 @@ func NewOctopusToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OctopusToken", NewOctopusToken)
+}
+
 // ========================================
 // NewOgreToken
 // ========================================
@@ -5641,6 +7201,10 @@ func NewOgreToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("OgreToken", NewOgreToken)
 }
 
 // ========================================
@@ -5658,6 +7222,10 @@ func NewOgreWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OgreWarriorToken", NewOgreWarriorToken)
+}
+
 // ========================================
 // NewOminousRoostBirdToken
 // ========================================
@@ -5671,6 +7239,10 @@ func NewOminousRoostBirdToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("OminousRoostBirdToken", NewOminousRoostBirdToken)
 }
 
 // ========================================
@@ -5687,6 +7259,10 @@ func NewOmnathElementalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OmnathElementalToken", NewOmnathElementalToken)
+}
+
 // ========================================
 // NewOneDozenEyesBeastToken
 // ========================================
@@ -5699,6 +7275,10 @@ func NewOneDozenEyesBeastToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(5, 5)
 	return tok
+}
+
+func init() {
+	Register("OneDozenEyesBeastToken", NewOneDozenEyesBeastToken)
 }
 
 // ========================================
@@ -5717,6 +7297,10 @@ func NewOonaQueenFaerieRogueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OonaQueenFaerieRogueToken", NewOonaQueenFaerieRogueToken)
+}
+
 // ========================================
 // NewOozeToken
 // ========================================
@@ -5730,6 +7314,10 @@ func NewOozeToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(0, 0)
 	return tok
+}
+
+func init() {
+	Register("OozeToken", NewOozeToken)
 }
 
 // ========================================
@@ -5747,6 +7335,10 @@ func NewOozeTrampleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OozeTrampleToken", NewOozeTrampleToken)
+}
+
 // ========================================
 // NewOphiomancerSnakeToken
 // ========================================
@@ -5760,6 +7352,10 @@ func NewOphiomancerSnakeToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("deathtouch")
 	return tok
+}
+
+func init() {
+	Register("OphiomancerSnakeToken", NewOphiomancerSnakeToken)
 }
 
 // ========================================
@@ -5777,6 +7373,10 @@ func NewOrcArmyToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OrcArmyToken", NewOrcArmyToken)
+}
+
 // ========================================
 // NewOrnithopterToken
 // ========================================
@@ -5792,6 +7392,10 @@ func NewOrnithopterToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OrnithopterToken", NewOrnithopterToken)
+}
+
 // ========================================
 // NewOtterProwessToken
 // ========================================
@@ -5804,6 +7408,10 @@ func NewOtterProwessToken() *Token {
 	tok.SetColor(Color{Blue: true, Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("OtterProwessToken", NewOtterProwessToken)
 }
 
 // ========================================
@@ -5823,6 +7431,10 @@ func NewOutlawsMerrimentClericToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OutlawsMerrimentClericToken", NewOutlawsMerrimentClericToken)
+}
+
 // ========================================
 // NewOutlawsMerrimentRogueToken
 // ========================================
@@ -5837,6 +7449,10 @@ func NewOutlawsMerrimentRogueToken() *Token {
 	tok.SetPowerToughness(1, 2)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("OutlawsMerrimentRogueToken", NewOutlawsMerrimentRogueToken)
 }
 
 // ========================================
@@ -5856,6 +7472,10 @@ func NewOutlawsMerrimentWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OutlawsMerrimentWarriorToken", NewOutlawsMerrimentWarriorToken)
+}
+
 // ========================================
 // NewOviyaPashiriSageLifecrafterToken
 // ========================================
@@ -5867,6 +7487,10 @@ func NewOviyaPashiriSageLifecrafterToken() *Token {
 	tok.AddCardType(CardTypeCreature)
 	tok.AddSubtype("CONSTRUCT")
 	return tok
+}
+
+func init() {
+	Register("OviyaPashiriSageLifecrafterToken", NewOviyaPashiriSageLifecrafterToken)
 }
 
 // ========================================
@@ -5883,6 +7507,10 @@ func NewOx22Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Ox22Token", NewOx22Token)
+}
+
 // ========================================
 // NewOxGreenToken
 // ========================================
@@ -5895,6 +7523,10 @@ func NewOxGreenToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("OxGreenToken", NewOxGreenToken)
 }
 
 // ========================================
@@ -5911,6 +7543,10 @@ func NewOxToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("OxToken", NewOxToken)
+}
+
 // ========================================
 // NewPatagiaViperSnakeToken
 // ========================================
@@ -5923,6 +7559,10 @@ func NewPatagiaViperSnakeToken() *Token {
 	tok.SetColor(Color{Blue: true, Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("PatagiaViperSnakeToken", NewPatagiaViperSnakeToken)
 }
 
 // ========================================
@@ -5940,6 +7580,10 @@ func NewPegasusToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PegasusToken", NewPegasusToken)
+}
+
 // ========================================
 // NewPentaviteToken
 // ========================================
@@ -5953,6 +7597,10 @@ func NewPentaviteToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("PentaviteToken", NewPentaviteToken)
 }
 
 // ========================================
@@ -5969,6 +7617,10 @@ func NewPenumbraBobcatToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PenumbraBobcatToken", NewPenumbraBobcatToken)
+}
+
 // ========================================
 // NewPenumbraKavuToken
 // ========================================
@@ -5981,6 +7633,10 @@ func NewPenumbraKavuToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("PenumbraKavuToken", NewPenumbraKavuToken)
 }
 
 // ========================================
@@ -5998,6 +7654,10 @@ func NewPenumbraSpiderToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PenumbraSpiderToken", NewPenumbraSpiderToken)
+}
+
 // ========================================
 // NewPenumbraWurmToken
 // ========================================
@@ -6011,6 +7671,10 @@ func NewPenumbraWurmToken() *Token {
 	tok.SetPowerToughness(6, 6)
 	tok.AddAbility("trample")
 	return tok
+}
+
+func init() {
+	Register("PenumbraWurmToken", NewPenumbraWurmToken)
 }
 
 // ========================================
@@ -6027,6 +7691,10 @@ func NewPest11GainLifeToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("Pest11GainLifeToken", NewPest11GainLifeToken)
+}
+
 // ========================================
 // NewPestToken
 // ========================================
@@ -6039,6 +7707,10 @@ func NewPestToken() *Token {
 	tok.AddSubtype("PEST")
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("PestToken", NewPestToken)
 }
 
 // ========================================
@@ -6057,6 +7729,10 @@ func NewPharikaSnakeToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PharikaSnakeToken", NewPharikaSnakeToken)
+}
+
 // ========================================
 // NewPhobosToken
 // ========================================
@@ -6071,6 +7747,10 @@ func NewPhobosToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhobosToken", NewPhobosToken)
+}
+
 // ========================================
 // NewPhyrexian00Token
 // ========================================
@@ -6083,6 +7763,10 @@ func NewPhyrexian00Token() *Token {
 	tok.AddSubtype("PHYREXIAN")
 	tok.SetPowerToughness(0, 0)
 	return tok
+}
+
+func init() {
+	Register("Phyrexian00Token", NewPhyrexian00Token)
 }
 
 // ========================================
@@ -6100,6 +7784,10 @@ func NewPhyrexianBeastToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianBeastToken", NewPhyrexianBeastToken)
+}
+
 // ========================================
 // NewPhyrexianBeastToxicToken
 // ========================================
@@ -6115,6 +7803,10 @@ func NewPhyrexianBeastToxicToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianBeastToxicToken", NewPhyrexianBeastToxicToken)
+}
+
 // ========================================
 // NewPhyrexianGermToken
 // ========================================
@@ -6128,6 +7820,10 @@ func NewPhyrexianGermToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(0, 0)
 	return tok
+}
+
+func init() {
+	Register("PhyrexianGermToken", NewPhyrexianGermToken)
 }
 
 // ========================================
@@ -6146,6 +7842,10 @@ func NewPhyrexianGoblinHasteToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianGoblinHasteToken", NewPhyrexianGoblinHasteToken)
+}
+
 // ========================================
 // NewPhyrexianGoblinToken
 // ========================================
@@ -6159,6 +7859,10 @@ func NewPhyrexianGoblinToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("PhyrexianGoblinToken", NewPhyrexianGoblinToken)
 }
 
 // ========================================
@@ -6176,6 +7880,10 @@ func NewPhyrexianGolemToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianGolemToken", NewPhyrexianGolemToken)
+}
+
 // ========================================
 // NewPhyrexianHorrorGreenToken
 // ========================================
@@ -6188,6 +7896,10 @@ func NewPhyrexianHorrorGreenToken() *Token {
 	tok.AddSubtype("HORROR")
 	tok.SetColor(Color{Green: true})
 	return tok
+}
+
+func init() {
+	Register("PhyrexianHorrorGreenToken", NewPhyrexianHorrorGreenToken)
 }
 
 // ========================================
@@ -6206,6 +7918,10 @@ func NewPhyrexianHorrorRedToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianHorrorRedToken", NewPhyrexianHorrorRedToken)
+}
+
 // ========================================
 // NewPhyrexianHydraWithLifelinkToken
 // ========================================
@@ -6220,6 +7936,10 @@ func NewPhyrexianHydraWithLifelinkToken() *Token {
 	tok.SetPowerToughness(3, 3)
 	tok.AddAbility("lifelink")
 	return tok
+}
+
+func init() {
+	Register("PhyrexianHydraWithLifelinkToken", NewPhyrexianHydraWithLifelinkToken)
 }
 
 // ========================================
@@ -6238,6 +7958,10 @@ func NewPhyrexianHydraWithReachToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianHydraWithReachToken", NewPhyrexianHydraWithReachToken)
+}
+
 // ========================================
 // NewPhyrexianMinionToken
 // ========================================
@@ -6250,6 +7974,10 @@ func NewPhyrexianMinionToken() *Token {
 	tok.AddSubtype("MINION")
 	tok.SetColor(Color{Black: true})
 	return tok
+}
+
+func init() {
+	Register("PhyrexianMinionToken", NewPhyrexianMinionToken)
 }
 
 // ========================================
@@ -6267,6 +7995,10 @@ func NewPhyrexianMiteToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianMiteToken", NewPhyrexianMiteToken)
+}
+
 // ========================================
 // NewPhyrexianMyrToken
 // ========================================
@@ -6282,6 +8014,10 @@ func NewPhyrexianMyrToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianMyrToken", NewPhyrexianMyrToken)
+}
+
 // ========================================
 // NewPhyrexianRebirthHorrorToken
 // ========================================
@@ -6294,6 +8030,10 @@ func NewPhyrexianRebirthHorrorToken() *Token {
 	tok.AddSubtype("PHYREXIAN")
 	tok.AddSubtype("HORROR")
 	return tok
+}
+
+func init() {
+	Register("PhyrexianRebirthHorrorToken", NewPhyrexianRebirthHorrorToken)
 }
 
 // ========================================
@@ -6311,6 +8051,10 @@ func NewPhyrexianSaprolingToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianSaprolingToken", NewPhyrexianSaprolingToken)
+}
+
 // ========================================
 // NewPhyrexianToken
 // ========================================
@@ -6323,6 +8067,10 @@ func NewPhyrexianToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("PhyrexianToken", NewPhyrexianToken)
 }
 
 // ========================================
@@ -6342,6 +8090,10 @@ func NewPhyrexianWurm12DeathtouchToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianWurm12DeathtouchToken", NewPhyrexianWurm12DeathtouchToken)
+}
+
 // ========================================
 // NewPhyrexianWurm21LifelinkToken
 // ========================================
@@ -6359,6 +8111,10 @@ func NewPhyrexianWurm21LifelinkToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianWurm21LifelinkToken", NewPhyrexianWurm21LifelinkToken)
+}
+
 // ========================================
 // NewPhyrexianWurmToken
 // ========================================
@@ -6372,6 +8128,10 @@ func NewPhyrexianWurmToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.AddAbility("trample")
 	return tok
+}
+
+func init() {
+	Register("PhyrexianWurmToken", NewPhyrexianWurmToken)
 }
 
 // ========================================
@@ -6389,6 +8149,10 @@ func NewPhyrexianZombieToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PhyrexianZombieToken", NewPhyrexianZombieToken)
+}
+
 // ========================================
 // NewPilotCrewToken
 // ========================================
@@ -6400,6 +8164,10 @@ func NewPilotCrewToken() *Token {
 	tok.AddSubtype("PILOT")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("PilotCrewToken", NewPilotCrewToken)
 }
 
 // ========================================
@@ -6415,6 +8183,10 @@ func NewPilotSaddleCrewToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PilotSaddleCrewToken", NewPilotSaddleCrewToken)
+}
+
 // ========================================
 // NewPincherToken
 // ========================================
@@ -6426,6 +8198,10 @@ func NewPincherToken() *Token {
 	tok.AddSubtype("PINCHER")
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("PincherToken", NewPincherToken)
 }
 
 // ========================================
@@ -6443,6 +8219,10 @@ func NewPirateRedToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PirateRedToken", NewPirateRedToken)
+}
+
 // ========================================
 // NewPirateToken
 // ========================================
@@ -6455,6 +8235,10 @@ func NewPirateToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("PirateToken", NewPirateToken)
 }
 
 // ========================================
@@ -6471,6 +8255,10 @@ func NewPlaguebearerOfNurgleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PlaguebearerOfNurgleToken", NewPlaguebearerOfNurgleToken)
+}
+
 // ========================================
 // NewPlanewideCelebrationToken
 // ========================================
@@ -6483,6 +8271,10 @@ func NewPlanewideCelebrationToken() *Token {
 	tok.SetColor(Color{White: true, Blue: true, Black: true, Red: true, Green: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("PlanewideCelebrationToken", NewPlanewideCelebrationToken)
 }
 
 // ========================================
@@ -6499,6 +8291,10 @@ func NewPlant11Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Plant11Token", NewPlant11Token)
+}
+
 // ========================================
 // NewPlantToken
 // ========================================
@@ -6511,6 +8307,10 @@ func NewPlantToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("PlantToken", NewPlantToken)
 }
 
 // ========================================
@@ -6529,6 +8329,10 @@ func NewPlantWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PlantWarriorToken", NewPlantWarriorToken)
+}
+
 // ========================================
 // NewPorgToken
 // ========================================
@@ -6543,6 +8347,10 @@ func NewPorgToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PorgToken", NewPorgToken)
+}
+
 // ========================================
 // NewPowerstoneToken
 // ========================================
@@ -6553,6 +8361,10 @@ func NewPowerstoneToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("POWERSTONE")
 	return tok
+}
+
+func init() {
+	Register("PowerstoneToken", NewPowerstoneToken)
 }
 
 // ========================================
@@ -6569,6 +8381,10 @@ func NewPrimoTheIndivisibleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PrimoTheIndivisibleToken", NewPrimoTheIndivisibleToken)
+}
+
 // ========================================
 // NewPrismToken
 // ========================================
@@ -6581,6 +8397,10 @@ func NewPrismToken() *Token {
 	tok.AddSubtype("PRISM")
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("PrismToken", NewPrismToken)
 }
 
 // ========================================
@@ -6598,6 +8418,10 @@ func NewPurphorossInterventionToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("PurphorossInterventionToken", NewPurphorossInterventionToken)
+}
+
 // ========================================
 // NewPursuedWhaleToken
 // ========================================
@@ -6610,6 +8434,10 @@ func NewPursuedWhaleToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("PursuedWhaleToken", NewPursuedWhaleToken)
 }
 
 // ========================================
@@ -6628,6 +8456,10 @@ func NewQueenMarchesaAssassinToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("QueenMarchesaAssassinToken", NewQueenMarchesaAssassinToken)
+}
+
 // ========================================
 // NewQuestForTheGravelordZombieToken
 // ========================================
@@ -6641,6 +8473,10 @@ func NewQuestForTheGravelordZombieToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(5, 5)
 	return tok
+}
+
+func init() {
+	Register("QuestForTheGravelordZombieToken", NewQuestForTheGravelordZombieToken)
 }
 
 // ========================================
@@ -6657,6 +8493,10 @@ func NewRabbitToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RabbitToken", NewRabbitToken)
+}
+
 // ========================================
 // NewRabidSheepToken
 // ========================================
@@ -6669,6 +8509,10 @@ func NewRabidSheepToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("RabidSheepToken", NewRabidSheepToken)
 }
 
 // ========================================
@@ -6685,6 +8529,10 @@ func NewRaccoonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RaccoonToken", NewRaccoonToken)
+}
+
 // ========================================
 // NewRagavanToken
 // ========================================
@@ -6697,6 +8545,10 @@ func NewRagavanToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(2, 1)
 	return tok
+}
+
+func init() {
+	Register("RagavanToken", NewRagavanToken)
 }
 
 // ========================================
@@ -6714,6 +8566,10 @@ func NewRakdosGuildmageGoblinToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RakdosGuildmageGoblinToken", NewRakdosGuildmageGoblinToken)
+}
+
 // ========================================
 // NewRasputinKnightToken
 // ========================================
@@ -6726,6 +8582,10 @@ func NewRasputinKnightToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("RasputinKnightToken", NewRasputinKnightToken)
 }
 
 // ========================================
@@ -6743,6 +8603,10 @@ func NewRat11LifelinkToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("Rat11LifelinkToken", NewRat11LifelinkToken)
+}
+
 // ========================================
 // NewRatCantBlockToken
 // ========================================
@@ -6755,6 +8619,10 @@ func NewRatCantBlockToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("RatCantBlockToken", NewRatCantBlockToken)
 }
 
 // ========================================
@@ -6772,6 +8640,10 @@ func NewRatRogueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RatRogueToken", NewRatRogueToken)
+}
+
 // ========================================
 // NewRatToken
 // ========================================
@@ -6786,6 +8658,10 @@ func NewRatToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RatToken", NewRatToken)
+}
+
 // ========================================
 // NewRebelRedToken
 // ========================================
@@ -6798,6 +8674,10 @@ func NewRebelRedToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("RebelRedToken", NewRebelRedToken)
 }
 
 // ========================================
@@ -6816,6 +8696,10 @@ func NewRebelStarshipToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RebelStarshipToken", NewRebelStarshipToken)
+}
+
 // ========================================
 // NewRebelToken
 // ========================================
@@ -6830,6 +8714,10 @@ func NewRebelToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RebelToken", NewRebelToken)
+}
+
 // ========================================
 // NewRedElementalToken
 // ========================================
@@ -6842,6 +8730,10 @@ func NewRedElementalToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("RedElementalToken", NewRedElementalToken)
 }
 
 // ========================================
@@ -6859,6 +8751,10 @@ func NewRedGreenBeastToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RedGreenBeastToken", NewRedGreenBeastToken)
+}
+
 // ========================================
 // NewRedHumanToken
 // ========================================
@@ -6873,6 +8769,10 @@ func NewRedHumanToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RedHumanToken", NewRedHumanToken)
+}
+
 // ========================================
 // NewRedWarriorToken
 // ========================================
@@ -6885,6 +8785,10 @@ func NewRedWarriorToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("RedWarriorToken", NewRedWarriorToken)
 }
 
 // ========================================
@@ -6902,6 +8806,10 @@ func NewRedWhiteGolemToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RedWhiteGolemToken", NewRedWhiteGolemToken)
+}
+
 // ========================================
 // NewRedWolfToken
 // ========================================
@@ -6914,6 +8822,10 @@ func NewRedWolfToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(3, 2)
 	return tok
+}
+
+func init() {
+	Register("RedWolfToken", NewRedWolfToken)
 }
 
 // ========================================
@@ -6930,6 +8842,10 @@ func NewReefWormFishToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ReefWormFishToken", NewReefWormFishToken)
+}
+
 // ========================================
 // NewReefWormWhaleToken
 // ========================================
@@ -6942,6 +8858,10 @@ func NewReefWormWhaleToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(6, 6)
 	return tok
+}
+
+func init() {
+	Register("ReefWormWhaleToken", NewReefWormWhaleToken)
 }
 
 // ========================================
@@ -6958,6 +8878,10 @@ func NewReflectionBlueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ReflectionBlueToken", NewReflectionBlueToken)
+}
+
 // ========================================
 // NewReflectionPureToken
 // ========================================
@@ -6969,6 +8893,10 @@ func NewReflectionPureToken() *Token {
 	tok.AddSubtype("REFLECTION")
 	tok.SetColor(Color{White: true})
 	return tok
+}
+
+func init() {
+	Register("ReflectionPureToken", NewReflectionPureToken)
 }
 
 // ========================================
@@ -6983,6 +8911,10 @@ func NewReflectionToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("ReflectionToken", NewReflectionToken)
 }
 
 // ========================================
@@ -7000,6 +8932,10 @@ func NewRekindlingPhoenixToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RekindlingPhoenixToken", NewRekindlingPhoenixToken)
+}
+
 // ========================================
 // NewRelicRobberToken
 // ========================================
@@ -7013,6 +8949,10 @@ func NewRelicRobberToken() *Token {
 	tok.AddSubtype("CONSTRUCT")
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("RelicRobberToken", NewRelicRobberToken)
 }
 
 // ========================================
@@ -7031,6 +8971,10 @@ func NewReliquaryDragonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ReliquaryDragonToken", NewReliquaryDragonToken)
+}
+
 // ========================================
 // NewRenownedWeaverSpiderToken
 // ========================================
@@ -7046,6 +8990,10 @@ func NewRenownedWeaverSpiderToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RenownedWeaverSpiderToken", NewRenownedWeaverSpiderToken)
+}
+
 // ========================================
 // NewReplicatedRingToken
 // ========================================
@@ -7055,6 +9003,10 @@ func NewReplicatedRingToken() *Token {
 	tok := NewToken("ReplicatedRingToken", "")
 	tok.AddCardType(CardTypeArtifact)
 	return tok
+}
+
+func init() {
+	Register("ReplicatedRingToken", NewReplicatedRingToken)
 }
 
 // ========================================
@@ -7069,6 +9021,10 @@ func NewResearchDevelopmentToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(3, 1)
 	return tok
+}
+
+func init() {
+	Register("ResearchDevelopmentToken", NewResearchDevelopmentToken)
 }
 
 // ========================================
@@ -7086,6 +9042,10 @@ func NewRhinoToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RhinoToken", NewRhinoToken)
+}
+
 // ========================================
 // NewRhinoWarriorToken
 // ========================================
@@ -7101,6 +9061,10 @@ func NewRhinoWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RhinoWarriorToken", NewRhinoWarriorToken)
+}
+
 // ========================================
 // NewRhonassLastStandToken
 // ========================================
@@ -7113,6 +9077,10 @@ func NewRhonassLastStandToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(5, 4)
 	return tok
+}
+
+func init() {
+	Register("RhonassLastStandToken", NewRhonassLastStandToken)
 }
 
 // ========================================
@@ -7130,6 +9098,10 @@ func NewRiftmarkedKnightToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RiftmarkedKnightToken", NewRiftmarkedKnightToken)
+}
+
 // ========================================
 // NewRiptideReplicatorToken
 // ========================================
@@ -7139,6 +9111,10 @@ func NewRiptideReplicatorToken() *Token {
 	tok := NewToken("RiptideReplicatorToken", "X/X creature token of the chosen color and type")
 	tok.AddCardType(CardTypeCreature)
 	return tok
+}
+
+func init() {
+	Register("RiptideReplicatorToken", NewRiptideReplicatorToken)
 }
 
 // ========================================
@@ -7155,6 +9131,10 @@ func NewRiseOfTheAntsInsectToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RiseOfTheAntsInsectToken", NewRiseOfTheAntsInsectToken)
+}
+
 // ========================================
 // NewRitualOfTheReturnedZombieToken
 // ========================================
@@ -7166,6 +9146,10 @@ func NewRitualOfTheReturnedZombieToken() *Token {
 	tok.AddSubtype("ZOMBIE")
 	tok.SetColor(Color{Black: true})
 	return tok
+}
+
+func init() {
+	Register("RitualOfTheReturnedZombieToken", NewRitualOfTheReturnedZombieToken)
 }
 
 // ========================================
@@ -7180,6 +9164,10 @@ func NewRobot33Token() *Token {
 	tok.AddSubtype("ROBOT")
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("Robot33Token", NewRobot33Token)
 }
 
 // ========================================
@@ -7197,6 +9185,10 @@ func NewRobotBlueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RobotBlueToken", NewRobotBlueToken)
+}
+
 // ========================================
 // NewRobotCantBlockToken
 // ========================================
@@ -7209,6 +9201,10 @@ func NewRobotCantBlockToken() *Token {
 	tok.AddSubtype("ROBOT")
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("RobotCantBlockToken", NewRobotCantBlockToken)
 }
 
 // ========================================
@@ -7226,6 +9222,10 @@ func NewRobotFlyingToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RobotFlyingToken", NewRobotFlyingToken)
+}
+
 // ========================================
 // NewRobotToken
 // ========================================
@@ -7238,6 +9238,10 @@ func NewRobotToken() *Token {
 	tok.AddSubtype("ROBOT")
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("RobotToken", NewRobotToken)
 }
 
 // ========================================
@@ -7255,6 +9259,10 @@ func NewRocEggToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RocEggToken", NewRocEggToken)
+}
+
 // ========================================
 // NewRockToken
 // ========================================
@@ -7265,6 +9273,10 @@ func NewRockToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("EQUIPMENT")
 	return tok
+}
+
+func init() {
+	Register("RockToken", NewRockToken)
 }
 
 // ========================================
@@ -7279,6 +9291,10 @@ func NewRogueToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("RogueToken", NewRogueToken)
 }
 
 // ========================================
@@ -7296,6 +9312,10 @@ func NewRoyalGuardToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RoyalGuardToken", NewRoyalGuardToken)
+}
+
 // ========================================
 // NewRoyalRoleToken
 // ========================================
@@ -7307,6 +9327,10 @@ func NewRoyalRoleToken() *Token {
 	tok.AddSubtype("AURA")
 	tok.AddSubtype("ROLE")
 	return tok
+}
+
+func init() {
+	Register("RoyalRoleToken", NewRoyalRoleToken)
 }
 
 // ========================================
@@ -7324,6 +9348,10 @@ func NewRukhEggBirdToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("RukhEggBirdToken", NewRukhEggBirdToken)
+}
+
 // ========================================
 // NewSalamanderWarriorToken
 // ========================================
@@ -7337,6 +9365,10 @@ func NewSalamanderWarriorToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(4, 3)
 	return tok
+}
+
+func init() {
+	Register("SalamanderWarriorToken", NewSalamanderWarriorToken)
 }
 
 // ========================================
@@ -7354,6 +9386,10 @@ func NewSamuraiToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SamuraiToken", NewSamuraiToken)
+}
+
 // ========================================
 // NewSandWarriorToken
 // ========================================
@@ -7367,6 +9403,10 @@ func NewSandWarriorToken() *Token {
 	tok.SetColor(Color{White: true, Red: true, Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SandWarriorToken", NewSandWarriorToken)
 }
 
 // ========================================
@@ -7383,6 +9423,10 @@ func NewSaprolingBurstToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SaprolingBurstToken", NewSaprolingBurstToken)
+}
+
 // ========================================
 // NewSaprolingToken
 // ========================================
@@ -7397,6 +9441,10 @@ func NewSaprolingToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SaprolingToken", NewSaprolingToken)
+}
+
 // ========================================
 // NewSatyrCantBlockToken
 // ========================================
@@ -7409,6 +9457,10 @@ func NewSatyrCantBlockToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SatyrCantBlockToken", NewSatyrCantBlockToken)
 }
 
 // ========================================
@@ -7427,6 +9479,10 @@ func NewSatyrNyxSmithElementalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SatyrNyxSmithElementalToken", NewSatyrNyxSmithElementalToken)
+}
+
 // ========================================
 // NewScionOfTheDeepToken
 // ========================================
@@ -7439,6 +9495,10 @@ func NewScionOfTheDeepToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(8, 8)
 	return tok
+}
+
+func init() {
+	Register("ScionOfTheDeepToken", NewScionOfTheDeepToken)
 }
 
 // ========================================
@@ -7458,6 +9518,10 @@ func NewScorpionDragonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ScorpionDragonToken", NewScorpionDragonToken)
+}
+
 // ========================================
 // NewScrapToken
 // ========================================
@@ -7467,6 +9531,10 @@ func NewScrapToken() *Token {
 	tok := NewToken("ScrapToken", "colorless artifact token named Scrap")
 	tok.AddCardType(CardTypeArtifact)
 	return tok
+}
+
+func init() {
+	Register("ScrapToken", NewScrapToken)
 }
 
 // ========================================
@@ -7484,6 +9552,10 @@ func NewSeizeTheStormElementalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SeizeTheStormElementalToken", NewSeizeTheStormElementalToken)
+}
+
 // ========================================
 // NewSengirNosferatuBatToken
 // ========================================
@@ -7497,6 +9569,10 @@ func NewSengirNosferatuBatToken() *Token {
 	tok.SetPowerToughness(1, 2)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("SengirNosferatuBatToken", NewSengirNosferatuBatToken)
 }
 
 // ========================================
@@ -7513,6 +9589,10 @@ func NewSerfToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SerfToken", NewSerfToken)
+}
+
 // ========================================
 // NewSerpentGeneratorSnakeToken
 // ========================================
@@ -7525,6 +9605,10 @@ func NewSerpentGeneratorSnakeToken() *Token {
 	tok.AddSubtype("SNAKE")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SerpentGeneratorSnakeToken", NewSerpentGeneratorSnakeToken)
 }
 
 // ========================================
@@ -7541,6 +9625,10 @@ func NewServoToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ServoToken", NewServoToken)
+}
+
 // ========================================
 // NewSettlementToken
 // ========================================
@@ -7554,6 +9642,10 @@ func NewSettlementToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SettlementToken", NewSettlementToken)
+}
+
 // ========================================
 // NewShapeshifter32Token
 // ========================================
@@ -7565,6 +9657,10 @@ func NewShapeshifter32Token() *Token {
 	tok.AddSubtype("SHAPESHIFTER")
 	tok.SetPowerToughness(3, 2)
 	return tok
+}
+
+func init() {
+	Register("Shapeshifter32Token", NewShapeshifter32Token)
 }
 
 // ========================================
@@ -7581,6 +9677,10 @@ func NewShapeshifterBlueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ShapeshifterBlueToken", NewShapeshifterBlueToken)
+}
+
 // ========================================
 // NewShapeshifterDeathtouchToken
 // ========================================
@@ -7592,6 +9692,10 @@ func NewShapeshifterDeathtouchToken() *Token {
 	tok.AddSubtype("SHAPESHIFTER")
 	tok.AddAbility("deathtouch")
 	return tok
+}
+
+func init() {
+	Register("ShapeshifterDeathtouchToken", NewShapeshifterDeathtouchToken)
 }
 
 // ========================================
@@ -7607,6 +9711,10 @@ func NewShapeshifterToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ShapeshifterToken", NewShapeshifterToken)
+}
+
 // ========================================
 // NewShardToken
 // ========================================
@@ -7617,6 +9725,10 @@ func NewShardToken() *Token {
 	tok.AddCardType(CardTypeEnchantment)
 	tok.AddSubtype("SHARD")
 	return tok
+}
+
+func init() {
+	Register("ShardToken", NewShardToken)
 }
 
 // ========================================
@@ -7633,6 +9745,10 @@ func NewShark33Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Shark33Token", NewShark33Token)
+}
+
 // ========================================
 // NewSharkToken
 // ========================================
@@ -7645,6 +9761,10 @@ func NewSharkToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("SharkToken", NewSharkToken)
 }
 
 // ========================================
@@ -7661,6 +9781,10 @@ func NewSheepToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SheepToken", NewSheepToken)
+}
+
 // ========================================
 // NewSheepWhiteToken
 // ========================================
@@ -7673,6 +9797,10 @@ func NewSheepWhiteToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SheepWhiteToken", NewSheepWhiteToken)
 }
 
 // ========================================
@@ -7689,6 +9817,10 @@ func NewShrineToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ShrineToken", NewShrineToken)
+}
+
 // ========================================
 // NewSkeletonMenaceToken
 // ========================================
@@ -7701,6 +9833,10 @@ func NewSkeletonMenaceToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(4, 1)
 	return tok
+}
+
+func init() {
+	Register("SkeletonMenaceToken", NewSkeletonMenaceToken)
 }
 
 // ========================================
@@ -7718,6 +9854,10 @@ func NewSkeletonPirateToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SkeletonPirateToken", NewSkeletonPirateToken)
+}
+
 // ========================================
 // NewSkeletonRegenerateToken
 // ========================================
@@ -7732,6 +9872,10 @@ func NewSkeletonRegenerateToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SkeletonRegenerateToken", NewSkeletonRegenerateToken)
+}
+
 // ========================================
 // NewSkeletonToken
 // ========================================
@@ -7744,6 +9888,10 @@ func NewSkeletonToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SkeletonToken", NewSkeletonToken)
 }
 
 // ========================================
@@ -7761,6 +9909,10 @@ func NewSliverArmyToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SliverArmyToken", NewSliverArmyToken)
+}
+
 // ========================================
 // NewSliverToken
 // ========================================
@@ -7772,6 +9924,10 @@ func NewSliverToken() *Token {
 	tok.AddSubtype("SLIVER")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SliverToken", NewSliverToken)
 }
 
 // ========================================
@@ -7786,6 +9942,10 @@ func NewSlugToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SlugToken", NewSlugToken)
 }
 
 // ========================================
@@ -7804,6 +9964,10 @@ func NewSmaugToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SmaugToken", NewSmaugToken)
+}
+
 // ========================================
 // NewSmokeBlessingToken
 // ========================================
@@ -7815,6 +9979,10 @@ func NewSmokeBlessingToken() *Token {
 	tok.AddSubtype("AURA")
 	tok.SetColor(Color{Red: true})
 	return tok
+}
+
+func init() {
+	Register("SmokeBlessingToken", NewSmokeBlessingToken)
 }
 
 // ========================================
@@ -7831,6 +9999,10 @@ func NewSnailToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SnailToken", NewSnailToken)
+}
+
 // ========================================
 // NewSnakeToken
 // ========================================
@@ -7843,6 +10015,10 @@ func NewSnakeToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SnakeToken", NewSnakeToken)
 }
 
 // ========================================
@@ -7859,6 +10035,10 @@ func NewSoldier22Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Soldier22Token", NewSoldier22Token)
+}
+
 // ========================================
 // NewSoldierArtifactToken
 // ========================================
@@ -7873,6 +10053,10 @@ func NewSoldierArtifactToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SoldierArtifactToken", NewSoldierArtifactToken)
+}
+
 // ========================================
 // NewSoldierFirebendingToken
 // ========================================
@@ -7885,6 +10069,10 @@ func NewSoldierFirebendingToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("SoldierFirebendingToken", NewSoldierFirebendingToken)
 }
 
 // ========================================
@@ -7902,6 +10090,10 @@ func NewSoldierLifelinkToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SoldierLifelinkToken", NewSoldierLifelinkToken)
+}
+
 // ========================================
 // NewSoldierRedToken
 // ========================================
@@ -7916,6 +10108,10 @@ func NewSoldierRedToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SoldierRedToken", NewSoldierRedToken)
+}
+
 // ========================================
 // NewSoldierToken
 // ========================================
@@ -7928,6 +10124,10 @@ func NewSoldierToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SoldierToken", NewSoldierToken)
 }
 
 // ========================================
@@ -7945,6 +10145,10 @@ func NewSoldierVigilanceToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SoldierVigilanceToken", NewSoldierVigilanceToken)
+}
+
 // ========================================
 // NewSorcererRoleToken
 // ========================================
@@ -7956,6 +10160,10 @@ func NewSorcererRoleToken() *Token {
 	tok.AddSubtype("AURA")
 	tok.AddSubtype("ROLE")
 	return tok
+}
+
+func init() {
+	Register("SorcererRoleToken", NewSorcererRoleToken)
 }
 
 // ========================================
@@ -7973,6 +10181,10 @@ func NewSorinLordOfInnistradVampireToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SorinLordOfInnistradVampireToken", NewSorinLordOfInnistradVampireToken)
+}
+
 // ========================================
 // NewSoundTheCallToken
 // ========================================
@@ -7985,6 +10197,10 @@ func NewSoundTheCallToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SoundTheCallToken", NewSoundTheCallToken)
 }
 
 // ========================================
@@ -8003,6 +10219,10 @@ func NewSparkElementalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SparkElementalToken", NewSparkElementalToken)
+}
+
 // ========================================
 // NewSpawnToken
 // ========================================
@@ -8015,6 +10235,10 @@ func NewSpawnToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("SpawnToken", NewSpawnToken)
 }
 
 // ========================================
@@ -8032,6 +10256,10 @@ func NewSpawningGroundsBeastToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SpawningGroundsBeastToken", NewSpawningGroundsBeastToken)
+}
+
 // ========================================
 // NewSpawningPitToken
 // ========================================
@@ -8046,6 +10274,10 @@ func NewSpawningPitToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SpawningPitToken", NewSpawningPitToken)
+}
+
 // ========================================
 // NewSpellgorgerWeirdToken
 // ========================================
@@ -8058,6 +10290,10 @@ func NewSpellgorgerWeirdToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("SpellgorgerWeirdToken", NewSpellgorgerWeirdToken)
 }
 
 // ========================================
@@ -8075,6 +10311,10 @@ func NewSpider21Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Spider21Token", NewSpider21Token)
+}
+
 // ========================================
 // NewSpider22Token
 // ========================================
@@ -8088,6 +10328,10 @@ func NewSpider22Token() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("reach")
 	return tok
+}
+
+func init() {
+	Register("Spider22Token", NewSpider22Token)
 }
 
 // ========================================
@@ -8105,6 +10349,10 @@ func NewSpiderToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SpiderToken", NewSpiderToken)
+}
+
 // ========================================
 // NewSpikeToken
 // ========================================
@@ -8117,6 +10365,10 @@ func NewSpikeToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SpikeToken", NewSpikeToken)
 }
 
 // ========================================
@@ -8134,6 +10386,10 @@ func NewSpirit22Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Spirit22Token", NewSpirit22Token)
+}
+
 // ========================================
 // NewSpirit31Token
 // ========================================
@@ -8149,6 +10405,10 @@ func NewSpirit31Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Spirit31Token", NewSpirit31Token)
+}
+
 // ========================================
 // NewSpirit32Token
 // ========================================
@@ -8161,6 +10421,10 @@ func NewSpirit32Token() *Token {
 	tok.SetColor(Color{White: true, Red: true})
 	tok.SetPowerToughness(3, 2)
 	return tok
+}
+
+func init() {
+	Register("Spirit32Token", NewSpirit32Token)
 }
 
 // ========================================
@@ -8178,6 +10442,10 @@ func NewSpiritBlueToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SpiritBlueToken", NewSpiritBlueToken)
+}
+
 // ========================================
 // NewSpiritClericToken
 // ========================================
@@ -8191,6 +10459,10 @@ func NewSpiritClericToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(0, 0)
 	return tok
+}
+
+func init() {
+	Register("SpiritClericToken", NewSpiritClericToken)
 }
 
 // ========================================
@@ -8208,6 +10480,10 @@ func NewSpiritEvilBorosCharmToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SpiritEvilBorosCharmToken", NewSpiritEvilBorosCharmToken)
+}
+
 // ========================================
 // NewSpiritGreenToken
 // ========================================
@@ -8220,6 +10496,10 @@ func NewSpiritGreenToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(4, 5)
 	return tok
+}
+
+func init() {
+	Register("SpiritGreenToken", NewSpiritGreenToken)
 }
 
 // ========================================
@@ -8235,6 +10515,10 @@ func NewSpiritGreenXToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SpiritGreenXToken", NewSpiritGreenXToken)
+}
+
 // ========================================
 // NewSpiritRedToken
 // ========================================
@@ -8247,6 +10531,10 @@ func NewSpiritRedToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("SpiritRedToken", NewSpiritRedToken)
 }
 
 // ========================================
@@ -8264,6 +10552,10 @@ func NewSpiritTeferiToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SpiritTeferiToken", NewSpiritTeferiToken)
+}
+
 // ========================================
 // NewSpiritToken
 // ========================================
@@ -8275,6 +10567,10 @@ func NewSpiritToken() *Token {
 	tok.AddSubtype("SPIRIT")
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SpiritToken", NewSpiritToken)
 }
 
 // ========================================
@@ -8289,6 +10585,10 @@ func NewSpiritWarriorToken() *Token {
 	tok.AddSubtype("WARRIOR")
 	tok.SetColor(Color{Black: true, Green: true})
 	return tok
+}
+
+func init() {
+	Register("SpiritWarriorToken", NewSpiritWarriorToken)
 }
 
 // ========================================
@@ -8306,6 +10606,10 @@ func NewSpiritWhiteToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SpiritWhiteToken", NewSpiritWhiteToken)
+}
+
 // ========================================
 // NewSpiritWorldToken
 // ========================================
@@ -8319,6 +10623,10 @@ func NewSpiritWorldToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SpiritWorldToken", NewSpiritWorldToken)
+}
+
 // ========================================
 // NewSpiritXXToken
 // ========================================
@@ -8330,6 +10638,10 @@ func NewSpiritXXToken() *Token {
 	tok.AddSubtype("SPIRIT")
 	tok.SetColor(Color{White: true})
 	return tok
+}
+
+func init() {
+	Register("SpiritXXToken", NewSpiritXXToken)
 }
 
 // ========================================
@@ -8347,6 +10659,10 @@ func NewSplinterToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SplinterToken", NewSplinterToken)
+}
+
 // ========================================
 // NewSpyMasterGoblinToken
 // ========================================
@@ -8359,6 +10675,10 @@ func NewSpyMasterGoblinToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SpyMasterGoblinToken", NewSpyMasterGoblinToken)
 }
 
 // ========================================
@@ -8375,6 +10695,10 @@ func NewSquidToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SquidToken", NewSquidToken)
+}
+
 // ========================================
 // NewSquirrelToken
 // ========================================
@@ -8387,6 +10711,10 @@ func NewSquirrelToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SquirrelToken", NewSquirrelToken)
 }
 
 // ========================================
@@ -8404,6 +10732,10 @@ func NewStanggTwinToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("StanggTwinToken", NewStanggTwinToken)
+}
+
 // ========================================
 // NewStarfishToken
 // ========================================
@@ -8416,6 +10748,10 @@ func NewStarfishToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("StarfishToken", NewStarfishToken)
 }
 
 // ========================================
@@ -8431,6 +10767,10 @@ func NewStitcherGeralfZombieToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("StitcherGeralfZombieToken", NewStitcherGeralfZombieToken)
+}
+
 // ========================================
 // NewStitchersApprenticeHomunculusToken
 // ========================================
@@ -8443,6 +10783,10 @@ func NewStitchersApprenticeHomunculusToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("StitchersApprenticeHomunculusToken", NewStitchersApprenticeHomunculusToken)
 }
 
 // ========================================
@@ -8460,6 +10804,10 @@ func NewStoneIdolToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("StoneIdolToken", NewStoneIdolToken)
+}
+
 // ========================================
 // NewStormCrowToken
 // ========================================
@@ -8473,6 +10821,10 @@ func NewStormCrowToken() *Token {
 	tok.SetPowerToughness(1, 2)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("StormCrowToken", NewStormCrowToken)
 }
 
 // ========================================
@@ -8489,6 +10841,10 @@ func NewSubterraneanTremorsLizardToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SubterraneanTremorsLizardToken", NewSubterraneanTremorsLizardToken)
+}
+
 // ========================================
 // NewSurvivorToken
 // ========================================
@@ -8501,6 +10857,10 @@ func NewSurvivorToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("SurvivorToken", NewSurvivorToken)
 }
 
 // ========================================
@@ -8518,6 +10878,10 @@ func NewSwanSongBirdToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("SwanSongBirdToken", NewSwanSongBirdToken)
+}
+
 // ========================================
 // NewSwordToken
 // ========================================
@@ -8528,6 +10892,10 @@ func NewSwordToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("EQUIPMENT")
 	return tok
+}
+
+func init() {
+	Register("SwordToken", NewSwordToken)
 }
 
 // ========================================
@@ -8541,6 +10909,10 @@ func NewSylvanOfferingTreefolkToken() *Token {
 	tok.AddSubtype("TREEFOLK")
 	tok.SetColor(Color{Green: true})
 	return tok
+}
+
+func init() {
+	Register("SylvanOfferingTreefolkToken", NewSylvanOfferingTreefolkToken)
 }
 
 // ========================================
@@ -8558,6 +10930,10 @@ func NewTIEFighterToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TIEFighterToken", NewTIEFighterToken)
+}
+
 // ========================================
 // NewTamiyosNotebookToken
 // ========================================
@@ -8567,6 +10943,10 @@ func NewTamiyosNotebookToken() *Token {
 	tok := NewToken("TamiyosNotebookToken", "")
 	tok.AddCardType(CardTypeArtifact)
 	return tok
+}
+
+func init() {
+	Register("TamiyosNotebookToken", NewTamiyosNotebookToken)
 }
 
 // ========================================
@@ -8581,6 +10961,10 @@ func NewTarmogoyfToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(0, 1)
 	return tok
+}
+
+func init() {
+	Register("TarmogoyfToken", NewTarmogoyfToken)
 }
 
 // ========================================
@@ -8599,6 +10983,10 @@ func NewTatsumaDragonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TatsumaDragonToken", NewTatsumaDragonToken)
+}
+
 // ========================================
 // NewTentacleToken
 // ========================================
@@ -8611,6 +10999,10 @@ func NewTentacleToken() *Token {
 	tok.SetColor(Color{Blue: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("TentacleToken", NewTentacleToken)
 }
 
 // ========================================
@@ -8628,6 +11020,10 @@ func NewTetraviteToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TetraviteToken", NewTetraviteToken)
+}
+
 // ========================================
 // NewTeyoToken
 // ========================================
@@ -8643,6 +11039,10 @@ func NewTeyoToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TeyoToken", NewTeyoToken)
+}
+
 // ========================================
 // NewThatcherHumanToken
 // ========================================
@@ -8656,6 +11056,10 @@ func NewThatcherHumanToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("ThatcherHumanToken", NewThatcherHumanToken)
 }
 
 // ========================================
@@ -8674,6 +11078,10 @@ func NewTheAtropalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TheAtropalToken", NewTheAtropalToken)
+}
+
 // ========================================
 // NewTheBlackjackToken
 // ========================================
@@ -8686,6 +11094,10 @@ func NewTheBlackjackToken() *Token {
 	tok.SetPowerToughness(3, 3)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("TheBlackjackToken", NewTheBlackjackToken)
 }
 
 // ========================================
@@ -8702,6 +11114,10 @@ func NewTheEleventhHourToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TheEleventhHourToken", NewTheEleventhHourToken)
+}
+
 // ========================================
 // NewTheGirlInTheFireplaceHorseToken
 // ========================================
@@ -8714,6 +11130,10 @@ func NewTheGirlInTheFireplaceHorseToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("TheGirlInTheFireplaceHorseToken", NewTheGirlInTheFireplaceHorseToken)
 }
 
 // ========================================
@@ -8729,6 +11149,10 @@ func NewTheGirlInTheFireplaceHumanNobleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TheGirlInTheFireplaceHumanNobleToken", NewTheGirlInTheFireplaceHumanNobleToken)
+}
+
 // ========================================
 // NewTheHollowSentinelToken
 // ========================================
@@ -8742,6 +11166,10 @@ func NewTheHollowSentinelToken() *Token {
 	tok.AddSubtype("GOLEM")
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("TheHollowSentinelToken", NewTheHollowSentinelToken)
 }
 
 // ========================================
@@ -8760,6 +11188,10 @@ func NewTheLocustGodInsectToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TheLocustGodInsectToken", NewTheLocustGodInsectToken)
+}
+
 // ========================================
 // NewThePrydwenSteelFlagshipHumanKnightToken
 // ========================================
@@ -8771,6 +11203,10 @@ func NewThePrydwenSteelFlagshipHumanKnightToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("ThePrydwenSteelFlagshipHumanKnightToken", NewThePrydwenSteelFlagshipHumanKnightToken)
 }
 
 // ========================================
@@ -8788,6 +11224,10 @@ func NewThopter00ColorlessToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("Thopter00ColorlessToken", NewThopter00ColorlessToken)
+}
+
 // ========================================
 // NewThopterColorlessToken
 // ========================================
@@ -8801,6 +11241,10 @@ func NewThopterColorlessToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("ThopterColorlessToken", NewThopterColorlessToken)
 }
 
 // ========================================
@@ -8819,6 +11263,10 @@ func NewThopterToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ThopterToken", NewThopterToken)
+}
+
 // ========================================
 // NewThrullToken
 // ========================================
@@ -8831,6 +11279,10 @@ func NewThrullToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("ThrullToken", NewThrullToken)
 }
 
 // ========================================
@@ -8848,6 +11300,10 @@ func NewTidalWaveWallToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TidalWaveWallToken", NewTidalWaveWallToken)
+}
+
 // ========================================
 // NewTinyToken
 // ========================================
@@ -8860,6 +11316,10 @@ func NewTinyToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("trample")
 	return tok
+}
+
+func init() {
+	Register("TinyToken", NewTinyToken)
 }
 
 // ========================================
@@ -8876,6 +11336,10 @@ func NewTitanForgeGolemToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TitanForgeGolemToken", NewTitanForgeGolemToken)
+}
+
 // ========================================
 // NewTitaniaProtectorOfArgothElementalToken
 // ========================================
@@ -8888,6 +11352,10 @@ func NewTitaniaProtectorOfArgothElementalToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(5, 3)
 	return tok
+}
+
+func init() {
+	Register("TitaniaProtectorOfArgothElementalToken", NewTitaniaProtectorOfArgothElementalToken)
 }
 
 // ========================================
@@ -8905,6 +11373,10 @@ func NewTolsimirMidnightsLightToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TolsimirMidnightsLightToken", NewTolsimirMidnightsLightToken)
+}
+
 // ========================================
 // NewTombspawnZombieToken
 // ========================================
@@ -8918,6 +11390,10 @@ func NewTombspawnZombieToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("TombspawnZombieToken", NewTombspawnZombieToken)
 }
 
 // ========================================
@@ -8935,6 +11411,10 @@ func NewToyToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ToyToken", NewToyToken)
+}
+
 // ========================================
 // NewTreasureToken
 // ========================================
@@ -8945,6 +11425,10 @@ func NewTreasureToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("TREASURE")
 	return tok
+}
+
+func init() {
+	Register("TreasureToken", NewTreasureToken)
 }
 
 // ========================================
@@ -8962,6 +11446,10 @@ func NewTreefolkShamanToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TreefolkShamanToken", NewTreefolkShamanToken)
+}
+
 // ========================================
 // NewTriskelaviteToken
 // ========================================
@@ -8975,6 +11463,10 @@ func NewTriskelaviteToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("TriskelaviteToken", NewTriskelaviteToken)
 }
 
 // ========================================
@@ -8993,6 +11485,10 @@ func NewTrollWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TrollWarriorToken", NewTrollWarriorToken)
+}
+
 // ========================================
 // NewTrooperToken
 // ========================================
@@ -9005,6 +11501,10 @@ func NewTrooperToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("TrooperToken", NewTrooperToken)
 }
 
 // ========================================
@@ -9022,6 +11522,10 @@ func NewTuktukTheReturnedToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TuktukTheReturnedToken", NewTuktukTheReturnedToken)
+}
+
 // ========================================
 // NewTuskenRaiderToken
 // ========================================
@@ -9037,6 +11541,10 @@ func NewTuskenRaiderToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TuskenRaiderToken", NewTuskenRaiderToken)
+}
+
 // ========================================
 // NewTyranid55Token
 // ========================================
@@ -9049,6 +11557,10 @@ func NewTyranid55Token() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(5, 5)
 	return tok
+}
+
+func init() {
+	Register("Tyranid55Token", NewTyranid55Token)
 }
 
 // ========================================
@@ -9067,6 +11579,10 @@ func NewTyranidGargoyleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TyranidGargoyleToken", NewTyranidGargoyleToken)
+}
+
 // ========================================
 // NewTyranidToken
 // ========================================
@@ -9079,6 +11595,10 @@ func NewTyranidToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("TyranidToken", NewTyranidToken)
 }
 
 // ========================================
@@ -9097,6 +11617,10 @@ func NewTyranidWarriorToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("TyranidWarriorToken", NewTyranidWarriorToken)
+}
+
 // ========================================
 // NewUginTheIneffableToken
 // ========================================
@@ -9108,6 +11632,10 @@ func NewUginTheIneffableToken() *Token {
 	tok.AddSubtype("SPIRIT")
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("UginTheIneffableToken", NewUginTheIneffableToken)
 }
 
 // ========================================
@@ -9124,6 +11652,10 @@ func NewUktabiKongApeToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("UktabiKongApeToken", NewUktabiKongApeToken)
+}
+
 // ========================================
 // NewUnicornToken
 // ========================================
@@ -9136,6 +11668,10 @@ func NewUnicornToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("UnicornToken", NewUnicornToken)
 }
 
 // ========================================
@@ -9154,6 +11690,10 @@ func NewUramiToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("UramiToken", NewUramiToken)
+}
+
 // ========================================
 // NewUtvaraHellkiteDragonToken
 // ========================================
@@ -9169,6 +11709,10 @@ func NewUtvaraHellkiteDragonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("UtvaraHellkiteDragonToken", NewUtvaraHellkiteDragonToken)
+}
+
 // ========================================
 // NewValorsReachTagTeamToken
 // ========================================
@@ -9181,6 +11725,10 @@ func NewValorsReachTagTeamToken() *Token {
 	tok.SetColor(Color{White: true, Red: true})
 	tok.SetPowerToughness(3, 2)
 	return tok
+}
+
+func init() {
+	Register("ValorsReachTagTeamToken", NewValorsReachTagTeamToken)
 }
 
 // ========================================
@@ -9199,6 +11747,10 @@ func NewVampireDemonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("VampireDemonToken", NewVampireDemonToken)
+}
+
 // ========================================
 // NewVampireKnightToken
 // ========================================
@@ -9213,6 +11765,10 @@ func NewVampireKnightToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("lifelink")
 	return tok
+}
+
+func init() {
+	Register("VampireKnightToken", NewVampireKnightToken)
 }
 
 // ========================================
@@ -9231,6 +11787,10 @@ func NewVampireLifelinkToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("VampireLifelinkToken", NewVampireLifelinkToken)
+}
+
 // ========================================
 // NewVampireRogueToken
 // ========================================
@@ -9245,6 +11805,10 @@ func NewVampireRogueToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("lifelink")
 	return tok
+}
+
+func init() {
+	Register("VampireRogueToken", NewVampireRogueToken)
 }
 
 // ========================================
@@ -9262,6 +11826,10 @@ func NewVampireToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("VampireToken", NewVampireToken)
+}
+
 // ========================================
 // NewVarmintToken
 // ========================================
@@ -9274,6 +11842,10 @@ func NewVarmintToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(2, 1)
 	return tok
+}
+
+func init() {
+	Register("VarmintToken", NewVarmintToken)
 }
 
 // ========================================
@@ -9292,6 +11864,10 @@ func NewVecnaToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("VecnaToken", NewVecnaToken)
+}
+
 // ========================================
 // NewVehicleToken
 // ========================================
@@ -9303,6 +11879,10 @@ func NewVehicleToken() *Token {
 	tok.AddSubtype("VEHICLE")
 	tok.SetPowerToughness(3, 2)
 	return tok
+}
+
+func init() {
+	Register("VehicleToken", NewVehicleToken)
 }
 
 // ========================================
@@ -9318,6 +11898,10 @@ func NewVirtuousRoleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("VirtuousRoleToken", NewVirtuousRoleToken)
+}
+
 // ========================================
 // NewVoiceOfResurgenceToken
 // ========================================
@@ -9330,6 +11914,10 @@ func NewVoiceOfResurgenceToken() *Token {
 	tok.SetColor(Color{White: true, Green: true})
 	tok.SetPowerToughness(0, 0)
 	return tok
+}
+
+func init() {
+	Register("VoiceOfResurgenceToken", NewVoiceOfResurgenceToken)
 }
 
 // ========================================
@@ -9347,6 +11935,10 @@ func NewVoiceOfTheWoodsElementalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("VoiceOfTheWoodsElementalToken", NewVoiceOfTheWoodsElementalToken)
+}
+
 // ========================================
 // NewVojaFriendToElvesToken
 // ========================================
@@ -9359,6 +11951,10 @@ func NewVojaFriendToElvesToken() *Token {
 	tok.SetColor(Color{White: true, Green: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("VojaFriendToElvesToken", NewVojaFriendToElvesToken)
 }
 
 // ========================================
@@ -9375,6 +11971,10 @@ func NewVojaToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("VojaToken", NewVojaToken)
+}
+
 // ========================================
 // NewVolosJournalToken
 // ========================================
@@ -9385,6 +11985,10 @@ func NewVolosJournalToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddAbility("hexproof")
 	return tok
+}
+
+func init() {
+	Register("VolosJournalToken", NewVolosJournalToken)
 }
 
 // ========================================
@@ -9399,6 +12003,10 @@ func NewVolrathsLaboratoryToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("VolrathsLaboratoryToken", NewVolrathsLaboratoryToken)
+}
+
 // ========================================
 // NewVrenRatToken
 // ========================================
@@ -9411,6 +12019,10 @@ func NewVrenRatToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("VrenRatToken", NewVrenRatToken)
 }
 
 // ========================================
@@ -9428,6 +12040,10 @@ func NewVrondissRageOfAncientsToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("VrondissRageOfAncientsToken", NewVrondissRageOfAncientsToken)
+}
+
 // ========================================
 // NewWalkerToken
 // ========================================
@@ -9440,6 +12056,10 @@ func NewWalkerToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("WalkerToken", NewWalkerToken)
 }
 
 // ========================================
@@ -9455,6 +12075,10 @@ func NewWall13Token() *Token {
 	tok.SetPowerToughness(1, 3)
 	tok.AddAbility("defender")
 	return tok
+}
+
+func init() {
+	Register("Wall13Token", NewWall13Token)
 }
 
 // ========================================
@@ -9473,6 +12097,10 @@ func NewWallFlyingToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WallFlyingToken", NewWallFlyingToken)
+}
+
 // ========================================
 // NewWallOfResurgenceToken
 // ========================================
@@ -9485,6 +12113,10 @@ func NewWallOfResurgenceToken() *Token {
 	tok.SetPowerToughness(0, 0)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("WallOfResurgenceToken", NewWallOfResurgenceToken)
 }
 
 // ========================================
@@ -9502,6 +12134,10 @@ func NewWallToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WallToken", NewWallToken)
+}
+
 // ========================================
 // NewWallWhiteToken
 // ========================================
@@ -9515,6 +12151,10 @@ func NewWallWhiteToken() *Token {
 	tok.SetPowerToughness(0, 4)
 	tok.AddAbility("defender")
 	return tok
+}
+
+func init() {
+	Register("WallWhiteToken", NewWallWhiteToken)
 }
 
 // ========================================
@@ -9532,6 +12172,10 @@ func NewWandOfTheElementsFirstToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WandOfTheElementsFirstToken", NewWandOfTheElementsFirstToken)
+}
+
 // ========================================
 // NewWandOfTheElementsSecondToken
 // ========================================
@@ -9544,6 +12188,10 @@ func NewWandOfTheElementsSecondToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("WandOfTheElementsSecondToken", NewWandOfTheElementsSecondToken)
 }
 
 // ========================================
@@ -9562,6 +12210,10 @@ func NewWardenSphinxToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WardenSphinxToken", NewWardenSphinxToken)
+}
+
 // ========================================
 // NewWarriorToken
 // ========================================
@@ -9574,6 +12226,10 @@ func NewWarriorToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("WarriorToken", NewWarriorToken)
 }
 
 // ========================================
@@ -9589,6 +12245,10 @@ func NewWarriorVigilantToken() *Token {
 	tok.SetPowerToughness(1, 1)
 	tok.AddAbility("vigilance")
 	return tok
+}
+
+func init() {
+	Register("WarriorVigilantToken", NewWarriorVigilantToken)
 }
 
 // ========================================
@@ -9607,6 +12267,10 @@ func NewWasitoraCatDragonToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WasitoraCatDragonToken", NewWasitoraCatDragonToken)
+}
+
 // ========================================
 // NewWaspToken
 // ========================================
@@ -9622,6 +12286,10 @@ func NewWaspToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WaspToken", NewWaspToken)
+}
+
 // ========================================
 // NewWastelandSurvivalGuideToken
 // ========================================
@@ -9632,6 +12300,10 @@ func NewWastelandSurvivalGuideToken() *Token {
 	tok.AddCardType(CardTypeArtifact)
 	tok.AddSubtype("EQUIPMENT")
 	return tok
+}
+
+func init() {
+	Register("WastelandSurvivalGuideToken", NewWastelandSurvivalGuideToken)
 }
 
 // ========================================
@@ -9646,6 +12318,10 @@ func NewWaylayToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("WaylayToken", NewWaylayToken)
 }
 
 // ========================================
@@ -9664,6 +12340,10 @@ func NewWeirdToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WeirdToken", NewWeirdToken)
+}
+
 // ========================================
 // NewWhiteAstartesWarriorToken
 // ========================================
@@ -9678,6 +12358,10 @@ func NewWhiteAstartesWarriorToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("vigilance")
 	return tok
+}
+
+func init() {
+	Register("WhiteAstartesWarriorToken", NewWhiteAstartesWarriorToken)
 }
 
 // ========================================
@@ -9695,6 +12379,10 @@ func NewWhiteBlackSpiritToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WhiteBlackSpiritToken", NewWhiteBlackSpiritToken)
+}
+
 // ========================================
 // NewWhiteBlueBirdToken
 // ========================================
@@ -9710,6 +12398,10 @@ func NewWhiteBlueBirdToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WhiteBlueBirdToken", NewWhiteBlueBirdToken)
+}
+
 // ========================================
 // NewWhiteDogToken
 // ========================================
@@ -9722,6 +12414,10 @@ func NewWhiteDogToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("WhiteDogToken", NewWhiteDogToken)
 }
 
 // ========================================
@@ -9739,6 +12435,10 @@ func NewWhiteElementalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WhiteElementalToken", NewWhiteElementalToken)
+}
+
 // ========================================
 // NewWickedRoleToken
 // ========================================
@@ -9750,6 +12450,10 @@ func NewWickedRoleToken() *Token {
 	tok.AddSubtype("AURA")
 	tok.AddSubtype("ROLE")
 	return tok
+}
+
+func init() {
+	Register("WickedRoleToken", NewWickedRoleToken)
 }
 
 // ========================================
@@ -9764,6 +12468,10 @@ func NewWildfireAwakenerToken() *Token {
 	tok.SetColor(Color{Red: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("WildfireAwakenerToken", NewWildfireAwakenerToken)
 }
 
 // ========================================
@@ -9781,6 +12489,10 @@ func NewWingmateRocToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WingmateRocToken", NewWingmateRocToken)
+}
+
 // ========================================
 // NewWireflyToken
 // ========================================
@@ -9794,6 +12506,10 @@ func NewWireflyToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("WireflyToken", NewWireflyToken)
 }
 
 // ========================================
@@ -9810,6 +12526,10 @@ func NewWizardToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WizardToken", NewWizardToken)
+}
+
 // ========================================
 // NewWolfToken
 // ========================================
@@ -9822,6 +12542,10 @@ func NewWolfToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("WolfToken", NewWolfToken)
 }
 
 // ========================================
@@ -9838,6 +12562,10 @@ func NewWolfsQuarryToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WolfsQuarryToken", NewWolfsQuarryToken)
+}
+
 // ========================================
 // NewWolvesOfTheHuntToken
 // ========================================
@@ -9850,6 +12578,10 @@ func NewWolvesOfTheHuntToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("WolvesOfTheHuntToken", NewWolvesOfTheHuntToken)
 }
 
 // ========================================
@@ -9867,6 +12599,10 @@ func NewWoodToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WoodToken", NewWoodToken)
+}
+
 // ========================================
 // NewWraithToken
 // ========================================
@@ -9879,6 +12615,10 @@ func NewWraithToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(3, 3)
 	return tok
+}
+
+func init() {
+	Register("WraithToken", NewWraithToken)
 }
 
 // ========================================
@@ -9896,6 +12636,10 @@ func NewWrennAndSevenTreefolkToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WrennAndSevenTreefolkToken", NewWrennAndSevenTreefolkToken)
+}
+
 // ========================================
 // NewWurm44Token
 // ========================================
@@ -9908,6 +12652,10 @@ func NewWurm44Token() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(4, 4)
 	return tok
+}
+
+func init() {
+	Register("Wurm44Token", NewWurm44Token)
 }
 
 // ========================================
@@ -9924,6 +12672,10 @@ func NewWurm55Token() *Token {
 	return tok
 }
 
+func init() {
+	Register("Wurm55Token", NewWurm55Token)
+}
+
 // ========================================
 // NewWurmCallingWurmToken
 // ========================================
@@ -9938,6 +12690,10 @@ func NewWurmCallingWurmToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WurmCallingWurmToken", NewWurmCallingWurmToken)
+}
+
 // ========================================
 // NewWurmToken
 // ========================================
@@ -9950,6 +12706,10 @@ func NewWurmToken() *Token {
 	tok.SetColor(Color{Green: true})
 	tok.SetPowerToughness(6, 6)
 	return tok
+}
+
+func init() {
+	Register("WurmToken", NewWurmToken)
 }
 
 // ========================================
@@ -9968,6 +12728,10 @@ func NewWurmWithDeathtouchToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WurmWithDeathtouchToken", NewWurmWithDeathtouchToken)
+}
+
 // ========================================
 // NewWurmWithLifelinkToken
 // ========================================
@@ -9982,6 +12746,10 @@ func NewWurmWithLifelinkToken() *Token {
 	tok.SetPowerToughness(3, 3)
 	tok.AddAbility("lifelink")
 	return tok
+}
+
+func init() {
+	Register("WurmWithLifelinkToken", NewWurmWithLifelinkToken)
 }
 
 // ========================================
@@ -9999,6 +12767,10 @@ func NewWurmWithTrampleToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("WurmWithTrampleToken", NewWurmWithTrampleToken)
+}
+
 // ========================================
 // NewXenagosSatyrToken
 // ========================================
@@ -10012,6 +12784,10 @@ func NewXenagosSatyrToken() *Token {
 	tok.SetPowerToughness(2, 2)
 	tok.AddAbility("haste")
 	return tok
+}
+
+func init() {
+	Register("XenagosSatyrToken", NewXenagosSatyrToken)
 }
 
 // ========================================
@@ -10029,6 +12805,10 @@ func NewXiraBlackInsectToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("XiraBlackInsectToken", NewXiraBlackInsectToken)
+}
+
 // ========================================
 // NewXmageToken
 // ========================================
@@ -10037,6 +12817,10 @@ func NewXiraBlackInsectToken() *Token {
 func NewXmageToken() *Token {
 	tok := NewToken("XmageToken", "")
 	return tok
+}
+
+func init() {
+	Register("XmageToken", NewXmageToken)
 }
 
 // ========================================
@@ -10050,6 +12834,10 @@ func NewYoungHeroRoleToken() *Token {
 	tok.AddSubtype("AURA")
 	tok.AddSubtype("ROLE")
 	return tok
+}
+
+func init() {
+	Register("YoungHeroRoleToken", NewYoungHeroRoleToken)
 }
 
 // ========================================
@@ -10066,6 +12854,10 @@ func NewZaxaraTheExemplaryHydraToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ZaxaraTheExemplaryHydraToken", NewZaxaraTheExemplaryHydraToken)
+}
+
 // ========================================
 // NewZendikarsRoilElementalToken
 // ========================================
@@ -10080,6 +12872,10 @@ func NewZendikarsRoilElementalToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ZendikarsRoilElementalToken", NewZendikarsRoilElementalToken)
+}
+
 // ========================================
 // NewZeppelinToken
 // ========================================
@@ -10092,6 +12888,10 @@ func NewZeppelinToken() *Token {
 	tok.SetPowerToughness(5, 5)
 	tok.AddAbility("flying")
 	return tok
+}
+
+func init() {
+	Register("ZeppelinToken", NewZeppelinToken)
 }
 
 // ========================================
@@ -10109,6 +12909,10 @@ func NewZombieArmyToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ZombieArmyToken", NewZombieArmyToken)
+}
+
 // ========================================
 // NewZombieBerserkerToken
 // ========================================
@@ -10124,6 +12928,10 @@ func NewZombieBerserkerToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ZombieBerserkerToken", NewZombieBerserkerToken)
+}
+
 // ========================================
 // NewZombieDecayedToken
 // ========================================
@@ -10136,6 +12944,10 @@ func NewZombieDecayedToken() *Token {
 	tok.SetColor(Color{Black: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("ZombieDecayedToken", NewZombieDecayedToken)
 }
 
 // ========================================
@@ -10153,6 +12965,10 @@ func NewZombieDruidToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ZombieDruidToken", NewZombieDruidToken)
+}
+
 // ========================================
 // NewZombieKnightToken
 // ========================================
@@ -10166,6 +12982,10 @@ func NewZombieKnightToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ZombieKnightToken", NewZombieKnightToken)
+}
+
 // ========================================
 // NewZombieMenaceToken
 // ========================================
@@ -10177,6 +12997,10 @@ func NewZombieMenaceToken() *Token {
 	tok.AddSubtype("ZOMBIE")
 	tok.SetColor(Color{Blue: true, Black: true})
 	return tok
+}
+
+func init() {
+	Register("ZombieMenaceToken", NewZombieMenaceToken)
 }
 
 // ========================================
@@ -10194,6 +13018,10 @@ func NewZombieMutantToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ZombieMutantToken", NewZombieMutantToken)
+}
+
 // ========================================
 // NewZombieRogueToken
 // ========================================
@@ -10207,6 +13035,10 @@ func NewZombieRogueToken() *Token {
 	tok.SetColor(Color{Blue: true, Black: true})
 	tok.SetPowerToughness(2, 2)
 	return tok
+}
+
+func init() {
+	Register("ZombieRogueToken", NewZombieRogueToken)
 }
 
 // ========================================
@@ -10223,6 +13055,10 @@ func NewZombieToken() *Token {
 	return tok
 }
 
+func init() {
+	Register("ZombieToken", NewZombieToken)
+}
+
 // ========================================
 // NewZombieWhiteToken
 // ========================================
@@ -10235,6 +13071,10 @@ func NewZombieWhiteToken() *Token {
 	tok.SetColor(Color{White: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("ZombieWhiteToken", NewZombieWhiteToken)
 }
 
 // ========================================
@@ -10250,4 +13090,8 @@ func NewZombieWizardToken() *Token {
 	tok.SetColor(Color{Blue: true, Black: true})
 	tok.SetPowerToughness(1, 1)
 	return tok
+}
+
+func init() {
+	Register("ZombieWizardToken", NewZombieWizardToken)
 }
