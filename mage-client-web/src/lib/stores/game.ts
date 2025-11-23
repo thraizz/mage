@@ -36,8 +36,8 @@ function createGameStore() {
 			ws = new MageWebSocket(url);
 
 			// Handle game state updates
-			ws.on('game_state', (data: GameState) => {
-				set(data);
+			ws.on('game_state', (data: unknown) => {
+				set(data as GameState);
 			});
 
 			// Handle incremental updates

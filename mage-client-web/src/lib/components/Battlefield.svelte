@@ -5,7 +5,8 @@
 	interface Props {
 		cards: CardType[];
 		title: string;
-		onCardClick?: (card: CardType) => void;
+		// eslint-disable-next-line no-unused-vars
+		onCardClick?: (cardItem: CardType) => void;
 	}
 
 	let { cards, title, onCardClick }: Props = $props();
@@ -15,8 +16,8 @@
 	<h2>{title} ({cards.length} creatures)</h2>
 
 	<div class="cards-grid">
-		{#each cards as card (card.id)}
-			<Card {card} onclick={() => onCardClick?.(card)} />
+		{#each cards as cardItem (cardItem.id)}
+			<Card card={cardItem} onclick={() => onCardClick?.(cardItem)} />
 		{/each}
 	</div>
 

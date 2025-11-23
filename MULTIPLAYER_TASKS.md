@@ -138,19 +138,28 @@ Set up the basic routing structure with placeholder pages for main sections.
 ---
 
 ## T006: Authentication Store
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T001
 
-**Description:**  
+**Description:**
 Create a Svelte writable store to manage authentication state (JWT token, user info).
 
 **Acceptance Criteria:**
-- [ ] Store tracks: `isAuthenticated`, `token`, `user` (username, email, id)
-- [ ] `login()` function stores token in localStorage and updates store
-- [ ] `logout()` function clears token and resets store
-- [ ] `loadAuthFromStorage()` function restores session on app load
-- [ ] Store is properly typed with TypeScript
-- [ ] Token expiry check implemented (basic JWT decode)
+- [x] Store tracks: `isAuthenticated`, `token`, `user` (username, email, id)
+- [x] `login()` function stores token in localStorage and updates store
+- [x] `logout()` function clears token and resets store
+- [x] `loadAuthFromStorage()` function restores session on app load
+- [x] Store is properly typed with TypeScript
+- [x] Token expiry check implemented (basic JWT decode)
+- [x] Test suite created for auth store functionality
+- [x] All code passes typecheck, lint, and format checks
+
+**Files Created:**
+- `src/lib/types/auth.ts` - Authentication type definitions (User, AuthState, JwtPayload, LoginCredentials, RegisterData)
+- `src/lib/utils/jwt.ts` - JWT utility functions (decodeJwt, isTokenExpired, getTokenTimeRemaining, getUserFromToken)
+- `src/lib/stores/auth.ts` - Authentication store with login/logout/loadAuthFromStorage/checkTokenValidity/updateUser
+- `src/lib/stores/__tests__/auth.test.ts` - Comprehensive test suite for auth store
+- Updated `package.json` with vitest dependencies
 
 ---
 
