@@ -164,22 +164,29 @@ Create a Svelte writable store to manage authentication state (JWT token, user i
 ---
 
 ## T007: Login Page Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T005, T006
 
-**Description:**  
+**Description:**
 Create a functional login page with form validation and authentication.
 
 **Acceptance Criteria:**
-- [ ] Form has username and password fields
-- [ ] Client-side validation (required fields, min length)
-- [ ] "Remember me" checkbox
-- [ ] Submit button with loading state
-- [ ] Error message display for failed login
-- [ ] Link to registration page
-- [ ] "Guest login" button
-- [ ] Redirects to `/lobby` on successful login
-- [ ] Form is accessible (proper labels, ARIA attributes)
+- [x] Form has username and password fields
+- [x] Client-side validation (required fields, min length)
+- [x] "Remember me" checkbox
+- [x] Submit button with loading state
+- [x] Error message display for failed login
+- [x] Link to registration page
+- [x] "Guest login" button
+- [x] Redirects to `/lobby` on successful login
+- [x] Form is accessible (proper labels, ARIA attributes)
+- [x] Simulated API calls with mock JWT tokens
+- [x] Integration with auth store
+- [x] Auto-redirect if already authenticated
+
+**Files Modified:**
+- `src/routes/login/+page.svelte` - Complete login page with form validation, loading states, guest login, and auth integration
+- Includes simulated API calls that will be replaced with actual backend calls later
 
 ---
 

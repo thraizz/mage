@@ -1,11 +1,60 @@
 {
-  "total_cards": 30097,
-  "successful": 30097,
-  "failed": 0,
-  "has_todo": 0,
-  "fully_implemented": 30097,
-  "success_rate": "100.00%",
-  "failure_rate": "0%",
-  "todo_rate": "0%",
-  "complete_rate": "100.00%"
+  "timestamp": "2025-11-23T11:00:34.923305",
+  "summary": {
+    "total": 1000,
+    "successful": 994,
+    "failed": 6,
+    "success_rate": "99.40%"
+  },
+  "error_categories": {
+    "ParseError": {
+      "count": 6,
+      "cards": [
+        "RagnarokDivineDeliverance",
+        "RainOfRiches",
+        "RedSunsTwilight",
+        "RejectImperfection",
+        "ResourcefulDefense",
+        "ReySkywalker"
+      ]
+    }
+  },
+  "failed_cards": [
+    {
+      "card_name": "RagnarokDivineDeliverance",
+      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RagnarokDivineDeliverance.java",
+      "error_type": "ParseError",
+      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RagnarokDivineDeliverance.java"
+    },
+    {
+      "card_name": "RainOfRiches",
+      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RainOfRiches.java",
+      "error_type": "ParseError",
+      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RainOfRiches.java"
+    },
+    {
+      "card_name": "RedSunsTwilight",
+      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RedSunsTwilight.java",
+      "error_type": "ParseError",
+      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RedSunsTwilight.java"
+    },
+    {
+      "card_name": "RejectImperfection",
+      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RejectImperfection.java",
+      "error_type": "ParseError",
+      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RejectImperfection.java"
+    },
+    {
+      "card_name": "ResourcefulDefense",
+      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/ResourcefulDefense.java",
+      "error_type": "ParseError",
+      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/ResourcefulDefense.java"
+    },
+    {
+      "card_name": "ReySkywalker",
+      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/ReySkywalker.java",
+      "error_type": "ParseError",
+      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/ReySkywalker.java"
+    }
+  ]
 }

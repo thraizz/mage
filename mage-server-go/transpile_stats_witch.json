@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-11-23T11:00:26.206885",
+  "summary": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0,
+    "success_rate": "100.00%"
+  },
+  "error_categories": {},
+  "failed_cards": []
+}

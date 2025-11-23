@@ -11,10 +11,12 @@ Usage:
 import os
 import re
 import sys
+import json
 import argparse
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
+from datetime import datetime
 
 
 @dataclass
@@ -1254,6 +1256,23 @@ func init() {{
             lines.append(f'\t// card.AddAbility(ability{index})')
             return '\n'.join(lines)
 
+        # Pre-process to find tokens that need variables
+        token_vars = {}
+        for effect_str in ability.effects:
+            java_effect_class, params, go_func = eval(effect_str)
+            # Process params to see what tokens are referenced
+            params_clean = self._process_effect_params(params, java_effect_class)
+            # Check if this effect uses tokens
+            token_matches = re.findall(r'token\.GetToken\("(\w+)"\)', params_clean)
+            for token_name in token_matches:
+                if token_name not in token_vars:
+                    var_name = f'token{index}_{len(token_vars)}'
+                    lines.append(f'\t{var_name}, err := token.GetToken("{token_name}")')
+                    lines.append(f'\tif err != nil {{')
+                    lines.append(f'\t\treturn nil, err')
+                    lines.append(f'\t}}')
+                    token_vars[token_name] = var_name
+
         lines.append(f'\tability{index}, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).')
 
         # Add effects
@@ -1261,6 +1280,11 @@ func init() {{
             java_effect_class, params, go_func = eval(effect_str)
             # Clean up params - process counter, token, and ability expressions
             params_clean = self._process_effect_params(params, java_effect_class)
+
+            # Replace token.GetToken calls with token variables
+            for token_name, var_name in token_vars.items():
+                params_clean = params_clean.replace(f'token.GetToken("{token_name}")', var_name)
+
             lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
 
         # Add targets
@@ -1310,6 +1334,23 @@ func init() {{
             lines.append(f'\t// card.AddAbility(ability{index})')
             return '\n'.join(lines)
 
+        # Pre-process to find tokens that need variables
+        token_vars = {}
+        for effect_str in ability.effects:
+            java_effect_class, params, go_func = eval(effect_str)
+            # Process params to see what tokens are referenced
+            params_clean = self._process_effect_params(params, java_effect_class)
+            # Check if this effect uses tokens
+            token_matches = re.findall(r'token\.GetToken\("(\w+)"\)', params_clean)
+            for token_name in token_matches:
+                if token_name not in token_vars:
+                    var_name = f'token{index}_{len(token_vars)}'
+                    lines.append(f'\t{var_name}, err := token.GetToken("{token_name}")')
+                    lines.append(f'\tif err != nil {{')
+                    lines.append(f'\t\treturn nil, err')
+                    lines.append(f'\t}}')
+                    token_vars[token_name] = var_name
+
         lines.append(f'\tability{index} := abilities.NewActivatedAbilityBuilder(card.ID).')
 
         # Add costs
@@ -1321,6 +1362,11 @@ func init() {{
             java_effect_class, params, go_func = eval(effect_str)
             # Clean up params - process counter, token, and ability expressions
             params_clean = self._process_effect_params(params, java_effect_class)
+
+            # Replace token.GetToken calls with token variables
+            for token_name, var_name in token_vars.items():
+                params_clean = params_clean.replace(f'token.GetToken("{token_name}")', var_name)
+
             lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
 
         # Add targets
@@ -1331,6 +1377,37 @@ func init() {{
         lines.append(f'\tcard.AddAbility(ability{index})')
 
         return '\n'.join(lines)
+
+    def _remove_nested_constructors(self, params: str, class_patterns: List[str]) -> str:
+        """Remove Java constructor calls with proper parenthesis balancing"""
+        for pattern in class_patterns:
+            while True:
+                # Find 'new ClassName(' with balanced parentheses
+                match = re.search(rf'new {pattern}\(', params)
+                if not match:
+                    break
+
+                start = match.start()
+                paren_start = match.end() - 1  # Position of opening '('
+
+                # Count parentheses to find matching close
+                paren_count = 1
+                i = paren_start + 1
+                while i < len(params) and paren_count > 0:
+                    if params[i] == '(':
+                        paren_count += 1
+                    elif params[i] == ')':
+                        paren_count -= 1
+                    i += 1
+
+                if paren_count == 0:
+                    # Found balanced parens - remove entire constructor call
+                    params = params[:start] + params[i:]
+                else:
+                    # Unbalanced - can't process, skip
+                    break
+
+        return params
 
     def _process_effect_params(self, params: str, effect_class: str = '') -> str:
         """Process effect parameters - convert counters, tokens, abilities, and clean up durations"""
@@ -1520,6 +1597,20 @@ func init() {{
             params
         )
 
+        # Remove common Java constructor patterns that don't translate to Go
+        # Use helper function to handle nested constructors properly
+        params = self._remove_nested_constructors(params, [
+            'GenericManaCost',
+            'FilterCard',
+            'Filter[A-Z]\\w*',  # All other filter classes
+            'CardsInAllGraveyardsCount',
+            'PermanentsOnBattlefieldCount',
+            'SimpleStaticAbility',
+            'PutIntoGraveFromBattlefieldAllTriggeredAbility',
+            'BandsWithOtherAbility',
+            'AvatarToken\\d*',  # Token references like AvatarToken2
+        ])
+
         # Clean up Duration.* arguments
         params = re.sub(r',\s*Duration\.\w+', '', params)
         params = re.sub(r'Duration\.\w+,\s*', '', params)
@@ -1527,6 +1618,21 @@ func init() {{
 
         # Clean up staticText parameters (common in effects)
         params = re.sub(r',\s*"[^"]*"', '', params)
+
+        # Clean up StaticFilters references (should be handled by filter processing)
+        params = re.sub(r'StaticFilters\.\w+', '', params)
+
+        # Clean up ability variable references like "this" or bare variable names
+        params = re.sub(r'\bthis\b', '', params)
+        params = re.sub(r'\bability\b(?!\w)', '', params)
+
+        # Clean up multiple commas and leading/trailing commas
+        params = re.sub(r',\s*,', ',', params)
+        params = re.sub(r'^\s*,\s*', '', params)
+        params = re.sub(r',\s*$', '', params)
+
+        # Clean up extra spaces
+        params = re.sub(r'\s+', ' ', params).strip()
 
         return params
 
@@ -1590,7 +1696,18 @@ func init() {{
         return 'abilities.NewAnyTargetFilter()'
 
 
-def transpile_card(java_file: str, output_dir: str) -> Optional[str]:
+@dataclass
+class TranspileResult:
+    """Result of transpiling a single card"""
+    java_file: str
+    card_name: str
+    success: bool
+    output_file: Optional[str] = None
+    error_type: Optional[str] = None
+    error_message: Optional[str] = None
+
+
+def transpile_card(java_file: str, output_dir: str) -> TranspileResult:
     """Transpile a single card file"""
     try:
         # Parse Java file
@@ -1607,11 +1724,93 @@ def transpile_card(java_file: str, output_dir: str) -> Optional[str]:
         output_file.write_text(go_code)
 
         print(f"✓ Generated: {output_file}")
-        return str(output_file)
+        return TranspileResult(
+            java_file=java_file,
+            card_name=card_data.name,
+            success=True,
+            output_file=str(output_file)
+        )
 
+    except ValueError as e:
+        # Parsing errors (class name not found, etc.)
+        error_msg = str(e)
+        print(f"✗ Error processing {java_file}: {error_msg}")
+        return TranspileResult(
+            java_file=java_file,
+            card_name=Path(java_file).stem,
+            success=False,
+            error_type="ParseError",
+            error_message=error_msg
+        )
     except Exception as e:
-        print(f"✗ Error processing {java_file}: {e}")
-        return None
+        # Other errors
+        error_msg = str(e)
+        print(f"✗ Error processing {java_file}: {error_msg}")
+        return TranspileResult(
+            java_file=java_file,
+            card_name=Path(java_file).stem,
+            success=False,
+            error_type=type(e).__name__,
+            error_message=error_msg
+        )
+
+
+def save_stats(results: List[TranspileResult], stats_file: str = "transpile_stats.json"):
+    """Save transpilation statistics to JSON file"""
+    # Categorize errors
+    error_categories = {}
+    failed_cards = []
+
+    for result in results:
+        if not result.success:
+            failed_cards.append({
+                "card_name": result.card_name,
+                "java_file": result.java_file,
+                "error_type": result.error_type,
+                "error_message": result.error_message
+            })
+
+            # Group by error type
+            error_type = result.error_type or "Unknown"
+            if error_type not in error_categories:
+                error_categories[error_type] = []
+            error_categories[error_type].append(result.card_name)
+
+    # Build statistics
+    stats = {
+        "timestamp": datetime.now().isoformat(),
+        "summary": {
+            "total": len(results),
+            "successful": sum(1 for r in results if r.success),
+            "failed": sum(1 for r in results if not r.success),
+            "success_rate": f"{(sum(1 for r in results if r.success) / len(results) * 100):.2f}%"
+        },
+        "error_categories": {
+            error_type: {
+                "count": len(cards),
+                "cards": sorted(cards)
+            }
+            for error_type, cards in sorted(error_categories.items())
+        },
+        "failed_cards": sorted(failed_cards, key=lambda x: x["card_name"])
+    }
+
+    # Write to file
+    stats_path = Path(stats_file)
+    stats_path.write_text(json.dumps(stats, indent=2))
+    print(f"\n📊 Statistics saved to {stats_file}")
+
+    # Print summary
+    print(f"\n=== Transpilation Summary ===")
+    print(f"Total: {stats['summary']['total']}")
+    print(f"Successful: {stats['summary']['successful']}")
+    print(f"Failed: {stats['summary']['failed']}")
+    print(f"Success rate: {stats['summary']['success_rate']}")
+
+    if error_categories:
+        print(f"\n=== Error Breakdown ===")
+        for error_type, cards in sorted(error_categories.items(), key=lambda x: -len(x[1])):
+            print(f"{error_type}: {len(cards)} cards")
 
 
 def main():
@@ -1625,6 +1824,8 @@ def main():
                        help='Transpile all cards in input directory')
     parser.add_argument('--limit', type=int, default=0,
                        help='Limit number of cards to transpile (0 for no limit)')
+    parser.add_argument('--stats', default='transpile_stats.json',
+                       help='Output file for statistics (default: transpile_stats.json)')
 
     args = parser.parse_args()
 
@@ -1638,12 +1839,14 @@ def main():
             print(f"Error: Java file not found: {java_file}")
             return 1
 
-        transpile_card(java_file, args.output)
+        result = transpile_card(java_file, args.output)
+
+        # Save single-card stats
+        save_stats([result], args.stats)
 
     elif args.batch:
         # Transpile all cards
-        total = 0
-        success = 0
+        results = []
 
         # Collect all Java files first
         all_files = []
@@ -1658,17 +1861,17 @@ def main():
             print(f"Processing first {args.limit} cards...")
 
         # Process all files
-        for java_file in all_files:
-            total += 1
+        for i, java_file in enumerate(all_files, 1):
             result = transpile_card(java_file, args.output)
-            if result:
-                success += 1
+            results.append(result)
 
             # Progress indicator every 100 cards
-            if total % 100 == 0:
-                print(f"Progress: {total}/{len(all_files)} cards ({success} successful)")
+            if i % 100 == 0:
+                success = sum(1 for r in results if r.success)
+                print(f"Progress: {i}/{len(all_files)} cards ({success} successful)")
 
-        print(f"\nTranspilation complete: {success}/{total} cards")
+        # Save statistics
+        save_stats(results, args.stats)
 
     else:
         parser.print_help()
