@@ -1,12 +1,21 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { auth } from '$lib/stores/auth';
+	import { websocketStore } from '$lib/stores/websocket';
 	import type { Table, GameFormat } from '$lib/types/table';
 	import type { OnlinePlayer } from '$lib/types/player';
 	import { fetchTables, fetchOnlinePlayers, getGameFormats } from '$lib/api/lobby';
+	import {
+		subscribeLobbyUpdates,
+		connectLobbyUpdates,
+		disconnectLobbyUpdates,
+		type TableUpdateEvent
+	} from '$lib/services/lobby-updates';
+	import { getMageClient } from '$lib/grpc/client';
 	import TableCard from '$lib/components/TableCard.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import CreateTableModal from '$lib/components/CreateTableModal.svelte';
+	import JoinTableModal from '$lib/components/JoinTableModal.svelte';
 	import OnlinePlayersList from '$lib/components/OnlinePlayersList.svelte';
 	import LobbyChat from '$lib/components/LobbyChat.svelte';
 
@@ -26,9 +35,14 @@
 
 	// Modal state
 	let showCreateModal = $state(false);
+	let showJoinModal = $state(false);
+	let joiningTable = $state<Table | null>(null);
 
 	// Available formats
 	const formats = getGameFormats();
+
+	// WebSocket connection state
+	let wsState = $derived($websocketStore.state);
 
 	/**
 	 * Load tables from API
@@ -92,12 +106,21 @@
 	});
 
 	/**
-	 * Handle table click - join table
+	 * Handle table click - show join modal
 	 */
 	function handleTableClick(table: Table): void {
-		// TODO: Implement join table logic
-		// For now, just navigate to table page
-		window.location.href = `/table/${table.id}`;
+		joiningTable = table;
+		showJoinModal = true;
+	}
+
+	/**
+	 * Handle successful table join
+	 */
+	function handleTableJoined(tableId: string): void {
+		showJoinModal = false;
+		joiningTable = null;
+		// Navigate to table page
+		window.location.href = `/table/${tableId}`;
 	}
 
 	/**
@@ -140,6 +163,65 @@
 		window.location.href = `/table/${tableId}`;
 	}
 
+	// WebSocket subscription cleanup function
+	let unsubscribeLobby: (() => void) | null = null;
+
+	/**
+	 * Handle table updates from WebSocket
+	 */
+	function handleTableUpdate(event: TableUpdateEvent): void {
+		console.log('[Lobby] Table update:', event.type, event.table.id);
+
+		switch (event.type) {
+			case 'created':
+			case 'updated': {
+				// Find existing table
+				const existingIndex = tables.findIndex((t) => t.id === event.table.id);
+
+				if (existingIndex >= 0) {
+					// Update existing table
+					tables[existingIndex] = event.table;
+					// Trigger reactivity
+					tables = [...tables];
+				} else {
+					// Add new table with animation
+					tables = [...tables, event.table];
+				}
+				break;
+			}
+			case 'deleted': {
+				// Remove table
+				tables = tables.filter((t) => t.id !== event.table.id);
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Connect to WebSocket for real-time updates
+	 */
+	async function connectWebSocket(): Promise<void> {
+		try {
+			const client = getMageClient();
+			const sessionId = client.getSessionId();
+
+			if (!sessionId) {
+				console.warn('[Lobby] No session ID available for WebSocket connection');
+				return;
+			}
+
+			// Connect to WebSocket
+			await connectLobbyUpdates(sessionId);
+
+			// Subscribe to table updates
+			unsubscribeLobby = subscribeLobbyUpdates(handleTableUpdate);
+
+			console.log('[Lobby] WebSocket connected and subscribed to updates');
+		} catch (err) {
+			console.error('[Lobby] Failed to connect WebSocket:', err);
+		}
+	}
+
 	// Load tables and online players on mount
 	// Wait for auth to be ready before making API calls
 	onMount(() => {
@@ -147,17 +229,35 @@
 		const checkAuth = () => {
 			if ($auth.isAuthenticated) {
 				// Give a small delay to ensure sessionId is restored
-				setTimeout(() => {
-					loadTables();
-					loadOnlinePlayers();
+				setTimeout(async () => {
+					// Load initial data
+					await loadTables();
+					await loadOnlinePlayers();
+
+					// Connect WebSocket for real-time updates
+					await connectWebSocket();
 				}, 100);
 			} else {
 				// Wait a bit and check again
 				setTimeout(checkAuth, 100);
 			}
 		};
-		
+
 		checkAuth();
+	});
+
+	// Cleanup on unmount
+	onDestroy(() => {
+		// Unsubscribe from lobby updates
+		if (unsubscribeLobby) {
+			unsubscribeLobby();
+			unsubscribeLobby = null;
+		}
+
+		// Disconnect WebSocket
+		disconnectLobbyUpdates();
+
+		console.log('[Lobby] Cleaned up WebSocket subscriptions');
 	});
 </script>
 
@@ -179,6 +279,17 @@
 							<span class="total-count">{tables.length}</span>
 						{/if}
 						{filteredTables().length === 1 ? 'table' : 'tables'}
+					</span>
+				{/if}
+				{#if wsState === 'connected'}
+					<span class="ws-status ws-connected" title="Real-time updates active">
+						<span class="ws-dot"></span>
+						Live
+					</span>
+				{:else if wsState === 'reconnecting'}
+					<span class="ws-status ws-reconnecting" title="Reconnecting...">
+						<span class="ws-dot"></span>
+						Reconnecting
 					</span>
 				{/if}
 			</div>
@@ -369,6 +480,9 @@
 	onSuccess={handleTableCreated}
 />
 
+<!-- Join Table Modal -->
+<JoinTableModal bind:open={showJoinModal} table={joiningTable} onSuccess={handleTableJoined} />
+
 <style>
 	.lobby-page {
 		display: flex;
@@ -420,6 +534,64 @@
 
 	.total-count {
 		opacity: 0.8;
+	}
+
+	.ws-status {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.375rem 0.75rem;
+		border-radius: 1rem;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		transition: all 0.2s;
+	}
+
+	.ws-connected {
+		background-color: #10b981;
+		color: white;
+	}
+
+	.ws-reconnecting {
+		background-color: #f59e0b;
+		color: white;
+	}
+
+	.ws-dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background-color: currentColor;
+	}
+
+	.ws-connected .ws-dot {
+		animation: pulse-dot 2s ease-in-out infinite;
+	}
+
+	.ws-reconnecting .ws-dot {
+		animation: blink-dot 1s ease-in-out infinite;
+	}
+
+	@keyframes pulse-dot {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
+	}
+
+	@keyframes blink-dot {
+		0%,
+		50%,
+		100% {
+			opacity: 1;
+		}
+		25%,
+		75% {
+			opacity: 0.3;
+		}
 	}
 
 	.header-right {

@@ -17,7 +17,7 @@ export const load: LayoutLoad = async () => {
 	if (browser) {
 		// Load authentication from localStorage if available
 		auth.loadAuthFromStorage();
-		
+
 		// Initialize connection with session keep-alive
 		// Server lease period is 120 seconds, so ping every 60 seconds to keep session alive
 		connection.initialize({
@@ -29,4 +29,3 @@ export const load: LayoutLoad = async () => {
 
 	return {};
 };
-

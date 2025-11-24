@@ -74,7 +74,7 @@ function convertTableViewToTable(view: TableView): Table {
  */
 export async function fetchTables(): Promise<Table[]> {
 	const client = getMageClient();
-	
+
 	// Ensure sessionId is available (will restore from token if needed)
 	const sessionId = await client.ensureSessionId();
 	if (!sessionId) {
@@ -89,7 +89,7 @@ export async function fetchTables(): Promise<Table[]> {
 
 	// Get all tables in the room
 	const response = await client.getAllTables(roomResponse.roomId);
-	
+
 	// Convert TableView[] to Table[]
 	return response.tables.map(convertTableViewToTable);
 }

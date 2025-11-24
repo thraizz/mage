@@ -39,6 +39,10 @@ type TargetRequirement struct {
 	Optional bool
 	// Description is a human-readable description of the target requirement
 	Description string
+	// SourceID is the ID of the spell/ability doing the targeting (for hexproof/protection checks)
+	SourceID string
+	// ControllerID is the ID of the player controlling the source (for hexproof checks)
+	ControllerID string
 }
 
 // TargetSelection represents a player's target selection for a spell or ability.

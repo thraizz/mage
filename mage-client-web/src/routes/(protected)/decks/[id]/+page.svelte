@@ -101,7 +101,9 @@
 <ConfirmDialog
 	bind:open={showDeleteConfirm}
 	title="Delete Deck"
-	message={deck ? `Are you sure you want to delete "${deck.name}"? This action cannot be undone.` : 'Are you sure?'}
+	message={deck
+		? `Are you sure you want to delete "${deck.name}"? This action cannot be undone.`
+		: 'Are you sure?'}
 	confirmText={isDeleting ? 'Deleting...' : 'Delete'}
 	cancelText="Cancel"
 	destructive={true}

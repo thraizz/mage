@@ -144,7 +144,7 @@ function createConnectionStore() {
 		try {
 			const client = getMageClient();
 			const response = await client.ping();
-			
+
 			// Check if ping was successful
 			if (response.success) {
 				handlePong();

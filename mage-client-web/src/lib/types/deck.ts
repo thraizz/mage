@@ -13,6 +13,7 @@ export interface Deck {
 	isValid: boolean;
 	mainDeck: DeckCard[];
 	sideboard: DeckCard[];
+	commanders: DeckCard[]; // For Commander format
 }
 
 export interface DeckCard {

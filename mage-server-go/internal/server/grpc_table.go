@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/magefree/mage-server-go/internal/repository"
@@ -707,6 +708,15 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 		}
 	}
 
+	// Validate all card names exist in the database
+	allCardNames := append(mainDeckNames, sideboardNames...)
+	if err := s.validateCardNames(ctx, allCardNames); err != nil {
+		return &pb.DeckSubmitResponse{
+			Success: false,
+			Error:   err.Error(),
+		}, nil
+	}
+
 	deckList := table.DeckList{
 		MainDeck:  mainDeckNames,
 		Sideboard: sideboardNames,
@@ -808,6 +818,22 @@ func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb
 		}
 	}
 
+	var commanderNames []string
+	for _, card := range deck.GetCommanders() {
+		for i := int32(0); i < card.GetQuantity(); i++ {
+			commanderNames = append(commanderNames, card.GetName())
+		}
+	}
+
+	// Validate all card names exist in the database
+	allCardNames := append(append(mainDeckNames, sideboardNames...), commanderNames...)
+	if err := s.validateCardNames(ctx, allCardNames); err != nil {
+		return &pb.DeckSaveResponse{
+			Success: false,
+			Error:   err.Error(),
+		}, nil
+	}
+
 	// Create deck in repository
 	deckModel := &repository.Deck{
 		UserID:      user.ID,
@@ -816,6 +842,7 @@ func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb
 		Description: strings.TrimSpace(req.GetDescription()),
 		MainDeck:    mainDeckNames,
 		Sideboard:   sideboardNames,
+		Commanders:  commanderNames,
 	}
 
 	if err := s.deckRepo.Create(ctx, deckModel); err != nil {
@@ -1107,6 +1134,19 @@ func (s *mageServer) DeckGet(ctx context.Context, req *pb.DeckGetRequest) (*pb.D
 		}, nil
 	}
 
+	commanderCards, err := s.buildDeckCardsWithMetadata(ctx, deck.Commanders)
+	if err != nil {
+		s.logger.Error("failed to build commander cards with metadata",
+			zap.String("username", username),
+			zap.Int64("deck_id", req.GetDeckId()),
+			zap.Error(err),
+		)
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   "failed to fetch card metadata",
+		}, nil
+	}
+
 	return &pb.DeckGetResponse{
 		Success: true,
 		Info: &pb.DeckInfo{
@@ -1120,10 +1160,93 @@ func (s *mageServer) DeckGet(ctx context.Context, req *pb.DeckGetRequest) (*pb.D
 			UpdatedAt:      deck.UpdatedAt.Unix(),
 		},
 		Deck: &pb.DeckCardLists{
-			MainDeck:  mainDeckCards,
-			Sideboard: sideboardCards,
+			MainDeck:   mainDeckCards,
+			Sideboard:  sideboardCards,
+			Commanders: commanderCards,
 		},
 	}, nil
+}
+
+// normalizeCardName normalizes a card name to match database format
+// Removes punctuation (commas, apostrophes, hyphens) and normalizes spacing
+func normalizeCardName(name string) string {
+	// Trim whitespace
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return ""
+	}
+
+	// Replace common punctuation with spaces
+	name = strings.ReplaceAll(name, ",", " ")
+	name = strings.ReplaceAll(name, "'", "")
+	name = strings.ReplaceAll(name, "’", "") // Unicode apostrophe
+	name = strings.ReplaceAll(name, "-", " ")
+	name = strings.ReplaceAll(name, "/", " ")
+	name = strings.ReplaceAll(name, "//", " ")
+
+	// Normalize multiple spaces to single space
+	spaceRegex := regexp.MustCompile(`\s+`)
+	name = spaceRegex.ReplaceAllString(name, " ")
+
+	return strings.TrimSpace(name)
+}
+
+// validateCardNames checks that all card names exist in the database
+func (s *mageServer) validateCardNames(ctx context.Context, cardNames []string) error {
+	if len(cardNames) == 0 {
+		return nil
+	}
+
+	// Normalize and get unique card names to avoid duplicate database queries
+	// Map: normalized name -> original name (for error messages)
+	uniqueNames := make(map[string]string)
+	for _, name := range cardNames {
+		normalized := normalizeCardName(name)
+		if normalized != "" {
+			// Store mapping from normalized to original for error messages
+			// If multiple cards normalize to the same name, keep the first original
+			if _, exists := uniqueNames[normalized]; !exists {
+				uniqueNames[normalized] = name
+			}
+		}
+	}
+
+	// Validate each unique normalized card name (case-insensitive)
+	var invalidCards []string
+	for normalizedName, originalName := range uniqueNames {
+		cards, err := s.cardRepo.GetByNameCaseInsensitive(ctx, normalizedName)
+		if err != nil {
+			s.logger.Warn("failed to validate card",
+				zap.String("card_name", originalName),
+				zap.String("normalized", normalizedName),
+				zap.Error(err),
+			)
+			invalidCards = append(invalidCards, originalName)
+			continue
+		}
+
+		if len(cards) == 0 {
+			s.logger.Info("card not found in database",
+				zap.String("card_name", originalName),
+				zap.String("normalized", normalizedName),
+				zap.String("normalized_length", fmt.Sprintf("%d", len(normalizedName))),
+				zap.String("normalized_bytes", fmt.Sprintf("%v", []byte(normalizedName))),
+			)
+			invalidCards = append(invalidCards, originalName)
+		} else {
+			s.logger.Debug("card found in database",
+				zap.String("card_name", originalName),
+				zap.String("normalized", normalizedName),
+				zap.Int("matches", len(cards)),
+			)
+		}
+	}
+
+	if len(invalidCards) > 0 {
+		return fmt.Errorf("invalid card names: %s", strings.Join(invalidCards, ", "))
+	}
+
+	return nil
 }
 
 // buildDeckCardsWithMetadata converts card names to DeckCard messages with full metadata

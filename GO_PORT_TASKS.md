@@ -15,7 +15,7 @@ Status legend:
 - [x] Provide `MageEngine` core skeleton that tracks games, players, and actions
 - [x] Implement `TurnManager` mirroring MTG phase/step progression and priority handoff
 - [x] Introduce `StackManager` with basic push/pop mechanics and simple resolution hooks
-- [-] Extend stack resolution to support triggered abilities, replacement effects, and modal choices
+- [x] Extend stack resolution to support triggered abilities, replacement effects, and modal choices
 - [x] Implement priority windows for casting during stack resolution (e.g., mana abilities, nested responses)
   - [x] Implement mana ability activation during spell/ability resolution (Rule 117.1d, 605.3a)
     - [x] Add `ActivateManaAbility()` method that can be called during resolution
@@ -52,7 +52,7 @@ Status legend:
 - [x] Add comprehensive error handling and rollback when resolution fails
 - [x] Implement priority retention after casting (caster retains priority by default, only passes when explicitly passing)
 - [x] Add state bookmarking and rollback mechanism for error recovery
-- [ ] Implement comprehensive priority loop structure matching Java `playPriority()` pattern
+- [-] Implement comprehensive priority loop structure matching Java `playPriority()` pattern
 - [x] Implement mulligan system
 - [x] Implement game cleanup and resource disposal
 - [x] Add complete lifecycle state validation
@@ -74,15 +74,25 @@ Status legend:
 - [x] Record log message when a stack item resolves
 - [x] Auto-advance priority after resolution back to the active player
 - [x] Allow triggered abilities to be queued automatically when conditions are met
-- [ ] Support casting spells/activating abilities while another object is resolving (linked abilities)
+- [x] Support casting spells/activating abilities while another object is resolving (linked abilities)
 - [x] Implement replacement/prevention effects that modify or negate stack resolution
 - [x] Ensure stack legality checks (targets available, costs paid) prior to resolution
-- [ ] Implement target selection flow for spells/abilities requiring targets
+- [x] Implement target selection flow for spells/abilities requiring targets
 - [x] Add exhaustive integration tests covering multi-object stacks, counterspells, and priority loops
 - [x] Resolve stack one item at a time with state-based action and triggered ability checks between each resolution
 - [x] Implement triggered ability queue processing before priority (APNAP order: Active Player, Non-Active Player)
 - [x] Add `checkStateAndTriggered()` method that runs before each priority (SBA → triggers → repeat until stable)
 - [x] Handle simultaneous events between stack resolutions (process events after each resolution)
+
+## Engine Integration Systems
+- [x] Implement EnhancedStackManager with ability integration (Rule 405, 608)
+- [x] Implement AbilityRegistry for UUID-based ability tracking and retrieval
+- [x] Implement TargetSelectionManager with validation and legal target calculation (Rule 115)
+- [x] Implement ContinuousEffectsManager with automatic layer recalculation (Rule 613)
+- [x] Implement AbilityActivationManager for spell casting and ability activation workflows (Rule 601, 602, 605)
+- [x] Implement CombatIntegrationManager connecting combat steps to triggered abilities (Rule 508-510)
+- [x] Integrate PriorityManager with layer recalculation before SBA checks
+- [x] Implement event adapter bridging rules events to abilities system triggers
 
 ## Combat System
 ### Core Combat Infrastructure (P0 - Critical)
@@ -302,11 +312,11 @@ Status legend:
   - [x] Write unit tests (12 tests passing)
 - [x] **Phase 2 Complete: Ability Framework**
   - [x] Define core ability interfaces (Effect, Cost, Target, Ability)
-  - [x] Implement 10 common effects (damage, draw, destroy, counter, boost, tap, mana)
+  - [x] Implement 40+ effects (damage, draw, destroy, counter, boost, tap, mana, tokens, counters, mill, bounce, exile, search, scry, surveil, etc.)
   - [x] Implement 7 cost types (mana, tap, sacrifice, discard, pay life, composite)
   - [x] Implement 10+ target filters (any, creature, player, permanent, spell, etc.)
   - [x] Write builder API for fluent ability construction
-  - [x] Write 24 unit tests (all passing)
+  - [x] Write 8 test files with comprehensive unit tests (all passing)
 - [ ] **Phase 3: Manual Test Cards** (20 cards)
   - [ ] Implement 5 basic lands
   - [ ] Implement 3 vanilla creatures
@@ -325,15 +335,15 @@ Status legend:
   - [x] Add smart import detection (auto-add counters/token packages when needed)
   - [x] Test transpiler with complex cards (Yorvo Lord of Garenbrig, Regisaur Alpha) - ✅ Both transpile without TODOs
   - [x] Create batch generation pipeline
-  - [x] Generate all 30,439 remaining cards
-  - [ ] Fix unmapped effects (estimated 1000-2000 cards)
+  - [x] Generate all 30,439 remaining cards (30,404 files generated = 99.8% success rate)
+  - [ ] Fix unmapped effects (estimated 1000-2000 cards need manual fixes)
   - [x] Add more triggered ability types (DiesTriggeredAbility, AttacksTriggeredAbility, etc.)
   - [x] Add static ability support (GainAbilityControlledEffect, BoostControlledEffect, etc.)
   - [x] Add activated ability support (SimpleActivatedAbility with costs)
   - [ ] Manually implement complex cards (planeswalkers, transforming)
 - [ ] Build automated verification to compare Java vs Go card behavior for representative samples
 - [ ] **Re-enable disabled integration tests** that expect specific cards (8 tests disabled - see comments in test files for details)
-- [ ] Add abilities that are missing in the java implementation, e.g. face-down cards
+- [x] Add abilities that are missing in the java implementation, e.g. face-down cards
 
 ## Event System & Watchers
 - [x] Mirror Java event bus for game events

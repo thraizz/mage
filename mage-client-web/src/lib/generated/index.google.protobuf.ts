@@ -5,5 +5,5 @@
 
 /* eslint-disable */
 
-export * from "./google/protobuf/timestamp";
-export * from "./google/protobuf/any";
+export * from './google/protobuf/timestamp';
+export * from './google/protobuf/any';

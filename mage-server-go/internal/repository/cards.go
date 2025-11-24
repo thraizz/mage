@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -20,11 +22,11 @@ type Card struct {
 	Power         string
 	Toughness     string
 	RulesText     string
-	FlavorText    string
-	OriginalText  string
-	OriginalType  string
-	CN            int64
-	CardName      string
+	FlavorText    sql.NullString // Nullable
+	OriginalText  sql.NullString // Nullable
+	OriginalType  sql.NullString // Nullable
+	CN            sql.NullInt64  // Nullable - basic lands have NULL collector numbers
+	CardName      sql.NullString // Nullable - basic lands have NULL card_name
 	Rarity        string
 	CardClassName string
 	CreatedAt     time.Time
@@ -87,6 +89,44 @@ func (r *CardRepository) GetByName(ctx context.Context, name string) ([]*Card, e
 		       original_type, cn, card_name, rarity, card_class_name, created_at
 		FROM cards
 		WHERE name = $1
+		ORDER BY set_code, card_number
+	`
+
+	rows, err := r.db.Pool.Query(ctx, query, name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query cards: %w", err)
+	}
+	defer rows.Close()
+
+	cards := make([]*Card, 0)
+	for rows.Next() {
+		card := &Card{}
+		err := rows.Scan(
+			&card.ID, &card.CardNumber, &card.SetCode, &card.Name, &card.CardType,
+			&card.ManaCost, &card.Power, &card.Toughness, &card.RulesText,
+			&card.FlavorText, &card.OriginalText, &card.OriginalType, &card.CN,
+			&card.CardName, &card.Rarity, &card.CardClassName, &card.CreatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan card: %w", err)
+		}
+		cards = append(cards, card)
+	}
+
+	return cards, nil
+}
+
+// GetByNameCaseInsensitive retrieves cards by name (case-insensitive)
+func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name string) ([]*Card, error) {
+	// Trim the input name to handle any whitespace issues
+	name = strings.TrimSpace(name)
+
+	query := `
+		SELECT id, card_number, set_code, name, card_type, mana_cost,
+		       power, toughness, rules_text, flavor_text, original_text,
+		       original_type, cn, card_name, rarity, card_class_name, created_at
+		FROM cards
+		WHERE LOWER(TRIM(name)) = LOWER(TRIM($1))
 		ORDER BY set_code, card_number
 	`
 
@@ -223,14 +263,33 @@ func (r *CardRepository) Create(ctx context.Context, card *Card) error {
 
 	err := r.db.Pool.QueryRow(ctx, query,
 		card.CardNumber, card.SetCode, card.Name, card.CardType, card.ManaCost,
-		card.Power, card.Toughness, card.RulesText, card.FlavorText, card.OriginalText,
-		card.OriginalType, card.CN, card.CardName, card.Rarity, card.CardClassName,
+		card.Power, card.Toughness, card.RulesText,
+		getNullStringValue(card.FlavorText),
+		getNullStringValue(card.OriginalText),
+		getNullStringValue(card.OriginalType),
+		getNullInt64Value(card.CN), getNullStringValue(card.CardName), card.Rarity, card.CardClassName,
 	).Scan(&card.ID, &card.CreatedAt)
 
 	if err != nil {
 		return fmt.Errorf("failed to create card: %w", err)
 	}
 
+	return nil
+}
+
+// getNullStringValue returns the string value from sql.NullString, or nil if not valid
+func getNullStringValue(ns sql.NullString) interface{} {
+	if ns.Valid {
+		return ns.String
+	}
+	return nil
+}
+
+// getNullInt64Value returns the int64 value from sql.NullInt64, or nil if not valid
+func getNullInt64Value(ni sql.NullInt64) interface{} {
+	if ni.Valid {
+		return ni.Int64
+	}
 	return nil
 }
 

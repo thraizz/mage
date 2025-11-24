@@ -112,43 +112,43 @@ async function callRpc<TRequest, TResponse>(
 
 	if (!response.ok) {
 		const errorText = await response.text();
-		
+
 		// Check for authentication errors (401 Unauthorized)
 		if (response.status === 401) {
 			handleSessionError('Session expired. Please log in again.');
 		}
-		
+
 		throw new Error(`RPC ${method} failed: ${response.statusText} - ${errorText}`);
 	}
 
 	const jsonResponse = await response.json();
-	
+
 	// Convert snake_case keys to camelCase
 	// The server uses UseProtoNames: true which returns snake_case JSON
 	// but TypeScript interfaces expect camelCase
 	const convertedResponse = convertSnakeToCamel<TResponse>(jsonResponse);
-	
+
 	// Check for session errors in the response
 	// Some responses have an error field or success: false with error messages
 	if (convertedResponse && typeof convertedResponse === 'object') {
 		const responseObj = convertedResponse as Record<string, unknown>;
-		
-			// Check if response has an error field indicating session issues
-			if (responseObj.error && typeof responseObj.error === 'string') {
-				const errorMsg = responseObj.error.toLowerCase();
-				if (
-					errorMsg.includes('session not found') ||
-					errorMsg.includes('invalid or expired session') ||
-					errorMsg.includes('missing session') ||
-					errorMsg.includes('session expired')
-				) {
-					// Handle session error (logout and redirect to login)
-					handleSessionError('Session expired. Please log in again.');
-					throw new Error(responseObj.error);
-				}
+
+		// Check if response has an error field indicating session issues
+		if (responseObj.error && typeof responseObj.error === 'string') {
+			const errorMsg = responseObj.error.toLowerCase();
+			if (
+				errorMsg.includes('session not found') ||
+				errorMsg.includes('invalid or expired session') ||
+				errorMsg.includes('missing session') ||
+				errorMsg.includes('session expired')
+			) {
+				// Handle session error (logout and redirect to login)
+				handleSessionError('Session expired. Please log in again.');
+				throw new Error(responseObj.error);
 			}
+		}
 	}
-	
+
 	return convertedResponse;
 }
 
@@ -293,7 +293,11 @@ export class MageClient {
 	 * Register a new user
 	 * Email is optional
 	 */
-	async register(userName: string, password: string, email?: string): Promise<AuthRegisterResponse> {
+	async register(
+		userName: string,
+		password: string,
+		email?: string
+	): Promise<AuthRegisterResponse> {
 		const request: AuthRegisterRequest = {
 			userName,
 			password,

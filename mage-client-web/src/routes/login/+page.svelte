@@ -86,7 +86,7 @@
 
 			// Check if sessionId is in the response or already set in client
 			let sessionId = response.sessionId || client.getSessionId();
-			
+
 			// If still no sessionId, this is an error
 			if (!sessionId || sessionId.trim() === '') {
 				console.error('Login response missing sessionId:', response);
@@ -120,7 +120,7 @@
 			toast.success(`Welcome back, ${loginUsername}!`);
 
 			// Small delay to ensure everything is set before navigation
-			await new Promise(resolve => setTimeout(resolve, 50));
+			await new Promise((resolve) => setTimeout(resolve, 50));
 
 			// Redirect to original URL or lobby on successful login
 			goto(returnUrl);
@@ -263,11 +263,14 @@
 
 	function copyPasswordToClipboard() {
 		if (typeof navigator !== 'undefined' && navigator.clipboard) {
-			navigator.clipboard.writeText(guestPassword).then(() => {
-				toast.success('Password copied to clipboard!');
-			}).catch(() => {
-				toast.error('Failed to copy password');
-			});
+			navigator.clipboard
+				.writeText(guestPassword)
+				.then(() => {
+					toast.success('Password copied to clipboard!');
+				})
+				.catch(() => {
+					toast.error('Failed to copy password');
+				});
 		}
 	}
 
@@ -275,7 +278,16 @@
 		// Auto-fill credentials and trigger login
 		username = 'thraizz';
 		password = 'Test123!';
-		
+
+		// Perform login directly with dev credentials
+		await performLogin(username, password);
+	}
+
+	async function handleDevLogin2() {
+		// Auto-fill credentials and trigger login
+		username = 'thraizz2';
+		password = 'Test123!';
+
 		// Perform login directly with dev credentials
 		await performLogin(username, password);
 	}
@@ -382,6 +394,15 @@
 					Log in as thraizz
 				{/if}
 			</button>
+
+			<button type="button" class="btn-dev" on:click={handleDevLogin2} disabled={isLoading}>
+				{#if isLoading}
+					<span class="spinner" aria-hidden="true"></span>
+					Logging in...
+				{:else}
+					Log in as thraizz2
+				{/if}
+			</button>
 		{/if}
 
 		<div class="links">
@@ -402,8 +423,8 @@
 >
 	<div class="password-modal-content">
 		<p class="password-warning">
-			A guest account has been created for you. <strong>Save your password</strong> if you want to
-			play again with this account.
+			A guest account has been created for you. <strong>Save your password</strong> if you want to play
+			again with this account.
 		</p>
 
 		<div class="credentials-box">

@@ -7,6 +7,8 @@
 	import { fetchTable, toggleReady, leaveTable, startGame, kickPlayer } from '$lib/api/table';
 	import type { Table } from '$lib/types/table';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+	import TableChat from '$lib/components/TableChat.svelte';
+	import GameStartCountdown from '$lib/components/GameStartCountdown.svelte';
 
 	// Get table ID from URL
 	const tableId = $derived($page.params.id);
@@ -17,11 +19,10 @@
 	let error = $state<string | null>(null);
 	let togglingReady = $state(false);
 	let startingGame = $state(false);
+	let showCountdown = $state(false);
 
 	// Derived state
-	const currentPlayer = $derived(
-		table?.players.find((p) => p.username === $auth.user?.username)
-	);
+	const currentPlayer = $derived(table?.players.find((p) => p.username === $auth.user?.username));
 	const isHost = $derived(currentPlayer?.isHost ?? false);
 	const allPlayersReady = $derived(
 		table?.players.every((p) => p.isReady) && (table?.players.length ?? 0) >= 2
@@ -108,6 +109,16 @@
 	async function handleStartGame(): Promise<void> {
 		if (!canStartGame || startingGame || !tableId) return;
 
+		// Show countdown first
+		showCountdown = true;
+	}
+
+	/**
+	 * Handle countdown complete - actually start the game
+	 */
+	async function handleCountdownComplete(): Promise<void> {
+		if (!tableId) return;
+
 		startingGame = true;
 
 		try {
@@ -119,7 +130,16 @@
 			console.error('Failed to start game:', err);
 			setTimeout(() => (error = null), 3000);
 			startingGame = false;
+			showCountdown = false;
 		}
+	}
+
+	/**
+	 * Handle countdown cancelled
+	 */
+	function handleCountdownCancel(): void {
+		showCountdown = false;
+		startingGame = false;
 	}
 
 	/**
@@ -260,9 +280,15 @@
 		<!-- Players Grid -->
 		<div class="players-section">
 			<h2>Players</h2>
-			<div class="players-grid" style="grid-template-columns: repeat({table.maxPlayers > 4 ? 3 : 2}, 1fr);">
+			<div
+				class="players-grid"
+				style="grid-template-columns: repeat({table.maxPlayers > 4 ? 3 : 2}, 1fr);"
+			>
 				{#each table.players as player (player.id)}
-					<div class="player-slot occupied" class:is-current={player.username === currentPlayer?.username}>
+					<div
+						class="player-slot occupied"
+						class:is-current={player.username === currentPlayer?.username}
+					>
 						<div class="player-avatar">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -310,7 +336,9 @@
 				{/each}
 
 				<!-- Empty Slots -->
-				{#each Array(table.maxPlayers - table.players.length).fill(0).map((_, i) => i) as i (i)}
+				{#each Array(table.maxPlayers - table.players.length)
+					.fill(0)
+					.map((_, i) => i) as i (i)}
 					<div class="player-slot empty">
 						<div class="empty-icon">
 							<svg
@@ -335,46 +363,63 @@
 			</div>
 		</div>
 
-		<!-- Actions -->
-		<div class="actions">
-			{#if !isHost && currentPlayer}
-				<button
-					class="btn-primary btn-large"
-					class:btn-success={currentPlayer.isReady}
-					disabled={togglingReady}
-					onclick={handleToggleReady}
-				>
-					{#if togglingReady}
-						<LoadingSpinner size="small" color="white" />
-					{:else if currentPlayer.isReady}
-						✓ Ready
-					{:else}
-						Ready Up
+		<!-- Main Content Grid: Players + Chat -->
+		<div class="content-grid">
+			<div class="left-column">
+				<!-- Actions -->
+				<div class="actions">
+					{#if !isHost && currentPlayer}
+						<button
+							class="btn-primary btn-large"
+							class:btn-success={currentPlayer.isReady}
+							disabled={togglingReady}
+							onclick={handleToggleReady}
+						>
+							{#if togglingReady}
+								<LoadingSpinner size="small" color="white" />
+							{:else if currentPlayer.isReady}
+								✓ Ready
+							{:else}
+								Ready Up
+							{/if}
+						</button>
 					{/if}
-				</button>
-			{/if}
 
-			{#if isHost}
-				<button
-					class="btn-primary btn-large btn-start-game"
-					disabled={!canStartGame || startingGame}
-					onclick={handleStartGame}
-					title={!allPlayersReady ? 'All players must be ready' : 'Start the game'}
-				>
-					{#if startingGame}
-						<LoadingSpinner size="small" color="white" />
-						Starting...
-					{:else}
-						Start Game
+					{#if isHost}
+						<button
+							class="btn-primary btn-large btn-start-game"
+							disabled={!canStartGame || startingGame}
+							onclick={handleStartGame}
+							title={!allPlayersReady ? 'All players must be ready' : 'Start the game'}
+						>
+							{#if startingGame}
+								<LoadingSpinner size="small" color="white" />
+								Starting...
+							{:else}
+								Start Game
+							{/if}
+						</button>
+						{#if !allPlayersReady}
+							<p class="hint">Waiting for all players to ready up...</p>
+						{/if}
 					{/if}
-				</button>
-				{#if !allPlayersReady}
-					<p class="hint">Waiting for all players to ready up...</p>
-				{/if}
-			{/if}
+				</div>
+			</div>
+
+			<!-- Chat Column -->
+			<div class="chat-column">
+				<TableChat {tableId} />
+			</div>
 		</div>
 	{/if}
 </div>
+
+<!-- Game Start Countdown -->
+<GameStartCountdown
+	bind:show={showCountdown}
+	onComplete={handleCountdownComplete}
+	onCancel={handleCountdownCancel}
+/>
 
 <style>
 	.container {
@@ -665,6 +710,23 @@
 		color: white;
 	}
 
+	/* Content Grid */
+	.content-grid {
+		display: grid;
+		grid-template-columns: 1fr 400px;
+		gap: 2rem;
+		margin-top: 2rem;
+	}
+
+	.left-column {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.chat-column {
+		height: 600px;
+	}
+
 	/* Actions */
 	.actions {
 		display: flex;
@@ -738,6 +800,17 @@
 	}
 
 	/* Responsive */
+	@media (max-width: 1024px) {
+		.content-grid {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+
+		.chat-column {
+			height: 400px;
+		}
+	}
+
 	@media (max-width: 768px) {
 		.container {
 			padding: 1rem;
@@ -759,6 +832,14 @@
 		.table-info {
 			flex-direction: column;
 			gap: 1rem;
+		}
+
+		.content-grid {
+			gap: 1rem;
+		}
+
+		.chat-column {
+			height: 300px;
 		}
 	}
 </style>

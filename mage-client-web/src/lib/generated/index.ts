@@ -5,5 +5,5 @@
 
 /* eslint-disable */
 
-export * as google from "./index.google";
-export * as mage from "./index.mage";
+export * as google from './index.google';
+export * as mage from './index.mage';

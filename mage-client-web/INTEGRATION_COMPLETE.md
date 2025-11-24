@@ -9,68 +9,61 @@ All mock implementations have been successfully replaced with real gRPC client c
 ## ✅ Completed Changes
 
 ### 1. **Authentication** (`src/routes/`)
+
 - ✅ **Login Page** (`login/+page.svelte`)
   - Replaced `simulateLogin()` with `client.connectUser()`
   - Real server authentication
   - Session management with server-provided sessionId
-  
 - ✅ **Register Page** (`register/+page.svelte`)
   - Replaced `simulateRegister()` with `client.register()`
   - Auto-login after successful registration
   - Real user account creation
 
 ### 2. **Lobby API** (`src/lib/api/lobby.ts`)
+
 - ✅ **fetchTables()**
   - Now calls `client.getMainRoomId()` + `client.getAllTables()`
   - Converts `TableView[]` proto to `Table[]` client type
-  
 - ✅ **createTable()**
   - Now calls `RoomCreateTable` RPC
   - Creates real tables on the server
-  
 - ✅ **joinTable()**
   - Now calls `RoomJoinTable` RPC
   - Real table joining with password support
-  
 - ✅ **leaveTable()**
   - Now calls `RoomLeaveTableOrTournament` RPC
   - Properly leaves tables on the server
-  
 - ✅ **fetchOnlinePlayers()**
   - Now calls `RoomGetUsers` RPC
   - Shows real online players in the lobby
 
 ### 3. **Chat API** (`src/lib/api/chat.ts`)
+
 - ✅ **sendLobbyMessage()**
   - Now calls `ChatFindByRoom` + `ChatSendMessage` RPCs
   - Sends real chat messages to the server
-  
 - ✅ **joinChat() / leaveChat()**
   - New functions for joining/leaving chat rooms
   - Required for receiving WebSocket chat callbacks
-  
 - ℹ️ **fetchLobbyMessages()**
   - Note: Chat messages should come via WebSocket callbacks
   - This function now finds the chat ID but returns empty array
   - Real-time messages need WebSocket integration
 
 ### 4. **Table API** (`src/lib/api/table.ts`)
+
 - ✅ **fetchTable()**
   - Now calls `RoomGetTableById` RPC
   - Gets real-time table state
-  
 - ✅ **toggleReady()**
   - Now calls `TableSetReady` RPC (if available)
   - Sets player ready status
-  
 - ✅ **leaveTable()**
   - Now calls `RoomLeaveTableOrTournament` RPC
   - Same as lobby leaveTable
-  
 - ✅ **startGame()**
   - Now calls `MatchStart` RPC
   - Starts the actual game on the server
-  
 - ⚠️ **kickPlayer()**
   - Placeholder - may require admin privileges
   - Not all servers expose this via regular RPC
@@ -93,6 +86,7 @@ ChatMessage (proto) → ChatMessage (client)
 ### **Session Management**
 
 All RPC calls now properly use:
+
 - `sessionId` from `MageClient.getSessionId()`
 - Auto-logout on authentication errors
 - JWT token stored in localStorage
@@ -108,6 +102,7 @@ All RPC calls now properly use:
 ## 🚀 What's Working Now
 
 ### **Fully Functional:**
+
 1. ✅ User registration
 2. ✅ User login (with real server authentication)
 3. ✅ Guest login
@@ -123,6 +118,7 @@ All RPC calls now properly use:
 13. ✅ Game starting
 
 ### **Requires WebSocket Integration:**
+
 - 🔜 Real-time chat message reception
 - 🔜 Real-time table updates
 - 🔜 Real-time game state updates
@@ -136,11 +132,13 @@ All RPC calls now properly use:
 ### **Priority 1: WebSocket Integration**
 
 The client already has:
+
 - ✅ WebSocket client implemented (`src/lib/websocket.ts`)
 - ✅ All callback types defined (`src/lib/generated/mage/v1/websocket.ts`)
 - ✅ Connection state management (`src/lib/stores/connection.ts`)
 
 **What's needed:**
+
 1. Connect WebSocket client to server
 2. Route callback messages to appropriate handlers
 3. Update UI components to listen for callbacks
@@ -148,6 +146,7 @@ The client already has:
 ### **Priority 2: Testing**
 
 With a running Go server:
+
 ```bash
 # Start server
 cd ../mage-server-go
@@ -159,6 +158,7 @@ bun run dev
 ```
 
 Test each feature:
+
 - [ ] Register a new account
 - [ ] Login with credentials
 - [ ] View tables in lobby
@@ -182,6 +182,7 @@ Test each feature:
 ### **Debugging RPC Calls**
 
 Check the browser console for:
+
 ```
 [gRPC] Calling RoomGetAllTables...
 [gRPC] Response: { tables: [...] }
@@ -200,13 +201,11 @@ If the server is not running, you'll see connection errors. The client will show
 3. Call via `client.call<TRequest, TResponse>(methodName, request)`
 
 Example:
+
 ```typescript
 import type { MyRequest, MyResponse } from '$lib/generated/mage/v1/room';
 
-const response = await client.call<MyRequest, MyResponse>(
-  'MyRpcMethod',
-  { sessionId, ...params }
-);
+const response = await client.call<MyRequest, MyResponse>('MyRpcMethod', { sessionId, ...params });
 ```
 
 ---
@@ -214,6 +213,7 @@ const response = await client.call<MyRequest, MyResponse>(
 ## 📊 Statistics
 
 **Files Modified:** 5
+
 - `src/routes/login/+page.svelte`
 - `src/routes/register/+page.svelte`
 - `src/lib/api/lobby.ts`
@@ -225,6 +225,7 @@ const response = await client.call<MyRequest, MyResponse>(
 **Mock Data Removed:** 100%
 
 **RPC Methods Integrated:** 15+
+
 - ConnectUser
 - AuthRegister
 - ServerGetMainRoomId
@@ -250,6 +251,7 @@ The mage-client-web is now a **fully functional gRPC client** that communicates 
 **Status: Production Ready (minus WebSocket streaming)**
 
 All request/response RPCs are working. The client can:
+
 - Authenticate users
 - Manage decks
 - List and join tables
@@ -257,4 +259,3 @@ All request/response RPCs are working. The client can:
 - Start games
 
 Real-time features (live chat, game state updates) require WebSocket connection.
-

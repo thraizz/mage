@@ -1,6 +1,7 @@
 package game
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -961,6 +962,337 @@ func joinStrings(strs []string) string {
 		result += s
 	}
 	return result
+}
+
+// ==============================================================================
+// CDA (Characteristic-Defining Ability) Support - Rule 604
+// ==============================================================================
+
+// GetAllCardsInZone returns all cards in a specific zone
+// Used by CDAs like Tarmogoyf (counts card types in graveyards)
+func (gc *GameContext) GetAllCardsInZone(ctx context.Context, zone int) []abilities.CardInfo {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return []abilities.CardInfo{}
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	result := []abilities.CardInfo{}
+
+	// Zone constants from abilities package: 0=Library, 1=Hand, 2=Battlefield, 3=Graveyard, 4=Stack, 5=Exile, 6=Command
+	switch zone {
+	case 0: // ZoneLibrary
+		// Get all cards from all players' libraries
+		for _, player := range gameState.players {
+			for _, card := range player.Library {
+				result = append(result, &cardInfoAdapter{card: card})
+			}
+		}
+
+	case 1: // ZoneHand
+		// Get all cards from all players' hands
+		for _, player := range gameState.players {
+			for _, card := range player.Hand {
+				result = append(result, &cardInfoAdapter{card: card})
+			}
+		}
+
+	case 2: // ZoneBattlefield
+		// Get all permanents on battlefield
+		for _, card := range gameState.battlefield {
+			result = append(result, &cardInfoAdapter{card: card})
+		}
+
+	case 3: // ZoneGraveyard
+		// Get all cards from all players' graveyards
+		for _, player := range gameState.players {
+			for _, card := range player.Graveyard {
+				result = append(result, &cardInfoAdapter{card: card})
+			}
+		}
+
+	case 4: // ZoneStack
+		// Get all cards on the stack
+		// TODO: Implement when stack access method is available
+		// gameState.stack is a *rules.StackManager, not a slice
+
+	case 5: // ZoneExile
+		// Get all cards in exile
+		for _, card := range gameState.exile {
+			result = append(result, &cardInfoAdapter{card: card})
+		}
+
+	case 6: // ZoneCommand
+		// Get all cards in command zone
+		for _, card := range gameState.command {
+			result = append(result, &cardInfoAdapter{card: card})
+		}
+	}
+
+	return result
+}
+
+// GetCreaturesControlledBy returns all creatures controlled by a player
+// Used by CDAs like "power/toughness equal to creatures you control"
+func (gc *GameContext) GetCreaturesControlledBy(ctx context.Context, playerID uuid.UUID) []abilities.CardInfo {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return []abilities.CardInfo{}
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	result := []abilities.CardInfo{}
+	playerIDStr := playerID.String()
+
+	for _, card := range gameState.battlefield {
+		// Check if controlled by player and is a creature
+		if card.ControllerID == playerIDStr && isCreature(card) {
+			result = append(result, &cardInfoAdapter{card: card})
+		}
+	}
+
+	return result
+}
+
+// GetPlayerHandForCDA returns cards in a player's hand for CDA calculations
+// Used by CDAs like Maro (power/toughness equal to hand size)
+func (gc *GameContext) GetPlayerHandForCDA(ctx context.Context, playerID uuid.UUID) []abilities.CardInfo {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return []abilities.CardInfo{}
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	player, exists := gameState.players[playerID.String()]
+	if !exists {
+		return []abilities.CardInfo{}
+	}
+
+	result := make([]abilities.CardInfo, 0, len(player.Hand))
+	for _, card := range player.Hand {
+		result = append(result, &cardInfoAdapter{card: card})
+	}
+
+	return result
+}
+
+// GetCountersOnPermanent returns the number of a specific counter type on a permanent
+// Used by CDAs where power/toughness equals counter count
+func (gc *GameContext) GetCountersOnPermanent(ctx context.Context, permanentID uuid.UUID, counterType string) int {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return 0
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	permanentIDStr := permanentID.String()
+
+	// Search battlefield for the permanent
+	for _, card := range gameState.battlefield {
+		if card.ID == permanentIDStr {
+			if card.Counters == nil {
+				return 0
+			}
+			return card.Counters.GetCount(counterType)
+		}
+	}
+
+	return 0
+}
+
+// isCreature checks if a card is a creature
+func isCreature(card *internalCard) bool {
+	if card == nil {
+		return false
+	}
+	// Simple check - look for "Creature" in Type string
+	cardType := card.Type
+	if len(cardType) < 8 {
+		return false
+	}
+	for i := 0; i <= len(cardType)-8; i++ {
+		if (cardType[i] == 'C' || cardType[i] == 'c') &&
+			(cardType[i+1] == 'R' || cardType[i+1] == 'r') &&
+			(cardType[i+2] == 'E' || cardType[i+2] == 'e') &&
+			(cardType[i+3] == 'A' || cardType[i+3] == 'a') &&
+			(cardType[i+4] == 'T' || cardType[i+4] == 't') &&
+			(cardType[i+5] == 'U' || cardType[i+5] == 'u') &&
+			(cardType[i+6] == 'R' || cardType[i+6] == 'r') &&
+			(cardType[i+7] == 'E' || cardType[i+7] == 'e') {
+			return true
+		}
+	}
+	return false
+}
+
+// cardInfoAdapter adapts internalCard to abilities.CardInfo interface
+// This prevents circular dependencies between abilities and game packages
+type cardInfoAdapter struct {
+	card *internalCard
+}
+
+// GetID returns the card's unique identifier
+func (c *cardInfoAdapter) GetID() uuid.UUID {
+	id, _ := uuid.Parse(c.card.ID)
+	return id
+}
+
+// GetName returns the card's name
+func (c *cardInfoAdapter) GetName() string {
+	return c.card.Name
+}
+
+// GetTypes returns the card's types (Creature, Artifact, etc.)
+func (c *cardInfoAdapter) GetTypes() []string {
+	// Parse Type string into slice
+	// Format is like "Creature — Human Warrior" or "Instant"
+	types := []string{}
+	parts := splitOnDash(c.card.Type)
+	if len(parts) > 0 {
+		typePart := trimSpace(parts[0])
+		types = splitOnSpace(typePart)
+	}
+	return types
+}
+
+// GetSubtypes returns the card's subtypes (Human, Warrior, etc.)
+func (c *cardInfoAdapter) GetSubtypes() []string {
+	// Use the SubTypes field directly - it's already a []string
+	return c.card.SubTypes
+}
+
+// GetPower returns the card's power (for creatures)
+func (c *cardInfoAdapter) GetPower() int {
+	power, _ := parseIntOrZero(c.card.Power)
+	return power
+}
+
+// GetToughness returns the card's toughness (for creatures)
+func (c *cardInfoAdapter) GetToughness() int {
+	toughness, _ := parseIntOrZero(c.card.Toughness)
+	return toughness
+}
+
+// Helper functions for string parsing
+func splitOnDash(s string) []string {
+	result := []string{}
+	current := ""
+	for _, ch := range s {
+		if ch == '—' || ch == '-' {
+			if current != "" {
+				result = append(result, current)
+				current = ""
+			}
+		} else {
+			current += string(ch)
+		}
+	}
+	if current != "" {
+		result = append(result, current)
+	}
+	return result
+}
+
+func trimSpace(s string) string {
+	start := 0
+	end := len(s)
+
+	for start < len(s) && (s[start] == ' ' || s[start] == '\t') {
+		start++
+	}
+
+	for end > start && (s[end-1] == ' ' || s[end-1] == '\t') {
+		end--
+	}
+
+	return s[start:end]
+}
+
+func splitOnSpace(s string) []string {
+	result := []string{}
+	current := ""
+	for _, ch := range s {
+		if ch == ' ' || ch == '\t' {
+			if current != "" {
+				result = append(result, current)
+				current = ""
+			}
+		} else {
+			current += string(ch)
+		}
+	}
+	if current != "" {
+		result = append(result, current)
+	}
+	return result
+}
+
+func parseIntOrZero(s string) (int, error) {
+	if s == "" || s == "*" || s == "X" {
+		return 0, nil
+	}
+
+	// Handle cases like "1+*" for Tarmogoyf
+	if len(s) > 1 && (s[len(s)-1] == '*' || s[len(s)-1] == 'X') {
+		// Just parse the numeric part
+		numPart := ""
+		for _, ch := range s {
+			if ch >= '0' && ch <= '9' {
+				numPart += string(ch)
+			}
+		}
+		if numPart != "" {
+			result := 0
+			for _, ch := range numPart {
+				result = result*10 + int(ch-'0')
+			}
+			return result, nil
+		}
+		return 0, nil
+	}
+
+	// Simple integer parsing
+	result := 0
+	negative := false
+	start := 0
+
+	if len(s) > 0 && s[0] == '-' {
+		negative = true
+		start = 1
+	}
+
+	for i := start; i < len(s); i++ {
+		if s[i] < '0' || s[i] > '9' {
+			return 0, fmt.Errorf("invalid integer: %s", s)
+		}
+		result = result*10 + int(s[i]-'0')
+	}
+
+	if negative {
+		result = -result
+	}
+
+	return result, nil
 }
 
 // Ensure GameContext implements all required interfaces at compile time

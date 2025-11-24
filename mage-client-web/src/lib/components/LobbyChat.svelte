@@ -38,7 +38,7 @@
 	function isRateLimited(): boolean {
 		const now = Date.now();
 		// Remove timestamps older than the window
-		messageTimestamps = messageTimestamps.filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
+		messageTimestamps = messageTimestamps.filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
 		return messageTimestamps.length >= RATE_LIMIT_MAX_MESSAGES;
 	}
 
@@ -116,7 +116,11 @@
 	/**
 	 * Parse whisper command (/w username message)
 	 */
-	function parseWhisperCommand(content: string): { isWhisper: boolean; username?: string; message?: string } {
+	function parseWhisperCommand(content: string): {
+		isWhisper: boolean;
+		username?: string;
+		message?: string;
+	} {
 		const whisperRegex = /^\/w\s+(\S+)\s+(.+)$/;
 		const match = content.match(whisperRegex);
 
@@ -350,7 +354,11 @@
 						<line x1="12" y1="8" x2="12" y2="12"></line>
 						<line x1="12" y1="16" x2="12.01" y2="16"></line>
 					</svg>
-					<span>Sending too fast, wait {rateLimitCooldownSeconds} second{rateLimitCooldownSeconds !== 1 ? 's' : ''}</span>
+					<span
+						>Sending too fast, wait {rateLimitCooldownSeconds} second{rateLimitCooldownSeconds !== 1
+							? 's'
+							: ''}</span
+					>
 				</div>
 			{/if}
 		</div>

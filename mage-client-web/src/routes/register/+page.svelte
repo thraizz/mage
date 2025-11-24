@@ -137,7 +137,7 @@
 
 			// Auto-login after successful registration
 			await new Promise((resolve) => setTimeout(resolve, 500));
-			
+
 			const loginResponse = await client.connectUser(username, password);
 
 			if (!loginResponse.success) {
@@ -148,11 +148,7 @@
 			}
 
 			// Create a session-based token from server response
-			const token = createSessionToken(
-				loginResponse.sessionId,
-				loginResponse.userId,
-				username
-			);
+			const token = createSessionToken(loginResponse.sessionId, loginResponse.userId, username);
 
 			// Store in auth store
 			auth.login(token, {

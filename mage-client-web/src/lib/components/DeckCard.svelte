@@ -136,15 +136,21 @@
 	.deck-card {
 		background-color: white;
 		border-radius: 0.5rem;
-		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-		transition: box-shadow 0.2s, border-color 0.2s;
+		box-shadow:
+			0 1px 3px 0 rgba(0, 0, 0, 0.1),
+			0 1px 2px 0 rgba(0, 0, 0, 0.06);
+		transition:
+			box-shadow 0.2s,
+			border-color 0.2s;
 		padding: 1rem;
 		cursor: pointer;
 		border: 1px solid #e5e7eb;
 	}
 
 	.deck-card:hover {
-		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+		box-shadow:
+			0 10px 15px -3px rgba(0, 0, 0, 0.1),
+			0 4px 6px -2px rgba(0, 0, 0, 0.05);
 		border-color: #60a5fa;
 	}
 

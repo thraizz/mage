@@ -26,7 +26,8 @@ function convertDeckInfoToDeck(deckInfo: DeckInfo): Deck {
 		updatedAt: deckInfo.updatedAt * 1000, // Convert seconds to milliseconds
 		isValid: true, // Assume valid if returned from server
 		mainDeck: [], // Summary view doesn't include card details
-		sideboard: []
+		sideboard: [],
+		commanders: [] // Summary view doesn't include commander details
 	};
 }
 
@@ -50,7 +51,8 @@ function convertCardListsToDeckCards(cardLists: DeckCardLists) {
 
 	return {
 		mainDeck: convertCardList(cardLists.mainDeck),
-		sideboard: convertCardList(cardLists.sideboard)
+		sideboard: convertCardList(cardLists.sideboard),
+		commanders: convertCardList(cardLists.commanders || [])
 	};
 }
 
@@ -76,7 +78,10 @@ export async function fetchUserDecks(format?: string): Promise<Deck[]> {
 		if (!response.success) {
 			// Check if error indicates session expired
 			const errorMsg = response.error || 'Failed to fetch decks';
-			if (errorMsg.toLowerCase().includes('session') || errorMsg.toLowerCase().includes('expired')) {
+			if (
+				errorMsg.toLowerCase().includes('session') ||
+				errorMsg.toLowerCase().includes('expired')
+			) {
 				throw new Error('Session expired - please login again');
 			}
 			throw new Error(errorMsg);
@@ -124,7 +129,8 @@ export async function getDeckDetails(deckId: string): Promise<Deck> {
 	return {
 		...baseDeck,
 		mainDeck: cardData.mainDeck,
-		sideboard: cardData.sideboard
+		sideboard: cardData.sideboard,
+		commanders: cardData.commanders
 	};
 }
 
@@ -140,19 +146,48 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 	}
 
 	// Parse the deck list text format
-	// Expected format: "4 Lightning Bolt\n20 Mountain\n\nSideboard:\n2 Dragon's Claw"
+	// Expected format: "4 Lightning Bolt\n20 Mountain\n\nCommander:\n1 Atraxa\n\nSideboard:\n2 Dragon's Claw"
 	const lines = request.deckList.split('\n').map((line) => line.trim());
 	const mainDeckCards = new Map<string, number>();
 	const sideboardCards = new Map<string, number>();
+	const commanderCards = new Map<string, number>();
 	let inSideboard = false;
+	let inCommander = false;
+	let commanderCardsProcessed = 0;
 
 	for (const line of lines) {
 		if (!line || line.startsWith('#') || line.startsWith('//')) {
+			// Empty line: if we were in commander section and had cards, switch back to main
+			if (!line && inCommander && commanderCardsProcessed > 0) {
+				inCommander = false;
+				commanderCardsProcessed = 0;
+			}
 			continue; // Skip empty lines and comments
 		}
 
+		// Check for section markers
+		if (line.toLowerCase().includes('commander') && line.toLowerCase().includes(':')) {
+			inCommander = true;
+			inSideboard = false;
+			commanderCardsProcessed = 0;
+			continue;
+		}
 		if (line.toLowerCase().includes('sideboard')) {
 			inSideboard = true;
+			inCommander = false;
+			commanderCardsProcessed = 0;
+			continue;
+		}
+		// Support "Main:", "Deck:", "Main Deck:" as explicit main deck markers
+		if (
+			(line.toLowerCase().includes('main') || line.toLowerCase().includes('deck')) &&
+			line.toLowerCase().includes(':') &&
+			!line.toLowerCase().includes('commander') &&
+			!line.toLowerCase().includes('sideboard')
+		) {
+			inSideboard = false;
+			inCommander = false;
+			commanderCardsProcessed = 0;
 			continue;
 		}
 
@@ -161,15 +196,48 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 		if (match) {
 			const quantity = parseInt(match[1]);
 			const cardName = match[2].trim();
+
+			// In Commander format: allow up to 2 commander cards total (for partner commanders)
+			// Check BEFORE processing: if we've already processed 2+ cards, switch to main
+			if (inCommander && commanderCardsProcessed >= 2) {
+				inCommander = false;
+			} else if (inCommander && commanderCardsProcessed + quantity > 2) {
+				// If adding this card would exceed 2, switch to main before processing
+				inCommander = false;
+			}
+
 			if (inSideboard) {
 				sideboardCards.set(cardName, (sideboardCards.get(cardName) || 0) + quantity);
+			} else if (inCommander) {
+				commanderCards.set(cardName, (commanderCards.get(cardName) || 0) + quantity);
+				commanderCardsProcessed += quantity;
+				// After processing commander cards, switch to main deck for next card
+				if (commanderCardsProcessed >= 2) {
+					inCommander = false;
+				}
 			} else {
 				mainDeckCards.set(cardName, (mainDeckCards.get(cardName) || 0) + quantity);
 			}
 		} else if (line) {
 			// Single card without quantity prefix
+			// In Commander format: allow up to 2 commander cards total (for partner commanders)
+			// Check BEFORE processing: if we've already processed 2+ cards, switch to main
+			if (inCommander && commanderCardsProcessed >= 2) {
+				inCommander = false;
+			} else if (inCommander && commanderCardsProcessed + 1 > 2) {
+				// If adding this card would exceed 2, switch to main before processing
+				inCommander = false;
+			}
+
 			if (inSideboard) {
 				sideboardCards.set(line, (sideboardCards.get(line) || 0) + 1);
+			} else if (inCommander) {
+				commanderCards.set(line, (commanderCards.get(line) || 0) + 1);
+				commanderCardsProcessed += 1;
+				// After processing commander cards, switch to main deck for next card
+				if (commanderCardsProcessed >= 2) {
+					inCommander = false;
+				}
 			} else {
 				mainDeckCards.set(line, (mainDeckCards.get(line) || 0) + 1);
 			}
@@ -199,9 +267,21 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 		toughness: ''
 	}));
 
+	const commanders = Array.from(commanderCards.entries()).map(([name, quantity]) => ({
+		name,
+		quantity,
+		manaCost: '',
+		cardType: '',
+		types: [],
+		colors: [],
+		power: '',
+		toughness: ''
+	}));
+
 	const deckCardLists: DeckCardLists = {
 		mainDeck,
-		sideboard
+		sideboard,
+		commanders
 	};
 
 	const saveRequest: DeckSaveRequest = {
@@ -236,7 +316,8 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 		updatedAt: Date.now(),
 		isValid: true,
 		mainDeck: [],
-		sideboard: []
+		sideboard: [],
+		commanders: []
 	};
 }
 
@@ -256,10 +337,7 @@ export async function deleteDeck(deckId: string): Promise<void> {
 		deckId: parseInt(deckId)
 	};
 
-	const response = await client.call<DeckDeleteRequest, DeckDeleteResponse>(
-		'DeckDelete',
-		request
-	);
+	const response = await client.call<DeckDeleteRequest, DeckDeleteResponse>('DeckDelete', request);
 
 	if (!response.success) {
 		throw new Error(response.error || 'Failed to delete deck');

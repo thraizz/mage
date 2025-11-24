@@ -168,6 +168,11 @@ func (sba *StateBasedActions) checkLethalDamage(state GameStateReader) []Action 
 	actions := []Action{}
 	for _, permanent := range state.GetAllPermanents() {
 		if sba.hasType(permanent, "CREATURE") {
+			// Rule 702.12: Indestructible permanents can't be destroyed
+			if sba.hasAbility(permanent, "indestructible") {
+				continue
+			}
+
 			if permanent.Damage >= permanent.Toughness && permanent.Toughness > 0 {
 				actions = append(actions, &DestroyAction{
 					PermanentID: permanent.ID,
@@ -184,6 +189,11 @@ func (sba *StateBasedActions) checkDeathtouchDamage(state GameStateReader) []Act
 	actions := []Action{}
 	for _, permanent := range state.GetAllPermanents() {
 		if sba.hasType(permanent, "CREATURE") && permanent.Damage > 0 {
+			// Rule 702.12: Indestructible permanents can't be destroyed
+			if sba.hasAbility(permanent, "indestructible") {
+				continue
+			}
+
 			// Check if any damage source had deathtouch
 			for sourceID := range permanent.DamageSources {
 				if source, ok := state.GetPermanent(sourceID); ok {

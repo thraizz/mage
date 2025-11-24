@@ -17,6 +17,7 @@
 
 	$: cardGroups = groupCardsByType(deck.mainDeck);
 	$: sideboardCards = groupCards(deck.sideboard);
+	$: commanderCards = groupCards(deck.commanders || []);
 	$: deckStats = calculateDeckStats(deck.mainDeck);
 
 	function groupCardsByType(cards: DeckCard[]): CardGroup[] {
@@ -60,7 +61,7 @@
 
 	function calculateDeckStats(cards: DeckCard[]) {
 		const totalCards = cards.reduce((sum, c) => sum + c.quantity, 0);
-		const uniqueCards = new Set(cards.map(c => c.cardName)).size;
+		const uniqueCards = new Set(cards.map((c) => c.cardName)).size;
 
 		// Calculate mana curve from actual card data
 		const manaCurve = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -161,6 +162,17 @@
 		let deckText = `# ${deck.name}\n`;
 		deckText += `# Format: ${deck.format}\n`;
 		deckText += `# Cards: ${deck.cardCount}\n\n`;
+
+		// Commander(s)
+		if (deck.commanders && deck.commanders.length > 0) {
+			deckText += `Commander:\n`;
+			for (const card of deck.commanders) {
+				if (card.quantity > 0) {
+					deckText += `${card.quantity} ${card.cardName}\n`;
+				}
+			}
+			deckText += `\n`;
+		}
 
 		// Main deck
 		for (const card of deck.mainDeck) {
@@ -269,6 +281,12 @@
 					<div class="stat-label">Main Deck</div>
 					<div class="stat-value">{deck.mainDeck.reduce((sum, c) => sum + c.quantity, 0)}</div>
 				</div>
+				{#if deck.commanders && deck.commanders.length > 0}
+					<div class="stat-card">
+						<div class="stat-label">Commander{deck.commanders.length > 1 ? 's' : ''}</div>
+						<div class="stat-value">{deck.commanders.reduce((sum, c) => sum + c.quantity, 0)}</div>
+					</div>
+				{/if}
 				{#if deck.sideboard.length > 0}
 					<div class="stat-card">
 						<div class="stat-label">Sideboard</div>
@@ -283,7 +301,10 @@
 				<div class="mana-curve">
 					{#each deckStats.manaCurve as count, cost}
 						<div class="curve-bar">
-							<div class="bar-fill" style="height: {count > 0 ? (count / Math.max(...deckStats.manaCurve)) * 100 : 0}%">
+							<div
+								class="bar-fill"
+								style="height: {count > 0 ? (count / Math.max(...deckStats.manaCurve)) * 100 : 0}%"
+							>
 								<span class="bar-count">{count}</span>
 							</div>
 							<div class="bar-label">{cost === 7 ? '7+' : cost}</div>
@@ -314,6 +335,25 @@
 			<!-- Card List -->
 			<div class="card-list-section">
 				<h2>Card List</h2>
+
+				{#if deck.commanders && deck.commanders.length > 0}
+					<div class="card-group">
+						<h3 class="group-header commander-header">
+							Commander{deck.commanders.length > 1 ? 's' : ''} ({deck.commanders.reduce(
+								(sum, c) => sum + c.quantity,
+								0
+							)})
+						</h3>
+						<div class="card-items">
+							{#each commanderCards as card}
+								<div class="card-item commander-card">
+									<span class="card-quantity">{card.quantity}x</span>
+									<span class="card-name">{card.name}</span>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
 
 				{#each cardGroups as group}
 					<div class="card-group">
@@ -679,6 +719,11 @@
 		border-bottom: 2px solid #e5e7eb;
 	}
 
+	.commander-header {
+		color: #7c3aed;
+		border-bottom-color: #7c3aed;
+	}
+
 	.card-items {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -697,6 +742,15 @@
 
 	.card-item:hover {
 		background-color: #f3f4f6;
+	}
+
+	.commander-card {
+		background-color: #f5f3ff;
+		border-left: 3px solid #7c3aed;
+	}
+
+	.commander-card:hover {
+		background-color: #ede9fe;
 	}
 
 	.card-quantity {

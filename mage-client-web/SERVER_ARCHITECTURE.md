@@ -396,13 +396,13 @@ export interface MageServer {
 ```typescript
 // gRPC call in client.ts
 const response = await fetch(`${serverUrl}/mage.v1.MageServer/${method}`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    // Optional: JWT authentication
-    // 'Authorization': `Bearer ${token}`
-  },
-  body: JSON.stringify(request) // includes sessionId
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/json'
+		// Optional: JWT authentication
+		// 'Authorization': `Bearer ${token}`
+	},
+	body: JSON.stringify(request) // includes sessionId
 });
 ```
 
@@ -473,17 +473,17 @@ const response = await fetch(`${serverUrl}/mage.v1.MageServer/${method}`, {
 
 ### **Mock vs Real Implementations**
 
-| Component | Current | Target | How to Switch |
-|-----------|---------|--------|---------------|
-| **Login** | Mock | Real | Replace `simulateLogin()` with `client.connectUser()` |
-| **Register** | Mock | Real | Replace `simulateRegister()` with `client.register()` |
-| **Fetch Tables** | Mock | Real | Replace `MOCK_TABLES` with `client.getAllTables()` |
-| **Create Table** | Mock | Real | Call `client.call('RoomCreateTable', request)` |
-| **Join Table** | Mock | Real | Call `client.call('RoomJoinTable', request)` |
-| **Chat Messages** | Mock | Real | Use WebSocket callbacks |
-| **Fetch Decks** | ✅ Real | ✅ Real | Already using `client.call('DeckList')` |
-| **Save Deck** | ✅ Real | ✅ Real | Already using `client.call('DeckSave')` |
-| **Delete Deck** | ✅ Real | ✅ Real | Already using `client.call('DeckDelete')` |
+| Component         | Current | Target  | How to Switch                                         |
+| ----------------- | ------- | ------- | ----------------------------------------------------- |
+| **Login**         | Mock    | Real    | Replace `simulateLogin()` with `client.connectUser()` |
+| **Register**      | Mock    | Real    | Replace `simulateRegister()` with `client.register()` |
+| **Fetch Tables**  | Mock    | Real    | Replace `MOCK_TABLES` with `client.getAllTables()`    |
+| **Create Table**  | Mock    | Real    | Call `client.call('RoomCreateTable', request)`        |
+| **Join Table**    | Mock    | Real    | Call `client.call('RoomJoinTable', request)`          |
+| **Chat Messages** | Mock    | Real    | Use WebSocket callbacks                               |
+| **Fetch Decks**   | ✅ Real | ✅ Real | Already using `client.call('DeckList')`               |
+| **Save Deck**     | ✅ Real | ✅ Real | Already using `client.call('DeckSave')`               |
+| **Delete Deck**   | ✅ Real | ✅ Real | Already using `client.call('DeckDelete')`             |
 
 ### **Environment Configuration**
 
@@ -537,23 +537,23 @@ VITE_GRPC_SERVER_URL=https://api.mage.example.com
 
 ```typescript
 export enum GrpcStatusCode {
-  OK = 0,
-  CANCELLED = 1,
-  UNKNOWN = 2,
-  INVALID_ARGUMENT = 3,
-  DEADLINE_EXCEEDED = 4,
-  NOT_FOUND = 5,
-  ALREADY_EXISTS = 6,
-  PERMISSION_DENIED = 7,
-  RESOURCE_EXHAUSTED = 8,
-  FAILED_PRECONDITION = 9,
-  ABORTED = 10,
-  OUT_OF_RANGE = 11,
-  UNIMPLEMENTED = 12,
-  INTERNAL = 13,
-  UNAVAILABLE = 14,
-  DATA_LOSS = 15,
-  UNAUTHENTICATED = 16,
+	OK = 0,
+	CANCELLED = 1,
+	UNKNOWN = 2,
+	INVALID_ARGUMENT = 3,
+	DEADLINE_EXCEEDED = 4,
+	NOT_FOUND = 5,
+	ALREADY_EXISTS = 6,
+	PERMISSION_DENIED = 7,
+	RESOURCE_EXHAUSTED = 8,
+	FAILED_PRECONDITION = 9,
+	ABORTED = 10,
+	OUT_OF_RANGE = 11,
+	UNIMPLEMENTED = 12,
+	INTERNAL = 13,
+	UNAVAILABLE = 14,
+	DATA_LOSS = 15,
+	UNAUTHENTICATED = 16
 }
 ```
 
@@ -616,6 +616,7 @@ The mage-client-web uses a **two-channel architecture**:
 2. **WebSocket** - Real-time streaming updates for game state, chat, etc.
 
 The infrastructure is **fully in place**, with:
+
 - ✅ Type-safe proto definitions generated
 - ✅ gRPC client implemented and working
 - ✅ WebSocket client implemented (needs connection to server)
@@ -625,4 +626,3 @@ The infrastructure is **fully in place**, with:
 - ⚠️ Auth, lobby, and chat using mock data (easy to replace)
 
 **Next steps:** Replace mock implementations with real server calls by swapping function implementations in `src/lib/api/*.ts` files.
-

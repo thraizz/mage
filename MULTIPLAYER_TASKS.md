@@ -643,53 +643,59 @@ Add host-specific controls to the table lobby.
 ---
 
 ## T028: Table View - Table Chat
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T026, T023
 
-**Description:**  
+**Description:**
 Add table-specific chat panel to the table lobby.
 
 **Acceptance Criteria:**
-- [ ] Reuse Chat component from lobby
-- [ ] Table chat scope (only players at table)
-- [ ] Separate chat stream per table
-- [ ] Chat persists when players join/leave
-- [ ] System messages for player join/leave events
-- [ ] Clear chat when table closes
+- [x] Reuse Chat component from lobby
+- [x] Table chat scope (only players at table)
+- [x] Separate chat stream per table
+- [x] Chat persists when players join/leave
+- [x] System messages for player join/leave events
+- [x] Clear chat when table closes
+
+**Implementation:** See `TABLE_VIEW_FEATURES.md` for complete details
 
 ---
 
 ## T029: Table View - Game Start Countdown
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T026
 
-**Description:**  
+**Description:**
 Add countdown timer before game starts when all players ready.
 
 **Acceptance Criteria:**
-- [ ] When host clicks "Start Game", show 5 second countdown
-- [ ] Display countdown overlay (modal or banner)
-- [ ] Count down: 5... 4... 3... 2... 1... Starting!
-- [ ] Cancel countdown if player unreadies
-- [ ] Navigate to game view after countdown completes
-- [ ] Host can cancel countdown
+- [x] When host clicks "Start Game", show 5 second countdown
+- [x] Display countdown overlay (modal or banner)
+- [x] Count down: 5... 4... 3... 2... 1... Starting!
+- [x] Cancel countdown if player unreadies
+- [x] Navigate to game view after countdown completes
+- [x] Host can cancel countdown
+
+**Implementation:** See `TABLE_VIEW_FEATURES.md` for complete details
 
 ---
 
 ## T030: Table View - Leave Table Confirmation
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T026, T013
 
-**Description:**  
+**Description:**
 Add confirmation dialog when player tries to leave table.
 
 **Acceptance Criteria:**
-- [ ] "Leave Table" button triggers confirmation
-- [ ] Dialog shows warning: "Are you sure you want to leave?"
-- [ ] Confirm button sends leave request to API
-- [ ] On success, navigate back to lobby
-- [ ] Show toast notification on error
-- [ ] If host leaves, table closes for all players
+- [x] "Leave Table" button triggers confirmation
+- [x] Dialog shows warning: "Are you sure you want to leave?"
+- [x] Confirm button sends leave request to API
+- [x] On success, navigate back to lobby
+- [x] Show toast notification on error
+- [x] If host leaves, table closes for all players
+
+**Implementation:** Already implemented in T026-T027
 
 ---
 
@@ -794,105 +800,121 @@ Create a component to view deck details and card list.
 ---
 
 ## T035: Deck Deletion with Confirmation
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T034, T013
 
-**Description:**  
+**Description:**
 Add deck deletion functionality with confirmation dialog.
 
 **Acceptance Criteria:**
-- [ ] "Delete" button in deck viewer
-- [ ] Confirmation dialog: "Delete [Deck Name]?"
-- [ ] Warning: "This action cannot be undone"
-- [ ] API call to delete deck
-- [ ] Remove deck from list on success
-- [ ] Show toast notification
-- [ ] Handle errors gracefully
+- [x] "Delete" button in deck viewer
+- [x] Confirmation dialog: "Delete [Deck Name]?"
+- [x] Warning: "This action cannot be undone"
+- [x] API call to delete deck
+- [x] Remove deck from list on success
+- [x] Show toast notification
+- [x] Handle errors gracefully
+
+**Implementation:** Already implemented in `src/routes/(protected)/decks/[id]/+page.svelte`
 
 ---
 
 ## T036: User Profile Page - Basic Info Display
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T009, T015
 
-**Description:**  
+**Description:**
 Create user profile page displaying basic account information and stats.
 
 **Acceptance Criteria:**
-- [ ] Display username and email
-- [ ] Show join date / account created date
-- [ ] Display stats:
+- [x] Display username and email
+- [x] Show join date / account created date
+- [x] Display stats:
   - Total games played
   - Wins / Losses
   - Win rate percentage
   - Quit ratio (prominently displayed)
-- [ ] Stats cards with icons
-- [ ] Loading state while fetching profile
-- [ ] Error state if fetch fails
+- [x] Stats cards with icons
+- [x] Loading state while fetching profile
+- [x] Error state if fetch fails
+
+**Files Created:**
+- `src/lib/api/profile.ts` - Profile API functions
+- `src/lib/types/profile.ts` - Profile type definitions
+
+**Files Modified:**
+- `src/routes/(protected)/profile/+page.svelte` - Complete profile page implementation
 
 
 ---
 
 ## T037: User Profile - Change Password Form
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T036
 
-**Description:**  
+**Description:**
 Add change password functionality to user profile.
 
 **Acceptance Criteria:**
-- [ ] Form with three fields: current password, new password, confirm new password
-- [ ] Client-side validation:
+- [x] Form with three fields: current password, new password, confirm new password
+- [x] Client-side validation:
   - Current password required
   - New password min 8 characters
   - Confirm password matches new password
-- [ ] "Change Password" submit button
-- [ ] Loading state during submission
-- [ ] Success toast on password changed
-- [ ] Error messages for:
+- [x] "Change Password" submit button
+- [x] Loading state during submission
+- [x] Success toast on password changed
+- [x] Error messages for:
   - Wrong current password
   - Server errors
-- [ ] Clear form on success
+- [x] Clear form on success
+
+**Implementation:** Integrated into profile page (`src/routes/(protected)/profile/+page.svelte`)
 ---
 
 ## T038: User Profile - Recent Match History
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T036
 
-**Description:**  
+**Description:**
 Display list of recent matches on profile page.
 
 **Acceptance Criteria:**
-- [ ] Show last 10 matches
-- [ ] Each match displays:
+- [x] Show last 10 matches
+- [x] Each match displays:
   - Opponent username
   - Format
   - Result (Win/Loss/Draw)
   - Date/time
-- [ ] Result badge colored (green win, red loss, gray draw)
-- [ ] Sorted by most recent first
-- [ ] Empty state if no matches played
+- [x] Result badge colored (green win, red loss, gray draw)
+- [x] Sorted by most recent first
+- [x] Empty state if no matches played
 - [ ] Link to match details (future)
+
+**Implementation:** Integrated into profile page (`src/routes/(protected)/profile/+page.svelte`)
 
 ---
 
 ## T039: Game View - Basic Layout Structure
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T009
 
-**Description:**  
+**Description:**
 Create the basic game view layout with zones for opponent, battlefield, and player.
 
 **Acceptance Criteria:**
-- [ ] Three main sections:
+- [x] Three main sections:
   - Top: Opponent area (hand placeholder, life, library count)
   - Middle: Battlefield (shared zone)
   - Bottom: Player area (hand, life, library count)
-- [ ] Side panel for game chat
-- [ ] Game info header (format, turn count, current phase)
-- [ ] "Concede" button with prominent placement
-- [ ] Responsive layout (stack vertically on mobile)
-- [ ] Fixed positions for zones (no scrolling inside zones)
+- [x] Side panel for game chat
+- [x] Game info header (format, turn count, current phase)
+- [x] "Concede" button with prominent placement
+- [x] Responsive layout (stack vertically on mobile)
+- [x] Fixed positions for zones (no scrolling inside zones)
+
+**Files Modified:**
+- `src/routes/(protected)/game/[id]/+page.svelte` - Complete game view layout with dark theme, responsive design, and placeholder game state
 ---
 
 ## T040: Game View - Game Info Header
@@ -915,43 +937,50 @@ Create the game info header showing game state and current phase.
 ---
 
 ## T041: Game View - Player Hand Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T039
 
-**Description:**  
+**Description:**
 Create component to display player's hand with draggable cards.
 
 **Acceptance Criteria:**
-- [ ] Display cards in a horizontal row
-- [ ] Cards overlap slightly (fan layout)
-- [ ] Hover to preview card (enlarge and lift)
-- [ ] Click to select card (highlight border)
-- [ ] Multi-select with Shift+Click
-- [ ] Drag card to battlefield or other zone
-- [ ] Show card count badge
-- [ ] Responsive (stack on mobile)
-- [ ] Empty state when hand is empty
+- [x] Display cards in a horizontal row
+- [x] Cards overlap slightly (fan layout)
+- [x] Hover to preview card (enlarge and lift)
+- [x] Click to select card (highlight border)
+- [x] Multi-select with Shift+Click
+- [ ] Drag card to battlefield or other zone (future enhancement)
+- [x] Show card count badge
+- [x] Responsive (stack on mobile)
+- [x] Empty state when hand is empty
+
+**Files Created:**
+- `src/lib/components/game/PlayerHand.svelte` - Player hand component with card selection and multi-select
 
 ---
 
 ## T042: Game View - Card Component with Hover Preview
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T041
 
-**Description:**  
+**Description:**
 Create the card component with hover preview and tooltips.
 
 **Acceptance Criteria:**
-- [ ] Display card image (placeholder if not loaded)
-- [ ] Hover shows enlarged card preview
-- [ ] Preview positioned to not go off-screen
-- [ ] Show card name as tooltip
-- [ ] Display mana cost in corner
-- [ ] Show tapped state (90° rotation animation)
-- [ ] Display counters (+1/+1, etc.) as badges
-- [ ] Selection highlight (border glow)
-- [ ] Loading state for card images
-- [ ] Fallback for missing images
+- [x] Display card image (placeholder if not loaded)
+- [x] Hover shows enlarged card preview
+- [x] Preview positioned to not go off-screen
+- [x] Show card name as tooltip
+- [x] Display mana cost in corner
+- [x] Show tapped state (90° rotation animation)
+- [x] Display counters (+1/+1, etc.) as badges
+- [x] Selection highlight (border glow)
+- [x] Loading state for card images
+- [x] Fallback for missing images
+
+**Files Created:**
+- `src/lib/components/game/Card.svelte` - Reusable card component with hover preview, tapped state, counters, and mana symbols
+- `src/lib/types/game.ts` - Game state type definitions (GameCard, GameState, GamePlayer, etc.)
 
 ---
 
@@ -1017,45 +1046,44 @@ Create life total display component for both players.
 ---
 
 ## T046: Game View - Graveyard Display
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T039, T042
 
-**Description:**  
+**Description:**
 Create graveyard zone component for both players.
 
 **Acceptance Criteria:**
-- [ ] Shows top card of graveyard (if any)
-- [ ] Card count badge
-- [ ] Click to expand and view all cards
-- [ ] Modal or side panel shows full graveyard
-- [ ] Cards in graveyard are hoverable (preview)
-- [ ] Close button to collapse graveyard view
-- [ ] Empty state when graveyard is empty
-- [ ] Separate graveyards for each player
+- [x] Shows top card of graveyard (if any)
+- [x] Card count badge
+- [x] Click to expand and view all cards
+- [x] Modal or side panel shows full graveyard
+- [x] Cards in graveyard are hoverable (preview)
+- [x] Close button to collapse graveyard view
+- [x] Empty state when graveyard is empty
+- [x] Separate graveyards for each player
 
-**Files to Create:**
-- `src/lib/components/game/Graveyard.svelte`
-- `src/lib/components/game/GraveyardModal.svelte`
+**Files Created:**
+- `src/lib/components/game/Graveyard.svelte` - Complete graveyard component with modal viewer and card selection
 
 ---
 
 ## T047: Game View - Exile Zone Display
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T046
 
-**Description:**  
+**Description:**
 Create exile zone component (similar to graveyard).
 
 **Acceptance Criteria:**
-- [ ] Shows exiled cards count
-- [ ] Click to expand and view all cards
-- [ ] Modal/panel shows exiled cards
-- [ ] Cards are hoverable (preview)
-- [ ] Empty state when no exiled cards
-- [ ] Different visual style from graveyard
+- [x] Shows exiled cards count
+- [x] Click to expand and view all cards
+- [x] Modal/panel shows exiled cards
+- [x] Cards are hoverable (preview)
+- [x] Empty state when no exiled cards
+- [x] Different visual style from graveyard (purple theme with sparkle animation)
 
-**Files to Create:**
-- `src/lib/components/game/ExileZone.svelte`
+**Files Created:**
+- `src/lib/components/game/ExileZone.svelte` - Exile zone component with purple theme, sparkle effects, and modal viewer
 
 ---
 
@@ -1080,24 +1108,23 @@ Create library (deck) counter display showing remaining cards.
 ---
 
 ## T049: Game View - Mana Pool Display
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T039
 
-**Description:**  
+**Description:**
 Create mana pool display showing available mana.
 
 **Acceptance Criteria:**
-- [ ] Shows mana symbols with counts (W, U, B, R, G, C)
-- [ ] Animated when mana added/spent
-- [ ] Positioned near player hand
-- [ ] Compact display (mana icons + numbers)
-- [ ] Updates in real-time
-- [ ] Empty state when no mana available
-- [ ] Accessible (ARIA labels)
+- [x] Shows mana symbols with counts (W, U, B, R, G, C)
+- [ ] Animated when mana added/spent (future enhancement)
+- [x] Positioned near player hand
+- [x] Compact display (mana icons + numbers)
+- [x] Updates in real-time
+- [x] Empty state when no mana available
+- [x] Accessible (ARIA labels)
 
-**Files to Create:**
-- `src/lib/components/game/ManaPool.svelte`
-- `src/lib/components/game/ManaSymbol.svelte`
+**Files Created:**
+- `src/lib/components/game/ManaPool.svelte` - Complete mana pool with clickable colored orbs, three size variants, and empty state
 
 ---
 

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/counters"
 	"github.com/magefree/mage-server-go/internal/game/effects"
 	"github.com/magefree/mage-server-go/internal/game/mana"
@@ -47,6 +49,27 @@ func zoneToString(zone int) string {
 	default:
 		return "UNKNOWN"
 	}
+}
+
+// Context helpers for CDA calculations
+// These allow CDAs to access game state through context
+
+// contextKey is a custom type for context keys to avoid collisions
+type contextKey string
+
+const gameIDContextKey contextKey = "gameID"
+
+// withGameID adds a game ID to the context for CDA calculations
+func withGameID(ctx context.Context, gameID string) context.Context {
+	return context.WithValue(ctx, gameIDContextKey, gameID)
+}
+
+// extractGameIDFromContext retrieves the game ID from context
+func extractGameIDFromContext(ctx context.Context) string {
+	if gameID, ok := ctx.Value(gameIDContextKey).(string); ok {
+		return gameID
+	}
+	return ""
 }
 
 // Ability ID constants matching Java keyword abilities
@@ -401,6 +424,7 @@ type engineGameState struct {
 	legality           *rules.LegalityChecker
 	targetValidator    *targeting.TargetValidator
 	layerSystem        *effects.LayerSystem
+	abilityRegistry    *AbilityRegistry             // Maps ability IDs to ability objects for retrieval
 	triggeredQueue     []*triggeredAbilityQueueItem // Queue of triggered abilities waiting to be put on stack
 	combatTriggers     []*combatTrigger             // Registered combat triggers (for cards with combat-related abilities)
 	simultaneousEvents []rules.Event                // Queue of events that happened simultaneously
@@ -474,18 +498,27 @@ type MageEngine struct {
 	// Replay recording system
 	// Records step-by-step game state for replay and spectator synchronization
 	replayRecorder *ReplayRecorder
+
+	// Critical game systems (Tier 1 gaps integration)
+	// Replacement effects (Rule 614) - ETB effects, doubling, death replacement
+	replacementEffects map[string]*effects.ReplacementManager // gameID -> manager
+
+	// TODO: Prevention effects (Rule 615) - Damage prevention, protection
+	// Prevention effects exist but need a manager similar to ReplacementManager
+	// preventionEffects map[string]*effects.PreventionManager // gameID -> manager
 }
 
 // NewMageEngine creates a new MageEngine instance
 func NewMageEngine(logger *zap.Logger) *MageEngine {
 	return &MageEngine{
-		logger:           logger,
-		games:            make(map[string]*engineGameState),
-		bookmarks:        make(map[string][]*gameStateSnapshot),
-		turnSnapshots:    make(map[string]map[int]*gameStateSnapshot),
-		rollbackTurnsMax: 4,                                    // Keep last 4 turns
-		rollbackAllowed:  true,                                 // Enable turn rollback by default
-		replayRecorder:   NewReplayRecorder(logger, "replays"), // Default replay directory
+		logger:             logger,
+		games:              make(map[string]*engineGameState),
+		bookmarks:          make(map[string][]*gameStateSnapshot),
+		turnSnapshots:      make(map[string]map[int]*gameStateSnapshot),
+		rollbackTurnsMax:   4,                                            // Keep last 4 turns
+		rollbackAllowed:    true,                                         // Enable turn rollback by default
+		replayRecorder:     NewReplayRecorder(logger, "replays"),         // Default replay directory
+		replacementEffects: make(map[string]*effects.ReplacementManager), // Per-game replacement effects
 	}
 }
 
@@ -634,6 +667,10 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 	gameState.eventBus = rules.NewEventBus()
 	gameState.watchers = rules.NewWatcherRegistry()
 	gameState.layerSystem = effects.NewLayerSystem()
+	gameState.abilityRegistry = NewAbilityRegistry()
+
+	// Initialize per-game effect managers (Rule 614)
+	e.replacementEffects[gameID] = effects.NewReplacementManager(e.logger)
 
 	// Create players
 	for i, playerID := range players {
@@ -3826,6 +3863,9 @@ func (e *MageEngine) CleanupGame(gameID string) error {
 		gameState.watchers.Clear()
 	}
 
+	// Clear effect managers (Rule 614)
+	delete(e.replacementEffects, gameID)
+
 	// Remove game from engine
 	delete(e.games, gameID)
 
@@ -5909,7 +5949,7 @@ func (e *MageEngine) assignDamageToBlockers(gameState *engineGameState, group *c
 	}
 
 	// Get attacker's power
-	power, err := e.getCreaturePower(attacker)
+	power, err := e.getCreaturePower(gameState, attacker)
 	if err != nil {
 		power = 0
 	}
@@ -6143,7 +6183,7 @@ func (e *MageEngine) AssignAttackerDamage(gameID, attackerID, playerID string, d
 		return fmt.Errorf("attacker %s not found", attackerID)
 	}
 
-	power, err := e.getCreaturePower(attacker)
+	power, err := e.getCreaturePower(gameState, attacker)
 	if err != nil {
 		power = 0
 	}
@@ -6242,7 +6282,7 @@ func (e *MageEngine) AssignBlockerDamage(gameID, blockerID, playerID string, dam
 		}
 	}
 
-	power, err := e.getCreaturePower(blocker)
+	power, err := e.getCreaturePower(gameState, blocker)
 	if err != nil {
 		power = 0
 	}
@@ -6305,7 +6345,7 @@ func (e *MageEngine) computeDefaultAttackerDamageAssignment(gameState *engineGam
 		return make(map[string]int)
 	}
 
-	power, err := e.getCreaturePower(attacker)
+	power, err := e.getCreaturePower(gameState, attacker)
 	if err != nil {
 		power = 0
 	}
@@ -6376,7 +6416,7 @@ func (e *MageEngine) computeDefaultBlockerDamageAssignment(gameState *engineGame
 		return make(map[string]int)
 	}
 
-	power, err := e.getCreaturePower(blocker)
+	power, err := e.getCreaturePower(gameState, blocker)
 	if err != nil {
 		power = 0
 	}
@@ -6864,14 +6904,21 @@ func (e *MageEngine) wasFirstStrikingCreatureInCombat(gameState *engineGameState
 }
 
 // getCreaturePower gets the power of a creature
-func (e *MageEngine) getCreaturePower(creature *internalCard) (int, error) {
+// Supports dynamic power calculation via CDAs (Characteristic-Defining Abilities) for cards with * power
+func (e *MageEngine) getCreaturePower(gameState *engineGameState, creature *internalCard) (int, error) {
 	if creature.Power == "" {
 		return 0, nil
 	}
 
-	// Parse power (handle X, *, etc.)
-	if creature.Power == "*" || creature.Power == "X" {
-		return 0, nil // TODO: Calculate dynamic power
+	// Check for dynamic power (*, X, or contains *)
+	if creature.Power == "*" || creature.Power == "X" || containsStar(creature.Power) {
+		// Try to calculate via CDA (Rule 604.3)
+		power, err := e.calculateCDAPower(gameState, creature)
+		if err == nil {
+			return power, nil
+		}
+		// Fall back to 0 if no CDA found or calculation failed
+		return 0, nil
 	}
 
 	power, err := strconv.Atoi(creature.Power)
@@ -6883,14 +6930,21 @@ func (e *MageEngine) getCreaturePower(creature *internalCard) (int, error) {
 }
 
 // getCreatureToughness gets the toughness of a creature
-func (e *MageEngine) getCreatureToughness(creature *internalCard) (int, error) {
+// Supports dynamic toughness calculation via CDAs (Characteristic-Defining Abilities) for cards with * toughness
+func (e *MageEngine) getCreatureToughness(gameState *engineGameState, creature *internalCard) (int, error) {
 	if creature.Toughness == "" {
 		return 0, nil
 	}
 
-	// Parse toughness (handle X, *, etc.)
-	if creature.Toughness == "*" || creature.Toughness == "X" {
-		return 0, nil // TODO: Calculate dynamic toughness
+	// Check for dynamic toughness (*, X, or contains *)
+	if creature.Toughness == "*" || creature.Toughness == "X" || containsStar(creature.Toughness) {
+		// Try to calculate via CDA (Rule 604.3)
+		toughness, err := e.calculateCDAToughness(gameState, creature)
+		if err == nil {
+			return toughness, nil
+		}
+		// Fall back to 0 if no CDA found or calculation failed
+		return 0, nil
 	}
 
 	toughness, err := strconv.Atoi(creature.Toughness)
@@ -6901,11 +6955,113 @@ func (e *MageEngine) getCreatureToughness(creature *internalCard) (int, error) {
 	return toughness, nil
 }
 
+// containsStar checks if a string contains an asterisk
+func containsStar(s string) bool {
+	for _, ch := range s {
+		if ch == '*' {
+			return true
+		}
+	}
+	return false
+}
+
+// calculateCDAPower calculates dynamic power via Characteristic-Defining Abilities
+// Rule 604.3: CDAs function in all zones and define characteristics
+func (e *MageEngine) calculateCDAPower(gameState *engineGameState, creature *internalCard) (int, error) {
+	if gameState.abilityRegistry == nil {
+		return 0, fmt.Errorf("ability registry not initialized")
+	}
+
+	// Create a GameContext for the CDA to use
+	gameIDUUID, err := uuid.Parse(gameState.gameID)
+	if err != nil {
+		return 0, fmt.Errorf("invalid game ID: %w", err)
+	}
+	gameContext := NewGameContext(gameIDUUID, e, e.logger)
+	ctx := withGameID(context.Background(), gameState.gameID)
+
+	// Check each ability on the creature
+	for _, abilityView := range creature.Abilities {
+		// Parse ability ID
+		abilityID, err := uuid.Parse(abilityView.ID)
+		if err != nil {
+			continue // Skip invalid IDs
+		}
+
+		// Retrieve the actual ability object from the registry
+		ability, err := gameState.abilityRegistry.GetAbility(abilityID)
+		if err != nil {
+			continue // Ability not in registry
+		}
+
+		// Check if this is a CDA that defines power
+		if cda, ok := ability.(abilities.CharacteristicDefiningAbility); ok {
+			if cda.DefinesPower() {
+				// Calculate power using the CDA
+				power, err := cda.CalculatePower(ctx, gameContext)
+				if err == nil {
+					return power, nil
+				}
+			}
+		}
+	}
+
+	// No CDA found that defines power
+	return 0, fmt.Errorf("no CDA found for dynamic power calculation")
+}
+
+// calculateCDAToughness calculates dynamic toughness via Characteristic-Defining Abilities
+// Rule 604.3: CDAs function in all zones and define characteristics
+func (e *MageEngine) calculateCDAToughness(gameState *engineGameState, creature *internalCard) (int, error) {
+	if gameState.abilityRegistry == nil {
+		return 0, fmt.Errorf("ability registry not initialized")
+	}
+
+	// Create a GameContext for the CDA to use
+	gameIDUUID, err := uuid.Parse(gameState.gameID)
+	if err != nil {
+		return 0, fmt.Errorf("invalid game ID: %w", err)
+	}
+	gameContext := NewGameContext(gameIDUUID, e, e.logger)
+	ctx := withGameID(context.Background(), gameState.gameID)
+
+	// Check each ability on the creature
+	for _, abilityView := range creature.Abilities {
+		// Parse ability ID
+		abilityID, err := uuid.Parse(abilityView.ID)
+		if err != nil {
+			continue // Skip invalid IDs
+		}
+
+		// Retrieve the actual ability object from the registry
+		ability, err := gameState.abilityRegistry.GetAbility(abilityID)
+		if err != nil {
+			continue // Ability not in registry
+		}
+
+		// Check if this is a CDA that defines toughness
+		if cda, ok := ability.(abilities.CharacteristicDefiningAbility); ok {
+			if cda.DefinesToughness() {
+				// Calculate toughness using the CDA
+				toughness, err := cda.CalculateToughness(ctx, gameContext)
+				if err == nil {
+					return toughness, nil
+				}
+			}
+		}
+	}
+
+	// No CDA found that defines toughness
+	return 0, fmt.Errorf("no CDA found for dynamic toughness calculation")
+}
+
 // getLethalDamage calculates the amount of damage needed to destroy a creature
 // This is toughness minus damage already marked on the creature
 // Deprecated: Use getLethalDamageWithAttacker instead
+// Note: This deprecated function cannot calculate dynamic toughness properly without gameState
 func (e *MageEngine) getLethalDamage(creature *internalCard, attackerID string) int {
-	toughness, err := e.getCreatureToughness(creature)
+	// Cannot pass gameState to deprecated function, dynamic toughness will be 0
+	toughness, err := e.getCreatureToughness(nil, creature)
 	if err != nil {
 		return 0
 	}
@@ -6942,7 +7098,7 @@ func (e *MageEngine) getLethalDamageWithAttacker(gameState *engineGameState, cre
 	}
 
 	// For creatures, calculate based on toughness
-	toughness, err := e.getCreatureToughness(creature)
+	toughness, err := e.getCreatureToughness(gameState, creature)
 	if err != nil {
 		return 0
 	}
@@ -7239,7 +7395,7 @@ func (e *MageEngine) applyDamageToCreature(gameState *engineGameState, creatureI
 	}
 
 	// Get creature's toughness
-	toughness, err := e.getCreatureToughness(creature)
+	toughness, err := e.getCreatureToughness(gameState, creature)
 	if err != nil {
 		toughness = 0
 	}
@@ -7383,6 +7539,67 @@ func (s *engineGameState) GetStackItemsForTarget() []targeting.TargetStackItem {
 		}
 	}
 	return result
+}
+
+// HasKeywordAbility checks if a card has a specific keyword ability
+// TODO: Implement full keyword ability checking once ability system is fully integrated
+func (s *engineGameState) HasKeywordAbility(cardID, keyword string) bool {
+	// Stub implementation - will be replaced with full ability system integration
+	return false
+}
+
+// GetProtectionQualities returns protection qualities (colors/types) for a card
+// TODO: Implement full protection quality checking once ability system is fully integrated
+func (s *engineGameState) GetProtectionQualities(cardID string) []string {
+	// Stub implementation - will be replaced with full ability system integration
+	return []string{}
+}
+
+// GetCardColor returns the color(s) of a card
+// TODO: Enhance to include color-changing effects from layer system
+func (s *engineGameState) GetCardColor(cardID string) []string {
+	// Find the card
+	for _, card := range s.battlefield {
+		if card.ID == cardID {
+			return parseColors(card.Color)
+		}
+	}
+
+	// Check other zones if needed
+	for _, player := range s.players {
+		for _, card := range player.Hand {
+			if card.ID == cardID {
+				return parseColors(card.Color)
+			}
+		}
+		for _, card := range player.Graveyard {
+			if card.ID == cardID {
+				return parseColors(card.Color)
+			}
+		}
+	}
+
+	return []string{}
+}
+
+// parseColors converts a color string like "WU" to []string{"White", "Blue"}
+func parseColors(colorStr string) []string {
+	colors := []string{}
+	for _, ch := range colorStr {
+		switch ch {
+		case 'W':
+			colors = append(colors, "White")
+		case 'U':
+			colors = append(colors, "Blue")
+		case 'B':
+			colors = append(colors, "Black")
+		case 'R':
+			colors = append(colors, "Red")
+		case 'G':
+			colors = append(colors, "Green")
+		}
+	}
+	return colors
 }
 
 // ====================================

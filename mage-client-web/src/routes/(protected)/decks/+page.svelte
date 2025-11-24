@@ -45,7 +45,16 @@
 		loadDecks();
 	}
 
-	const formats = ['Standard', 'Modern', 'Commander', 'Legacy', 'Vintage', 'Pioneer', 'Pauper', 'Historic'];
+	const formats = [
+		'Standard',
+		'Modern',
+		'Commander',
+		'Legacy',
+		'Vintage',
+		'Pioneer',
+		'Pauper',
+		'Historic'
+	];
 </script>
 
 <svelte:head>
@@ -63,7 +72,12 @@
 				</div>
 				<button class="btn-upload" on:click={handleUploadNewDeck}>
 					<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 4v16m8-8H4"
+						/>
 					</svg>
 					Upload New Deck
 				</button>
@@ -72,27 +86,21 @@
 
 		<!-- Filters -->
 		<div class="filters">
-			<label for="format" class="filter-label">
-				Filter by format:
-			</label>
-			<select
-				id="format"
-				bind:value={selectedFormat}
-				on:change={loadDecks}
-				class="format-select"
-			>
+			<label for="format" class="filter-label"> Filter by format: </label>
+			<select id="format" bind:value={selectedFormat} on:change={loadDecks} class="format-select">
 				<option value="">All Formats</option>
 				{#each formats as format}
 					<option value={format}>{format}</option>
 				{/each}
 			</select>
-			<button
-				on:click={loadDecks}
-				class="btn-refresh"
-				title="Refresh deck list"
-			>
+			<button on:click={loadDecks} class="btn-refresh" title="Refresh deck list">
 				<svg class="refresh-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+					/>
 				</svg>
 			</button>
 		</div>
@@ -108,31 +116,45 @@
 				<div class="error-content">
 					<div class="error-icon-wrapper">
 						<svg class="error-icon" fill="currentColor" viewBox="0 0 20 20">
-							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+							<path
+								fill-rule="evenodd"
+								d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+								clip-rule="evenodd"
+							/>
 						</svg>
 					</div>
 					<div class="error-text">
 						<h3>Error loading decks</h3>
 						<p>{error}</p>
-						<button class="btn-retry" on:click={loadDecks}>
-							Try Again
-						</button>
+						<button class="btn-retry" on:click={loadDecks}> Try Again </button>
 					</div>
 				</div>
 			</div>
 		{:else if decks.length === 0}
 			<div class="empty-state">
 				<svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+					/>
 				</svg>
 				<h3>No decks found</h3>
 				<p>
-					{selectedFormat ? `No ${selectedFormat} decks in your collection.` : 'Get started by uploading your first deck.'}
+					{selectedFormat
+						? `No ${selectedFormat} decks in your collection.`
+						: 'Get started by uploading your first deck.'}
 				</p>
 				<div class="empty-actions">
 					<button class="btn-upload-empty" on:click={handleUploadNewDeck}>
 						<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 4v16m8-8H4"
+							/>
 						</svg>
 						Upload Deck
 					</button>
@@ -160,7 +182,7 @@
 <!-- Deck Upload Modal -->
 <DeckUploadModal
 	open={showUploadModal}
-	on:close={() => showUploadModal = false}
+	on:close={() => (showUploadModal = false)}
 	on:success={handleUploadSuccess}
 />
 

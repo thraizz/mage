@@ -128,7 +128,7 @@ export function createSessionToken(
 ): string {
 	const now = Math.floor(Date.now() / 1000);
 	const exp = now + expiresIn;
-	
+
 	const payload = {
 		sub: userId,
 		sessionId: sessionId, // Store sessionId in payload
@@ -137,17 +137,17 @@ export function createSessionToken(
 		exp,
 		iat: now
 	};
-	
+
 	const payloadStr = JSON.stringify(payload);
 	const encodedPayload = btoa(payloadStr);
-	
+
 	// Create a JWT-like token: header.payload.signature
 	// For session tokens, we use "session" as the header type
 	const header = btoa(JSON.stringify({ typ: 'JWT', alg: 'session' }));
-	
+
 	// Use sessionId as part of the signature for validation
 	// In a real implementation, this would be signed by the server
 	const signature = btoa(sessionId).slice(0, 16); // Truncate for consistency
-	
+
 	return `${header}.${encodedPayload}.${signature}`;
 }

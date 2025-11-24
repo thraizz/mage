@@ -176,7 +176,7 @@ export function isRetryableError(error: GrpcError | unknown): boolean {
 export function isAuthError(error: GrpcError | unknown): boolean {
 	const grpcError = toGrpcError(error);
 	const message = grpcError.message?.toLowerCase() || '';
-	
+
 	// Check for authentication status codes
 	if (
 		grpcError.code === GrpcStatusCode.UNAUTHENTICATED ||
@@ -184,7 +184,7 @@ export function isAuthError(error: GrpcError | unknown): boolean {
 	) {
 		return true;
 	}
-	
+
 	// Check for "session not found" in error messages (even if status is NOT_FOUND)
 	if (
 		message.includes('session not found') ||
@@ -194,7 +194,7 @@ export function isAuthError(error: GrpcError | unknown): boolean {
 	) {
 		return true;
 	}
-	
+
 	return false;
 }
 

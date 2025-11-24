@@ -13,11 +13,13 @@ The mage-client-web communicates with the Go server using **gRPC/Protobuf over H
 The main interface for communicating with the Go server.
 
 **Server URL Configuration:**
+
 ```typescript
-serverUrl: import.meta.env.VITE_GRPC_SERVER_URL || 'http://localhost:17171'
+serverUrl: import.meta.env.VITE_GRPC_SERVER_URL || 'http://localhost:17171';
 ```
 
 **Key Features:**
+
 - Type-safe RPC method calls
 - Session ID management (stored after login)
 - JWT token authentication
@@ -29,6 +31,7 @@ serverUrl: import.meta.env.VITE_GRPC_SERVER_URL || 'http://localhost:17171'
 Generic WebSocket client for real-time bidirectional communication.
 
 **Features:**
+
 - Automatic reconnection (up to 5 attempts)
 - Message type routing
 - Event callbacks (onConnect, onDisconnect)
@@ -43,7 +46,9 @@ Generic WebSocket client for real-time bidirectional communication.
 ### **Authentication & Connection**
 
 #### 1. Login (`src/routes/login/+page.svelte`)
+
 **Status:** ⚠️ Mock Implementation
+
 ```typescript
 // Currently simulated - will be replaced with:
 const client = getMageClient();
@@ -51,11 +56,14 @@ const response = await client.connectUser(username, password);
 ```
 
 **Server Method:** `ConnectUser`
+
 - **Request:** `ConnectUserRequest` (userName, password, clientVersion)
 - **Response:** `ConnectUserResponse` (success, sessionId, userId, userName)
 
 #### 2. Registration (`src/routes/register/+page.svelte`)
+
 **Status:** ⚠️ Mock Implementation
+
 ```typescript
 // Will be replaced with:
 const client = getMageClient();
@@ -63,16 +71,20 @@ const response = await client.register(userName, password, email);
 ```
 
 **Server Method:** `AuthRegister`
+
 - **Request:** `AuthRegisterRequest` (userName, password, email)
 - **Response:** `AuthRegisterResponse` (success, error, userId)
 
 #### 3. Ping/Keepalive (`src/lib/grpc/client.ts`)
+
 **Status:** ✅ Implemented
+
 ```typescript
 await client.ping();
 ```
 
 **Server Method:** `Ping`
+
 - Keeps session alive
 - Checks connection health
 - Returns server timestamp and latency
@@ -82,27 +94,35 @@ await client.ping();
 ### **Lobby & Room Operations**
 
 #### 1. Get Main Room ID (`src/lib/grpc/client.ts`)
+
 **Status:** ✅ Implemented
+
 ```typescript
 const lobby = await client.getMainRoomId();
 ```
 
 **Server Method:** `ServerGetMainRoomId`
+
 - **Request:** `ServerGetMainRoomIdRequest` (sessionId)
 - **Response:** `ServerGetMainRoomIdResponse` (roomId)
 
 #### 2. Get All Tables (`src/lib/grpc/client.ts`)
+
 **Status:** ✅ Implemented
+
 ```typescript
 const tables = await client.getAllTables(roomId);
 ```
 
 **Server Method:** `RoomGetAllTables`
+
 - **Request:** `RoomGetAllTablesRequest` (sessionId, roomId)
 - **Response:** `RoomGetAllTablesResponse` (tables[])
 
 #### 3. Fetch Tables (`src/lib/api/lobby.ts`)
+
 **Status:** ⚠️ Mock Implementation (uses hard-coded data)
+
 ```typescript
 // Currently returns MOCK_TABLES
 // Will be replaced with actual gRPC call
@@ -111,18 +131,22 @@ const tables = await client.getAllTables(roomId);
 **Usage:** `src/routes/(protected)/lobby/+page.svelte`
 
 #### 4. Create Table (`src/lib/api/lobby.ts`)
+
 **Status:** ⚠️ Mock Implementation
 
 **Server Method (when implemented):** `RoomCreateTable`
+
 - **Request:** `RoomCreateTableRequest` (sessionId, roomId, matchOptions)
 - **Response:** `RoomCreateTableResponse` (tableId)
 
 #### 5. Join Table (`src/lib/api/lobby.ts`)
+
 **Status:** ⚠️ Mock Implementation
 
 **Server Method (when implemented):** `RoomJoinTable`
 
 #### 6. Leave Table (`src/lib/api/lobby.ts`)
+
 **Status:** ⚠️ Mock Implementation
 
 **Server Method (when implemented):** `RoomLeaveTable`
@@ -132,43 +156,55 @@ const tables = await client.getAllTables(roomId);
 ### **Deck Management**
 
 #### 1. Fetch User Decks (`src/lib/api/decks.ts`)
+
 **Status:** ✅ Implemented
+
 ```typescript
 const client = getMageClient();
 const response = await client.call('DeckList', request);
 ```
 
 **Server Method:** `DeckList`
+
 - **Request:** `DeckListRequest` (sessionId, format?)
 - **Response:** `DeckListResponse` (success, decks[], error?)
 
 #### 2. Get Deck Details (`src/lib/api/decks.ts`)
+
 **Status:** ✅ Implemented
+
 ```typescript
 await client.call('DeckGet', { sessionId, deckId });
 ```
 
 **Server Method:** `DeckGet`
+
 - **Request:** `DeckGetRequest` (sessionId, deckId)
 - **Response:** `DeckGetResponse` (success, info, deck, error?)
 
 #### 3. Upload/Save Deck (`src/lib/api/decks.ts`)
+
 **Status:** ✅ Implemented
+
 ```typescript
 await client.call('DeckSave', saveRequest);
 ```
 
 **Server Method:** `DeckSave`
+
 - **Request:** `DeckSaveRequest` (sessionId, deckName, deck, format, description)
 - **Response:** `DeckSaveResponse` (success, deckId, error?)
 
 #### 4. Delete Deck (`src/lib/api/decks.ts`)
+
 **Status:** ✅ Implemented
+
 ```typescript
 await client.call('DeckDelete', request);
 ```
 
 **Server Method:** `DeckDelete`
+
 - **Request:** `DeckDeleteRequest` (sessionId, deckId)
 - **Response:** `DeckDeleteResponse` (success, error?)
 
@@ -177,21 +213,26 @@ await client.call('DeckDelete', request);
 ### **Chat System**
 
 #### 1. Send Chat Message (`src/lib/grpc/client.ts`)
+
 **Status:** ✅ Implemented
+
 ```typescript
 await client.sendChatMessage(chatId, message);
 ```
 
 **Server Method:** `ChatSendMessage`
+
 - **Request:** `ChatSendMessageRequest` (sessionId, chatId, message)
 - **Response:** `ChatSendMessageResponse` (success, messageId)
 
 #### 2. Fetch Lobby Messages (`src/lib/api/chat.ts`)
+
 **Status:** ⚠️ Mock Implementation (uses MOCK_MESSAGES)
 
 **Server Method (when implemented):** `ChatGetMessages` or streaming via WebSocket
 
 #### 3. Send Whisper (`src/lib/api/chat.ts`)
+
 **Status:** ⚠️ Mock Implementation
 
 **Server Method (when implemented):** `ChatSendWhisper`
@@ -201,24 +242,30 @@ await client.sendChatMessage(chatId, message);
 ### **Game Operations**
 
 #### 1. Get Game View (`src/lib/grpc/client.ts`)
+
 **Status:** ✅ Implemented
+
 ```typescript
 await client.getGameView(gameId, playerId);
 ```
 
 **Server Method:** `GameGetView`
+
 - **Request:** `GameGetViewRequest` (sessionId, gameId, playerId)
 - **Response:** `GameGetViewResponse` (gameView)
 
 #### 2. Start Game (`src/lib/api/table.ts`)
+
 **Status:** ⚠️ Mock Implementation
 
 **Server Method (when implemented):** `MatchStart`
 
 #### 3. Game Actions
+
 **Status:** Planned for WebSocket implementation
 
 **Server Methods (when implemented):**
+
 - `GamePassPriority`
 - `GameConcede`
 - `GamePlayCard`
@@ -236,21 +283,25 @@ The client is designed to receive real-time updates via WebSocket using callback
 #### **Callback Methods** (Server → Client)
 
 ##### Chat & Messages
+
 - `CHATMESSAGE` - New chat message
 - `SHOW_USERMESSAGE` - User-specific message
 - `SERVER_MESSAGE` - Server announcement
 
 ##### Table Events
+
 - `JOINED_TABLE` - Player joined table
 - `TABLE_WAITING` - Table status update
 
 ##### Tournament Events
+
 - `START_TOURNAMENT` - Tournament started
 - `TOURNAMENT_INIT` - Tournament initialization
 - `TOURNAMENT_UPDATE` - Tournament state update
 - `TOURNAMENT_OVER` - Tournament ended
 
 ##### Draft Events
+
 - `START_DRAFT` - Draft started
 - `DRAFT_INIT` - Draft initialization
 - `DRAFT_PICK` - Card picked in draft
@@ -258,6 +309,7 @@ The client is designed to receive real-time updates via WebSocket using callback
 - `DRAFT_OVER` - Draft completed
 
 ##### Game Events
+
 - `START_GAME` - Game started
 - `GAME_INIT` - Game initialization
 - `GAME_UPDATE` - Game state update
@@ -278,20 +330,24 @@ The client is designed to receive real-time updates via WebSocket using callback
 - `END_GAME_INFO` - End game statistics
 
 ##### Watch Events
+
 - `SHOW_TOURNAMENT` - Spectate tournament
 - `WATCHGAME` - Spectate game
 
 ##### Replay Events
+
 - `REPLAY_GAME` - Replay started
 - `REPLAY_INIT` - Replay initialization
 - `REPLAY_UPDATE` - Replay state update
 - `REPLAY_DONE` - Replay completed
 
 ##### Deck View Events
+
 - `VIEW_LIMITED_DECK` - View limited deck
 - `VIEW_SIDEBOARD` - View sideboard
 
 ##### User Interaction
+
 - `USER_REQUEST_DIALOG` - User dialog required
 - `GAME_REDRAW_GUI` - GUI refresh needed
 
@@ -322,6 +378,7 @@ All protocol buffer definitions are generated into `src/lib/generated/`:
 ## 🔄 Connection Flow
 
 ### **1. Initial Connection**
+
 ```
 User opens app
   ↓
@@ -335,6 +392,7 @@ Ping server to verify connection
 ```
 
 ### **2. Login Flow**
+
 ```
 User enters credentials
   ↓
@@ -352,6 +410,7 @@ Redirect to /lobby
 ```
 
 ### **3. Lobby Flow**
+
 ```
 User enters lobby
   ↓
@@ -367,6 +426,7 @@ Establish WebSocket connection for real-time updates
 ```
 
 ### **4. Game Flow**
+
 ```
 Table ready to start
   ↓
@@ -404,13 +464,13 @@ Receive updates via WebSocket
 ```typescript
 // Metadata injection in service-factory.ts
 const metadata = createGrpcMetadata({
-  authorization: `Bearer ${token}`
+	authorization: `Bearer ${token}`
 });
 
 // Automatic logout on auth errors
 if (isAuthError(grpcError)) {
-  auth.logout();
-  toast.error('Session expired. Please log in again.');
+	auth.logout();
+	toast.error('Session expired. Please log in again.');
 }
 ```
 
@@ -418,19 +478,20 @@ if (isAuthError(grpcError)) {
 
 ## 📊 Current Implementation Status
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| **Authentication** | ⚠️ Mock | Uses simulated login, needs real gRPC integration |
-| **Deck Management** | ✅ Implemented | Fully integrated with server |
-| **Lobby Tables** | ⚠️ Mock | Uses hard-coded data, needs gRPC integration |
-| **Chat** | ⚠️ Mock | Uses hard-coded messages, needs WebSocket integration |
-| **Game View** | ✅ Implemented | Can fetch game state via gRPC |
-| **Game Actions** | 🔜 Planned | Needs WebSocket bidirectional communication |
-| **Real-time Updates** | 🔜 Planned | WebSocket callbacks defined, not yet connected |
-| **Connection Health** | ✅ Implemented | Ping, reconnection, health checks working |
-| **Error Handling** | ✅ Implemented | Comprehensive gRPC error handling |
+| Feature               | Status         | Notes                                                 |
+| --------------------- | -------------- | ----------------------------------------------------- |
+| **Authentication**    | ⚠️ Mock        | Uses simulated login, needs real gRPC integration     |
+| **Deck Management**   | ✅ Implemented | Fully integrated with server                          |
+| **Lobby Tables**      | ⚠️ Mock        | Uses hard-coded data, needs gRPC integration          |
+| **Chat**              | ⚠️ Mock        | Uses hard-coded messages, needs WebSocket integration |
+| **Game View**         | ✅ Implemented | Can fetch game state via gRPC                         |
+| **Game Actions**      | 🔜 Planned     | Needs WebSocket bidirectional communication           |
+| **Real-time Updates** | 🔜 Planned     | WebSocket callbacks defined, not yet connected        |
+| **Connection Health** | ✅ Implemented | Ping, reconnection, health checks working             |
+| **Error Handling**    | ✅ Implemented | Comprehensive gRPC error handling                     |
 
 **Legend:**
+
 - ✅ Implemented - Fully working with real server integration
 - ⚠️ Mock - Interface exists but uses simulated data
 - 🔜 Planned - Types/interfaces defined, implementation pending
@@ -442,6 +503,7 @@ if (isAuthError(grpcError)) {
 ### **Environment Variables**
 
 Create `.env` file (optional):
+
 ```bash
 VITE_GRPC_SERVER_URL=http://localhost:17171
 ```
@@ -504,17 +566,20 @@ Client will be available at `http://localhost:5173`.
 ## 🚀 Next Steps for Full Integration
 
 ### **Priority 1: Authentication**
+
 - Replace mock login with `client.connectUser()`
 - Replace mock register with `client.register()`
 - Test session persistence and token refresh
 
 ### **Priority 2: Lobby Integration**
+
 - Replace `fetchTables()` with `client.getAllTables()`
 - Implement `createTable()` with `RoomCreateTable` RPC
 - Implement `joinTable()` with `RoomJoinTable` RPC
 - Implement `leaveTable()` with `RoomLeaveTable` RPC
 
 ### **Priority 3: WebSocket Integration**
+
 - Connect WebSocket client to server
 - Implement callback message routing
 - Handle real-time game state updates
@@ -522,11 +587,13 @@ Client will be available at `http://localhost:5173`.
 - Handle table state updates
 
 ### **Priority 4: Game Actions**
+
 - Implement game action RPCs
 - Handle game state updates via WebSocket
 - Implement user interaction prompts (target selection, choices, etc.)
 
 ### **Priority 5: Chat System**
+
 - Replace mock chat with WebSocket-based chat
 - Implement whisper messages
 - Handle server announcements
@@ -541,10 +608,10 @@ The mage-client-web is designed to communicate with the Go server using:
 2. **WebSocket** for real-time bidirectional communication (server push)
 
 **Current Status:**
+
 - ✅ Infrastructure is fully set up and working
 - ✅ Deck management is fully integrated
 - ⚠️ Auth, lobby, and chat are mocked but have interfaces ready
 - 🔜 Game actions and real-time updates need WebSocket integration
 
 All proto definitions are generated and type-safe. The client is ready to replace mock implementations with real server calls by simply swapping out the mock functions with the already-implemented gRPC client methods.
-

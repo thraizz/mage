@@ -2,6 +2,7 @@ package cards
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -81,7 +82,7 @@ func (f *factory) CreateCard(ctx context.Context, name string, ownerID uuid.UUID
 		Power:         cardData.Power,
 		Toughness:     cardData.Toughness,
 		RulesText:     cardData.RulesText,
-		FlavorText:    cardData.FlavorText,
+		FlavorText:    nullStringToString(cardData.FlavorText),
 		Rarity:        cardData.Rarity,
 		CardClassName: cardData.CardClassName,
 		// TODO: Parse types, subtypes, supertypes, colors from CardType string
@@ -130,4 +131,12 @@ func (f *factory) Stats() FactoryStats {
 		UnimplementedCards: 30459 - implementedCount,
 		PercentImplemented: float64(implementedCount) / 30459.0 * 100.0,
 	}
+}
+
+// nullStringToString converts sql.NullString to string
+func nullStringToString(ns sql.NullString) string {
+	if ns.Valid {
+		return ns.String
+	}
+	return ""
 }

@@ -5,14 +5,14 @@
 
 /* eslint-disable */
 
-export * from "./mage/v1/models";
-export * from "./mage/v1/admin";
-export * from "./mage/v1/auth";
-export * from "./mage/v1/chat";
-export * from "./mage/v1/draft";
-export * from "./mage/v1/game";
-export * from "./mage/v1/room";
-export * from "./mage/v1/table";
-export * from "./mage/v1/tournament";
-export * from "./mage/v1/server";
-export * from "./mage/v1/websocket";
+export * from './mage/v1/models';
+export * from './mage/v1/admin';
+export * from './mage/v1/auth';
+export * from './mage/v1/chat';
+export * from './mage/v1/draft';
+export * from './mage/v1/game';
+export * from './mage/v1/room';
+export * from './mage/v1/table';
+export * from './mage/v1/tournament';
+export * from './mage/v1/server';
+export * from './mage/v1/websocket';

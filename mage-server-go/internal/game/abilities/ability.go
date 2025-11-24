@@ -112,7 +112,29 @@ type GameContext interface {
 	// GetPermanentsControlledByPlayer returns all permanents controlled by a player
 	GetPermanentsControlledByPlayer(playerID uuid.UUID) ([]interface{}, error)
 
-	// TODO: Add more methods as needed
+	// CDA support methods
+	// GetAllCardsInZone returns all cards in a specific zone (for Tarmogoyf, Lord of Extinction, etc.)
+	GetAllCardsInZone(ctx context.Context, zone int) []CardInfo
+
+	// GetCreaturesControlledBy returns all creatures controlled by a player (for "creatures you control" CDAs)
+	GetCreaturesControlledBy(ctx context.Context, playerID uuid.UUID) []CardInfo
+
+	// GetPlayerHandForCDA returns cards in a player's hand for CDA calculations (for Maro, etc.)
+	// Note: This is separate from GetPlayerHand above to avoid signature conflicts
+	GetPlayerHandForCDA(ctx context.Context, playerID uuid.UUID) []CardInfo
+
+	// GetCountersOnPermanent returns the number of a specific counter type on a permanent
+	GetCountersOnPermanent(ctx context.Context, permanentID uuid.UUID, counterType string) int
+}
+
+// CardInfo provides minimal card information for CDA calculations
+type CardInfo interface {
+	GetID() uuid.UUID
+	GetName() string
+	GetTypes() []string
+	GetSubtypes() []string
+	GetPower() int
+	GetToughness() int
 }
 
 // ManaPoolInterface provides access to a player's mana pool

@@ -22,6 +22,12 @@ type TargetGameStateAccessor interface {
 	GetCardZone(cardID string) (int, bool)
 	// GetStackItemsForTarget returns all items currently on the stack
 	GetStackItemsForTarget() []TargetStackItem
+	// HasKeywordAbility checks if a card has a specific keyword ability
+	HasKeywordAbility(cardID, keyword string) bool
+	// GetProtectionQualities returns protection qualities (colors/types) for a card
+	GetProtectionQualities(cardID string) []string
+	// GetCardColor returns the color(s) of a card
+	GetCardColor(cardID string) []string
 }
 
 // TargetCardInfo provides information about a card for target validation.
@@ -118,8 +124,52 @@ func (tv *TargetValidator) ValidateTarget(targetID string, requirement TargetReq
 		return fmt.Errorf("target %s is a card but requirement is player", card.Name)
 	}
 
-	// TODO: Check for hexproof, protection, shroud, etc.
-	// This would require additional card metadata
+	// Check for targeting restrictions (hexproof, shroud, protection)
+	if err := tv.checkTargetingRestrictions(card, requirement); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// checkTargetingRestrictions checks if a card can be legally targeted
+// Implements Rule 702.11 (Hexproof), 702.18 (Shroud), 702.16 (Protection)
+func (tv *TargetValidator) checkTargetingRestrictions(card TargetCardInfo, requirement TargetRequirement) error {
+	// Rule 702.18: Shroud - can't be the target of spells or abilities
+	if tv.gameState.HasKeywordAbility(card.ID, "SHROUD") {
+		return fmt.Errorf("target %s has shroud and can't be targeted", card.Name)
+	}
+
+	// Rule 702.11: Hexproof - can't be targeted by spells or abilities opponents control
+	if tv.gameState.HasKeywordAbility(card.ID, "HEXPROOF") {
+		if requirement.ControllerID != "" && requirement.ControllerID != card.ControllerID {
+			return fmt.Errorf("target %s has hexproof and can't be targeted by opponents", card.Name)
+		}
+	}
+
+	// Rule 702.16: Protection - can't be targeted by sources with the protected quality
+	protectionQualities := tv.gameState.GetProtectionQualities(card.ID)
+	if len(protectionQualities) > 0 && requirement.SourceID != "" {
+		// Check if source matches any protection quality
+		sourceColors := tv.gameState.GetCardColor(requirement.SourceID)
+
+		for _, quality := range protectionQualities {
+			// Check color protection
+			for _, color := range sourceColors {
+				if strings.EqualFold(quality, color) {
+					return fmt.Errorf("target %s has protection from %s", card.Name, quality)
+				}
+			}
+
+			// Check type protection (e.g., "protection from creatures")
+			sourceInfo, found := tv.gameState.FindCardForTarget(requirement.SourceID)
+			if found {
+				if strings.Contains(strings.ToLower(sourceInfo.Type), strings.ToLower(quality)) {
+					return fmt.Errorf("target %s has protection from %s", card.Name, quality)
+				}
+			}
+		}
+	}
 
 	return nil
 }

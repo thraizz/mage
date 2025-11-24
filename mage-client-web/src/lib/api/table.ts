@@ -6,11 +6,11 @@
 import type { Table } from '$lib/types/table';
 import { getMageClient } from '$lib/grpc/client';
 import type { TableView } from '$lib/generated/mage/v1/models';
-import type { RoomGetTableByIdRequest, RoomGetTableByIdResponse } from '$lib/generated/mage/v1/room';
 import type {
-	TableSetReadyRequest,
-	TableSetReadyResponse
-} from '$lib/generated/mage/v1/table';
+	RoomGetTableByIdRequest,
+	RoomGetTableByIdResponse
+} from '$lib/generated/mage/v1/room';
+import type { TableSetReadyRequest, TableSetReadyResponse } from '$lib/generated/mage/v1/table';
 import type { GameFormat } from '$lib/types/table';
 
 /**
@@ -107,7 +107,7 @@ export async function fetchTable(tableId: string): Promise<Table> {
 
 /**
  * Toggle ready status for current player
- * 
+ *
  * Note: The actual RPC method name might be different
  * This assumes TableSetReady exists in the proto
  */
@@ -149,6 +149,45 @@ export async function toggleReady(tableId: string, isReady: boolean): Promise<vo
 }
 
 /**
+ * Join table with deck
+ */
+export async function joinTable(
+	tableId: string,
+	deckList: string,
+	password?: string
+): Promise<void> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	// Get main room ID
+	const roomResponse = await client.getMainRoomId();
+	if (!roomResponse.roomId) {
+		throw new Error('Failed to get main room ID');
+	}
+
+	const request = {
+		sessionId,
+		roomId: roomResponse.roomId,
+		tableId,
+		playerName: '', // Server derives from session
+		playerType: 'Human',
+		skillLevel: 0, // Default skill level
+		deckList,
+		password: password || ''
+	};
+
+	const response = await client.call('RoomJoinTable', request);
+
+	if (!response.success) {
+		throw new Error(response.error || 'Failed to join table');
+	}
+}
+
+/**
  * Leave table
  * Uses the same RPC as leaving from lobby
  */
@@ -181,7 +220,7 @@ export async function leaveTable(tableId: string): Promise<void> {
 
 /**
  * Start game (host only)
- * 
+ *
  * Note: The actual method to start a match might be different
  * This assumes MatchStart exists
  */
@@ -222,7 +261,7 @@ export async function startGame(tableId: string): Promise<string> {
 
 /**
  * Kick player from table (host only)
- * 
+ *
  * Note: This functionality might not be available via RPC
  * It might require admin privileges or be handled differently
  */

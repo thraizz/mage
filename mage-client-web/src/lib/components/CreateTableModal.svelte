@@ -49,12 +49,7 @@
 	 * Validate form
 	 */
 	const isValid = $derived(() => {
-		return (
-			selectedFormat !== null &&
-			maxPlayers >= 2 &&
-			maxPlayers <= 8 &&
-			selectedDeck !== null
-		);
+		return selectedFormat !== null && maxPlayers >= 2 && maxPlayers <= 8 && selectedDeck !== null;
 	});
 
 	/**
