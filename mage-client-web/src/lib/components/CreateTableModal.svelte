@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { GameFormat } from '$lib/types/table';
+	import type { Deck } from '$lib/types/deck';
 	import { getGameFormats, createTable } from '$lib/api/lobby';
+	import { fetchUserDecks } from '$lib/api/decks';
 	import Modal from './Modal.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 
@@ -26,6 +28,11 @@
 	let maxPlayers = $state(4);
 	let password = $state('');
 	let showPassword = $state(false);
+	let selectedDeck = $state<string | null>(null);
+
+	// Deck state
+	let availableDecks = $state<Deck[]>([]);
+	let loadingDecks = $state(false);
 
 	// UI state
 	let loading = $state(false);
@@ -34,15 +41,39 @@
 	// Validation state
 	let touched = $state({
 		format: false,
-		maxPlayers: false
+		maxPlayers: false,
+		deck: false
 	});
 
 	/**
 	 * Validate form
 	 */
 	const isValid = $derived(() => {
-		return selectedFormat !== null && maxPlayers >= 2 && maxPlayers <= 8;
+		return (
+			selectedFormat !== null &&
+			maxPlayers >= 2 &&
+			maxPlayers <= 8 &&
+			selectedDeck !== null
+		);
 	});
+
+	/**
+	 * Load decks for selected format
+	 */
+	async function loadDecksForFormat(): Promise<void> {
+		loadingDecks = true;
+		try {
+			availableDecks = await fetchUserDecks(selectedFormat);
+			// Reset deck selection when format changes
+			selectedDeck = availableDecks.length > 0 ? availableDecks[0].id : null;
+		} catch (err) {
+			console.error('Failed to load decks:', err);
+			availableDecks = [];
+			selectedDeck = null;
+		} finally {
+			loadingDecks = false;
+		}
+	}
 
 	/**
 	 * Reset form to defaults
@@ -53,13 +84,35 @@
 		maxPlayers = 4;
 		password = '';
 		showPassword = false;
+		selectedDeck = null;
+		availableDecks = [];
 		loading = false;
+		loadingDecks = false;
 		error = null;
 		touched = {
 			format: false,
-			maxPlayers: false
+			maxPlayers: false,
+			deck: false
 		};
 	}
+
+	/**
+	 * Load decks when modal opens or format changes
+	 */
+	$effect(() => {
+		if (open) {
+			loadDecksForFormat();
+		}
+	});
+
+	/**
+	 * Reload decks when format changes
+	 */
+	$effect(() => {
+		if (open && selectedFormat) {
+			loadDecksForFormat();
+		}
+	});
 
 	/**
 	 * Handle form submission
@@ -70,7 +123,8 @@
 		// Mark all fields as touched
 		touched = {
 			format: true,
-			maxPlayers: true
+			maxPlayers: true,
+			deck: true
 		};
 
 		// Validate
@@ -153,6 +207,58 @@
 			</select>
 			{#if touched.format && !selectedFormat}
 				<p class="error-text">Please select a format</p>
+			{/if}
+		</div>
+
+		<!-- Deck Selection -->
+		<div class="form-group">
+			<label for="deck" class="form-label">
+				Select Deck <span class="required-text">*</span>
+			</label>
+			{#if loadingDecks}
+				<div class="loading-decks">
+					<LoadingSpinner size="small" />
+					<span>Loading decks...</span>
+				</div>
+			{:else if availableDecks.length === 0}
+				<div class="no-decks-message">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<circle cx="12" cy="12" r="10"></circle>
+						<line x1="12" y1="8" x2="12" y2="12"></line>
+						<line x1="12" y1="16" x2="12.01" y2="16"></line>
+					</svg>
+					<span>No {selectedFormat} decks found. Please create a deck first.</span>
+				</div>
+			{:else}
+				<select
+					id="deck"
+					class="form-select"
+					bind:value={selectedDeck}
+					disabled={loading}
+					onfocus={() => (touched.deck = true)}
+				>
+					{#each availableDecks as deck}
+						<option value={deck.id}>
+							{deck.name} ({deck.cardCount} cards)
+							{#if !deck.isValid}
+								- Invalid
+							{/if}
+						</option>
+					{/each}
+				</select>
+				{#if touched.deck && !selectedDeck}
+					<p class="error-text">Please select a deck</p>
+				{/if}
 			{/if}
 		</div>
 
@@ -409,6 +515,38 @@
 	.error-icon {
 		flex-shrink: 0;
 		color: #ef4444;
+	}
+
+	/* Loading Decks State */
+	.loading-decks {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.875rem 1rem;
+		background-color: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;
+		color: #6b7280;
+		font-size: 0.875rem;
+	}
+
+	/* No Decks Message */
+	.no-decks-message {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.875rem 1rem;
+		background-color: #fffbeb;
+		border: 1px solid #fde68a;
+		border-radius: 0.5rem;
+		color: #92400e;
+		font-size: 0.875rem;
+		line-height: 1.5;
+	}
+
+	.no-decks-message svg {
+		flex-shrink: 0;
+		color: #f59e0b;
 	}
 
 	/* Form Actions */
