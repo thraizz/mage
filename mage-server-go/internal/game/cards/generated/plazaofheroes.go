@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewPlazaOfHeroes creates a Plaza Of Heroes
-//   - LAND
+//  - LAND
 func NewPlazaOfHeroes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Plaza Of Heroes")
 	card.ManaCost = ""

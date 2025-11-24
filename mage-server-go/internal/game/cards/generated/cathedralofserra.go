@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewCathedralOfSerra creates a Cathedral Of Serra
-//   - LAND
+//  - LAND
 func NewCathedralOfSerra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cathedral Of Serra")
 	card.ManaCost = ""

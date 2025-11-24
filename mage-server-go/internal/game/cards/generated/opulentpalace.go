@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOpulentPalace creates a Opulent Palace
-//   - LAND
+//  - LAND
 func NewOpulentPalace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Opulent Palace")
 	card.ManaCost = ""

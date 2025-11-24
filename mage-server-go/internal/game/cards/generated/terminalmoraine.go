@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTerminalMoraine creates a Terminal Moraine
-//   - LAND
+//  - LAND
 func NewTerminalMoraine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Terminal Moraine")
 	card.ManaCost = ""

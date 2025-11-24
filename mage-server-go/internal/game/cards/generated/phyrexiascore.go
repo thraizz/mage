@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPhyrexiasCore creates a Phyrexias Core
-//   - LAND
+//  - LAND
 func NewPhyrexiasCore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Phyrexias Core")
 	card.ManaCost = ""

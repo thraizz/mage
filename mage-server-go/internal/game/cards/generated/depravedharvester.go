@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewDepravedHarvester creates a Depraved Harvester
-//   - CREATURE
-//
+//  - CREATURE
 // Lifelink
 func NewDepravedHarvester(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Depraved Harvester")

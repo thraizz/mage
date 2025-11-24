@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewWingShredder creates a Wing Shredder
-//   - CREATURE
-//
+//  - CREATURE
 // Reach
 func NewWingShredder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wing Shredder")

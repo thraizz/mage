@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVoltChargedBerserker creates a Volt Charged Berserker
-//   - CREATURE
+//  - CREATURE
 func NewVoltChargedBerserker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Volt Charged Berserker")
 	card.ManaCost = ""

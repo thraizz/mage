@@ -14,8 +14,7 @@ func init() {
 }
 
 // NewHollowhengeHuntmaster creates a Hollowhenge Huntmaster
-//   - CREATURE
-//
+//  - CREATURE
 // Hexproof
 func NewHollowhengeHuntmaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hollowhenge Huntmaster")

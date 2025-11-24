@@ -24,7 +24,7 @@ func NewElusiveSpellfist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 0)).
+		AddEffect(abilities.NewBoostEffect(1,0)).
 		Build()
 	if err != nil {
 		return nil, err

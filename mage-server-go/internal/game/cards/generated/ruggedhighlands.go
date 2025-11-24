@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRuggedHighlands creates a Rugged Highlands
-//   - LAND
+//  - LAND
 func NewRuggedHighlands(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rugged Highlands")
 	card.ManaCost = ""

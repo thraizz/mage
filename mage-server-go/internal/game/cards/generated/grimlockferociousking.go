@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewGrimlockFerociousKing creates a Grimlock Ferocious King
-//   - ARTIFACT CREATURE
-//
+//  - ARTIFACT CREATURE
 // Trample
 func NewGrimlockFerociousKing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grimlock Ferocious King")

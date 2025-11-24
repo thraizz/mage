@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewZanarkandAncientMetropolis creates a Zanarkand Ancient Metropolis
-//   - LAND
+//  - LAND
 func NewZanarkandAncientMetropolis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Zanarkand Ancient Metropolis")
 	card.ManaCost = ""

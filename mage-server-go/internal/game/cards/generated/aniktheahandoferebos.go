@@ -26,7 +26,7 @@ func NewAniktheaHandOfErebos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new MenaceAbility(false), filter, true)).
+		AddEffect(abilities.NewGrantAbilityEffect(filter, true)).
 		Build()
 	if err != nil {
 		return nil, err

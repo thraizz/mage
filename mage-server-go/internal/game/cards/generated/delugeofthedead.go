@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewDelugeOfTheDead creates a Deluge Of The Dead
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewDelugeOfTheDead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Deluge Of The Dead")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIcebergTitan creates a Iceberg Titan
-//   - ARTIFACT CREATURE
+//  - ARTIFACT CREATURE
 func NewIcebergTitan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Iceberg Titan")
 	card.ManaCost = ""

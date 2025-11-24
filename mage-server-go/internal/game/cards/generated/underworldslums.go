@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUnderworldSlums creates a Underworld Slums
-//   - LAND
+//  - LAND
 func NewUnderworldSlums(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Underworld Slums")
 	card.ManaCost = ""

@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewChaosTheEndless creates a Chaos The Endless
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewChaosTheEndless(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Chaos The Endless")

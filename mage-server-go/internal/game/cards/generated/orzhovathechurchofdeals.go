@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOrzhovaTheChurchOfDeals creates a Orzhova The Church Of Deals
-//   - LAND
+//  - LAND
 func NewOrzhovaTheChurchOfDeals(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Orzhova The Church Of Deals")
 	card.ManaCost = ""

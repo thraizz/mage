@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUrborgVolcano creates a Urborg Volcano
-//   - LAND
+//  - LAND
 func NewUrborgVolcano(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Urborg Volcano")
 	card.ManaCost = ""

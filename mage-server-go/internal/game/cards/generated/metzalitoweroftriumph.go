@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMetzaliTowerOfTriumph creates a Metzali Tower Of Triumph
-//   - LAND
+//  - LAND
 func NewMetzaliTowerOfTriumph(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Metzali Tower Of Triumph")
 	card.ManaCost = ""

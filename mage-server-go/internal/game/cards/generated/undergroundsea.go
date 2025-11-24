@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUndergroundSea creates a Underground Sea
-//   - LAND
+//  - LAND
 func NewUndergroundSea(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Underground Sea")
 	card.ManaCost = ""

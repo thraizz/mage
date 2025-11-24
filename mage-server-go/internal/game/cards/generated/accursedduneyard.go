@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAccursedDuneyard creates a Accursed Duneyard
-//   - LAND
+//  - LAND
 func NewAccursedDuneyard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Accursed Duneyard")
 	card.ManaCost = ""

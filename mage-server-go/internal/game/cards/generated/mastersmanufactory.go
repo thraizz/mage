@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMastersManufactory creates a Masters Manufactory
-//   - ARTIFACT
+//  - ARTIFACT
 func NewMastersManufactory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Masters Manufactory")
 	card.ManaCost = ""

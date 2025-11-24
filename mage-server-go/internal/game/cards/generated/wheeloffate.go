@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWheelOfFate creates a Wheel Of Fate
-//   - SORCERY
+//  - SORCERY
 func NewWheelOfFate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wheel Of Fate")
 	card.ManaCost = ""

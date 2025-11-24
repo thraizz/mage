@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewKjeldoranOutpost creates a Kjeldoran Outpost
-//   - LAND
+//  - LAND
 func NewKjeldoranOutpost(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kjeldoran Outpost")
 	card.ManaCost = ""

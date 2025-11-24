@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCentaurGarden creates a Centaur Garden
-//   - LAND
+//  - LAND
 func NewCentaurGarden(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Centaur Garden")
 	card.ManaCost = ""

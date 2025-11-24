@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewNeckBreaker creates a Neck Breaker
-//   - CREATURE
+//  - CREATURE
 func NewNeckBreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Neck Breaker")
 	card.ManaCost = ""

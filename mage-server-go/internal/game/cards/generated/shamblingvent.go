@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewShamblingVent creates a Shambling Vent
-//   - LAND
-//
+//  - LAND
 // Lifelink
 func NewShamblingVent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shambling Vent")

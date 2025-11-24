@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlackcleaveCliffs creates a Blackcleave Cliffs
-//   - LAND
+//  - LAND
 func NewBlackcleaveCliffs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blackcleave Cliffs")
 	card.ManaCost = ""

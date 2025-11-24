@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPillarOfTheParuns creates a Pillar Of The Paruns
-//   - LAND
+//  - LAND
 func NewPillarOfTheParuns(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Pillar Of The Paruns")
 	card.ManaCost = ""

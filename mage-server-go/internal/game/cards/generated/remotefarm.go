@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRemoteFarm creates a Remote Farm
-//   - LAND
+//  - LAND
 func NewRemoteFarm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Remote Farm")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMoltenTributary creates a Molten Tributary
-//   - LAND
+//  - LAND
 func NewMoltenTributary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Molten Tributary")
 	card.ManaCost = ""

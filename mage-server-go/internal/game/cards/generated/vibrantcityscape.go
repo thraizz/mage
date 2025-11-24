@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVibrantCityscape creates a Vibrant Cityscape
-//   - LAND
+//  - LAND
 func NewVibrantCityscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vibrant Cityscape")
 	card.ManaCost = ""

@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewOKagachiMadeManifest creates a O Kagachi Made Manifest
-//   - ENCHANTMENT CREATURE
-//
+//  - ENCHANTMENT CREATURE
 // Flying, Trample
 func NewOKagachiMadeManifest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "O Kagachi Made Manifest")

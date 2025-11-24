@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewWerewolfOfAncientHunger creates a Werewolf Of Ancient Hunger
-//   - CREATURE
-//
+//  - CREATURE
 // Vigilance, Trample
 func NewWerewolfOfAncientHunger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Werewolf Of Ancient Hunger")

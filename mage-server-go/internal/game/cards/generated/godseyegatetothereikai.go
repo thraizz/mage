@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGodsEyeGateToTheReikai creates a Gods Eye Gate To The Reikai
-//   - LAND
+//  - LAND
 func NewGodsEyeGateToTheReikai(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gods Eye Gate To The Reikai")
 	card.ManaCost = ""

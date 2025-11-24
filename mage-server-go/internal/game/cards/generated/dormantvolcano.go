@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDormantVolcano creates a Dormant Volcano
-//   - LAND
+//  - LAND
 func NewDormantVolcano(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dormant Volcano")
 	card.ManaCost = ""

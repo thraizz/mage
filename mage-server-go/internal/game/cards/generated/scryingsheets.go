@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewScryingSheets creates a Scrying Sheets
-//   - LAND
+//  - LAND
 func NewScryingSheets(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Scrying Sheets")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewRestlessBivouac creates a Restless Bivouac
-//   - LAND
+//  - LAND
 func NewRestlessBivouac(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Restless Bivouac")
 	card.ManaCost = ""

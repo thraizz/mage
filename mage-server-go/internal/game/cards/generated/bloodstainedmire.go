@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBloodstainedMire creates a Bloodstained Mire
-//   - LAND
+//  - LAND
 func NewBloodstainedMire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bloodstained Mire")
 	card.ManaCost = ""

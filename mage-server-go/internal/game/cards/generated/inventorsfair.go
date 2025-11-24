@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewInventorsFair creates a Inventors Fair
-//   - LAND
+//  - LAND
 func NewInventorsFair(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Inventors Fair")
 	card.ManaCost = ""

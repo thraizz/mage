@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHavenwoodBattleground creates a Havenwood Battleground
-//   - LAND
+//  - LAND
 func NewHavenwoodBattleground(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Havenwood Battleground")
 	card.ManaCost = ""

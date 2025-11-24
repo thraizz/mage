@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewRonaTolarianObliterator creates a Rona Tolarian Obliterator
-//   - CREATURE
-//
+//  - CREATURE
 // Trample
 func NewRonaTolarianObliterator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rona Tolarian Obliterator")

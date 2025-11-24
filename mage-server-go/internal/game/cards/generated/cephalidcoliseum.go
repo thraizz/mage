@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCephalidColiseum creates a Cephalid Coliseum
-//   - LAND
+//  - LAND
 func NewCephalidColiseum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cephalid Coliseum")
 	card.ManaCost = ""

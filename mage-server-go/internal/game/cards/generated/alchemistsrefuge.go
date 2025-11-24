@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAlchemistsRefuge creates a Alchemists Refuge
-//   - LAND
+//  - LAND
 func NewAlchemistsRefuge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Alchemists Refuge")
 	card.ManaCost = ""

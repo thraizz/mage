@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlightedFen creates a Blighted Fen
-//   - LAND
+//  - LAND
 func NewBlightedFen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blighted Fen")
 	card.ManaCost = ""

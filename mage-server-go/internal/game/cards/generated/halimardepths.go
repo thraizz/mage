@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHalimarDepths creates a Halimar Depths
-//   - LAND
+//  - LAND
 func NewHalimarDepths(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Halimar Depths")
 	card.ManaCost = ""

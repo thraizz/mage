@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWarRoom creates a War Room
-//   - LAND
+//  - LAND
 func NewWarRoom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "War Room")
 	card.ManaCost = ""

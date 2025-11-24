@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFellTheProfane creates a Fell The Profane
-//   - INSTANT
+//  - INSTANT
 func NewFellTheProfane(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fell The Profane")
 	card.ManaCost = ""

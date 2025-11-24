@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewStalkingPredator creates a Stalking Predator
-//   - CREATURE
-//
+//  - CREATURE
 // Menace
 func NewStalkingPredator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Stalking Predator")

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewOakhollowVillage creates a Oakhollow Village
-//   - LAND
+//  - LAND
 func NewOakhollowVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Oakhollow Village")
 	card.ManaCost = ""

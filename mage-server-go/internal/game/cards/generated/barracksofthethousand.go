@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewBarracksOfTheThousand creates a Barracks Of The Thousand
-//   - ARTIFACT LAND
+//  - ARTIFACT LAND
 func NewBarracksOfTheThousand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Barracks Of The Thousand")
 	card.ManaCost = ""

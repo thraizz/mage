@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNeglectedManor creates a Neglected Manor
-//   - LAND
+//  - LAND
 func NewNeglectedManor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Neglected Manor")
 	card.ManaCost = ""

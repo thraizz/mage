@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMudflatVillage creates a Mudflat Village
-//   - LAND
+//  - LAND
 func NewMudflatVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mudflat Village")
 	card.ManaCost = ""

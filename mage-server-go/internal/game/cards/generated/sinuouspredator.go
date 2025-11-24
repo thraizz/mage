@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSinuousPredator creates a Sinuous Predator
-//   - CREATURE
+//  - CREATURE
 func NewSinuousPredator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sinuous Predator")
 	card.ManaCost = ""

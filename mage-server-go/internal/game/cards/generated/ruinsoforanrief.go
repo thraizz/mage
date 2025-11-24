@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewRuinsOfOranRief creates a Ruins Of Oran Rief
-//   - LAND
+//  - LAND
 func NewRuinsOfOranRief(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ruins Of Oran Rief")
 	card.ManaCost = ""

@@ -24,7 +24,7 @@ func NewAdarkarSentinel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(0, 1)).
+		AddEffect(abilities.NewBoostEffect(0,1)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

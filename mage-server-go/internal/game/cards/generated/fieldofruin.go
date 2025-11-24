@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFieldOfRuin creates a Field Of Ruin
-//   - LAND
+//  - LAND
 func NewFieldOfRuin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Field Of Ruin")
 	card.ManaCost = ""

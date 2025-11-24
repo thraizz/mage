@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCrumblingNecropolis creates a Crumbling Necropolis
-//   - LAND
+//  - LAND
 func NewCrumblingNecropolis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crumbling Necropolis")
 	card.ManaCost = ""

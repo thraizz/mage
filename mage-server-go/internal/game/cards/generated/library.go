@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLibrary creates a Library
-//   - LAND
+//  - LAND
 func NewLibrary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Library")
 	card.ManaCost = ""

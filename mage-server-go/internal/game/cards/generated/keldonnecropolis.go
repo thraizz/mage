@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKeldonNecropolis creates a Keldon Necropolis
-//   - LAND
+//  - LAND
 func NewKeldonNecropolis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Keldon Necropolis")
 	card.ManaCost = ""

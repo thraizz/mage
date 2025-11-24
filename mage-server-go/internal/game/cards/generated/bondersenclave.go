@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBondersEnclave creates a Bonders Enclave
-//   - LAND
+//  - LAND
 func NewBondersEnclave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bonders Enclave")
 	card.ManaCost = ""

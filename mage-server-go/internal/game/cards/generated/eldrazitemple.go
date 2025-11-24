@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEldraziTemple creates a Eldrazi Temple
-//   - LAND
+//  - LAND
 func NewEldraziTemple(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Eldrazi Temple")
 	card.ManaCost = ""

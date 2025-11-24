@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewJyotiMoagAncient creates a Jyoti Moag Ancient
-//
-//	-
+//  - 
 func NewJyotiMoagAncient(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jyoti Moag Ancient")
 	card.ManaCost = ""

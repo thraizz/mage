@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAysenAbbey creates a Aysen Abbey
-//   - LAND
+//  - LAND
 func NewAysenAbbey(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Aysen Abbey")
 	card.ManaCost = ""

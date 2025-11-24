@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThrivingIsle creates a Thriving Isle
-//   - LAND
+//  - LAND
 func NewThrivingIsle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thriving Isle")
 	card.ManaCost = ""

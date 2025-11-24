@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLoneWolfOfTheNatterknolls creates a Lone Wolf Of The Natterknolls
-//   - CREATURE
+//  - CREATURE
 func NewLoneWolfOfTheNatterknolls(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lone Wolf Of The Natterknolls")
 	card.ManaCost = ""

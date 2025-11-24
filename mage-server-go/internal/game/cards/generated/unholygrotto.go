@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUnholyGrotto creates a Unholy Grotto
-//   - LAND
+//  - LAND
 func NewUnholyGrotto(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Unholy Grotto")
 	card.ManaCost = ""

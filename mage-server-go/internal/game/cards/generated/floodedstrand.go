@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFloodedStrand creates a Flooded Strand
-//   - LAND
+//  - LAND
 func NewFloodedStrand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Flooded Strand")
 	card.ManaCost = ""

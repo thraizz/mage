@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSchoolOfTheUnseen creates a School Of The Unseen
-//   - LAND
+//  - LAND
 func NewSchoolOfTheUnseen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "School Of The Unseen")
 	card.ManaCost = ""

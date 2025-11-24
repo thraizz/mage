@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheAutonomousFurnace creates a The Autonomous Furnace
-//   - LAND
+//  - LAND
 func NewTheAutonomousFurnace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Autonomous Furnace")
 	card.ManaCost = ""

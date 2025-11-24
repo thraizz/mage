@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBladewheelChariot creates a Bladewheel Chariot
-//   - ARTIFACT
+//  - ARTIFACT
 func NewBladewheelChariot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bladewheel Chariot")
 	card.ManaCost = ""

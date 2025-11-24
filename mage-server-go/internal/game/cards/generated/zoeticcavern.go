@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewZoeticCavern creates a Zoetic Cavern
-//   - LAND
+//  - LAND
 func NewZoeticCavern(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Zoetic Cavern")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDarkslickShores creates a Darkslick Shores
-//   - LAND
+//  - LAND
 func NewDarkslickShores(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Darkslick Shores")
 	card.ManaCost = ""

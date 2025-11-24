@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVectorImperialCapital creates a Vector Imperial Capital
-//   - LAND
+//  - LAND
 func NewVectorImperialCapital(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vector Imperial Capital")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewContestedCliffs creates a Contested Cliffs
-//   - LAND
+//  - LAND
 func NewContestedCliffs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Contested Cliffs")
 	card.ManaCost = ""

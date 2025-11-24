@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIsolatedWatchtower creates a Isolated Watchtower
-//   - LAND
+//  - LAND
 func NewIsolatedWatchtower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Isolated Watchtower")
 	card.ManaCost = ""

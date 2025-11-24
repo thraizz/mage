@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSilentClearing creates a Silent Clearing
-//   - LAND
+//  - LAND
 func NewSilentClearing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Silent Clearing")
 	card.ManaCost = ""

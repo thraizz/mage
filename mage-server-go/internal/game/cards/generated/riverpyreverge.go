@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRiverpyreVerge creates a Riverpyre Verge
-//   - LAND
+//  - LAND
 func NewRiverpyreVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Riverpyre Verge")
 	card.ManaCost = ""

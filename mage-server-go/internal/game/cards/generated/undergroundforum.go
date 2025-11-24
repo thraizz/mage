@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewUndergroundForum creates a Underground Forum
-//   - LAND
+//  - LAND
 func NewUndergroundForum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Underground Forum")
 	card.ManaCost = ""

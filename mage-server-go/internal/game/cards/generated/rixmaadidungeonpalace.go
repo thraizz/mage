@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRixMaadiDungeonPalace creates a Rix Maadi Dungeon Palace
-//   - LAND
+//  - LAND
 func NewRixMaadiDungeonPalace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rix Maadi Dungeon Palace")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEndlessSands creates a Endless Sands
-//   - LAND
+//  - LAND
 func NewEndlessSands(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Endless Sands")
 	card.ManaCost = ""

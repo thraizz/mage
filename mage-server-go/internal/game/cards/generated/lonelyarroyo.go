@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLonelyArroyo creates a Lonely Arroyo
-//   - LAND
+//  - LAND
 func NewLonelyArroyo(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lonely Arroyo")
 	card.ManaCost = ""

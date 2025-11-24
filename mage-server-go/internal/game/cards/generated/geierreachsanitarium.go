@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGeierReachSanitarium creates a Geier Reach Sanitarium
-//   - LAND
+//  - LAND
 func NewGeierReachSanitarium(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Geier Reach Sanitarium")
 	card.ManaCost = ""

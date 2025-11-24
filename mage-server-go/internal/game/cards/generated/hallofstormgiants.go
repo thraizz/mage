@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHallOfStormGiants creates a Hall Of Storm Giants
-//   - LAND
+//  - LAND
 func NewHallOfStormGiants(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hall Of Storm Giants")
 	card.ManaCost = ""

@@ -29,7 +29,7 @@ func NewDragonrage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	}
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(1, 0)).
+		AddEffect(abilities.NewBoostEffect(1,0)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

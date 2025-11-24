@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTyriteSanctum creates a Tyrite Sanctum
-//   - LAND
+//  - LAND
 func NewTyriteSanctum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tyrite Sanctum")
 	card.ManaCost = ""

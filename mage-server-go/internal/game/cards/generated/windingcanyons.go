@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWindingCanyons creates a Winding Canyons
-//   - LAND
+//  - LAND
 func NewWindingCanyons(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Winding Canyons")
 	card.ManaCost = ""

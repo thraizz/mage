@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewThroneOfMakindi creates a Throne Of Makindi
-//   - LAND
+//  - LAND
 func NewThroneOfMakindi(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Throne Of Makindi")
 	card.ManaCost = ""

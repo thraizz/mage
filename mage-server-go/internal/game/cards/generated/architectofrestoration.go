@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewArchitectOfRestoration creates a Architect Of Restoration
-//   - ENCHANTMENT CREATURE
-//
+//  - ENCHANTMENT CREATURE
 // Vigilance
 func NewArchitectOfRestoration(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Architect Of Restoration")

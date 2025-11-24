@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGrixisPanorama creates a Grixis Panorama
-//   - LAND
+//  - LAND
 func NewGrixisPanorama(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grixis Panorama")
 	card.ManaCost = ""

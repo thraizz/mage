@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewNissaSageAnimist creates a Nissa Sage Animist
-//   - PLANESWALKER
+//  - PLANESWALKER
 func NewNissaSageAnimist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nissa Sage Animist")
 	card.ManaCost = ""

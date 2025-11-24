@@ -26,7 +26,7 @@ func NewMabelHeirToCragflame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, true)).
+		AddEffect(abilities.NewBoostEffect(1,1,filter,true)).
 		Build()
 	if err != nil {
 		return nil, err

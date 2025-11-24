@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJediTemple creates a Jedi Temple
-//   - LAND
+//  - LAND
 func NewJediTemple(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jedi Temple")
 	card.ManaCost = ""

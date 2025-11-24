@@ -12,9 +12,7 @@ func init() {
 }
 
 // NewInfernalCaptor creates a Infernal Captor
-//
-//	-
-//
+//  - 
 // Haste
 func NewInfernalCaptor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Infernal Captor")

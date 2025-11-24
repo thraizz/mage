@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBogWreckage creates a Bog Wreckage
-//   - LAND
+//  - LAND
 func NewBogWreckage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bog Wreckage")
 	card.ManaCost = ""

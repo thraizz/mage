@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheMycosynthGardens creates a The Mycosynth Gardens
-//   - LAND
+//  - LAND
 func NewTheMycosynthGardens(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Mycosynth Gardens")
 	card.ManaCost = ""

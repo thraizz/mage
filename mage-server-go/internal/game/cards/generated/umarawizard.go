@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewUmaraWizard creates a Umara Wizard
-//   - CREATURE
+//  - CREATURE
 func NewUmaraWizard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Umara Wizard")
 	card.ManaCost = ""

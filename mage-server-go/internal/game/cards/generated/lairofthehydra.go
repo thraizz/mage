@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLairOfTheHydra creates a Lair Of The Hydra
-//   - LAND
+//  - LAND
 func NewLairOfTheHydra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lair Of The Hydra")
 	card.ManaCost = ""

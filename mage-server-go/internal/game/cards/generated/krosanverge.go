@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKrosanVerge creates a Krosan Verge
-//   - LAND
+//  - LAND
 func NewKrosanVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Krosan Verge")
 	card.ManaCost = ""

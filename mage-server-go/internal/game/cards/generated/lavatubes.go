@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLavaTubes creates a Lava Tubes
-//   - LAND
+//  - LAND
 func NewLavaTubes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lava Tubes")
 	card.ManaCost = ""

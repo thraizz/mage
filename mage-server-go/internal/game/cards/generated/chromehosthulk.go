@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewChromeHostHulk creates a Chrome Host Hulk
-//   - CREATURE
+//  - CREATURE
 func NewChromeHostHulk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Chrome Host Hulk")
 	card.ManaCost = ""

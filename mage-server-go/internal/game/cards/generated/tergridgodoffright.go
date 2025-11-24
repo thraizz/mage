@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTergridGodOfFright creates a Tergrid God Of Fright
-//   - CREATURE
+//  - CREATURE
 func NewTergridGodOfFright(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tergrid God Of Fright")
 	card.ManaCost = ""

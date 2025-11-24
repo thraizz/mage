@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJidoorAristocraticCapital creates a Jidoor Aristocratic Capital
-//   - LAND
+//  - LAND
 func NewJidoorAristocraticCapital(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jidoor Aristocratic Capital")
 	card.ManaCost = ""

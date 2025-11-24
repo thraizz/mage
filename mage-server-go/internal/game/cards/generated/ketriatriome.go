@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKetriaTriome creates a Ketria Triome
-//   - LAND
+//  - LAND
 func NewKetriaTriome(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ketria Triome")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpectralBinding creates a Spectral Binding
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewSpectralBinding(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spectral Binding")
 	card.ManaCost = ""

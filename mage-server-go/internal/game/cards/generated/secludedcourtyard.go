@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSecludedCourtyard creates a Secluded Courtyard
-//   - LAND
+//  - LAND
 func NewSecludedCourtyard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Secluded Courtyard")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTresserhornSinks creates a Tresserhorn Sinks
-//   - LAND
+//  - LAND
 func NewTresserhornSinks(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tresserhorn Sinks")
 	card.ManaCost = ""

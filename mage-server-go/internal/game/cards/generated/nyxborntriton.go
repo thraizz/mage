@@ -24,7 +24,7 @@ func NewNyxbornTriton(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(2, 3)).
+		AddEffect(abilities.NewBoostEnchantedEffect(2,3)).
 		Build()
 	if err != nil {
 		return nil, err

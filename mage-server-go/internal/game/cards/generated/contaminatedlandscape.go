@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewContaminatedLandscape creates a Contaminated Landscape
-//   - LAND
+//  - LAND
 func NewContaminatedLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Contaminated Landscape")
 	card.ManaCost = ""

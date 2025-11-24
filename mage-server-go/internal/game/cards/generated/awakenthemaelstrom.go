@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAwakenTheMaelstrom creates a Awaken The Maelstrom
-//   - SORCERY
+//  - SORCERY
 func NewAwakenTheMaelstrom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Awaken The Maelstrom")
 	card.ManaCost = ""

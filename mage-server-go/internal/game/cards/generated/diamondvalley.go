@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDiamondValley creates a Diamond Valley
-//   - LAND
+//  - LAND
 func NewDiamondValley(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Diamond Valley")
 	card.ManaCost = ""

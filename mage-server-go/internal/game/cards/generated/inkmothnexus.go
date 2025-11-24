@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewInkmothNexus creates a Inkmoth Nexus
-//   - LAND
-//
+//  - LAND
 // Flying
 func NewInkmothNexus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Inkmoth Nexus")

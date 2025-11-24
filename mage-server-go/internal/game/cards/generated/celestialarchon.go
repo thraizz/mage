@@ -37,7 +37,7 @@ func NewCelestialArchon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(4, 4)).
+		AddEffect(abilities.NewBoostEnchantedEffect(4,4)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FlyingAbility", abilities.AttachmentTypeAura)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FlyingAbility", abilities.AttachmentTypeAura)).
 		Build()

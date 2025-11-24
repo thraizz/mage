@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDemonPossessedWitch creates a Demon Possessed Witch
-//   - CREATURE
+//  - CREATURE
 func NewDemonPossessedWitch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Demon Possessed Witch")
 	card.ManaCost = ""

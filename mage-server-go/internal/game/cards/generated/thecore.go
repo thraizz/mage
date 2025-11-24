@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheCore creates a The Core
-//   - LAND
+//  - LAND
 func NewTheCore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Core")
 	card.ManaCost = ""

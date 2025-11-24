@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewGhostlyCastigator creates a Ghostly Castigator
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewGhostlyCastigator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ghostly Castigator")

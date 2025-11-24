@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWaterfrontDistrict creates a Waterfront District
-//   - LAND
+//  - LAND
 func NewWaterfrontDistrict(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Waterfront District")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPendelhaven creates a Pendelhaven
-//   - LAND
+//  - LAND
 func NewPendelhaven(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Pendelhaven")
 	card.ManaCost = ""

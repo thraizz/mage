@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGoldbugScrappyScout creates a Goldbug Scrappy Scout
-//   - ARTIFACT
+//  - ARTIFACT
 func NewGoldbugScrappyScout(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Goldbug Scrappy Scout")
 	card.ManaCost = ""

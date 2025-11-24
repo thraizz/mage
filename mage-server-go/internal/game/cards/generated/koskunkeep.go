@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKoskunKeep creates a Koskun Keep
-//   - LAND
+//  - LAND
 func NewKoskunKeep(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Koskun Keep")
 	card.ManaCost = ""

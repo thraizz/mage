@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMosswortBridge creates a Mosswort Bridge
-//   - LAND
+//  - LAND
 func NewMosswortBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mosswort Bridge")
 	card.ManaCost = ""

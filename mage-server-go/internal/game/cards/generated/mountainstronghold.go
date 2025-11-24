@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMountainStronghold creates a Mountain Stronghold
-//   - LAND
+//  - LAND
 func NewMountainStronghold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mountain Stronghold")
 	card.ManaCost = ""

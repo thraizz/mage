@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGuildmagesForum creates a Guildmages Forum
-//   - LAND
+//  - LAND
 func NewGuildmagesForum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Guildmages Forum")
 	card.ManaCost = ""

@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewStarscreamSeekerLeader creates a Starscream Seeker Leader
-//   - ARTIFACT
-//
+//  - ARTIFACT
 // Flying, Haste
 func NewStarscreamSeekerLeader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Starscream Seeker Leader")

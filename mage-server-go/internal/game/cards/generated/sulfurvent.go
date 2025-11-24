@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSulfurVent creates a Sulfur Vent
-//   - LAND
+//  - LAND
 func NewSulfurVent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sulfur Vent")
 	card.ManaCost = ""

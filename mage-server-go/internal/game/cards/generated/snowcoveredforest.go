@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSnowCoveredForest creates a Snow Covered Forest
-//   - LAND
+//  - LAND
 func NewSnowCoveredForest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Snow Covered Forest")
 	card.ManaCost = ""

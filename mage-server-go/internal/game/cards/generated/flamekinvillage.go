@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewFlamekinVillage creates a Flamekin Village
-//   - LAND
+//  - LAND
 func NewFlamekinVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Flamekin Village")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMagosiTheWaterveil creates a Magosi The Waterveil
-//   - LAND
+//  - LAND
 func NewMagosiTheWaterveil(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Magosi The Waterveil")
 	card.ManaCost = ""

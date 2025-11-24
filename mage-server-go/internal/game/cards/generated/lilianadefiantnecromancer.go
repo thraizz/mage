@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLilianaDefiantNecromancer creates a Liliana Defiant Necromancer
-//   - PLANESWALKER
+//  - PLANESWALKER
 func NewLilianaDefiantNecromancer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Liliana Defiant Necromancer")
 	card.ManaCost = ""

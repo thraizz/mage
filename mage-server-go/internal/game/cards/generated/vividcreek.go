@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVividCreek creates a Vivid Creek
-//   - LAND
+//  - LAND
 func NewVividCreek(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vivid Creek")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewKessigWolfRun creates a Kessig Wolf Run
-//   - LAND
+//  - LAND
 func NewKessigWolfRun(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kessig Wolf Run")
 	card.ManaCost = ""

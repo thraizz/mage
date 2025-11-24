@@ -21,7 +21,7 @@ func NewIllnessInTheRanks(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(-1, -1, filter, false)).
+		AddEffect(abilities.NewBoostEffect(-1,-1, filter, false)).
 		Build()
 	if err != nil {
 		return nil, err

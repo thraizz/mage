@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewMoonriseIntruder creates a Moonrise Intruder
-//   - CREATURE
-//
+//  - CREATURE
 // Menace
 func NewMoonriseIntruder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Moonrise Intruder")

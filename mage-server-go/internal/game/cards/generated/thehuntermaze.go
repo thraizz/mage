@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheHunterMaze creates a The Hunter Maze
-//   - LAND
+//  - LAND
 func NewTheHunterMaze(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Hunter Maze")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBraidedQuipu creates a Braided Quipu
-//   - ARTIFACT
+//  - ARTIFACT
 func NewBraidedQuipu(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Braided Quipu")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLonelySandbar creates a Lonely Sandbar
-//   - LAND
+//  - LAND
 func NewLonelySandbar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lonely Sandbar")
 	card.ManaCost = ""

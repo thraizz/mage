@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThornwoodFalls creates a Thornwood Falls
-//   - LAND
+//  - LAND
 func NewThornwoodFalls(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thornwood Falls")
 	card.ManaCost = ""

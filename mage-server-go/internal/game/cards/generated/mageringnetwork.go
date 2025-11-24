@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMageRingNetwork creates a Mage Ring Network
-//   - LAND
+//  - LAND
 func NewMageRingNetwork(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mage Ring Network")
 	card.ManaCost = ""

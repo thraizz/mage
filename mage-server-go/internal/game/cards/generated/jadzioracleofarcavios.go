@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJadziOracleOfArcavios creates a Jadzi Oracle Of Arcavios
-//   - CREATURE
+//  - CREATURE
 func NewJadziOracleOfArcavios(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jadzi Oracle Of Arcavios")
 	card.ManaCost = ""

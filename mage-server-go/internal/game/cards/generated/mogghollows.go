@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMoggHollows creates a Mogg Hollows
-//   - LAND
+//  - LAND
 func NewMoggHollows(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mogg Hollows")
 	card.ManaCost = ""

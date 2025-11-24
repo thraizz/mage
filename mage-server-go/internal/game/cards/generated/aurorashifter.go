@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewAuroraShifter creates a Aurora Shifter
-//
-//	-
+//  - 
 func NewAuroraShifter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Aurora Shifter")
 	card.ManaCost = ""

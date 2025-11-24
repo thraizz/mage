@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOrderOfTheAlabasterHost creates a Order Of The Alabaster Host
-//   - CREATURE
+//  - CREATURE
 func NewOrderOfTheAlabasterHost(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Order Of The Alabaster Host")
 	card.ManaCost = ""

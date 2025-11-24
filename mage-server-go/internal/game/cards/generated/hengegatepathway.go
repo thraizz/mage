@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHengegatePathway creates a Hengegate Pathway
-//   - LAND
+//  - LAND
 func NewHengegatePathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hengegate Pathway")
 	card.ManaCost = ""

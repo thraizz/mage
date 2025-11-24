@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShivanReef creates a Shivan Reef
-//   - LAND
+//  - LAND
 func NewShivanReef(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shivan Reef")
 	card.ManaCost = ""

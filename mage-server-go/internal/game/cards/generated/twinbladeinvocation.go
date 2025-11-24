@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTwinbladeInvocation creates a Twinblade Invocation
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewTwinbladeInvocation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Twinblade Invocation")
 	card.ManaCost = ""

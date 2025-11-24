@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewSarumanOfManyColors creates a Saruman Of Many Colors
-//
-//	-
+//  - 
 func NewSarumanOfManyColors(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Saruman Of Many Colors")
 	card.ManaCost = ""

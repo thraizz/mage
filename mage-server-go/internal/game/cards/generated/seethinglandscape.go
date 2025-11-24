@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSeethingLandscape creates a Seething Landscape
-//   - LAND
+//  - LAND
 func NewSeethingLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seething Landscape")
 	card.ManaCost = ""

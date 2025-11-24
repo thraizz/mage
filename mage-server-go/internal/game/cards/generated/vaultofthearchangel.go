@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewVaultOfTheArchangel creates a Vault Of The Archangel
-//   - LAND
+//  - LAND
 func NewVaultOfTheArchangel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vault Of The Archangel")
 	card.ManaCost = ""

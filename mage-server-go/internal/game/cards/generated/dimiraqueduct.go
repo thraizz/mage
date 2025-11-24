@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDimirAqueduct creates a Dimir Aqueduct
-//   - LAND
+//  - LAND
 func NewDimirAqueduct(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dimir Aqueduct")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTendoIceBridge creates a Tendo Ice Bridge
-//   - LAND
+//  - LAND
 func NewTendoIceBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tendo Ice Bridge")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFlamescrollCelebrant creates a Flamescroll Celebrant
-//   - CREATURE
+//  - CREATURE
 func NewFlamescrollCelebrant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Flamescroll Celebrant")
 	card.ManaCost = ""

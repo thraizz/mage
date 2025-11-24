@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewReidaneGodOfTheWorthy creates a Reidane God Of The Worthy
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Vigilance
 func NewReidaneGodOfTheWorthy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Reidane God Of The Worthy")

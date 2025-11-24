@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMyriadLandscape creates a Myriad Landscape
-//   - LAND
+//  - LAND
 func NewMyriadLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Myriad Landscape")
 	card.ManaCost = ""

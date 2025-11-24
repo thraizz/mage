@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTheMonumentalFacade creates a The Monumental Facade
-//   - LAND
+//  - LAND
 func NewTheMonumentalFacade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Monumental Facade")
 	card.ManaCost = ""

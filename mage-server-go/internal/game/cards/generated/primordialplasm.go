@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPrimordialPlasm creates a Primordial Plasm
-//   - CREATURE
+//  - CREATURE
 func NewPrimordialPlasm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Primordial Plasm")
 	card.ManaCost = ""

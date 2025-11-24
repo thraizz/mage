@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewBurnishedDunestomper creates a Burnished Dunestomper
-//   - CREATURE
-//
+//  - CREATURE
 // Trample
 func NewBurnishedDunestomper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Burnished Dunestomper")

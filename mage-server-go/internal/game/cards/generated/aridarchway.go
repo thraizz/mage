@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAridArchway creates a Arid Archway
-//   - LAND
+//  - LAND
 func NewAridArchway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Arid Archway")
 	card.ManaCost = ""

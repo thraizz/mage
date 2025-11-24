@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewStonewingAntagonizer creates a Stonewing Antagonizer
-//   - ARTIFACT CREATURE
-//
+//  - ARTIFACT CREATURE
 // Flying
 func NewStonewingAntagonizer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Stonewing Antagonizer")

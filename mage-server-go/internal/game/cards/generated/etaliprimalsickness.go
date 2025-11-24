@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewEtaliPrimalSickness creates a Etali Primal Sickness
-//   - CREATURE
-//
+//  - CREATURE
 // Trample, Indestructible
 func NewEtaliPrimalSickness(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Etali Primal Sickness")

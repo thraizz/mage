@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSpawningBed creates a Spawning Bed
-//   - LAND
+//  - LAND
 func NewSpawningBed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spawning Bed")
 	card.ManaCost = ""

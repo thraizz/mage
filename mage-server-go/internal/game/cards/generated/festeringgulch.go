@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFesteringGulch creates a Festering Gulch
-//   - LAND
+//  - LAND
 func NewFesteringGulch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Festering Gulch")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewFungalReaches creates a Fungal Reaches
-//   - LAND
+//  - LAND
 func NewFungalReaches(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fungal Reaches")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCosimaGodOfTheVoyage creates a Cosima God Of The Voyage
-//   - CREATURE
+//  - CREATURE
 func NewCosimaGodOfTheVoyage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cosima God Of The Voyage")
 	card.ManaCost = ""

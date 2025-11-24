@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTheWorldTree creates a The World Tree
-//   - LAND
+//  - LAND
 func NewTheWorldTree(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The World Tree")
 	card.ManaCost = ""

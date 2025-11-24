@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewContestedWarZone creates a Contested War Zone
-//   - LAND
+//  - LAND
 func NewContestedWarZone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Contested War Zone")
 	card.ManaCost = ""

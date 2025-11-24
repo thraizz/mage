@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWinnowingForces creates a Winnowing Forces
-//   - CREATURE
+//  - CREATURE
 func NewWinnowingForces(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Winnowing Forces")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHauntedRidge creates a Haunted Ridge
-//   - LAND
+//  - LAND
 func NewHauntedRidge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Haunted Ridge")
 	card.ManaCost = ""

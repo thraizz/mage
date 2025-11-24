@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNayaPanorama creates a Naya Panorama
-//   - LAND
+//  - LAND
 func NewNayaPanorama(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Naya Panorama")
 	card.ManaCost = ""

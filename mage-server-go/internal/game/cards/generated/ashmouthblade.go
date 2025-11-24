@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAshmouthBlade creates a Ashmouth Blade
-//   - ARTIFACT
+//  - ARTIFACT
 func NewAshmouthBlade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ashmouth Blade")
 	card.ManaCost = ""

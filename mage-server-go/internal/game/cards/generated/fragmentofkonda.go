@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewFragmentOfKonda creates a Fragment Of Konda
-//   - ENCHANTMENT CREATURE
-//
+//  - ENCHANTMENT CREATURE
 // Defender
 func NewFragmentOfKonda(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fragment Of Konda")

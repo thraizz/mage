@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSecretPassage creates a Secret Passage
-//   - LAND
+//  - LAND
 func NewSecretPassage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Secret Passage")
 	card.ManaCost = ""

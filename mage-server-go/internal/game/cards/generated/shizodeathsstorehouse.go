@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewShizoDeathsStorehouse creates a Shizo Deaths Storehouse
-//   - LAND
+//  - LAND
 func NewShizoDeathsStorehouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shizo Deaths Storehouse")
 	card.ManaCost = ""

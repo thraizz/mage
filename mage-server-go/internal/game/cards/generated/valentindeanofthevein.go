@@ -14,8 +14,7 @@ func init() {
 }
 
 // NewValentinDeanOfTheVein creates a Valentin Dean Of The Vein
-//   - CREATURE
-//
+//  - CREATURE
 // Lifelink, Trample
 func NewValentinDeanOfTheVein(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Valentin Dean Of The Vein")

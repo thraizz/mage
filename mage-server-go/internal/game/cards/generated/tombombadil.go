@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewTomBombadil creates a Tom Bombadil
-//
-//	-
+//  - 
 func NewTomBombadil(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tom Bombadil")
 	card.ManaCost = ""

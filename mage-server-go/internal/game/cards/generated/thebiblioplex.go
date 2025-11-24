@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheBiblioplex creates a The Biblioplex
-//   - LAND
+//  - LAND
 func NewTheBiblioplex(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Biblioplex")
 	card.ManaCost = ""

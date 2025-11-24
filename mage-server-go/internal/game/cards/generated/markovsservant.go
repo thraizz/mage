@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMarkovsServant creates a Markovs Servant
-//   - CREATURE
+//  - CREATURE
 func NewMarkovsServant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Markovs Servant")
 	card.ManaCost = ""

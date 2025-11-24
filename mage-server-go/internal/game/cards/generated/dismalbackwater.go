@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDismalBackwater creates a Dismal Backwater
-//   - LAND
+//  - LAND
 func NewDismalBackwater(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dismal Backwater")
 	card.ManaCost = ""

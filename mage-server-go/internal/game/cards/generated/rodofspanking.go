@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewRodOfSpanking creates a Rod Of Spanking
-//
-//	-
+//  - 
 func NewRodOfSpanking(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rod Of Spanking")
 	card.ManaCost = ""

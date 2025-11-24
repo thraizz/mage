@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNightMarket creates a Night Market
-//   - LAND
+//  - LAND
 func NewNightMarket(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Night Market")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewRalLeylineProdigy creates a Ral Leyline Prodigy
-//   - PLANESWALKER
+//  - PLANESWALKER
 func NewRalLeylineProdigy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ral Leyline Prodigy")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewPestilentCauldron creates a Pestilent Cauldron
-//   - ARTIFACT
+//  - ARTIFACT
 func NewPestilentCauldron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Pestilent Cauldron")
 	card.ManaCost = ""

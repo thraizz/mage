@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWarpedLandscape creates a Warped Landscape
-//   - LAND
+//  - LAND
 func NewWarpedLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Warped Landscape")
 	card.ManaCost = ""

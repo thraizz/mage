@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShatterskullSmashing creates a Shatterskull Smashing
-//   - SORCERY
+//  - SORCERY
 func NewShatterskullSmashing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shatterskull Smashing")
 	card.ManaCost = ""

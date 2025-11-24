@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGallifreyCouncilChamber creates a Gallifrey Council Chamber
-//   - LAND
+//  - LAND
 func NewGallifreyCouncilChamber(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gallifrey Council Chamber")
 	card.ManaCost = ""

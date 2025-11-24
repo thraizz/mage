@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPetrifiedField creates a Petrified Field
-//   - LAND
+//  - LAND
 func NewPetrifiedField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Petrified Field")
 	card.ManaCost = ""

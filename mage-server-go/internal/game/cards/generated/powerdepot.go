@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPowerDepot creates a Power Depot
-//   - ARTIFACT LAND
+//  - ARTIFACT LAND
 func NewPowerDepot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Power Depot")
 	card.ManaCost = ""

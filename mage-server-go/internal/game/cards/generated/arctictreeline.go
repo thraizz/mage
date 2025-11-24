@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewArcticTreeline creates a Arctic Treeline
-//   - LAND
+//  - LAND
 func NewArcticTreeline(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Arctic Treeline")
 	card.ManaCost = ""

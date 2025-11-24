@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKazanduRefuge creates a Kazandu Refuge
-//   - LAND
+//  - LAND
 func NewKazanduRefuge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kazandu Refuge")
 	card.ManaCost = ""

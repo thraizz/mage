@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSaprazzanSkerry creates a Saprazzan Skerry
-//   - LAND
+//  - LAND
 func NewSaprazzanSkerry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Saprazzan Skerry")
 	card.ManaCost = ""

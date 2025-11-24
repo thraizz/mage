@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIceFloe creates a Ice Floe
-//   - LAND
+//  - LAND
 func NewIceFloe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ice Floe")
 	card.ManaCost = ""

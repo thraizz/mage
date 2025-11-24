@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewProfaneTutor creates a Profane Tutor
-//   - SORCERY
+//  - SORCERY
 func NewProfaneTutor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Profane Tutor")
 	card.ManaCost = ""

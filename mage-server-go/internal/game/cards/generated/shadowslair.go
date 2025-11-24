@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShadowsLair creates a Shadows Lair
-//   - LAND
+//  - LAND
 func NewShadowsLair(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shadows Lair")
 	card.ManaCost = ""

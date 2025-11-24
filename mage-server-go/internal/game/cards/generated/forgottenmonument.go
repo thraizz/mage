@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewForgottenMonument creates a Forgotten Monument
-//   - LAND
+//  - LAND
 func NewForgottenMonument(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Forgotten Monument")
 	card.ManaCost = ""

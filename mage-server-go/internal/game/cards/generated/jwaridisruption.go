@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewJwariDisruption creates a Jwari Disruption
-//   - INSTANT
+//  - INSTANT
 func NewJwariDisruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jwari Disruption")
 	card.ManaCost = ""

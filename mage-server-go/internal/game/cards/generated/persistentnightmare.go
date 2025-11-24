@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPersistentNightmare creates a Persistent Nightmare
-//   - CREATURE
+//  - CREATURE
 func NewPersistentNightmare(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Persistent Nightmare")
 	card.ManaCost = ""

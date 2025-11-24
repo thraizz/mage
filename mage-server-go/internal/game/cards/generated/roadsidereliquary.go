@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRoadsideReliquary creates a Roadside Reliquary
-//   - LAND
+//  - LAND
 func NewRoadsideReliquary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Roadside Reliquary")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewConsumingSepulcher creates a Consuming Sepulcher
-//   - ARTIFACT
+//  - ARTIFACT
 func NewConsumingSepulcher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Consuming Sepulcher")
 	card.ManaCost = ""

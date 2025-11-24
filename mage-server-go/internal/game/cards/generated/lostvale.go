@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLostVale creates a Lost Vale
-//   - LAND
+//  - LAND
 func NewLostVale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lost Vale")
 	card.ManaCost = ""

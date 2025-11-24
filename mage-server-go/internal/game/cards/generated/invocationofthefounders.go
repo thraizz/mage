@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewInvocationOfTheFounders creates a Invocation Of The Founders
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewInvocationOfTheFounders(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Invocation Of The Founders")
 	card.ManaCost = ""

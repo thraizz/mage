@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewUrzasSaga creates a Urzas Saga
-//   - ENCHANTMENT LAND
+//  - ENCHANTMENT LAND
 func NewUrzasSaga(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Urzas Saga")
 	card.ManaCost = ""

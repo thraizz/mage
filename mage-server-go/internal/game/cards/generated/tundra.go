@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTundra creates a Tundra
-//   - LAND
+//  - LAND
 func NewTundra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tundra")
 	card.ManaCost = ""

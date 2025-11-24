@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSunderingEruption creates a Sundering Eruption
-//   - SORCERY
+//  - SORCERY
 func NewSunderingEruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sundering Eruption")
 	card.ManaCost = ""

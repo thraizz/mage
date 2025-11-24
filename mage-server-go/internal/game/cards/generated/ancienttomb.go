@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAncientTomb creates a Ancient Tomb
-//   - LAND
+//  - LAND
 func NewAncientTomb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ancient Tomb")
 	card.ManaCost = ""

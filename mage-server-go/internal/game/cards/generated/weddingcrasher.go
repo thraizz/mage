@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWeddingCrasher creates a Wedding Crasher
-//   - CREATURE
+//  - CREATURE
 func NewWeddingCrasher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wedding Crasher")
 	card.ManaCost = ""

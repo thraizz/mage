@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewForbiddingWatchtower creates a Forbidding Watchtower
-//   - LAND
+//  - LAND
 func NewForbiddingWatchtower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Forbidding Watchtower")
 	card.ManaCost = ""

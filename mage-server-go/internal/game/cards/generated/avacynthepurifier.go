@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewAvacynThePurifier creates a Avacyn The Purifier
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewAvacynThePurifier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Avacyn The Purifier")

@@ -14,8 +14,7 @@ func init() {
 }
 
 // NewMilesMorales creates a Miles Morales
-//   - CREATURE
-//
+//  - CREATURE
 // FirstStrike, Haste
 func NewMilesMorales(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Miles Morales")

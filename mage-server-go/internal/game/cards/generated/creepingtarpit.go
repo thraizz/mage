@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCreepingTarPit creates a Creeping Tar Pit
-//   - LAND
+//  - LAND
 func NewCreepingTarPit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Creeping Tar Pit")
 	card.ManaCost = ""

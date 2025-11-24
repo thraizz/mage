@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewPrickleFaeries creates a Prickle Faeries
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewPrickleFaeries(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Prickle Faeries")

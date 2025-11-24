@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGlacialFloodplain creates a Glacial Floodplain
-//   - LAND
+//  - LAND
 func NewGlacialFloodplain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glacial Floodplain")
 	card.ManaCost = ""

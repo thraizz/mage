@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEdenSeatOfTheSanctum creates a Eden Seat Of The Sanctum
-//   - LAND
+//  - LAND
 func NewEdenSeatOfTheSanctum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Eden Seat Of The Sanctum")
 	card.ManaCost = ""

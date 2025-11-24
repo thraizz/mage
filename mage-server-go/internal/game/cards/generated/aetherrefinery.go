@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewAetherRefinery creates a Aether Refinery
-//
-//	-
+//  - 
 func NewAetherRefinery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Aether Refinery")
 	card.ManaCost = ""

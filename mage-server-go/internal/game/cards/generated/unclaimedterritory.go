@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUnclaimedTerritory creates a Unclaimed Territory
-//   - LAND
+//  - LAND
 func NewUnclaimedTerritory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Unclaimed Territory")
 	card.ManaCost = ""

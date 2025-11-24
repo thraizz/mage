@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { auth } from '$lib/stores/auth';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 
 	// Form state
@@ -14,11 +15,14 @@
 	let usernameError = '';
 	let passwordError = '';
 
+	// Get return URL from query params
+	$: returnUrl = $page.url.searchParams.get('returnUrl') || '/lobby';
+
 	// Redirect if already authenticated
 	onMount(() => {
 		const restored = auth.loadAuthFromStorage();
 		if (restored) {
-			goto('/lobby');
+			goto(returnUrl);
 		}
 	});
 
@@ -63,8 +67,8 @@
 			// For now, simulate API call with timeout
 			await simulateLogin(username, password);
 
-			// Redirect to lobby on successful login
-			goto('/lobby');
+			// Redirect to original URL or lobby on successful login
+			goto(returnUrl);
 		} catch (error) {
 			if (error instanceof Error) {
 				errorMessage = error.message;
@@ -84,8 +88,8 @@
 			// TODO: Replace with actual guest login API call
 			await simulateLogin('Guest', '', true);
 
-			// Redirect to lobby on successful login
-			goto('/lobby');
+			// Redirect to original URL or lobby on successful login
+			goto(returnUrl);
 		} catch (error) {
 			if (error instanceof Error) {
 				errorMessage = error.message;

@@ -21,7 +21,7 @@ func NewHitRun(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(attackingCreatures-1, 0)).
+		AddEffect(abilities.NewBoostEffect(attackingCreatures - 1, 0)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNomadStadium creates a Nomad Stadium
-//   - LAND
+//  - LAND
 func NewNomadStadium(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nomad Stadium")
 	card.ManaCost = ""

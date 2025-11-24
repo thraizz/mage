@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSandSilos creates a Sand Silos
-//   - LAND
+//  - LAND
 func NewSandSilos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sand Silos")
 	card.ManaCost = ""

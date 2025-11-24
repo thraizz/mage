@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRestlessFortress creates a Restless Fortress
-//   - LAND
+//  - LAND
 func NewRestlessFortress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Restless Fortress")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTavernSmasher creates a Tavern Smasher
-//   - CREATURE
+//  - CREATURE
 func NewTavernSmasher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tavern Smasher")
 	card.ManaCost = ""

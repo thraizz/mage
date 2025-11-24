@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThawingGlaciers creates a Thawing Glaciers
-//   - LAND
+//  - LAND
 func NewThawingGlaciers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thawing Glaciers")
 	card.ManaCost = ""

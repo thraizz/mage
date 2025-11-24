@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMariposaMilitaryBase creates a Mariposa Military Base
-//   - LAND
+//  - LAND
 func NewMariposaMilitaryBase(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mariposa Military Base")
 	card.ManaCost = ""

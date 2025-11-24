@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewScrubland creates a Scrubland
-//   - LAND
+//  - LAND
 func NewScrubland(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Scrubland")
 	card.ManaCost = ""

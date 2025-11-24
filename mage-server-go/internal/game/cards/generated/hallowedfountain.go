@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHallowedFountain creates a Hallowed Fountain
-//   - LAND
+//  - LAND
 func NewHallowedFountain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hallowed Fountain")
 	card.ManaCost = ""

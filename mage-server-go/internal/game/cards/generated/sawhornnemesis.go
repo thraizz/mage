@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewSawhornNemesis creates a Sawhorn Nemesis
-//
-//	-
+//  - 
 func NewSawhornNemesis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sawhorn Nemesis")
 	card.ManaCost = ""

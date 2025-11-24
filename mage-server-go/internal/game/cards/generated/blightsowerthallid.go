@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewBlightsowerThallid creates a Blightsower Thallid
-//   - CREATURE
+//  - CREATURE
 func NewBlightsowerThallid(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blightsower Thallid")
 	card.ManaCost = ""

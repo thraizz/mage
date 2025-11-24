@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMirageMesa creates a Mirage Mesa
-//   - LAND
+//  - LAND
 func NewMirageMesa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mirage Mesa")
 	card.ManaCost = ""

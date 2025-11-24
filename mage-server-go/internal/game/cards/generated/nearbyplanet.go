@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNearbyPlanet creates a Nearby Planet
-//   - LAND
+//  - LAND
 func NewNearbyPlanet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nearby Planet")
 	card.ManaCost = ""

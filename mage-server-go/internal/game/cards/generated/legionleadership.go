@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewLegionLeadership creates a Legion Leadership
-//   - INSTANT
+//  - INSTANT
 func NewLegionLeadership(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Legion Leadership")
 	card.ManaCost = ""

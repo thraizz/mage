@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHavenOfTheSpiritDragon creates a Haven Of The Spirit Dragon
-//   - LAND
+//  - LAND
 func NewHavenOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Haven Of The Spirit Dragon")
 	card.ManaCost = ""

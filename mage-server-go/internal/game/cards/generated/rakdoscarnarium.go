@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRakdosCarnarium creates a Rakdos Carnarium
-//   - LAND
+//  - LAND
 func NewRakdosCarnarium(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rakdos Carnarium")
 	card.ManaCost = ""

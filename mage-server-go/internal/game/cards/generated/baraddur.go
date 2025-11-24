@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBaradDur creates a Barad Dur
-//   - LAND
+//  - LAND
 func NewBaradDur(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Barad Dur")
 	card.ManaCost = ""

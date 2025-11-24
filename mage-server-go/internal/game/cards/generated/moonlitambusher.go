@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMoonlitAmbusher creates a Moonlit Ambusher
-//   - CREATURE
+//  - CREATURE
 func NewMoonlitAmbusher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Moonlit Ambusher")
 	card.ManaCost = ""

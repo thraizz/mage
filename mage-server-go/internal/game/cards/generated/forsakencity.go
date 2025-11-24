@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewForsakenCity creates a Forsaken City
-//   - LAND
+//  - LAND
 func NewForsakenCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Forsaken City")
 	card.ManaCost = ""

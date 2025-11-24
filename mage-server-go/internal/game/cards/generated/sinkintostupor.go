@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSinkIntoStupor creates a Sink Into Stupor
-//   - INSTANT
+//  - INSTANT
 func NewSinkIntoStupor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sink Into Stupor")
 	card.ManaCost = ""

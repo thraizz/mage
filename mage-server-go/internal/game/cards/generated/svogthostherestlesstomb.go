@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSvogthosTheRestlessTomb creates a Svogthos The Restless Tomb
-//   - LAND
+//  - LAND
 func NewSvogthosTheRestlessTomb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Svogthos The Restless Tomb")
 	card.ManaCost = ""

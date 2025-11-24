@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewGitaxianSpellstalker creates a Gitaxian Spellstalker
-//   - CREATURE
-//
+//  - CREATURE
 // Trample
 func NewGitaxianSpellstalker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gitaxian Spellstalker")

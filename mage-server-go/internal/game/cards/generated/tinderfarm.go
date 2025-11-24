@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTinderFarm creates a Tinder Farm
-//   - LAND
+//  - LAND
 func NewTinderFarm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tinder Farm")
 	card.ManaCost = ""

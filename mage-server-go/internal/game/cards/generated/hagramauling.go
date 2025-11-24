@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHagraMauling creates a Hagra Mauling
-//   - INSTANT
+//  - INSTANT
 func NewHagraMauling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hagra Mauling")
 	card.ManaCost = ""

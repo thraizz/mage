@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAetherHub creates a Aether Hub
-//   - LAND
+//  - LAND
 func NewAetherHub(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Aether Hub")
 	card.ManaCost = ""

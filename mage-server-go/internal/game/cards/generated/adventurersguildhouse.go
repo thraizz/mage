@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewAdventurersGuildhouse creates a Adventurers Guildhouse
-//   - LAND
+//  - LAND
 func NewAdventurersGuildhouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Adventurers Guildhouse")
 	card.ManaCost = ""

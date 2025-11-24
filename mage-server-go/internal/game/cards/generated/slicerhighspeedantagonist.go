@@ -12,9 +12,7 @@ func init() {
 }
 
 // NewSlicerHighSpeedAntagonist creates a Slicer High Speed Antagonist
-//
-//	-
-//
+//  - 
 // FirstStrike, Haste
 func NewSlicerHighSpeedAntagonist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Slicer High Speed Antagonist")

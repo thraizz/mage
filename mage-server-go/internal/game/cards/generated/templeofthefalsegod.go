@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTempleOfTheFalseGod creates a Temple Of The False God
-//   - LAND
+//  - LAND
 func NewTempleOfTheFalseGod(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Temple Of The False God")
 	card.ManaCost = ""

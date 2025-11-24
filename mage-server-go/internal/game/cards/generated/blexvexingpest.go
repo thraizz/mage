@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlexVexingPest creates a Blex Vexing Pest
-//   - CREATURE
+//  - CREATURE
 func NewBlexVexingPest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blex Vexing Pest")
 	card.ManaCost = ""

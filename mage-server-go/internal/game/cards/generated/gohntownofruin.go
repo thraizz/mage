@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGohnTownOfRuin creates a Gohn Town Of Ruin
-//   - LAND
+//  - LAND
 func NewGohnTownOfRuin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gohn Town Of Ruin")
 	card.ManaCost = ""

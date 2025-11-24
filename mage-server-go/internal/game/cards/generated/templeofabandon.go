@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTempleOfAbandon creates a Temple Of Abandon
-//   - LAND
+//  - LAND
 func NewTempleOfAbandon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Temple Of Abandon")
 	card.ManaCost = ""

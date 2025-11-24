@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShadowbloodRidge creates a Shadowblood Ridge
-//   - LAND
+//  - LAND
 func NewShadowbloodRidge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shadowblood Ridge")
 	card.ManaCost = ""

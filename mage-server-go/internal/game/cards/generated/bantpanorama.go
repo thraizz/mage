@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBantPanorama creates a Bant Panorama
-//   - LAND
+//  - LAND
 func NewBantPanorama(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bant Panorama")
 	card.ManaCost = ""

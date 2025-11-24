@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGnottvoldSlumbermound creates a Gnottvold Slumbermound
-//   - LAND
+//  - LAND
 func NewGnottvoldSlumbermound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gnottvold Slumbermound")
 	card.ManaCost = ""

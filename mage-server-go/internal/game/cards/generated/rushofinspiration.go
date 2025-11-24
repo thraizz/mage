@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRushOfInspiration creates a Rush Of Inspiration
-//   - INSTANT
+//  - INSTANT
 func NewRushOfInspiration(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rush Of Inspiration")
 	card.ManaCost = ""

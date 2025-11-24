@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThreeTreeCity creates a Three Tree City
-//   - LAND
+//  - LAND
 func NewThreeTreeCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Three Tree City")
 	card.ManaCost = ""

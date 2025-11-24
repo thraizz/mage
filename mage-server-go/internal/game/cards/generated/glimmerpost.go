@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGlimmerpost creates a Glimmerpost
-//   - LAND
+//  - LAND
 func NewGlimmerpost(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glimmerpost")
 	card.ManaCost = ""

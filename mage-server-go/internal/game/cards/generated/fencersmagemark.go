@@ -27,7 +27,7 @@ func NewFencersMagemark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationWhileOnBattlefield)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, false)).
+		AddEffect(abilities.NewBoostEffect(1,1, filter, false)).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationWhileOnBattlefield)).
 		Build()
 	if err != nil {
@@ -35,7 +35,7 @@ func NewFencersMagemark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, false)).
+		AddEffect(abilities.NewBoostEffect(1,1, filter, false)).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationWhileOnBattlefield)).
 		Build()
 	if err != nil {

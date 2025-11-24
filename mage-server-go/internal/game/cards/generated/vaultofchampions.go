@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVaultOfChampions creates a Vault Of Champions
-//   - LAND
+//  - LAND
 func NewVaultOfChampions(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vault Of Champions")
 	card.ManaCost = ""

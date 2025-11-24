@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShimmeringGrotto creates a Shimmering Grotto
-//   - LAND
+//  - LAND
 func NewShimmeringGrotto(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shimmering Grotto")
 	card.ManaCost = ""

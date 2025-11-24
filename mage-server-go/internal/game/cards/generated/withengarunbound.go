@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewWithengarUnbound creates a Withengar Unbound
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Trample
 func NewWithengarUnbound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Withengar Unbound")

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPeculiarLighthouse creates a Peculiar Lighthouse
-//   - LAND
+//  - LAND
 func NewPeculiarLighthouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Peculiar Lighthouse")
 	card.ManaCost = ""

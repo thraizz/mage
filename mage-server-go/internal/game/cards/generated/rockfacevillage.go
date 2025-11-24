@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRockfaceVillage creates a Rockface Village
-//   - LAND
+//  - LAND
 func NewRockfaceVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rockface Village")
 	card.ManaCost = ""

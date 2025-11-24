@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSubmergedBoneyard creates a Submerged Boneyard
-//   - LAND
+//  - LAND
 func NewSubmergedBoneyard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Submerged Boneyard")
 	card.ManaCost = ""

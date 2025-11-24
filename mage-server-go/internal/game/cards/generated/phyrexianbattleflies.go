@@ -27,7 +27,7 @@ func NewPhyrexianBattleflies(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 0)).
+		AddEffect(abilities.NewBoostEffect(1,0)).
 		Build()
 	if err != nil {
 		return nil, err

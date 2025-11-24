@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIshgardTheHolySee creates a Ishgard The Holy See
-//   - LAND
+//  - LAND
 func NewIshgardTheHolySee(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ishgard The Holy See")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewScouredBarrens creates a Scoured Barrens
-//   - LAND
+//  - LAND
 func NewScouredBarrens(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Scoured Barrens")
 	card.ManaCost = ""

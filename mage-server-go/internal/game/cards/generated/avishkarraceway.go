@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAvishkarRaceway creates a Avishkar Raceway
-//   - LAND
+//  - LAND
 func NewAvishkarRaceway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Avishkar Raceway")
 	card.ManaCost = ""

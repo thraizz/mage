@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSeasideCitadel creates a Seaside Citadel
-//   - LAND
+//  - LAND
 func NewSeasideCitadel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seaside Citadel")
 	card.ManaCost = ""

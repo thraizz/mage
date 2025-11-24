@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSeafarersQuay creates a Seafarers Quay
-//   - LAND
+//  - LAND
 func NewSeafarersQuay(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seafarers Quay")
 	card.ManaCost = ""

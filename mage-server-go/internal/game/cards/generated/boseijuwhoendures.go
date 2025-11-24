@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBoseijuWhoEndures creates a Boseiju Who Endures
-//   - LAND
+//  - LAND
 func NewBoseijuWhoEndures(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Boseiju Who Endures")
 	card.ManaCost = ""

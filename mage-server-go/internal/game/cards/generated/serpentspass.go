@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSerpentsPass creates a Serpents Pass
-//   - LAND
+//  - LAND
 func NewSerpentsPass(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Serpents Pass")
 	card.ManaCost = ""

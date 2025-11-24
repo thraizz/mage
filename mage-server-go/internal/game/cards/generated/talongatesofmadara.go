@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTalonGatesOfMadara creates a Talon Gates Of Madara
-//   - LAND
+//  - LAND
 func NewTalonGatesOfMadara(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Talon Gates Of Madara")
 	card.ManaCost = ""

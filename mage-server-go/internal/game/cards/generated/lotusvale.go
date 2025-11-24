@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLotusVale creates a Lotus Vale
-//   - LAND
+//  - LAND
 func NewLotusVale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lotus Vale")
 	card.ManaCost = ""

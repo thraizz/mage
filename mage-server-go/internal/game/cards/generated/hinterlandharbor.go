@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHinterlandHarbor creates a Hinterland Harbor
-//   - LAND
+//  - LAND
 func NewHinterlandHarbor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hinterland Harbor")
 	card.ManaCost = ""

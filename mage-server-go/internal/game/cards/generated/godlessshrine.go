@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGodlessShrine creates a Godless Shrine
-//   - LAND
+//  - LAND
 func NewGodlessShrine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Godless Shrine")
 	card.ManaCost = ""

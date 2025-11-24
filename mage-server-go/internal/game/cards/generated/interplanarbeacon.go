@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewInterplanarBeacon creates a Interplanar Beacon
-//   - LAND
+//  - LAND
 func NewInterplanarBeacon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Interplanar Beacon")
 	card.ManaCost = ""

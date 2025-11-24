@@ -31,7 +31,7 @@ func NewThassasEmissary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(3, 3)).
+		AddEffect(abilities.NewBoostEnchantedEffect(3,3)).
 		Build()
 	if err != nil {
 		return nil, err

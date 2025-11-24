@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewConquerorsFoothold creates a Conquerors Foothold
-//   - LAND
+//  - LAND
 func NewConquerorsFoothold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Conquerors Foothold")
 	card.ManaCost = ""

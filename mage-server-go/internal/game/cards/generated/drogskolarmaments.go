@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDrogskolArmaments creates a Drogskol Armaments
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewDrogskolArmaments(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Drogskol Armaments")
 	card.ManaCost = ""

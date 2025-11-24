@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlossomCladWerewolf creates a Blossom Clad Werewolf
-//   - CREATURE
+//  - CREATURE
 func NewBlossomCladWerewolf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blossom Clad Werewolf")
 	card.ManaCost = ""

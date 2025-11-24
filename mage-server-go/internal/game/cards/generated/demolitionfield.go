@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDemolitionField creates a Demolition Field
-//   - LAND
+//  - LAND
 func NewDemolitionField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Demolition Field")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBattlefieldForge creates a Battlefield Forge
-//   - LAND
+//  - LAND
 func NewBattlefieldForge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Battlefield Forge")
 	card.ManaCost = ""

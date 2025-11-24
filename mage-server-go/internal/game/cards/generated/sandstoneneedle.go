@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSandstoneNeedle creates a Sandstone Needle
-//   - LAND
+//  - LAND
 func NewSandstoneNeedle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sandstone Needle")
 	card.ManaCost = ""

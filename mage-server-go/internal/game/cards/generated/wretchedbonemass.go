@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWretchedBonemass creates a Wretched Bonemass
-//   - CREATURE
+//  - CREATURE
 func NewWretchedBonemass(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wretched Bonemass")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMemorialToUnity creates a Memorial To Unity
-//   - LAND
+//  - LAND
 func NewMemorialToUnity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Memorial To Unity")
 	card.ManaCost = ""

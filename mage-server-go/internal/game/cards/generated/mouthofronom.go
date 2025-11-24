@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMouthOfRonom creates a Mouth Of Ronom
-//   - LAND
+//  - LAND
 func NewMouthOfRonom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mouth Of Ronom")
 	card.ManaCost = ""

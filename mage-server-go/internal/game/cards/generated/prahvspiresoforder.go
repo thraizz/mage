@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPrahvSpiresOfOrder creates a Prahv Spires Of Order
-//   - LAND
+//  - LAND
 func NewPrahvSpiresOfOrder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Prahv Spires Of Order")
 	card.ManaCost = ""

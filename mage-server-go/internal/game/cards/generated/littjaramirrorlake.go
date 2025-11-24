@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewLittjaraMirrorlake creates a Littjara Mirrorlake
-//   - LAND
+//  - LAND
 func NewLittjaraMirrorlake(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Littjara Mirrorlake")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCatapultCaptain creates a Catapult Captain
-//   - CREATURE
+//  - CREATURE
 func NewCatapultCaptain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Catapult Captain")
 	card.ManaCost = ""

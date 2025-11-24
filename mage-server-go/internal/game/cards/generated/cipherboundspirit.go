@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewCipherboundSpirit creates a Cipherbound Spirit
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewCipherboundSpirit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cipherbound Spirit")

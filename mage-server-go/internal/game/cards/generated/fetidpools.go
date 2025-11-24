@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFetidPools creates a Fetid Pools
-//   - LAND
+//  - LAND
 func NewFetidPools(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fetid Pools")
 	card.ManaCost = ""

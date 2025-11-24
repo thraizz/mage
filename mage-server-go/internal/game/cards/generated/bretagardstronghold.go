@@ -14,7 +14,7 @@ func init() {
 }
 
 // NewBretagardStronghold creates a Bretagard Stronghold
-//   - LAND
+//  - LAND
 func NewBretagardStronghold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bretagard Stronghold")
 	card.ManaCost = ""

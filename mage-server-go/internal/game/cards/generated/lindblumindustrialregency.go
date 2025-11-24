@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewLindblumIndustrialRegency creates a Lindblum Industrial Regency
-//   - LAND
+//  - LAND
 func NewLindblumIndustrialRegency(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lindblum Industrial Regency")
 	card.ManaCost = ""

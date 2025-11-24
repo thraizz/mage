@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTranquilThicket creates a Tranquil Thicket
-//   - LAND
+//  - LAND
 func NewTranquilThicket(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tranquil Thicket")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEwokVillage creates a Ewok Village
-//   - LAND
+//  - LAND
 func NewEwokVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ewok Village")
 	card.ManaCost = ""

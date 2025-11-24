@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKabiraCrossroads creates a Kabira Crossroads
-//   - LAND
+//  - LAND
 func NewKabiraCrossroads(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kabira Crossroads")
 	card.ManaCost = ""

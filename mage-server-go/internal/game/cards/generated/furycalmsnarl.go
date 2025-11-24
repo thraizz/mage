@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFurycalmSnarl creates a Furycalm Snarl
-//   - LAND
+//  - LAND
 func NewFurycalmSnarl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Furycalm Snarl")
 	card.ManaCost = ""

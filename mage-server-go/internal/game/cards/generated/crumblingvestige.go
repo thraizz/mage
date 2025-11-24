@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCrumblingVestige creates a Crumbling Vestige
-//   - LAND
+//  - LAND
 func NewCrumblingVestige(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crumbling Vestige")
 	card.ManaCost = ""

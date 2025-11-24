@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFrostwalkBastion creates a Frostwalk Bastion
-//   - LAND
+//  - LAND
 func NewFrostwalkBastion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Frostwalk Bastion")
 	card.ManaCost = ""

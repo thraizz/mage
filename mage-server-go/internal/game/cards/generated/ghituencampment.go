@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewGhituEncampment creates a Ghitu Encampment
-//   - LAND
-//
+//  - LAND
 // FirstStrike
 func NewGhituEncampment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ghitu Encampment")

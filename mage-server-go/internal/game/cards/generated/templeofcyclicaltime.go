@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTempleOfCyclicalTime creates a Temple Of Cyclical Time
-//   - LAND
+//  - LAND
 func NewTempleOfCyclicalTime(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Temple Of Cyclical Time")
 	card.ManaCost = ""

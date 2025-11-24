@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRestoreBalance creates a Restore Balance
-//   - SORCERY
+//  - SORCERY
 func NewRestoreBalance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Restore Balance")
 	card.ManaCost = ""

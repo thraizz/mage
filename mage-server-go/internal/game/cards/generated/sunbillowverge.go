@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSunbillowVerge creates a Sunbillow Verge
-//   - LAND
+//  - LAND
 func NewSunbillowVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sunbillow Verge")
 	card.ManaCost = ""

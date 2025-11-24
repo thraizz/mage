@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFortifiedBeachhead creates a Fortified Beachhead
-//   - LAND
+//  - LAND
 func NewFortifiedBeachhead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fortified Beachhead")
 	card.ManaCost = ""

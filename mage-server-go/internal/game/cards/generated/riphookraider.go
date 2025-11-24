@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRiphookRaider creates a Riphook Raider
-//   - CREATURE
+//  - CREATURE
 func NewRiphookRaider(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Riphook Raider")
 	card.ManaCost = ""

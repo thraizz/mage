@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewVectorGlider creates a Vector Glider
-//   - ENCHANTMENT CREATURE
-//
+//  - ENCHANTMENT CREATURE
 // Flying
 func NewVectorGlider(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vector Glider")

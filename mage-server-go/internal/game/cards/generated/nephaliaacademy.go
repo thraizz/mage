@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNephaliaAcademy creates a Nephalia Academy
-//   - LAND
+//  - LAND
 func NewNephaliaAcademy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nephalia Academy")
 	card.ManaCost = ""

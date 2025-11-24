@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPathOfAncestry creates a Path Of Ancestry
-//   - LAND
+//  - LAND
 func NewPathOfAncestry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Path Of Ancestry")
 	card.ManaCost = ""

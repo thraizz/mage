@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewDarthVader creates a Darth Vader
-//   - CREATURE
-//
+//  - CREATURE
 // Menace, Lifelink
 func NewDarthVader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Darth Vader")

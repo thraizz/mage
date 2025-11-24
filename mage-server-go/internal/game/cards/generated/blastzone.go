@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewBlastZone creates a Blast Zone
-//   - LAND
+//  - LAND
 func NewBlastZone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blast Zone")
 	card.ManaCost = ""

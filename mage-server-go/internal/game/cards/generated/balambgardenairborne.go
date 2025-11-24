@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewBalambGardenAirborne creates a Balamb Garden Airborne
-//   - ARTIFACT
-//
+//  - ARTIFACT
 // Flying
 func NewBalambGardenAirborne(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Balamb Garden Airborne")

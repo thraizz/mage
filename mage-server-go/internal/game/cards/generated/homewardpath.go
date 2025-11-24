@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHomewardPath creates a Homeward Path
-//   - LAND
+//  - LAND
 func NewHomewardPath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Homeward Path")
 	card.ManaCost = ""

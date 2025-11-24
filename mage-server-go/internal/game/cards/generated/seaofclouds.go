@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSeaOfClouds creates a Sea Of Clouds
-//   - LAND
+//  - LAND
 func NewSeaOfClouds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sea Of Clouds")
 	card.ManaCost = ""

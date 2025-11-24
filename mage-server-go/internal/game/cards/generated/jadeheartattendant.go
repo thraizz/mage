@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJadeheartAttendant creates a Jadeheart Attendant
-//   - ARTIFACT CREATURE
+//  - ARTIFACT CREATURE
 func NewJadeheartAttendant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jadeheart Attendant")
 	card.ManaCost = ""

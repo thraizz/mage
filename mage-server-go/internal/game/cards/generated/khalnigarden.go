@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewKhalniGarden creates a Khalni Garden
-//   - LAND
+//  - LAND
 func NewKhalniGarden(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Khalni Garden")
 	card.ManaCost = ""

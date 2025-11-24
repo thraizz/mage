@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewHenrikaInfernalSeer creates a Henrika Infernal Seer
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Deathtouch, Lifelink
 func NewHenrikaInfernalSeer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Henrika Infernal Seer")

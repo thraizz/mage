@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTombOfTheSpiritDragon creates a Tomb Of The Spirit Dragon
-//   - LAND
+//  - LAND
 func NewTombOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tomb Of The Spirit Dragon")
 	card.ManaCost = ""

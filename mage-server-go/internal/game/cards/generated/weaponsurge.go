@@ -22,8 +22,8 @@ func NewWeaponSurge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 0, filter, false)).
-		AddEffect(abilities.NewBoostEffect(1, 0)).
+		AddEffect(abilities.NewBoostEffect(1,0, filter, false)).
+		AddEffect(abilities.NewBoostEffect(1,0)).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {

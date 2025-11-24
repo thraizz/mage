@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCommandBeacon creates a Command Beacon
-//   - LAND
+//  - LAND
 func NewCommandBeacon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Command Beacon")
 	card.ManaCost = ""

@@ -25,14 +25,14 @@ func NewWeightOfTheUnderworld(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeUnboostCreature)).
-		AddEffect(abilities.NewBoostEnchantedEffect(-3, -2)).
+		AddEffect(abilities.NewBoostEnchantedEffect(-3,-2)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(-3, -2)).
+		AddEffect(abilities.NewBoostEnchantedEffect(-3,-2)).
 		Build()
 	if err != nil {
 		return nil, err

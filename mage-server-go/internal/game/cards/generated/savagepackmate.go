@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewSavagePackmate creates a Savage Packmate
-//   - CREATURE
-//
+//  - CREATURE
 // Trample
 func NewSavagePackmate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Savage Packmate")

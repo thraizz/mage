@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTakenumaAbandonedMire creates a Takenuma Abandoned Mire
-//   - LAND
+//  - LAND
 func NewTakenumaAbandonedMire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Takenuma Abandoned Mire")
 	card.ManaCost = ""

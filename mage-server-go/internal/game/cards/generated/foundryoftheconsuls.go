@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewFoundryOfTheConsuls creates a Foundry Of The Consuls
-//   - LAND
+//  - LAND
 func NewFoundryOfTheConsuls(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Foundry Of The Consuls")
 	card.ManaCost = ""

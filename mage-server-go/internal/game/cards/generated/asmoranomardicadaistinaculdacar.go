@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAsmoranomardicadaistinaculdacar creates a Asmoranomardicadaistinaculdacar
-//   - CREATURE
+//  - CREATURE
 func NewAsmoranomardicadaistinaculdacar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Asmoranomardicadaistinaculdacar")
 	card.ManaCost = ""

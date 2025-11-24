@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCoastalTower creates a Coastal Tower
-//   - LAND
+//  - LAND
 func NewCoastalTower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Coastal Tower")
 	card.ManaCost = ""

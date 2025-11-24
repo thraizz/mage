@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewClivesHideaway creates a Clives Hideaway
-//   - LAND
+//  - LAND
 func NewClivesHideaway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Clives Hideaway")
 	card.ManaCost = ""

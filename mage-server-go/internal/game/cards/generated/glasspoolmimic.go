@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGlasspoolMimic creates a Glasspool Mimic
-//   - CREATURE
+//  - CREATURE
 func NewGlasspoolMimic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glasspool Mimic")
 	card.ManaCost = ""

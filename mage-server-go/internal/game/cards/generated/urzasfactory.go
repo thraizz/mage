@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewUrzasFactory creates a Urzas Factory
-//   - LAND
+//  - LAND
 func NewUrzasFactory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Urzas Factory")
 	card.ManaCost = ""

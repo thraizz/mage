@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMuragandaRaceway creates a Muraganda Raceway
-//   - LAND
+//  - LAND
 func NewMuragandaRaceway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Muraganda Raceway")
 	card.ManaCost = ""

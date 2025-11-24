@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTamiyoSeasonedScholar creates a Tamiyo Seasoned Scholar
-//   - PLANESWALKER
+//  - PLANESWALKER
 func NewTamiyoSeasonedScholar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tamiyo Seasoned Scholar")
 	card.ManaCost = ""

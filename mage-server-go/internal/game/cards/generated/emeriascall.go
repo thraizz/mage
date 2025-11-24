@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewEmeriasCall creates a Emerias Call
-//   - SORCERY
+//  - SORCERY
 func NewEmeriasCall(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Emerias Call")
 	card.ManaCost = ""

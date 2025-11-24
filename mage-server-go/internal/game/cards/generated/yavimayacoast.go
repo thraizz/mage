@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewYavimayaCoast creates a Yavimaya Coast
-//   - LAND
+//  - LAND
 func NewYavimayaCoast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Yavimaya Coast")
 	card.ManaCost = ""

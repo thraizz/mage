@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGeodeGrotto creates a Geode Grotto
-//   - LAND
+//  - LAND
 func NewGeodeGrotto(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Geode Grotto")
 	card.ManaCost = ""

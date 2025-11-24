@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCryptOfAgadeem creates a Crypt Of Agadeem
-//   - LAND
+//  - LAND
 func NewCryptOfAgadeem(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crypt Of Agadeem")
 	card.ManaCost = ""

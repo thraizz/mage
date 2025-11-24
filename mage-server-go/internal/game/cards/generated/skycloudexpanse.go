@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSkycloudExpanse creates a Skycloud Expanse
-//   - LAND
+//  - LAND
 func NewSkycloudExpanse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Skycloud Expanse")
 	card.ManaCost = ""

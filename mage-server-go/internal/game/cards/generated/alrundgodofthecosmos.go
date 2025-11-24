@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewAlrundGodOfTheCosmos creates a Alrund God Of The Cosmos
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewAlrundGodOfTheCosmos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Alrund God Of The Cosmos")

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSunbakedCanyon creates a Sunbaked Canyon
-//   - LAND
+//  - LAND
 func NewSunbakedCanyon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sunbaked Canyon")
 	card.ManaCost = ""

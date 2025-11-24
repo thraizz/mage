@@ -28,14 +28,14 @@ func NewGuardiansMagemark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, false)).
+		AddEffect(abilities.NewBoostEffect(1,1, filter, false)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, false)).
+		AddEffect(abilities.NewBoostEffect(1,1, filter, false)).
 		Build()
 	if err != nil {
 		return nil, err

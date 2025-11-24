@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPrimalBeyond creates a Primal Beyond
-//   - LAND
+//  - LAND
 func NewPrimalBeyond(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Primal Beyond")
 	card.ManaCost = ""

@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewExtusOriqOverlord creates a Extus Oriq Overlord
-//   - CREATURE
-//
+//  - CREATURE
 // DoubleStrike
 func NewExtusOriqOverlord(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Extus Oriq Overlord")

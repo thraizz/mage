@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBranchloftPathway creates a Branchloft Pathway
-//   - LAND
+//  - LAND
 func NewBranchloftPathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Branchloft Pathway")
 	card.ManaCost = ""

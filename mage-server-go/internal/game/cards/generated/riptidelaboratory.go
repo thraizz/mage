@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRiptideLaboratory creates a Riptide Laboratory
-//   - LAND
+//  - LAND
 func NewRiptideLaboratory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Riptide Laboratory")
 	card.ManaCost = ""

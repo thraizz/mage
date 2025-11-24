@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewHowlingChorus creates a Howling Chorus
-//   - CREATURE
+//  - CREATURE
 func NewHowlingChorus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Howling Chorus")
 	card.ManaCost = ""

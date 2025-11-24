@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRishadanPort creates a Rishadan Port
-//   - LAND
+//  - LAND
 func NewRishadanPort(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rishadan Port")
 	card.ManaCost = ""

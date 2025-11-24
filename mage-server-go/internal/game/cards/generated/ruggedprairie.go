@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRuggedPrairie creates a Rugged Prairie
-//   - LAND
+//  - LAND
 func NewRuggedPrairie(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rugged Prairie")
 	card.ManaCost = ""

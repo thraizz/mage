@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNorthPoleGates creates a North Pole Gates
-//   - LAND
+//  - LAND
 func NewNorthPoleGates(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "North Pole Gates")
 	card.ManaCost = ""

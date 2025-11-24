@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFrostMarsh creates a Frost Marsh
-//   - LAND
+//  - LAND
 func NewFrostMarsh(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Frost Marsh")
 	card.ManaCost = ""

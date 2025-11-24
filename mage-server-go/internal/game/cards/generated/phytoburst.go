@@ -21,7 +21,7 @@ func NewPhytoburst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(5, 5)).
+		AddEffect(abilities.NewBoostEffect(5,5)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

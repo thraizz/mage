@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheFairBasilica creates a The Fair Basilica
-//   - LAND
+//  - LAND
 func NewTheFairBasilica(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Fair Basilica")
 	card.ManaCost = ""

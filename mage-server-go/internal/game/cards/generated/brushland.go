@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBrushland creates a Brushland
-//   - LAND
+//  - LAND
 func NewBrushland(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Brushland")
 	card.ManaCost = ""

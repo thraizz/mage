@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCreosoteHeath creates a Creosote Heath
-//   - LAND
+//  - LAND
 func NewCreosoteHeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Creosote Heath")
 	card.ManaCost = ""

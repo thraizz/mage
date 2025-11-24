@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTerramorphicExpanse creates a Terramorphic Expanse
-//   - LAND
+//  - LAND
 func NewTerramorphicExpanse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Terramorphic Expanse")
 	card.ManaCost = ""

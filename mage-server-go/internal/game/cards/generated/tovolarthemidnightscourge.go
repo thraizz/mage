@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTovolarTheMidnightScourge creates a Tovolar The Midnight Scourge
-//   - CREATURE
+//  - CREATURE
 func NewTovolarTheMidnightScourge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tovolar The Midnight Scourge")
 	card.ManaCost = ""

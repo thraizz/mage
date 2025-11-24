@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRootboundCrag creates a Rootbound Crag
-//   - LAND
+//  - LAND
 func NewRootboundCrag(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rootbound Crag")
 	card.ManaCost = ""

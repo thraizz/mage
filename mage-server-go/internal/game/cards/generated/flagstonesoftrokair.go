@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFlagstonesOfTrokair creates a Flagstones Of Trokair
-//   - LAND
+//  - LAND
 func NewFlagstonesOfTrokair(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Flagstones Of Trokair")
 	card.ManaCost = ""

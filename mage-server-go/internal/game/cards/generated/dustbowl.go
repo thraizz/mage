@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDustBowl creates a Dust Bowl
-//   - LAND
+//  - LAND
 func NewDustBowl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dust Bowl")
 	card.ManaCost = ""

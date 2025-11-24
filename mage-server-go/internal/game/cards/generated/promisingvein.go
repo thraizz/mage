@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPromisingVein creates a Promising Vein
-//   - LAND
+//  - LAND
 func NewPromisingVein(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Promising Vein")
 	card.ManaCost = ""

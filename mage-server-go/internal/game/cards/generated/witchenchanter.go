@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWitchEnchanter creates a Witch Enchanter
-//   - CREATURE
+//  - CREATURE
 func NewWitchEnchanter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Witch Enchanter")
 	card.ManaCost = ""

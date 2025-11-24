@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRazorgrassAmbush creates a Razorgrass Ambush
-//   - INSTANT
+//  - INSTANT
 func NewRazorgrassAmbush(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Razorgrass Ambush")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCragcrownPathway creates a Cragcrown Pathway
-//   - LAND
+//  - LAND
 func NewCragcrownPathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cragcrown Pathway")
 	card.ManaCost = ""

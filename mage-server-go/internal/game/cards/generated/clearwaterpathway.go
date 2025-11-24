@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewClearwaterPathway creates a Clearwater Pathway
-//   - LAND
+//  - LAND
 func NewClearwaterPathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Clearwater Pathway")
 	card.ManaCost = ""

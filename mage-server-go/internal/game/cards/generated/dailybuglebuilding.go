@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDailyBugleBuilding creates a Daily Bugle Building
-//   - LAND
+//  - LAND
 func NewDailyBugleBuilding(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Daily Bugle Building")
 	card.ManaCost = ""

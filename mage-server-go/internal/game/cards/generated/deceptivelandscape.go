@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDeceptiveLandscape creates a Deceptive Landscape
-//   - LAND
+//  - LAND
 func NewDeceptiveLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Deceptive Landscape")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBleachboneVerge creates a Bleachbone Verge
-//   - LAND
+//  - LAND
 func NewBleachboneVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bleachbone Verge")
 	card.ManaCost = ""

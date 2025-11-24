@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewBloodswornKnight creates a Bloodsworn Knight
-//   - CREATURE
+//  - CREATURE
 func NewBloodswornKnight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bloodsworn Knight")
 	card.ManaCost = ""

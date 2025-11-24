@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDesertOfTheGlorified creates a Desert Of The Glorified
-//   - LAND
+//  - LAND
 func NewDesertOfTheGlorified(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Desert Of The Glorified")
 	card.ManaCost = ""

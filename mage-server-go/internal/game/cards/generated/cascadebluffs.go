@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCascadeBluffs creates a Cascade Bluffs
-//   - LAND
+//  - LAND
 func NewCascadeBluffs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cascade Bluffs")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewIfnirDeadlands creates a Ifnir Deadlands
-//   - LAND
+//  - LAND
 func NewIfnirDeadlands(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ifnir Deadlands")
 	card.ManaCost = ""

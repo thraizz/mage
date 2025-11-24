@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBaldursGate creates a Baldurs Gate
-//   - LAND
+//  - LAND
 func NewBaldursGate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Baldurs Gate")
 	card.ManaCost = ""

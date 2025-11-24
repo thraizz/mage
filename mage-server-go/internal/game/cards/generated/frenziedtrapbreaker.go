@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFrenziedTrapbreaker creates a Frenzied Trapbreaker
-//   - CREATURE
+//  - CREATURE
 func NewFrenziedTrapbreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Frenzied Trapbreaker")
 	card.ManaCost = ""

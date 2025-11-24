@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAccessTunnel creates a Access Tunnel
-//   - LAND
+//  - LAND
 func NewAccessTunnel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Access Tunnel")
 	card.ManaCost = ""

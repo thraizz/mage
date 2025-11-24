@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCavesOfKoilos creates a Caves Of Koilos
-//   - LAND
+//  - LAND
 func NewCavesOfKoilos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Caves Of Koilos")
 	card.ManaCost = ""

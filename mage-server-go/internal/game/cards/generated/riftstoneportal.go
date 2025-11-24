@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRiftstonePortal creates a Riftstone Portal
-//   - LAND
+//  - LAND
 func NewRiftstonePortal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Riftstone Portal")
 	card.ManaCost = ""

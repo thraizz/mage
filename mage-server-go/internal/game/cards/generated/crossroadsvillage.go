@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCrossroadsVillage creates a Crossroads Village
-//   - LAND
+//  - LAND
 func NewCrossroadsVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crossroads Village")
 	card.ManaCost = ""

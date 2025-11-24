@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHomicidalBrute creates a Homicidal Brute
-//   - CREATURE
+//  - CREATURE
 func NewHomicidalBrute(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Homicidal Brute")
 	card.ManaCost = ""

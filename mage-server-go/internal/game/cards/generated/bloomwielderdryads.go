@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBloomwielderDryads creates a Bloomwielder Dryads
-//   - CREATURE
+//  - CREATURE
 func NewBloomwielderDryads(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bloomwielder Dryads")
 	card.ManaCost = ""

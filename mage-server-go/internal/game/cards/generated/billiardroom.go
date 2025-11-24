@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBilliardRoom creates a Billiard Room
-//   - LAND
+//  - LAND
 func NewBilliardRoom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Billiard Room")
 	card.ManaCost = ""

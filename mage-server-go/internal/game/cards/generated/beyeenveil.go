@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBeyeenVeil creates a Beyeen Veil
-//   - INSTANT
+//  - INSTANT
 func NewBeyeenVeil(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Beyeen Veil")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTournamentGrounds creates a Tournament Grounds
-//   - LAND
+//  - LAND
 func NewTournamentGrounds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tournament Grounds")
 	card.ManaCost = ""

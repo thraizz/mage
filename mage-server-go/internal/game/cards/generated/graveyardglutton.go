@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGraveyardGlutton creates a Graveyard Glutton
-//   - CREATURE
+//  - CREATURE
 func NewGraveyardGlutton(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Graveyard Glutton")
 	card.ManaCost = ""

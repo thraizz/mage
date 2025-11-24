@@ -21,7 +21,7 @@ func NewPhyresisOutbreak(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(totalPoison*-1, totalPoison*-1)).
+		AddEffect(abilities.NewBoostEffect(totalPoison * -1, totalPoison * -1)).
 		Build()
 	if err != nil {
 		return nil, err

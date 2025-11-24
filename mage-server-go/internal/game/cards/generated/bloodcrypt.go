@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBloodCrypt creates a Blood Crypt
-//   - LAND
+//  - LAND
 func NewBloodCrypt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blood Crypt")
 	card.ManaCost = ""

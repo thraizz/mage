@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTaintedIsle creates a Tainted Isle
-//   - LAND
+//  - LAND
 func NewTaintedIsle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tainted Isle")
 	card.ManaCost = ""

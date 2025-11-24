@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBaneclawMarauder creates a Baneclaw Marauder
-//   - CREATURE
+//  - CREATURE
 func NewBaneclawMarauder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Baneclaw Marauder")
 	card.ManaCost = ""

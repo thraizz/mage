@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPinnacleMonk creates a Pinnacle Monk
-//   - CREATURE
+//  - CREATURE
 func NewPinnacleMonk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Pinnacle Monk")
 	card.ManaCost = ""

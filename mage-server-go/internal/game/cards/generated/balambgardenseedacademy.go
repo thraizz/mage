@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBalambGardenSeeDAcademy creates a Balamb Garden See D Academy
-//   - LAND
+//  - LAND
 func NewBalambGardenSeeDAcademy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Balamb Garden See D Academy")
 	card.ManaCost = ""

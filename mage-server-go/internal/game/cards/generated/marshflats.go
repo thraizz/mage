@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMarshFlats creates a Marsh Flats
-//   - LAND
+//  - LAND
 func NewMarshFlats(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Marsh Flats")
 	card.ManaCost = ""

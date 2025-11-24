@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMountDoom creates a Mount Doom
-//   - LAND
+//  - LAND
 func NewMountDoom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mount Doom")
 	card.ManaCost = ""

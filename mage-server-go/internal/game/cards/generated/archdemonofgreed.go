@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewArchdemonOfGreed creates a Archdemon Of Greed
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Trample
 func NewArchdemonOfGreed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Archdemon Of Greed")

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSwarmyard creates a Swarmyard
-//   - LAND
+//  - LAND
 func NewSwarmyard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Swarmyard")
 	card.ManaCost = ""

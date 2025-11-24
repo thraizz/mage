@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewVastwoodFortification creates a Vastwood Fortification
-//   - INSTANT
+//  - INSTANT
 func NewVastwoodFortification(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vastwood Fortification")
 	card.ManaCost = ""

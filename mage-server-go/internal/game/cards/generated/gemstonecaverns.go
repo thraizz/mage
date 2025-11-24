@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGemstoneCaverns creates a Gemstone Caverns
-//   - LAND
+//  - LAND
 func NewGemstoneCaverns(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gemstone Caverns")
 	card.ManaCost = ""

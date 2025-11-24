@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewGitaxianMindstinger creates a Gitaxian Mindstinger
-//   - CREATURE
-//
+//  - CREATURE
 // Deathtouch
 func NewGitaxianMindstinger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gitaxian Mindstinger")

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBotanicalSanctum creates a Botanical Sanctum
-//   - LAND
+//  - LAND
 func NewBotanicalSanctum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Botanical Sanctum")
 	card.ManaCost = ""

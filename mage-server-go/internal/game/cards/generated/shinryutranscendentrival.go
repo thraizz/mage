@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewShinryuTranscendentRival creates a Shinryu Transcendent Rival
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewShinryuTranscendentRival(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shinryu Transcendent Rival")

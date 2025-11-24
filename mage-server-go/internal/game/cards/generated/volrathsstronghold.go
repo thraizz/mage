@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVolrathsStronghold creates a Volraths Stronghold
-//   - LAND
+//  - LAND
 func NewVolrathsStronghold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Volraths Stronghold")
 	card.ManaCost = ""

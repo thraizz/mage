@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGreatHallOfTheCitadel creates a Great Hall Of The Citadel
-//   - LAND
+//  - LAND
 func NewGreatHallOfTheCitadel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Great Hall Of The Citadel")
 	card.ManaCost = ""

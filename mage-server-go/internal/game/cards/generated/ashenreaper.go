@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewAshenReaper creates a Ashen Reaper
-//   - CREATURE
+//  - CREATURE
 func NewAshenReaper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ashen Reaper")
 	card.ManaCost = ""

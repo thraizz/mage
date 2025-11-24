@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWintermoonMesa creates a Wintermoon Mesa
-//   - LAND
+//  - LAND
 func NewWintermoonMesa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wintermoon Mesa")
 	card.ManaCost = ""

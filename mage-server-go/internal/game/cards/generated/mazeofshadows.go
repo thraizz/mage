@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMazeOfShadows creates a Maze Of Shadows
-//   - LAND
+//  - LAND
 func NewMazeOfShadows(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Maze Of Shadows")
 	card.ManaCost = ""

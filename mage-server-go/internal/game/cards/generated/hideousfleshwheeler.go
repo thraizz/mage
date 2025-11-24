@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewHideousFleshwheeler creates a Hideous Fleshwheeler
-//   - CREATURE
-//
+//  - CREATURE
 // Menace
 func NewHideousFleshwheeler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hideous Fleshwheeler")

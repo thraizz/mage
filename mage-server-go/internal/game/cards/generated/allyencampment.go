@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAllyEncampment creates a Ally Encampment
-//   - LAND
+//  - LAND
 func NewAllyEncampment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ally Encampment")
 	card.ManaCost = ""

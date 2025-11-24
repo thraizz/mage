@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTwistedLandscape creates a Twisted Landscape
-//   - LAND
+//  - LAND
 func NewTwistedLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Twisted Landscape")
 	card.ManaCost = ""

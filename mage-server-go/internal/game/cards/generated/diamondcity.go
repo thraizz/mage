@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewDiamondCity creates a Diamond City
-//   - LAND
+//  - LAND
 func NewDiamondCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Diamond City")
 	card.ManaCost = ""

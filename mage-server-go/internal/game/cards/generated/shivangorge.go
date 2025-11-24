@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShivanGorge creates a Shivan Gorge
-//   - LAND
+//  - LAND
 func NewShivanGorge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shivan Gorge")
 	card.ManaCost = ""

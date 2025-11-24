@@ -1,60 +1,29 @@
 {
-  "timestamp": "2025-11-23T11:00:34.923305",
+  "timestamp": "2025-11-23T21:50:44.994690",
   "summary": {
-    "total": 1000,
-    "successful": 994,
-    "failed": 6,
-    "success_rate": "99.40%"
+    "total": 1,
+    "successful": 1,
+    "failed": 0,
+    "has_todo": 1,
+    "fully_implemented": 0,
+    "success_rate": "100.00%",
+    "todo_rate": "100.00%",
+    "complete_rate": "0.00%"
   },
-  "error_categories": {
-    "ParseError": {
-      "count": 6,
-      "cards": [
-        "RagnarokDivineDeliverance",
-        "RainOfRiches",
-        "RedSunsTwilight",
-        "RejectImperfection",
-        "ResourcefulDefense",
-        "ReySkywalker"
-      ]
+  "todo_analysis": {
+    "total": 1,
+    "cards_with_todos": [
+      "archonofsunsgrace"
+    ],
+    "sample_details": {
+      "archonofsunsgrace": {
+        "count": 1,
+        "messages": [
+          "TODO: CreateTokenEffect with complex parameters"
+        ]
+      }
     }
   },
-  "failed_cards": [
-    {
-      "card_name": "RagnarokDivineDeliverance",
-      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RagnarokDivineDeliverance.java",
-      "error_type": "ParseError",
-      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RagnarokDivineDeliverance.java"
-    },
-    {
-      "card_name": "RainOfRiches",
-      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RainOfRiches.java",
-      "error_type": "ParseError",
-      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RainOfRiches.java"
-    },
-    {
-      "card_name": "RedSunsTwilight",
-      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RedSunsTwilight.java",
-      "error_type": "ParseError",
-      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RedSunsTwilight.java"
-    },
-    {
-      "card_name": "RejectImperfection",
-      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RejectImperfection.java",
-      "error_type": "ParseError",
-      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/RejectImperfection.java"
-    },
-    {
-      "card_name": "ResourcefulDefense",
-      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/ResourcefulDefense.java",
-      "error_type": "ParseError",
-      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/ResourcefulDefense.java"
-    },
-    {
-      "card_name": "ReySkywalker",
-      "java_file": "/Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/ReySkywalker.java",
-      "error_type": "ParseError",
-      "error_message": "Could not find class name in /Users/aron/dev/opensource/mage/Mage.Sets/src/mage/cards/r/ReySkywalker.java"
-    }
-  ]
+  "error_categories": {},
+  "failed_cards": []
 }

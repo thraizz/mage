@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewHookHauntDrifter creates a Hook Haunt Drifter
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewHookHauntDrifter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hook Haunt Drifter")

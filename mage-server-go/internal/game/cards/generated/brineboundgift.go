@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewBrineboundGift creates a Brinebound Gift
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewBrineboundGift(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Brinebound Gift")
 	card.ManaCost = ""

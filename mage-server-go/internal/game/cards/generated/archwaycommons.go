@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewArchwayCommons creates a Archway Commons
-//   - LAND
+//  - LAND
 func NewArchwayCommons(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Archway Commons")
 	card.ManaCost = ""

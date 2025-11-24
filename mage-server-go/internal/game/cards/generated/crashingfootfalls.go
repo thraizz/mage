@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewCrashingFootfalls creates a Crashing Footfalls
-//   - SORCERY
+//  - SORCERY
 func NewCrashingFootfalls(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crashing Footfalls")
 	card.ManaCost = ""

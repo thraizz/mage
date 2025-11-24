@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRusticClachan creates a Rustic Clachan
-//   - LAND
+//  - LAND
 func NewRusticClachan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rustic Clachan")
 	card.ManaCost = ""

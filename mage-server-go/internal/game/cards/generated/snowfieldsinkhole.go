@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSnowfieldSinkhole creates a Snowfield Sinkhole
-//   - LAND
+//  - LAND
 func NewSnowfieldSinkhole(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Snowfield Sinkhole")
 	card.ManaCost = ""

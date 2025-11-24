@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSunhomeFortressOfTheLegion creates a Sunhome Fortress Of The Legion
-//   - LAND
+//  - LAND
 func NewSunhomeFortressOfTheLegion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sunhome Fortress Of The Legion")
 	card.ManaCost = ""

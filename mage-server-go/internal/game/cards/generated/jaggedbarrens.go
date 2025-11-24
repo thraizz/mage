@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJaggedBarrens creates a Jagged Barrens
-//   - LAND
+//  - LAND
 func NewJaggedBarrens(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jagged Barrens")
 	card.ManaCost = ""

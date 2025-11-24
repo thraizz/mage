@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDauntlessAvenger creates a Dauntless Avenger
-//   - CREATURE
+//  - CREATURE
 func NewDauntlessAvenger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dauntless Avenger")
 	card.ManaCost = ""

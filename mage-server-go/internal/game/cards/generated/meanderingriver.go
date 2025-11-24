@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMeanderingRiver creates a Meandering River
-//   - LAND
+//  - LAND
 func NewMeanderingRiver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Meandering River")
 	card.ManaCost = ""

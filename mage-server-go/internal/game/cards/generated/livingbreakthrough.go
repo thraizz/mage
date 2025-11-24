@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewLivingBreakthrough creates a Living Breakthrough
-//   - ENCHANTMENT CREATURE
-//
+//  - ENCHANTMENT CREATURE
 // Flying
 func NewLivingBreakthrough(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Living Breakthrough")

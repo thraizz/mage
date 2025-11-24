@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBoseijuWhoSheltersAll creates a Boseiju Who Shelters All
-//   - LAND
+//  - LAND
 func NewBoseijuWhoSheltersAll(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Boseiju Who Shelters All")
 	card.ManaCost = ""

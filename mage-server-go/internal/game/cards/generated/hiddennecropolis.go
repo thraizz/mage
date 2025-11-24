@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHiddenNecropolis creates a Hidden Necropolis
-//   - LAND
+//  - LAND
 func NewHiddenNecropolis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hidden Necropolis")
 	card.ManaCost = ""

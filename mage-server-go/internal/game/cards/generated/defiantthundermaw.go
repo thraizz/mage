@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewDefiantThundermaw creates a Defiant Thundermaw
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Trample
 func NewDefiantThundermaw(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Defiant Thundermaw")

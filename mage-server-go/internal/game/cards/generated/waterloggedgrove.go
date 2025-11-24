@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWaterloggedGrove creates a Waterlogged Grove
-//   - LAND
+//  - LAND
 func NewWaterloggedGrove(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Waterlogged Grove")
 	card.ManaCost = ""

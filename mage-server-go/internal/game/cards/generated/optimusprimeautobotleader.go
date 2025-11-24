@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewOptimusPrimeAutobotLeader creates a Optimus Prime Autobot Leader
-//   - ARTIFACT
-//
+//  - ARTIFACT
 // Trample
 func NewOptimusPrimeAutobotLeader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Optimus Prime Autobot Leader")

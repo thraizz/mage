@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEvermind creates a Evermind
-//   - INSTANT
+//  - INSTANT
 func NewEvermind(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Evermind")
 	card.ManaCost = ""

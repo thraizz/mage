@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpireGarden creates a Spire Garden
-//   - LAND
+//  - LAND
 func NewSpireGarden(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spire Garden")
 	card.ManaCost = ""

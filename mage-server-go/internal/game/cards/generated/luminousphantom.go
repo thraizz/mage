@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewLuminousPhantom creates a Luminous Phantom
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewLuminousPhantom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Luminous Phantom")

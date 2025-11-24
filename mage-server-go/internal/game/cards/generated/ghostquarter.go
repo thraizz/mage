@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGhostQuarter creates a Ghost Quarter
-//   - LAND
+//  - LAND
 func NewGhostQuarter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ghost Quarter")
 	card.ManaCost = ""

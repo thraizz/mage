@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEscapeTunnel creates a Escape Tunnel
-//   - LAND
+//  - LAND
 func NewEscapeTunnel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Escape Tunnel")
 	card.ManaCost = ""

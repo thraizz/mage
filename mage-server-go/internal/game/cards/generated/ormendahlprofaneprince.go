@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewOrmendahlProfanePrince creates a Ormendahl Profane Prince
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Lifelink, Indestructible, Haste
 func NewOrmendahlProfanePrince(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ormendahl Profane Prince")

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSithRuins creates a Sith Ruins
-//   - LAND
+//  - LAND
 func NewSithRuins(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sith Ruins")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewConservatory creates a Conservatory
-//   - LAND
+//  - LAND
 func NewConservatory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Conservatory")
 	card.ManaCost = ""

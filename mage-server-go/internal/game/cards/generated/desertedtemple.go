@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDesertedTemple creates a Deserted Temple
-//   - LAND
+//  - LAND
 func NewDesertedTemple(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Deserted Temple")
 	card.ManaCost = ""

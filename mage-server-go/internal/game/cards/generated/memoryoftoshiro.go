@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMemoryOfToshiro creates a Memory Of Toshiro
-//   - ENCHANTMENT CREATURE
+//  - ENCHANTMENT CREATURE
 func NewMemoryOfToshiro(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Memory Of Toshiro")
 	card.ManaCost = ""

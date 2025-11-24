@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewYiazmatUltimateMark creates a Yiazmat Ultimate Mark
-//   - CREATURE
+//  - CREATURE
 func NewYiazmatUltimateMark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Yiazmat Ultimate Mark")
 	card.ManaCost = ""

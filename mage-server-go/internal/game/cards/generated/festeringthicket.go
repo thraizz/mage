@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFesteringThicket creates a Festering Thicket
-//   - LAND
+//  - LAND
 func NewFesteringThicket(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Festering Thicket")
 	card.ManaCost = ""

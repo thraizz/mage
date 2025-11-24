@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewChandraRoaringFlame creates a Chandra Roaring Flame
-//   - PLANESWALKER
+//  - PLANESWALKER
 func NewChandraRoaringFlame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Chandra Roaring Flame")
 	card.ManaCost = ""

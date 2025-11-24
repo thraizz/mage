@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewForebodingLandscape creates a Foreboding Landscape
-//   - LAND
+//  - LAND
 func NewForebodingLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Foreboding Landscape")
 	card.ManaCost = ""

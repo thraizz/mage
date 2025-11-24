@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJundPanorama creates a Jund Panorama
-//   - LAND
+//  - LAND
 func NewJundPanorama(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jund Panorama")
 	card.ManaCost = ""

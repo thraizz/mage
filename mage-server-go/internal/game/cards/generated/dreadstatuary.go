@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDreadStatuary creates a Dread Statuary
-//   - LAND
+//  - LAND
 func NewDreadStatuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dread Statuary")
 	card.ManaCost = ""

@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewCasalPathbreakerOwlbear creates a Casal Pathbreaker Owlbear
-//   - CREATURE
-//
+//  - CREATURE
 // Vigilance, Trample
 func NewCasalPathbreakerOwlbear(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Casal Pathbreaker Owlbear")

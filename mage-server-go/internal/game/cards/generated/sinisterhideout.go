@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSinisterHideout creates a Sinister Hideout
-//   - LAND
+//  - LAND
 func NewSinisterHideout(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sinister Hideout")
 	card.ManaCost = ""

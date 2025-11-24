@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSceneOfTheCrime creates a Scene Of The Crime
-//   - ARTIFACT LAND
+//  - ARTIFACT LAND
 func NewSceneOfTheCrime(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Scene Of The Crime")
 	card.ManaCost = ""

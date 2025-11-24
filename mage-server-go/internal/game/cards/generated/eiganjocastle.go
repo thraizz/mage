@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEiganjoCastle creates a Eiganjo Castle
-//   - LAND
+//  - LAND
 func NewEiganjoCastle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Eiganjo Castle")
 	card.ManaCost = ""

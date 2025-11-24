@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEchoingDeeps creates a Echoing Deeps
-//   - LAND
+//  - LAND
 func NewEchoingDeeps(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Echoing Deeps")
 	card.ManaCost = ""

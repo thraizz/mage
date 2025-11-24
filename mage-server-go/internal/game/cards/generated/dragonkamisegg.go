@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDragonKamisEgg creates a Dragon Kamis Egg
-//   - ENCHANTMENT CREATURE
+//  - ENCHANTMENT CREATURE
 func NewDragonKamisEgg(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dragon Kamis Egg")
 	card.ManaCost = ""

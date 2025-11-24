@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewKefkaRulerOfRuin creates a Kefka Ruler Of Ruin
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewKefkaRulerOfRuin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kefka Ruler Of Ruin")

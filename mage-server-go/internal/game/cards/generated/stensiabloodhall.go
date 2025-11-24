@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStensiaBloodhall creates a Stensia Bloodhall
-//   - LAND
+//  - LAND
 func NewStensiaBloodhall(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Stensia Bloodhall")
 	card.ManaCost = ""

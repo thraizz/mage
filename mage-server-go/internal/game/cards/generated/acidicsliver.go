@@ -31,7 +31,7 @@ func NewAcidicSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect({2}, Sacrifice permanent: This permanent deals 2 damage to any target.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

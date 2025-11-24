@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewEumidianHatchery creates a Eumidian Hatchery
-//   - LAND
+//  - LAND
 func NewEumidianHatchery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Eumidian Hatchery")
 	card.ManaCost = ""

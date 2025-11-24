@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSharlayanNationOfScholars creates a Sharlayan Nation Of Scholars
-//   - LAND
+//  - LAND
 func NewSharlayanNationOfScholars(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sharlayan Nation Of Scholars")
 	card.ManaCost = ""

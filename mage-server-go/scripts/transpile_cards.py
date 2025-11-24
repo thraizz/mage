@@ -1285,7 +1285,16 @@ func init() {{
             for token_name, var_name in token_vars.items():
                 params_clean = params_clean.replace(f'token.GetToken("{token_name}")', var_name)
 
-            lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
+            # Check if params are malformed (empty, double parens, etc)
+            # If so, use TODO comment instead of generating broken code
+            if (re.search(r'\(\s*\)', params_clean) or  # Empty params
+                re.search(r'\{[^}]*\}', params_clean) or  # Unescaped braces
+                re.search(r'/\*.*?\*/', params_clean) or  # Contains TODO marker
+                params_clean.strip() == ''):  # Completely empty
+                # Generate TODO instead of broken code
+                lines.append(f'\t\t// TODO: {java_effect_class} with complex parameters')
+            else:
+                lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
 
         # Add targets
         for target in ability.targets:
@@ -1367,7 +1376,16 @@ func init() {{
             for token_name, var_name in token_vars.items():
                 params_clean = params_clean.replace(f'token.GetToken("{token_name}")', var_name)
 
-            lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
+            # Check if params are malformed (empty, double parens, etc)
+            # If so, use TODO comment instead of generating broken code
+            if (re.search(r'\(\s*\)', params_clean) or  # Empty params
+                re.search(r'\{[^}]*\}', params_clean) or  # Unescaped braces
+                re.search(r'/\*.*?\*/', params_clean) or  # Contains TODO marker
+                params_clean.strip() == ''):  # Completely empty
+                # Generate TODO instead of broken code
+                lines.append(f'\t\t// TODO: {java_effect_class} with complex parameters')
+            else:
+                lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
 
         # Add targets
         for target in ability.targets:
@@ -1603,13 +1621,25 @@ func init() {{
             'GenericManaCost',
             'FilterCard',
             'Filter[A-Z]\\w*',  # All other filter classes
-            'CardsInAllGraveyardsCount',
+            'CardsInAllGraveyardCount',
+            'CardsInControllerGraveyardCount',  # Another dynamic value variant
             'PermanentsOnBattlefieldCount',
             'SimpleStaticAbility',
             'PutIntoGraveFromBattlefieldAllTriggeredAbility',
             'BandsWithOtherAbility',
-            'AvatarToken\\d*',  # Token references like AvatarToken2
+            '\\w+Token\\d+',  # Token variants like CatToken3, PegasusToken2, AvatarToken2
+            '\\w+Value',  # Dynamic value objects like ArcheryTrainingValue
+            'MenaceAbility',  # Keyword abilities that should use keyword system
+            'RenownAbility',
+            'SimpleActivatedAbility',  # Nested ability definitions
+            'GainAbilityAllEffect',  # Grant ability effects with nested abilities
         ])
+
+        # Clean up empty or malformed parameter lists left after constructor removal
+        # Replace (()) with TODO placeholder
+        params = re.sub(r'\(\s*\(\s*\)\s*\)', '/* TODO: dynamic value removed */', params)
+        # Replace ({...}) with TODO (malformed after text removal)
+        params = re.sub(r'\(\s*\{[^}]*\}[^)]*\)', '/* TODO: complex parameter removed */', params)
 
         # Clean up Duration.* arguments
         params = re.sub(r',\s*Duration\.\w+', '', params)
@@ -1755,7 +1785,55 @@ def transpile_card(java_file: str, output_dir: str) -> TranspileResult:
         )
 
 
-def save_stats(results: List[TranspileResult], stats_file: str = "transpile_stats.json"):
+def analyze_todos(results: List[TranspileResult], output_dir: str) -> Dict:
+    """Analyze TODO comments in generated files for successful transpilations"""
+    todo_cards = []
+    todo_details = {}
+
+    output_path = Path(output_dir)
+    if not output_path.exists():
+        return {"total": 0, "cards": [], "details": {}}
+
+    # Only check files that were successfully transpiled in this run
+    successful_files = {Path(r.output_file).stem for r in results if r.success and r.output_file}
+
+    for go_file in output_path.glob("*.go"):
+        # Skip files not in this transpilation run
+        if go_file.stem not in successful_files:
+            continue
+
+        content = go_file.read_text()
+
+        if "TODO" in content:
+            card_name = go_file.stem
+
+            # Count TODO occurrences
+            todo_count = content.count("TODO")
+
+            # Extract TODO messages
+            todo_messages = []
+            for line in content.split('\n'):
+                if 'TODO' in line:
+                    # Extract the TODO message
+                    todo_msg = line.strip()
+                    if '//' in todo_msg:
+                        todo_msg = todo_msg.split('//', 1)[1].strip()
+                    todo_messages.append(todo_msg)
+
+            todo_cards.append(card_name)
+            todo_details[card_name] = {
+                "count": todo_count,
+                "messages": todo_messages[:5]  # Limit to first 5 TODO messages
+            }
+
+    return {
+        "total": len(todo_cards),
+        "cards": sorted(todo_cards),
+        "details": todo_details
+    }
+
+
+def save_stats(results: List[TranspileResult], stats_file: str = "transpile_stats.json", output_dir: str = "internal/game/cards/generated"):
     """Save transpilation statistics to JSON file"""
     # Categorize errors
     error_categories = {}
@@ -1776,14 +1854,31 @@ def save_stats(results: List[TranspileResult], stats_file: str = "transpile_stat
                 error_categories[error_type] = []
             error_categories[error_type].append(result.card_name)
 
+    # Analyze TODO markers in generated files
+    print("\n🔍 Analyzing TODO markers in generated files...")
+    todo_analysis = analyze_todos(results, output_dir)
+
+    # Calculate fully implemented count
+    successful_count = sum(1 for r in results if r.success)
+    fully_implemented = successful_count - todo_analysis["total"]
+
     # Build statistics
     stats = {
         "timestamp": datetime.now().isoformat(),
         "summary": {
             "total": len(results),
-            "successful": sum(1 for r in results if r.success),
+            "successful": successful_count,
             "failed": sum(1 for r in results if not r.success),
-            "success_rate": f"{(sum(1 for r in results if r.success) / len(results) * 100):.2f}%"
+            "has_todo": todo_analysis["total"],
+            "fully_implemented": fully_implemented,
+            "success_rate": f"{(successful_count / len(results) * 100):.2f}%",
+            "todo_rate": f"{(todo_analysis['total'] / len(results) * 100):.2f}%",
+            "complete_rate": f"{(fully_implemented / len(results) * 100):.2f}%"
+        },
+        "todo_analysis": {
+            "total": todo_analysis["total"],
+            "cards_with_todos": todo_analysis["cards"][:100],  # Limit to first 100 for brevity
+            "sample_details": dict(list(todo_analysis["details"].items())[:10])  # Sample 10 cards
         },
         "error_categories": {
             error_type: {
@@ -1802,15 +1897,26 @@ def save_stats(results: List[TranspileResult], stats_file: str = "transpile_stat
 
     # Print summary
     print(f"\n=== Transpilation Summary ===")
-    print(f"Total: {stats['summary']['total']}")
-    print(f"Successful: {stats['summary']['successful']}")
-    print(f"Failed: {stats['summary']['failed']}")
-    print(f"Success rate: {stats['summary']['success_rate']}")
+    print(f"Total cards:          {stats['summary']['total']}")
+    print(f"✓ Successful:         {stats['summary']['successful']} ({stats['summary']['success_rate']})")
+    print(f"✗ Failed:             {stats['summary']['failed']}")
+    print(f"⚠ Has TODO:           {stats['summary']['has_todo']} ({stats['summary']['todo_rate']})")
+    print(f"✅ Fully implemented: {stats['summary']['fully_implemented']} ({stats['summary']['complete_rate']})")
 
     if error_categories:
         print(f"\n=== Error Breakdown ===")
         for error_type, cards in sorted(error_categories.items(), key=lambda x: -len(x[1])):
             print(f"{error_type}: {len(cards)} cards")
+
+    if todo_analysis["total"] > 0:
+        print(f"\n=== TODO Analysis ===")
+        print(f"Cards with TODOs: {todo_analysis['total']}")
+        if todo_analysis["details"]:
+            print(f"\nSample cards with TODOs:")
+            for card_name, details in list(todo_analysis["details"].items())[:5]:
+                print(f"  {card_name}: {details['count']} TODO(s)")
+                if details["messages"]:
+                    print(f"    - {details['messages'][0]}")
 
 
 def main():
@@ -1842,7 +1948,7 @@ def main():
         result = transpile_card(java_file, args.output)
 
         # Save single-card stats
-        save_stats([result], args.stats)
+        save_stats([result], args.stats, args.output)
 
     elif args.batch:
         # Transpile all cards
@@ -1871,7 +1977,7 @@ def main():
                 print(f"Progress: {i}/{len(all_files)} cards ({success} successful)")
 
         # Save statistics
-        save_stats(results, args.stats)
+        save_stats(results, args.stats, args.output)
 
     else:
         parser.print_help()

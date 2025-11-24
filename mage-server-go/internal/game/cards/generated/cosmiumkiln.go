@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewCosmiumKiln creates a Cosmium Kiln
-//   - ARTIFACT
+//  - ARTIFACT
 func NewCosmiumKiln(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cosmium Kiln")
 	card.ManaCost = ""

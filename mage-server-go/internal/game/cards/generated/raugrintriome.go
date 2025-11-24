@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRaugrinTriome creates a Raugrin Triome
-//   - LAND
+//  - LAND
 func NewRaugrinTriome(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Raugrin Triome")
 	card.ManaCost = ""

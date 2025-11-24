@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVaultOfCatlacan creates a Vault Of Catlacan
-//   - LAND
+//  - LAND
 func NewVaultOfCatlacan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vault Of Catlacan")
 	card.ManaCost = ""

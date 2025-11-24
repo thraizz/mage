@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGiltLeafPalace creates a Gilt Leaf Palace
-//   - LAND
+//  - LAND
 func NewGiltLeafPalace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gilt Leaf Palace")
 	card.ManaCost = ""

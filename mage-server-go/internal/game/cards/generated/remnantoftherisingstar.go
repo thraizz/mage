@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewRemnantOfTheRisingStar creates a Remnant Of The Rising Star
-//   - ENCHANTMENT CREATURE
-//
+//  - ENCHANTMENT CREATURE
 // Flying
 func NewRemnantOfTheRisingStar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Remnant Of The Rising Star")

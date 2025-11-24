@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTombOfTheDuskRose creates a Tomb Of The Dusk Rose
-//   - LAND
+//  - LAND
 func NewTombOfTheDuskRose(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tomb Of The Dusk Rose")
 	card.ManaCost = ""

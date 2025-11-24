@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewForbiddenOrchard creates a Forbidden Orchard
-//   - LAND
+//  - LAND
 func NewForbiddenOrchard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Forbidden Orchard")
 	card.ManaCost = ""

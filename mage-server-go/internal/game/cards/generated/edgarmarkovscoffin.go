@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewEdgarMarkovsCoffin creates a Edgar Markovs Coffin
-//   - ARTIFACT
+//  - ARTIFACT
 func NewEdgarMarkovsCoffin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Edgar Markovs Coffin")
 	card.ManaCost = ""

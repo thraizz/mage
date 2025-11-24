@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewErodedCanyon creates a Eroded Canyon
-//   - LAND
+//  - LAND
 func NewErodedCanyon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Eroded Canyon")
 	card.ManaCost = ""

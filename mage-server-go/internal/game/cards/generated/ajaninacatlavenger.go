@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewAjaniNacatlAvenger creates a Ajani Nacatl Avenger
-//   - PLANESWALKER
+//  - PLANESWALKER
 func NewAjaniNacatlAvenger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ajani Nacatl Avenger")
 	card.ManaCost = ""

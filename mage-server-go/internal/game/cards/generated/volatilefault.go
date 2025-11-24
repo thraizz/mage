@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewVolatileFault creates a Volatile Fault
-//   - LAND
+//  - LAND
 func NewVolatileFault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Volatile Fault")
 	card.ManaCost = ""

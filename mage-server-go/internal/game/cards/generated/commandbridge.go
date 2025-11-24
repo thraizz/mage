@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCommandBridge creates a Command Bridge
-//   - LAND
+//  - LAND
 func NewCommandBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Command Bridge")
 	card.ManaCost = ""

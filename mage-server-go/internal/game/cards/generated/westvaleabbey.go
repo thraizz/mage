@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewWestvaleAbbey creates a Westvale Abbey
-//   - LAND
+//  - LAND
 func NewWestvaleAbbey(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Westvale Abbey")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTowerOfTheMagistrate creates a Tower Of The Magistrate
-//   - LAND
+//  - LAND
 func NewTowerOfTheMagistrate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tower Of The Magistrate")
 	card.ManaCost = ""

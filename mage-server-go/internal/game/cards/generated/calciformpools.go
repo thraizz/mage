@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewCalciformPools creates a Calciform Pools
-//   - LAND
+//  - LAND
 func NewCalciformPools(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Calciform Pools")
 	card.ManaCost = ""

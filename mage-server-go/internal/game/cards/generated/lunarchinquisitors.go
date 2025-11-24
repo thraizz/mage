@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLunarchInquisitors creates a Lunarch Inquisitors
-//   - CREATURE
+//  - CREATURE
 func NewLunarchInquisitors(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lunarch Inquisitors")
 	card.ManaCost = ""

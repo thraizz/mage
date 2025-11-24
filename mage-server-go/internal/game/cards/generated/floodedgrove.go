@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFloodedGrove creates a Flooded Grove
-//   - LAND
+//  - LAND
 func NewFloodedGrove(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Flooded Grove")
 	card.ManaCost = ""

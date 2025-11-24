@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMeditationPools creates a Meditation Pools
-//   - LAND
+//  - LAND
 func NewMeditationPools(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Meditation Pools")
 	card.ManaCost = ""

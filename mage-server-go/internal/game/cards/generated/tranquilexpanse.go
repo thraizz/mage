@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTranquilExpanse creates a Tranquil Expanse
-//   - LAND
+//  - LAND
 func NewTranquilExpanse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tranquil Expanse")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLoomingSpires creates a Looming Spires
-//   - LAND
+//  - LAND
 func NewLoomingSpires(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Looming Spires")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSunBlessedPeak creates a Sun Blessed Peak
-//   - LAND
+//  - LAND
 func NewSunBlessedPeak(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sun Blessed Peak")
 	card.ManaCost = ""

@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewStormOfSaruman creates a Storm Of Saruman
-//
-//	-
+//  - 
 func NewStormOfSaruman(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Storm Of Saruman")
 	card.ManaCost = ""

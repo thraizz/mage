@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewEchoOfDeathsWail creates a Echo Of Deaths Wail
-//   - ENCHANTMENT CREATURE
-//
+//  - ENCHANTMENT CREATURE
 // Flying, Haste
 func NewEchoOfDeathsWail(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Echo Of Deaths Wail")

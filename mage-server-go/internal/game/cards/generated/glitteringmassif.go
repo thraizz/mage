@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGlitteringMassif creates a Glittering Massif
-//   - LAND
+//  - LAND
 func NewGlitteringMassif(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glittering Massif")
 	card.ManaCost = ""

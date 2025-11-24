@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAdagiaWindsweptBastion creates a Adagia Windswept Bastion
-//   - LAND
+//  - LAND
 func NewAdagiaWindsweptBastion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Adagia Windswept Bastion")
 	card.ManaCost = ""

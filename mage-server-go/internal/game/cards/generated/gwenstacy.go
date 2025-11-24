@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewGwenStacy creates a Gwen Stacy
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Vigilance, Haste
 func NewGwenStacy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gwen Stacy")

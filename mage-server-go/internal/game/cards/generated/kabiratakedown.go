@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKabiraTakedown creates a Kabira Takedown
-//   - INSTANT
+//  - INSTANT
 func NewKabiraTakedown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kabira Takedown")
 	card.ManaCost = ""

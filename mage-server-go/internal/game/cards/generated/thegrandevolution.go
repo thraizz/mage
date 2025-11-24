@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheGrandEvolution creates a The Grand Evolution
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewTheGrandEvolution(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Grand Evolution")
 	card.ManaCost = ""

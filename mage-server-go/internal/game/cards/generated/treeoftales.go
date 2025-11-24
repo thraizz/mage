@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTreeOfTales creates a Tree Of Tales
-//   - ARTIFACT LAND
+//  - ARTIFACT LAND
 func NewTreeOfTales(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tree Of Tales")
 	card.ManaCost = ""

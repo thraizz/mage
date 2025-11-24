@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGlimpseOfTomorrow creates a Glimpse Of Tomorrow
-//   - SORCERY
+//  - SORCERY
 func NewGlimpseOfTomorrow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glimpse Of Tomorrow")
 	card.ManaCost = ""

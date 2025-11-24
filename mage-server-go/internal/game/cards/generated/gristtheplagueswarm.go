@@ -14,7 +14,7 @@ func init() {
 }
 
 // NewGristThePlagueSwarm creates a Grist The Plague Swarm
-//   - PLANESWALKER
+//  - PLANESWALKER
 func NewGristThePlagueSwarm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grist The Plague Swarm")
 	card.ManaCost = ""

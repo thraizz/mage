@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTrenoDarkCity creates a Treno Dark City
-//   - LAND
+//  - LAND
 func NewTrenoDarkCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Treno Dark City")
 	card.ManaCost = ""

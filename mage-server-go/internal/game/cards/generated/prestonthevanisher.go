@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewPrestonTheVanisher creates a Preston The Vanisher
-//
-//	-
+//  - 
 func NewPrestonTheVanisher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Preston The Vanisher")
 	card.ManaCost = ""

@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewIronfang creates a Ironfang
-//   - CREATURE
-//
+//  - CREATURE
 // FirstStrike
 func NewIronfang(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ironfang")

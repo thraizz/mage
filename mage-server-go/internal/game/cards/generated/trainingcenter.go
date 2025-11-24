@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTrainingCenter creates a Training Center
-//   - LAND
+//  - LAND
 func NewTrainingCenter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Training Center")
 	card.ManaCost = ""

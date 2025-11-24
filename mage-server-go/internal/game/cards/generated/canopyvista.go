@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCanopyVista creates a Canopy Vista
-//   - LAND
+//  - LAND
 func NewCanopyVista(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Canopy Vista")
 	card.ManaCost = ""

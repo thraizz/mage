@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewKjeldoranPride creates a Kjeldoran Pride
-//
-//	-
+//  - 
 func NewKjeldoranPride(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kjeldoran Pride")
 	card.ManaCost = ""

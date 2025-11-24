@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGondGate creates a Gond Gate
-//   - LAND
+//  - LAND
 func NewGondGate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gond Gate")
 	card.ManaCost = ""

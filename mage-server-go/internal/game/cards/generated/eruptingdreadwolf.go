@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEruptingDreadwolf creates a Erupting Dreadwolf
-//   - CREATURE
+//  - CREATURE
 func NewEruptingDreadwolf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Erupting Dreadwolf")
 	card.ManaCost = ""

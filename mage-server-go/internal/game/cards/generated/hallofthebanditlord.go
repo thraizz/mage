@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewHallOfTheBanditLord creates a Hall Of The Bandit Lord
-//   - LAND
+//  - LAND
 func NewHallOfTheBanditLord(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hall Of The Bandit Lord")
 	card.ManaCost = ""

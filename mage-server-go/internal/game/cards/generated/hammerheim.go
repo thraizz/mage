@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHammerheim creates a Hammerheim
-//   - LAND
+//  - LAND
 func NewHammerheim(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hammerheim")
 	card.ManaCost = ""

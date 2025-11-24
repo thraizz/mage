@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPortOfKarfell creates a Port Of Karfell
-//   - LAND
+//  - LAND
 func NewPortOfKarfell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Port Of Karfell")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheSeedcore creates a The Seedcore
-//   - LAND
+//  - LAND
 func NewTheSeedcore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Seedcore")
 	card.ManaCost = ""

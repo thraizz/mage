@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLavaclawReaches creates a Lavaclaw Reaches
-//   - LAND
+//  - LAND
 func NewLavaclawReaches(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lavaclaw Reaches")
 	card.ManaCost = ""

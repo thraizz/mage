@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMechHangar creates a Mech Hangar
-//   - LAND
+//  - LAND
 func NewMechHangar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mech Hangar")
 	card.ManaCost = ""

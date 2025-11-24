@@ -6,8 +6,8 @@ import (
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
 	"github.com/magefree/mage-server-go/internal/game/counters"
-	"github.com/magefree/mage-server-go/internal/game/effects"
 	"github.com/magefree/mage-server-go/internal/game/token"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {

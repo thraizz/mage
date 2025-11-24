@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNurturingPeatland creates a Nurturing Peatland
-//   - LAND
+//  - LAND
 func NewNurturingPeatland(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nurturing Peatland")
 	card.ManaCost = ""

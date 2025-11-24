@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewStirringWildwood creates a Stirring Wildwood
-//   - LAND
-//
+//  - LAND
 // Reach
 func NewStirringWildwood(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Stirring Wildwood")

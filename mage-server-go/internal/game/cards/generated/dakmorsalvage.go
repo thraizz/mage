@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDakmorSalvage creates a Dakmor Salvage
-//   - LAND
+//  - LAND
 func NewDakmorSalvage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dakmor Salvage")
 	card.ManaCost = ""

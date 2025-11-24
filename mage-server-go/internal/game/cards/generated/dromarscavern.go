@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDromarsCavern creates a Dromars Cavern
-//   - LAND
+//  - LAND
 func NewDromarsCavern(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dromars Cavern")
 	card.ManaCost = ""

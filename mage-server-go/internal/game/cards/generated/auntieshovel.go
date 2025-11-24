@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAuntiesHovel creates a Aunties Hovel
-//   - LAND
+//  - LAND
 func NewAuntiesHovel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Aunties Hovel")
 	card.ManaCost = ""

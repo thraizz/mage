@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMemorialToWar creates a Memorial To War
-//   - LAND
+//  - LAND
 func NewMemorialToWar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Memorial To War")
 	card.ManaCost = ""

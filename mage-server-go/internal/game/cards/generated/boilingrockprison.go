@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBoilingRockPrison creates a Boiling Rock Prison
-//   - LAND
+//  - LAND
 func NewBoilingRockPrison(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Boiling Rock Prison")
 	card.ManaCost = ""

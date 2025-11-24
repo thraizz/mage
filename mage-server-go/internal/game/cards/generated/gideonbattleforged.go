@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewGideonBattleForged creates a Gideon Battle Forged
-//   - PLANESWALKER
-//
+//  - PLANESWALKER
 // Indestructible
 func NewGideonBattleForged(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gideon Battle Forged")

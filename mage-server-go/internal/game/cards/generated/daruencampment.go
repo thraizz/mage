@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDaruEncampment creates a Daru Encampment
-//   - LAND
+//  - LAND
 func NewDaruEncampment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Daru Encampment")
 	card.ManaCost = ""

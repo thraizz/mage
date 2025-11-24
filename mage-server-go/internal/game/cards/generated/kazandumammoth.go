@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKazanduMammoth creates a Kazandu Mammoth
-//   - CREATURE
+//  - CREATURE
 func NewKazanduMammoth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kazandu Mammoth")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMysticGate creates a Mystic Gate
-//   - LAND
+//  - LAND
 func NewMysticGate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mystic Gate")
 	card.ManaCost = ""

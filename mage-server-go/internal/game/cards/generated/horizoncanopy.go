@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHorizonCanopy creates a Horizon Canopy
-//   - LAND
+//  - LAND
 func NewHorizonCanopy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Horizon Canopy")
 	card.ManaCost = ""

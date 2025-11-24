@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSunpetalGrove creates a Sunpetal Grove
-//   - LAND
+//  - LAND
 func NewSunpetalGrove(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sunpetal Grove")
 	card.ManaCost = ""

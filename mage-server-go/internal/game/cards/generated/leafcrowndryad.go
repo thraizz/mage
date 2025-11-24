@@ -34,7 +34,7 @@ func NewLeafcrownDryad(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
+		AddEffect(abilities.NewBoostEnchantedEffect(2,2)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("ReachAbility", abilities.AttachmentTypeAura)).
 		Build()
 	if err != nil {

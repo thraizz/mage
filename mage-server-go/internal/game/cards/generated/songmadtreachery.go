@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSongMadTreachery creates a Song Mad Treachery
-//   - SORCERY
+//  - SORCERY
 func NewSongMadTreachery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Song Mad Treachery")
 	card.ManaCost = ""

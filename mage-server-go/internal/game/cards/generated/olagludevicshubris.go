@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOlagLudevicsHubris creates a Olag Ludevics Hubris
-//   - CREATURE
+//  - CREATURE
 func NewOlagLudevicsHubris(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Olag Ludevics Hubris")
 	card.ManaCost = ""

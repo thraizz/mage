@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewSeshirosLivingLegacy creates a Seshiros Living Legacy
-//   - ENCHANTMENT CREATURE
-//
+//  - ENCHANTMENT CREATURE
 // Vigilance, Haste
 func NewSeshirosLivingLegacy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seshiros Living Legacy")

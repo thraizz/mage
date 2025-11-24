@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBalduvianTradingPost creates a Balduvian Trading Post
-//   - LAND
+//  - LAND
 func NewBalduvianTradingPost(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Balduvian Trading Post")
 	card.ManaCost = ""

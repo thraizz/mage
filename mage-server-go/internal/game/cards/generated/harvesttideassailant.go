@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewHarvesttideAssailant creates a Harvesttide Assailant
-//   - CREATURE
-//
+//  - CREATURE
 // Trample
 func NewHarvesttideAssailant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Harvesttide Assailant")

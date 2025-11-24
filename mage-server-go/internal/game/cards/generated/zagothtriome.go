@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewZagothTriome creates a Zagoth Triome
-//   - LAND
+//  - LAND
 func NewZagothTriome(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Zagoth Triome")
 	card.ManaCost = ""

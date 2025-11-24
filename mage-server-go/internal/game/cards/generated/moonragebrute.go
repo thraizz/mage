@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewMoonrageBrute creates a Moonrage Brute
-//   - CREATURE
-//
+//  - CREATURE
 // FirstStrike
 func NewMoonrageBrute(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Moonrage Brute")

@@ -25,11 +25,11 @@ func NewRuthlessInstincts(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddEffect(abilities.NewGrantAbilityEffect("ReachAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewBoostEffect(2, 2)).
+		AddEffect(abilities.NewBoostEffect(2,2)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewBoostEffect(2, 2)).
+		AddEffect(abilities.NewBoostEffect(2,2)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {

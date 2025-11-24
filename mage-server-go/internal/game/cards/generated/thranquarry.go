@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThranQuarry creates a Thran Quarry
-//   - LAND
+//  - LAND
 func NewThranQuarry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thran Quarry")
 	card.ManaCost = ""

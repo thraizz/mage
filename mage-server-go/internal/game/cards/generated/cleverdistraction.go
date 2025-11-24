@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCleverDistraction creates a Clever Distraction
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewCleverDistraction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Clever Distraction")
 	card.ManaCost = ""

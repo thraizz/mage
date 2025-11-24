@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWindScarredCrag creates a Wind Scarred Crag
-//   - LAND
+//  - LAND
 func NewWindScarredCrag(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wind Scarred Crag")
 	card.ManaCost = ""

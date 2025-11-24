@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewGlyphElemental creates a Glyph Elemental
-//
-//	-
+//  - 
 func NewGlyphElemental(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glyph Elemental")
 	card.ManaCost = ""

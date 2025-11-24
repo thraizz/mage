@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewScatteredGroves creates a Scattered Groves
-//   - LAND
+//  - LAND
 func NewScatteredGroves(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Scattered Groves")
 	card.ManaCost = ""

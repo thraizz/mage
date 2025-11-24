@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHELIOSOne creates a H E L I O S One
-//   - LAND
+//  - LAND
 func NewHELIOSOne(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "H E L I O S One")
 	card.ManaCost = ""

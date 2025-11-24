@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpawningPool creates a Spawning Pool
-//   - LAND
+//  - LAND
 func NewSpawningPool(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spawning Pool")
 	card.ManaCost = ""

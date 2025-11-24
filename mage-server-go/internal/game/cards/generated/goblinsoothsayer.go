@@ -25,7 +25,7 @@ func NewGoblinSoothsayer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, false)).
+		AddEffect(abilities.NewBoostEffect(1,1, filter, false)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

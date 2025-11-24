@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewRatchetRescueRacer creates a Ratchet Rescue Racer
-//   - ARTIFACT
-//
+//  - ARTIFACT
 // Lifelink
 func NewRatchetRescueRacer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ratchet Rescue Racer")

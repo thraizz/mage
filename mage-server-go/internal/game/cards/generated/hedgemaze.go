@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHedgeMaze creates a Hedge Maze
-//   - LAND
+//  - LAND
 func NewHedgeMaze(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hedge Maze")
 	card.ManaCost = ""

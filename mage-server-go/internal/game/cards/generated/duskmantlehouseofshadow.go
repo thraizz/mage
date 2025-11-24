@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDuskmantleHouseOfShadow creates a Duskmantle House Of Shadow
-//   - LAND
+//  - LAND
 func NewDuskmantleHouseOfShadow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Duskmantle House Of Shadow")
 	card.ManaCost = ""

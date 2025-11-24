@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMalakirRebirth creates a Malakir Rebirth
-//   - INSTANT
+//  - INSTANT
 func NewMalakirRebirth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Malakir Rebirth")
 	card.ManaCost = ""

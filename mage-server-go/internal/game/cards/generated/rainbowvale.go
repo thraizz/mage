@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRainbowVale creates a Rainbow Vale
-//   - LAND
+//  - LAND
 func NewRainbowVale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rainbow Vale")
 	card.ManaCost = ""

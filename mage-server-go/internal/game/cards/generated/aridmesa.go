@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAridMesa creates a Arid Mesa
-//   - LAND
+//  - LAND
 func NewAridMesa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Arid Mesa")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTheTabernacleAtPendrellVale creates a The Tabernacle At Pendrell Vale
-//   - LAND
+//  - LAND
 func NewTheTabernacleAtPendrellVale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Tabernacle At Pendrell Vale")
 	card.ManaCost = ""

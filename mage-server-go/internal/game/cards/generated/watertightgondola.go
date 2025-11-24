@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewWatertightGondola creates a Watertight Gondola
-//   - ARTIFACT
-//
+//  - ARTIFACT
 // Vigilance
 func NewWatertightGondola(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Watertight Gondola")

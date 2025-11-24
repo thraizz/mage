@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpireOfIndustry creates a Spire Of Industry
-//   - LAND
+//  - LAND
 func NewSpireOfIndustry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spire Of Industry")
 	card.ManaCost = ""

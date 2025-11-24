@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStudyHall creates a Study Hall
-//   - LAND
+//  - LAND
 func NewStudyHall(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Study Hall")
 	card.ManaCost = ""

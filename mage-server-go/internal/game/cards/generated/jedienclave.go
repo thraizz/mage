@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJediEnclave creates a Jedi Enclave
-//   - LAND
+//  - LAND
 func NewJediEnclave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jedi Enclave")
 	card.ManaCost = ""

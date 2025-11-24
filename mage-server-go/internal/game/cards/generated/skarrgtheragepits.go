@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSkarrgTheRagePits creates a Skarrg The Rage Pits
-//   - LAND
+//  - LAND
 func NewSkarrgTheRagePits(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Skarrg The Rage Pits")
 	card.ManaCost = ""

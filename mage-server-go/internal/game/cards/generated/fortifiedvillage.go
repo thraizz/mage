@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFortifiedVillage creates a Fortified Village
-//   - LAND
+//  - LAND
 func NewFortifiedVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fortified Village")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSteamVents creates a Steam Vents
-//   - LAND
+//  - LAND
 func NewSteamVents(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Steam Vents")
 	card.ManaCost = ""

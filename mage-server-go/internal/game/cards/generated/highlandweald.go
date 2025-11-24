@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHighlandWeald creates a Highland Weald
-//   - LAND
+//  - LAND
 func NewHighlandWeald(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Highland Weald")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUlvenwaldAbomination creates a Ulvenwald Abomination
-//   - CREATURE
+//  - CREATURE
 func NewUlvenwaldAbomination(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ulvenwald Abomination")
 	card.ManaCost = ""

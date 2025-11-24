@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMaelstromOfTheSpiritDragon creates a Maelstrom Of The Spirit Dragon
-//   - LAND
+//  - LAND
 func NewMaelstromOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Maelstrom Of The Spirit Dragon")
 	card.ManaCost = ""

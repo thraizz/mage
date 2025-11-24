@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewInsectileAberration creates a Insectile Aberration
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewInsectileAberration(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Insectile Aberration")

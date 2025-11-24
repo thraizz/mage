@@ -25,7 +25,7 @@ func NewJacquesLeVert(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(0, 2, filter)).
+		AddEffect(abilities.NewBoostEffect(0,2, filter)).
 		Build()
 	if err != nil {
 		return nil, err

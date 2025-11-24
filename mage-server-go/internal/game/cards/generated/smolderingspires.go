@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSmolderingSpires creates a Smoldering Spires
-//   - LAND
+//  - LAND
 func NewSmolderingSpires(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Smoldering Spires")
 	card.ManaCost = ""

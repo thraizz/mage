@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSorrowsPath creates a Sorrows Path
-//   - LAND
+//  - LAND
 func NewSorrowsPath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sorrows Path")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWaterloggedTeachings creates a Waterlogged Teachings
-//   - INSTANT
+//  - INSTANT
 func NewWaterloggedTeachings(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Waterlogged Teachings")
 	card.ManaCost = ""

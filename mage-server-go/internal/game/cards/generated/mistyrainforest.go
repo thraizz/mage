@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMistyRainforest creates a Misty Rainforest
-//   - LAND
+//  - LAND
 func NewMistyRainforest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Misty Rainforest")
 	card.ManaCost = ""

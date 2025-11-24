@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStalkingVampire creates a Stalking Vampire
-//   - CREATURE
+//  - CREATURE
 func NewStalkingVampire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Stalking Vampire")
 	card.ManaCost = ""

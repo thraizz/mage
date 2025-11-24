@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFrostboilSnarl creates a Frostboil Snarl
-//   - LAND
+//  - LAND
 func NewFrostboilSnarl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Frostboil Snarl")
 	card.ManaCost = ""

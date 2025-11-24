@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewImperialMoth creates a Imperial Moth
-//   - ENCHANTMENT CREATURE
-//
+//  - ENCHANTMENT CREATURE
 // Flying
 func NewImperialMoth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Imperial Moth")

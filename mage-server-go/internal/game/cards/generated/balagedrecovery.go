@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBalaGedRecovery creates a Bala Ged Recovery
-//   - SORCERY
+//  - SORCERY
 func NewBalaGedRecovery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bala Ged Recovery")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDisciplesOfTheInferno creates a Disciples Of The Inferno
-//   - CREATURE
+//  - CREATURE
 func NewDisciplesOfTheInferno(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Disciples Of The Inferno")
 	card.ManaCost = ""

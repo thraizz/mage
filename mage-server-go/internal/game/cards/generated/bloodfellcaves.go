@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBloodfellCaves creates a Bloodfell Caves
-//   - LAND
+//  - LAND
 func NewBloodfellCaves(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bloodfell Caves")
 	card.ManaCost = ""

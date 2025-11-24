@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNephaliaDrownyard creates a Nephalia Drownyard
-//   - LAND
+//  - LAND
 func NewNephaliaDrownyard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nephalia Drownyard")
 	card.ManaCost = ""

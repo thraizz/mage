@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWirewoodLodge creates a Wirewood Lodge
-//   - LAND
+//  - LAND
 func NewWirewoodLodge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wirewood Lodge")
 	card.ManaCost = ""

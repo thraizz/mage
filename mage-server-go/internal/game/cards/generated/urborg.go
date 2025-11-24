@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewUrborg creates a Urborg
-//   - LAND
-//
+//  - LAND
 // FirstStrike
 func NewUrborg(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Urborg")

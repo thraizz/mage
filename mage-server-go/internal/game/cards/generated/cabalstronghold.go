@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCabalStronghold creates a Cabal Stronghold
-//   - LAND
+//  - LAND
 func NewCabalStronghold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cabal Stronghold")
 	card.ManaCost = ""

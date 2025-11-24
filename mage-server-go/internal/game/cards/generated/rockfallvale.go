@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRockfallVale creates a Rockfall Vale
-//   - LAND
+//  - LAND
 func NewRockfallVale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rockfall Vale")
 	card.ManaCost = ""

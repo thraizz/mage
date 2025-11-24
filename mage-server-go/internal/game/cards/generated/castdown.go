@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewCastDown creates a Cast Down
-//
-//	-
+//  - 
 func NewCastDown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cast Down")
 	card.ManaCost = ""

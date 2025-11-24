@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOdiousWitch creates a Odious Witch
-//   - CREATURE
+//  - CREATURE
 func NewOdiousWitch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Odious Witch")
 	card.ManaCost = ""

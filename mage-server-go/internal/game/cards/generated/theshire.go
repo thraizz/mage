@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTheShire creates a The Shire
-//   - LAND
+//  - LAND
 func NewTheShire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Shire")
 	card.ManaCost = ""

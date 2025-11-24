@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDenOfTheBugbear creates a Den Of The Bugbear
-//   - LAND
+//  - LAND
 func NewDenOfTheBugbear(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Den Of The Bugbear")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewBottomlessVault creates a Bottomless Vault
-//   - LAND
+//  - LAND
 func NewBottomlessVault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bottomless Vault")
 	card.ManaCost = ""

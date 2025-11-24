@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewBlackbloomRogue creates a Blackbloom Rogue
-//   - CREATURE
-//
+//  - CREATURE
 // Menace
 func NewBlackbloomRogue(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blackbloom Rogue")

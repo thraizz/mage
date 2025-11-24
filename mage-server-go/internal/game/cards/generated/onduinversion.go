@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOnduInversion creates a Ondu Inversion
-//   - SORCERY
+//  - SORCERY
 func NewOnduInversion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ondu Inversion")
 	card.ManaCost = ""

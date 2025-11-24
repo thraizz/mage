@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewCaveOfTheFrostDragon creates a Cave Of The Frost Dragon
-//   - LAND
-//
+//  - LAND
 // Flying
 func NewCaveOfTheFrostDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cave Of The Frost Dragon")

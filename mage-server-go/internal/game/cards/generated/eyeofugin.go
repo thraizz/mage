@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEyeOfUgin creates a Eye Of Ugin
-//   - LAND
+//  - LAND
 func NewEyeOfUgin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Eye Of Ugin")
 	card.ManaCost = ""

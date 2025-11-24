@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSejiriRefuge creates a Sejiri Refuge
-//   - LAND
+//  - LAND
 func NewSejiriRefuge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sejiri Refuge")
 	card.ManaCost = ""

@@ -41,8 +41,29 @@ Uses the Python transpiler in batch mode with statistics tracking.
 
 **Output:**
 - Generated Go files: `internal/game/cards/generated/*.go`
-- Statistics: `transpile_stats.json` (includes error breakdown)
+- Statistics: `transpile_stats.json` (includes error breakdown and TODO analysis)
 - Log: `transpile_results.log`
+
+**`analyze_transpile_stats.py`** - Analyze transpilation statistics
+
+View and query statistics from `transpile_stats.json`:
+
+```bash
+# Show full analysis
+python3 scripts/analyze_transpile_stats.py
+
+# Show summary only
+python3 scripts/analyze_transpile_stats.py --summary
+
+# Show TODO analysis
+python3 scripts/analyze_transpile_stats.py --todos
+
+# Show error details
+python3 scripts/analyze_transpile_stats.py --errors
+
+# Export failed cards to CSV
+python3 scripts/analyze_transpile_stats.py --export-csv failed_cards.csv
+```
 
 ## Database Scripts
 

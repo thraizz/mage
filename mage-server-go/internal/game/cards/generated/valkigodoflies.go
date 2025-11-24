@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewValkiGodOfLies creates a Valki God Of Lies
-//   - CREATURE
+//  - CREATURE
 func NewValkiGodOfLies(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Valki God Of Lies")
 	card.ManaCost = ""

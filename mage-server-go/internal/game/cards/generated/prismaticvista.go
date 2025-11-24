@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPrismaticVista creates a Prismatic Vista
-//   - LAND
+//  - LAND
 func NewPrismaticVista(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Prismatic Vista")
 	card.ManaCost = ""

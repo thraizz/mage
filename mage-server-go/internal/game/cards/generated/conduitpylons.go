@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewConduitPylons creates a Conduit Pylons
-//   - LAND
+//  - LAND
 func NewConduitPylons(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Conduit Pylons")
 	card.ManaCost = ""

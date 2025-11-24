@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTramwayStation creates a Tramway Station
-//   - LAND
+//  - LAND
 func NewTramwayStation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tramway Station")
 	card.ManaCost = ""

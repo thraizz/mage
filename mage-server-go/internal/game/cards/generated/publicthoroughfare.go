@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPublicThoroughfare creates a Public Thoroughfare
-//   - LAND
+//  - LAND
 func NewPublicThoroughfare(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Public Thoroughfare")
 	card.ManaCost = ""

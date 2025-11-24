@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUndergroundRiver creates a Underground River
-//   - LAND
+//  - LAND
 func NewUndergroundRiver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Underground River")
 	card.ManaCost = ""

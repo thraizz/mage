@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewReliquaryTower creates a Reliquary Tower
-//   - LAND
+//  - LAND
 func NewReliquaryTower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Reliquary Tower")
 	card.ManaCost = ""

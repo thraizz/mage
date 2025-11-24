@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewIcatianStore creates a Icatian Store
-//   - LAND
+//  - LAND
 func NewIcatianStore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Icatian Store")
 	card.ManaCost = ""

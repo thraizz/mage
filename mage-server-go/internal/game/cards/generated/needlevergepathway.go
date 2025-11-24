@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNeedlevergePathway creates a Needleverge Pathway
-//   - LAND
+//  - LAND
 func NewNeedlevergePathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Needleverge Pathway")
 	card.ManaCost = ""

@@ -27,7 +27,7 @@ func NewHopefulEidolon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(1, 1)).
+		AddEffect(abilities.NewBoostEnchantedEffect(1,1)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("LifelinkAbility", abilities.AttachmentTypeAura)).
 		Build()
 	if err != nil {

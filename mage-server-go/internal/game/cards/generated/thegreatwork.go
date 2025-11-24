@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheGreatWork creates a The Great Work
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewTheGreatWork(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Great Work")
 	card.ManaCost = ""

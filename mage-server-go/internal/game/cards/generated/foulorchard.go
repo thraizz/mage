@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFoulOrchard creates a Foul Orchard
-//   - LAND
+//  - LAND
 func NewFoulOrchard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Foul Orchard")
 	card.ManaCost = ""

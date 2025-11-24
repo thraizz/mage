@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSvyeluniteTemple creates a Svyelunite Temple
-//   - LAND
+//  - LAND
 func NewSvyeluniteTemple(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Svyelunite Temple")
 	card.ManaCost = ""

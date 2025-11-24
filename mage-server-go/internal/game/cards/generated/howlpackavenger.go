@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHowlpackAvenger creates a Howlpack Avenger
-//   - CREATURE
+//  - CREATURE
 func NewHowlpackAvenger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Howlpack Avenger")
 	card.ManaCost = ""

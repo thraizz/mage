@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCinderGlade creates a Cinder Glade
-//   - LAND
+//  - LAND
 func NewCinderGlade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cinder Glade")
 	card.ManaCost = ""

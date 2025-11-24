@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLlanowarReborn creates a Llanowar Reborn
-//   - LAND
+//  - LAND
 func NewLlanowarReborn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Llanowar Reborn")
 	card.ManaCost = ""

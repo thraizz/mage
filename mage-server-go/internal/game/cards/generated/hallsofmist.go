@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHallsOfMist creates a Halls Of Mist
-//   - LAND
+//  - LAND
 func NewHallsOfMist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Halls Of Mist")
 	card.ManaCost = ""

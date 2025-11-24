@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewLightshieldArray creates a Lightshield Array
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewLightshieldArray(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lightshield Array")
 	card.ManaCost = ""

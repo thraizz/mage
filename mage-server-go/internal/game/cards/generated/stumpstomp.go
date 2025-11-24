@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStumpStomp creates a Stump Stomp
-//   - SORCERY
+//  - SORCERY
 func NewStumpStomp(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Stump Stomp")
 	card.ManaCost = ""

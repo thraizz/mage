@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewFacelessHaven creates a Faceless Haven
-//   - LAND
-//
+//  - LAND
 // Vigilance
 func NewFacelessHaven(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Faceless Haven")

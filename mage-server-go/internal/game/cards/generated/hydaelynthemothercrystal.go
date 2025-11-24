@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewHydaelynTheMothercrystal creates a Hydaelyn The Mothercrystal
-//   - CREATURE
-//
+//  - CREATURE
 // Indestructible
 func NewHydaelynTheMothercrystal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hydaelyn The Mothercrystal")

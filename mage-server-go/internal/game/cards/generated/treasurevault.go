@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTreasureVault creates a Treasure Vault
-//   - ARTIFACT LAND
+//  - ARTIFACT LAND
 func NewTreasureVault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Treasure Vault")
 	card.ManaCost = ""

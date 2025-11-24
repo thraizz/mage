@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewAmonkhetRaceway creates a Amonkhet Raceway
-//   - LAND
+//  - LAND
 func NewAmonkhetRaceway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Amonkhet Raceway")
 	card.ManaCost = ""

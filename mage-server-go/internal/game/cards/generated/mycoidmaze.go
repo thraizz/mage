@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMycoidMaze creates a Mycoid Maze
-//   - LAND
+//  - LAND
 func NewMycoidMaze(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mycoid Maze")
 	card.ManaCost = ""

@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewTheRani creates a The Rani
-//
-//	-
+//  - 
 func NewTheRani(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Rani")
 	card.ManaCost = ""

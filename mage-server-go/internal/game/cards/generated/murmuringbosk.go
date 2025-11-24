@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMurmuringBosk creates a Murmuring Bosk
-//   - LAND
+//  - LAND
 func NewMurmuringBosk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Murmuring Bosk")
 	card.ManaCost = ""

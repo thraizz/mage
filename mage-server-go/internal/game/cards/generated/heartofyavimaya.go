@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHeartOfYavimaya creates a Heart Of Yavimaya
-//   - LAND
+//  - LAND
 func NewHeartOfYavimaya(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Heart Of Yavimaya")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewHeartOfYavimaya(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewBoostEffect(1, 1)).
+		AddEffect(abilities.NewBoostEffect(1,1)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMishrasWorkshop creates a Mishras Workshop
-//   - LAND
+//  - LAND
 func NewMishrasWorkshop(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mishras Workshop")
 	card.ManaCost = ""

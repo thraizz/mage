@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewUvildaDeanOfPerfection creates a Uvilda Dean Of Perfection
-//   - CREATURE
+//  - CREATURE
 func NewUvildaDeanOfPerfection(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Uvilda Dean Of Perfection")
 	card.ManaCost = ""

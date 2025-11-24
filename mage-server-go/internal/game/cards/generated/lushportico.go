@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLushPortico creates a Lush Portico
-//   - LAND
+//  - LAND
 func NewLushPortico(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lush Portico")
 	card.ManaCost = ""

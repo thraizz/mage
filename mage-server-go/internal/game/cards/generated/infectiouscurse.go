@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewInfectiousCurse creates a Infectious Curse
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewInfectiousCurse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Infectious Curse")
 	card.ManaCost = ""

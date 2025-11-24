@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThornspireVerge creates a Thornspire Verge
-//   - LAND
+//  - LAND
 func NewThornspireVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thornspire Verge")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUntaidakeTheCloudKeeper creates a Untaidake The Cloud Keeper
-//   - LAND
+//  - LAND
 func NewUntaidakeTheCloudKeeper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Untaidake The Cloud Keeper")
 	card.ManaCost = ""

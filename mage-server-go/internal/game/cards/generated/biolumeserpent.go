@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBiolumeSerpent creates a Biolume Serpent
-//   - CREATURE
+//  - CREATURE
 func NewBiolumeSerpent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Biolume Serpent")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAxgardArmory creates a Axgard Armory
-//   - LAND
+//  - LAND
 func NewAxgardArmory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Axgard Armory")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewViridescentBog creates a Viridescent Bog
-//   - LAND
+//  - LAND
 func NewViridescentBog(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Viridescent Bog")
 	card.ManaCost = ""

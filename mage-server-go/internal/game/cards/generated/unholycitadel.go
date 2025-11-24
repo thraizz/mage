@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewUnholyCitadel creates a Unholy Citadel
-//   - LAND
+//  - LAND
 func NewUnholyCitadel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Unholy Citadel")
 	card.ManaCost = ""

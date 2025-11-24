@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewUlvenwaldBehemoth creates a Ulvenwald Behemoth
-//   - CREATURE
-//
+//  - CREATURE
 // Trample, Haste
 func NewUlvenwaldBehemoth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ulvenwald Behemoth")

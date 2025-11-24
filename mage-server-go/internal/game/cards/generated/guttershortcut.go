@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGutterShortcut creates a Gutter Shortcut
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewGutterShortcut(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gutter Shortcut")
 	card.ManaCost = ""

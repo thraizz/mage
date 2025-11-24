@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEvolvingWilds creates a Evolving Wilds
-//   - LAND
+//  - LAND
 func NewEvolvingWilds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Evolving Wilds")
 	card.ManaCost = ""

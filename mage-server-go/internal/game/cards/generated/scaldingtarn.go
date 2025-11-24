@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewScaldingTarn creates a Scalding Tarn
-//   - LAND
+//  - LAND
 func NewScaldingTarn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Scalding Tarn")
 	card.ManaCost = ""

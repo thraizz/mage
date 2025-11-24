@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewAncientOfTheEquinox creates a Ancient Of The Equinox
-//   - CREATURE
-//
+//  - CREATURE
 // Trample, Hexproof
 func NewAncientOfTheEquinox(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ancient Of The Equinox")

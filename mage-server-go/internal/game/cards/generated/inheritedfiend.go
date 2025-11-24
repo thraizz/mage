@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewInheritedFiend creates a Inherited Fiend
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewInheritedFiend(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Inherited Fiend")

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCanyonSlough creates a Canyon Slough
-//   - LAND
+//  - LAND
 func NewCanyonSlough(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Canyon Slough")
 	card.ManaCost = ""

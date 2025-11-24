@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewFlamewarStreetwiseOperative creates a Flamewar Streetwise Operative
-//   - ARTIFACT
-//
+//  - ARTIFACT
 // Deathtouch
 func NewFlamewarStreetwiseOperative(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Flamewar Streetwise Operative")

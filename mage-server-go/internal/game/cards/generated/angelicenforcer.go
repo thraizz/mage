@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewAngelicEnforcer creates a Angelic Enforcer
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Hexproof
 func NewAngelicEnforcer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Angelic Enforcer")

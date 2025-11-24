@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPoppetFactory creates a Poppet Factory
-//   - ARTIFACT
+//  - ARTIFACT
 func NewPoppetFactory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Poppet Factory")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGatewayPlaza creates a Gateway Plaza
-//   - LAND
+//  - LAND
 func NewGatewayPlaza(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gateway Plaza")
 	card.ManaCost = ""

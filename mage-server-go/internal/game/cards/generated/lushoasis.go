@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLushOasis creates a Lush Oasis
-//   - LAND
+//  - LAND
 func NewLushOasis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lush Oasis")
 	card.ManaCost = ""

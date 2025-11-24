@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewSephirothOneWingedAngel creates a Sephiroth One Winged Angel
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewSephirothOneWingedAngel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sephiroth One Winged Angel")

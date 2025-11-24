@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHallOfHeliodsGenerosity creates a Hall Of Heliods Generosity
-//   - LAND
+//  - LAND
 func NewHallOfHeliodsGenerosity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hall Of Heliods Generosity")
 	card.ManaCost = ""

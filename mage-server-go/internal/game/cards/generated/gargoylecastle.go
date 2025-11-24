@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGargoyleCastle creates a Gargoyle Castle
-//   - LAND
+//  - LAND
 func NewGargoyleCastle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gargoyle Castle")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShelteringLandscape creates a Sheltering Landscape
-//   - LAND
+//  - LAND
 func NewShelteringLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sheltering Landscape")
 	card.ManaCost = ""

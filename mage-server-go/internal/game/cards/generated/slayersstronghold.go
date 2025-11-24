@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSlayersStronghold creates a Slayers Stronghold
-//   - LAND
+//  - LAND
 func NewSlayersStronghold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Slayers Stronghold")
 	card.ManaCost = ""

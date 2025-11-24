@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewValgavothsLair creates a Valgavoths Lair
-//   - ENCHANTMENT LAND
-//
+//  - ENCHANTMENT LAND
 // Hexproof
 func NewValgavothsLair(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Valgavoths Lair")

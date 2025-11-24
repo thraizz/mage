@@ -12,9 +12,7 @@ func init() {
 }
 
 // NewJadeOrbOfDragonkind creates a Jade Orb Of Dragonkind
-//
-//	-
-//
+//  - 
 // Hexproof
 func NewJadeOrbOfDragonkind(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jade Orb Of Dragonkind")

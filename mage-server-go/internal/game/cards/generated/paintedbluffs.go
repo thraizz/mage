@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPaintedBluffs creates a Painted Bluffs
-//   - LAND
+//  - LAND
 func NewPaintedBluffs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Painted Bluffs")
 	card.ManaCost = ""

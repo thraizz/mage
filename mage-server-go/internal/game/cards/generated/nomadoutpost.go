@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNomadOutpost creates a Nomad Outpost
-//   - LAND
+//  - LAND
 func NewNomadOutpost(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nomad Outpost")
 	card.ManaCost = ""

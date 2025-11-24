@@ -24,7 +24,7 @@ func NewNyxbornShieldmate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(1, 2)).
+		AddEffect(abilities.NewBoostEnchantedEffect(1,2)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLabyrinthOfSkophos creates a Labyrinth Of Skophos
-//   - LAND
+//  - LAND
 func NewLabyrinthOfSkophos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Labyrinth Of Skophos")
 	card.ManaCost = ""

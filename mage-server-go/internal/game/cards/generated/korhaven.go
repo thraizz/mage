@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKorHaven creates a Kor Haven
-//   - LAND
+//  - LAND
 func NewKorHaven(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kor Haven")
 	card.ManaCost = ""

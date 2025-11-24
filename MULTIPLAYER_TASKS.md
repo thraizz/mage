@@ -191,40 +191,51 @@ Create a functional login page with form validation and authentication.
 ---
 
 ## T008: Registration Page Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T005, T006
 
-**Description:**  
+**Description:**
 Create a registration page with form validation for new user signup.
 
 **Acceptance Criteria:**
-- [ ] Form has username, email, password, confirm password fields
-- [ ] Client-side validation:
+- [x] Form has username, email, password, confirm password fields
+- [x] Client-side validation:
   - Username: 3-20 characters, alphanumeric
   - Email: valid email format
   - Password: min 8 characters
   - Confirm password: matches password
-- [ ] Submit button with loading state
-- [ ] Error message display (username taken, etc.)
-- [ ] Success message on registration
-- [ ] Link back to login page
-- [ ] Auto-login after successful registration (optional)
+- [x] Submit button with loading state
+- [x] Error message display (username taken, etc.)
+- [x] Success message on registration
+- [x] Link back to login page
+- [x] Auto-login after successful registration
+
+**Files Modified:**
+- `src/routes/register/+page.svelte` - Complete registration page with comprehensive validation, error handling, success messages, auth integration, and auto-login functionality
 
 ---
 
 ## T009: Auth Guard (Protected Routes)
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T006
 
-**Description:**  
+**Description:**
 Create a route guard that redirects unauthenticated users to login page.
 
 **Acceptance Criteria:**
-- [ ] `+layout.ts` or `+page.ts` load function checks auth state
-- [ ] Redirects to `/login` if not authenticated
-- [ ] Preserves original URL for redirect after login
-- [ ] Works with SSR and client-side navigation
-- [ ] Does not protect `/login` and `/register` routes
+- [x] `+layout.ts` or `+page.ts` load function checks auth state
+- [x] Redirects to `/login` if not authenticated
+- [x] Preserves original URL for redirect after login
+- [x] Works with SSR and client-side navigation
+- [x] Does not protect `/login` and `/register` routes
+
+**Files Created/Modified:**
+- `src/routes/(protected)/+layout.ts` - Server-side auth guard with redirect logic
+- `src/routes/(protected)/+layout.svelte` - Client-side auth guard with loading state and periodic token validation
+- `src/lib/utils/auth-guard.ts` - Reusable auth check utilities (isAuthenticated, isTokenValid, clearInvalidToken)
+- `src/routes/login/+page.svelte` - Updated to handle returnUrl query parameter
+- `src/routes/register/+page.svelte` - Updated to handle returnUrl query parameter
+- Moved protected routes into `(protected)` group: lobby, decks, profile, game, table
 ---
 
 ## T010: Main App Layout Component

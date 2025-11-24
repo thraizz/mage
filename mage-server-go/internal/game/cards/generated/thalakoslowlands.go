@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThalakosLowlands creates a Thalakos Lowlands
-//   - LAND
+//  - LAND
 func NewThalakosLowlands(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thalakos Lowlands")
 	card.ManaCost = ""

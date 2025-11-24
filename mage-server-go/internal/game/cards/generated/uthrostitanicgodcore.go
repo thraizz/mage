@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUthrosTitanicGodcore creates a Uthros Titanic Godcore
-//   - LAND
+//  - LAND
 func NewUthrosTitanicGodcore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Uthros Titanic Godcore")
 	card.ManaCost = ""

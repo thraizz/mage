@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewAuroraOfEmrakul creates a Aurora Of Emrakul
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Deathtouch
 func NewAuroraOfEmrakul(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Aurora Of Emrakul")

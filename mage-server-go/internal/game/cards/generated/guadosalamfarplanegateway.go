@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGuadosalamFarplaneGateway creates a Guadosalam Farplane Gateway
-//   - LAND
+//  - LAND
 func NewGuadosalamFarplaneGateway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Guadosalam Farplane Gateway")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUrzasTower creates a Urzas Tower
-//   - LAND
+//  - LAND
 func NewUrzasTower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Urzas Tower")
 	card.ManaCost = ""

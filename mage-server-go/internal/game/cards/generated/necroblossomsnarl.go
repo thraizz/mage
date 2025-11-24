@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNecroblossomSnarl creates a Necroblossom Snarl
-//   - LAND
+//  - LAND
 func NewNecroblossomSnarl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Necroblossom Snarl")
 	card.ManaCost = ""

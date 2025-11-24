@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewSunbirdEffigy creates a Sunbird Effigy
-//   - ARTIFACT CREATURE
-//
+//  - ARTIFACT CREATURE
 // Flying, Vigilance, Haste
 func NewSunbirdEffigy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sunbird Effigy")

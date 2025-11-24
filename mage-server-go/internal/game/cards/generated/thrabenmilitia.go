@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewThrabenMilitia creates a Thraben Militia
-//   - CREATURE
-//
+//  - CREATURE
 // Trample
 func NewThrabenMilitia(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thraben Militia")

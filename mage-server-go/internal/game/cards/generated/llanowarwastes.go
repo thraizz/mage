@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLlanowarWastes creates a Llanowar Wastes
-//   - LAND
+//  - LAND
 func NewLlanowarWastes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Llanowar Wastes")
 	card.ManaCost = ""

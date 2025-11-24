@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDroidFactory creates a Droid Factory
-//   - LAND
+//  - LAND
 func NewDroidFactory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Droid Factory")
 	card.ManaCost = ""

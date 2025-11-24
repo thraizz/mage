@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBuriedRuin creates a Buried Ruin
-//   - LAND
+//  - LAND
 func NewBuriedRuin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Buried Ruin")
 	card.ManaCost = ""

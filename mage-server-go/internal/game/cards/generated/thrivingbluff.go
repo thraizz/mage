@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThrivingBluff creates a Thriving Bluff
-//   - LAND
+//  - LAND
 func NewThrivingBluff(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thriving Bluff")
 	card.ManaCost = ""

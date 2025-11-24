@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewArcaneSanctum creates a Arcane Sanctum
-//   - LAND
+//  - LAND
 func NewArcaneSanctum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Arcane Sanctum")
 	card.ManaCost = ""

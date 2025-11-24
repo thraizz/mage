@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewSoulstoneSanctuary creates a Soulstone Sanctuary
-//   - LAND
-//
+//  - LAND
 // Vigilance
 func NewSoulstoneSanctuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Soulstone Sanctuary")

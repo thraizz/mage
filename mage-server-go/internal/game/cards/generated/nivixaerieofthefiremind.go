@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNivixAerieOfTheFiremind creates a Nivix Aerie Of The Firemind
-//   - LAND
+//  - LAND
 func NewNivixAerieOfTheFiremind(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nivix Aerie Of The Firemind")
 	card.ManaCost = ""

@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewLordOfLineage creates a Lord Of Lineage
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewLordOfLineage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lord Of Lineage")

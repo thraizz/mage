@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTranquilGarden creates a Tranquil Garden
-//   - LAND
+//  - LAND
 func NewTranquilGarden(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tranquil Garden")
 	card.ManaCost = ""

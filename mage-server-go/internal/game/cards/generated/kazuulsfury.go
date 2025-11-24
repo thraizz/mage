@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKazuulsFury creates a Kazuuls Fury
-//   - INSTANT
+//  - INSTANT
 func NewKazuulsFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kazuuls Fury")
 	card.ManaCost = ""

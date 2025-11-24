@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewEmbodimentOfFlame creates a Embodiment Of Flame
-//   - CREATURE
+//  - CREATURE
 func NewEmbodimentOfFlame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Embodiment Of Flame")
 	card.ManaCost = ""

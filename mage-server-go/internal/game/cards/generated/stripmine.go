@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStripMine creates a Strip Mine
-//   - LAND
+//  - LAND
 func NewStripMine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Strip Mine")
 	card.ManaCost = ""

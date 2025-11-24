@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewFaerieConclave creates a Faerie Conclave
-//   - LAND
-//
+//  - LAND
 // Flying
 func NewFaerieConclave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Faerie Conclave")

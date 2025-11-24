@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSkybridgeTowers creates a Skybridge Towers
-//   - LAND
+//  - LAND
 func NewSkybridgeTowers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Skybridge Towers")
 	card.ManaCost = ""

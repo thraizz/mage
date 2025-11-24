@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUndiscoveredParadise creates a Undiscovered Paradise
-//   - LAND
+//  - LAND
 func NewUndiscoveredParadise(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Undiscovered Paradise")
 	card.ManaCost = ""

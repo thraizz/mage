@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVildinPackAlpha creates a Vildin Pack Alpha
-//   - CREATURE
+//  - CREATURE
 func NewVildinPackAlpha(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vildin Pack Alpha")
 	card.ManaCost = ""

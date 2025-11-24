@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewFieldOfTheDead creates a Field Of The Dead
-//   - LAND
+//  - LAND
 func NewFieldOfTheDead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Field Of The Dead")
 	card.ManaCost = ""

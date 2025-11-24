@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCavernousMaw creates a Cavernous Maw
-//   - LAND
+//  - LAND
 func NewCavernousMaw(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cavernous Maw")
 	card.ManaCost = ""

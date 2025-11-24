@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlinkmothWell creates a Blinkmoth Well
-//   - LAND
+//  - LAND
 func NewBlinkmothWell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blinkmoth Well")
 	card.ManaCost = ""

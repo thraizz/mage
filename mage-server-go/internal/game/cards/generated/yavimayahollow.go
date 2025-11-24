@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewYavimayaHollow creates a Yavimaya Hollow
-//   - LAND
+//  - LAND
 func NewYavimayaHollow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Yavimaya Hollow")
 	card.ManaCost = ""

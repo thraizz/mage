@@ -1,10 +1,63 @@
 {
-  "timestamp": "2025-11-23T11:00:13.600246",
+  "timestamp": "2025-11-23T11:42:12.175092",
   "summary": {
-    "total": 50,
-    "successful": 50,
+    "total": 100,
+    "successful": 100,
     "failed": 0,
-    "success_rate": "100.00%"
+    "has_todo": 6,
+    "fully_implemented": 94,
+    "success_rate": "100.00%",
+    "todo_rate": "6.00%",
+    "complete_rate": "94.00%"
+  },
+  "todo_analysis": {
+    "total": 6,
+    "cards_with_todos": [
+      "radagastthebrown",
+      "raffweatherlightstalwart",
+      "rafterdemon",
+      "ragefirehellkite",
+      "raggedrecluse",
+      "ragnar"
+    ],
+    "sample_details": {
+      "rafterdemon": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement spell ability with unmapped effects"
+        ]
+      },
+      "raffweatherlightstalwart": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement spell ability with unmapped effects"
+        ]
+      },
+      "radagastthebrown": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement spell ability with unmapped effects"
+        ]
+      },
+      "ragnar": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement activated ability with unmapped effects"
+        ]
+      },
+      "raggedrecluse": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement spell ability with unmapped effects"
+        ]
+      },
+      "ragefirehellkite": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement spell ability with unmapped effects"
+        ]
+      }
+    }
   },
   "error_categories": {},
   "failed_cards": []

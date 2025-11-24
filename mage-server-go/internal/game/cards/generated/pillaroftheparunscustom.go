@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewPillarOfTheParunsCustom creates a Pillar Of The Paruns Custom
-//   - LAND
-//
+//  - LAND
 // Hexproof
 func NewPillarOfTheParunsCustom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Pillar Of The Paruns Custom")

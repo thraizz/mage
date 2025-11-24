@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLambholtRavager creates a Lambholt Ravager
-//   - CREATURE
+//  - CREATURE
 func NewLambholtRavager(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lambholt Ravager")
 	card.ManaCost = ""

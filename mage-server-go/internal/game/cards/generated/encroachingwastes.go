@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEncroachingWastes creates a Encroaching Wastes
-//   - LAND
+//  - LAND
 func NewEncroachingWastes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Encroaching Wastes")
 	card.ManaCost = ""

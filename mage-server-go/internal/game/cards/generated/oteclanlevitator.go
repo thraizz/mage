@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewOteclanLevitator creates a Oteclan Levitator
-//   - ARTIFACT CREATURE
-//
+//  - ARTIFACT CREATURE
 // Flying
 func NewOteclanLevitator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Oteclan Levitator")

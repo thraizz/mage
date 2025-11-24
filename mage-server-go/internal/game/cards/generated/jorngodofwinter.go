@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJornGodOfWinter creates a Jorn God Of Winter
-//   - CREATURE
+//  - CREATURE
 func NewJornGodOfWinter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jorn God Of Winter")
 	card.ManaCost = ""

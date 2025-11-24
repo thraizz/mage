@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNightfallPredator creates a Nightfall Predator
-//   - CREATURE
+//  - CREATURE
 func NewNightfallPredator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nightfall Predator")
 	card.ManaCost = ""

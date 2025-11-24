@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewWitchsClinic creates a Witchs Clinic
-//   - LAND
+//  - LAND
 func NewWitchsClinic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Witchs Clinic")
 	card.ManaCost = ""

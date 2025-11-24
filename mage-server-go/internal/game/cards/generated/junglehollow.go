@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJungleHollow creates a Jungle Hollow
-//   - LAND
+//  - LAND
 func NewJungleHollow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jungle Hollow")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewWestvaleCultLeader creates a Westvale Cult Leader
-//   - CREATURE
+//  - CREATURE
 func NewWestvaleCultLeader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Westvale Cult Leader")
 	card.ManaCost = ""

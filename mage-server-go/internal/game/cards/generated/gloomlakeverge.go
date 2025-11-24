@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGloomlakeVerge creates a Gloomlake Verge
-//   - LAND
+//  - LAND
 func NewGloomlakeVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gloomlake Verge")
 	card.ManaCost = ""

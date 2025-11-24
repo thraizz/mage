@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAzoriusChancery creates a Azorius Chancery
-//   - LAND
+//  - LAND
 func NewAzoriusChancery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Azorius Chancery")
 	card.ManaCost = ""

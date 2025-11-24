@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWoodlandChasm creates a Woodland Chasm
-//   - LAND
+//  - LAND
 func NewWoodlandChasm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Woodland Chasm")
 	card.ManaCost = ""

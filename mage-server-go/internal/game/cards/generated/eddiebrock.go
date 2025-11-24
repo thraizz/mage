@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewEddieBrock creates a Eddie Brock
-//   - CREATURE
-//
+//  - CREATURE
 // Menace, Trample, Haste
 func NewEddieBrock(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Eddie Brock")

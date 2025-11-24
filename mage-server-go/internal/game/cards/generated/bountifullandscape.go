@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBountifulLandscape creates a Bountiful Landscape
-//   - LAND
+//  - LAND
 func NewBountifulLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bountiful Landscape")
 	card.ManaCost = ""

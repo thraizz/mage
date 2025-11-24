@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGroveOfTheBurnwillows creates a Grove Of The Burnwillows
-//   - LAND
+//  - LAND
 func NewGroveOfTheBurnwillows(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grove Of The Burnwillows")
 	card.ManaCost = ""

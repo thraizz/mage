@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTheDeathStar creates a The Death Star
-//   - LAND
+//  - LAND
 func NewTheDeathStar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Death Star")
 	card.ManaCost = ""

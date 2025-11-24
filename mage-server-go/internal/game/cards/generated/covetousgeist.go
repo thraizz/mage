@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewCovetousGeist creates a Covetous Geist
-//   - CREATURE
-//
+//  - CREATURE
 // Flying, Deathtouch
 func NewCovetousGeist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Covetous Geist")

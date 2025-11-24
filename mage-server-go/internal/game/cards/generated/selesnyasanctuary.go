@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSelesnyaSanctuary creates a Selesnya Sanctuary
-//   - LAND
+//  - LAND
 func NewSelesnyaSanctuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Selesnya Sanctuary")
 	card.ManaCost = ""

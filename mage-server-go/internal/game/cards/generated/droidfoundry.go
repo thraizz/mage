@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDroidFoundry creates a Droid Foundry
-//   - LAND
+//  - LAND
 func NewDroidFoundry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Droid Foundry")
 	card.ManaCost = ""

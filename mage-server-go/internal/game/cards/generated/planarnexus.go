@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPlanarNexus creates a Planar Nexus
-//   - LAND
+//  - LAND
 func NewPlanarNexus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Planar Nexus")
 	card.ManaCost = ""

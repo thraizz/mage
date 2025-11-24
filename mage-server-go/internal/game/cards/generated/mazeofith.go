@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMazeOfIth creates a Maze Of Ith
-//   - LAND
+//  - LAND
 func NewMazeOfIth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Maze Of Ith")
 	card.ManaCost = ""

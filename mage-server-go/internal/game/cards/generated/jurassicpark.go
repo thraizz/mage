@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJurassicPark creates a Jurassic Park
-//   - LAND
+//  - LAND
 func NewJurassicPark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jurassic Park")
 	card.ManaCost = ""

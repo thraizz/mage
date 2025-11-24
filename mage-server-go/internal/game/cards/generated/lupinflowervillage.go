@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLupinflowerVillage creates a Lupinflower Village
-//   - LAND
+//  - LAND
 func NewLupinflowerVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lupinflower Village")
 	card.ManaCost = ""

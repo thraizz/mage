@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewGatstafRavagers creates a Gatstaf Ravagers
-//   - CREATURE
-//
+//  - CREATURE
 // Menace
 func NewGatstafRavagers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gatstaf Ravagers")

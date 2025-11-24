@@ -13,8 +13,7 @@ func init() {
 }
 
 // NewTerrorOfKruinPass creates a Terror Of Kruin Pass
-//   - CREATURE
-//
+//  - CREATURE
 // DoubleStrike
 func NewTerrorOfKruinPass(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Terror Of Kruin Pass")

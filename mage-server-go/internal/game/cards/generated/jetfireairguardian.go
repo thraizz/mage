@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewJetfireAirGuardian creates a Jetfire Air Guardian
-//   - ARTIFACT
-//
+//  - ARTIFACT
 // Flying
 func NewJetfireAirGuardian(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jetfire Air Guardian")

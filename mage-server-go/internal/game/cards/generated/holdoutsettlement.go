@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHoldoutSettlement creates a Holdout Settlement
-//   - LAND
+//  - LAND
 func NewHoldoutSettlement(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Holdout Settlement")
 	card.ManaCost = ""

@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewGrandmotherRaviSengir creates a Grandmother Ravi Sengir
-//   - CREATURE
-//
+//  - CREATURE
 // Flying
 func NewGrandmotherRaviSengir(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grandmother Ravi Sengir")

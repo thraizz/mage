@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheArgentEtchings creates a The Argent Etchings
-//   - ENCHANTMENT
+//  - ENCHANTMENT
 func NewTheArgentEtchings(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Argent Etchings")
 	card.ManaCost = ""

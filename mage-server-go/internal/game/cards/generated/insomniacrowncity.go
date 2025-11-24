@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewInsomniaCrownCity creates a Insomnia Crown City
-//   - LAND
+//  - LAND
 func NewInsomniaCrownCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Insomnia Crown City")
 	card.ManaCost = ""

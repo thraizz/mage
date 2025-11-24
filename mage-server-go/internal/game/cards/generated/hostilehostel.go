@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewHostileHostel creates a Hostile Hostel
-//   - LAND
+//  - LAND
 func NewHostileHostel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hostile Hostel")
 	card.ManaCost = ""

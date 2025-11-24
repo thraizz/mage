@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBrightclimbPathway creates a Brightclimb Pathway
-//   - LAND
+//  - LAND
 func NewBrightclimbPathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Brightclimb Pathway")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMirrorpool creates a Mirrorpool
-//   - LAND
+//  - LAND
 func NewMirrorpool(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mirrorpool")
 	card.ManaCost = ""

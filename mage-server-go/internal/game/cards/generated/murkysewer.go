@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMurkySewer creates a Murky Sewer
-//   - LAND
+//  - LAND
 func NewMurkySewer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Murky Sewer")
 	card.ManaCost = ""

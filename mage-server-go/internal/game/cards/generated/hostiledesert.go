@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHostileDesert creates a Hostile Desert
-//   - LAND
+//  - LAND
 func NewHostileDesert(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hostile Desert")
 	card.ManaCost = ""

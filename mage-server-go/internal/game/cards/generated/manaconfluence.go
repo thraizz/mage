@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewManaConfluence creates a Mana Confluence
-//   - LAND
+//  - LAND
 func NewManaConfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mana Confluence")
 	card.ManaCost = ""

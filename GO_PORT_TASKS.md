@@ -322,12 +322,12 @@ Status legend:
   - [x] Implement balanced parentheses parser for nested function calls
   - [x] Add smart import detection (auto-add counters/token packages when needed)
   - [x] Test transpiler with complex cards (Yorvo Lord of Garenbrig, Regisaur Alpha) - ✅ Both transpile without TODOs
-  - [ ] Create batch generation pipeline
-  - [ ] Generate all 30,439 remaining cards
+  - [x] Create batch generation pipeline
+  - [x] Generate all 30,439 remaining cards
   - [ ] Fix unmapped effects (estimated 1000-2000 cards)
-  - [ ] Add more triggered ability types (DiesTriggeredAbility, AttacksTriggeredAbility, etc.)
-  - [ ] Add static ability support (GainAbilityControlledEffect, BoostControlledEffect, etc.)
-  - [ ] Add activated ability support (SimpleActivatedAbility with costs)
+  - [x] Add more triggered ability types (DiesTriggeredAbility, AttacksTriggeredAbility, etc.)
+  - [x] Add static ability support (GainAbilityControlledEffect, BoostControlledEffect, etc.)
+  - [x] Add activated ability support (SimpleActivatedAbility with costs)
   - [ ] Manually implement complex cards (planeswalkers, transforming)
 - [ ] Build automated verification to compare Java vs Go card behavior for representative samples
 - [ ] **Re-enable disabled integration tests** that expect specific cards (8 tests disabled - see comments in test files for details)
@@ -367,4 +367,249 @@ Status legend:
 - [ ] Translate Java replay/log formats to Go for client consumption
 - [ ] Document protocol changes and migration steps for server operators
 - [ ] Benchmark Go engine against Java baseline (latency, throughput, memory, stability)
+
+## gRPC/Protocol Buffers Infrastructure
+- [ ] Define all 60+ RPC methods in proto files (auth, room, table, game, tournament, draft, chat, admin)
+- [ ] Define data models in proto (TableView, GameView, MatchOptions, etc.)
+- [ ] Define WebSocket event messages for server push
+- [ ] Generate Go code from proto files
+- [ ] Generate TypeScript client code from proto files
+
+## Server Core Infrastructure
+- [x] Initialize Go module and project structure
+- [x] Set up Viper configuration management
+- [x] Implement PostgreSQL connection pooling (pgx)
+- [x] Create database migration system
+- [x] Set up Zap structured logging
+- [x] Implement Argon2id password hashing
+- [ ] Set up health check endpoint
+- [ ] Implement metrics/Prometheus instrumentation
+
+## Session & Authentication
+- [x] Implement in-memory session manager with expiration
+- [x] Implement session cleanup goroutine
+- [x] Add concurrent request locking per session
+- [x] Implement user registration (anonymous and authenticated modes)
+- [x] Implement username validation and uniqueness checks
+- [x] Implement password reset token generation (6-digit)
+- [ ] Implement email service (SMTP/Mailgun)
+- [ ] Add Redis-backed session store for production
+
+## Database Repositories
+- [x] Implement user repository (CRUD + queries)
+- [x] Implement card repository with full-text search
+- [x] Implement stats repository with Glicko rating queries
+- [ ] Implement table records repository
+- [ ] Implement deck repository
+- [ ] Implement match history repository
+
+## gRPC Server & Interceptors
+- [x] Implement gRPC server bootstrap with graceful shutdown
+- [x] Implement session validation interceptor
+- [x] Implement logging interceptor
+- [x] Implement panic recovery interceptor
+- [ ] Implement metrics interceptor
+
+## WebSocket Server for Push Events
+- [x] Implement WebSocket server with Gorilla WebSocket
+- [x] Handle WebSocket upgrade and session validation
+- [x] Forward ServerEvent messages from session to WebSocket
+- [x] Implement ping/pong keep-alive
+- [ ] Add reconnection handling (resume from last message ID)
+- [ ] Implement message compression for large payloads
+
+## Authentication RPC Methods
+- [x] Implement ConnectUser (login with credentials)
+- [x] Implement Ping (session keep-alive)
+- [x] Implement AuthRegister (new user registration)
+- [ ] Implement AuthSendTokenToEmail (password reset)
+- [ ] Implement AuthResetPassword (reset with token)
+- [ ] Implement ConnectAdmin (admin login)
+- [ ] Implement ConnectSetUserData (client preferences)
+
+## Server Info RPC Methods
+- [x] Implement GetServerState (status, player count)
+- [ ] Implement ServerGetPromotionMessages (MOTD, announcements)
+- [ ] Implement ServerAddFeedbackMessage (bug reports)
+
+## Room/Lobby RPC Methods
+- [x] Implement ServerGetMainRoomId (lobby ID)
+- [x] Implement RoomGetUsers (online player list)
+- [ ] Implement RoomGetFinishedMatches (recent matches)
+- [x] Implement RoomGetAllTables (table list)
+- [ ] Implement RoomGetTableById (table details)
+
+## Table Management RPC Methods
+- [x] Implement RoomCreateTable (create new table)
+- [x] Implement RoomJoinTable (join existing table)
+- [x] Implement RoomLeaveTableOrTournament (leave table)
+- [ ] Implement RoomWatchTable (spectator join)
+- [ ] Implement TableSwapSeats (change seat)
+- [ ] Implement TableRemove (host closes table)
+- [ ] Implement TableIsOwner (check host status)
+- [ ] Implement RoomCreateTournament
+- [ ] Implement RoomJoinTournament
+- [ ] Implement RoomWatchTournament
+
+## Deck Management RPC Methods
+- [ ] Implement DeckSubmit (submit deck for table/tournament)
+- [ ] Implement DeckSave (save deck to collection)
+- [ ] Implement DeckList (get user's decks)
+- [ ] Implement DeckDelete (delete deck)
+- [ ] Implement DeckValidate (check format legality)
+
+## Game Execution RPC Methods
+- [x] Implement MatchStart (start match from table)
+- [ ] Implement GameJoin (join ongoing game)
+- [ ] Implement GameWatchStart (spectator join game)
+- [ ] Implement GameWatchStop (spectator leave game)
+- [x] Implement GameGetView (get full game state)
+- [ ] Implement SendPlayerUUID (target selection)
+- [ ] Implement SendPlayerString (text input)
+- [ ] Implement SendPlayerBoolean (yes/no choice)
+- [ ] Implement SendPlayerInteger (number input)
+- [ ] Implement SendPlayerManaType (mana color choice)
+- [ ] Implement SendPlayerAction (pass priority, play card, etc.)
+- [ ] Implement MatchQuit (concede)
+
+## Chat RPC Methods
+- [x] Implement ChatJoin (join chat channel)
+- [x] Implement ChatLeave (leave chat channel)
+- [x] Implement ChatSendMessage (send message)
+- [x] Implement ChatFindByRoom (get lobby chat)
+- [x] Implement ChatFindByTable (get table chat)
+- [x] Implement ChatFindByGame (get game chat)
+- [ ] Implement ChatFindByTournament (get tournament chat)
+- [ ] Implement whisper/private message support
+- [ ] Implement chat rate limiting
+- [ ] Implement HTML sanitization (bluemonday)
+
+## Draft RPC Methods
+- [ ] Implement DraftJoin (join draft)
+- [ ] Implement SendDraftCardPick (pick card from pack)
+- [ ] Implement SendDraftCardMark (mark card for review)
+- [ ] Implement DraftSetBoosterLoaded (client ready for pack)
+- [ ] Implement DraftQuit (leave draft)
+- [ ] Implement booster pack generation from card repository
+
+## Tournament RPC Methods
+- [ ] Implement TournamentJoin (register for tournament)
+- [ ] Implement TournamentStart (begin tournament)
+- [ ] Implement TournamentQuit (drop from tournament)
+- [ ] Implement TournamentFindById (get tournament details)
+- [ ] Implement Swiss pairing algorithm
+- [ ] Implement elimination bracket generation
+
+## Replay RPC Methods
+- [ ] Implement ReplayInit (initialize replay viewer)
+- [ ] Implement ReplayStart (start playback)
+- [ ] Implement ReplayStop (stop playback)
+- [ ] Implement ReplayNext (next action)
+- [ ] Implement ReplayPrevious (previous action)
+- [ ] Implement ReplaySkipForward (skip N actions)
+
+## Admin RPC Methods
+- [ ] Implement AdminGetUsers (list all users)
+- [ ] Implement AdminDisconnectUser (kick user)
+- [ ] Implement AdminMuteUser (mute in chat)
+- [ ] Implement AdminLockUser (temporary ban)
+- [ ] Implement AdminActivateUser (unlock account)
+- [ ] Implement AdminToggleActivateUser (toggle active status)
+- [ ] Implement AdminEndUserSession (force disconnect)
+- [ ] Implement AdminTableRemove (force close table)
+- [ ] Implement AdminSendBroadcastMessage (server announcement)
+
+## Room/Lobby Management
+- [x] Implement GamesRoom (main lobby)
+- [x] Implement lobby features (user list, table list, finished matches)
+- [x] Implement room update broadcasting
+- [ ] Implement real-time table updates via WebSocket
+- [ ] Implement real-time user join/leave notifications
+
+## Table Controller
+- [ ] Implement TableController state machine (WAITING → STARTING → DUELING → FINISHED)
+- [ ] Implement player seat assignment and swapping
+- [ ] Implement deck validation hooks
+- [ ] Implement match creation logic
+- [ ] Implement host controls (kick player, start game)
+- [ ] Integrate with game/tournament controllers
+
+## Game Controller
+- [ ] Implement GameController state management
+- [ ] Implement player action queue and processing
+- [ ] Implement watcher management
+- [ ] Integrate with MageEngine
+- [ ] Implement game view generation for clients
+- [ ] Implement spectator view (hide hidden information)
+
+## Tournament System
+- [ ] Implement TournamentController state machine
+- [ ] Implement round management
+- [ ] Implement tournament view generation
+- [ ] Integrate with draft system
+
+## User Profile & Stats
+- [x] Implement user stats tracking (matches, wins, losses, tournaments)
+- [x] Implement Glicko rating calculation
+- [x] Implement rating update on match completion
+- [ ] Implement match history display
+- [ ] Implement user profile page data
+
+## Real-Time Updates & Streaming
+- [ ] Implement gRPC streaming for lobby updates
+- [ ] Implement gRPC streaming for table updates
+- [ ] Implement gRPC streaming for game state updates
+- [ ] Implement event filtering per client subscription
+- [ ] Handle stream errors and reconnection
+
+## Connection Management
+- [ ] Implement connection status tracking
+- [ ] Implement auto-reconnect with exponential backoff
+- [ ] Implement connection health check (ping/pong)
+- [ ] Implement max reconnection attempts
+- [ ] Implement state restoration after reconnect
+
+## Error Handling & Recovery
+- [ ] Implement global error interceptor
+- [ ] Convert gRPC errors to user-friendly messages
+- [ ] Implement retry logic for transient errors
+- [ ] Add error logging and reporting
+- [ ] Handle 401/403/404/500 errors appropriately
+
+## Performance & Optimization
+- [ ] Implement card caching with groupcache
+- [ ] Add cache warming on startup
+- [ ] Implement database query optimization
+- [ ] Profile with pprof (CPU, memory, goroutines)
+- [ ] Implement connection pooling limits
+- [ ] Add request timeout handling (30s default)
+
+## Testing & Quality
+- [ ] Write unit tests for repositories (70%+ coverage)
+- [ ] Write unit tests for managers and controllers
+- [ ] Write integration tests for complete user flows
+- [ ] Write integration tests for game flow
+- [ ] Write integration tests for tournament flow
+- [ ] Write integration tests for chat system
+- [ ] Set up load testing (100, 500, 1000 concurrent users)
+- [ ] Test WebSocket callback delivery
+- [ ] Test session lifecycle (connect → ping → timeout)
+
+## Documentation
+- [ ] Write API documentation (generated from proto)
+- [ ] Document server configuration options
+- [ ] Write deployment guide
+- [ ] Write client integration guide
+- [ ] Write troubleshooting guide
+- [ ] Document protocol changes from Java server
+
+## Deployment & Operations
+- [ ] Create multi-stage Dockerfile
+- [ ] Create Docker Compose for local development
+- [ ] Set up CI/CD pipeline (GitHub Actions)
+- [ ] Configure Prometheus metrics scraping
+- [ ] Create Grafana dashboards
+- [ ] Set up alerting rules
+- [ ] Implement graceful shutdown (drain connections)
+- [ ] Add distributed tracing (optional: Jaeger)
 

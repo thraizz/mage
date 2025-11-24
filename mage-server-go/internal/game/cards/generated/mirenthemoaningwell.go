@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMirenTheMoaningWell creates a Miren The Moaning Well
-//   - LAND
+//  - LAND
 func NewMirenTheMoaningWell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Miren The Moaning Well")
 	card.ManaCost = ""

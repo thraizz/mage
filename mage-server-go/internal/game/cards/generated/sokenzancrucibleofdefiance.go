@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSokenzanCrucibleOfDefiance creates a Sokenzan Crucible Of Defiance
-//   - LAND
+//  - LAND
 func NewSokenzanCrucibleOfDefiance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sokenzan Crucible Of Defiance")
 	card.ManaCost = ""

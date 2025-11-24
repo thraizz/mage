@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOboroPalaceInTheClouds creates a Oboro Palace In The Clouds
-//   - LAND
+//  - LAND
 func NewOboroPalaceInTheClouds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Oboro Palace In The Clouds")
 	card.ManaCost = ""

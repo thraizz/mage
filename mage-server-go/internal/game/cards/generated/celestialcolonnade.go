@@ -12,8 +12,7 @@ func init() {
 }
 
 // NewCelestialColonnade creates a Celestial Colonnade
-//   - LAND
-//
+//  - LAND
 // Flying, Vigilance
 func NewCelestialColonnade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Celestial Colonnade")
