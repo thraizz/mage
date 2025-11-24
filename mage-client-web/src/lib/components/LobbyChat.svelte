@@ -13,6 +13,13 @@
 	let messagesContainer: HTMLDivElement | undefined;
 	let isAtBottom = $state(true);
 
+	// Rate limiting state
+	const RATE_LIMIT_MAX_MESSAGES = 10;
+	const RATE_LIMIT_WINDOW_MS = 60000; // 60 seconds
+	let messageTimestamps = $state<number[]>([]);
+	let rateLimitCooldownSeconds = $state(0);
+	let rateLimitTimer: ReturnType<typeof setInterval> | null = null;
+
 	/**
 	 * Format timestamp as HH:MM
 	 */
@@ -23,6 +30,68 @@
 			minute: '2-digit',
 			hour12: false
 		});
+	}
+
+	/**
+	 * Check if user is rate limited
+	 */
+	function isRateLimited(): boolean {
+		const now = Date.now();
+		// Remove timestamps older than the window
+		messageTimestamps = messageTimestamps.filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
+		return messageTimestamps.length >= RATE_LIMIT_MAX_MESSAGES;
+	}
+
+	/**
+	 * Calculate cooldown time remaining
+	 */
+	function getCooldownSeconds(): number {
+		if (messageTimestamps.length < RATE_LIMIT_MAX_MESSAGES) {
+			return 0;
+		}
+		const now = Date.now();
+		const oldestTimestamp = messageTimestamps[0];
+		const timeElapsed = now - oldestTimestamp;
+		const timeRemaining = RATE_LIMIT_WINDOW_MS - timeElapsed;
+		return Math.ceil(timeRemaining / 1000);
+	}
+
+	/**
+	 * Start cooldown timer
+	 */
+	function startCooldownTimer(): void {
+		// Clear existing timer
+		if (rateLimitTimer) {
+			clearInterval(rateLimitTimer);
+		}
+
+		// Update cooldown display every second
+		rateLimitTimer = setInterval(() => {
+			const seconds = getCooldownSeconds();
+			rateLimitCooldownSeconds = seconds;
+
+			if (seconds <= 0) {
+				// Cooldown expired
+				if (rateLimitTimer) {
+					clearInterval(rateLimitTimer);
+					rateLimitTimer = null;
+				}
+			}
+		}, 1000);
+	}
+
+	/**
+	 * Record message timestamp
+	 */
+	function recordMessageSent(): void {
+		const now = Date.now();
+		messageTimestamps.push(now);
+
+		// Check if now rate limited
+		if (isRateLimited()) {
+			rateLimitCooldownSeconds = getCooldownSeconds();
+			startCooldownTimer();
+		}
 	}
 
 	/**
@@ -73,6 +142,14 @@
 			return;
 		}
 
+		// Check rate limiting
+		if (isRateLimited()) {
+			const seconds = getCooldownSeconds();
+			error = `Sending too fast, wait ${seconds} second${seconds !== 1 ? 's' : ''}`;
+			setTimeout(() => (error = null), 3000);
+			return;
+		}
+
 		// Check if it's a whisper command
 		const whisperInfo = parseWhisperCommand(content);
 
@@ -105,6 +182,9 @@
 				// Send regular message
 				message = await sendLobbyMessage({ content });
 			}
+
+			// Record message timestamp for rate limiting
+			recordMessageSent();
 
 			messages.push(message);
 			messageInput = '';
@@ -244,14 +324,42 @@
 
 	<!-- Input Container -->
 	<form class="chat-input-container" onsubmit={handleSendMessage}>
-		<input
-			type="text"
-			class="message-input"
-			placeholder="Type a message... (use /w username message to whisper)"
-			bind:value={messageInput}
-			disabled={sending}
-		/>
-		<button type="submit" class="send-button" disabled={!messageInput.trim() || sending}>
+		<div class="input-wrapper">
+			<input
+				type="text"
+				class="message-input"
+				class:rate-limited={rateLimitCooldownSeconds > 0}
+				placeholder="Type a message... (use /w username message to whisper)"
+				bind:value={messageInput}
+				disabled={sending || rateLimitCooldownSeconds > 0}
+			/>
+			{#if rateLimitCooldownSeconds > 0}
+				<div class="rate-limit-warning">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<circle cx="12" cy="12" r="10"></circle>
+						<line x1="12" y1="8" x2="12" y2="12"></line>
+						<line x1="12" y1="16" x2="12.01" y2="16"></line>
+					</svg>
+					<span>Sending too fast, wait {rateLimitCooldownSeconds} second{rateLimitCooldownSeconds !== 1 ? 's' : ''}</span>
+				</div>
+			{/if}
+		</div>
+		<button
+			type="submit"
+			class="send-button"
+			class:rate-limited={rateLimitCooldownSeconds > 0}
+			disabled={!messageInput.trim() || sending || rateLimitCooldownSeconds > 0}
+		>
 			{#if sending}
 				<LoadingSpinner size="small" color="white" />
 			{:else}
@@ -484,6 +592,46 @@
 	.send-button:disabled {
 		background-color: #9ca3af;
 		cursor: not-allowed;
+	}
+
+	/* Rate Limiting Styles */
+	.input-wrapper {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+
+	.message-input.rate-limited {
+		border-color: #ef4444;
+		background-color: #fef2f2;
+	}
+
+	.message-input.rate-limited:focus {
+		border-color: #ef4444;
+		box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+	}
+
+	.rate-limit-warning {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.75rem;
+		color: #dc2626;
+		padding: 0 0.25rem;
+	}
+
+	.rate-limit-warning svg {
+		flex-shrink: 0;
+	}
+
+	.send-button.rate-limited {
+		background-color: #ef4444;
+		cursor: not-allowed;
+	}
+
+	.send-button.rate-limited:hover {
+		background-color: #ef4444;
 	}
 
 	/* Scrollbar Styling */
