@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte';
 	import { auth } from '$lib/stores/auth';
 	import { confirm } from '$lib/stores/confirm';
-	import { fetchTable, toggleReady, leaveTable, startGame } from '$lib/api/table';
+	import { fetchTable, toggleReady, leaveTable, startGame, kickPlayer } from '$lib/api/table';
 	import type { Table } from '$lib/types/table';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 
@@ -119,6 +119,35 @@
 			console.error('Failed to start game:', err);
 			setTimeout(() => (error = null), 3000);
 			startingGame = false;
+		}
+	}
+
+	/**
+	 * Handle kick player (host only)
+	 */
+	async function handleKickPlayer(playerId: string, playerName: string): Promise<void> {
+		if (!isHost || !tableId) return;
+
+		const confirmed = await confirm.confirm({
+			title: 'Kick Player',
+			message: `Are you sure you want to kick ${playerName} from the table?`,
+			confirmText: 'Kick',
+			cancelText: 'Cancel',
+			destructive: true
+		});
+
+		if (!confirmed) return;
+
+		try {
+			await kickPlayer(tableId, playerId);
+			// Remove player from local state
+			if (table) {
+				table.players = table.players.filter((p) => p.id !== playerId);
+			}
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Failed to kick player';
+			console.error('Failed to kick player:', err);
+			setTimeout(() => (error = null), 3000);
 		}
 	}
 
@@ -257,13 +286,24 @@
 									<span class="you-badge">(You)</span>
 								{/if}
 							</h3>
-							{#if player.isHost}
-								<span class="host-badge">Host</span>
-							{/if}
-							{#if player.isReady}
-								<span class="ready-badge">✓ Ready</span>
-							{:else}
-								<span class="not-ready-badge">Not Ready</span>
+							<div class="player-badges">
+								{#if player.isHost}
+									<span class="host-badge">Host</span>
+								{/if}
+								{#if player.isReady}
+									<span class="ready-badge">✓ Ready</span>
+								{:else}
+									<span class="not-ready-badge">Not Ready</span>
+								{/if}
+							</div>
+							{#if isHost && !player.isHost}
+								<button
+									class="btn-kick"
+									onclick={() => handleKickPlayer(player.id, player.username)}
+									title="Kick player"
+								>
+									Kick
+								</button>
 							{/if}
 						</div>
 					</div>
@@ -569,6 +609,14 @@
 		font-weight: 600;
 	}
 
+	.player-badges {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		margin-bottom: 0.5rem;
+	}
+
 	.host-badge {
 		display: inline-block;
 		padding: 0.25rem 0.625rem;
@@ -577,7 +625,6 @@
 		border-radius: 0.75rem;
 		font-size: 0.75rem;
 		font-weight: 600;
-		margin-bottom: 0.375rem;
 	}
 
 	.ready-badge {
@@ -598,6 +645,24 @@
 		border-radius: 0.75rem;
 		font-size: 0.75rem;
 		font-weight: 600;
+	}
+
+	.btn-kick {
+		margin-top: 0.5rem;
+		padding: 0.375rem 0.75rem;
+		background: white;
+		color: #ef4444;
+		border: 1px solid #ef4444;
+		border-radius: 0.375rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-kick:hover {
+		background: #ef4444;
+		color: white;
 	}
 
 	/* Actions */

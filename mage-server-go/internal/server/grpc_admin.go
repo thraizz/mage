@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	pb "github.com/magefree/mage-server-go/pkg/proto/mage/v1"
@@ -40,7 +39,7 @@ func (s *mageServer) AdminGetUsers(ctx context.Context, req *pb.AdminGetUsersReq
 				Wins:        int32(stats.Wins),
 				Losses:      int32(stats.Losses),
 				Rating:      stats.Rating,
-				TourneysWon: int32(stats.TournamentsWon),
+				TourneysWon: int32(stats.TourneysWon),
 			}
 		}
 

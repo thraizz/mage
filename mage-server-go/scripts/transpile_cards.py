@@ -188,7 +188,9 @@ class AbilityMapper:
         'TapSourceEffect': ('TapEffect', 'abilities.NewTapEffect'),
         'UntapTargetEffect': ('UntapEffect', 'abilities.NewUntapEffect'),
         'UntapAllEffect': ('UntapEffect', 'abilities.NewUntapEffect'),
+        'UntapAllControllerEffect': ('UntapEffect', 'abilities.NewUntapEffect'),
         'UntapSourceEffect': ('UntapEffect', 'abilities.NewUntapEffect'),
+        'UntapEnchantedEffect': ('UntapEnchantedEffect', 'abilities.NewUntapEnchantedEffect'),
 
         # Counter spells
         'CounterTargetEffect': ('CounterSpellEffect', 'abilities.NewCounterSpellEffect'),
@@ -216,11 +218,12 @@ class AbilityMapper:
         'SacrificeAllEffect': ('TODO', 'nil'),
         'SacrificeControllerEffect': ('TODO', 'nil'),
 
-        # Discard
+        # Discard - TODO: Implement these effects in abilities package
         'DiscardTargetEffect': ('TODO', 'nil'),
         'DiscardControllerEffect': ('TODO', 'nil'),
         'DiscardEachPlayerEffect': ('TODO', 'nil'),
         'DiscardHandControllerEffect': ('TODO', 'nil'),
+        'DiscardHandTargetEffect': ('TODO', 'nil'),
 
         # Search library
         'SearchLibraryPutInPlayEffect': ('SearchLibraryPutInPlayEffect', 'abilities.NewSearchLibraryPutInPlayEffect'),
@@ -398,15 +401,18 @@ class AbilityMapper:
 
     # Duration mapping (Java Duration enum to Go constants)
     DURATION_MAP = {
-        'EndOfTurn': 'effects.DurationEndOfTurn',
-        'EndOfCombat': 'effects.DurationEndOfCombat',
-        'WhileOnBattlefield': 'effects.DurationWhileOnBattlefield',
-        'WhileOnStack': 'effects.DurationWhileOnStack',
-        'WhileInGraveyard': 'effects.DurationWhileInGraveyard',
-        'UntilYourNextTurn': 'effects.DurationUntilYourNextTurn',
-        'UntilEndOfYourNextTurn': 'effects.DurationUntilEndOfYourNextTurn',
-        'OneUse': 'effects.DurationOneUse',
-        'Custom': 'effects.DurationCustom',
+        'EndOfTurn': 'abilities.DurationUntilEndOfTurn',
+        'EndOfCombat': 'abilities.DurationUntilEndOfCombat',
+        'WhileOnBattlefield': 'abilities.DurationWhileOnBattlefield',
+        'WhileOnStack': 'abilities.DurationWhileOnStack',
+        'WhileInGraveyard': 'abilities.DurationWhileInGraveyard',
+        'WhileInHand': 'abilities.DurationWhileInHand',
+        'WhileInExile': 'abilities.DurationWhileInExile',
+        'UntilYourNextTurn': 'abilities.DurationUntilYourNextTurn',
+        'UntilEndOfYourNextTurn': 'abilities.DurationUntilEndOfYourNextTurn',
+        'Permanent': 'abilities.DurationPermanent',
+        'OneUse': 'abilities.DurationOneUse',
+        'Custom': 'abilities.DurationCustom',
     }
 
     # Map Java StaticFilters to Go filter expressions
@@ -450,14 +456,14 @@ class AbilityMapper:
         """
         Parse Java Duration enum to Go duration constant.
         Examples:
-          Duration.EndOfTurn → effects.DurationEndOfTurn
-          Duration.WhileOnBattlefield → effects.DurationWhileOnBattlefield
+          Duration.EndOfTurn → abilities.DurationUntilEndOfTurn
+          Duration.WhileOnBattlefield → abilities.DurationWhileOnBattlefield
         """
         # Pattern: Duration.X
         match = re.search(r'Duration\.(\w+)', java_expr)
         if match:
             duration_name = match.group(1)
-            return cls.DURATION_MAP.get(duration_name, 'effects.DurationEndOfTurn')
+            return cls.DURATION_MAP.get(duration_name, 'abilities.DurationUntilEndOfTurn')
 
         return None
 
@@ -1285,6 +1291,25 @@ func init() {{
             for token_name, var_name in token_vars.items():
                 params_clean = params_clean.replace(f'token.GetToken("{token_name}")', var_name)
 
+            # Special handling for CreateTokenEffect - choose correct constructor
+            if java_effect_class == 'CreateTokenEffect':
+                # Count commas to determine which constructor variant to use
+                comma_count = params_clean.count(',')
+                if comma_count == 0:
+                    # NewCreateTokenEffect(token)
+                    effect_call = f'abilities.NewCreateTokenEffect({params_clean})'
+                elif comma_count == 1:
+                    # NewCreateTokenEffectAmount(token, amount)
+                    effect_call = f'abilities.NewCreateTokenEffectAmount({params_clean})'
+                elif comma_count == 2:
+                    # NewCreateTokenEffectTapped(token, amount, tapped)
+                    effect_call = f'abilities.NewCreateTokenEffectTapped({params_clean})'
+                else:
+                    # NewCreateTokenEffectAttacking(token, amount, tapped, attacking)
+                    effect_call = f'abilities.NewCreateTokenEffectAttacking({params_clean})'
+                lines.append(f'\t\tAddEffect({effect_call}).')
+                continue
+
             # Check if params are malformed (empty, double parens, Java constructors, etc)
             # If so, use TODO comment instead of generating broken code
             if (re.search(r'\(\s*\)', params_clean) or          # Empty params
@@ -1379,6 +1404,25 @@ func init() {{
             for token_name, var_name in token_vars.items():
                 params_clean = params_clean.replace(f'token.GetToken("{token_name}")', var_name)
 
+            # Special handling for CreateTokenEffect - choose correct constructor
+            if java_effect_class == 'CreateTokenEffect':
+                # Count commas to determine which constructor variant to use
+                comma_count = params_clean.count(',')
+                if comma_count == 0:
+                    # NewCreateTokenEffect(token)
+                    effect_call = f'abilities.NewCreateTokenEffect({params_clean})'
+                elif comma_count == 1:
+                    # NewCreateTokenEffectAmount(token, amount)
+                    effect_call = f'abilities.NewCreateTokenEffectAmount({params_clean})'
+                elif comma_count == 2:
+                    # NewCreateTokenEffectTapped(token, amount, tapped)
+                    effect_call = f'abilities.NewCreateTokenEffectTapped({params_clean})'
+                else:
+                    # NewCreateTokenEffectAttacking(token, amount, tapped, attacking)
+                    effect_call = f'abilities.NewCreateTokenEffectAttacking({params_clean})'
+                lines.append(f'\t\tAddEffect({effect_call}).')
+                continue
+
             # Check if params are malformed (empty, double parens, Java constructors, etc)
             # If so, use TODO comment instead of generating broken code
             if (re.search(r'\(\s*\)', params_clean) or          # Empty params
@@ -1459,6 +1503,47 @@ func init() {{
             # Parse filter from TargetCardInLibrary
             filter_expr = self._extract_filter_from_target(params)
             return f'abilities.NewTargetRequirement(0, 1, {filter_expr}), {reveal}'
+
+        # Special handling for CreateTokenEffect
+        if effect_class == 'CreateTokenEffect':
+            # Extract token and optional amount/tapped/attacking parameters
+            # Java: new CreateTokenEffect(new SoldierToken(), 2, true, false)
+            # Go: NewCreateTokenEffectTapped(token, 2, true) or NewCreateTokenEffect(token)
+
+            # Parse token name
+            token_match = re.search(r'new (\w+Token)\(\)', params)
+            if not token_match:
+                return '/* TODO: token extraction failed */'
+
+            token_name = token_match.group(1)
+
+            # Parse amount (default 1)
+            amount_match = re.search(r',\s*(\d+)', params)
+            amount = amount_match.group(1) if amount_match else '1'
+
+            # Parse tapped flag
+            tapped_match = re.search(r',\s*(true|false)\s*(?:,|$)', params)
+            tapped = tapped_match.group(1) if tapped_match else None
+
+            # Parse attacking flag
+            attacking_match = re.search(r',\s*true\s*,\s*(true|false)', params)
+            attacking = attacking_match.group(1) if attacking_match else None
+
+            # Return token variable reference with appropriate constructor
+            token_var = f'token.GetToken("{token_name}")'
+
+            if amount == '1' and not tapped and not attacking:
+                # Simple case: NewCreateTokenEffect(token)
+                return token_var
+            elif tapped and attacking:
+                # Full case: NewCreateTokenEffectAttacking(token, amount, tapped, attacking)
+                return f'{token_var}, {amount}, {tapped}, {attacking}'
+            elif tapped:
+                # Tapped case: NewCreateTokenEffectTapped(token, amount, tapped)
+                return f'{token_var}, {amount}, {tapped}'
+            else:
+                # Amount case: NewCreateTokenEffectAmount(token, amount)
+                return f'{token_var}, {amount}'
 
         # Special handling for MillCardsTargetEffect
         if effect_class == 'MillCardsTargetEffect':
@@ -1558,7 +1643,20 @@ func init() {{
             outcome_match = re.search(r'Outcome\.(\w+)', params)
             if outcome_match:
                 outcome_name = outcome_match.group(1)
-                return f'abilities.Outcome{outcome_name}'
+                # Map Java Outcome names to Go constants
+                outcome_map = {
+                    'Benefit': 'OutcomeBenefit',
+                    'BoostCreature': 'OutcomeBoostCreature',
+                    'AddAbility': 'OutcomeAddAbility',
+                    'Protect': 'OutcomeProtect',
+                    'Detriment': 'OutcomeDetriment',
+                    'Neutral': 'OutcomeNeutral',
+                    'GainControl': 'OutcomeDetriment',  # Map GainControl to Detriment
+                    'Tap': 'OutcomeDetriment',
+                    'Untap': 'OutcomeBenefit',
+                }
+                go_outcome = outcome_map.get(outcome_name, 'OutcomeBenefit')
+                return f'abilities.{go_outcome}'
             # Default if no outcome found
             return 'abilities.OutcomeBenefit'
 
@@ -1575,7 +1673,20 @@ func init() {{
                     attachment_type = attachment_match.group(1)
                     # Convert AURA/EQUIPMENT to AttachmentTypeAura/AttachmentTypeEquipment
                     attachment_const = f'abilities.AttachmentType{attachment_type.capitalize()}'
-                    return f'"{ability_name}", {attachment_const}'
+
+                    # Extract Duration (default to WhileOnBattlefield)
+                    duration_match = re.search(r'Duration\.(\w+)', params)
+                    if duration_match:
+                        duration_name = duration_match.group(1)
+                        duration_const = AbilityMapper.DURATION_MAP.get(duration_name, 'abilities.DurationWhileOnBattlefield')
+                    else:
+                        duration_const = 'abilities.DurationWhileOnBattlefield'
+
+                    # Create keyword ability constructor call
+                    ability_call = f'abilities.NewKeywordAbility(card.ID, abilities.Keyword{ability_name.replace("Ability", "")})'
+
+                    # Return with all 4 parameters
+                    return f'{ability_call}, {attachment_const}, {duration_const}, ""'
 
         # Special handling for GrantAbilityEffect: extract ability and duration
         if effect_class == 'GainAbilityTargetEffect' or 'GainAbility' in effect_class:
@@ -1588,7 +1699,7 @@ func init() {{
                 duration_match = re.search(r'Duration\.(\w+)', params)
                 if duration_match:
                     duration_name = duration_match.group(1)
-                    duration_const = AbilityMapper.DURATION_MAP.get(duration_name, 'effects.DurationEndOfTurn')
+                    duration_const = AbilityMapper.DURATION_MAP.get(duration_name, 'abilities.DurationUntilEndOfTurn')
 
                     # Return formatted for GrantAbilityEffect: (abilityID, duration)
                     return f'"{ability_name}", {duration_const}'
@@ -1628,13 +1739,16 @@ func init() {{
             'FilterCard',
             'Filter[A-Z]\\w*',  # All other filter classes
             'CardsInAllGraveyardCount',
-            'CardsInControllerGraveyardCount',  # Another dynamic value variant
+            'CardsInControllerGraveyardCount',
             'PermanentsOnBattlefieldCount',
+            'DevotionCount',  # Dynamic value: devotion to a color
+            'ManaSpentToCastCount',  # Dynamic value: X cost tracking
+            'CountersSourceCount',  # Dynamic value: counters on source
             'SimpleStaticAbility',
             'PutIntoGraveFromBattlefieldAllTriggeredAbility',
             'BandsWithOtherAbility',
             '\\w+Token\\d+',  # Token variants like CatToken3, PegasusToken2, AvatarToken2
-            '\\w+Value',  # Dynamic value objects like ArcheryTrainingValue
+            '\\w+Value',  # Dynamic value objects like ArcheryTrainingValue, xValue, count
             'MenaceAbility',  # Keyword abilities that should use keyword system
             'RenownAbility',
             'SimpleActivatedAbility',  # Nested ability definitions

@@ -77,3 +77,14 @@ export async function startGame(tableId: string): Promise<string> {
 	console.log(`Started game ${gameId} for table ${tableId}`);
 	return gameId;
 }
+
+/**
+ * Kick player from table (host only)
+ */
+export async function kickPlayer(tableId: string, playerId: string): Promise<void> {
+	// Simulate network delay
+	await new Promise((resolve) => setTimeout(resolve, 300));
+
+	// Mock success
+	console.log(`Kicked player ${playerId} from table ${tableId}`);
+}
