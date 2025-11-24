@@ -28,6 +28,23 @@ function convertTableViewToTable(view: TableView): Table {
 		status = 'finished';
 	}
 
+	// Helper to convert createTime to timestamp
+	// Handles both Date objects and ISO string timestamps
+	const getCreateTime = (): number => {
+		if (!view.createTime) {
+			return Date.now();
+		}
+		if (view.createTime instanceof Date) {
+			return view.createTime.getTime();
+		}
+		if (typeof view.createTime === 'string') {
+			return new Date(view.createTime).getTime();
+		}
+		return Date.now();
+	};
+
+	const createTime = getCreateTime();
+
 	// Convert seats to players
 	const players = view.seats
 		.filter((seat) => seat.playerName) // Only include occupied seats
@@ -36,7 +53,7 @@ function convertTableViewToTable(view: TableView): Table {
 			username: seat.playerName,
 			isHost: index === 0, // First player is typically the host
 			isReady: status !== 'waiting', // Assume ready if game is not waiting
-			joinedAt: view.createTime?.getTime() || Date.now()
+			joinedAt: createTime
 		}));
 
 	return {
@@ -48,7 +65,7 @@ function convertTableViewToTable(view: TableView): Table {
 		maxPlayers: view.numSeats,
 		status,
 		hasPassword: !!view.password,
-		createdAt: view.createTime?.getTime() || Date.now(),
+		createdAt: createTime,
 		startedAt: status === 'playing' ? Date.now() : undefined
 	};
 }

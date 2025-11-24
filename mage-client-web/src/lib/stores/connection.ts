@@ -149,6 +149,20 @@ function createConnectionStore() {
 			if (response.success) {
 				handlePong();
 			} else {
+				// Check if it's a session error
+				if (response.error) {
+					const errorMsg = response.error.toLowerCase();
+					if (
+						errorMsg.includes('session not found') ||
+						errorMsg.includes('invalid or expired session') ||
+						errorMsg.includes('missing session') ||
+						errorMsg.includes('session expired')
+					) {
+						// Session error - will be handled by callRpc, but we should stop health check
+						stopHealthCheck();
+						return;
+					}
+				}
 				// Ping failed - connection may be lost
 				console.error('[Connection] Ping failed: server returned success=false');
 				handleConnectionLost(new Error('Ping failed'));
@@ -156,6 +170,7 @@ function createConnectionStore() {
 		} catch (error) {
 			console.error('[Connection] Ping failed:', error);
 			// Ping error - connection may be lost
+			// Note: Session errors will be handled by callRpc and redirect to login
 			handleConnectionLost(error instanceof Error ? error : new Error('Ping failed'));
 		}
 	}

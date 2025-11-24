@@ -34,24 +34,23 @@ function convertDeckInfoToDeck(deckInfo: DeckInfo): Deck {
  * Convert DeckCardLists from proto to our DeckCard array format
  */
 function convertCardListsToDeckCards(cardLists: DeckCardLists) {
-	const parseCardList = (cards: string[]) => {
-		return cards.map((card) => {
-			// Parse card names - format is typically just card name
-			// or "4x Card Name" or "Card Name (SET)"
-			const match = card.match(/^(?:(\d+)x?\s+)?(.+?)(?:\s+\(([A-Z0-9]+)\))?$/i);
-			if (match) {
-				const quantity = match[1] ? parseInt(match[1]) : 1;
-				const cardName = match[2].trim();
-				const setCode = match[3];
-				return { cardName, quantity, setCode };
-			}
-			return { cardName: card, quantity: 1 };
-		});
+	const convertCardList = (cards: any[]) => {
+		return cards.map((card) => ({
+			cardName: card.name,
+			quantity: card.quantity || 1,
+			setCode: card.setCode,
+			manaCost: card.manaCost,
+			cardType: card.cardType,
+			types: card.types || [],
+			colors: card.colors || [],
+			power: card.power,
+			toughness: card.toughness
+		}));
 	};
 
 	return {
-		mainDeck: parseCardList(cardLists.mainDeck),
-		sideboard: parseCardList(cardLists.sideboard)
+		mainDeck: convertCardList(cardLists.mainDeck),
+		sideboard: convertCardList(cardLists.sideboard)
 	};
 }
 
@@ -143,8 +142,8 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 	// Parse the deck list text format
 	// Expected format: "4 Lightning Bolt\n20 Mountain\n\nSideboard:\n2 Dragon's Claw"
 	const lines = request.deckList.split('\n').map((line) => line.trim());
-	const mainDeck: string[] = [];
-	const sideboard: string[] = [];
+	const mainDeckCards = new Map<string, number>();
+	const sideboardCards = new Map<string, number>();
 	let inSideboard = false;
 
 	for (const line of lines) {
@@ -162,22 +161,43 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 		if (match) {
 			const quantity = parseInt(match[1]);
 			const cardName = match[2].trim();
-			for (let i = 0; i < quantity; i++) {
-				if (inSideboard) {
-					sideboard.push(cardName);
-				} else {
-					mainDeck.push(cardName);
-				}
+			if (inSideboard) {
+				sideboardCards.set(cardName, (sideboardCards.get(cardName) || 0) + quantity);
+			} else {
+				mainDeckCards.set(cardName, (mainDeckCards.get(cardName) || 0) + quantity);
 			}
 		} else if (line) {
 			// Single card without quantity prefix
 			if (inSideboard) {
-				sideboard.push(line);
+				sideboardCards.set(line, (sideboardCards.get(line) || 0) + 1);
 			} else {
-				mainDeck.push(line);
+				mainDeckCards.set(line, (mainDeckCards.get(line) || 0) + 1);
 			}
 		}
 	}
+
+	// Convert to DeckCard format (server will populate metadata)
+	const mainDeck = Array.from(mainDeckCards.entries()).map(([name, quantity]) => ({
+		name,
+		quantity,
+		manaCost: '',
+		cardType: '',
+		types: [],
+		colors: [],
+		power: '',
+		toughness: ''
+	}));
+
+	const sideboard = Array.from(sideboardCards.entries()).map(([name, quantity]) => ({
+		name,
+		quantity,
+		manaCost: '',
+		cardType: '',
+		types: [],
+		colors: [],
+		power: '',
+		toughness: ''
+	}));
 
 	const deckCardLists: DeckCardLists = {
 		mainDeck,
@@ -202,12 +222,16 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 		throw new Error('Deck saved but no deck ID returned from server');
 	}
 
+	// Calculate total card count from quantities
+	const mainDeckCount = mainDeck.reduce((sum, card) => sum + card.quantity, 0);
+	const sideboardCount = sideboard.reduce((sum, card) => sum + card.quantity, 0);
+
 	// Return a basic deck object - caller should refetch to get full details
 	return {
 		id: response.deckId.toString(),
 		name: request.name,
 		format: request.format,
-		cardCount: mainDeck.length + sideboard.length,
+		cardCount: mainDeckCount + sideboardCount,
 		createdAt: Date.now(),
 		updatedAt: Date.now(),
 		isValid: true,

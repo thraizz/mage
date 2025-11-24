@@ -167,6 +167,7 @@ message DeckCard {
 message DeckCardLists {
   repeated DeckCard main_deck = 1;
   repeated DeckCard sideboard = 2;
+  repeated DeckCard commanders = 3; // For Commander format (usually 1-2 cards)
 }
 
 message DeckSubmitResponse {

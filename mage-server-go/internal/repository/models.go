@@ -43,6 +43,7 @@ type Deck struct {
 	Description string
 	MainDeck    []string // Card names
 	Sideboard   []string // Card names
+	Commanders  []string // Commander card names (for Commander format)
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -81,6 +82,24 @@ func (d *Deck) SetSideboardFromJSON(jsonStr string) error {
 		return nil
 	}
 	return json.Unmarshal([]byte(jsonStr), &d.Sideboard)
+}
+
+// CommandersJSON returns the commanders as JSON string
+func (d *Deck) CommandersJSON() (string, error) {
+	data, err := json.Marshal(d.Commanders)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+// SetCommandersFromJSON parses JSON string into Commanders slice
+func (d *Deck) SetCommandersFromJSON(jsonStr string) error {
+	if jsonStr == "" {
+		d.Commanders = []string{}
+		return nil
+	}
+	return json.Unmarshal([]byte(jsonStr), &d.Commanders)
 }
 
 // CardCount returns the total number of cards in the deck (main + sideboard)

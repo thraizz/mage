@@ -171,13 +171,31 @@ export function isRetryableError(error: GrpcError | unknown): boolean {
 
 /**
  * Check if error is authentication related
+ * Includes status codes and "session not found" errors
  */
 export function isAuthError(error: GrpcError | unknown): boolean {
 	const grpcError = toGrpcError(error);
-	return (
+	const message = grpcError.message?.toLowerCase() || '';
+	
+	// Check for authentication status codes
+	if (
 		grpcError.code === GrpcStatusCode.UNAUTHENTICATED ||
 		grpcError.code === GrpcStatusCode.PERMISSION_DENIED
-	);
+	) {
+		return true;
+	}
+	
+	// Check for "session not found" in error messages (even if status is NOT_FOUND)
+	if (
+		message.includes('session not found') ||
+		message.includes('invalid or expired session') ||
+		message.includes('missing session') ||
+		message.includes('session expired')
+	) {
+		return true;
+	}
+	
+	return false;
 }
 
 /**

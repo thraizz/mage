@@ -19,6 +19,12 @@ export interface DeckCard {
 	cardName: string;
 	quantity: number;
 	setCode?: string;
+	manaCost?: string;
+	cardType?: string;
+	types?: string[];
+	colors?: string[];
+	power?: string;
+	toughness?: string;
 }
 
 export interface DeckListState {

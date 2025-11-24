@@ -162,9 +162,12 @@
 
 	/**
 	 * Generate a random guest username
+	 * Must match pattern: ^[a-z0-9_]+$ (lowercase letters, numbers, and underscores only)
 	 */
 	function generateGuestUsername(): string {
-		return 'Guest_' + Math.random().toString(36).substring(2, 9);
+		// Use lowercase 'guest_' prefix and random alphanumeric suffix
+		const randomPart = Math.random().toString(36).substring(2, 9); // lowercase letters and numbers
+		return 'guest_' + randomPart;
 	}
 
 	async function handleGuestLogin() {

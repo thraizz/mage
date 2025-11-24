@@ -100,7 +100,7 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	statsRepo := repository.NewStatsRepository(db)
 	deckRepo := repository.NewDeckRepository(db)
-	cardRepo := repository.NewCardRepository(db)
+	cardRepo := repository.NewCardRepository(db, logger)
 	matchHistoryRepo := repository.NewMatchHistoryRepository(db)
 
 	// Initialize user manager

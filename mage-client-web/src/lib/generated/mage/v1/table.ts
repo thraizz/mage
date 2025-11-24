@@ -152,9 +152,28 @@ export interface DeckSubmitRequest {
   deck?: DeckCardLists | undefined;
 }
 
+/** DeckCard contains a card name and its full metadata */
+export interface DeckCard {
+  name: string;
+  /** e.g., "{2}{U}{U}" */
+  manaCost: string;
+  /** e.g., "Creature - Human Wizard" */
+  cardType: string;
+  /** e.g., ["CREATURE", "INSTANT"] */
+  types: string[];
+  /** e.g., ["U", "W"] (W=White, U=Blue, B=Black, R=Red, G=Green) */
+  colors: string[];
+  /** For creatures, e.g., "2" */
+  power: string;
+  /** For creatures, e.g., "3" */
+  toughness: string;
+  /** Number of copies in the deck */
+  quantity: number;
+}
+
 export interface DeckCardLists {
-  mainDeck: string[];
-  sideboard: string[];
+  mainDeck: DeckCard[];
+  sideboard: DeckCard[];
 }
 
 export interface DeckSubmitResponse {
@@ -2472,6 +2491,178 @@ export const DeckSubmitRequest: MessageFns<DeckSubmitRequest> = {
   },
 };
 
+function createBaseDeckCard(): DeckCard {
+  return { name: "", manaCost: "", cardType: "", types: [], colors: [], power: "", toughness: "", quantity: 0 };
+}
+
+export const DeckCard: MessageFns<DeckCard> = {
+  encode(message: DeckCard, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.manaCost !== "") {
+      writer.uint32(18).string(message.manaCost);
+    }
+    if (message.cardType !== "") {
+      writer.uint32(26).string(message.cardType);
+    }
+    for (const v of message.types) {
+      writer.uint32(34).string(v!);
+    }
+    for (const v of message.colors) {
+      writer.uint32(42).string(v!);
+    }
+    if (message.power !== "") {
+      writer.uint32(50).string(message.power);
+    }
+    if (message.toughness !== "") {
+      writer.uint32(58).string(message.toughness);
+    }
+    if (message.quantity !== 0) {
+      writer.uint32(64).int32(message.quantity);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckCard {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckCard();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.manaCost = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.cardType = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.types.push(reader.string());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.colors.push(reader.string());
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.power = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.toughness = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.quantity = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeckCard {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      manaCost: isSet(object.manaCost) ? globalThis.String(object.manaCost) : "",
+      cardType: isSet(object.cardType) ? globalThis.String(object.cardType) : "",
+      types: globalThis.Array.isArray(object?.types) ? object.types.map((e: any) => globalThis.String(e)) : [],
+      colors: globalThis.Array.isArray(object?.colors) ? object.colors.map((e: any) => globalThis.String(e)) : [],
+      power: isSet(object.power) ? globalThis.String(object.power) : "",
+      toughness: isSet(object.toughness) ? globalThis.String(object.toughness) : "",
+      quantity: isSet(object.quantity) ? globalThis.Number(object.quantity) : 0,
+    };
+  },
+
+  toJSON(message: DeckCard): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.manaCost !== "") {
+      obj.manaCost = message.manaCost;
+    }
+    if (message.cardType !== "") {
+      obj.cardType = message.cardType;
+    }
+    if (message.types?.length) {
+      obj.types = message.types;
+    }
+    if (message.colors?.length) {
+      obj.colors = message.colors;
+    }
+    if (message.power !== "") {
+      obj.power = message.power;
+    }
+    if (message.toughness !== "") {
+      obj.toughness = message.toughness;
+    }
+    if (message.quantity !== 0) {
+      obj.quantity = Math.round(message.quantity);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeckCard>): DeckCard {
+    return DeckCard.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckCard>): DeckCard {
+    const message = createBaseDeckCard();
+    message.name = object.name ?? "";
+    message.manaCost = object.manaCost ?? "";
+    message.cardType = object.cardType ?? "";
+    message.types = object.types?.map((e) => e) || [];
+    message.colors = object.colors?.map((e) => e) || [];
+    message.power = object.power ?? "";
+    message.toughness = object.toughness ?? "";
+    message.quantity = object.quantity ?? 0;
+    return message;
+  },
+};
+
 function createBaseDeckCardLists(): DeckCardLists {
   return { mainDeck: [], sideboard: [] };
 }
@@ -2479,10 +2670,10 @@ function createBaseDeckCardLists(): DeckCardLists {
 export const DeckCardLists: MessageFns<DeckCardLists> = {
   encode(message: DeckCardLists, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.mainDeck) {
-      writer.uint32(10).string(v!);
+      DeckCard.encode(v!, writer.uint32(10).fork()).join();
     }
     for (const v of message.sideboard) {
-      writer.uint32(18).string(v!);
+      DeckCard.encode(v!, writer.uint32(18).fork()).join();
     }
     return writer;
   },
@@ -2499,7 +2690,7 @@ export const DeckCardLists: MessageFns<DeckCardLists> = {
             break;
           }
 
-          message.mainDeck.push(reader.string());
+          message.mainDeck.push(DeckCard.decode(reader, reader.uint32()));
           continue;
         }
         case 2: {
@@ -2507,7 +2698,7 @@ export const DeckCardLists: MessageFns<DeckCardLists> = {
             break;
           }
 
-          message.sideboard.push(reader.string());
+          message.sideboard.push(DeckCard.decode(reader, reader.uint32()));
           continue;
         }
       }
@@ -2521,9 +2712,9 @@ export const DeckCardLists: MessageFns<DeckCardLists> = {
 
   fromJSON(object: any): DeckCardLists {
     return {
-      mainDeck: globalThis.Array.isArray(object?.mainDeck) ? object.mainDeck.map((e: any) => globalThis.String(e)) : [],
+      mainDeck: globalThis.Array.isArray(object?.mainDeck) ? object.mainDeck.map((e: any) => DeckCard.fromJSON(e)) : [],
       sideboard: globalThis.Array.isArray(object?.sideboard)
-        ? object.sideboard.map((e: any) => globalThis.String(e))
+        ? object.sideboard.map((e: any) => DeckCard.fromJSON(e))
         : [],
     };
   },
@@ -2531,10 +2722,10 @@ export const DeckCardLists: MessageFns<DeckCardLists> = {
   toJSON(message: DeckCardLists): unknown {
     const obj: any = {};
     if (message.mainDeck?.length) {
-      obj.mainDeck = message.mainDeck;
+      obj.mainDeck = message.mainDeck.map((e) => DeckCard.toJSON(e));
     }
     if (message.sideboard?.length) {
-      obj.sideboard = message.sideboard;
+      obj.sideboard = message.sideboard.map((e) => DeckCard.toJSON(e));
     }
     return obj;
   },
@@ -2544,8 +2735,8 @@ export const DeckCardLists: MessageFns<DeckCardLists> = {
   },
   fromPartial(object: DeepPartial<DeckCardLists>): DeckCardLists {
     const message = createBaseDeckCardLists();
-    message.mainDeck = object.mainDeck?.map((e) => e) || [];
-    message.sideboard = object.sideboard?.map((e) => e) || [];
+    message.mainDeck = object.mainDeck?.map((e) => DeckCard.fromPartial(e)) || [];
+    message.sideboard = object.sideboard?.map((e) => DeckCard.fromPartial(e)) || [];
     return message;
   },
 };

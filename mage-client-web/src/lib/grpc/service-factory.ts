@@ -10,6 +10,7 @@ import {
 	logGrpcError
 } from '$lib/utils/grpc-errors';
 import { toast } from '$lib/stores/toast';
+import { handleSessionError } from '$lib/utils/session-error-handler';
 
 /**
  * Default client options
@@ -92,10 +93,9 @@ export async function grpcCall<TRequest, TResponse>(
 			// Log error in dev mode
 			logGrpcError(grpcError, context);
 
-			// Handle authentication errors - logout user
+			// Handle authentication errors - logout user and redirect to login
 			if (isAuthError(grpcError)) {
-				auth.logout();
-				toast.error('Session expired. Please log in again.');
+				handleSessionError('Session expired. Please log in again.');
 				throw grpcError;
 			}
 

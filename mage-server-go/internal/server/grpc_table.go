@@ -794,14 +794,14 @@ func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb
 	}
 
 	// Convert DeckCard messages to card name strings for storage
-	mainDeckNames = make([]string, 0)
+	var mainDeckNames []string
 	for _, card := range deck.GetMainDeck() {
 		for i := int32(0); i < card.GetQuantity(); i++ {
 			mainDeckNames = append(mainDeckNames, card.GetName())
 		}
 	}
 
-	sideboardNames = make([]string, 0)
+	var sideboardNames []string
 	for _, card := range deck.GetSideboard() {
 		for i := int32(0); i < card.GetQuantity(); i++ {
 			sideboardNames = append(sideboardNames, card.GetName())

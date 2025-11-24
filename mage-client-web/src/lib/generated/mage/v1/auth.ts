@@ -54,6 +54,7 @@ export interface ConnectSetUserDataResponse {
 export interface AuthRegisterRequest {
   userName: string;
   password: string;
+  /** Optional - not currently used */
   email: string;
 }
 

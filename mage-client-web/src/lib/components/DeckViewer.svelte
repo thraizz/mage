@@ -59,23 +59,23 @@
 	}
 
 	function calculateDeckStats(cards: DeckCard[]) {
-		// Calculate mana curve and color distribution
-		// For MVP, we'll use simple placeholder stats
-		// In production, this would query card database for mana costs and colors
 		const totalCards = cards.reduce((sum, c) => sum + c.quantity, 0);
 		const uniqueCards = new Set(cards.map(c => c.cardName)).size;
 
-		// Placeholder mana curve (0-7+)
+		// Calculate mana curve from actual card data
 		const manaCurve = [0, 0, 0, 0, 0, 0, 0, 0];
-		// For now, distribute randomly as placeholder
-		const avgCost = 3;
 		for (const card of cards) {
-			// Placeholder: assume average card cost is around 3
-			const cost = Math.min(7, Math.floor(Math.random() * 6) + 1);
-			manaCurve[cost] += card.quantity;
+			if (card.manaCost) {
+				const cmc = calculateCMC(card.manaCost);
+				const index = Math.min(7, cmc);
+				manaCurve[index] += card.quantity;
+			} else {
+				// No mana cost (likely a land), count as 0
+				manaCurve[0] += card.quantity;
+			}
 		}
 
-		// Placeholder color distribution
+		// Calculate color distribution from actual card data
 		const colors = {
 			White: 0,
 			Blue: 0,
@@ -85,12 +85,75 @@
 			Colorless: 0
 		};
 
+		for (const card of cards) {
+			if (card.colors && card.colors.length > 0) {
+				for (const color of card.colors) {
+					switch (color) {
+						case 'W':
+							colors.White += card.quantity;
+							break;
+						case 'U':
+							colors.Blue += card.quantity;
+							break;
+						case 'B':
+							colors.Black += card.quantity;
+							break;
+						case 'R':
+							colors.Red += card.quantity;
+							break;
+						case 'G':
+							colors.Green += card.quantity;
+							break;
+					}
+				}
+			} else {
+				colors.Colorless += card.quantity;
+			}
+		}
+
 		return {
 			totalCards,
 			uniqueCards,
 			manaCurve,
 			colors
 		};
+	}
+
+	// Calculate Converted Mana Cost (CMC) from mana cost string
+	function calculateCMC(manaCost: string): number {
+		if (!manaCost) return 0;
+
+		let cmc = 0;
+		// Match all numbers in braces {2}, {3}, etc.
+		const genericMatches = manaCost.match(/\{(\d+)\}/g);
+		if (genericMatches) {
+			for (const match of genericMatches) {
+				const num = match.match(/\d+/);
+				if (num) {
+					cmc += parseInt(num[0]);
+				}
+			}
+		}
+
+		// Count colored mana symbols
+		const coloredSymbols = manaCost.match(/\{[WUBRG]\}/g);
+		if (coloredSymbols) {
+			cmc += coloredSymbols.length;
+		}
+
+		// Count hybrid mana symbols (e.g., {W/U}, {2/W})
+		const hybridSymbols = manaCost.match(/\{[WUBRG0-9]\/[WUBRG0-9]\}/g);
+		if (hybridSymbols) {
+			cmc += hybridSymbols.length;
+		}
+
+		// Count Phyrexian mana symbols (e.g., {W/P})
+		const phyrexianSymbols = manaCost.match(/\{[WUBRG]\/P\}/g);
+		if (phyrexianSymbols) {
+			cmc += phyrexianSymbols.length;
+		}
+
+		return cmc;
 	}
 
 	function handleExport() {
@@ -227,7 +290,6 @@
 						</div>
 					{/each}
 				</div>
-				<p class="chart-note">Note: Mana costs are placeholder data in this MVP version</p>
 			</div>
 
 			<!-- Color Distribution -->
@@ -247,7 +309,6 @@
 						</div>
 					{/each}
 				</div>
-				<p class="chart-note">Note: Color data is placeholder in this MVP version</p>
 			</div>
 
 			<!-- Card List -->

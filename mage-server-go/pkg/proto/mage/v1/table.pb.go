@@ -1542,6 +1542,7 @@ type DeckCardLists struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MainDeck      []*DeckCard            `protobuf:"bytes,1,rep,name=main_deck,json=mainDeck,proto3" json:"main_deck,omitempty"`
 	Sideboard     []*DeckCard            `protobuf:"bytes,2,rep,name=sideboard,proto3" json:"sideboard,omitempty"`
+	Commanders    []*DeckCard            `protobuf:"bytes,3,rep,name=commanders,proto3" json:"commanders,omitempty"` // For Commander format (usually 1-2 cards)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1586,6 +1587,13 @@ func (x *DeckCardLists) GetMainDeck() []*DeckCard {
 func (x *DeckCardLists) GetSideboard() []*DeckCard {
 	if x != nil {
 		return x.Sideboard
+	}
+	return nil
+}
+
+func (x *DeckCardLists) GetCommanders() []*DeckCard {
+	if x != nil {
+		return x.Commanders
 	}
 	return nil
 }
@@ -2347,10 +2355,13 @@ const file_mage_v1_table_proto_rawDesc = "" +
 	"\x06colors\x18\x05 \x03(\tR\x06colors\x12\x14\n" +
 	"\x05power\x18\x06 \x01(\tR\x05power\x12\x1c\n" +
 	"\ttoughness\x18\a \x01(\tR\ttoughness\x12\x1a\n" +
-	"\bquantity\x18\b \x01(\x05R\bquantity\"p\n" +
+	"\bquantity\x18\b \x01(\x05R\bquantity\"\xa3\x01\n" +
 	"\rDeckCardLists\x12.\n" +
 	"\tmain_deck\x18\x01 \x03(\v2\x11.mage.v1.DeckCardR\bmainDeck\x12/\n" +
-	"\tsideboard\x18\x02 \x03(\v2\x11.mage.v1.DeckCardR\tsideboard\"D\n" +
+	"\tsideboard\x18\x02 \x03(\v2\x11.mage.v1.DeckCardR\tsideboard\x121\n" +
+	"\n" +
+	"commanders\x18\x03 \x03(\v2\x11.mage.v1.DeckCardR\n" +
+	"commanders\"D\n" +
 	"\x12DeckSubmitResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\"\xb3\x01\n" +
@@ -2457,15 +2468,16 @@ var file_mage_v1_table_proto_depIdxs = []int32{
 	23, // 2: mage.v1.DeckSubmitRequest.deck:type_name -> mage.v1.DeckCardLists
 	22, // 3: mage.v1.DeckCardLists.main_deck:type_name -> mage.v1.DeckCard
 	22, // 4: mage.v1.DeckCardLists.sideboard:type_name -> mage.v1.DeckCard
-	23, // 5: mage.v1.DeckSaveRequest.deck:type_name -> mage.v1.DeckCardLists
-	28, // 6: mage.v1.DeckListResponse.decks:type_name -> mage.v1.DeckInfo
-	28, // 7: mage.v1.DeckGetResponse.info:type_name -> mage.v1.DeckInfo
-	23, // 8: mage.v1.DeckGetResponse.deck:type_name -> mage.v1.DeckCardLists
-	9,  // [9:9] is the sub-list for method output_type
-	9,  // [9:9] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	22, // 5: mage.v1.DeckCardLists.commanders:type_name -> mage.v1.DeckCard
+	23, // 6: mage.v1.DeckSaveRequest.deck:type_name -> mage.v1.DeckCardLists
+	28, // 7: mage.v1.DeckListResponse.decks:type_name -> mage.v1.DeckInfo
+	28, // 8: mage.v1.DeckGetResponse.info:type_name -> mage.v1.DeckInfo
+	23, // 9: mage.v1.DeckGetResponse.deck:type_name -> mage.v1.DeckCardLists
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_table_proto_init() }

@@ -27,6 +27,23 @@ function convertTableViewToTable(view: TableView): Table {
 		status = 'finished';
 	}
 
+	// Helper to convert createTime to timestamp
+	// Handles both Date objects and ISO string timestamps
+	const getCreateTime = (): number => {
+		if (!view.createTime) {
+			return Date.now();
+		}
+		if (view.createTime instanceof Date) {
+			return view.createTime.getTime();
+		}
+		if (typeof view.createTime === 'string') {
+			return new Date(view.createTime).getTime();
+		}
+		return Date.now();
+	};
+
+	const createTime = getCreateTime();
+
 	// Convert seats to players
 	const players = view.seats
 		.filter((seat) => seat.playerName) // Only include occupied seats
@@ -35,7 +52,7 @@ function convertTableViewToTable(view: TableView): Table {
 			username: seat.playerName,
 			isHost: index === 0, // First player is typically the host
 			isReady: status !== 'waiting', // Assume ready if game is not waiting
-			joinedAt: view.createTime?.getTime() || Date.now()
+			joinedAt: createTime
 		}));
 
 	return {
@@ -47,7 +64,7 @@ function convertTableViewToTable(view: TableView): Table {
 		maxPlayers: view.numSeats,
 		status,
 		hasPassword: !!view.password,
-		createdAt: view.createTime?.getTime() || Date.now(),
+		createdAt: createTime,
 		startedAt: status === 'playing' ? Date.now() : undefined
 	};
 }
@@ -261,10 +278,27 @@ export async function fetchOnlinePlayers(currentUsername?: string): Promise<Onli
 	);
 
 	// Convert UserView[] to OnlinePlayer[]
-	return response.users.map((user) => ({
-		id: user.userName, // Use username as ID since we don't have user ID
-		username: user.userName,
-		isCurrentUser: user.userName === currentUsername,
-		joinedAt: user.connectedAt?.getTime() || Date.now()
-	}));
+	return response.users.map((user) => {
+		// Helper to convert connectedAt to timestamp
+		// Handles both Date objects and ISO string timestamps
+		const getConnectedAt = (): number => {
+			if (!user.connectedAt) {
+				return Date.now();
+			}
+			if (user.connectedAt instanceof Date) {
+				return user.connectedAt.getTime();
+			}
+			if (typeof user.connectedAt === 'string') {
+				return new Date(user.connectedAt).getTime();
+			}
+			return Date.now();
+		};
+
+		return {
+			id: user.userName, // Use username as ID since we don't have user ID
+			username: user.userName,
+			isCurrentUser: user.userName === currentUsername,
+			joinedAt: getConnectedAt()
+		};
+	});
 }
