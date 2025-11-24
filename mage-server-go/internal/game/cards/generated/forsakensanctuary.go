@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewForsakenSanctuary creates a Forsaken Sanctuary
-//  - LAND
+//   - LAND
 func NewForsakenSanctuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Forsaken Sanctuary")
 	card.ManaCost = ""

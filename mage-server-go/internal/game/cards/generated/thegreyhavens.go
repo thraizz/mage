@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheGreyHavens creates a The Grey Havens
-//  - LAND
+//   - LAND
 func NewTheGreyHavens(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Grey Havens")
 	card.ManaCost = ""

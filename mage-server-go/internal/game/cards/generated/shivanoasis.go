@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShivanOasis creates a Shivan Oasis
-//  - LAND
+//   - LAND
 func NewShivanOasis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shivan Oasis")
 	card.ManaCost = ""

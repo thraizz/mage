@@ -25,7 +25,7 @@ func NewIndebtedSpirit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(1, 1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new AfterlifeAbility(1), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

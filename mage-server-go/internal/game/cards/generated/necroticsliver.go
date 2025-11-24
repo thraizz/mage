@@ -27,11 +27,11 @@ func NewNecroticSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddManaCost("{3}").
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect({3}, Sacrifice permanent: Destroy target permanent.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

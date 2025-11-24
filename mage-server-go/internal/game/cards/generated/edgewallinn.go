@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEdgewallInn creates a Edgewall Inn
-//  - LAND
+//   - LAND
 func NewEdgewallInn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Edgewall Inn")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewEdgewallInn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

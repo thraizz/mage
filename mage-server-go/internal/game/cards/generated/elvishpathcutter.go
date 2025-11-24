@@ -25,7 +25,7 @@ func NewElvishPathcutter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewGrantAbilityEffect(new ForestwalkAbility(false))).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewBlastZone creates a Blast Zone
-//  - LAND
+//   - LAND
 func NewBlastZone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blast Zone")
 	card.ManaCost = ""
@@ -32,7 +32,7 @@ func NewBlastZone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddManaCost("{3}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect(filter)).
+		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

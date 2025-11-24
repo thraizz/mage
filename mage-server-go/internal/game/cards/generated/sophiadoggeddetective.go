@@ -38,7 +38,7 @@ func NewSophiaDoggedDetective(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	token2_0, err := token.GetToken("TinyToken")

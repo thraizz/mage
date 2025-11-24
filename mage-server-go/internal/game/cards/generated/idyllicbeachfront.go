@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIdyllicBeachfront creates a Idyllic Beachfront
-//  - LAND
+//   - LAND
 func NewIdyllicBeachfront(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Idyllic Beachfront")
 	card.ManaCost = ""

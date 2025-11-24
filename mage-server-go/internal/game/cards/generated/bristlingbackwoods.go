@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBristlingBackwoods creates a Bristling Backwoods
-//  - LAND
+//   - LAND
 func NewBristlingBackwoods(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bristling Backwoods")
 	card.ManaCost = ""

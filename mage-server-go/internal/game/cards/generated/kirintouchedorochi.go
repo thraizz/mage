@@ -14,7 +14,7 @@ func init() {
 }
 
 // NewKirinTouchedOrochi creates a Kirin Touched Orochi
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
 func NewKirinTouchedOrochi(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kirin Touched Orochi")
 	card.ManaCost = ""

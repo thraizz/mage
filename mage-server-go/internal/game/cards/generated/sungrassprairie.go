@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSungrassPrairie creates a Sungrass Prairie
-//  - LAND
+//   - LAND
 func NewSungrassPrairie(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sungrass Prairie")
 	card.ManaCost = ""

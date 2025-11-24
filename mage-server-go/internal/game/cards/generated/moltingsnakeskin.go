@@ -32,7 +32,7 @@ func NewMoltingSnakeskin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(2, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new SimpleActivatedAbility(new RegenerateSourceEffect(), new ManaCostsImpl<>("{2}{B}")), AttachmentType.AURA)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err

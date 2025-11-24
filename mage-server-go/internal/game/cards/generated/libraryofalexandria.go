@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLibraryOfAlexandria creates a Library Of Alexandria
-//  - LAND
+//   - LAND
 func NewLibraryOfAlexandria(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Library Of Alexandria")
 	card.ManaCost = ""

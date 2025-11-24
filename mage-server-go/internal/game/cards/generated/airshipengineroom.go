@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAirshipEngineRoom creates a Airship Engine Room
-//  - LAND
+//   - LAND
 func NewAirshipEngineRoom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Airship Engine Room")
 	card.ManaCost = ""

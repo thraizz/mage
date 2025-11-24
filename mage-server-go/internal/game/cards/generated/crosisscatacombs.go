@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCrosissCatacombs creates a Crosiss Catacombs
-//  - LAND
+//   - LAND
 func NewCrosissCatacombs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crosiss Catacombs")
 	card.ManaCost = ""

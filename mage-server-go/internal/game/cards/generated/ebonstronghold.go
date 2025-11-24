@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEbonStronghold creates a Ebon Stronghold
-//  - LAND
+//   - LAND
 func NewEbonStronghold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ebon Stronghold")
 	card.ManaCost = ""

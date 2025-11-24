@@ -33,7 +33,7 @@ func NewKaitoCunningInfiltrator(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(new NinjaToken2())).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

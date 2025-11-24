@@ -29,7 +29,7 @@ func NewSyrGwynHeroOfAshvale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new EquipAbility( Outcome.AddAbility, new TargetPermanent(filter2) ))).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewBlinkmothNexus creates a Blinkmoth Nexus
-//  - LAND
+//   - LAND
+//
 // Flying
 func NewBlinkmothNexus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blinkmoth Nexus")

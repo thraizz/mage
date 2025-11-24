@@ -21,7 +21,7 @@ func NewCratersClaws(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(new IntPlusDynamicValue(2, GetXValue.instance))).
+		// TODO: DamageTargetEffect with complex parameters
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()

@@ -67,11 +67,12 @@ message AdminToggleActivateUserRequest {
 message AdminToggleActivateUserResponse {
   bool success = 1;
   string error = 2;
+  bool new_status = 3;
 }
 
 message AdminEndUserSessionRequest {
   string session_id = 1;
-  string user_name = 2;
+  string target_session_id = 2;
 }
 
 message AdminEndUserSessionResponse {
@@ -97,4 +98,5 @@ message AdminSendBroadcastMessageRequest {
 message AdminSendBroadcastMessageResponse {
   bool success = 1;
   string error = 2;
+  int32 recipient_count = 3;
 }

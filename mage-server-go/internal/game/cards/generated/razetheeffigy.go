@@ -22,7 +22,7 @@ func NewRazeTheEffigy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

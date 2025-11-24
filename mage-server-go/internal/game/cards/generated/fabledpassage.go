@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFabledPassage creates a Fabled Passage
-//  - LAND
+//   - LAND
 func NewFabledPassage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fabled Passage")
 	card.ManaCost = ""

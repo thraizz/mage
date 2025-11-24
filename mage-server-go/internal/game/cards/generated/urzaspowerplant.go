@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUrzasPowerPlant creates a Urzas Power Plant
-//  - LAND
+//   - LAND
 func NewUrzasPowerPlant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Urzas Power Plant")
 	card.ManaCost = ""

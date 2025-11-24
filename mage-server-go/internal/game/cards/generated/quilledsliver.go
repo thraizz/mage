@@ -30,7 +30,7 @@ func NewQuilledSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filter{T}: This permanent deals 1 damage to target attacking or blocking creature.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

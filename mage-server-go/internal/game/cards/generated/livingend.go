@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLivingEnd creates a Living End
-//  - SORCERY
+//   - SORCERY
 func NewLivingEnd(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Living End")
 	card.ManaCost = ""

@@ -27,7 +27,7 @@ func NewFountainportBell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutOnTopEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: SearchLibraryPutOnLibraryEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

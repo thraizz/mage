@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHavenOfTheSpiritDragon creates a Haven Of The Spirit Dragon
-//  - LAND
+//   - LAND
 func NewHavenOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Haven Of The Spirit Dragon")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewHavenOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

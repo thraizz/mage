@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewAugmenterPugilist creates a Augmenter Pugilist
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewAugmenterPugilist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Augmenter Pugilist")

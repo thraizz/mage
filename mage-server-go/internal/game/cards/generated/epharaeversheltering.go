@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewEpharaEverSheltering creates a Ephara Ever Sheltering
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
 func NewEpharaEverSheltering(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ephara Ever Sheltering")
 	card.ManaCost = ""

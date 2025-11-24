@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMysticSanctuary creates a Mystic Sanctuary
-//  - LAND
+//   - LAND
 func NewMysticSanctuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mystic Sanctuary")
 	card.ManaCost = ""

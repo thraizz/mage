@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTolarianAcademy creates a Tolarian Academy
-//  - LAND
+//   - LAND
 func NewTolarianAcademy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tolarian Academy")
 	card.ManaCost = ""

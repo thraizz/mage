@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHorizonOfProgress creates a Horizon Of Progress
-//  - LAND
+//   - LAND
 func NewHorizonOfProgress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Horizon Of Progress")
 	card.ManaCost = ""

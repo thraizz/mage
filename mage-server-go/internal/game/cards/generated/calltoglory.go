@@ -21,8 +21,8 @@ func NewCallToGlory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, false)).
+		// TODO: UntapAllEffect with complex parameters
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

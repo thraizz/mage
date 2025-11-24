@@ -21,8 +21,8 @@ func NewFerocityOfTheUnderworld(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

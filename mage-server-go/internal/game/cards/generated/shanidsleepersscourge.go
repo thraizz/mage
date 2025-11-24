@@ -26,7 +26,7 @@ func NewShanidSleepersScourge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new MenaceAbility(false), otherLegendaryCreaturesFilter, true)).
+		AddEffect(abilities.NewGrantAbilityEffect(otherLegendaryCreaturesFilter, true)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -36,9 +36,9 @@ func NewStickyFingers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new MenaceAbility(false), AttachmentType.AURA)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new DealsCombatDamageToAPlayerTriggeredAbility(new CreateTokenEffect(token2_0), false), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

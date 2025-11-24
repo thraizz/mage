@@ -37,7 +37,7 @@ func NewJirinaKudro(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 0, filter, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -28,7 +28,7 @@ func NewKheruLichLord(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

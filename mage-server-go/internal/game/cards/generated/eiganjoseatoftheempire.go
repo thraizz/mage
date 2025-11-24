@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEiganjoSeatOfTheEmpire creates a Eiganjo Seat Of The Empire
-//  - LAND
+//   - LAND
 func NewEiganjoSeatOfTheEmpire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Eiganjo Seat Of The Empire")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDesolateMire creates a Desolate Mire
-//  - LAND
+//   - LAND
 func NewDesolateMire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Desolate Mire")
 	card.ManaCost = ""

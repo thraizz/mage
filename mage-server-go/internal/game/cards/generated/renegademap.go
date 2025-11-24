@@ -23,7 +23,7 @@ func NewRenegadeMap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

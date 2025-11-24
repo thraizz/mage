@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewAnimusOfNightsReach creates a Animus Of Nights Reach
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Menace
 func NewAnimusOfNightsReach(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Animus Of Nights Reach")

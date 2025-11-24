@@ -29,7 +29,7 @@ func NewExpeditionDiviner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGrantAbilityEffect(new DiesSourceTriggeredAbility(new DrawCardSourceControllerEffect(1)))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

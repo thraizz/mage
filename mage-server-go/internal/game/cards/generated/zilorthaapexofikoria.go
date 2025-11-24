@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewZilorthaApexOfIkoria creates a Zilortha Apex Of Ikoria
-//  - CREATURE
+//   - CREATURE
+//
 // Reach
 func NewZilorthaApexOfIkoria(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Zilortha Apex Of Ikoria")

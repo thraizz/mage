@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNimbusMaze creates a Nimbus Maze
-//  - LAND
+//   - LAND
 func NewNimbusMaze(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nimbus Maze")
 	card.ManaCost = ""

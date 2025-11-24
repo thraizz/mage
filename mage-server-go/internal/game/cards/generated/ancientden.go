@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAncientDen creates a Ancient Den
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
 func NewAncientDen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ancient Den")
 	card.ManaCost = ""

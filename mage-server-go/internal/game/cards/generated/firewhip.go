@@ -41,7 +41,7 @@ func NewFireWhip(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		Build()
 	card.AddAbility(ability3)
 	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ability1, AttachmentType.AURA{T}: This creature deals 1 damage to any target.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

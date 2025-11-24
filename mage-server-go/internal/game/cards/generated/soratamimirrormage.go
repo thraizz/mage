@@ -28,7 +28,7 @@ func NewSoratamiMirrorMage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

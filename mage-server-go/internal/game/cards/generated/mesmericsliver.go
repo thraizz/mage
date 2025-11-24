@@ -24,12 +24,9 @@ func NewMesmericSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filterSliverWhen permanent enters the battlefield, you may fateseal 1.\" <i>(To fateseal 1, its controller looks at the top card of an opponent's library, then they may put that card on the bottom of that library.)</i>")).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Complex grant ability effects need proper transpilation
+	// This card grants "When this enters, you may fateseal 1" to all Slivers
+	// Temporarily stubbed until card transpiler is fixed
+	_ = card // Use card to avoid unused variable error
 	return card, nil
 }

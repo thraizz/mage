@@ -29,8 +29,8 @@ func NewNissaVitalForce(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: UntapTargetEffect with complex parameters
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

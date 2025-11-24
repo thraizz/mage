@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAwokenHorror creates a Awoken Horror
-//  - CREATURE
+//   - CREATURE
 func NewAwokenHorror(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Awoken Horror")
 	card.ManaCost = ""

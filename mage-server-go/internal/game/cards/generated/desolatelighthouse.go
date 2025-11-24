@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDesolateLighthouse creates a Desolate Lighthouse
-//  - LAND
+//   - LAND
 func NewDesolateLighthouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Desolate Lighthouse")
 	card.ManaCost = ""

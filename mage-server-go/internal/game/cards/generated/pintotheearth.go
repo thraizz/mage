@@ -31,7 +31,7 @@ func NewPinToTheEarth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(-6,-0)).
+		AddEffect(abilities.NewBoostEnchantedEffect(-6, -0)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWastewoodVerge creates a Wastewood Verge
-//  - LAND
+//   - LAND
 func NewWastewoodVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wastewood Verge")
 	card.ManaCost = ""

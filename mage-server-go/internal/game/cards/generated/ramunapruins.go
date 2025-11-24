@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRamunapRuins creates a Ramunap Ruins
-//  - LAND
+//   - LAND
 func NewRamunapRuins(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ramunap Ruins")
 	card.ManaCost = ""

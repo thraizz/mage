@@ -29,7 +29,7 @@ func NewHexgoldHoverwings(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 0, filter, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

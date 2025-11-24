@@ -25,7 +25,7 @@ func NewSeedcradleWitch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(3, 3)).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

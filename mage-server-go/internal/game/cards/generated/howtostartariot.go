@@ -23,7 +23,7 @@ func NewHowToStartARiot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new MenaceAbility(false))).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

@@ -14,7 +14,8 @@ func init() {
 }
 
 // NewUntamedPup creates a Untamed Pup
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewUntamedPup(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Untamed Pup")

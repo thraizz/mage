@@ -27,7 +27,7 @@ func NewGild(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

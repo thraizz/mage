@@ -28,7 +28,7 @@ func NewDropkickBomber(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - SacrificeSourceEffect()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUrzasCave creates a Urzas Cave
-//  - LAND
+//   - LAND
 func NewUrzasCave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Urzas Cave")
 	card.ManaCost = ""
@@ -27,7 +27,7 @@ func NewUrzasCave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddManaCost("{3}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

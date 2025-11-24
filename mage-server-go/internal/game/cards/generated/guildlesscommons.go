@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGuildlessCommons creates a Guildless Commons
-//  - LAND
+//   - LAND
 func NewGuildlessCommons(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Guildless Commons")
 	card.ManaCost = ""

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewNeoExdeathDimensionsEnd creates a Neo Exdeath Dimensions End
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewNeoExdeathDimensionsEnd(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Neo Exdeath Dimensions End")

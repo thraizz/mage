@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDreamrootCascade creates a Dreamroot Cascade
-//  - LAND
+//   - LAND
 func NewDreamrootCascade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dreamroot Cascade")
 	card.ManaCost = ""

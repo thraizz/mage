@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewArchOfOrazca creates a Arch Of Orazca
-//  - LAND
+//   - LAND
 func NewArchOfOrazca(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Arch Of Orazca")
 	card.ManaCost = ""

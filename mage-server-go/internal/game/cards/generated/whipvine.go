@@ -30,7 +30,7 @@ func NewWhipVine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

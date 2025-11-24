@@ -26,8 +26,8 @@ func NewSnowHound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddTapCost().
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -25,7 +25,7 @@ func NewAvariceAmulet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddEffect(abilities.NewBoostEquippedEffect(2, 0)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("VigilanceAbility", abilities.AttachmentTypeEquipment)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new BeginningOfUpkeepTriggeredAbility(new DrawCardSourceControllerEffect(1)), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

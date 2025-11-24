@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMoonringIsland creates a Moonring Island
-//  - LAND
+//   - LAND
 func NewMoonringIsland(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Moonring Island")
 	card.ManaCost = ""

@@ -21,8 +21,8 @@ func NewPublicExecution(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(-2, 0, filter, false)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: BoostAllEffect with complex parameters
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -28,7 +28,7 @@ func NewDancersChakrams(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 2, filter, true)).
+		// TODO: BoostAllEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationWhileOnBattlefield)).
 		Build()
 	if err != nil {

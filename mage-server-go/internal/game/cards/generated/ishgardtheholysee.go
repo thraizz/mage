@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIshgardTheHolySee creates a Ishgard The Holy See
-//  - LAND
+//   - LAND
 func NewIshgardTheHolySee(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ishgard The Holy See")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewIshgardTheHolySee(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

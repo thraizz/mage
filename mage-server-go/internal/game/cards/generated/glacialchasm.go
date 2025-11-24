@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGlacialChasm creates a Glacial Chasm
-//  - LAND
+//   - LAND
 func NewGlacialChasm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glacial Chasm")
 	card.ManaCost = ""

@@ -35,14 +35,14 @@ func NewDraconicDestiny(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FlyingAbility", abilities.AttachmentTypeAura)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("HasteAbility", abilities.AttachmentTypeAura)).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new SimpleActivatedAbility( new BoostSourceEffect(1, 0), ), AttachmentType.AURA)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

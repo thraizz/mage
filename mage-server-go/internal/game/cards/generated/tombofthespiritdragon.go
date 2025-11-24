@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTombOfTheSpiritDragon creates a Tomb Of The Spirit Dragon
-//  - LAND
+//   - LAND
 func NewTombOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tomb Of The Spirit Dragon")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewTombOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddTapCost().
-		AddEffect(abilities.NewGainLifeEffect()).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

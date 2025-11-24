@@ -25,7 +25,7 @@ func NewGhostLitWarder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect(new ManaCostsImpl<>("{4}"))).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func NewGhostLitWarder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCounterSpellEffect(new ManaCostsImpl<>("{2}"))).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSwiftwaterCliffs creates a Swiftwater Cliffs
-//  - LAND
+//   - LAND
 func NewSwiftwaterCliffs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Swiftwater Cliffs")
 	card.ManaCost = ""

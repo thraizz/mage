@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRestlessSpire creates a Restless Spire
-//  - LAND
+//   - LAND
 func NewRestlessSpire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Restless Spire")
 	card.ManaCost = ""

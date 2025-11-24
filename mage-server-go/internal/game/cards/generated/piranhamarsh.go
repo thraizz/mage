@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPiranhaMarsh creates a Piranha Marsh
-//  - LAND
+//   - LAND
 func NewPiranhaMarsh(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Piranha Marsh")
 	card.ManaCost = ""

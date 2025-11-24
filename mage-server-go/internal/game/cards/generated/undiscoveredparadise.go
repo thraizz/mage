@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUndiscoveredParadise creates a Undiscovered Paradise
-//  - LAND
+//   - LAND
 func NewUndiscoveredParadise(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Undiscovered Paradise")
 	card.ManaCost = ""
@@ -21,7 +21,7 @@ func NewUndiscoveredParadise(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

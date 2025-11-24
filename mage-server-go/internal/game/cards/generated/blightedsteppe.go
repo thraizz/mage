@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlightedSteppe creates a Blighted Steppe
-//  - LAND
+//   - LAND
 func NewBlightedSteppe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blighted Steppe")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewBlightedSteppe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewGainLifeEffect()).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

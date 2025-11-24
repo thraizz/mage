@@ -27,7 +27,7 @@ func NewOrochiMergeKeeper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new SimpleManaAbility( Zone.BATTLEFIELD, Mana.GreenMana(2), new TapSourceCost() ))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

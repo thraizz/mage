@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewBraskasFinalAeon creates a Braskas Final Aeon
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Menace
 func NewBraskasFinalAeon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Braskas Final Aeon")

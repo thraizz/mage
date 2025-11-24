@@ -5,8 +5,8 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/token"
 	"github.com/magefree/mage-server-go/internal/game/effects"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -30,10 +30,10 @@ func NewUginTheIneffable(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewGrantAbilityEffect(sa)).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

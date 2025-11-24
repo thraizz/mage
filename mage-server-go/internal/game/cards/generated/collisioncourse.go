@@ -22,7 +22,7 @@ func NewCollisionCourse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(xValue)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

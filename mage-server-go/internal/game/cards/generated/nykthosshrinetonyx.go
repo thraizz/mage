@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNykthosShrineToNyx creates a Nykthos Shrine To Nyx
-//  - LAND
+//   - LAND
 func NewNykthosShrineToNyx(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nykthos Shrine To Nyx")
 	card.ManaCost = ""

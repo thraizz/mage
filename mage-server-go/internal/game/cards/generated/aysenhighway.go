@@ -22,7 +22,7 @@ func NewAysenHighway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new PlainswalkAbility(false), filter)).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

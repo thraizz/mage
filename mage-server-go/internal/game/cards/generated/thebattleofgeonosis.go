@@ -21,8 +21,8 @@ func NewTheBattleOfGeonosis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(new IntPlusDynamicValue(1, GetXValue.instance))).
-		AddEffect(abilities.NewDamageEffect(new IntPlusDynamicValue(1, GetXValue.instance))).
+		// TODO: DamageAllEffect with complex parameters
+		// TODO: DamageAllEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
 		Build()
 	if err != nil {

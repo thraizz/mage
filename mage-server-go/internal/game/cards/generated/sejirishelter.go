@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSejiriShelter creates a Sejiri Shelter
-//  - INSTANT
+//   - INSTANT
 func NewSejiriShelter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sejiri Shelter")
 	card.ManaCost = ""

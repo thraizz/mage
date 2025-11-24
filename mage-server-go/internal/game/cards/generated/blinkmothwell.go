@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlinkmothWell creates a Blinkmoth Well
-//  - LAND
+//   - LAND
 func NewBlinkmothWell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blinkmoth Well")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewBlinkmothWell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddTapCost().
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

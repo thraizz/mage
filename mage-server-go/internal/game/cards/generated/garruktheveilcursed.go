@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGarrukTheVeilCursed creates a Garruk The Veil Cursed
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewGarrukTheVeilCursed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Garruk The Veil Cursed")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewGarrukTheVeilCursed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(new WolfTokenWithDeathtouch())).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

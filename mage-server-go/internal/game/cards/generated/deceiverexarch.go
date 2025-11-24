@@ -27,8 +27,8 @@ func NewDeceiverExarch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

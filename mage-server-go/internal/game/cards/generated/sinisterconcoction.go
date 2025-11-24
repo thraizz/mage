@@ -22,7 +22,7 @@ func NewSinisterConcoction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

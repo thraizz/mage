@@ -26,7 +26,7 @@ func NewVowOfFlight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FlyingAbility", abilities.AttachmentTypeAura)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		AddEffect(abilities.NewBoostEnchantedEffect(2,2)).
+		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FlyingAbility", abilities.AttachmentTypeAura)).
 		Build()
 	if err != nil {
@@ -34,7 +34,7 @@ func NewVowOfFlight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(2,2)).
+		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FlyingAbility", abilities.AttachmentTypeAura)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FlyingAbility", abilities.AttachmentTypeAura)).
 		Build()

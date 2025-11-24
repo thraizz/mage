@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIslandOfWakWak creates a Island Of Wak Wak
-//  - LAND
+//   - LAND
 func NewIslandOfWakWak(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Island Of Wak Wak")
 	card.ManaCost = ""

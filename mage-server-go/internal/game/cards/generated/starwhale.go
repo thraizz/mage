@@ -30,7 +30,7 @@ func NewStarWhale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new WardAbility(, false), true)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

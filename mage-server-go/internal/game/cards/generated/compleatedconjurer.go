@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCompleatedConjurer creates a Compleated Conjurer
-//  - CREATURE
+//   - CREATURE
 func NewCompleatedConjurer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Compleated Conjurer")
 	card.ManaCost = ""

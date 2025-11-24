@@ -22,7 +22,7 @@ func NewChokingFumes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeM1M1.CreateInstance(1), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

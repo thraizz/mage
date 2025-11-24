@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRuptureSpire creates a Rupture Spire
-//  - LAND
+//   - LAND
 func NewRuptureSpire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rupture Spire")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLikenessOfTheSeeker creates a Likeness Of The Seeker
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
 func NewLikenessOfTheSeeker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Likeness Of The Seeker")
 	card.ManaCost = ""

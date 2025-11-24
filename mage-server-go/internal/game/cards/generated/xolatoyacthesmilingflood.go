@@ -33,7 +33,7 @@ func NewXolatoyacTheSmilingFlood(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect(filter)).
+		// TODO: UntapAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

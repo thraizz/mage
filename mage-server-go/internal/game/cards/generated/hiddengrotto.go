@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHiddenGrotto creates a Hidden Grotto
-//  - LAND
+//   - LAND
 func NewHiddenGrotto(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hidden Grotto")
 	card.ManaCost = ""

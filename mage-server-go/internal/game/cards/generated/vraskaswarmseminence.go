@@ -33,7 +33,7 @@ func NewVraskaSwarmsEminence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(new AssassinToken2())).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -32,7 +32,7 @@ func NewKrovikanWhispers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(new MultipliedValue(new CountersSourceCount(CounterType.AGE), 2))).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

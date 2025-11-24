@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewValakutTheMoltenPinnacle creates a Valakut The Molten Pinnacle
-//  - LAND
+//   - LAND
 func NewValakutTheMoltenPinnacle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Valakut The Molten Pinnacle")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPrismaticVista creates a Prismatic Vista
-//  - LAND
+//   - LAND
 func NewPrismaticVista(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Prismatic Vista")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewPrismaticVista(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), false)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBelenonWarAnthem creates a Belenon War Anthem
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewBelenonWarAnthem(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Belenon War Anthem")
 	card.ManaCost = ""

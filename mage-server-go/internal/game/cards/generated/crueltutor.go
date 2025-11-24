@@ -21,7 +21,7 @@ func NewCruelTutor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutOnTopEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), false)).
+		// TODO: SearchLibraryPutOnLibraryEffect with complex parameters
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		Build()
 	if err != nil {

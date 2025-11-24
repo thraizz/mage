@@ -28,7 +28,7 @@ func NewCommanderSofiaDaguerre(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

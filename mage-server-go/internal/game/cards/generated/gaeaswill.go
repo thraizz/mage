@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGaeasWill creates a Gaeas Will
-//  - SORCERY
+//   - SORCERY
 func NewGaeasWill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gaeas Will")
 	card.ManaCost = ""

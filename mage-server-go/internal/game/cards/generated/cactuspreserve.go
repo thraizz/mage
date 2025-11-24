@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewCactusPreserve creates a Cactus Preserve
-//  - LAND
+//   - LAND
+//
 // Reach
 func NewCactusPreserve(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cactus Preserve")

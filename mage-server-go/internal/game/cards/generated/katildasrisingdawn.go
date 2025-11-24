@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKatildasRisingDawn creates a Katildas Rising Dawn
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewKatildasRisingDawn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Katildas Rising Dawn")
 	card.ManaCost = ""
@@ -33,7 +33,7 @@ func NewKatildasRisingDawn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("LifelinkAbility", abilities.AttachmentTypeAura)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new ProtectionAbility(filter), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewBoostEquippedEffect(xValue, xValue)).
 		Build()
 	if err != nil {

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewFibrousEntangler creates a Fibrous Entangler
-//  - CREATURE
+//   - CREATURE
+//
 // Vigilance
 func NewFibrousEntangler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fibrous Entangler")

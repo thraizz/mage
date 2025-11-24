@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewForgottenMonument creates a Forgotten Monument
-//  - LAND
+//   - LAND
 func NewForgottenMonument(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Forgotten Monument")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewForgottenMonument(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filter, true)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

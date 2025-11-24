@@ -33,7 +33,7 @@ func NewLightOfPromise(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), SavedGainedLifeValue.MANY)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new GainLifeControllerTriggeredAbility( new AddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), SavedGainedLifeValue.MANY), false, true ), AttachmentType.AURAWhenever you gain life, put that many +1/+1 counters on creature.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

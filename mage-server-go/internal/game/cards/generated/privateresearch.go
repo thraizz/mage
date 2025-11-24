@@ -39,7 +39,7 @@ func NewPrivateResearch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(new CountersSourceCount(CounterType.PAGE))).
+		// TODO: DrawCardSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

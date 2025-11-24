@@ -38,7 +38,7 @@ func NewForbiddenLore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainAbility, AttachmentType.AURA{T}: Target creature gets +2/+1 until end of turn.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

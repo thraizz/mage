@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGolgariGuildgate creates a Golgari Guildgate
-//  - LAND
+//   - LAND
 func NewGolgariGuildgate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Golgari Guildgate")
 	card.ManaCost = ""

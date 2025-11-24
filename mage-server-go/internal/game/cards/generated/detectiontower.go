@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDetectionTower creates a Detection Tower
-//  - LAND
+//   - LAND
 func NewDetectionTower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Detection Tower")
 	card.ManaCost = ""

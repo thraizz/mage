@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewVisionOfTheUnspeakable creates a Vision Of The Unspeakable
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Flying, Trample
 func NewVisionOfTheUnspeakable(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vision Of The Unspeakable")

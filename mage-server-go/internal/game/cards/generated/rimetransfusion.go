@@ -40,7 +40,7 @@ func NewRimeTransfusion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability2)
 	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewGrantAbilityEffect(new SimpleEvasionAbility(new CantBeBlockedByCreaturesSourceEffect(filter)))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability3)
 	return card, nil

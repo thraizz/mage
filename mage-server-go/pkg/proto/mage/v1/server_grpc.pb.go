@@ -46,6 +46,9 @@ const (
 	MageServer_TableIsOwner_FullMethodName               = "/mage.v1.MageServer/TableIsOwner"
 	MageServer_DeckSubmit_FullMethodName                 = "/mage.v1.MageServer/DeckSubmit"
 	MageServer_DeckSave_FullMethodName                   = "/mage.v1.MageServer/DeckSave"
+	MageServer_DeckList_FullMethodName                   = "/mage.v1.MageServer/DeckList"
+	MageServer_DeckDelete_FullMethodName                 = "/mage.v1.MageServer/DeckDelete"
+	MageServer_DeckGet_FullMethodName                    = "/mage.v1.MageServer/DeckGet"
 	MageServer_GameJoin_FullMethodName                   = "/mage.v1.MageServer/GameJoin"
 	MageServer_GameWatchStart_FullMethodName             = "/mage.v1.MageServer/GameWatchStart"
 	MageServer_GameWatchStop_FullMethodName              = "/mage.v1.MageServer/GameWatchStop"
@@ -74,6 +77,8 @@ const (
 	MageServer_ChatFindByGame_FullMethodName             = "/mage.v1.MageServer/ChatFindByGame"
 	MageServer_ChatFindByTournament_FullMethodName       = "/mage.v1.MageServer/ChatFindByTournament"
 	MageServer_ChatFindByRoom_FullMethodName             = "/mage.v1.MageServer/ChatFindByRoom"
+	MageServer_GetMatchHistory_FullMethodName            = "/mage.v1.MageServer/GetMatchHistory"
+	MageServer_GetMatchById_FullMethodName               = "/mage.v1.MageServer/GetMatchById"
 	MageServer_ReplayInit_FullMethodName                 = "/mage.v1.MageServer/ReplayInit"
 	MageServer_ReplayStart_FullMethodName                = "/mage.v1.MageServer/ReplayStart"
 	MageServer_ReplayStop_FullMethodName                 = "/mage.v1.MageServer/ReplayStop"
@@ -152,6 +157,12 @@ type MageServerClient interface {
 	DeckSubmit(ctx context.Context, in *DeckSubmitRequest, opts ...grpc.CallOption) (*DeckSubmitResponse, error)
 	// Save deck to database
 	DeckSave(ctx context.Context, in *DeckSaveRequest, opts ...grpc.CallOption) (*DeckSaveResponse, error)
+	// List user's decks (optionally filtered by format)
+	DeckList(ctx context.Context, in *DeckListRequest, opts ...grpc.CallOption) (*DeckListResponse, error)
+	// Delete a deck
+	DeckDelete(ctx context.Context, in *DeckDeleteRequest, opts ...grpc.CallOption) (*DeckDeleteResponse, error)
+	// Get deck details by ID
+	DeckGet(ctx context.Context, in *DeckGetRequest, opts ...grpc.CallOption) (*DeckGetResponse, error)
 	// Join a game as a player
 	GameJoin(ctx context.Context, in *GameJoinRequest, opts ...grpc.CallOption) (*GameJoinResponse, error)
 	// Start watching a game
@@ -208,6 +219,10 @@ type MageServerClient interface {
 	ChatFindByTournament(ctx context.Context, in *ChatFindByTournamentRequest, opts ...grpc.CallOption) (*ChatFindByTournamentResponse, error)
 	// Find chat by room
 	ChatFindByRoom(ctx context.Context, in *ChatFindByRoomRequest, opts ...grpc.CallOption) (*ChatFindByRoomResponse, error)
+	// Get user's match history (paginated)
+	GetMatchHistory(ctx context.Context, in *GetMatchHistoryRequest, opts ...grpc.CallOption) (*GetMatchHistoryResponse, error)
+	// Get specific match details by ID
+	GetMatchById(ctx context.Context, in *GetMatchByIdRequest, opts ...grpc.CallOption) (*GetMatchByIdResponse, error)
 	// Initialize replay
 	ReplayInit(ctx context.Context, in *ReplayInitRequest, opts ...grpc.CallOption) (*ReplayInitResponse, error)
 	// Start replay playback
@@ -518,6 +533,36 @@ func (c *mageServerClient) DeckSave(ctx context.Context, in *DeckSaveRequest, op
 	return out, nil
 }
 
+func (c *mageServerClient) DeckList(ctx context.Context, in *DeckListRequest, opts ...grpc.CallOption) (*DeckListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeckListResponse)
+	err := c.cc.Invoke(ctx, MageServer_DeckList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mageServerClient) DeckDelete(ctx context.Context, in *DeckDeleteRequest, opts ...grpc.CallOption) (*DeckDeleteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeckDeleteResponse)
+	err := c.cc.Invoke(ctx, MageServer_DeckDelete_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mageServerClient) DeckGet(ctx context.Context, in *DeckGetRequest, opts ...grpc.CallOption) (*DeckGetResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeckGetResponse)
+	err := c.cc.Invoke(ctx, MageServer_DeckGet_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *mageServerClient) GameJoin(ctx context.Context, in *GameJoinRequest, opts ...grpc.CallOption) (*GameJoinResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GameJoinResponse)
@@ -798,6 +843,26 @@ func (c *mageServerClient) ChatFindByRoom(ctx context.Context, in *ChatFindByRoo
 	return out, nil
 }
 
+func (c *mageServerClient) GetMatchHistory(ctx context.Context, in *GetMatchHistoryRequest, opts ...grpc.CallOption) (*GetMatchHistoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMatchHistoryResponse)
+	err := c.cc.Invoke(ctx, MageServer_GetMatchHistory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mageServerClient) GetMatchById(ctx context.Context, in *GetMatchByIdRequest, opts ...grpc.CallOption) (*GetMatchByIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMatchByIdResponse)
+	err := c.cc.Invoke(ctx, MageServer_GetMatchById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *mageServerClient) ReplayInit(ctx context.Context, in *ReplayInitRequest, opts ...grpc.CallOption) (*ReplayInitResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ReplayInitResponse)
@@ -1009,6 +1074,12 @@ type MageServerServer interface {
 	DeckSubmit(context.Context, *DeckSubmitRequest) (*DeckSubmitResponse, error)
 	// Save deck to database
 	DeckSave(context.Context, *DeckSaveRequest) (*DeckSaveResponse, error)
+	// List user's decks (optionally filtered by format)
+	DeckList(context.Context, *DeckListRequest) (*DeckListResponse, error)
+	// Delete a deck
+	DeckDelete(context.Context, *DeckDeleteRequest) (*DeckDeleteResponse, error)
+	// Get deck details by ID
+	DeckGet(context.Context, *DeckGetRequest) (*DeckGetResponse, error)
 	// Join a game as a player
 	GameJoin(context.Context, *GameJoinRequest) (*GameJoinResponse, error)
 	// Start watching a game
@@ -1065,6 +1136,10 @@ type MageServerServer interface {
 	ChatFindByTournament(context.Context, *ChatFindByTournamentRequest) (*ChatFindByTournamentResponse, error)
 	// Find chat by room
 	ChatFindByRoom(context.Context, *ChatFindByRoomRequest) (*ChatFindByRoomResponse, error)
+	// Get user's match history (paginated)
+	GetMatchHistory(context.Context, *GetMatchHistoryRequest) (*GetMatchHistoryResponse, error)
+	// Get specific match details by ID
+	GetMatchById(context.Context, *GetMatchByIdRequest) (*GetMatchByIdResponse, error)
 	// Initialize replay
 	ReplayInit(context.Context, *ReplayInitRequest) (*ReplayInitResponse, error)
 	// Start replay playback
@@ -1186,6 +1261,15 @@ func (UnimplementedMageServerServer) DeckSubmit(context.Context, *DeckSubmitRequ
 func (UnimplementedMageServerServer) DeckSave(context.Context, *DeckSaveRequest) (*DeckSaveResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeckSave not implemented")
 }
+func (UnimplementedMageServerServer) DeckList(context.Context, *DeckListRequest) (*DeckListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeckList not implemented")
+}
+func (UnimplementedMageServerServer) DeckDelete(context.Context, *DeckDeleteRequest) (*DeckDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeckDelete not implemented")
+}
+func (UnimplementedMageServerServer) DeckGet(context.Context, *DeckGetRequest) (*DeckGetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeckGet not implemented")
+}
 func (UnimplementedMageServerServer) GameJoin(context.Context, *GameJoinRequest) (*GameJoinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GameJoin not implemented")
 }
@@ -1269,6 +1353,12 @@ func (UnimplementedMageServerServer) ChatFindByTournament(context.Context, *Chat
 }
 func (UnimplementedMageServerServer) ChatFindByRoom(context.Context, *ChatFindByRoomRequest) (*ChatFindByRoomResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChatFindByRoom not implemented")
+}
+func (UnimplementedMageServerServer) GetMatchHistory(context.Context, *GetMatchHistoryRequest) (*GetMatchHistoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMatchHistory not implemented")
+}
+func (UnimplementedMageServerServer) GetMatchById(context.Context, *GetMatchByIdRequest) (*GetMatchByIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMatchById not implemented")
 }
 func (UnimplementedMageServerServer) ReplayInit(context.Context, *ReplayInitRequest) (*ReplayInitResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReplayInit not implemented")
@@ -1822,6 +1912,60 @@ func _MageServer_DeckSave_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MageServer_DeckList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeckListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MageServerServer).DeckList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MageServer_DeckList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MageServerServer).DeckList(ctx, req.(*DeckListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MageServer_DeckDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeckDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MageServerServer).DeckDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MageServer_DeckDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MageServerServer).DeckDelete(ctx, req.(*DeckDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MageServer_DeckGet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeckGetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MageServerServer).DeckGet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MageServer_DeckGet_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MageServerServer).DeckGet(ctx, req.(*DeckGetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MageServer_GameJoin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GameJoinRequest)
 	if err := dec(in); err != nil {
@@ -2326,6 +2470,42 @@ func _MageServer_ChatFindByRoom_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MageServer_GetMatchHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMatchHistoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MageServerServer).GetMatchHistory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MageServer_GetMatchHistory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MageServerServer).GetMatchHistory(ctx, req.(*GetMatchHistoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MageServer_GetMatchById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMatchByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MageServerServer).GetMatchById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MageServer_GetMatchById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MageServerServer).GetMatchById(ctx, req.(*GetMatchByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MageServer_ReplayInit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReplayInitRequest)
 	if err := dec(in); err != nil {
@@ -2712,6 +2892,18 @@ var MageServer_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MageServer_DeckSave_Handler,
 		},
 		{
+			MethodName: "DeckList",
+			Handler:    _MageServer_DeckList_Handler,
+		},
+		{
+			MethodName: "DeckDelete",
+			Handler:    _MageServer_DeckDelete_Handler,
+		},
+		{
+			MethodName: "DeckGet",
+			Handler:    _MageServer_DeckGet_Handler,
+		},
+		{
 			MethodName: "GameJoin",
 			Handler:    _MageServer_GameJoin_Handler,
 		},
@@ -2822,6 +3014,14 @@ var MageServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ChatFindByRoom",
 			Handler:    _MageServer_ChatFindByRoom_Handler,
+		},
+		{
+			MethodName: "GetMatchHistory",
+			Handler:    _MageServer_GetMatchHistory_Handler,
+		},
+		{
+			MethodName: "GetMatchById",
+			Handler:    _MageServer_GetMatchById_Handler,
 		},
 		{
 			MethodName: "ReplayInit",

@@ -24,7 +24,7 @@ func NewEscapeArtist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

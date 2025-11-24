@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBaneOfHanweir creates a Bane Of Hanweir
-//  - CREATURE
+//   - CREATURE
 func NewBaneOfHanweir(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bane Of Hanweir")
 	card.ManaCost = ""

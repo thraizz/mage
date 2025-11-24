@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewVesselOfTheAllConsuming creates a Vessel Of The All Consuming
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Trample
 func NewVesselOfTheAllConsuming(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vessel Of The All Consuming")

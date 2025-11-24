@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUginsLabyrinth creates a Ugins Labyrinth
-//  - LAND
+//   - LAND
 func NewUginsLabyrinth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ugins Labyrinth")
 	card.ManaCost = ""

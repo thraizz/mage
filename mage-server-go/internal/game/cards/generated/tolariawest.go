@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTolariaWest creates a Tolaria West
-//  - LAND
+//   - LAND
 func NewTolariaWest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tolaria West")
 	card.ManaCost = ""

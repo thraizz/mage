@@ -23,7 +23,7 @@ func NewHonorWornShaku(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

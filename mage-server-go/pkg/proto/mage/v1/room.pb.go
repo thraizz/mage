@@ -602,6 +602,454 @@ func (x *RoomGetTableByIdResponse) GetTable() *TableView {
 	return nil
 }
 
+type GetMatchHistoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`   // Default 50, max 100
+	Offset        int32                  `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"` // For pagination
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMatchHistoryRequest) Reset() {
+	*x = GetMatchHistoryRequest{}
+	mi := &file_mage_v1_room_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMatchHistoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMatchHistoryRequest) ProtoMessage() {}
+
+func (x *GetMatchHistoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_room_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMatchHistoryRequest.ProtoReflect.Descriptor instead.
+func (*GetMatchHistoryRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_room_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetMatchHistoryRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *GetMatchHistoryRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *GetMatchHistoryRequest) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+type MatchPlayerInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Deck          string                 `protobuf:"bytes,3,opt,name=deck,proto3" json:"deck,omitempty"`     // Deck name or summary
+	Result        string                 `protobuf:"bytes,4,opt,name=result,proto3" json:"result,omitempty"` // "win", "loss", "draw", "concede"
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MatchPlayerInfo) Reset() {
+	*x = MatchPlayerInfo{}
+	mi := &file_mage_v1_room_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MatchPlayerInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MatchPlayerInfo) ProtoMessage() {}
+
+func (x *MatchPlayerInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_room_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MatchPlayerInfo.ProtoReflect.Descriptor instead.
+func (*MatchPlayerInfo) Descriptor() ([]byte, []int) {
+	return file_mage_v1_room_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *MatchPlayerInfo) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *MatchPlayerInfo) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *MatchPlayerInfo) GetDeck() string {
+	if x != nil {
+		return x.Deck
+	}
+	return ""
+}
+
+func (x *MatchPlayerInfo) GetResult() string {
+	if x != nil {
+		return x.Result
+	}
+	return ""
+}
+
+type MatchHistoryEntry struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	GameId          string                 `protobuf:"bytes,2,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	TableId         string                 `protobuf:"bytes,3,opt,name=table_id,json=tableId,proto3" json:"table_id,omitempty"`
+	TournamentId    string                 `protobuf:"bytes,4,opt,name=tournament_id,json=tournamentId,proto3" json:"tournament_id,omitempty"`
+	Players         []*MatchPlayerInfo     `protobuf:"bytes,5,rep,name=players,proto3" json:"players,omitempty"`
+	GameType        string                 `protobuf:"bytes,6,opt,name=game_type,json=gameType,proto3" json:"game_type,omitempty"`
+	StartTime       *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime         *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	DurationSeconds int32                  `protobuf:"varint,9,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
+	WinnerId        int64                  `protobuf:"varint,10,opt,name=winner_id,json=winnerId,proto3" json:"winner_id,omitempty"`
+	WinnerName      string                 `protobuf:"bytes,11,opt,name=winner_name,json=winnerName,proto3" json:"winner_name,omitempty"`
+	CreatedAt       *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *MatchHistoryEntry) Reset() {
+	*x = MatchHistoryEntry{}
+	mi := &file_mage_v1_room_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MatchHistoryEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MatchHistoryEntry) ProtoMessage() {}
+
+func (x *MatchHistoryEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_room_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MatchHistoryEntry.ProtoReflect.Descriptor instead.
+func (*MatchHistoryEntry) Descriptor() ([]byte, []int) {
+	return file_mage_v1_room_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *MatchHistoryEntry) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *MatchHistoryEntry) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *MatchHistoryEntry) GetTableId() string {
+	if x != nil {
+		return x.TableId
+	}
+	return ""
+}
+
+func (x *MatchHistoryEntry) GetTournamentId() string {
+	if x != nil {
+		return x.TournamentId
+	}
+	return ""
+}
+
+func (x *MatchHistoryEntry) GetPlayers() []*MatchPlayerInfo {
+	if x != nil {
+		return x.Players
+	}
+	return nil
+}
+
+func (x *MatchHistoryEntry) GetGameType() string {
+	if x != nil {
+		return x.GameType
+	}
+	return ""
+}
+
+func (x *MatchHistoryEntry) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *MatchHistoryEntry) GetEndTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndTime
+	}
+	return nil
+}
+
+func (x *MatchHistoryEntry) GetDurationSeconds() int32 {
+	if x != nil {
+		return x.DurationSeconds
+	}
+	return 0
+}
+
+func (x *MatchHistoryEntry) GetWinnerId() int64 {
+	if x != nil {
+		return x.WinnerId
+	}
+	return 0
+}
+
+func (x *MatchHistoryEntry) GetWinnerName() string {
+	if x != nil {
+		return x.WinnerName
+	}
+	return ""
+}
+
+func (x *MatchHistoryEntry) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type GetMatchHistoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	Matches       []*MatchHistoryEntry   `protobuf:"bytes,3,rep,name=matches,proto3" json:"matches,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,4,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"` // Total matches for this user (for pagination)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMatchHistoryResponse) Reset() {
+	*x = GetMatchHistoryResponse{}
+	mi := &file_mage_v1_room_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMatchHistoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMatchHistoryResponse) ProtoMessage() {}
+
+func (x *GetMatchHistoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_room_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMatchHistoryResponse.ProtoReflect.Descriptor instead.
+func (*GetMatchHistoryResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_room_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetMatchHistoryResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetMatchHistoryResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *GetMatchHistoryResponse) GetMatches() []*MatchHistoryEntry {
+	if x != nil {
+		return x.Matches
+	}
+	return nil
+}
+
+func (x *GetMatchHistoryResponse) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+type GetMatchByIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	MatchId       int64                  `protobuf:"varint,2,opt,name=match_id,json=matchId,proto3" json:"match_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMatchByIdRequest) Reset() {
+	*x = GetMatchByIdRequest{}
+	mi := &file_mage_v1_room_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMatchByIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMatchByIdRequest) ProtoMessage() {}
+
+func (x *GetMatchByIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_room_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMatchByIdRequest.ProtoReflect.Descriptor instead.
+func (*GetMatchByIdRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_room_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetMatchByIdRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *GetMatchByIdRequest) GetMatchId() int64 {
+	if x != nil {
+		return x.MatchId
+	}
+	return 0
+}
+
+type GetMatchByIdResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	Match         *MatchHistoryEntry     `protobuf:"bytes,3,opt,name=match,proto3" json:"match,omitempty"`
+	ReplayData    string                 `protobuf:"bytes,4,opt,name=replay_data,json=replayData,proto3" json:"replay_data,omitempty"` // Optional: game log for replay
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMatchByIdResponse) Reset() {
+	*x = GetMatchByIdResponse{}
+	mi := &file_mage_v1_room_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMatchByIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMatchByIdResponse) ProtoMessage() {}
+
+func (x *GetMatchByIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_room_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMatchByIdResponse.ProtoReflect.Descriptor instead.
+func (*GetMatchByIdResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_room_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetMatchByIdResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetMatchByIdResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *GetMatchByIdResponse) GetMatch() *MatchHistoryEntry {
+	if x != nil {
+		return x.Match
+	}
+	return nil
+}
+
+func (x *GetMatchByIdResponse) GetReplayData() string {
+	if x != nil {
+		return x.ReplayData
+	}
+	return ""
+}
+
 var File_mage_v1_room_proto protoreflect.FileDescriptor
 
 const file_mage_v1_room_proto_rawDesc = "" +
@@ -646,7 +1094,50 @@ const file_mage_v1_room_proto_rawDesc = "" +
 	"\aroom_id\x18\x02 \x01(\tR\x06roomId\x12\x19\n" +
 	"\btable_id\x18\x03 \x01(\tR\atableId\"D\n" +
 	"\x18RoomGetTableByIdResponse\x12(\n" +
-	"\x05table\x18\x01 \x01(\v2\x12.mage.v1.TableViewR\x05tableB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
+	"\x05table\x18\x01 \x01(\v2\x12.mage.v1.TableViewR\x05table\"e\n" +
+	"\x16GetMatchHistoryRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x03 \x01(\x05R\x06offset\"r\n" +
+	"\x0fMatchPlayerInfo\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x12\n" +
+	"\x04deck\x18\x03 \x01(\tR\x04deck\x12\x16\n" +
+	"\x06result\x18\x04 \x01(\tR\x06result\"\xe3\x03\n" +
+	"\x11MatchHistoryEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
+	"\agame_id\x18\x02 \x01(\tR\x06gameId\x12\x19\n" +
+	"\btable_id\x18\x03 \x01(\tR\atableId\x12#\n" +
+	"\rtournament_id\x18\x04 \x01(\tR\ftournamentId\x122\n" +
+	"\aplayers\x18\x05 \x03(\v2\x18.mage.v1.MatchPlayerInfoR\aplayers\x12\x1b\n" +
+	"\tgame_type\x18\x06 \x01(\tR\bgameType\x129\n" +
+	"\n" +
+	"start_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
+	"\bend_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12)\n" +
+	"\x10duration_seconds\x18\t \x01(\x05R\x0fdurationSeconds\x12\x1b\n" +
+	"\twinner_id\x18\n" +
+	" \x01(\x03R\bwinnerId\x12\x1f\n" +
+	"\vwinner_name\x18\v \x01(\tR\n" +
+	"winnerName\x129\n" +
+	"\n" +
+	"created_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xa0\x01\n" +
+	"\x17GetMatchHistoryResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\x124\n" +
+	"\amatches\x18\x03 \x03(\v2\x1a.mage.v1.MatchHistoryEntryR\amatches\x12\x1f\n" +
+	"\vtotal_count\x18\x04 \x01(\x05R\n" +
+	"totalCount\"O\n" +
+	"\x13GetMatchByIdRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x19\n" +
+	"\bmatch_id\x18\x02 \x01(\x03R\amatchId\"\x99\x01\n" +
+	"\x14GetMatchByIdResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\x120\n" +
+	"\x05match\x18\x03 \x01(\v2\x1a.mage.v1.MatchHistoryEntryR\x05match\x12\x1f\n" +
+	"\vreplay_data\x18\x04 \x01(\tR\n" +
+	"replayDataB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
 
 var (
 	file_mage_v1_room_proto_rawDescOnce sync.Once
@@ -660,7 +1151,7 @@ func file_mage_v1_room_proto_rawDescGZIP() []byte {
 	return file_mage_v1_room_proto_rawDescData
 }
 
-var file_mage_v1_room_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_mage_v1_room_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_mage_v1_room_proto_goTypes = []any{
 	(*ServerGetMainRoomIdRequest)(nil),     // 0: mage.v1.ServerGetMainRoomIdRequest
 	(*ServerGetMainRoomIdResponse)(nil),    // 1: mage.v1.ServerGetMainRoomIdResponse
@@ -673,21 +1164,33 @@ var file_mage_v1_room_proto_goTypes = []any{
 	(*RoomGetAllTablesResponse)(nil),       // 8: mage.v1.RoomGetAllTablesResponse
 	(*RoomGetTableByIdRequest)(nil),        // 9: mage.v1.RoomGetTableByIdRequest
 	(*RoomGetTableByIdResponse)(nil),       // 10: mage.v1.RoomGetTableByIdResponse
-	(*UserView)(nil),                       // 11: mage.v1.UserView
-	(*timestamppb.Timestamp)(nil),          // 12: google.protobuf.Timestamp
-	(*TableView)(nil),                      // 13: mage.v1.TableView
+	(*GetMatchHistoryRequest)(nil),         // 11: mage.v1.GetMatchHistoryRequest
+	(*MatchPlayerInfo)(nil),                // 12: mage.v1.MatchPlayerInfo
+	(*MatchHistoryEntry)(nil),              // 13: mage.v1.MatchHistoryEntry
+	(*GetMatchHistoryResponse)(nil),        // 14: mage.v1.GetMatchHistoryResponse
+	(*GetMatchByIdRequest)(nil),            // 15: mage.v1.GetMatchByIdRequest
+	(*GetMatchByIdResponse)(nil),           // 16: mage.v1.GetMatchByIdResponse
+	(*UserView)(nil),                       // 17: mage.v1.UserView
+	(*timestamppb.Timestamp)(nil),          // 18: google.protobuf.Timestamp
+	(*TableView)(nil),                      // 19: mage.v1.TableView
 }
 var file_mage_v1_room_proto_depIdxs = []int32{
-	11, // 0: mage.v1.RoomGetUsersResponse.users:type_name -> mage.v1.UserView
+	17, // 0: mage.v1.RoomGetUsersResponse.users:type_name -> mage.v1.UserView
 	6,  // 1: mage.v1.RoomGetFinishedMatchesResponse.finished_matches:type_name -> mage.v1.MatchView
-	12, // 2: mage.v1.MatchView.end_time:type_name -> google.protobuf.Timestamp
-	13, // 3: mage.v1.RoomGetAllTablesResponse.tables:type_name -> mage.v1.TableView
-	13, // 4: mage.v1.RoomGetTableByIdResponse.table:type_name -> mage.v1.TableView
-	5,  // [5:5] is the sub-list for method output_type
-	5,  // [5:5] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	18, // 2: mage.v1.MatchView.end_time:type_name -> google.protobuf.Timestamp
+	19, // 3: mage.v1.RoomGetAllTablesResponse.tables:type_name -> mage.v1.TableView
+	19, // 4: mage.v1.RoomGetTableByIdResponse.table:type_name -> mage.v1.TableView
+	12, // 5: mage.v1.MatchHistoryEntry.players:type_name -> mage.v1.MatchPlayerInfo
+	18, // 6: mage.v1.MatchHistoryEntry.start_time:type_name -> google.protobuf.Timestamp
+	18, // 7: mage.v1.MatchHistoryEntry.end_time:type_name -> google.protobuf.Timestamp
+	18, // 8: mage.v1.MatchHistoryEntry.created_at:type_name -> google.protobuf.Timestamp
+	13, // 9: mage.v1.GetMatchHistoryResponse.matches:type_name -> mage.v1.MatchHistoryEntry
+	13, // 10: mage.v1.GetMatchByIdResponse.match:type_name -> mage.v1.MatchHistoryEntry
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_room_proto_init() }
@@ -702,7 +1205,7 @@ func file_mage_v1_room_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_room_proto_rawDesc), len(file_mage_v1_room_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

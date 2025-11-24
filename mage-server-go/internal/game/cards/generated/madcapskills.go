@@ -32,7 +32,7 @@ func NewMadcapSkills(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(3, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new MenaceAbility(false), AttachmentType.AURA)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err

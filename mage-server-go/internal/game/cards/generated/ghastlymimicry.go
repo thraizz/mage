@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGhastlyMimicry creates a Ghastly Mimicry
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewGhastlyMimicry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ghastly Mimicry")
 	card.ManaCost = ""

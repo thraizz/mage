@@ -26,7 +26,7 @@ func NewMartyrOfBones(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

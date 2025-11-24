@@ -22,7 +22,7 @@ func NewEnergyFlux(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new BeginningOfUpkeepTriggeredAbility( TargetController.YOU, new SacrificeSourceUnlessPaysEffect(), false), At the beginning of your upkeep, sacrifice artifact unless you pay {2}.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

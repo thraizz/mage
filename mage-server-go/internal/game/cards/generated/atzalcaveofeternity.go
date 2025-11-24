@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAtzalCaveOfEternity creates a Atzal Cave Of Eternity
-//  - LAND
+//   - LAND
 func NewAtzalCaveOfEternity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Atzal Cave Of Eternity")
 	card.ManaCost = ""

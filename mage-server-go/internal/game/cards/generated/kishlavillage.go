@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKishlaVillage creates a Kishla Village
-//  - LAND
+//   - LAND
 func NewKishlaVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kishla Village")
 	card.ManaCost = ""

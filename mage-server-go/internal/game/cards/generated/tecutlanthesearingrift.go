@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTecutlanTheSearingRift creates a Tecutlan The Searing Rift
-//  - LAND
+//   - LAND
 func NewTecutlanTheSearingRift(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tecutlan The Searing Rift")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSecludedSteppe creates a Secluded Steppe
-//  - LAND
+//   - LAND
 func NewSecludedSteppe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Secluded Steppe")
 	card.ManaCost = ""

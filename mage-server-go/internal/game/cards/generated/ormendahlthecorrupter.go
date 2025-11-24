@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewOrmendahlTheCorrupter creates a Ormendahl The Corrupter
-//  - CREATURE
+//   - CREATURE
+//
 // Flying, Trample, Lifelink
 func NewOrmendahlTheCorrupter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ormendahl The Corrupter")

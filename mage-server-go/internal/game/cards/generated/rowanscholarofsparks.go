@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRowanScholarOfSparks creates a Rowan Scholar Of Sparks
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewRowanScholarOfSparks(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rowan Scholar Of Sparks")
 	card.ManaCost = ""

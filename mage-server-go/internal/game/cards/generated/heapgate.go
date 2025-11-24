@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewHeapGate creates a Heap Gate
-//  - LAND
+//   - LAND
 func NewHeapGate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Heap Gate")
 	card.ManaCost = ""

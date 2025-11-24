@@ -35,7 +35,7 @@ func NewInfestingRadroach(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

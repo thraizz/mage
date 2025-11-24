@@ -24,7 +24,7 @@ func NewArchmagesCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(2)).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationCustom)).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterTargetEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

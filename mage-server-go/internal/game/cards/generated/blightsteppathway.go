@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlightstepPathway creates a Blightstep Pathway
-//  - LAND
+//   - LAND
 func NewBlightstepPathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blightstep Pathway")
 	card.ManaCost = ""

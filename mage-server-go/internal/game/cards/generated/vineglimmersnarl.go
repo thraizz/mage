@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVineglimmerSnarl creates a Vineglimmer Snarl
-//  - LAND
+//   - LAND
 func NewVineglimmerSnarl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vineglimmer Snarl")
 	card.ManaCost = ""

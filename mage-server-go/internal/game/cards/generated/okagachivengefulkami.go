@@ -30,7 +30,7 @@ func NewOKagachiVengefulKami(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

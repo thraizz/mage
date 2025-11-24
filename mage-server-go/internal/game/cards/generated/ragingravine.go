@@ -14,7 +14,7 @@ func init() {
 }
 
 // NewRagingRavine creates a Raging Ravine
-//  - LAND
+//   - LAND
 func NewRagingRavine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Raging Ravine")
 	card.ManaCost = ""
@@ -28,7 +28,7 @@ func NewRagingRavine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddEffect(abilities.NewGrantAbilityEffect(new AttacksTriggeredAbility(new AddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1)), false))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -28,7 +28,7 @@ func NewDraconicDisciple(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{7}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCreateTokenEffect(new DragonToken2())).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

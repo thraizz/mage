@@ -5,8 +5,8 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/token"
 	"github.com/magefree/mage-server-go/internal/game/effects"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -28,7 +28,7 @@ func NewProsperityTycoon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	token1_0, err := token.GetToken("MercenaryToken")

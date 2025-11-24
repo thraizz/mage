@@ -23,7 +23,7 @@ func NewTamiyosJournal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

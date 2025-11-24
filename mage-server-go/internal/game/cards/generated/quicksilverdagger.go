@@ -37,7 +37,7 @@ func NewQuicksilverDagger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainAbility, AttachmentType.AURA{T}: This creature deals 1 damage to target player or planeswalker. You draw a card.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

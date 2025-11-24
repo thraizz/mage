@@ -28,14 +28,14 @@ func NewKellanTheFaeBlooded(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(new AdditiveDynamicValue(new AuraAttachedCount(), new EquipmentAttachedCount()), StaticValue.get(0), filter, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

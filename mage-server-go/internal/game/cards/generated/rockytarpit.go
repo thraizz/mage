@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRockyTarPit creates a Rocky Tar Pit
-//  - LAND
+//   - LAND
 func NewRockyTarPit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rocky Tar Pit")
 	card.ManaCost = ""

@@ -28,7 +28,7 @@ func NewBattleMenu(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewBoostEffect(0, 4)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(4)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

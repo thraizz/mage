@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVernalFen creates a Vernal Fen
-//  - LAND
+//   - LAND
 func NewVernalFen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vernal Fen")
 	card.ManaCost = ""

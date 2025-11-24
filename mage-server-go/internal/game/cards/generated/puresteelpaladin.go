@@ -32,7 +32,7 @@ func NewPuresteelPaladin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new EquipAbility( Outcome.AddAbility, ), filter)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

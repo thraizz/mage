@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDarigaazsCaldera creates a Darigaazs Caldera
-//  - LAND
+//   - LAND
 func NewDarigaazsCaldera(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Darigaazs Caldera")
 	card.ManaCost = ""

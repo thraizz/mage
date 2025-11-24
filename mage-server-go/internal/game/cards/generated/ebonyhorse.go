@@ -23,7 +23,7 @@ func NewEbonyHorse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddTapCost().
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

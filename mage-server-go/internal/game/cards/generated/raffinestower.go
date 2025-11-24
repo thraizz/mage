@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRaffinesTower creates a Raffines Tower
-//  - LAND
+//   - LAND
 func NewRaffinesTower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Raffines Tower")
 	card.ManaCost = ""

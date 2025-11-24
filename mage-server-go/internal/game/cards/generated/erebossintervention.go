@@ -21,9 +21,9 @@ func NewErebossIntervention(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(x,x)).
+		AddEffect(abilities.NewBoostEffect(x, x)).
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

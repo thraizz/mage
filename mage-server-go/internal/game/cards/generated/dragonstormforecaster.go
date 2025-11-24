@@ -26,7 +26,7 @@ func NewDragonstormForecaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddTapCost().
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

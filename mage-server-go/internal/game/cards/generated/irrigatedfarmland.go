@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIrrigatedFarmland creates a Irrigated Farmland
-//  - LAND
+//   - LAND
 func NewIrrigatedFarmland(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Irrigated Farmland")
 	card.ManaCost = ""

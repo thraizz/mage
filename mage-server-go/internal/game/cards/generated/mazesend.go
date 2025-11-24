@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMazesEnd creates a Mazes End
-//  - LAND
+//   - LAND
 func NewMazesEnd(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mazes End")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewMazesEnd(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddTapCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), false)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

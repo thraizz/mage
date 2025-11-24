@@ -29,7 +29,7 @@ func NewSpectralSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect()).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

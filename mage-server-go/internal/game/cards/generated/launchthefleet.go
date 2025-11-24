@@ -5,8 +5,8 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/token"
 	"github.com/magefree/mage-server-go/internal/game/effects"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -28,9 +28,9 @@ func NewLaunchTheFleet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1, true, true)).
-		AddEffect(abilities.NewGrantAbilityEffect(new AttacksTriggeredAbility(new CreateTokenEffect(token0_0, 1, true, true), false))).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1, true, true)).
-		AddEffect(abilities.NewGrantAbilityEffect(new AttacksTriggeredAbility(new CreateTokenEffect(token0_0, 1, true, true), false))).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCommandTower creates a Command Tower
-//  - LAND
+//   - LAND
 func NewCommandTower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Command Tower")
 	card.ManaCost = ""

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewBlitzwingAdaptiveAssailant creates a Blitzwing Adaptive Assailant
-//  - ARTIFACT
+//   - ARTIFACT
+//
 // Flying, Indestructible
 func NewBlitzwingAdaptiveAssailant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blitzwing Adaptive Assailant")

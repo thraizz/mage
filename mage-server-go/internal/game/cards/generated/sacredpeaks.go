@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSacredPeaks creates a Sacred Peaks
-//  - LAND
+//   - LAND
 func NewSacredPeaks(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sacred Peaks")
 	card.ManaCost = ""

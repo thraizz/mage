@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewCastDown creates a Cast Down
-//  - 
+//
+//	-
 func NewCastDown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cast Down")
 	card.ManaCost = ""
@@ -20,7 +21,7 @@ func NewCastDown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewHydroelectricSpecimen creates a Hydroelectric Specimen
-//  - CREATURE
+//   - CREATURE
+//
 // Flash
 func NewHydroelectricSpecimen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hydroelectric Specimen")

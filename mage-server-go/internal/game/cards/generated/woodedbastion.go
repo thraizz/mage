@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWoodedBastion creates a Wooded Bastion
-//  - LAND
+//   - LAND
 func NewWoodedBastion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wooded Bastion")
 	card.ManaCost = ""

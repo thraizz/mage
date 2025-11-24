@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSulfurFalls creates a Sulfur Falls
-//  - LAND
+//   - LAND
 func NewSulfurFalls(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sulfur Falls")
 	card.ManaCost = ""

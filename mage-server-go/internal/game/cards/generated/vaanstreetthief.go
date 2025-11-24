@@ -26,7 +26,7 @@ func NewVaanStreetThief(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

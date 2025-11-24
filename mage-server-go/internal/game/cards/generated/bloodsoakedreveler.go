@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewBloodsoakedReveler creates a Bloodsoaked Reveler
-//  - CREATURE
+//   - CREATURE
 func NewBloodsoakedReveler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bloodsoaked Reveler")
 	card.ManaCost = ""

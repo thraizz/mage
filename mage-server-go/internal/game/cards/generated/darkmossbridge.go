@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewDarkmossBridge creates a Darkmoss Bridge
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
+//
 // Indestructible
 func NewDarkmossBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Darkmoss Bridge")

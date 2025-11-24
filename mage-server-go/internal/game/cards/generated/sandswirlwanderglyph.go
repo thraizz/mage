@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewSandswirlWanderglyph creates a Sandswirl Wanderglyph
-//  - ARTIFACT CREATURE
+//   - ARTIFACT CREATURE
+//
 // Flying
 func NewSandswirlWanderglyph(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sandswirl Wanderglyph")

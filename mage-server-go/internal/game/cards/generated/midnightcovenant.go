@@ -26,7 +26,7 @@ func NewMidnightCovenant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new SimpleActivatedAbility(new BoostSourceEffect(1, 1), new ColoredManaCost(ColoredManaSymbol.B)), AttachmentType.AURA)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err

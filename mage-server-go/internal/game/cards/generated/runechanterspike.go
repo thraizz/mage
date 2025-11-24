@@ -23,7 +23,7 @@ func NewRunechantersPike(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FirstStrikeAbility", abilities.AttachmentTypeEquipment)).
-		AddEffect(abilities.NewBoostEquippedEffect(new RunechantersPikeValue(), StaticValue.get(0))).
+		AddEffect(abilities.NewBoostEquippedEffect(StaticValue.get(0))).
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAncientZiggurat creates a Ancient Ziggurat
-//  - LAND
+//   - LAND
 func NewAncientZiggurat(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ancient Ziggurat")
 	card.ManaCost = ""

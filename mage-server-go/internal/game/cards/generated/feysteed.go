@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewFeySteed creates a Fey Steed
-//  - 
+//
+//	-
 func NewFeySteed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fey Steed")
 	card.ManaCost = ""

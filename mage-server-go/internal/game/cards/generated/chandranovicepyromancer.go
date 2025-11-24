@@ -31,7 +31,7 @@ func NewChandraNovicePyromancer(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 0, filter)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -21,7 +21,7 @@ func NewStarlight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(new PermanentsTargetOpponentControlsCount(filter, 3))).
+		// TODO: GainLifeEffect with complex parameters
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {

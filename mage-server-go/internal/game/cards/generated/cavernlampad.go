@@ -31,7 +31,7 @@ func NewCavernLampad(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(2,2)).
+		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("IntimidateAbility", abilities.AttachmentTypeAura)).
 		Build()
 	if err != nil {

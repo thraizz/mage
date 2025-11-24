@@ -25,7 +25,7 @@ func NewGraveRobbers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(2)).
 		Build()
 	card.AddAbility(ability0)

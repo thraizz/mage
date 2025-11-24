@@ -72,3 +72,8 @@ func (a *SpellAbility) SetTargets(targets *TargetRequirement) {
 func (a *SpellAbility) GetManaCost() *ManaCost {
 	return a.ManaCost
 }
+
+// GetTargets returns the target requirement for this spell
+func (a *SpellAbility) GetTargets() *TargetRequirement {
+	return a.Targets
+}

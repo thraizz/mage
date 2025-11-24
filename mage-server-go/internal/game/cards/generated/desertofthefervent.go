@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDesertOfTheFervent creates a Desert Of The Fervent
-//  - LAND
+//   - LAND
 func NewDesertOfTheFervent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Desert Of The Fervent")
 	card.ManaCost = ""

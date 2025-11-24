@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWoodlandStream creates a Woodland Stream
-//  - LAND
+//   - LAND
 func NewWoodlandStream(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Woodland Stream")
 	card.ManaCost = ""

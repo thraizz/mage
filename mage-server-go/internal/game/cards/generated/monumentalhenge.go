@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMonumentalHenge creates a Monumental Henge
-//  - LAND
+//   - LAND
 func NewMonumentalHenge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Monumental Henge")
 	card.ManaCost = ""

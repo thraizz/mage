@@ -23,7 +23,7 @@ func NewBloodSpatterAnalysis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddEffect(abilities.NewMillCardsControllerEffect(1)).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

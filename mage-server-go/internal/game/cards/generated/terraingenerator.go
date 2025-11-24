@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTerrainGenerator creates a Terrain Generator
-//  - LAND
+//   - LAND
 func NewTerrainGenerator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Terrain Generator")
 	card.ManaCost = ""

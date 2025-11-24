@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSandsteppeCitadel creates a Sandsteppe Citadel
-//  - LAND
+//   - LAND
 func NewSandsteppeCitadel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sandsteppe Citadel")
 	card.ManaCost = ""

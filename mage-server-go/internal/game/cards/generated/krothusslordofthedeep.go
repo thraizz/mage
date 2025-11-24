@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewKrothussLordOfTheDeep creates a Krothuss Lord Of The Deep
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewKrothussLordOfTheDeep(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Krothuss Lord Of The Deep")

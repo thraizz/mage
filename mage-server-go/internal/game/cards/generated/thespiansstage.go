@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThespiansStage creates a Thespians Stage
-//  - LAND
+//   - LAND
 func NewThespiansStage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thespians Stage")
 	card.ManaCost = ""

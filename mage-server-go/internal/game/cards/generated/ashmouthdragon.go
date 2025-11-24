@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewAshmouthDragon creates a Ashmouth Dragon
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewAshmouthDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ashmouth Dragon")

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewCaveOfTheFrostDragon creates a Cave Of The Frost Dragon
-//  - LAND
+//   - LAND
+//
 // Flying
 func NewCaveOfTheFrostDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cave Of The Frost Dragon")
@@ -26,7 +27,7 @@ func NewCaveOfTheFrostDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

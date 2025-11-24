@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMeteorCrater creates a Meteor Crater
-//  - LAND
+//   - LAND
 func NewMeteorCrater(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Meteor Crater")
 	card.ManaCost = ""

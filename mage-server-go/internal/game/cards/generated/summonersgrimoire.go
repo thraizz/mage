@@ -27,7 +27,7 @@ func NewSummonersGrimoire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new AttacksTriggeredAbility(new SummonersGrimoireEffect()), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

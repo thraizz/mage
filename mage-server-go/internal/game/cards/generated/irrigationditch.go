@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIrrigationDitch creates a Irrigation Ditch
-//  - LAND
+//   - LAND
 func NewIrrigationDitch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Irrigation Ditch")
 	card.ManaCost = ""

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewAkoumWarrior creates a Akoum Warrior
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewAkoumWarrior(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Akoum Warrior")

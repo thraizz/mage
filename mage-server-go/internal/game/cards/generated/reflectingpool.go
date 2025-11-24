@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewReflectingPool creates a Reflecting Pool
-//  - LAND
+//   - LAND
 func NewReflectingPool(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Reflecting Pool")
 	card.ManaCost = ""

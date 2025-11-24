@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewCityOfShadows creates a City Of Shadows
-//  - LAND
+//   - LAND
 func NewCityOfShadows(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "City Of Shadows")
 	card.ManaCost = ""

@@ -22,7 +22,7 @@ func NewElementalAppeal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(new RedElementalWithTrampleAndHaste())).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

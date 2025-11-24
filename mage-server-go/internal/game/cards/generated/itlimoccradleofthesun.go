@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewItlimocCradleOfTheSun creates a Itlimoc Cradle Of The Sun
-//  - LAND
+//   - LAND
 func NewItlimocCradleOfTheSun(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Itlimoc Cradle Of The Sun")
 	card.ManaCost = ""

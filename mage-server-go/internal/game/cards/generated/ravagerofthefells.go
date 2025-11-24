@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewRavagerOfTheFells creates a Ravager Of The Fells
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewRavagerOfTheFells(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ravager Of The Fells")

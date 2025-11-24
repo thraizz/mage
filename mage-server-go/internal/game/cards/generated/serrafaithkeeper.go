@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewSerraFaithkeeper creates a Serra Faithkeeper
-//  - CREATURE
+//   - CREATURE
+//
 // Flying, Vigilance
 func NewSerraFaithkeeper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Serra Faithkeeper")

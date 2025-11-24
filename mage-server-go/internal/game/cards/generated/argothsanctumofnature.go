@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewArgothSanctumOfNature creates a Argoth Sanctum Of Nature
-//  - LAND
+//   - LAND
 func NewArgothSanctumOfNature(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Argoth Sanctum Of Nature")
 	card.ManaCost = ""

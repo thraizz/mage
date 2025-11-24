@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewZhalfirinVoid creates a Zhalfirin Void
-//  - LAND
+//   - LAND
 func NewZhalfirinVoid(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Zhalfirin Void")
 	card.ManaCost = ""

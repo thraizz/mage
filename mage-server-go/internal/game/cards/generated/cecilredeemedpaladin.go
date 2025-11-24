@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewCecilRedeemedPaladin creates a Cecil Redeemed Paladin
-//  - CREATURE
+//   - CREATURE
+//
 // Lifelink
 func NewCecilRedeemedPaladin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cecil Redeemed Paladin")

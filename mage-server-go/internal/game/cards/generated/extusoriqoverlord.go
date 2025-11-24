@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewExtusOriqOverlord creates a Extus Oriq Overlord
-//  - CREATURE
+//   - CREATURE
+//
 // DoubleStrike
 func NewExtusOriqOverlord(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Extus Oriq Overlord")
@@ -29,7 +30,7 @@ func NewExtusOriqOverlord(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	if err != nil {

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRiverglidePathway creates a Riverglide Pathway
-//  - LAND
+//   - LAND
 func NewRiverglidePathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Riverglide Pathway")
 	card.ManaCost = ""

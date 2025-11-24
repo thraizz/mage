@@ -24,7 +24,7 @@ func NewZhurTaaSwine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(5,4)).
+		AddEffect(abilities.NewBoostEffect(5, 4)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBotanicalPlaza creates a Botanical Plaza
-//  - LAND
+//   - LAND
 func NewBotanicalPlaza(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Botanical Plaza")
 	card.ManaCost = ""

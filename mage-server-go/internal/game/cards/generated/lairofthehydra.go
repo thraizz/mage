@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLairOfTheHydra creates a Lair Of The Hydra
-//  - LAND
+//   - LAND
 func NewLairOfTheHydra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lair Of The Hydra")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewLairOfTheHydra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

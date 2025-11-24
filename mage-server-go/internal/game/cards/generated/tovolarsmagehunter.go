@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTovolarsMagehunter creates a Tovolars Magehunter
-//  - CREATURE
+//   - CREATURE
 func NewTovolarsMagehunter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tovolars Magehunter")
 	card.ManaCost = ""

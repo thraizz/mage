@@ -1546,6 +1546,8 @@ type DeckSaveRequest struct {
 	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	DeckName      string                 `protobuf:"bytes,2,opt,name=deck_name,json=deckName,proto3" json:"deck_name,omitempty"`
 	Deck          *DeckCardLists         `protobuf:"bytes,3,opt,name=deck,proto3" json:"deck,omitempty"`
+	Format        string                 `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`           // e.g., "Standard", "Modern", "Commander"
+	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"` // Optional deck description
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1601,10 +1603,25 @@ func (x *DeckSaveRequest) GetDeck() *DeckCardLists {
 	return nil
 }
 
+func (x *DeckSaveRequest) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+func (x *DeckSaveRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
 type DeckSaveResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	DeckId        int64                  `protobuf:"varint,3,opt,name=deck_id,json=deckId,proto3" json:"deck_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1651,6 +1668,449 @@ func (x *DeckSaveResponse) GetError() string {
 		return x.Error
 	}
 	return ""
+}
+
+func (x *DeckSaveResponse) GetDeckId() int64 {
+	if x != nil {
+		return x.DeckId
+	}
+	return 0
+}
+
+type DeckListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	Format        string                 `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"` // Optional: filter by format (e.g., "Standard", "Modern", "Commander")
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeckListRequest) Reset() {
+	*x = DeckListRequest{}
+	mi := &file_mage_v1_table_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeckListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeckListRequest) ProtoMessage() {}
+
+func (x *DeckListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_table_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeckListRequest.ProtoReflect.Descriptor instead.
+func (*DeckListRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *DeckListRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *DeckListRequest) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+type DeckInfo struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Format         string                 `protobuf:"bytes,3,opt,name=format,proto3" json:"format,omitempty"`
+	Description    string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	MainDeckCount  int32                  `protobuf:"varint,5,opt,name=main_deck_count,json=mainDeckCount,proto3" json:"main_deck_count,omitempty"`
+	SideboardCount int32                  `protobuf:"varint,6,opt,name=sideboard_count,json=sideboardCount,proto3" json:"sideboard_count,omitempty"`
+	CreatedAt      int64                  `protobuf:"varint,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // Unix timestamp
+	UpdatedAt      int64                  `protobuf:"varint,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"` // Unix timestamp
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DeckInfo) Reset() {
+	*x = DeckInfo{}
+	mi := &file_mage_v1_table_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeckInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeckInfo) ProtoMessage() {}
+
+func (x *DeckInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_table_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeckInfo.ProtoReflect.Descriptor instead.
+func (*DeckInfo) Descriptor() ([]byte, []int) {
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *DeckInfo) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *DeckInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DeckInfo) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+func (x *DeckInfo) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *DeckInfo) GetMainDeckCount() int32 {
+	if x != nil {
+		return x.MainDeckCount
+	}
+	return 0
+}
+
+func (x *DeckInfo) GetSideboardCount() int32 {
+	if x != nil {
+		return x.SideboardCount
+	}
+	return 0
+}
+
+func (x *DeckInfo) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *DeckInfo) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
+type DeckListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	Decks         []*DeckInfo            `protobuf:"bytes,3,rep,name=decks,proto3" json:"decks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeckListResponse) Reset() {
+	*x = DeckListResponse{}
+	mi := &file_mage_v1_table_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeckListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeckListResponse) ProtoMessage() {}
+
+func (x *DeckListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_table_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeckListResponse.ProtoReflect.Descriptor instead.
+func (*DeckListResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *DeckListResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeckListResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *DeckListResponse) GetDecks() []*DeckInfo {
+	if x != nil {
+		return x.Decks
+	}
+	return nil
+}
+
+type DeckDeleteRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	DeckId        int64                  `protobuf:"varint,2,opt,name=deck_id,json=deckId,proto3" json:"deck_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeckDeleteRequest) Reset() {
+	*x = DeckDeleteRequest{}
+	mi := &file_mage_v1_table_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeckDeleteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeckDeleteRequest) ProtoMessage() {}
+
+func (x *DeckDeleteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_table_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeckDeleteRequest.ProtoReflect.Descriptor instead.
+func (*DeckDeleteRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *DeckDeleteRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *DeckDeleteRequest) GetDeckId() int64 {
+	if x != nil {
+		return x.DeckId
+	}
+	return 0
+}
+
+type DeckDeleteResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeckDeleteResponse) Reset() {
+	*x = DeckDeleteResponse{}
+	mi := &file_mage_v1_table_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeckDeleteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeckDeleteResponse) ProtoMessage() {}
+
+func (x *DeckDeleteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_table_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeckDeleteResponse.ProtoReflect.Descriptor instead.
+func (*DeckDeleteResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *DeckDeleteResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeckDeleteResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+type DeckGetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	DeckId        int64                  `protobuf:"varint,2,opt,name=deck_id,json=deckId,proto3" json:"deck_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeckGetRequest) Reset() {
+	*x = DeckGetRequest{}
+	mi := &file_mage_v1_table_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeckGetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeckGetRequest) ProtoMessage() {}
+
+func (x *DeckGetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_table_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeckGetRequest.ProtoReflect.Descriptor instead.
+func (*DeckGetRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *DeckGetRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *DeckGetRequest) GetDeckId() int64 {
+	if x != nil {
+		return x.DeckId
+	}
+	return 0
+}
+
+type DeckGetResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	Info          *DeckInfo              `protobuf:"bytes,3,opt,name=info,proto3" json:"info,omitempty"`
+	Deck          *DeckCardLists         `protobuf:"bytes,4,opt,name=deck,proto3" json:"deck,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeckGetResponse) Reset() {
+	*x = DeckGetResponse{}
+	mi := &file_mage_v1_table_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeckGetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeckGetResponse) ProtoMessage() {}
+
+func (x *DeckGetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_table_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeckGetResponse.ProtoReflect.Descriptor instead.
+func (*DeckGetResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *DeckGetResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeckGetResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *DeckGetResponse) GetInfo() *DeckInfo {
+	if x != nil {
+		return x.Info
+	}
+	return nil
+}
+
+func (x *DeckGetResponse) GetDeck() *DeckCardLists {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
 }
 
 var File_mage_v1_table_proto protoreflect.FileDescriptor
@@ -1783,15 +2243,53 @@ const file_mage_v1_table_proto_rawDesc = "" +
 	"\tsideboard\x18\x02 \x03(\tR\tsideboard\"D\n" +
 	"\x12DeckSubmitResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error\"y\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"\xb3\x01\n" +
 	"\x0fDeckSaveRequest\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x1b\n" +
 	"\tdeck_name\x18\x02 \x01(\tR\bdeckName\x12*\n" +
-	"\x04deck\x18\x03 \x01(\v2\x16.mage.v1.DeckCardListsR\x04deck\"B\n" +
+	"\x04deck\x18\x03 \x01(\v2\x16.mage.v1.DeckCardListsR\x04deck\x12\x16\n" +
+	"\x06format\x18\x04 \x01(\tR\x06format\x12 \n" +
+	"\vdescription\x18\x05 \x01(\tR\vdescription\"[\n" +
 	"\x10DeckSaveResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05errorB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
+	"\x05error\x18\x02 \x01(\tR\x05error\x12\x17\n" +
+	"\adeck_id\x18\x03 \x01(\x03R\x06deckId\"H\n" +
+	"\x0fDeckListRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x16\n" +
+	"\x06format\x18\x02 \x01(\tR\x06format\"\xf7\x01\n" +
+	"\bDeckInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06format\x18\x03 \x01(\tR\x06format\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12&\n" +
+	"\x0fmain_deck_count\x18\x05 \x01(\x05R\rmainDeckCount\x12'\n" +
+	"\x0fsideboard_count\x18\x06 \x01(\x05R\x0esideboardCount\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\b \x01(\x03R\tupdatedAt\"k\n" +
+	"\x10DeckListResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\x12'\n" +
+	"\x05decks\x18\x03 \x03(\v2\x11.mage.v1.DeckInfoR\x05decks\"K\n" +
+	"\x11DeckDeleteRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
+	"\adeck_id\x18\x02 \x01(\x03R\x06deckId\"D\n" +
+	"\x12DeckDeleteResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"H\n" +
+	"\x0eDeckGetRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
+	"\adeck_id\x18\x02 \x01(\x03R\x06deckId\"\x94\x01\n" +
+	"\x0fDeckGetResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\x12%\n" +
+	"\x04info\x18\x03 \x01(\v2\x11.mage.v1.DeckInfoR\x04info\x12*\n" +
+	"\x04deck\x18\x04 \x01(\v2\x16.mage.v1.DeckCardListsR\x04deckB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
 
 var (
 	file_mage_v1_table_proto_rawDescOnce sync.Once
@@ -1805,7 +2303,7 @@ func file_mage_v1_table_proto_rawDescGZIP() []byte {
 	return file_mage_v1_table_proto_rawDescData
 }
 
-var file_mage_v1_table_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_mage_v1_table_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
 var file_mage_v1_table_proto_goTypes = []any{
 	(*RoomCreateTableRequest)(nil),             // 0: mage.v1.RoomCreateTableRequest
 	(*RoomCreateTableResponse)(nil),            // 1: mage.v1.RoomCreateTableResponse
@@ -1833,18 +2331,28 @@ var file_mage_v1_table_proto_goTypes = []any{
 	(*DeckSubmitResponse)(nil),                 // 23: mage.v1.DeckSubmitResponse
 	(*DeckSaveRequest)(nil),                    // 24: mage.v1.DeckSaveRequest
 	(*DeckSaveResponse)(nil),                   // 25: mage.v1.DeckSaveResponse
-	(*MatchOptions)(nil),                       // 26: mage.v1.MatchOptions
+	(*DeckListRequest)(nil),                    // 26: mage.v1.DeckListRequest
+	(*DeckInfo)(nil),                           // 27: mage.v1.DeckInfo
+	(*DeckListResponse)(nil),                   // 28: mage.v1.DeckListResponse
+	(*DeckDeleteRequest)(nil),                  // 29: mage.v1.DeckDeleteRequest
+	(*DeckDeleteResponse)(nil),                 // 30: mage.v1.DeckDeleteResponse
+	(*DeckGetRequest)(nil),                     // 31: mage.v1.DeckGetRequest
+	(*DeckGetResponse)(nil),                    // 32: mage.v1.DeckGetResponse
+	(*MatchOptions)(nil),                       // 33: mage.v1.MatchOptions
 }
 var file_mage_v1_table_proto_depIdxs = []int32{
-	26, // 0: mage.v1.RoomCreateTableRequest.match_options:type_name -> mage.v1.MatchOptions
+	33, // 0: mage.v1.RoomCreateTableRequest.match_options:type_name -> mage.v1.MatchOptions
 	3,  // 1: mage.v1.RoomCreateTournamentRequest.tournament_options:type_name -> mage.v1.TournamentOptions
 	22, // 2: mage.v1.DeckSubmitRequest.deck:type_name -> mage.v1.DeckCardLists
 	22, // 3: mage.v1.DeckSaveRequest.deck:type_name -> mage.v1.DeckCardLists
-	4,  // [4:4] is the sub-list for method output_type
-	4,  // [4:4] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	27, // 4: mage.v1.DeckListResponse.decks:type_name -> mage.v1.DeckInfo
+	27, // 5: mage.v1.DeckGetResponse.info:type_name -> mage.v1.DeckInfo
+	22, // 6: mage.v1.DeckGetResponse.deck:type_name -> mage.v1.DeckCardLists
+	7,  // [7:7] is the sub-list for method output_type
+	7,  // [7:7] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_table_proto_init() }
@@ -1859,7 +2367,7 @@ func file_mage_v1_table_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_table_proto_rawDesc), len(file_mage_v1_table_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   33,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -28,7 +28,7 @@ func NewDemonOfWailingAgonies(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new DealsCombatDamageToAPlayerTriggeredAbility(new SacrificeEffect( , 1 ), false, true))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -27,7 +27,7 @@ func NewKemuriOnna(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	//   - DiscardTargetEffect(1)
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

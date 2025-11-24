@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewChaliceOfDeath creates a Chalice Of Death
-//  - ARTIFACT
+//   - ARTIFACT
 func NewChaliceOfDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Chalice Of Death")
 	card.ManaCost = ""

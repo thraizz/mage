@@ -36,7 +36,7 @@ func NewSinstrikersWill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA + "\"{T}: This creature deals damage " + "equal to its power to target " + "attacking or blocking creature.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -22,7 +22,7 @@ func NewCruxOfFate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect(filterNonDragon)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyAllEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect(filterNonDragon)).
 		Build()
 	if err != nil {

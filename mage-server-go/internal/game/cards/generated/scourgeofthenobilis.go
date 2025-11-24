@@ -33,7 +33,7 @@ func NewScourgeOfTheNobilis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(1, 1)).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new SimpleActivatedAbility(new BoostSourceEffect(1, 0), new ManaCostsImpl<>("{R/W}")), AttachmentType.AURA)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err

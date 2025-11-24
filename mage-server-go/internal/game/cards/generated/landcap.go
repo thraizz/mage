@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLandCap creates a Land Cap
-//  - LAND
+//   - LAND
 func NewLandCap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Land Cap")
 	card.ManaCost = ""

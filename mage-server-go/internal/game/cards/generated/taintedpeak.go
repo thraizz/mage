@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTaintedPeak creates a Tainted Peak
-//  - LAND
+//   - LAND
 func NewTaintedPeak(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tainted Peak")
 	card.ManaCost = ""

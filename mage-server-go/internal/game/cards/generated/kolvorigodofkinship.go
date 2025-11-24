@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewKolvoriGodOfKinship creates a Kolvori God Of Kinship
-//  - CREATURE
+//   - CREATURE
 func NewKolvoriGodOfKinship(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kolvori God Of Kinship")
 	card.ManaCost = ""

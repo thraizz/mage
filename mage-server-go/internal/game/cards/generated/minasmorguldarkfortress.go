@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMinasMorgulDarkFortress creates a Minas Morgul Dark Fortress
-//  - LAND
+//   - LAND
 func NewMinasMorgulDarkFortress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Minas Morgul Dark Fortress")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTurntimberSymbiosis creates a Turntimber Symbiosis
-//  - SORCERY
+//   - SORCERY
 func NewTurntimberSymbiosis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Turntimber Symbiosis")
 	card.ManaCost = ""

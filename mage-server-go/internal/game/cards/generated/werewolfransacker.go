@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWerewolfRansacker creates a Werewolf Ransacker
-//  - CREATURE
+//   - CREATURE
 func NewWerewolfRansacker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Werewolf Ransacker")
 	card.ManaCost = ""

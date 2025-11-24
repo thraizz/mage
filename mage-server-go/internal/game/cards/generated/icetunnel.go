@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIceTunnel creates a Ice Tunnel
-//  - LAND
+//   - LAND
 func NewIceTunnel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ice Tunnel")
 	card.ManaCost = ""

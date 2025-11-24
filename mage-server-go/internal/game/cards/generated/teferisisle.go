@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTeferisIsle creates a Teferis Isle
-//  - LAND
+//   - LAND
 func NewTeferisIsle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Teferis Isle")
 	card.ManaCost = ""

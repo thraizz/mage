@@ -21,8 +21,8 @@ func NewNecropotence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

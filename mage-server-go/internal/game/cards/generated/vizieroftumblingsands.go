@@ -24,8 +24,8 @@ func NewVizierOfTumblingSands(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

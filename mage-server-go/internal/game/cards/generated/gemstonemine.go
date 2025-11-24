@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGemstoneMine creates a Gemstone Mine
-//  - LAND
+//   - LAND
 func NewGemstoneMine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gemstone Mine")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHiddenNursery creates a Hidden Nursery
-//  - LAND
+//   - LAND
 func NewHiddenNursery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hidden Nursery")
 	card.ManaCost = ""

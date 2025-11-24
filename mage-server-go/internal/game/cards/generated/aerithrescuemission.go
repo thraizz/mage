@@ -29,7 +29,7 @@ func NewAerithRescueMission(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 1))).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0, 3)).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

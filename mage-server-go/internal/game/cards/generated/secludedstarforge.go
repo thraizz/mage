@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSecludedStarforge creates a Secluded Starforge
-//  - LAND
+//   - LAND
 func NewSecludedStarforge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Secluded Starforge")
 	card.ManaCost = ""

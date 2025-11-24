@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWrathfulJailbreaker creates a Wrathful Jailbreaker
-//  - CREATURE
+//   - CREATURE
 func NewWrathfulJailbreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wrathful Jailbreaker")
 	card.ManaCost = ""

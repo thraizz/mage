@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAkoumRefuge creates a Akoum Refuge
-//  - LAND
+//   - LAND
 func NewAkoumRefuge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Akoum Refuge")
 	card.ManaCost = ""

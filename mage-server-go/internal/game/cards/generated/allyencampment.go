@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAllyEncampment creates a Ally Encampment
-//  - LAND
+//   - LAND
 func NewAllyEncampment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ally Encampment")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewAllyEncampment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{1}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

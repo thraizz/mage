@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStartingTown creates a Starting Town
-//  - LAND
+//   - LAND
 func NewStartingTown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Starting Town")
 	card.ManaCost = ""

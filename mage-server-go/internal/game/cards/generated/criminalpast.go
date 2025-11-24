@@ -25,7 +25,7 @@ func NewCriminalPast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(xValue, StaticValue.get(0))).
-		AddEffect(abilities.NewGrantAbilityEffect()).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

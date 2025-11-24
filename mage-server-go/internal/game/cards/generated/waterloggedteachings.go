@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWaterloggedTeachings creates a Waterlogged Teachings
-//  - INSTANT
+//   - INSTANT
 func NewWaterloggedTeachings(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Waterlogged Teachings")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewWaterloggedTeachings(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

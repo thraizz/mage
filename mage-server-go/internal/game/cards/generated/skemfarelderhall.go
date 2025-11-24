@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSkemfarElderhall creates a Skemfar Elderhall
-//  - LAND
+//   - LAND
 func NewSkemfarElderhall(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Skemfar Elderhall")
 	card.ManaCost = ""

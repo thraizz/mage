@@ -22,10 +22,10 @@ func NewCrosissCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect(true)).
-		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect(true)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {

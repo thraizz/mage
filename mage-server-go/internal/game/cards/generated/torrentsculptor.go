@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTorrentSculptor creates a Torrent Sculptor
-//  - CREATURE
+//   - CREATURE
 func NewTorrentSculptor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Torrent Sculptor")
 	card.ManaCost = ""

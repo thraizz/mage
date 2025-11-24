@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCacklingCulprit creates a Cackling Culprit
-//  - CREATURE
+//   - CREATURE
 func NewCacklingCulprit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cackling Culprit")
 	card.ManaCost = ""

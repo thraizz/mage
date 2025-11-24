@@ -31,7 +31,7 @@ func NewForerunnerOfTheLegion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutOnTopEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutOnLibraryEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

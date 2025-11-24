@@ -21,10 +21,10 @@ func NewPainfulTruths(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(ColorsOfManaSpentToCastCount.getInstance())).
-		AddEffect(abilities.NewLoseLifeEffect(ColorsOfManaSpentToCastCount.getInstance())).
-		AddEffect(abilities.NewDrawCardsEffect(ColorsOfManaSpentToCastCount.getInstance())).
-		AddEffect(abilities.NewLoseLifeEffect(ColorsOfManaSpentToCastCount.getInstance())).
+		// TODO: DrawCardSourceControllerEffect with complex parameters
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
+		// TODO: DrawCardSourceControllerEffect with complex parameters
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

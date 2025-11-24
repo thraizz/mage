@@ -26,7 +26,7 @@ func NewInsatiableFrugivore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
-		AddEffect(abilities.NewGrantAbilityEffect(new MenaceAbility(false))).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

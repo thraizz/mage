@@ -34,7 +34,7 @@ func NewKayaSpiritsJustice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewSurveilEffect(1)).
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -21,7 +21,7 @@ func NewHowToKeepAnIzzetMageBusy(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

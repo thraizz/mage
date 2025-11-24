@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGrixisPanorama creates a Grixis Panorama
-//  - LAND
+//   - LAND
 func NewGrixisPanorama(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grixis Panorama")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewGrixisPanorama(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{1}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

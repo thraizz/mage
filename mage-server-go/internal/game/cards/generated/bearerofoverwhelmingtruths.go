@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBearerOfOverwhelmingTruths creates a Bearer Of Overwhelming Truths
-//  - CREATURE
+//   - CREATURE
 func NewBearerOfOverwhelmingTruths(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bearer Of Overwhelming Truths")
 	card.ManaCost = ""

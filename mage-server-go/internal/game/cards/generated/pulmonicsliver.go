@@ -32,7 +32,7 @@ func NewPulmonicSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new PutIntoGraveFromAnywhereSourceAbility(new ReturnToLibraryPermanentEffect(true), null, null, false, true), filterSliversIf permanent would be put into a graveyard, you may put it on top of its owner's library instead.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDryadArbor creates a Dryad Arbor
-//  - LAND CREATURE
+//   - LAND CREATURE
 func NewDryadArbor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dryad Arbor")
 	card.ManaCost = ""

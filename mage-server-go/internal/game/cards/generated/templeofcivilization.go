@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTempleOfCivilization creates a Temple Of Civilization
-//  - LAND
+//   - LAND
 func NewTempleOfCivilization(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Temple Of Civilization")
 	card.ManaCost = ""

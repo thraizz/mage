@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMeticulousArchive creates a Meticulous Archive
-//  - LAND
+//   - LAND
 func NewMeticulousArchive(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Meticulous Archive")
 	card.ManaCost = ""

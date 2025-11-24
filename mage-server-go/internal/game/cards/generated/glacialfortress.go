@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGlacialFortress creates a Glacial Fortress
-//  - LAND
+//   - LAND
 func NewGlacialFortress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glacial Fortress")
 	card.ManaCost = ""

@@ -35,7 +35,7 @@ func NewPhelddagrif(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		Build()
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1, true)).
 		Build()
 	card.AddAbility(ability2)

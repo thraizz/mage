@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewUltimeciaOmnipotent creates a Ultimecia Omnipotent
-//  - CREATURE
+//   - CREATURE
+//
 // Menace
 func NewUltimeciaOmnipotent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ultimecia Omnipotent")

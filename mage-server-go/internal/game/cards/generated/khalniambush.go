@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKhalniAmbush creates a Khalni Ambush
-//  - INSTANT
+//   - INSTANT
 func NewKhalniAmbush(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Khalni Ambush")
 	card.ManaCost = ""

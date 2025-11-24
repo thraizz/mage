@@ -30,7 +30,7 @@ func NewScreechingSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(allSliversFilter{T}: Target player mills a card.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

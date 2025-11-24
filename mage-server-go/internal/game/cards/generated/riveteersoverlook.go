@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRiveteersOverlook creates a Riveteers Overlook
-//  - LAND
+//   - LAND
 func NewRiveteersOverlook(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Riveteers Overlook")
 	card.ManaCost = ""

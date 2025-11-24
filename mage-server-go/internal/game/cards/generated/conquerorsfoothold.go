@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewConquerorsFoothold creates a Conquerors Foothold
-//  - LAND
+//   - LAND
 func NewConquerorsFoothold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Conquerors Foothold")
 	card.ManaCost = ""
@@ -29,7 +29,7 @@ func NewConquerorsFoothold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

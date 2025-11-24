@@ -36,7 +36,7 @@ func NewIymrithDesertDoom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new WardAbility())).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

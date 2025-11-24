@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWaterveilCavern creates a Waterveil Cavern
-//  - LAND
+//   - LAND
 func NewWaterveilCavern(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Waterveil Cavern")
 	card.ManaCost = ""

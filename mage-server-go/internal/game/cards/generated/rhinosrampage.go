@@ -21,7 +21,7 @@ func NewRhinosRampage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(1, 0)).
 		Build()
 	if err != nil {

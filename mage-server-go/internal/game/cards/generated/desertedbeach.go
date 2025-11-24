@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDesertedBeach creates a Deserted Beach
-//  - LAND
+//   - LAND
 func NewDesertedBeach(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Deserted Beach")
 	card.ManaCost = ""

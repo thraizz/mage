@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewMistvaultBridge creates a Mistvault Bridge
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
+//
 // Indestructible
 func NewMistvaultBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mistvault Bridge")

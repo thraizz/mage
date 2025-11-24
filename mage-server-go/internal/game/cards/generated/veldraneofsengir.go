@@ -27,7 +27,7 @@ func NewVeldraneOfSengir(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(-3, -0)).
-		AddEffect(abilities.NewGrantAbilityEffect(new ForestwalkAbility(false))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

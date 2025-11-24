@@ -27,7 +27,7 @@ func NewMyrkulsInvoker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{8}").
 		AddEffect(abilities.NewBoostEffect(2, 0)).
-		AddEffect(abilities.NewGrantAbilityEffect(new MenaceAbility(false))).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

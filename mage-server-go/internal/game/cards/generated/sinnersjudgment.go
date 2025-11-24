@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSinnersJudgment creates a Sinners Judgment
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewSinnersJudgment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sinners Judgment")
 	card.ManaCost = ""

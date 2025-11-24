@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewConduitOfEmrakul creates a Conduit Of Emrakul
-//  - CREATURE
+//   - CREATURE
 func NewConduitOfEmrakul(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Conduit Of Emrakul")
 	card.ManaCost = ""

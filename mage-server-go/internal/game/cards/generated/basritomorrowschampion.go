@@ -27,7 +27,7 @@ func NewBasriTomorrowsChampion(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(new CatToken2())).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLilypadVillage creates a Lilypad Village
-//  - LAND
+//   - LAND
 func NewLilypadVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lilypad Village")
 	card.ManaCost = ""

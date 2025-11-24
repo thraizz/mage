@@ -26,7 +26,7 @@ func NewDescendantOfKiyomaro(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(3)).
-		AddEffect(abilities.NewGrantAbilityEffect(new DealsCombatDamageTriggeredAbility(new GainLifeEffect(3), false))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

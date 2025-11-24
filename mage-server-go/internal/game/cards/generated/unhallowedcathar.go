@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUnhallowedCathar creates a Unhallowed Cathar
-//  - CREATURE
+//   - CREATURE
 func NewUnhallowedCathar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Unhallowed Cathar")
 	card.ManaCost = ""

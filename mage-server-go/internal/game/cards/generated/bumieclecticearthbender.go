@@ -26,7 +26,7 @@ func NewBumiEclecticEarthbender(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(2), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

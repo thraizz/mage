@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSorinRavenousNeonate creates a Sorin Ravenous Neonate
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewSorinRavenousNeonate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sorin Ravenous Neonate")
 	card.ManaCost = ""

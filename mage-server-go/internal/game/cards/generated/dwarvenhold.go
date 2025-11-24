@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewDwarvenHold creates a Dwarven Hold
-//  - LAND
+//   - LAND
 func NewDwarvenHold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dwarven Hold")
 	card.ManaCost = ""

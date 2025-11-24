@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSongMadTreachery creates a Song Mad Treachery
-//  - SORCERY
+//   - SORCERY
 func NewSongMadTreachery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Song Mad Treachery")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewSongMadTreachery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

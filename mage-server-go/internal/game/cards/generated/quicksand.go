@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewQuicksand creates a Quicksand
-//  - LAND
+//   - LAND
 func NewQuicksand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Quicksand")
 	card.ManaCost = ""

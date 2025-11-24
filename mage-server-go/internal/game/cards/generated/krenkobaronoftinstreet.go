@@ -30,7 +30,7 @@ func NewKrenkoBaronOfTinStreet(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects

@@ -23,7 +23,7 @@ func NewPsychicTrance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(abilityToAdd, filter)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func NewPsychicTrance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

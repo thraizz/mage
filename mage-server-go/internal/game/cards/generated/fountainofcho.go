@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFountainOfCho creates a Fountain Of Cho
-//  - LAND
+//   - LAND
 func NewFountainOfCho(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fountain Of Cho")
 	card.ManaCost = ""

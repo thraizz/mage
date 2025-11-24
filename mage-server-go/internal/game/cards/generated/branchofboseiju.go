@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewBranchOfBoseiju creates a Branch Of Boseiju
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Reach
 func NewBranchOfBoseiju(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Branch Of Boseiju")

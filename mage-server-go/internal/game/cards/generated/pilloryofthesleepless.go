@@ -32,7 +32,7 @@ func NewPilloryOfTheSleepless(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new BeginningOfUpkeepTriggeredAbility(new LoseLifeSourceControllerEffect(1)), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

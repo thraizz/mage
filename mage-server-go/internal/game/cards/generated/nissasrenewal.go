@@ -21,7 +21,7 @@ func NewNissasRenewal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(7)).
 		Build()
 	if err != nil {

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPetrifiedField creates a Petrified Field
-//  - LAND
+//   - LAND
 func NewPetrifiedField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Petrified Field")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewPetrifiedField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCaptivatingCave creates a Captivating Cave
-//  - LAND
+//   - LAND
 func NewCaptivatingCave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Captivating Cave")
 	card.ManaCost = ""

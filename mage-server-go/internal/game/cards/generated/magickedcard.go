@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewMagickedCard creates a Magicked Card
-//  - ARTIFACT
+//   - ARTIFACT
+//
 // Flying
 func NewMagickedCard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Magicked Card")

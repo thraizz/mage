@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMishrasFactory creates a Mishras Factory
-//  - LAND
+//   - LAND
 func NewMishrasFactory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mishras Factory")
 	card.ManaCost = ""

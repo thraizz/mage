@@ -21,7 +21,7 @@ func NewShatteredCrypt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		AddEffect(abilities.NewLoseLifeEffect(GetXValue.instance)).
 		Build()
 	if err != nil {

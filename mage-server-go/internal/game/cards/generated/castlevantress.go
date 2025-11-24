@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCastleVantress creates a Castle Vantress
-//  - LAND
+//   - LAND
 func NewCastleVantress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Castle Vantress")
 	card.ManaCost = ""

@@ -22,8 +22,8 @@ func NewVerdantConfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(2))).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

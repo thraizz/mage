@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewEsperTerra creates a Esper Terra
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Flying, Haste
 func NewEsperTerra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Esper Terra")

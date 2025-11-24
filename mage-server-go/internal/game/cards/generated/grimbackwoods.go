@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGrimBackwoods creates a Grim Backwoods
-//  - LAND
+//   - LAND
 func NewGrimBackwoods(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grim Backwoods")
 	card.ManaCost = ""

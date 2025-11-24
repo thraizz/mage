@@ -27,7 +27,7 @@ func NewSpinewoodsArmadillo(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(3)).
 		Build()
 	card.AddAbility(ability1)

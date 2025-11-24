@@ -26,8 +26,8 @@ func NewRivazOfTheClaw(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileSourceEffect()).
-		AddEffect(abilities.NewGrantAbilityEffect(new DiesSourceTriggeredAbility(new ExileSourceEffect().setText("exile it"), false)When creature dies, exile it.\"", true)).
+		// TODO: ExileSourceEffect with complex parameters
+		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

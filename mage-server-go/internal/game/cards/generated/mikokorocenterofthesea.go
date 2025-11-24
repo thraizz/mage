@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMikokoroCenterOfTheSea creates a Mikokoro Center Of The Sea
-//  - LAND
+//   - LAND
 func NewMikokoroCenterOfTheSea(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mikokoro Center Of The Sea")
 	card.ManaCost = ""

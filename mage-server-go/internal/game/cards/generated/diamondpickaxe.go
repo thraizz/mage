@@ -37,7 +37,7 @@ func NewDiamondPickAxe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(1, 1)).
 		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new AttacksTriggeredAbility(new CreateTokenEffect(token2_0)) .setTriggerPhrase("Whenever creature attacks, "), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

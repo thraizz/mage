@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewElephantGraveyard creates a Elephant Graveyard
-//  - LAND
+//   - LAND
 func NewElephantGraveyard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Elephant Graveyard")
 	card.ManaCost = ""

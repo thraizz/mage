@@ -23,7 +23,7 @@ func NewGrixisCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(-4, -4)).
 		AddEffect(abilities.NewBoostEffect(2, 0, false)).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(-4, -4)).
 		AddEffect(abilities.NewBoostEffect(2, 0, false)).
 		AddTarget(abilities.NewPermanentTargetFilter()).

@@ -25,7 +25,7 @@ func NewLeoninWarleader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(new CatToken2(), 2, true, true)).
+		AddEffect(abilities.NewCreateTokenEffect(2, true, true)).
 		Build()
 	if err != nil {
 		return nil, err

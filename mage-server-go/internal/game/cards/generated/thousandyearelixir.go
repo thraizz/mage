@@ -23,7 +23,7 @@ func NewThousandYearElixir(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddTapCost().
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

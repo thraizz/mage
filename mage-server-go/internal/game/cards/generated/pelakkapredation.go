@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPelakkaPredation creates a Pelakka Predation
-//  - SORCERY
+//   - SORCERY
 func NewPelakkaPredation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Pelakka Predation")
 	card.ManaCost = ""

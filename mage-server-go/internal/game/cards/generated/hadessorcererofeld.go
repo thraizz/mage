@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewHadesSorcererOfEld creates a Hades Sorcerer Of Eld
-//  - CREATURE
+//   - CREATURE
+//
 // Vigilance
 func NewHadesSorcererOfEld(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hades Sorcerer Of Eld")

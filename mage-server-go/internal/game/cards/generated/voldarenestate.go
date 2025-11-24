@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewVoldarenEstate creates a Voldaren Estate
-//  - LAND
+//   - LAND
 func NewVoldarenEstate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Voldaren Estate")
 	card.ManaCost = ""

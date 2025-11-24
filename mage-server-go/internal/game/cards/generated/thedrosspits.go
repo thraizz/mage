@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheDrossPits creates a The Dross Pits
-//  - LAND
+//   - LAND
 func NewTheDrossPits(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Dross Pits")
 	card.ManaCost = ""

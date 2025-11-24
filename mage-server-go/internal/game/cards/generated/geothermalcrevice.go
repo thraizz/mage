@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGeothermalCrevice creates a Geothermal Crevice
-//  - LAND
+//   - LAND
 func NewGeothermalCrevice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Geothermal Crevice")
 	card.ManaCost = ""

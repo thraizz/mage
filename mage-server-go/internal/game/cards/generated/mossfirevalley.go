@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMossfireValley creates a Mossfire Valley
-//  - LAND
+//   - LAND
 func NewMossfireValley(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mossfire Valley")
 	card.ManaCost = ""

@@ -27,7 +27,7 @@ func NewTemperedSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddEffect(abilities.NewGrantAbilityEffect(new DealsCombatDamageToAPlayerTriggeredAbility( new AddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1)) .setText("put a +1/+1 counter on it"), false ).setTriggerPhrase("Whenever creature deals combat damage to a player, "))).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

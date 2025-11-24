@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewSlagwoodsBridge creates a Slagwoods Bridge
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
+//
 // Indestructible
 func NewSlagwoodsBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Slagwoods Bridge")

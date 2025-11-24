@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewEgonGodOfDeath creates a Egon God Of Death
-//  - CREATURE
+//   - CREATURE
+//
 // Deathtouch
 func NewEgonGodOfDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Egon God Of Death")

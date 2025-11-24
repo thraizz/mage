@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTheDeathStar creates a The Death Star
-//  - LAND
+//   - LAND
 func NewTheDeathStar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Death Star")
 	card.ManaCost = ""
@@ -32,7 +32,7 @@ func NewTheDeathStar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

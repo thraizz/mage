@@ -23,7 +23,7 @@ func NewDredgingClaw(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(1, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new MenaceAbility(false), AttachmentType.EQUIPMENT)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.EQUIPMENT)).
 		Build()
 	if err != nil {
 		return nil, err

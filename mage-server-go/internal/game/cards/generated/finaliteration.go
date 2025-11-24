@@ -5,8 +5,8 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/token"
 	"github.com/magefree/mage-server-go/internal/game/effects"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -14,7 +14,8 @@ func init() {
 }
 
 // NewFinalIteration creates a Final Iteration
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewFinalIteration(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Final Iteration")

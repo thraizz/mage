@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSeaGate creates a Sea Gate
-//  - LAND
+//   - LAND
 func NewSeaGate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sea Gate")
 	card.ManaCost = ""

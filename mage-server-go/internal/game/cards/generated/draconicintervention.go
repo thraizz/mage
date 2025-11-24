@@ -21,7 +21,7 @@ func NewDraconicIntervention(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(DraconicInterventionValue.instance, filter)).
+		// TODO: DamageAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

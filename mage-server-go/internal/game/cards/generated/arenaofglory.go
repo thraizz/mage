@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewArenaOfGlory creates a Arena Of Glory
-//  - LAND
+//   - LAND
 func NewArenaOfGlory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Arena Of Glory")
 	card.ManaCost = ""

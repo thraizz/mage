@@ -22,8 +22,8 @@ func NewGruulWarChant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1,0, filter, false)).
-		AddEffect(abilities.NewGrantAbilityEffect(new MenaceAbility(false), filter)).
+		// TODO: BoostAllEffect with complex parameters
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

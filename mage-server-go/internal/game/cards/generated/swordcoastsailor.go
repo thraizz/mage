@@ -24,7 +24,7 @@ func NewSwordCoastSailor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new AttacksOpponentWithMostLifeTriggeredAbility( new CantBeBlockedSourceEffect() .setText(" creature can't be blocked turn"), false ))).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVibrantCityscape creates a Vibrant Cityscape
-//  - LAND
+//   - LAND
 func NewVibrantCityscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vibrant Cityscape")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewVibrantCityscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

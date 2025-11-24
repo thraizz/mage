@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewUltraMagnusArmoredCarrier creates a Ultra Magnus Armored Carrier
-//  - ARTIFACT
+//   - ARTIFACT
+//
 // Haste
 func NewUltraMagnusArmoredCarrier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ultra Magnus Armored Carrier")

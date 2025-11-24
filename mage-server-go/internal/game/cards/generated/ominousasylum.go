@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOminousAsylum creates a Ominous Asylum
-//  - LAND
+//   - LAND
 func NewOminousAsylum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ominous Asylum")
 	card.ManaCost = ""

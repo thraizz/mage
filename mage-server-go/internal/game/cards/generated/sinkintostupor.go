@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSinkIntoStupor creates a Sink Into Stupor
-//  - INSTANT
+//   - INSTANT
 func NewSinkIntoStupor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sink Into Stupor")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewSinkIntoStupor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

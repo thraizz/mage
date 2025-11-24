@@ -30,7 +30,7 @@ func NewGoldForgedThopteryx(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new WardAbility(), filter)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

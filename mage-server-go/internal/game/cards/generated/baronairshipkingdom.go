@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBaronAirshipKingdom creates a Baron Airship Kingdom
-//  - LAND
+//   - LAND
 func NewBaronAirshipKingdom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Baron Airship Kingdom")
 	card.ManaCost = ""

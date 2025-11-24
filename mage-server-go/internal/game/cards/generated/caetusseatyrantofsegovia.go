@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCaetusSeaTyrantOfSegovia creates a Caetus Sea Tyrant Of Segovia
-//  - CREATURE
+//   - CREATURE
 func NewCaetusSeaTyrantOfSegovia(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Caetus Sea Tyrant Of Segovia")
 	card.ManaCost = ""

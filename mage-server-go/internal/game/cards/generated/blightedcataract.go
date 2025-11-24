@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlightedCataract creates a Blighted Cataract
-//  - LAND
+//   - LAND
 func NewBlightedCataract(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blighted Cataract")
 	card.ManaCost = ""

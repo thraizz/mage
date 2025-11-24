@@ -27,7 +27,7 @@ func NewRaucousEntertainer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddTapCost().
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

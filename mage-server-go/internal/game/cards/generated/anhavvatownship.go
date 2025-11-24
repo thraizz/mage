@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAnHavvaTownship creates a An Havva Township
-//  - LAND
+//   - LAND
 func NewAnHavvaTownship(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "An Havva Township")
 	card.ManaCost = ""

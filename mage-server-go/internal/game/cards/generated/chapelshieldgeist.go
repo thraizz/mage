@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewChapelShieldgeist creates a Chapel Shieldgeist
-//  - CREATURE
+//   - CREATURE
+//
 // Flying, FirstStrike
 func NewChapelShieldgeist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Chapel Shieldgeist")
@@ -30,7 +31,7 @@ func NewChapelShieldgeist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new WardAbility())).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

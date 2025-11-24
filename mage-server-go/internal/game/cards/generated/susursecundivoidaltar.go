@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSusurSecundiVoidAltar creates a Susur Secundi Void Altar
-//  - LAND
+//   - LAND
 func NewSusurSecundiVoidAltar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Susur Secundi Void Altar")
 	card.ManaCost = ""

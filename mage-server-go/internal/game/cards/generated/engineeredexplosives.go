@@ -22,7 +22,7 @@ func NewEngineeredExplosives(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect(filter)).
+		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpirebluffCanal creates a Spirebluff Canal
-//  - LAND
+//   - LAND
 func NewSpirebluffCanal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spirebluff Canal")
 	card.ManaCost = ""

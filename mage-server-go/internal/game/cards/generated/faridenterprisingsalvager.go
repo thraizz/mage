@@ -6,8 +6,8 @@ import (
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
 	"github.com/magefree/mage-server-go/internal/game/counters"
-	"github.com/magefree/mage-server-go/internal/game/token"
 	"github.com/magefree/mage-server-go/internal/game/effects"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -29,7 +29,7 @@ func NewFaridEnterprisingSalvager(ownerID uuid.UUID, info *cards.CardInfo) (*gam
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddEffect(abilities.NewGrantAbilityEffect(new MenaceAbility(false))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	token1_0, err := token.GetToken("ScrapToken")

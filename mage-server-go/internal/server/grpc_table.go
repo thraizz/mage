@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/magefree/mage-server-go/internal/repository"
 	"github.com/magefree/mage-server-go/internal/table"
 	pb "github.com/magefree/mage-server-go/pkg/proto/mage/v1"
 	"go.uber.org/zap"
@@ -717,7 +718,7 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 
 const maxSavedDecksPerUser = 20
 
-// DeckSave saves a deck list for later reuse.
+// DeckSave saves a deck list to the database for later reuse.
 func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb.DeckSaveResponse, error) {
 	sessionID := strings.TrimSpace(req.GetSessionId())
 	if sessionID == "" {
@@ -751,6 +752,11 @@ func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb
 		}, nil
 	}
 
+	format := strings.TrimSpace(req.GetFormat())
+	if format == "" {
+		format = "Unknown" // Default format if not specified
+	}
+
 	deck := req.GetDeck()
 	if deck == nil || (len(deck.GetMainDeck()) == 0 && len(deck.GetSideboard()) == 0) {
 		return &pb.DeckSaveResponse{
@@ -759,32 +765,306 @@ func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb
 		}, nil
 	}
 
-	entry := savedDeck{
-		Name: deckName,
-		Deck: table.DeckList{
-			MainDeck:  append([]string(nil), deck.GetMainDeck()...),
-			Sideboard: append([]string(nil), deck.GetSideboard()...),
-		},
+	// Get user ID from repository
+	user, err := s.userRepo.GetByName(ctx, username)
+	if err != nil {
+		s.logger.Error("failed to get user for deck save",
+			zap.String("username", username),
+			zap.Error(err),
+		)
+		return &pb.DeckSaveResponse{
+			Success: false,
+			Error:   "user not found",
+		}, nil
 	}
 
-	s.savedDecksMu.Lock()
-	defer s.savedDecksMu.Unlock()
-
-	decks := append(s.savedDecks[username], entry)
-	if len(decks) > maxSavedDecksPerUser {
-		decks = decks[len(decks)-maxSavedDecksPerUser:]
+	// Create deck in repository
+	deckModel := &repository.Deck{
+		UserID:      user.ID,
+		Name:        deckName,
+		Format:      format,
+		Description: strings.TrimSpace(req.GetDescription()),
+		MainDeck:    append([]string(nil), deck.GetMainDeck()...),
+		Sideboard:   append([]string(nil), deck.GetSideboard()...),
 	}
-	s.savedDecks[username] = decks
 
-	s.logger.Info("deck saved",
+	if err := s.deckRepo.Create(ctx, deckModel); err != nil {
+		s.logger.Error("failed to save deck to database",
+			zap.String("username", username),
+			zap.String("deck_name", deckName),
+			zap.Error(err),
+		)
+		return &pb.DeckSaveResponse{
+			Success: false,
+			Error:   fmt.Sprintf("failed to save deck: %v", err),
+		}, nil
+	}
+
+	s.logger.Info("deck saved to database",
 		zap.String("username", username),
+		zap.Int64("deck_id", deckModel.ID),
 		zap.String("deck_name", deckName),
-		zap.Int("main_count", len(entry.Deck.MainDeck)),
-		zap.Int("sideboard_count", len(entry.Deck.Sideboard)),
-		zap.Int("total_saved", len(decks)),
+		zap.String("format", format),
+		zap.Int("main_count", len(deckModel.MainDeck)),
+		zap.Int("sideboard_count", len(deckModel.Sideboard)),
 	)
 
 	return &pb.DeckSaveResponse{
 		Success: true,
+		DeckId:  deckModel.ID,
+	}, nil
+}
+
+// DeckList retrieves all decks for the current user, optionally filtered by format.
+func (s *mageServer) DeckList(ctx context.Context, req *pb.DeckListRequest) (*pb.DeckListResponse, error) {
+	sessionID := strings.TrimSpace(req.GetSessionId())
+	if sessionID == "" {
+		return &pb.DeckListResponse{
+			Success: false,
+			Error:   "session_id is required",
+		}, nil
+	}
+
+	sess, ok := s.sessionMgr.GetSession(sessionID)
+	if !ok {
+		return &pb.DeckListResponse{
+			Success: false,
+			Error:   "session not found",
+		}, nil
+	}
+
+	username := sess.GetUserID()
+	if username == "" {
+		return &pb.DeckListResponse{
+			Success: false,
+			Error:   "session not associated with a user",
+		}, nil
+	}
+
+	// Get user ID from repository
+	user, err := s.userRepo.GetByName(ctx, username)
+	if err != nil {
+		s.logger.Error("failed to get user for deck list",
+			zap.String("username", username),
+			zap.Error(err),
+		)
+		return &pb.DeckListResponse{
+			Success: false,
+			Error:   "user not found",
+		}, nil
+	}
+
+	// Get decks from repository
+	var decks []*repository.Deck
+	format := strings.TrimSpace(req.GetFormat())
+	if format != "" {
+		decks, err = s.deckRepo.GetByUserAndFormat(ctx, user.ID, format)
+	} else {
+		decks, err = s.deckRepo.GetByUser(ctx, user.ID)
+	}
+
+	if err != nil {
+		s.logger.Error("failed to retrieve decks from database",
+			zap.String("username", username),
+			zap.String("format", format),
+			zap.Error(err),
+		)
+		return &pb.DeckListResponse{
+			Success: false,
+			Error:   fmt.Sprintf("failed to retrieve decks: %v", err),
+		}, nil
+	}
+
+	// Convert to proto format
+	deckInfos := make([]*pb.DeckInfo, len(decks))
+	for i, deck := range decks {
+		deckInfos[i] = &pb.DeckInfo{
+			Id:             deck.ID,
+			Name:           deck.Name,
+			Format:         deck.Format,
+			Description:    deck.Description,
+			MainDeckCount:  int32(deck.MainDeckCount()),
+			SideboardCount: int32(deck.SideboardCount()),
+			CreatedAt:      deck.CreatedAt.Unix(),
+			UpdatedAt:      deck.UpdatedAt.Unix(),
+		}
+	}
+
+	s.logger.Info("deck list retrieved",
+		zap.String("username", username),
+		zap.String("format", format),
+		zap.Int("count", len(deckInfos)),
+	)
+
+	return &pb.DeckListResponse{
+		Success: true,
+		Decks:   deckInfos,
+	}, nil
+}
+
+// DeckDelete deletes a deck from the database.
+func (s *mageServer) DeckDelete(ctx context.Context, req *pb.DeckDeleteRequest) (*pb.DeckDeleteResponse, error) {
+	sessionID := strings.TrimSpace(req.GetSessionId())
+	if sessionID == "" {
+		return &pb.DeckDeleteResponse{
+			Success: false,
+			Error:   "session_id is required",
+		}, nil
+	}
+
+	sess, ok := s.sessionMgr.GetSession(sessionID)
+	if !ok {
+		return &pb.DeckDeleteResponse{
+			Success: false,
+			Error:   "session not found",
+		}, nil
+	}
+
+	username := sess.GetUserID()
+	if username == "" {
+		return &pb.DeckDeleteResponse{
+			Success: false,
+			Error:   "session not associated with a user",
+		}, nil
+	}
+
+	if req.GetDeckId() == 0 {
+		return &pb.DeckDeleteResponse{
+			Success: false,
+			Error:   "deck_id is required",
+		}, nil
+	}
+
+	// Get user ID from repository
+	user, err := s.userRepo.GetByName(ctx, username)
+	if err != nil {
+		s.logger.Error("failed to get user for deck delete",
+			zap.String("username", username),
+			zap.Error(err),
+		)
+		return &pb.DeckDeleteResponse{
+			Success: false,
+			Error:   "user not found",
+		}, nil
+	}
+
+	// Delete deck (with ownership check)
+	if err := s.deckRepo.DeleteByUserAndID(ctx, user.ID, req.GetDeckId()); err != nil {
+		s.logger.Error("failed to delete deck",
+			zap.String("username", username),
+			zap.Int64("deck_id", req.GetDeckId()),
+			zap.Error(err),
+		)
+		return &pb.DeckDeleteResponse{
+			Success: false,
+			Error:   fmt.Sprintf("failed to delete deck: %v", err),
+		}, nil
+	}
+
+	s.logger.Info("deck deleted",
+		zap.String("username", username),
+		zap.Int64("deck_id", req.GetDeckId()),
+	)
+
+	return &pb.DeckDeleteResponse{
+		Success: true,
+	}, nil
+}
+
+// DeckGet retrieves a specific deck by ID.
+func (s *mageServer) DeckGet(ctx context.Context, req *pb.DeckGetRequest) (*pb.DeckGetResponse, error) {
+	sessionID := strings.TrimSpace(req.GetSessionId())
+	if sessionID == "" {
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   "session_id is required",
+		}, nil
+	}
+
+	sess, ok := s.sessionMgr.GetSession(sessionID)
+	if !ok {
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   "session not found",
+		}, nil
+	}
+
+	username := sess.GetUserID()
+	if username == "" {
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   "session not associated with a user",
+		}, nil
+	}
+
+	if req.GetDeckId() == 0 {
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   "deck_id is required",
+		}, nil
+	}
+
+	// Get user ID from repository
+	user, err := s.userRepo.GetByName(ctx, username)
+	if err != nil {
+		s.logger.Error("failed to get user for deck get",
+			zap.String("username", username),
+			zap.Error(err),
+		)
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   "user not found",
+		}, nil
+	}
+
+	// Get deck from repository
+	deck, err := s.deckRepo.GetByID(ctx, req.GetDeckId())
+	if err != nil {
+		s.logger.Error("failed to get deck",
+			zap.String("username", username),
+			zap.Int64("deck_id", req.GetDeckId()),
+			zap.Error(err),
+		)
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   fmt.Sprintf("failed to get deck: %v", err),
+		}, nil
+	}
+
+	// Verify ownership
+	if deck.UserID != user.ID {
+		s.logger.Warn("user attempted to access deck they don't own",
+			zap.String("username", username),
+			zap.Int64("deck_id", req.GetDeckId()),
+			zap.Int64("deck_user_id", deck.UserID),
+			zap.Int64("user_id", user.ID),
+		)
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   "deck not found",
+		}, nil
+	}
+
+	s.logger.Info("deck retrieved",
+		zap.String("username", username),
+		zap.Int64("deck_id", req.GetDeckId()),
+	)
+
+	return &pb.DeckGetResponse{
+		Success: true,
+		Info: &pb.DeckInfo{
+			Id:             deck.ID,
+			Name:           deck.Name,
+			Format:         deck.Format,
+			Description:    deck.Description,
+			MainDeckCount:  int32(deck.MainDeckCount()),
+			SideboardCount: int32(deck.SideboardCount()),
+			CreatedAt:      deck.CreatedAt.Unix(),
+			UpdatedAt:      deck.UpdatedAt.Unix(),
+		},
+		Deck: &pb.DeckCardLists{
+			MainDeck:  append([]string(nil), deck.MainDeck...),
+			Sideboard: append([]string(nil), deck.Sideboard...),
+		},
 	}, nil
 }

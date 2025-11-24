@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBoseijuWhoEndures creates a Boseiju Who Endures
-//  - LAND
+//   - LAND
 func NewBoseijuWhoEndures(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Boseiju Who Endures")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewBoseijuWhoEndures(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

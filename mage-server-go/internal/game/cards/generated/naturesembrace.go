@@ -38,7 +38,7 @@ func NewNaturesEmbrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new SimpleManaAbility( Zone.BATTLEFIELD, new AddManaOfAnyColorEffect(2), new TapSourceCost() ), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

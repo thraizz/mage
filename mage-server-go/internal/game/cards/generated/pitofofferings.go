@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPitOfOfferings creates a Pit Of Offerings
-//  - LAND
+//   - LAND
 func NewPitOfOfferings(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Pit Of Offerings")
 	card.ManaCost = ""

@@ -32,7 +32,7 @@ func NewBloodtracker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(new CountersSourceCount(CounterType.P1P1))).
+		// TODO: DrawCardSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

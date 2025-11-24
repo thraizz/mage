@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHengeOfRamos creates a Henge Of Ramos
-//  - LAND
+//   - LAND
 func NewHengeOfRamos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Henge Of Ramos")
 	card.ManaCost = ""

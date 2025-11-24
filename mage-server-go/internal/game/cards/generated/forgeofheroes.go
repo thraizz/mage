@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewForgeOfHeroes creates a Forge Of Heroes
-//  - LAND
+//   - LAND
 func NewForgeOfHeroes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Forge Of Heroes")
 	card.ManaCost = ""

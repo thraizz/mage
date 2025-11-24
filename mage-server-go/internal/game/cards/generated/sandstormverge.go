@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSandstormVerge creates a Sandstorm Verge
-//  - LAND
+//   - LAND
 func NewSandstormVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sandstorm Verge")
 	card.ManaCost = ""

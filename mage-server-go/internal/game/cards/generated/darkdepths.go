@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewDarkDepths creates a Dark Depths
-//  - LAND
+//   - LAND
 func NewDarkDepths(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dark Depths")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGriffinCanyon creates a Griffin Canyon
-//  - LAND
+//   - LAND
 func NewGriffinCanyon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Griffin Canyon")
 	card.ManaCost = ""

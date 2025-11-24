@@ -32,7 +32,7 @@ func NewDuskUrchins(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(new CountersSourceCount(CounterType.M1M1))).
+		// TODO: DrawCardSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

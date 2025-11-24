@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSeafloorDebris creates a Seafloor Debris
-//  - LAND
+//   - LAND
 func NewSeafloorDebris(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seafloor Debris")
 	card.ManaCost = ""

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewArcaneLighthouse creates a Arcane Lighthouse
-//  - LAND
+//   - LAND
+//
 // Hexproof
 func NewArcaneLighthouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Arcane Lighthouse")

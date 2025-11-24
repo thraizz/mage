@@ -161,13 +161,44 @@ type BoostEffect struct {
 	Duration  Duration
 }
 
+// Duration specifies how long a continuous effect lasts
+// Java: mage.constants.Duration
+// MTG Rules: 611 (Continuous Effects)
 type Duration int
 
 const (
+	// DurationUntilEndOfTurn lasts until end of turn (most common)
 	DurationUntilEndOfTurn Duration = iota
+
+	// DurationPermanent lasts forever (until removed)
 	DurationPermanent
+
+	// DurationWhileOnBattlefield lasts while the source is on battlefield
 	DurationWhileOnBattlefield
+
+	// DurationUntilEndOfCombat lasts until end of combat
 	DurationUntilEndOfCombat
+
+	// DurationEndOfTurn alias for DurationUntilEndOfTurn
+	DurationEndOfTurn = DurationUntilEndOfTurn
+
+	// DurationEndOfCombat alias for DurationUntilEndOfCombat
+	DurationEndOfCombat = DurationUntilEndOfCombat
+
+	// DurationUntilYourNextTurn lasts until your next turn
+	DurationUntilYourNextTurn Duration = iota + 3
+
+	// DurationWhileInGraveyard lasts while in graveyard
+	DurationWhileInGraveyard
+
+	// DurationWhileInHand lasts while in hand
+	DurationWhileInHand
+
+	// DurationWhileInExile lasts while in exile
+	DurationWhileInExile
+
+	// DurationCustom for special durations
+	DurationCustom
 )
 
 func NewBoostEffect(power, toughness int) *BoostEffect {

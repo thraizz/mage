@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRivendell creates a Rivendell
-//  - LAND
+//   - LAND
 func NewRivendell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rivendell")
 	card.ManaCost = ""

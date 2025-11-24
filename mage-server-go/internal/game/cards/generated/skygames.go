@@ -33,7 +33,7 @@ func NewSkygames(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainAbility, AttachmentType.AURA{T}: Target creature gains flying until end of turn. Activate only as a sorcery.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

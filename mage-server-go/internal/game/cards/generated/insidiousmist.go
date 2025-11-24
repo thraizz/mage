@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewInsidiousMist creates a Insidious Mist
-//  - CREATURE
+//   - CREATURE
+//
 // Hexproof, Indestructible
 func NewInsidiousMist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Insidious Mist")

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTombOfUrami creates a Tomb Of Urami
-//  - LAND
+//   - LAND
 func NewTombOfUrami(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tomb Of Urami")
 	card.ManaCost = ""

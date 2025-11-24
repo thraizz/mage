@@ -31,7 +31,7 @@ func NewQuiGonJinn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility")).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

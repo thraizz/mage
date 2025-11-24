@@ -30,7 +30,7 @@ func NewRakkaMar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(new ElementalTokenWithHaste())).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

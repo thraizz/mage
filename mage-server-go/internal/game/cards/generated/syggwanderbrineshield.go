@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSyggWanderbrineShield creates a Sygg Wanderbrine Shield
-//  - CREATURE
+//   - CREATURE
 func NewSyggWanderbrineShield(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sygg Wanderbrine Shield")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewSyggWanderbrineShield(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new ProtectionAbility(filter))).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

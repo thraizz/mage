@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheTrueScriptures creates a The True Scriptures
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewTheTrueScriptures(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The True Scriptures")
 	card.ManaCost = ""

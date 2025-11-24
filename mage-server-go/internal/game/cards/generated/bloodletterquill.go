@@ -25,7 +25,7 @@ func NewBloodletterQuill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewLoseLifeEffect(new CountersSourceCount(CounterType.BLOOD))).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

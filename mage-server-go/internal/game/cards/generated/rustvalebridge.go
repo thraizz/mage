@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewRustvaleBridge creates a Rustvale Bridge
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
+//
 // Indestructible
 func NewRustvaleBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rustvale Bridge")

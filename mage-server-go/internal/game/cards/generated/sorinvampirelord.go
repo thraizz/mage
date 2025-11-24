@@ -38,7 +38,7 @@ func NewSorinVampireLord(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filter)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

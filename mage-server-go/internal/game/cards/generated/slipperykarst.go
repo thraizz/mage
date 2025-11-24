@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSlipperyKarst creates a Slippery Karst
-//  - LAND
+//   - LAND
 func NewSlipperyKarst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Slippery Karst")
 	card.ManaCost = ""

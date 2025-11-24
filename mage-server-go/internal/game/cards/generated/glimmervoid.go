@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGlimmervoid creates a Glimmervoid
-//  - LAND
+//   - LAND
 func NewGlimmervoid(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glimmervoid")
 	card.ManaCost = ""

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewPlatedKilnbeast creates a Plated Kilnbeast
-//  - CREATURE
+//   - CREATURE
+//
 // Menace
 func NewPlatedKilnbeast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Plated Kilnbeast")

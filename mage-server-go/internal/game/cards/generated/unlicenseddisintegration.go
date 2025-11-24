@@ -21,7 +21,7 @@ func NewUnlicensedDisintegration(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

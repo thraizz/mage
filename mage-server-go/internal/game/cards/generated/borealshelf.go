@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBorealShelf creates a Boreal Shelf
-//  - LAND
+//   - LAND
 func NewBorealShelf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Boreal Shelf")
 	card.ManaCost = ""

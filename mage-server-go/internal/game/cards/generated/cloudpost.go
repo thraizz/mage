@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCloudpost creates a Cloudpost
-//  - LAND
+//   - LAND
 func NewCloudpost(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cloudpost")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewScavengerGrounds creates a Scavenger Grounds
-//  - LAND
+//   - LAND
 func NewScavengerGrounds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Scavenger Grounds")
 	card.ManaCost = ""

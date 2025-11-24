@@ -38,8 +38,8 @@ func NewGauntletsOfLight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new SimpleActivatedAbility( new UntapSourceEffect().setText("Untap creature"), new ManaCostsImpl<>("{2}{W}") ), AttachmentType.AURA)).
+		// TODO: UntapSourceEffect with complex parameters
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err

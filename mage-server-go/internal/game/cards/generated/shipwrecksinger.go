@@ -28,7 +28,7 @@ func NewShipwreckSinger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewBoostEffect(-1,-1, false)).
+		AddEffect(abilities.NewBoostEffect(-1, -1, false)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHomicidalBrute creates a Homicidal Brute
-//  - CREATURE
+//   - CREATURE
 func NewHomicidalBrute(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Homicidal Brute")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewHomicidalBrute(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -235,33 +235,52 @@ const (
 // GainAbilityAttachedEffect grants an ability to the attached permanent
 // Java: mage.abilities.effects.common.continuous.GainAbilityAttachedEffect
 type GainAbilityAttachedEffect struct {
-	abilityID      string         // The ability being granted (e.g., "TrampleAbility")
+	baseContinuousEffect
+	ability        Ability        // The ability being granted (can be complex)
 	attachmentType AttachmentType // Whether this is from an Aura or Equipment
+	description    string         // Custom description text
 }
 
 // NewGainAbilityAttachedEffect creates a new gain ability attached effect
-func NewGainAbilityAttachedEffect(abilityID string, attachmentType AttachmentType) *GainAbilityAttachedEffect {
+// ability: The ability to grant (can be keyword, activated, or any other ability)
+// attachmentType: Whether this is from an Aura or Equipment
+// duration: How long the effect lasts
+// description: Optional custom description (if empty, auto-generated)
+func NewGainAbilityAttachedEffect(
+	ability Ability,
+	attachmentType AttachmentType,
+	duration Duration,
+	description string,
+) *GainAbilityAttachedEffect {
 	return &GainAbilityAttachedEffect{
-		abilityID:      abilityID,
+		baseContinuousEffect: baseContinuousEffect{
+			layer:    LayerAbilityAddingRemoving,
+			duration: duration,
+		},
+		ability:        ability,
 		attachmentType: attachmentType,
+		description:    description,
 	}
 }
 
 // Apply applies the effect
 func (e *GainAbilityAttachedEffect) Apply(ctx context.Context, game GameContext, source uuid.UUID, targets []uuid.UUID) error {
 	// TODO: Implement gain ability attached logic
-	// This requires finding the attached permanent and granting the ability
+	// This requires:
+	// 1. Finding what the source is attached to
+	// 2. Granting the ability to that permanent
+	// 3. Managing the lifetime of the granted ability based on duration
 	return fmt.Errorf("gain ability attached effect not yet implemented")
 }
 
 // GetDescription returns a description
 func (e *GainAbilityAttachedEffect) GetDescription() string {
-	// Convert ability ID to readable text
-	abilityName := e.abilityID
-	if len(abilityName) > 7 && abilityName[len(abilityName)-7:] == "Ability" {
-		abilityName = abilityName[:len(abilityName)-7]
+	// Use custom description if provided
+	if e.description != "" {
+		return e.description
 	}
 
+	// Generate description from attachment type and ability
 	target := "attached"
 	if e.attachmentType == AttachmentTypeAura {
 		target = "enchanted"
@@ -269,5 +288,6 @@ func (e *GainAbilityAttachedEffect) GetDescription() string {
 		target = "equipped"
 	}
 
-	return fmt.Sprintf("%s creature has %s", target, abilityName)
+	abilityDesc := e.ability.String()
+	return fmt.Sprintf("%s creature has \"%s\"", target, abilityDesc)
 }

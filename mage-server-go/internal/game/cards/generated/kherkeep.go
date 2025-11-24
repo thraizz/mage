@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewKherKeep creates a Kher Keep
-//  - LAND
+//   - LAND
 func NewKherKeep(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kher Keep")
 	card.ManaCost = ""

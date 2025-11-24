@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFieryIslet creates a Fiery Islet
-//  - LAND
+//   - LAND
 func NewFieryIslet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fiery Islet")
 	card.ManaCost = ""

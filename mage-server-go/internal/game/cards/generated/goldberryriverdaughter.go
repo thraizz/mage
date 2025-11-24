@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewGoldberryRiverDaughter creates a Goldberry River Daughter
-//  - 
+//
+//	-
 func NewGoldberryRiverDaughter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Goldberry River Daughter")
 	card.ManaCost = ""

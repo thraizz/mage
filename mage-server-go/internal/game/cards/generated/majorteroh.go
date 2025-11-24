@@ -29,7 +29,7 @@ func NewMajorTeroh(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewExileAllEffect(abilities.NewAnyTargetFilter())).
+		// TODO: ExileAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

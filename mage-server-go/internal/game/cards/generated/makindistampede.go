@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMakindiStampede creates a Makindi Stampede
-//  - SORCERY
+//   - SORCERY
 func NewMakindiStampede(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Makindi Stampede")
 	card.ManaCost = ""

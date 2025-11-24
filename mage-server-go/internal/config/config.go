@@ -17,6 +17,7 @@ type Config struct {
 	Logging    LoggingConfig    `mapstructure:"logging"`
 	Cache      CacheConfig      `mapstructure:"cache"`
 	Plugins    PluginConfig     `mapstructure:"plugins"`
+	Health     HealthConfig     `mapstructure:"health"`
 	Metrics    MetricsConfig    `mapstructure:"metrics"`
 }
 
@@ -134,6 +135,12 @@ type PluginConfig struct {
 	PlayerTypes     []string `mapstructure:"player_types"`
 }
 
+// HealthConfig contains health check settings
+type HealthConfig struct {
+	Enabled bool   `mapstructure:"enabled"`
+	Address string `mapstructure:"address"`
+}
+
 // MetricsConfig contains metrics settings
 type MetricsConfig struct {
 	Enabled bool   `mapstructure:"enabled"`
@@ -227,6 +234,10 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("cache.cards.enabled", true)
 	v.SetDefault("cache.cards.ttl", "24h")
 	v.SetDefault("cache.cards.max_size", 100000)
+
+	// Health defaults
+	v.SetDefault("health.enabled", true)
+	v.SetDefault("health.address", "0.0.0.0:8080")
 
 	// Metrics defaults
 	v.SetDefault("metrics.enabled", true)

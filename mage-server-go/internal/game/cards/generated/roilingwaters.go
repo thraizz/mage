@@ -22,7 +22,7 @@ func NewRoilingWaters(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(2)).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(2)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

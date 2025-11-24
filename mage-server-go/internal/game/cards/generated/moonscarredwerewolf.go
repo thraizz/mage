@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewMoonscarredWerewolf creates a Moonscarred Werewolf
-//  - CREATURE
+//   - CREATURE
+//
 // Vigilance
 func NewMoonscarredWerewolf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Moonscarred Werewolf")

@@ -25,8 +25,8 @@ func NewScuttlingSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewGrantAbilityEffect(new SimpleActivatedAbility( new UntapSourceEffect().setText("untap creature"), ))).
+		// TODO: UntapSourceEffect with complex parameters
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

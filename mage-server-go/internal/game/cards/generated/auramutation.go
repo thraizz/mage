@@ -26,7 +26,7 @@ func NewAuraMutation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0, TargetManaValue.instance)).
 		Build()
 	if err != nil {

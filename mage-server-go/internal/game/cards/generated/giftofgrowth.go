@@ -21,7 +21,7 @@ func NewGiftOfGrowth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(4, 4)).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddTarget(abilities.NewCreatureTargetFilter()).

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSelflessGlyphweaver creates a Selfless Glyphweaver
-//  - CREATURE
+//   - CREATURE
 func NewSelflessGlyphweaver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Selfless Glyphweaver")
 	card.ManaCost = ""

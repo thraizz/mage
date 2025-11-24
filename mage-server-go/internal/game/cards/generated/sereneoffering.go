@@ -22,7 +22,7 @@ func NewSereneOffering(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(TargetManaValue.instance)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(TargetManaValue.instance)).
 		Build()
 	if err != nil {

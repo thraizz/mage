@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOverflowingBasin creates a Overflowing Basin
-//  - LAND
+//   - LAND
 func NewOverflowingBasin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Overflowing Basin")
 	card.ManaCost = ""

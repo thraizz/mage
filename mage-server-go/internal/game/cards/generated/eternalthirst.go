@@ -27,7 +27,7 @@ func NewEternalThirst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("LifelinkAbility", abilities.AttachmentTypeAura)).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new DiesCreatureTriggeredAbility(new AddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1)), false, ), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		Build()
 	if err != nil {

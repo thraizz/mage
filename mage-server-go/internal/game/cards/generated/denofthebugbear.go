@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDenOfTheBugbear creates a Den Of The Bugbear
-//  - LAND
+//   - LAND
 func NewDenOfTheBugbear(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Den Of The Bugbear")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewDenOfTheBugbear(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "R")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -23,7 +23,7 @@ func NewTemurCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

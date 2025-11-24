@@ -21,8 +21,8 @@ func NewBoundDetermined(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileSourceEffect()).
-		AddEffect(abilities.NewExileSourceEffect()).
+		// TODO: ExileSourceEffect with complex parameters
+		// TODO: ExileSourceEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {

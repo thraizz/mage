@@ -28,7 +28,7 @@ func NewHeroesPodium(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	//   - AddTapCost()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(HeroesPodiumValue.instance, HeroesPodiumValue.instance, filter, false)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

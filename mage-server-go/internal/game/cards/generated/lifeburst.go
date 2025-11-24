@@ -21,9 +21,9 @@ func NewLifeBurst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(new MultipliedValue(, 4))).
+		// TODO: GainLifeTargetEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(4)).
-		AddEffect(abilities.NewGainLifeEffect(new MultipliedValue(, 4))).
+		// TODO: GainLifeTargetEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

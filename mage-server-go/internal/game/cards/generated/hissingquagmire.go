@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewHissingQuagmire creates a Hissing Quagmire
-//  - LAND
+//   - LAND
+//
 // Deathtouch
 func NewHissingQuagmire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hissing Quagmire")

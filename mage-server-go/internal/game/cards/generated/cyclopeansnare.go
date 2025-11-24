@@ -23,8 +23,8 @@ func NewCyclopeanSnare(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddTapCost().
-		AddEffect(abilities.NewTapEffect()).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: TapTargetEffect with complex parameters
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

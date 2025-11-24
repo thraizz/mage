@@ -14,7 +14,7 @@ func init() {
 }
 
 // NewRevitalizingRepast creates a Revitalizing Repast
-//  - INSTANT
+//   - INSTANT
 func NewRevitalizingRepast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Revitalizing Repast")
 	card.ManaCost = ""

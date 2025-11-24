@@ -31,7 +31,7 @@ func NewKarrthusTyrantOfJund(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlAllEffect(abilities.DurationCustom, abilities.NewAnyTargetFilter())).
+		// TODO: GainControlAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

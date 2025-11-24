@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWanderingArchaic creates a Wandering Archaic
-//  - CREATURE
+//   - CREATURE
 func NewWanderingArchaic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wandering Archaic")
 	card.ManaCost = ""

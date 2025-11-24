@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUnderdarkRift creates a Underdark Rift
-//  - LAND
+//   - LAND
 func NewUnderdarkRift(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Underdark Rift")
 	card.ManaCost = ""

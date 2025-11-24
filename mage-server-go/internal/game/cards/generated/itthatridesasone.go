@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewItThatRidesAsOne creates a It That Rides As One
-//  - CREATURE
+//   - CREATURE
+//
 // FirstStrike, Trample, Lifelink
 func NewItThatRidesAsOne(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "It That Rides As One")

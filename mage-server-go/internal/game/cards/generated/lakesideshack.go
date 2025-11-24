@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLakesideShack creates a Lakeside Shack
-//  - LAND
+//   - LAND
 func NewLakesideShack(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lakeside Shack")
 	card.ManaCost = ""

@@ -30,7 +30,7 @@ func NewJiwariTheEarthAflame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance, filter)).
+		// TODO: DamageAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

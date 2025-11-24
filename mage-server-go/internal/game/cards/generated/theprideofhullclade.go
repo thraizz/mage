@@ -30,7 +30,7 @@ func NewThePrideOfHullClade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
-		AddEffect(abilities.NewGrantAbilityEffect(new DealsCombatDamageToAPlayerTriggeredAbility( new DrawCardSourceControllerEffect (SourcePermanentToughnessValue.instance).setText("draw cards equal to its toughness"), false))).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

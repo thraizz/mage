@@ -23,7 +23,7 @@ func NewSlateOfAncestry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{4}").
 		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect()).
+		// TODO: DrawCardSourceControllerEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

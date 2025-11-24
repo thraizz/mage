@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewNezumiRoadCaptain creates a Nezumi Road Captain
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
 func NewNezumiRoadCaptain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nezumi Road Captain")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewNezumiRoadCaptain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new MenaceAbility(true), filter)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

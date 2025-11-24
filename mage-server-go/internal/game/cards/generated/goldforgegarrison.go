@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGoldForgeGarrison creates a Gold Forge Garrison
-//  - LAND
+//   - LAND
 func NewGoldForgeGarrison(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gold Forge Garrison")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMaelstromOfTheSpiritDragon creates a Maelstrom Of The Spirit Dragon
-//  - LAND
+//   - LAND
 func NewMaelstromOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Maelstrom Of The Spirit Dragon")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewMaelstromOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*ga
 		AddManaCost("{4}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

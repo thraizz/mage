@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCabalPit creates a Cabal Pit
-//  - LAND
+//   - LAND
 func NewCabalPit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cabal Pit")
 	card.ManaCost = ""

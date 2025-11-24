@@ -29,7 +29,7 @@ func NewLavaspurBoots(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(1, 0)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("HasteAbility", abilities.AttachmentTypeEquipment)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new WardAbility(), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

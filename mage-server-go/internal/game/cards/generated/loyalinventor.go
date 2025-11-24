@@ -27,8 +27,8 @@ func NewLoyalInventor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewArtifactTargetFilter()), true)).
-		AddEffect(abilities.NewSearchLibraryPutOnTopEffect(abilities.NewTargetRequirement(0, 1, abilities.NewArtifactTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
+		// TODO: SearchLibraryPutOnLibraryEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

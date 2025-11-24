@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJaceTelepathUnbound creates a Jace Telepath Unbound
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewJaceTelepathUnbound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jace Telepath Unbound")
 	card.ManaCost = ""

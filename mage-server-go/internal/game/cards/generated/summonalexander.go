@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewSummonAlexander creates a Summon Alexander
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Flying
 func NewSummonAlexander(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Summon Alexander")

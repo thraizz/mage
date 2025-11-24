@@ -26,7 +26,7 @@ func NewAdverseConditions(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	if err != nil {

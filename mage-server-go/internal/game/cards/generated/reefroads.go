@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewReefRoads creates a Reef Roads
-//  - LAND
+//   - LAND
 func NewReefRoads(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Reef Roads")
 	card.ManaCost = ""

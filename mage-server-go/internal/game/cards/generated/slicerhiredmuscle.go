@@ -12,7 +12,9 @@ func init() {
 }
 
 // NewSlicerHiredMuscle creates a Slicer Hired Muscle
-//  - 
+//
+//	-
+//
 // DoubleStrike, Haste
 func NewSlicerHiredMuscle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Slicer Hired Muscle")

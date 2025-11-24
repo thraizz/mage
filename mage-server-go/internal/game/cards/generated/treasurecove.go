@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTreasureCove creates a Treasure Cove
-//  - LAND
+//   - LAND
 func NewTreasureCove(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Treasure Cove")
 	card.ManaCost = ""

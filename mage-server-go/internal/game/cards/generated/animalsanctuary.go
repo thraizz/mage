@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewAnimalSanctuary creates a Animal Sanctuary
-//  - LAND
+//   - LAND
 func NewAnimalSanctuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Animal Sanctuary")
 	card.ManaCost = ""

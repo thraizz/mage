@@ -28,7 +28,7 @@ func NewRallyTheMonastery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

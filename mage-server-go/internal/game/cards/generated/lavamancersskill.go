@@ -42,7 +42,7 @@ func NewLavamancersSkill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		Build()
 	card.AddAbility(ability3)
 	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(pingAbility, AttachmentType.AURA{T}: This creature deals 1 damage to target creature.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

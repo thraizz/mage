@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewHanweirBattlements creates a Hanweir Battlements
-//  - LAND
+//   - LAND
 func NewHanweirBattlements(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hanweir Battlements")
 	card.ManaCost = ""

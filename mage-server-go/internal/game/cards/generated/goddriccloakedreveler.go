@@ -30,7 +30,7 @@ func NewGoddricCloakedReveler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(1, 0, filter, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

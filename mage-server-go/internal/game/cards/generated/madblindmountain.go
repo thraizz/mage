@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMadblindMountain creates a Madblind Mountain
-//  - LAND
+//   - LAND
 func NewMadblindMountain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Madblind Mountain")
 	card.ManaCost = ""

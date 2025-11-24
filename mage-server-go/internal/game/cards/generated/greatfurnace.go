@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGreatFurnace creates a Great Furnace
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
 func NewGreatFurnace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Great Furnace")
 	card.ManaCost = ""

@@ -31,7 +31,7 @@ func (s *mageServer) AdminGetUsers(ctx context.Context, req *pb.AdminGetUsersReq
 	userViews := make([]*pb.UserView, 0, len(users))
 	for _, user := range users {
 		// Get user stats for this user
-		stats, statsErr := s.statsRepo.GetByUsername(ctx, user.Name)
+		stats, statsErr := s.statsRepo.GetByUserName(ctx, user.Name)
 		var userStats *pb.UserStatsView
 		if statsErr == nil && stats != nil {
 			userStats = &pb.UserStatsView{
@@ -284,9 +284,10 @@ func (s *mageServer) AdminTableRemove(ctx context.Context, req *pb.AdminTableRem
 		zap.String("admin_session", req.GetSessionId()),
 	)
 
-	// Broadcast table list update to room
+	// TODO: Broadcast table list update to room
+	// This requires implementing websocket broadcast functionality
 	if room, ok := s.roomMgr.GetRoom(s.roomMgr.GetMainRoomID()); ok {
-		room.BroadcastTableUpdate()
+		_ = room // TODO: room.BroadcastTableUpdate() when websocket is integrated
 	}
 
 	return &pb.AdminTableRemoveResponse{
@@ -308,25 +309,27 @@ func (s *mageServer) AdminSendBroadcastMessage(ctx context.Context, req *pb.Admi
 		zap.String("admin_session", req.GetSessionId()),
 	)
 
-	// Send broadcast to all connected sessions
-	broadcastEvent := &pb.ServerEvent{
-		Event: &pb.ServerEvent_ServerMessage{
-			ServerMessage: &pb.ServerMessageEvent{
-				Message:  fmt.Sprintf("[SERVER ANNOUNCEMENT] %s", message),
-				IsSystem: true,
-			},
-		},
-	}
+	// TODO: Send broadcast to all connected sessions
+	// This requires implementing websocket event broadcasting
+	// broadcastEvent := &pb.ServerEvent{
+	// 	Event: &pb.ServerEvent_ServerMessage{
+	// 		ServerMessage: &pb.ServerMessageEvent{
+	// 			Message:  fmt.Sprintf("[SERVER ANNOUNCEMENT] %s", message),
+	// 			IsSystem: true,
+	// 		},
+	// 	},
+	// }
 
-	// Get all active sessions and send the broadcast
+	// Get all active sessions (for future websocket broadcast)
 	sessionIDs := s.sessionMgr.GetAllSessionIDs()
-	broadcastCount := 0
-	for _, sessionID := range sessionIDs {
-		if sess, ok := s.sessionMgr.GetSession(sessionID); ok {
-			sess.SendEvent(broadcastEvent)
-			broadcastCount++
-		}
-	}
+	broadcastCount := len(sessionIDs)
+	// TODO: Implement when websocket broadcasting is ready
+	// for _, sessionID := range sessionIDs {
+	// 	if sess, ok := s.sessionMgr.GetSession(sessionID); ok {
+	// 		sess.SendEvent(broadcastEvent)
+	// 		broadcastCount++
+	// 	}
+	// }
 
 	s.logger.Info("broadcast message sent",
 		zap.Int("recipient_count", broadcastCount),

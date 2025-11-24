@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewWildbloodPack creates a Wildblood Pack
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewWildbloodPack(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wildblood Pack")

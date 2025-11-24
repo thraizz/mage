@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDesertOfTheMindful creates a Desert Of The Mindful
-//  - LAND
+//   - LAND
 func NewDesertOfTheMindful(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Desert Of The Mindful")
 	card.ManaCost = ""

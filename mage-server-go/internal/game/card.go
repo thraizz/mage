@@ -50,7 +50,7 @@ type Card struct {
 	DamageSources map[uuid.UUID]int // Damage by source
 
 	// Abilities (will be populated by card implementations)
-	Abilities []interface{} // TODO: Define proper ability types
+	Abilities []interface{} // Can store abilities.Ability or other ability types
 }
 
 // Zone represents where a card is located
@@ -129,6 +129,16 @@ func (c *Card) IsBasic() bool {
 // AddAbility adds an ability to this card
 func (c *Card) AddAbility(ability interface{}) {
 	c.Abilities = append(c.Abilities, ability)
+}
+
+// GetAbilities returns all abilities of this card
+func (c *Card) GetAbilities() []interface{} {
+	return c.Abilities
+}
+
+// GetAbilityCount returns the number of abilities on this card
+func (c *Card) GetAbilityCount() int {
+	return len(c.Abilities)
 }
 
 // ToInternal converts this Card to the internal engine format

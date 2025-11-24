@@ -21,7 +21,7 @@ func NewRiseOfTheEldrazi(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(4)).
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		AddTarget(abilities.NewPlayerTargetFilter()).

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewEtchingOfKumano creates a Etching Of Kumano
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Haste
 func NewEtchingOfKumano(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Etching Of Kumano")

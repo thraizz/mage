@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWirewoodLodge creates a Wirewood Lodge
-//  - LAND
+//   - LAND
 func NewWirewoodLodge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wirewood Lodge")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewWirewoodLodge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

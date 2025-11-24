@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSunscorchedDesert creates a Sunscorched Desert
-//  - LAND
+//   - LAND
 func NewSunscorchedDesert(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sunscorched Desert")
 	card.ManaCost = ""

@@ -29,7 +29,7 @@ func NewRidersOfRohan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0,2)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err

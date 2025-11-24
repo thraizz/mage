@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHighMarket creates a High Market
-//  - LAND
+//   - LAND
 func NewHighMarket(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "High Market")
 	card.ManaCost = ""

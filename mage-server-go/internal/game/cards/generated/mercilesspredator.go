@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMercilessPredator creates a Merciless Predator
-//  - CREATURE
+//   - CREATURE
 func NewMercilessPredator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Merciless Predator")
 	card.ManaCost = ""

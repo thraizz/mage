@@ -30,7 +30,7 @@ func NewRealitySmasher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect(new DiscardCardCost())).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewLeechingLurker creates a Leeching Lurker
-//  - CREATURE
+//   - CREATURE
+//
 // Lifelink
 func NewLeechingLurker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Leeching Lurker")

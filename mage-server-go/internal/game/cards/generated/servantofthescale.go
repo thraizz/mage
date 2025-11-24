@@ -25,7 +25,7 @@ func NewServantOfTheScale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(CounterType.P1P1.createInstance(amount))).
+		// TODO: AddCountersTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

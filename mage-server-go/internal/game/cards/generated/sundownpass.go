@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSundownPass creates a Sundown Pass
-//  - LAND
+//   - LAND
 func NewSundownPass(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sundown Pass")
 	card.ManaCost = ""

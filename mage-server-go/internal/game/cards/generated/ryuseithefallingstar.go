@@ -28,7 +28,7 @@ func NewRyuseiTheFallingStar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(5, filter)).
+		// TODO: DamageAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

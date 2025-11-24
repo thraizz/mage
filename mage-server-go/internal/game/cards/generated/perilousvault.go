@@ -23,7 +23,7 @@ func NewPerilousVault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{5}").
 		AddTapCost().
-		AddEffect(abilities.NewExileAllEffect(abilities.NewPermanentTargetFilter())).
+		// TODO: ExileAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

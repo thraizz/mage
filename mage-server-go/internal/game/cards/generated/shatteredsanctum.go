@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShatteredSanctum creates a Shattered Sanctum
-//  - LAND
+//   - LAND
 func NewShatteredSanctum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shattered Sanctum")
 	card.ManaCost = ""

@@ -29,7 +29,7 @@ func NewStormsurgeKraken(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(2)).
-		AddEffect(abilities.NewGrantAbilityEffect(new BecomesBlockedSourceTriggeredAbility( new DrawCardSourceControllerEffect(2), true ))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

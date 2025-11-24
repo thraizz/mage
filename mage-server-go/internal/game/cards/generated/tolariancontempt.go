@@ -22,7 +22,7 @@ func NewTolarianContempt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersAllEffect(counters.NewCounter("rejection", 1), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

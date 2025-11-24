@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBaseCamp creates a Base Camp
-//  - LAND
+//   - LAND
 func NewBaseCamp(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Base Camp")
 	card.ManaCost = ""

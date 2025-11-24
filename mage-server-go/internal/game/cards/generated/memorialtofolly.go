@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMemorialToFolly creates a Memorial To Folly
-//  - LAND
+//   - LAND
 func NewMemorialToFolly(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Memorial To Folly")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewMemorialToFolly(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

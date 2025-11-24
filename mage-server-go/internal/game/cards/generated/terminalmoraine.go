@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTerminalMoraine creates a Terminal Moraine
-//  - LAND
+//   - LAND
 func NewTerminalMoraine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Terminal Moraine")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewTerminalMoraine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

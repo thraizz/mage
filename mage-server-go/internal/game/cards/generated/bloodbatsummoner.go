@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewBloodbatSummoner creates a Bloodbat Summoner
-//  - CREATURE
+//   - CREATURE
+//
 // Flying, Flying, Haste
 func NewBloodbatSummoner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bloodbat Summoner")

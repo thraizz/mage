@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEvolvingWilds creates a Evolving Wilds
-//  - LAND
+//   - LAND
 func NewEvolvingWilds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Evolving Wilds")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewEvolvingWilds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

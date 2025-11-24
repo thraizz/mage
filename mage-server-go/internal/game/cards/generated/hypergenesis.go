@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHypergenesis creates a Hypergenesis
-//  - SORCERY
+//   - SORCERY
 func NewHypergenesis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hypergenesis")
 	card.ManaCost = ""

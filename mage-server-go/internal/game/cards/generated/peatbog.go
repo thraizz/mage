@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPeatBog creates a Peat Bog
-//  - LAND
+//   - LAND
 func NewPeatBog(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Peat Bog")
 	card.ManaCost = ""

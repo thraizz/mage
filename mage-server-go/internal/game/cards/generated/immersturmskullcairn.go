@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewImmersturmSkullcairn creates a Immersturm Skullcairn
-//  - LAND
+//   - LAND
 func NewImmersturmSkullcairn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Immersturm Skullcairn")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewPestilentCauldron creates a Pestilent Cauldron
-//  - ARTIFACT
+//   - ARTIFACT
 func NewPestilentCauldron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Pestilent Cauldron")
 	card.ManaCost = ""
@@ -22,7 +22,7 @@ func NewPestilentCauldron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func NewPestilentCauldron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{4}").
 		AddTapCost().
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability3)

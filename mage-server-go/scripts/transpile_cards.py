@@ -1285,12 +1285,15 @@ func init() {{
             for token_name, var_name in token_vars.items():
                 params_clean = params_clean.replace(f'token.GetToken("{token_name}")', var_name)
 
-            # Check if params are malformed (empty, double parens, etc)
+            # Check if params are malformed (empty, double parens, Java constructors, etc)
             # If so, use TODO comment instead of generating broken code
-            if (re.search(r'\(\s*\)', params_clean) or  # Empty params
-                re.search(r'\{[^}]*\}', params_clean) or  # Unescaped braces
-                re.search(r'/\*.*?\*/', params_clean) or  # Contains TODO marker
-                params_clean.strip() == ''):  # Completely empty
+            if (re.search(r'\(\s*\)', params_clean) or          # Empty params
+                re.search(r'\{[^}]*\}', params_clean) or        # Unescaped braces
+                re.search(r'/\*.*?\*/', params_clean) or        # Contains TODO marker
+                re.search(r'\bnew\s+[A-Z]', params_clean) or    # Java 'new' keyword (unconverted constructor)
+                re.search(r'filter\b', params_clean) or         # Undefined filter variable
+                re.search(r'CounterType\.', params_clean) or    # Java enum reference
+                params_clean.strip() == ''):                     # Completely empty
                 # Generate TODO instead of broken code
                 lines.append(f'\t\t// TODO: {java_effect_class} with complex parameters')
             else:
@@ -1376,12 +1379,15 @@ func init() {{
             for token_name, var_name in token_vars.items():
                 params_clean = params_clean.replace(f'token.GetToken("{token_name}")', var_name)
 
-            # Check if params are malformed (empty, double parens, etc)
+            # Check if params are malformed (empty, double parens, Java constructors, etc)
             # If so, use TODO comment instead of generating broken code
-            if (re.search(r'\(\s*\)', params_clean) or  # Empty params
-                re.search(r'\{[^}]*\}', params_clean) or  # Unescaped braces
-                re.search(r'/\*.*?\*/', params_clean) or  # Contains TODO marker
-                params_clean.strip() == ''):  # Completely empty
+            if (re.search(r'\(\s*\)', params_clean) or          # Empty params
+                re.search(r'\{[^}]*\}', params_clean) or        # Unescaped braces
+                re.search(r'/\*.*?\*/', params_clean) or        # Contains TODO marker
+                re.search(r'\bnew\s+[A-Z]', params_clean) or    # Java 'new' keyword (unconverted constructor)
+                re.search(r'filter\b', params_clean) or         # Undefined filter variable
+                re.search(r'CounterType\.', params_clean) or    # Java enum reference
+                params_clean.strip() == ''):                     # Completely empty
                 # Generate TODO instead of broken code
                 lines.append(f'\t\t// TODO: {java_effect_class} with complex parameters')
             else:

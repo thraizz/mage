@@ -36,7 +36,7 @@ func NewTalonsOfFalkenrath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new SimpleActivatedAbility(new BoostSourceEffect(2, 0), new ManaCostsImpl<>("{1}{R}")), AttachmentType.AURA)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err

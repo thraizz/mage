@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUnknownShores creates a Unknown Shores
-//  - LAND
+//   - LAND
 func NewUnknownShores(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Unknown Shores")
 	card.ManaCost = ""

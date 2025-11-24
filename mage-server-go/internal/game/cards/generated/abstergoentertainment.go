@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAbstergoEntertainment creates a Abstergo Entertainment
-//  - LAND
+//   - LAND
 func NewAbstergoEntertainment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Abstergo Entertainment")
 	card.ManaCost = ""

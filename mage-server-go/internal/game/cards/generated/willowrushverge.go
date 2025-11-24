@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWillowrushVerge creates a Willowrush Verge
-//  - LAND
+//   - LAND
 func NewWillowrushVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Willowrush Verge")
 	card.ManaCost = ""

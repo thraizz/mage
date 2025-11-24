@@ -24,7 +24,7 @@ func NewDarthSidiousSithLord(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationCustom)).
 		AddEffect(abilities.NewDamageEffect(7)).
 		Build()

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGraspingDunes creates a Grasping Dunes
-//  - LAND
+//   - LAND
 func NewGraspingDunes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grasping Dunes")
 	card.ManaCost = ""

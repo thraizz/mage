@@ -26,7 +26,7 @@ func NewArmorSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(0, 1)).
-		AddEffect(abilities.NewGrantAbilityEffect(new SimpleActivatedAbility(new BoostSourceEffect(0, 1).setText(" creature gets +0/+1 until end of turn"), ), false)).
+		AddEffect(abilities.NewGrantAbilityEffect(false)).
 		Build()
 	if err != nil {
 		return nil, err

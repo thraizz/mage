@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDungeonDescent creates a Dungeon Descent
-//  - LAND
+//   - LAND
 func NewDungeonDescent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dungeon Descent")
 	card.ManaCost = ""

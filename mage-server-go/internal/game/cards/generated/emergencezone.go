@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEmergenceZone creates a Emergence Zone
-//  - LAND
+//   - LAND
 func NewEmergenceZone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Emergence Zone")
 	card.ManaCost = ""

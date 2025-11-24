@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewLordOfLineage creates a Lord Of Lineage
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewLordOfLineage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lord Of Lineage")
@@ -27,7 +28,7 @@ func NewLordOfLineage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 2, filter, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

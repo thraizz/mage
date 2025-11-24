@@ -22,7 +22,7 @@ func NewMeishinTheMindCage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(new SignInversionDynamicValue(CardsInControllerHandCount.ANY), StaticValue.get(0), false)).
+		AddEffect(abilities.NewBoostEffect(StaticValue.get(0), false)).
 		Build()
 	if err != nil {
 		return nil, err

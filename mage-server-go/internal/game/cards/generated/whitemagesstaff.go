@@ -29,7 +29,7 @@ func NewWhiteMagesStaff(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(1, 1)).
 		AddEffect(abilities.NewGainLifeEffect(1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new AttacksTriggeredAbility(new GainLifeEffect(1)), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

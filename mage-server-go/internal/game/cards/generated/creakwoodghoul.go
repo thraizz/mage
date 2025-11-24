@@ -24,7 +24,7 @@ func NewCreakwoodGhoul(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(1)).
 		Build()
 	card.AddAbility(ability0)

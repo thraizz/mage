@@ -29,7 +29,7 @@ func NewSirenStormtamer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

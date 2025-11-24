@@ -27,7 +27,7 @@ func NewStunSniper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

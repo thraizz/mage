@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGatesOfIstfell creates a Gates Of Istfell
-//  - LAND
+//   - LAND
 func NewGatesOfIstfell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gates Of Istfell")
 	card.ManaCost = ""

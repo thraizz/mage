@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewReflectionOfKikiJiki creates a Reflection Of Kiki Jiki
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
 func NewReflectionOfKikiJiki(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Reflection Of Kiki Jiki")
 	card.ManaCost = ""

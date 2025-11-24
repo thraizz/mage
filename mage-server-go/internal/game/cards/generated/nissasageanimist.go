@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewNissaSageAnimist creates a Nissa Sage Animist
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewNissaSageAnimist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nissa Sage Animist")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewNissaSageAnimist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFurnaceBlessedConqueror creates a Furnace Blessed Conqueror
-//  - CREATURE
+//   - CREATURE
 func NewFurnaceBlessedConqueror(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Furnace Blessed Conqueror")
 	card.ManaCost = ""

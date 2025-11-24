@@ -27,7 +27,7 @@ func NewFirecatBlitz(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0, xValue)).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

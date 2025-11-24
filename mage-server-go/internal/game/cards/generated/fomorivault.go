@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFomoriVault creates a Fomori Vault
-//  - LAND
+//   - LAND
 func NewFomoriVault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fomori Vault")
 	card.ManaCost = ""

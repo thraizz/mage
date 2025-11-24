@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPyreOfTheWorldTree creates a Pyre Of The World Tree
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewPyreOfTheWorldTree(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Pyre Of The World Tree")
 	card.ManaCost = ""

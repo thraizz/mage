@@ -28,7 +28,7 @@ func NewGerrardWeatherlightHero(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileSourceEffect()).
+		// TODO: ExileSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

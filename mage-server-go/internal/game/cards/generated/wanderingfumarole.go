@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWanderingFumarole creates a Wandering Fumarole
-//  - LAND
+//   - LAND
 func NewWanderingFumarole(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wandering Fumarole")
 	card.ManaCost = ""

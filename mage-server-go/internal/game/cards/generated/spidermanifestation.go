@@ -31,7 +31,7 @@ func NewSpiderManifestation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability2 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

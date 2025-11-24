@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHowltoothHollow creates a Howltooth Hollow
-//  - LAND
+//   - LAND
 func NewHowltoothHollow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Howltooth Hollow")
 	card.ManaCost = ""

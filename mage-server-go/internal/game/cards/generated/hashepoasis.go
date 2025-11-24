@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHashepOasis creates a Hashep Oasis
-//  - LAND
+//   - LAND
 func NewHashepOasis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hashep Oasis")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewHashepOasis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(3,3)).
+		AddEffect(abilities.NewBoostEffect(3, 3)).
 		Build()
 	if err != nil {
 		return nil, err

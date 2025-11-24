@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUndergrowthStadium creates a Undergrowth Stadium
-//  - LAND
+//   - LAND
 func NewUndergrowthStadium(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Undergrowth Stadium")
 	card.ManaCost = ""

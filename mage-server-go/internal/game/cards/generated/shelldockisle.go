@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShelldockIsle creates a Shelldock Isle
-//  - LAND
+//   - LAND
 func NewShelldockIsle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shelldock Isle")
 	card.ManaCost = ""

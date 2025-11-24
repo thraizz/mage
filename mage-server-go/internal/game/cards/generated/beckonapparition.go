@@ -26,7 +26,7 @@ func NewBeckonApparition(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1)).
 		Build()
 	if err != nil {

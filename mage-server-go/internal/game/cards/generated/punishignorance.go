@@ -23,7 +23,7 @@ func NewPunishIgnorance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(3)).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterTargetEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(3)).
 		Build()
 	if err != nil {

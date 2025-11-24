@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCrystalGrotto creates a Crystal Grotto
-//  - LAND
+//   - LAND
 func NewCrystalGrotto(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crystal Grotto")
 	card.ManaCost = ""

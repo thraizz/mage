@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewPrestonTheVanisher creates a Preston The Vanisher
-//  - 
+//
+//	-
 func NewPrestonTheVanisher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Preston The Vanisher")
 	card.ManaCost = ""
@@ -24,7 +25,7 @@ func NewPrestonTheVanisher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

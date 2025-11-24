@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMilaCraftyCompanion creates a Mila Crafty Companion
-//  - CREATURE
+//   - CREATURE
 func NewMilaCraftyCompanion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mila Crafty Companion")
 	card.ManaCost = ""

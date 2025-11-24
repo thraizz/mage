@@ -21,8 +21,8 @@ func NewActiveVolcano(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

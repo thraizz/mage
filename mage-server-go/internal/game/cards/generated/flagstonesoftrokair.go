@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFlagstonesOfTrokair creates a Flagstones Of Trokair
-//  - LAND
+//   - LAND
 func NewFlagstonesOfTrokair(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Flagstones Of Trokair")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewFlagstonesOfTrokair(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

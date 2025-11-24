@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewPhyrexianSkyflayer creates a Phyrexian Skyflayer
-//  - CREATURE
+//   - CREATURE
+//
 // Flying, Haste
 func NewPhyrexianSkyflayer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Phyrexian Skyflayer")

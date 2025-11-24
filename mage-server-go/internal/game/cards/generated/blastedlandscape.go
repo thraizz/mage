@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlastedLandscape creates a Blasted Landscape
-//  - LAND
+//   - LAND
 func NewBlastedLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blasted Landscape")
 	card.ManaCost = ""

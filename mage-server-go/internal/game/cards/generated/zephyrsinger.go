@@ -30,7 +30,7 @@ func NewZephyrSinger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersAllEffect(counters.NewCounter("flying", 1), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

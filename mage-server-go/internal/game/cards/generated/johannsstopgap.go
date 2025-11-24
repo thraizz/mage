@@ -21,7 +21,7 @@ func NewJohannsStopgap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVerdantCatacombs creates a Verdant Catacombs
-//  - LAND
+//   - LAND
 func NewVerdantCatacombs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Verdant Catacombs")
 	card.ManaCost = ""

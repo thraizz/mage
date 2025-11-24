@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewDennickPiousApparition creates a Dennick Pious Apparition
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewDennickPiousApparition(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dennick Pious Apparition")

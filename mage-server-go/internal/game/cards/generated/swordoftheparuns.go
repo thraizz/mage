@@ -22,14 +22,14 @@ func NewSwordOfTheParuns(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2,0, filterTapped)).
+		AddEffect(abilities.NewBoostEffect(2, 0, filterTapped)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(0,2, filterUntapped)).
+		AddEffect(abilities.NewBoostEffect(0, 2, filterUntapped)).
 		Build()
 	if err != nil {
 		return nil, err

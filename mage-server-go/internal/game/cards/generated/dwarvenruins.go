@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDwarvenRuins creates a Dwarven Ruins
-//  - LAND
+//   - LAND
 func NewDwarvenRuins(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dwarven Ruins")
 	card.ManaCost = ""

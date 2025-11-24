@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUnstableFrontier creates a Unstable Frontier
-//  - LAND
+//   - LAND
 func NewUnstableFrontier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Unstable Frontier")
 	card.ManaCost = ""

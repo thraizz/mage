@@ -38,15 +38,18 @@ type mageServer struct {
 	logger        *zap.Logger
 	serverVersion string
 
-	sessionMgr    session.Manager
-	userMgr       user.Manager
-	userRepo      *repository.UserRepository
-	roomMgr       *room.Manager
-	chatMgr       *chat.Manager
-	tableMgr      *table.Manager
-	gameMgr       *game.Manager
-	tournamentMgr *tournament.Manager
-	draftMgr      *draft.Manager
+	sessionMgr       session.Manager
+	userMgr          user.Manager
+	userRepo         *repository.UserRepository
+	statsRepo        *repository.StatsRepository
+	deckRepo         *repository.DeckRepository
+	matchHistoryRepo *repository.MatchHistoryRepository
+	roomMgr          *room.Manager
+	chatMgr          *chat.Manager
+	tableMgr         *table.Manager
+	gameMgr          *game.Manager
+	tournamentMgr    *tournament.Manager
+	draftMgr         *draft.Manager
 
 	tokenStore *auth.TokenStore
 	mailClient mail.Client
@@ -69,6 +72,9 @@ func NewMageServer(
 	sessionMgr session.Manager,
 	userMgr user.Manager,
 	userRepo *repository.UserRepository,
+	statsRepo *repository.StatsRepository,
+	deckRepo *repository.DeckRepository,
+	matchHistoryRepo *repository.MatchHistoryRepository,
 	roomMgr *room.Manager,
 	chatMgr *chat.Manager,
 	tableMgr *table.Manager,
@@ -82,23 +88,26 @@ func NewMageServer(
 	gameAdapter *game.EngineAdapter,
 ) *mageServer {
 	return &mageServer{
-		config:        cfg,
-		logger:        logger,
-		serverVersion: serverVersion,
-		sessionMgr:    sessionMgr,
-		userMgr:       userMgr,
-		userRepo:      userRepo,
-		roomMgr:       roomMgr,
-		chatMgr:       chatMgr,
-		tableMgr:      tableMgr,
-		gameMgr:       gameMgr,
-		tournamentMgr: tournamentMgr,
-		draftMgr:      draftMgr,
-		tokenStore:    tokenStore,
-		mailClient:    mailClient,
-		db:            db,
-		savedDecks:    make(map[string][]savedDeck),
-		gameAdapter:   gameAdapter,
+		config:           cfg,
+		logger:           logger,
+		serverVersion:    serverVersion,
+		sessionMgr:       sessionMgr,
+		userMgr:          userMgr,
+		userRepo:         userRepo,
+		statsRepo:        statsRepo,
+		deckRepo:         deckRepo,
+		matchHistoryRepo: matchHistoryRepo,
+		roomMgr:          roomMgr,
+		chatMgr:          chatMgr,
+		tableMgr:         tableMgr,
+		gameMgr:          gameMgr,
+		tournamentMgr:    tournamentMgr,
+		draftMgr:         draftMgr,
+		tokenStore:       tokenStore,
+		mailClient:       mailClient,
+		db:               db,
+		savedDecks:       make(map[string][]savedDeck),
+		gameAdapter:      gameAdapter,
 	}
 }
 
@@ -603,6 +612,9 @@ func (s *mageServer) RoomCreateTable(ctx context.Context, req *pb.RoomCreateTabl
 		TableId: newTable.ID,
 	}, nil
 }
+
+// NOTE: TableIsOwner and ChatFindByTournament implementations moved to
+// grpc_table.go and grpc_chat.go respectively
 
 // ==================== Helper Functions ====================
 

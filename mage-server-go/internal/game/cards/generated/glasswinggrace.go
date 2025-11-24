@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGlasswingGrace creates a Glasswing Grace
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewGlasswingGrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Glasswing Grace")
 	card.ManaCost = ""

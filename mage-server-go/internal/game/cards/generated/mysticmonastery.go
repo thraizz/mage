@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMysticMonastery creates a Mystic Monastery
-//  - LAND
+//   - LAND
 func NewMysticMonastery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mystic Monastery")
 	card.ManaCost = ""

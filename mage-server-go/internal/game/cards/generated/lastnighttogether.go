@@ -23,7 +23,7 @@ func NewLastNightTogether(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(2))).
 		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility")).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility")).

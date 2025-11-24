@@ -27,7 +27,7 @@ func NewDragonMantle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ability2, AttachmentType.AURA{R}: This creature gets +1/+0 until end of turn.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func NewDragonMantle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	card.AddAbility(ability3)
 	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ability2, AttachmentType.AURA{R}: This creature gets +1/+0 until end of turn.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

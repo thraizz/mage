@@ -31,7 +31,7 @@ func NewThornscapeApprentice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -26,7 +26,7 @@ func NewLeoninBladetrap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDamageEffect(2, filter)).
+		// TODO: DamageAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

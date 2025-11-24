@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSuppressionRay creates a Suppression Ray
-//  - SORCERY
+//   - SORCERY
 func NewSuppressionRay(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Suppression Ray")
 	card.ManaCost = ""

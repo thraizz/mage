@@ -26,7 +26,7 @@ func NewCallTheMountainChocobo(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	if err != nil {

@@ -22,8 +22,8 @@ func NewVerdantCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: CounterTargetEffect with complex parameters
+		// TODO: ExileTargetEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(3)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

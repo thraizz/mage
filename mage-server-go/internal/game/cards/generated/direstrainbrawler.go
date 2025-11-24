@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewDireStrainBrawler creates a Dire Strain Brawler
-//  - CREATURE
+//   - CREATURE
+//
 // Vigilance
 func NewDireStrainBrawler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dire Strain Brawler")

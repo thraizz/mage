@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTaintedWood creates a Tainted Wood
-//  - LAND
+//   - LAND
 func NewTaintedWood(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tainted Wood")
 	card.ManaCost = ""

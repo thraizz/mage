@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPhyrexianTower creates a Phyrexian Tower
-//  - LAND
+//   - LAND
 func NewPhyrexianTower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Phyrexian Tower")
 	card.ManaCost = ""

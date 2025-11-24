@@ -25,7 +25,7 @@ func NewChandraFlamecaller(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(new ElementalTokenWithHaste(), 2)).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

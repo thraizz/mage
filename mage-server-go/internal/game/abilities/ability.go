@@ -91,6 +91,9 @@ type GameContext interface {
 	// AddMana adds mana to a player's mana pool
 	AddMana(playerID uuid.UUID, mana *Mana) error
 
+	// GetManaPool returns a player's mana pool for cost payment
+	GetManaPool(playerID uuid.UUID) ManaPoolInterface
+
 	// TapPermanent taps a permanent
 	TapPermanent(permanentID uuid.UUID) error
 
@@ -98,6 +101,18 @@ type GameContext interface {
 	UntapPermanent(permanentID uuid.UUID) error
 
 	// TODO: Add more methods as needed
+}
+
+// ManaPoolInterface provides access to a player's mana pool
+// This interface allows the abilities system to check and spend mana
+// without depending on the concrete mana.ManaPool type
+type ManaPoolInterface interface {
+	// GetAmount returns the amount of a specific mana type (including floating)
+	GetAmount(manaType string) int
+
+	// SpendMana attempts to spend mana from the pool
+	// Returns error if insufficient mana
+	SpendMana(manaType string, amount int) error
 }
 
 // Mana represents mana in a player's mana pool

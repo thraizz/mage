@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDiscipleOfFreyalise creates a Disciple Of Freyalise
-//  - CREATURE
+//   - CREATURE
 func NewDiscipleOfFreyalise(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Disciple Of Freyalise")
 	card.ManaCost = ""

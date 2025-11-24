@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWindsweptHeath creates a Windswept Heath
-//  - LAND
+//   - LAND
 func NewWindsweptHeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Windswept Heath")
 	card.ManaCost = ""

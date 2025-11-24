@@ -24,7 +24,7 @@ func NewEarthshaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(StaticValue.get(2) , creatureFilter)).
+		AddEffect(abilities.NewDamageEffect(StaticValue.get(2), creatureFilter)).
 		Build()
 	if err != nil {
 		return nil, err

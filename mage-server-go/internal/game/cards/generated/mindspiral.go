@@ -23,7 +23,7 @@ func NewMindSpiral(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(3)).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 1))).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

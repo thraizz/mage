@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewDeathBegetsLife creates a Death Begets Life
-//  - 
+//
+//	-
 func NewDeathBegetsLife(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Death Begets Life")
 	card.ManaCost = ""

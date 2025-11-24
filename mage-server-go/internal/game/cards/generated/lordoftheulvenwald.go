@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLordOfTheUlvenwald creates a Lord Of The Ulvenwald
-//  - CREATURE
+//   - CREATURE
 func NewLordOfTheUlvenwald(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lord Of The Ulvenwald")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewLordOfTheUlvenwald(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

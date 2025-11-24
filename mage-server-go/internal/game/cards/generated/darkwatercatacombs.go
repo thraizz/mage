@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDarkwaterCatacombs creates a Darkwater Catacombs
-//  - LAND
+//   - LAND
 func NewDarkwaterCatacombs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Darkwater Catacombs")
 	card.ManaCost = ""

@@ -24,7 +24,7 @@ func NewSlaughterhorn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(3,2)).
+		AddEffect(abilities.NewBoostEffect(3, 2)).
 		Build()
 	if err != nil {
 		return nil, err

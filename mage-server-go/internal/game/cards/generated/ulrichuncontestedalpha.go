@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUlrichUncontestedAlpha creates a Ulrich Uncontested Alpha
-//  - CREATURE
+//   - CREATURE
 func NewUlrichUncontestedAlpha(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ulrich Uncontested Alpha")
 	card.ManaCost = ""

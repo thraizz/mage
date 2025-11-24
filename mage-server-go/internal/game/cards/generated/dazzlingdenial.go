@@ -22,8 +22,8 @@ func NewDazzlingDenial(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterUnlessPaysEffect with complex parameters
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

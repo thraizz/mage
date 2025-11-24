@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOverloadedMageRing creates a Overloaded Mage Ring
-//  - ARTIFACT
+//   - ARTIFACT
 func NewOverloadedMageRing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Overloaded Mage Ring")
 	card.ManaCost = ""

@@ -33,7 +33,7 @@ func NewTiborAndLumia(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(1, filter)).
+		// TODO: DamageAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRestlessVents creates a Restless Vents
-//  - LAND
+//   - LAND
 func NewRestlessVents(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Restless Vents")
 	card.ManaCost = ""

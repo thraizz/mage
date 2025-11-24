@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMystifyingMaze creates a Mystifying Maze
-//  - LAND
+//   - LAND
 func NewMystifyingMaze(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mystifying Maze")
 	card.ManaCost = ""

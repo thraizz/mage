@@ -30,7 +30,7 @@ func NewEaterOfHope(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	//   - RegenerateSourceEffect()
 	// card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewWingIt creates a Wing It
-//  - 
+//
+//	-
 func NewWingIt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wing It")
 	card.ManaCost = ""

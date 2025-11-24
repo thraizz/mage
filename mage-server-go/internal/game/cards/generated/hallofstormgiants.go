@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHallOfStormGiants creates a Hall Of Storm Giants
-//  - LAND
+//   - LAND
 func NewHallOfStormGiants(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hall Of Storm Giants")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewHallOfStormGiants(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewFireLordSozin creates a Fire Lord Sozin
-//  - CREATURE
+//   - CREATURE
+//
 // Menace
 func NewFireLordSozin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fire Lord Sozin")

@@ -97,6 +97,8 @@ func main() {
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
 	statsRepo := repository.NewStatsRepository(db)
+	deckRepo := repository.NewDeckRepository(db)
+	matchHistoryRepo := repository.NewMatchHistoryRepository(db)
 
 	// Initialize user manager
 	userMgr := user.NewManager(userRepo, statsRepo, cfg.Validation, logger)
@@ -153,6 +155,9 @@ func main() {
 		sessionMgr,
 		userMgr,
 		userRepo,
+		statsRepo,
+		deckRepo,
+		matchHistoryRepo,
 		roomMgr,
 		chatMgr,
 		tableMgr,
@@ -203,15 +208,36 @@ func main() {
 		}
 	}()
 
+	// Start health check server if enabled
+	if cfg.Health.Enabled {
+		go func() {
+			if healthErr := server.StartHealthCheckServer(
+				cfg.Health.Address,
+				db,
+				sessionMgr,
+				version,
+				logger,
+			); healthErr != nil {
+				logger.Error("health check server error", zap.Error(healthErr))
+			}
+		}()
+	}
+
 	// TODO: Start metrics server if enabled
 	// if cfg.Metrics.Enabled {
 	//     go startMetricsServer(cfg.Metrics, logger)
 	// }
 
+	healthAddress := "disabled"
+	if cfg.Health.Enabled {
+		healthAddress = cfg.Health.Address
+	}
+
 	logger.Info("MAGE server initialized",
 		zap.String("version", version),
 		zap.String("grpc_address", cfg.Server.GRPC.Address),
 		zap.String("websocket_address", cfg.Server.WebSocket.Address),
+		zap.String("health_address", healthAddress),
 		zap.Int("max_sessions", cfg.Server.MaxSessions),
 	)
 

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewWingedTempleOfOrazca creates a Winged Temple Of Orazca
-//  - LAND
+//   - LAND
 func NewWingedTempleOfOrazca(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Winged Temple Of Orazca")
 	card.ManaCost = ""

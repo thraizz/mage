@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewValorsReachTagTeam creates a Valors Reach Tag Team
-//  - SORCERY
+//   - SORCERY
 func NewValorsReachTagTeam(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Valors Reach Tag Team")
 	card.ManaCost = ""

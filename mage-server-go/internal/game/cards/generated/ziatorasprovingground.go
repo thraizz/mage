@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewZiatorasProvingGround creates a Ziatoras Proving Ground
-//  - LAND
+//   - LAND
 func NewZiatorasProvingGround(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ziatoras Proving Ground")
 	card.ManaCost = ""

@@ -25,7 +25,7 @@ func NewDementiaSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(gainedAbility, {T}: Choose a card name. " + "Target opponent reveals a card at random from their hand." + " If that card has the chosen name, that player discards it." + " Activate only during your turn.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

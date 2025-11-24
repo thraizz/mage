@@ -21,7 +21,7 @@ func NewGruulCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlAllEffect(abilities.DurationCustom, abilities.NewAnyTargetFilter())).
+		// TODO: GainControlAllEffect with complex parameters
 		AddEffect(abilities.NewDamageEffect(3)).
 		Build()
 	if err != nil {

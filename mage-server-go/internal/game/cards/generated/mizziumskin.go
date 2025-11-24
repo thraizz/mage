@@ -22,8 +22,8 @@ func NewMizziumSkin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(0,1,false)).
-		AddEffect(abilities.NewBoostEffect(0,1)).
+		AddEffect(abilities.NewBoostEffect(0, 1, false)).
+		AddEffect(abilities.NewBoostEffect(0, 1)).
 		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {

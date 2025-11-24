@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewPeterParker creates a Peter Parker
-//  - CREATURE
+//   - CREATURE
+//
 // Vigilance, Reach
 func NewPeterParker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Peter Parker")

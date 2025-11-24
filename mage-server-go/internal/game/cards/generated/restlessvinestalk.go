@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewRestlessVinestalk creates a Restless Vinestalk
-//  - LAND
+//   - LAND
+//
 // Trample
 func NewRestlessVinestalk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Restless Vinestalk")

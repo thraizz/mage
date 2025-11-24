@@ -76,6 +76,21 @@ func (a *ActivatedAbility) Resolve(ctx context.Context, game GameContext) error 
 	return nil
 }
 
+// GetCosts returns the costs of this ability
+func (a *ActivatedAbility) GetCosts() []Cost {
+	return a.Costs
+}
+
+// GetEffects returns the effects of this ability
+func (a *ActivatedAbility) GetEffects() []Effect {
+	return a.Effects
+}
+
+// GetTimingRule returns the timing rule for this ability
+func (a *ActivatedAbility) GetTimingRule() TimingRule {
+	return a.TimingRule
+}
+
 // buildAbilityText constructs the text representation of an ability
 func buildAbilityText(costs []Cost, effects []Effect) string {
 	costStr := buildCostString(costs)

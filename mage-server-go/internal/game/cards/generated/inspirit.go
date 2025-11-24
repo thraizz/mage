@@ -22,7 +22,7 @@ func NewInspirit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 4)).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(2, 4)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

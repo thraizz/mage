@@ -24,7 +24,7 @@ func NewDraugrsHelm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(2, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new MenaceAbility(true), AttachmentType.EQUIPMENT)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.EQUIPMENT)).
 		Build()
 	if err != nil {
 		return nil, err

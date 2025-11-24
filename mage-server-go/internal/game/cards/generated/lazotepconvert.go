@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLazotepConvert creates a Lazotep Convert
-//  - CREATURE
+//   - CREATURE
 func NewLazotepConvert(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lazotep Convert")
 	card.ManaCost = ""

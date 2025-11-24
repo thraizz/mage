@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMysticMonstrosity creates a Mystic Monstrosity
-//  - ARTIFACT CREATURE
+//   - ARTIFACT CREATURE
 func NewMysticMonstrosity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mystic Monstrosity")
 	card.ManaCost = ""

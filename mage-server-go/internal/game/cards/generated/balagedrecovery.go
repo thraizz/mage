@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBalaGedRecovery creates a Bala Ged Recovery
-//  - SORCERY
+//   - SORCERY
 func NewBalaGedRecovery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bala Ged Recovery")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewBalaGedRecovery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

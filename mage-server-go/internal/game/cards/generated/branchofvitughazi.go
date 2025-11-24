@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBranchOfVituGhazi creates a Branch Of Vitu Ghazi
-//  - LAND
+//   - LAND
 func NewBranchOfVituGhazi(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Branch Of Vitu Ghazi")
 	card.ManaCost = ""

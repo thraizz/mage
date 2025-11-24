@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAncestralVision creates a Ancestral Vision
-//  - SORCERY
+//   - SORCERY
 func NewAncestralVision(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ancestral Vision")
 	card.ManaCost = ""

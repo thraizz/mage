@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShelteredValley creates a Sheltered Valley
-//  - LAND
+//   - LAND
 func NewShelteredValley(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sheltered Valley")
 	card.ManaCost = ""

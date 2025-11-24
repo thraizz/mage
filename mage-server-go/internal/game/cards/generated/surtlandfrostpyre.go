@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSurtlandFrostpyre creates a Surtland Frostpyre
-//  - LAND
+//   - LAND
 func NewSurtlandFrostpyre(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Surtland Frostpyre")
 	card.ManaCost = ""

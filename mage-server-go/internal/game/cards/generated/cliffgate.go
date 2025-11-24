@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCliffgate creates a Cliffgate
-//  - LAND
+//   - LAND
 func NewCliffgate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cliffgate")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlexVexingPest creates a Blex Vexing Pest
-//  - CREATURE
+//   - CREATURE
 func NewBlexVexingPest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blex Vexing Pest")
 	card.ManaCost = ""
@@ -21,7 +21,7 @@ func NewBlexVexingPest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSeafarersQuay creates a Seafarers Quay
-//  - LAND
+//   - LAND
 func NewSeafarersQuay(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seafarers Quay")
 	card.ManaCost = ""
@@ -22,7 +22,7 @@ func NewSeafarersQuay(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filter)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

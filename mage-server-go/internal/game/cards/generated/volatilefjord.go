@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVolatileFjord creates a Volatile Fjord
-//  - LAND
+//   - LAND
 func NewVolatileFjord(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Volatile Fjord")
 	card.ManaCost = ""

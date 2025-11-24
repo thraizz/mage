@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCookingCampsite creates a Cooking Campsite
-//  - LAND
+//   - LAND
 func NewCookingCampsite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cooking Campsite")
 	card.ManaCost = ""

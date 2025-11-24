@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewJwariDisruption creates a Jwari Disruption
-//  - INSTANT
+//   - INSTANT
 func NewJwariDisruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jwari Disruption")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewJwariDisruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

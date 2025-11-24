@@ -37,7 +37,7 @@ func NewEntersBattlefieldReplacementEffect(
 
 func (e *EntersBattlefieldReplacementEffect) ChecksEventType(eventType rules.EventType) bool {
 	return eventType == rules.EventZoneChange ||
-		eventType == rules.EventEntersBattlefield
+		eventType == rules.EventEntersTheBattlefield
 }
 
 func (e *EntersBattlefieldReplacementEffect) Applies(event rules.Event, gameID string) bool {
@@ -120,8 +120,7 @@ func NewDrawReplacementEffect(
 }
 
 func (e *DrawReplacementEffect) ChecksEventType(eventType rules.EventType) bool {
-	return eventType == rules.EventDrawCard ||
-		eventType == rules.EventDrawCards
+	return eventType == rules.EventDrawCard
 }
 
 func (e *DrawReplacementEffect) Applies(event rules.Event, gameID string) bool {
@@ -201,7 +200,7 @@ func NewDiesReplacementEffect(
 }
 
 func (e *DiesReplacementEffect) ChecksEventType(eventType rules.EventType) bool {
-	return eventType == rules.EventZoneChange && eventType == rules.EventDies
+	return eventType == rules.EventZoneChange
 }
 
 func (e *DiesReplacementEffect) Applies(event rules.Event, gameID string) bool {
@@ -280,8 +279,7 @@ func NewTokenCreationReplacementEffect(
 }
 
 func (e *TokenCreationReplacementEffect) ChecksEventType(eventType rules.EventType) bool {
-	return eventType == rules.EventCreateToken ||
-		eventType == rules.EventCreateTokens
+	return eventType == rules.EventCreateToken
 }
 
 func (e *TokenCreationReplacementEffect) Applies(event rules.Event, gameID string) bool {
@@ -415,8 +413,7 @@ func NewDiscardReplacementEffect(
 }
 
 func (e *DiscardReplacementEffect) ChecksEventType(eventType rules.EventType) bool {
-	return eventType == rules.EventDiscard ||
-		eventType == rules.EventDiscardCard
+	return eventType == rules.EventDiscardCard
 }
 
 func (e *DiscardReplacementEffect) Applies(event rules.Event, gameID string) bool {
@@ -476,7 +473,7 @@ func NewRegenerationEffect(sourceID, permanentID string) *RegenerationEffect {
 }
 
 func (e *RegenerationEffect) ChecksEventType(eventType rules.EventType) bool {
-	return eventType == rules.EventDestroy ||
+	return eventType == rules.EventDestroyPermanent ||
 		eventType == rules.EventZoneChange // When going to graveyard from lethal damage
 }
 
@@ -526,7 +523,7 @@ func (e *RegenerationEffect) ReplaceEvent(event rules.Event, gameID string) (rul
 	event.Metadata["remove_from_combat"] = "true"
 
 	// For destroy events, prevent destruction
-	if event.Type == rules.EventDestroy {
+	if event.Type == rules.EventDestroyPermanent {
 		// Completely prevent the destruction
 		return event, true
 	}

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewKaminoCloningFacility creates a Kamino Cloning Facility
-//  - LAND
+//   - LAND
 func NewKaminoCloningFacility(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kamino Cloning Facility")
 	card.ManaCost = ""

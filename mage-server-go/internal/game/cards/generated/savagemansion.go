@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSavageMansion creates a Savage Mansion
-//  - LAND
+//   - LAND
 func NewSavageMansion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Savage Mansion")
 	card.ManaCost = ""

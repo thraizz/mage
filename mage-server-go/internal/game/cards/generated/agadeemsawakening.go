@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAgadeemsAwakening creates a Agadeems Awakening
-//  - SORCERY
+//   - SORCERY
 func NewAgadeemsAwakening(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Agadeems Awakening")
 	card.ManaCost = ""

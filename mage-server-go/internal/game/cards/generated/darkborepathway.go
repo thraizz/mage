@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDarkborePathway creates a Darkbore Pathway
-//  - LAND
+//   - LAND
 func NewDarkborePathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Darkbore Pathway")
 	card.ManaCost = ""

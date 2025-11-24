@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHauntedFengraf creates a Haunted Fengraf
-//  - LAND
+//   - LAND
 func NewHauntedFengraf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Haunted Fengraf")
 	card.ManaCost = ""

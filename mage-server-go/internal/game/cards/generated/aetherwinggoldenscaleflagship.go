@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewAetherwingGoldenScaleFlagship creates a Aetherwing Golden Scale Flagship
-//  - ARTIFACT
+//   - ARTIFACT
+//
 // Flying
 func NewAetherwingGoldenScaleFlagship(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Aetherwing Golden Scale Flagship")

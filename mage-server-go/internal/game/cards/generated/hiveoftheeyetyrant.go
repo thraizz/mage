@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewHiveOfTheEyeTyrant creates a Hive Of The Eye Tyrant
-//  - LAND
+//   - LAND
+//
 // Menace
 func NewHiveOfTheEyeTyrant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hive Of The Eye Tyrant")
@@ -26,7 +27,7 @@ func NewHiveOfTheEyeTyrant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

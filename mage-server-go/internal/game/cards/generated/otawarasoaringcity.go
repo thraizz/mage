@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOtawaraSoaringCity creates a Otawara Soaring City
-//  - LAND
+//   - LAND
 func NewOtawaraSoaringCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Otawara Soaring City")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewOtawaraSoaringCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

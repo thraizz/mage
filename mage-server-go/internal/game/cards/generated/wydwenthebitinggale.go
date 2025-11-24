@@ -30,7 +30,7 @@ func NewWydwenTheBitingGale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

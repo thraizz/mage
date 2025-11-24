@@ -28,7 +28,7 @@ func NewMidsummerRevel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, new CountersSourceCount(CounterType.VERSE))).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

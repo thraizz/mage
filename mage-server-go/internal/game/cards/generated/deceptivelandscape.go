@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDeceptiveLandscape creates a Deceptive Landscape
-//  - LAND
+//   - LAND
 func NewDeceptiveLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Deceptive Landscape")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewDeceptiveLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTangledFlorahedron creates a Tangled Florahedron
-//  - CREATURE
+//   - CREATURE
 func NewTangledFlorahedron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tangled Florahedron")
 	card.ManaCost = ""

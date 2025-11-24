@@ -36,7 +36,7 @@ func NewChamberOfManipulation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(controlAbility, AttachmentType.AURA{T}, Discard a card: Gain control of target creature until end of turn.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

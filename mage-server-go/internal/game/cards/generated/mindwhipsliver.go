@@ -28,7 +28,7 @@ func NewMindwhipSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - DiscardTargetEffect(1, true)
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(gainedAbility, filter{2}, Sacrifice permanent: Target player discards a card at random. Activate only as a sorcery.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

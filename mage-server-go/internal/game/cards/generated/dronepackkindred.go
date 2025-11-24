@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewDronepackKindred creates a Dronepack Kindred
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewDronepackKindred(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dronepack Kindred")

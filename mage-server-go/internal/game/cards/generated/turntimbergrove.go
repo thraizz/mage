@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTurntimberGrove creates a Turntimber Grove
-//  - LAND
+//   - LAND
 func NewTurntimberGrove(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Turntimber Grove")
 	card.ManaCost = ""

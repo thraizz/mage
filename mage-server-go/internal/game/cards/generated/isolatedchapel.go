@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIsolatedChapel creates a Isolated Chapel
-//  - LAND
+//   - LAND
 func NewIsolatedChapel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Isolated Chapel")
 	card.ManaCost = ""

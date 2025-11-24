@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThrivingGrove creates a Thriving Grove
-//  - LAND
+//   - LAND
 func NewThrivingGrove(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thriving Grove")
 	card.ManaCost = ""

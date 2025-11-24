@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIfritWardenOfInferno creates a Ifrit Warden Of Inferno
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
 func NewIfritWardenOfInferno(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ifrit Warden Of Inferno")
 	card.ManaCost = ""

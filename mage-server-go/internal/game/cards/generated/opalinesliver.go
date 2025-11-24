@@ -24,12 +24,9 @@ func NewOpalineSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(gainedTriggeredAbility, filterSliverWhenever permanent becomes the target of a spell an opponent controls, you may draw a card.\"")).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Complex grant ability effects need proper transpilation
+	// This card grants "Whenever this becomes the target of a spell an opponent controls, you may draw a card" to all Slivers
+	// Temporarily stubbed until card transpiler is fixed
+	_ = card // Use card to avoid unused variable error
 	return card, nil
 }

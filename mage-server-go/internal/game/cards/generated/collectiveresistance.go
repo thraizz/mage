@@ -22,8 +22,8 @@ func NewCollectiveResistance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility")).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility")).
 		AddTarget(abilities.NewCreatureTargetFilter()).

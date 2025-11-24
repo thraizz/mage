@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlazemireVerge creates a Blazemire Verge
-//  - LAND
+//   - LAND
 func NewBlazemireVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Blazemire Verge")
 	card.ManaCost = ""

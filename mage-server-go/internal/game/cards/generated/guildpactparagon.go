@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGuildpactParagon creates a Guildpact Paragon
-//  - ARTIFACT CREATURE
+//   - ARTIFACT CREATURE
 func NewGuildpactParagon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Guildpact Paragon")
 	card.ManaCost = ""

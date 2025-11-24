@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewGenerousSoul creates a Generous Soul
-//  - CREATURE
+//   - CREATURE
+//
 // Flying, Vigilance
 func NewGenerousSoul(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Generous Soul")

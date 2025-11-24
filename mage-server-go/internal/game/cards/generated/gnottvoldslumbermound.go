@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGnottvoldSlumbermound creates a Gnottvold Slumbermound
-//  - LAND
+//   - LAND
 func NewGnottvoldSlumbermound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gnottvold Slumbermound")
 	card.ManaCost = ""
@@ -30,7 +30,7 @@ func NewGnottvoldSlumbermound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	card.AddAbility(ability1)

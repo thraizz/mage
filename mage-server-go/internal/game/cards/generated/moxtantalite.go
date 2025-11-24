@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMoxTantalite creates a Mox Tantalite
-//  - ARTIFACT
+//   - ARTIFACT
 func NewMoxTantalite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mox Tantalite")
 	card.ManaCost = ""

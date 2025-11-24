@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpymastersVault creates a Spymasters Vault
-//  - LAND
+//   - LAND
 func NewSpymastersVault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spymasters Vault")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSkyshroudForest creates a Skyshroud Forest
-//  - LAND
+//   - LAND
 func NewSkyshroudForest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Skyshroud Forest")
 	card.ManaCost = ""

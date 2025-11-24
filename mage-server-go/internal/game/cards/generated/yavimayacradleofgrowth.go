@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewYavimayaCradleOfGrowth creates a Yavimaya Cradle Of Growth
-//  - LAND
+//   - LAND
 func NewYavimayaCradleOfGrowth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Yavimaya Cradle Of Growth")
 	card.ManaCost = ""

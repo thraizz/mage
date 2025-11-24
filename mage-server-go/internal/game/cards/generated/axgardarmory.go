@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAxgardArmory creates a Axgard Armory
-//  - LAND
+//   - LAND
 func NewAxgardArmory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Axgard Armory")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewAxgardArmory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

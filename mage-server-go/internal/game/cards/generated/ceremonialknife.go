@@ -34,7 +34,7 @@ func NewCeremonialKnife(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(1, 0)).
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new DealsCombatDamageTriggeredAbility( new CreateTokenEffect(token1_0), false ).setTriggerPhrase("Whenever creature deals combat damage, "), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

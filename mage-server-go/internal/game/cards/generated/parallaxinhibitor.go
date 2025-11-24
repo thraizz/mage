@@ -24,7 +24,7 @@ func NewParallaxInhibitor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewAddCountersAllEffect(counters.NewCounter("fade", 1), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

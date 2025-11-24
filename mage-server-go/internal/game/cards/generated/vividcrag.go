@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVividCrag creates a Vivid Crag
-//  - LAND
+//   - LAND
 func NewVividCrag(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vivid Crag")
 	card.ManaCost = ""

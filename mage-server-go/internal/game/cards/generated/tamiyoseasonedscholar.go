@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTamiyoSeasonedScholar creates a Tamiyo Seasoned Scholar
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewTamiyoSeasonedScholar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tamiyo Seasoned Scholar")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewTamiyoSeasonedScholar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewIsiluCarrierOfTwilight creates a Isilu Carrier Of Twilight
-//  - CREATURE
+//   - CREATURE
+//
 // Flying, Lifelink
 func NewIsiluCarrierOfTwilight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Isilu Carrier Of Twilight")

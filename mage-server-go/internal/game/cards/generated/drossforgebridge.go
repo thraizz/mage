@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewDrossforgeBridge creates a Drossforge Bridge
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
+//
 // Indestructible
 func NewDrossforgeBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Drossforge Bridge")

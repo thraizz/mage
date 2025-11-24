@@ -25,7 +25,7 @@ func NewWargRider(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new MenaceAbility(false), filterOrcAndGoblins, true)).
+		AddEffect(abilities.NewGrantAbilityEffect(filterOrcAndGoblins, true)).
 		Build()
 	if err != nil {
 		return nil, err

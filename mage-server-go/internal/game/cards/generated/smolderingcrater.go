@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSmolderingCrater creates a Smoldering Crater
-//  - LAND
+//   - LAND
 func NewSmolderingCrater(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Smoldering Crater")
 	card.ManaCost = ""

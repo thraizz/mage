@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewHorrificAssault creates a Horrific Assault
-//  - 
+//
+//	-
 func NewHorrificAssault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Horrific Assault")
 	card.ManaCost = ""

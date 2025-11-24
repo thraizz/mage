@@ -33,7 +33,7 @@ func NewSquirrelWrangler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

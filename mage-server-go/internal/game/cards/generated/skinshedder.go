@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSkinShedder creates a Skin Shedder
-//  - CREATURE
+//   - CREATURE
 func NewSkinShedder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Skin Shedder")
 	card.ManaCost = ""

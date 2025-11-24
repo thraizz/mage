@@ -25,7 +25,7 @@ func NewFolkHero(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGrantAbilityEffect(new SpellCastControllerTriggeredAbility( new DrawCardSourceControllerEffect(1), filter, false ).setTriggersLimitEachTurn(1))).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

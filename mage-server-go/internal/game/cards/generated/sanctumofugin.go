@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSanctumOfUgin creates a Sanctum Of Ugin
-//  - LAND
+//   - LAND
 func NewSanctumOfUgin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sanctum Of Ugin")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewSanctumOfUgin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

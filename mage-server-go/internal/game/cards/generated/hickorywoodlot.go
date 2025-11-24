@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHickoryWoodlot creates a Hickory Woodlot
-//  - LAND
+//   - LAND
 func NewHickoryWoodlot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hickory Woodlot")
 	card.ManaCost = ""

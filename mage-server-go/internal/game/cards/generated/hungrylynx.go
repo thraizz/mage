@@ -26,7 +26,7 @@ func NewHungryLynx(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new ProtectionAbility(filterProRat), filterCat)).
+		// TODO: GainAbilityAllEffect with complex parameters
 		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), filterCat)).
 		Build()
 	if err != nil {

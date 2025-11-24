@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewCathedralOfSerra creates a Cathedral Of Serra
-//  - LAND
+//   - LAND
 func NewCathedralOfSerra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cathedral Of Serra")
 	card.ManaCost = ""
@@ -22,7 +22,7 @@ func NewCathedralOfSerra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filter)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

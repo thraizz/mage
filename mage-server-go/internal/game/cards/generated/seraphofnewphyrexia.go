@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewSeraphOfNewPhyrexia creates a Seraph Of New Phyrexia
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewSeraphOfNewPhyrexia(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seraph Of New Phyrexia")

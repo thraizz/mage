@@ -526,18 +526,24 @@ Status legend:
 - [x] Implement card repository caching (10k card LRU cache)
 - [x] Implement stats repository with Glicko rating queries
 - [ ] Implement table records repository (persist table/match history)
-- [ ] Implement deck repository (store/retrieve user deck collections)
-  - [ ] Create deck table schema (user_id, deck_name, format, cards JSON)
-  - [ ] Implement CreateDeck method
-  - [ ] Implement GetDecksByUser method
-  - [ ] Implement UpdateDeck method
-  - [ ] Implement DeleteDeck method
-  - [ ] Implement GetDeckByID method
-- [ ] Implement match history repository (player game history for stats/replay)
-  - [ ] Create match_history table schema
-  - [ ] Implement SaveMatch method
-  - [ ] Implement GetMatchesByUser method
-  - [ ] Implement GetMatchByID method
+- [x] Implement deck repository (store/retrieve user deck collections)
+  - [x] Create deck table schema (user_id, deck_name, format, description, cards JSON)
+  - [x] Implement CreateDeck method
+  - [x] Implement GetDecksByUser method
+  - [x] Implement GetDecksByUserAndFormat method
+  - [x] Implement UpdateDeck method
+  - [x] Implement DeleteDeck method
+  - [x] Implement DeleteByUserAndID method (with ownership check)
+  - [x] Implement GetDeckByID method
+- [x] Implement match history repository (player game history for stats/replay)
+  - [x] Create match_history table schema (with JSONB players, indexes, constraints)
+  - [x] Implement SaveMatch method
+  - [x] Implement GetMatchesByUser method (paginated)
+  - [x] Implement GetMatchByID method
+  - [x] Implement CountMatchesByUser method
+  - [x] Implement GetRecentMatches method (for lobby display)
+  - [x] Implement GetMatchesByGameType method
+  - [x] Implement GetMatchesByTournament method
 
 ## gRPC Server & Interceptors
 - [x] Implement gRPC server bootstrap with graceful shutdown
@@ -602,16 +608,20 @@ Status legend:
 
 ## Deck Management RPC Methods
 - [x] Implement DeckSubmit (submit deck for table/tournament)
-- [x] Implement DeckSave (save deck to collection)
-- [ ] Implement DeckList (get user's decks)
-  - [ ] Add proto definition for DeckListRequest/Response
-  - [ ] Implement gRPC handler in grpc.go
-  - [ ] Call deck repository GetDecksByUser
-  - [ ] Return list of deck metadata (id, name, format, card count)
-- [ ] Implement DeckDelete (delete deck)
-  - [ ] Add proto definition for DeckDeleteRequest/Response
-  - [ ] Implement gRPC handler with ownership check
-  - [ ] Call deck repository DeleteDeck
+- [x] Implement DeckSave (save deck to collection with format and description)
+- [x] Implement DeckList (get user's decks)
+  - [x] Add proto definition for DeckListRequest/Response with DeckInfo message
+  - [x] Implement gRPC handler in grpc_table.go
+  - [x] Call deck repository GetDecksByUser / GetDecksByUserAndFormat
+  - [x] Return list of deck metadata (id, name, format, description, card counts, timestamps)
+- [x] Implement DeckDelete (delete deck)
+  - [x] Add proto definition for DeckDeleteRequest/Response
+  - [x] Implement gRPC handler with ownership check
+  - [x] Call deck repository DeleteByUserAndID
+- [x] Implement DeckGet (get single deck by ID)
+  - [x] Add proto definition for DeckGetRequest/Response
+  - [x] Implement gRPC handler with ownership validation
+  - [x] Return full deck info and card lists
 - [ ] Implement DeckValidate (check format legality: Standard, Modern, Commander, etc.)
   - [ ] Add proto definition for DeckValidateRequest/Response
   - [ ] Implement format rules engine (card legality, deck size, banned list)
@@ -783,12 +793,12 @@ Status legend:
 - [x] Implement user stats tracking (matches, wins, losses, tournaments)
 - [x] Implement Glicko rating calculation
 - [x] Implement rating update on match completion
-- [ ] Implement match history display
-  - [ ] Add proto definition for GetMatchHistory RPC
-  - [ ] Query match_history repository by user ID
-  - [ ] Return paginated match list (opponent, result, date, format)
-  - [ ] Include rating change per match
-  - [ ] Support filtering by format/date range
+- [x] Implement match history display
+  - [x] Add proto definitions for GetMatchHistory and GetMatchById RPCs
+  - [x] Query match_history repository by user ID with pagination
+  - [x] Return paginated match list (players, winner, result, date, game type, duration)
+  - [x] Include total count for pagination
+  - [x] Implement GetMatchById with replay data support
 - [ ] Implement user profile page data
   - [ ] Add proto definition for GetUserProfile RPC
   - [ ] Return user stats (W/L record, rating, tournaments played)

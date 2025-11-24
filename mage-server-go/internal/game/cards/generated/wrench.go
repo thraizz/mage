@@ -32,7 +32,7 @@ func NewWrench(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddTapCost().
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

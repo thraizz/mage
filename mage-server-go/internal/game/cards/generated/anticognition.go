@@ -22,8 +22,8 @@ func NewAnticognition(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterTargetEffect with complex parameters
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddEffect(abilities.NewScryEffect(1)).
 		Build()
 	if err != nil {

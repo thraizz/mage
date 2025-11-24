@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShineshadowSnarl creates a Shineshadow Snarl
-//  - LAND
+//   - LAND
 func NewShineshadowSnarl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shineshadow Snarl")
 	card.ManaCost = ""

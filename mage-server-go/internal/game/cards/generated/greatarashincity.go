@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewGreatArashinCity creates a Great Arashin City
-//  - LAND
+//   - LAND
 func NewGreatArashinCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Great Arashin City")
 	card.ManaCost = ""

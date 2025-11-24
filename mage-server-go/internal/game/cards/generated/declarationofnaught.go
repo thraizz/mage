@@ -22,7 +22,7 @@ func NewDeclarationOfNaught(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

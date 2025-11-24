@@ -23,8 +23,8 @@ func NewAnzragsRampage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationCustom)).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddEffect(abilities.NewDestroyEffect(filter)).
+		// TODO: ReturnToHandTargetEffect with complex parameters
+		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

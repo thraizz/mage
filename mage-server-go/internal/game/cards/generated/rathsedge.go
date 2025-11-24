@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRathsEdge creates a Raths Edge
-//  - LAND
+//   - LAND
 func NewRathsEdge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Raths Edge")
 	card.ManaCost = ""

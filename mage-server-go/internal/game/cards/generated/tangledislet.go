@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTangledIslet creates a Tangled Islet
-//  - LAND
+//   - LAND
 func NewTangledIslet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tangled Islet")
 	card.ManaCost = ""

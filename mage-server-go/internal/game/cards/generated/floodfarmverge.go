@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFloodfarmVerge creates a Floodfarm Verge
-//  - LAND
+//   - LAND
 func NewFloodfarmVerge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Floodfarm Verge")
 	card.ManaCost = ""

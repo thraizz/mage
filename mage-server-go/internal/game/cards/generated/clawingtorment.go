@@ -32,7 +32,7 @@ func NewClawingTorment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new BeginningOfUpkeepTriggeredAbility( new LoseLifeSourceControllerEffect(1), false ), AttachmentType.AURAAt the beginning of your upkeep, you lose 1 life.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

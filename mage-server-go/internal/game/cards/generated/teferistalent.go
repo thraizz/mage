@@ -31,7 +31,7 @@ func NewTeferisTalent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new LoyaltyAbility(new GetEmblemEffect(new TeferisTalentEmblem()), -12), AttachmentType.AURA, null)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

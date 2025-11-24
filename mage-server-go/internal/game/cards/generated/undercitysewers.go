@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUndercitySewers creates a Undercity Sewers
-//  - LAND
+//   - LAND
 func NewUndercitySewers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Undercity Sewers")
 	card.ManaCost = ""

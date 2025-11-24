@@ -24,7 +24,7 @@ func NewEyeOfDoom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddManaCost("{2}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect(filter)).
+		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

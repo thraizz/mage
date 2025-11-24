@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRootwaterDepths creates a Rootwater Depths
-//  - LAND
+//   - LAND
 func NewRootwaterDepths(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rootwater Depths")
 	card.ManaCost = ""

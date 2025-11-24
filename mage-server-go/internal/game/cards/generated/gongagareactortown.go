@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGongagaReactorTown creates a Gongaga Reactor Town
-//  - LAND
+//   - LAND
 func NewGongagaReactorTown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gongaga Reactor Town")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSejiriSteppe creates a Sejiri Steppe
-//  - LAND
+//   - LAND
 func NewSejiriSteppe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sejiri Steppe")
 	card.ManaCost = ""

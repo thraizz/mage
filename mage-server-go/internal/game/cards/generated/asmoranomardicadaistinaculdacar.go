@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAsmoranomardicadaistinaculdacar creates a Asmoranomardicadaistinaculdacar
-//  - CREATURE
+//   - CREATURE
 func NewAsmoranomardicadaistinaculdacar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Asmoranomardicadaistinaculdacar")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewAsmoranomardicadaistinaculdacar(ownerID uuid.UUID, info *cards.CardInfo)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

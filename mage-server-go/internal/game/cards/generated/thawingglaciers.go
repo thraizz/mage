@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThawingGlaciers creates a Thawing Glaciers
-//  - LAND
+//   - LAND
 func NewThawingGlaciers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Thawing Glaciers")
 	card.ManaCost = ""
@@ -23,8 +23,8 @@ func NewThawingGlaciers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddTapCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

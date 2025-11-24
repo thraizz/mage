@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShrineOfTheForsakenGods creates a Shrine Of The Forsaken Gods
-//  - LAND
+//   - LAND
 func NewShrineOfTheForsakenGods(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shrine Of The Forsaken Gods")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAyaraFurnaceQueen creates a Ayara Furnace Queen
-//  - CREATURE
+//   - CREATURE
 func NewAyaraFurnaceQueen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ayara Furnace Queen")
 	card.ManaCost = ""

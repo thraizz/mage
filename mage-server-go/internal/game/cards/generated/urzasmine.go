@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUrzasMine creates a Urzas Mine
-//  - LAND
+//   - LAND
 func NewUrzasMine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Urzas Mine")
 	card.ManaCost = ""

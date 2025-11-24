@@ -39,7 +39,7 @@ func NewCommandingPresence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FirstStrikeAbility", abilities.AttachmentTypeAura)).
 		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new DealsCombatDamageToAPlayerTriggeredAbility( new CreateTokenEffect(token2_0), false ), AttachmentType.AURAWhenever creature deals combat damage to a playercreate a 1/1 white Human Soldier creature token.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJungleShrine creates a Jungle Shrine
-//  - LAND
+//   - LAND
 func NewJungleShrine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jungle Shrine")
 	card.ManaCost = ""

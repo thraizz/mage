@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFrenziedTrapbreaker creates a Frenzied Trapbreaker
-//  - CREATURE
+//   - CREATURE
 func NewFrenziedTrapbreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Frenzied Trapbreaker")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewFrenziedTrapbreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func NewFrenziedTrapbreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

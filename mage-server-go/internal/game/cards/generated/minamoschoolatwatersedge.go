@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMinamoSchoolAtWatersEdge creates a Minamo School At Waters Edge
-//  - LAND
+//   - LAND
 func NewMinamoSchoolAtWatersEdge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Minamo School At Waters Edge")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewMinamoSchoolAtWatersEdge(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

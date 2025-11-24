@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpinerockKnoll creates a Spinerock Knoll
-//  - LAND
+//   - LAND
 func NewSpinerockKnoll(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spinerock Knoll")
 	card.ManaCost = ""

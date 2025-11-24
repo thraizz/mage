@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBreedingPool creates a Breeding Pool
-//  - LAND
+//   - LAND
 func NewBreedingPool(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Breeding Pool")
 	card.ManaCost = ""

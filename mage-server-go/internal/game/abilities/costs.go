@@ -75,13 +75,130 @@ func ParseManaCost(costStr string) (*ManaCost, error) {
 }
 
 func (c *ManaCost) CanPay(ctx context.Context, game GameContext, playerID uuid.UUID) bool {
-	// TODO: Check if player has enough mana
+	if c.Mana == nil {
+		return true // No cost
+	}
+
+	// Get player's mana pool
+	pool := game.GetManaPool(playerID)
+	if pool == nil {
+		return false
+	}
+
+	// Check colored mana requirements
+	if pool.GetAmount("WHITE") < c.Mana.White {
+		return false
+	}
+	if pool.GetAmount("BLUE") < c.Mana.Blue {
+		return false
+	}
+	if pool.GetAmount("BLACK") < c.Mana.Black {
+		return false
+	}
+	if pool.GetAmount("RED") < c.Mana.Red {
+		return false
+	}
+	if pool.GetAmount("GREEN") < c.Mana.Green {
+		return false
+	}
+	if pool.GetAmount("COLORLESS") < c.Mana.Colorless {
+		return false
+	}
+
+	// Check generic mana requirement (can be paid with any mana)
+	// Calculate total available mana after paying colored costs
+	availableAfterColored := pool.GetAmount("WHITE") - c.Mana.White +
+		pool.GetAmount("BLUE") - c.Mana.Blue +
+		pool.GetAmount("BLACK") - c.Mana.Black +
+		pool.GetAmount("RED") - c.Mana.Red +
+		pool.GetAmount("GREEN") - c.Mana.Green +
+		pool.GetAmount("COLORLESS") - c.Mana.Colorless
+
+	if availableAfterColored < c.Mana.Generic {
+		return false
+	}
+
 	return true
 }
 
 func (c *ManaCost) Pay(ctx context.Context, game GameContext, playerID uuid.UUID) error {
-	// TODO: Implement mana payment
-	return fmt.Errorf("mana payment not yet implemented")
+	if c.Mana == nil {
+		return nil // No cost
+	}
+
+	// First check if we can pay
+	if !c.CanPay(ctx, game, playerID) {
+		return fmt.Errorf("insufficient mana to pay cost")
+	}
+
+	// Get player's mana pool
+	pool := game.GetManaPool(playerID)
+	if pool == nil {
+		return fmt.Errorf("player has no mana pool")
+	}
+
+	// Pay colored mana first (these MUST be paid with the specific color)
+	if c.Mana.White > 0 {
+		if err := pool.SpendMana("WHITE", c.Mana.White); err != nil {
+			return fmt.Errorf("failed to spend white mana: %w", err)
+		}
+	}
+	if c.Mana.Blue > 0 {
+		if err := pool.SpendMana("BLUE", c.Mana.Blue); err != nil {
+			return fmt.Errorf("failed to spend blue mana: %w", err)
+		}
+	}
+	if c.Mana.Black > 0 {
+		if err := pool.SpendMana("BLACK", c.Mana.Black); err != nil {
+			return fmt.Errorf("failed to spend black mana: %w", err)
+		}
+	}
+	if c.Mana.Red > 0 {
+		if err := pool.SpendMana("RED", c.Mana.Red); err != nil {
+			return fmt.Errorf("failed to spend red mana: %w", err)
+		}
+	}
+	if c.Mana.Green > 0 {
+		if err := pool.SpendMana("GREEN", c.Mana.Green); err != nil {
+			return fmt.Errorf("failed to spend green mana: %w", err)
+		}
+	}
+	if c.Mana.Colorless > 0 {
+		if err := pool.SpendMana("COLORLESS", c.Mana.Colorless); err != nil {
+			return fmt.Errorf("failed to spend colorless mana: %w", err)
+		}
+	}
+
+	// Pay generic mana (can be paid with any remaining mana)
+	// We need to implement a strategy for paying generic costs
+	if c.Mana.Generic > 0 {
+		remaining := c.Mana.Generic
+
+		// Try to pay with each color in order: W, U, B, R, G, C
+		colors := []string{"WHITE", "BLUE", "BLACK", "RED", "GREEN", "COLORLESS"}
+		for _, color := range colors {
+			available := pool.GetAmount(color)
+			if available > 0 {
+				toPay := available
+				if toPay > remaining {
+					toPay = remaining
+				}
+				if err := pool.SpendMana(color, toPay); err != nil {
+					return fmt.Errorf("failed to spend %s mana for generic cost: %w", color, err)
+				}
+				remaining -= toPay
+				if remaining == 0 {
+					break
+				}
+			}
+		}
+
+		if remaining > 0 {
+			return fmt.Errorf("insufficient mana to pay generic cost")
+		}
+	}
+
+	return nil
 }
 
 func (c *ManaCost) String() string {
@@ -332,4 +449,50 @@ func (c *NoCost) Pay(ctx context.Context, game GameContext, playerID uuid.UUID) 
 
 func (c *NoCost) String() string {
 	return ""
+}
+
+// ========================================
+// Discard Target Cost (with filtering)
+// ========================================
+
+// DiscardTargetCost represents discarding specific cards (with filtering) as a cost
+// Java: mage.abilities.costs.common.DiscardTargetCost
+// MTG Rules: 118.9 (Costs), 701.8 (Discard)
+type DiscardTargetCost struct {
+	amount int
+	filter CardFilter // What types of cards can be discarded
+}
+
+// NewDiscardTargetCost creates a new discard target cost
+// Example: NewDiscardTargetCost(2, NewArtifactCardFilter()) = "Discard two artifact cards"
+func NewDiscardTargetCost(amount int, filter CardFilter) *DiscardTargetCost {
+	return &DiscardTargetCost{
+		amount: amount,
+		filter: filter,
+	}
+}
+
+// CanPay checks if the player can pay this cost
+func (c *DiscardTargetCost) CanPay(ctx context.Context, game GameContext, playerID uuid.UUID) bool {
+	// TODO: Check if player has enough cards matching the filter
+	return true
+}
+
+// Pay pays this cost (discards the specified cards)
+func (c *DiscardTargetCost) Pay(ctx context.Context, game GameContext, playerID uuid.UUID) error {
+	// TODO: Discard cards matching the filter
+	return fmt.Errorf("discard target cost not yet implemented")
+}
+
+// String returns a text representation
+func (c *DiscardTargetCost) String() string {
+	filterDesc := "card"
+	if c.filter != nil {
+		filterDesc = c.filter.GetDescription()
+	}
+
+	if c.amount == 1 {
+		return fmt.Sprintf("Discard a %s", filterDesc)
+	}
+	return fmt.Sprintf("Discard %d %ss", c.amount, filterDesc)
 }

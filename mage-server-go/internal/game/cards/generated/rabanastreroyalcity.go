@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRabanastreRoyalCity creates a Rabanastre Royal City
-//  - LAND
+//   - LAND
 func NewRabanastreRoyalCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rabanastre Royal City")
 	card.ManaCost = ""

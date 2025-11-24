@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPollutedDelta creates a Polluted Delta
-//  - LAND
+//   - LAND
 func NewPollutedDelta(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Polluted Delta")
 	card.ManaCost = ""

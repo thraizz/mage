@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPollutedMire creates a Polluted Mire
-//  - LAND
+//   - LAND
 func NewPollutedMire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Polluted Mire")
 	card.ManaCost = ""

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewMobilizedDistrict creates a Mobilized District
-//  - LAND
+//   - LAND
+//
 // Vigilance
 func NewMobilizedDistrict(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mobilized District")

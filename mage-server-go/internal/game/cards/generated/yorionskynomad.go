@@ -12,7 +12,9 @@ func init() {
 }
 
 // NewYorionSkyNomad creates a Yorion Sky Nomad
-//  - 
+//
+//	-
+//
 // Flying
 func NewYorionSkyNomad(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Yorion Sky Nomad")

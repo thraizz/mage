@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewGalianBeast creates a Galian Beast
-//  - CREATURE
+//   - CREATURE
+//
 // Trample, Lifelink
 func NewGalianBeast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Galian Beast")

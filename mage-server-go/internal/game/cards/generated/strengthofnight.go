@@ -21,9 +21,9 @@ func NewStrengthOfNight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 2, filter)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewBoostEffect(2, 2, filter)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

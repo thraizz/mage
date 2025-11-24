@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHaukensInsight creates a Haukens Insight
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewHaukensInsight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Haukens Insight")
 	card.ManaCost = ""

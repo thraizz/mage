@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKeldonMegaliths creates a Keldon Megaliths
-//  - LAND
+//   - LAND
 func NewKeldonMegaliths(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Keldon Megaliths")
 	card.ManaCost = ""

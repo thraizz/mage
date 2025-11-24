@@ -27,7 +27,7 @@ func NewSunkenField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
-		AddEffect(abilities.NewCounterSpellEffect(new ManaCostsImpl<>("{1}"))).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
@@ -37,7 +37,7 @@ func NewSunkenField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCounterSpellEffect(new ManaCostsImpl<>("{1}"))).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

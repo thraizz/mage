@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewRoarOfTheFifthPeople creates a Roar Of The Fifth People
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewRoarOfTheFifthPeople(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Roar Of The Fifth People")
 	card.ManaCost = ""

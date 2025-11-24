@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOneOfThePack creates a One Of The Pack
-//  - CREATURE
+//   - CREATURE
 func NewOneOfThePack(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "One Of The Pack")
 	card.ManaCost = ""

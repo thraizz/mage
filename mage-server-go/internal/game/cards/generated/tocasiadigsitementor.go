@@ -27,7 +27,7 @@ func NewTocasiaDigSiteMentor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewSurveilEffect(1)).
-		AddEffect(abilities.NewGrantAbilityEffect(new SimpleActivatedAbility( new SurveilEffect(1, false), new TapSourceCost() ))).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

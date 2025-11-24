@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDragonskullSummit creates a Dragonskull Summit
-//  - LAND
+//   - LAND
 func NewDragonskullSummit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dragonskull Summit")
 	card.ManaCost = ""

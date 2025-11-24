@@ -21,8 +21,8 @@ func NewScorchTheFields(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewDamageEffect(1, filter)).
+		// TODO: DestroyTargetEffect with complex parameters
+		// TODO: DamageAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

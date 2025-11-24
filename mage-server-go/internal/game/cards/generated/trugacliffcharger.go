@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewTrugaCliffcharger creates a Truga Cliffcharger
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewTrugaCliffcharger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Truga Cliffcharger")

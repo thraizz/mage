@@ -21,7 +21,7 @@ func NewCrisisOfConscience(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect(filter)).
+		// TODO: DestroyAllEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect(filter2)).
 		Build()
 	if err != nil {

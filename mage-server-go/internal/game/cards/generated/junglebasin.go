@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJungleBasin creates a Jungle Basin
-//  - LAND
+//   - LAND
 func NewJungleBasin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jungle Basin")
 	card.ManaCost = ""

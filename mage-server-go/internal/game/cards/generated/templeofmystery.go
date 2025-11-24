@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTempleOfMystery creates a Temple Of Mystery
-//  - LAND
+//   - LAND
 func NewTempleOfMystery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Temple Of Mystery")
 	card.ManaCost = ""

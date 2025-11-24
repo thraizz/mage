@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewChokedEstuary creates a Choked Estuary
-//  - LAND
+//   - LAND
 func NewChokedEstuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Choked Estuary")
 	card.ManaCost = ""

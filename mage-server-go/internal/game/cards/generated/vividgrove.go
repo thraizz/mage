@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVividGrove creates a Vivid Grove
-//  - LAND
+//   - LAND
 func NewVividGrove(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vivid Grove")
 	card.ManaCost = ""

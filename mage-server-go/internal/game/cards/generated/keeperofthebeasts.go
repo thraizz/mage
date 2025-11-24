@@ -26,7 +26,7 @@ func NewKeeperOfTheBeasts(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(new BeastToken4())).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

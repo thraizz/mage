@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSolTalisman creates a Sol Talisman
-//  - ARTIFACT
+//   - ARTIFACT
 func NewSolTalisman(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sol Talisman")
 	card.ManaCost = ""

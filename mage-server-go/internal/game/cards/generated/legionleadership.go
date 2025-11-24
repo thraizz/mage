@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewLegionLeadership creates a Legion Leadership
-//  - INSTANT
+//   - INSTANT
 func NewLegionLeadership(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Legion Leadership")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewLegionLeadership(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(permanent.getPower().getValue(), 0)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewHollowTrees creates a Hollow Trees
-//  - LAND
+//   - LAND
 func NewHollowTrees(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hollow Trees")
 	card.ManaCost = ""

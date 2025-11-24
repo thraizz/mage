@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSequesteredStash creates a Sequestered Stash
-//  - LAND
+//   - LAND
 func NewSequesteredStash(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sequestered Stash")
 	card.ManaCost = ""

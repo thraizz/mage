@@ -27,7 +27,7 @@ func NewNecrogenesis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)

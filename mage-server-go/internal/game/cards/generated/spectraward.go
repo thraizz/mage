@@ -31,7 +31,7 @@ func NewSpectraWard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(2,2)).
+		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
 		Build()
 	if err != nil {
 		return nil, err

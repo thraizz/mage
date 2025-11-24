@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDustBowl creates a Dust Bowl
-//  - LAND
+//   - LAND
 func NewDustBowl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dust Bowl")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewDustBowl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddTapCost().
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

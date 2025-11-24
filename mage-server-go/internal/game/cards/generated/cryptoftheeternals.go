@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCryptOfTheEternals creates a Crypt Of The Eternals
-//  - LAND
+//   - LAND
 func NewCryptOfTheEternals(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crypt Of The Eternals")
 	card.ManaCost = ""

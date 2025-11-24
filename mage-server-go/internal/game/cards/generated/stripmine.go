@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStripMine creates a Strip Mine
-//  - LAND
+//   - LAND
 func NewStripMine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Strip Mine")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewStripMine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

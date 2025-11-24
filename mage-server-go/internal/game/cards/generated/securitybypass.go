@@ -31,7 +31,7 @@ func NewSecurityBypass(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new DealsCombatDamageToAPlayerTriggeredAbility(new ConniveSourceEffect(), false) .setTriggerPhrase("Whenever creature deals combat damage to a playerenchanted creature has " + "\"Whenever creature deals combat damage to a player, it connives.\" " + "<i>(Its controller draws a card, then discards a card. If they discarded a nonland cardthey put a +1/+1 counter on creature.)</i>")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

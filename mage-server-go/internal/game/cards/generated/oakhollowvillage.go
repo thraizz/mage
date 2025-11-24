@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewOakhollowVillage creates a Oakhollow Village
-//  - LAND
+//   - LAND
 func NewOakhollowVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Oakhollow Village")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewOakhollowVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), filter)).
+		// TODO: AddCountersAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -22,7 +22,7 @@ func NewSoulRead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(2)).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()

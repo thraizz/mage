@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIndathaTriome creates a Indatha Triome
-//  - LAND
+//   - LAND
 func NewIndathaTriome(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Indatha Triome")
 	card.ManaCost = ""

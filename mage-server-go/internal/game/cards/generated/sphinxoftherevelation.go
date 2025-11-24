@@ -12,7 +12,9 @@ func init() {
 }
 
 // NewSphinxOfTheRevelation creates a Sphinx Of The Revelation
-//  - 
+//
+//	-
+//
 // Flying, Lifelink
 func NewSphinxOfTheRevelation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sphinx Of The Revelation")

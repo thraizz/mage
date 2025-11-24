@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLotusBloom creates a Lotus Bloom
-//  - ARTIFACT
+//   - ARTIFACT
 func NewLotusBloom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lotus Bloom")
 	card.ManaCost = ""

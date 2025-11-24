@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNestingGrounds creates a Nesting Grounds
-//  - LAND
+//   - LAND
 func NewNestingGrounds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nesting Grounds")
 	card.ManaCost = ""

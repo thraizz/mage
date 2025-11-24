@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewJunktown creates a Junktown
-//  - LAND
+//   - LAND
 func NewJunktown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Junktown")
 	card.ManaCost = ""

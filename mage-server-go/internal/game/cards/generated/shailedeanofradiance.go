@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewShaileDeanOfRadiance creates a Shaile Dean Of Radiance
-//  - CREATURE
+//   - CREATURE
+//
 // Flying, Vigilance
 func NewShaileDeanOfRadiance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shaile Dean Of Radiance")

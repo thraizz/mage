@@ -33,7 +33,7 @@ func NewAlelaArtfulProvocateur(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 0, filter, true)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

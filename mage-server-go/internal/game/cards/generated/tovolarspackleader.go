@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewTovolarsPackleader creates a Tovolars Packleader
-//  - CREATURE
+//   - CREATURE
 func NewTovolarsPackleader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tovolars Packleader")
 	card.ManaCost = ""

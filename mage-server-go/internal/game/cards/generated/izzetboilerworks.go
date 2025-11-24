@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIzzetBoilerworks creates a Izzet Boilerworks
-//  - LAND
+//   - LAND
 func NewIzzetBoilerworks(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Izzet Boilerworks")
 	card.ManaCost = ""

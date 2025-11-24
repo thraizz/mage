@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGameTrail creates a Game Trail
-//  - LAND
+//   - LAND
 func NewGameTrail(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Game Trail")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWindbriskHeights creates a Windbrisk Heights
-//  - LAND
+//   - LAND
 func NewWindbriskHeights(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Windbrisk Heights")
 	card.ManaCost = ""

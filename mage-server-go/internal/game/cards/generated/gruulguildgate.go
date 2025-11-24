@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGruulGuildgate creates a Gruul Guildgate
-//  - LAND
+//   - LAND
 func NewGruulGuildgate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gruul Guildgate")
 	card.ManaCost = ""

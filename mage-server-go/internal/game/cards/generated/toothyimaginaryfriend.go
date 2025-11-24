@@ -33,7 +33,7 @@ func NewToothyImaginaryFriend(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(new CountersSourceCount(CounterType.P1P1))).
+		// TODO: DrawCardSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

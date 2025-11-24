@@ -32,7 +32,7 @@ func NewMindlashSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - AddSacrificeSourceCost()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filter{1}, Sacrifice permanent: Each player discards a card.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

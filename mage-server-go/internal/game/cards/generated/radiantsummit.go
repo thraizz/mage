@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRadiantSummit creates a Radiant Summit
-//  - LAND
+//   - LAND
 func NewRadiantSummit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Radiant Summit")
 	card.ManaCost = ""

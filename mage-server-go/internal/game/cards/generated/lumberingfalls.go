@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewLumberingFalls creates a Lumbering Falls
-//  - LAND
+//   - LAND
+//
 // Hexproof
 func NewLumberingFalls(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lumbering Falls")

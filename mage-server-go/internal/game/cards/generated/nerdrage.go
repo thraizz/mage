@@ -32,7 +32,7 @@ func NewNerdRage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(10, 10)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new AttacksTriggeredAbility(new BoostSourceEffect( 10, 10 )).withInterveningIf(condition), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

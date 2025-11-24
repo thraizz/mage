@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewDreadshipReef creates a Dreadship Reef
-//  - LAND
+//   - LAND
 func NewDreadshipReef(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dreadship Reef")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCitadelGate creates a Citadel Gate
-//  - LAND
+//   - LAND
 func NewCitadelGate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Citadel Gate")
 	card.ManaCost = ""

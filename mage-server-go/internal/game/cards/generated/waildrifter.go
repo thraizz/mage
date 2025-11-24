@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewWaildrifter creates a Waildrifter
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewWaildrifter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Waildrifter")

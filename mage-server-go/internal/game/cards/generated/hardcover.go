@@ -32,7 +32,7 @@ func NewHardCover(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(0, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new SimpleActivatedAbility( new DrawDiscardControllerEffect(1, 1), new TapSourceCost() ), AttachmentType.AURA)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err

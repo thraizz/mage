@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSilundiVision creates a Silundi Vision
-//  - INSTANT
+//   - INSTANT
 func NewSilundiVision(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Silundi Vision")
 	card.ManaCost = ""

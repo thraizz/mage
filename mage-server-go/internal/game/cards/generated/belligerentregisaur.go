@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewBelligerentRegisaur creates a Belligerent Regisaur
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewBelligerentRegisaur(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Belligerent Regisaur")

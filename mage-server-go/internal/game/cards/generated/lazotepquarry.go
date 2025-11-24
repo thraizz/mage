@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLazotepQuarry creates a Lazotep Quarry
-//  - LAND
+//   - LAND
 func NewLazotepQuarry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lazotep Quarry")
 	card.ManaCost = ""

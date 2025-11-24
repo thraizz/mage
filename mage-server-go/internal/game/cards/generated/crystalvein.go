@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCrystalVein creates a Crystal Vein
-//  - LAND
+//   - LAND
 func NewCrystalVein(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crystal Vein")
 	card.ManaCost = ""

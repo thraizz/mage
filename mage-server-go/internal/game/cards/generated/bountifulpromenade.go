@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBountifulPromenade creates a Bountiful Promenade
-//  - LAND
+//   - LAND
 func NewBountifulPromenade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bountiful Promenade")
 	card.ManaCost = ""

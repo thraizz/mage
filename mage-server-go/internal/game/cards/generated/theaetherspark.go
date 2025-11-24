@@ -27,7 +27,7 @@ func NewTheAetherspark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeLoyalty.CreateInstance(0), SavedDamageValue.MANY)).
-		AddEffect(abilities.NewGrantAbilityEffect(new DealsCombatDamageEquippedTriggeredAbility(new AddCountersSourceEffect( counters.CounterTypeLoyalty.CreateInstance(0), SavedDamageValue.MANY )).withTriggerCondition(MyTurnCondition.instance))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

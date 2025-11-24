@@ -32,8 +32,8 @@ func NewMorgulKnifeWound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(-3, 0)).
-		AddEffect(abilities.NewExileSourceEffect()).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new BeginningOfUpkeepTriggeredAbility( new DoUnlessControllerPaysEffect( new ExileSourceEffect(), new PayLifeCost(2) ).setText("exile {} unless you pay 2 life") ), AttachmentType.AURA)).
+		// TODO: ExileSourceEffect with complex parameters
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

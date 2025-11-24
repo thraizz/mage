@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMoistureFarm creates a Moisture Farm
-//  - LAND
+//   - LAND
 func NewMoistureFarm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Moisture Farm")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOvergrownTomb creates a Overgrown Tomb
-//  - LAND
+//   - LAND
 func NewOvergrownTomb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Overgrown Tomb")
 	card.ManaCost = ""

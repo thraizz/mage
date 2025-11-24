@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEtchedCornfield creates a Etched Cornfield
-//  - LAND
+//   - LAND
 func NewEtchedCornfield(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Etched Cornfield")
 	card.ManaCost = ""

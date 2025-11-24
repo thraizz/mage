@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLanternsLift creates a Lanterns Lift
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewLanternsLift(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lanterns Lift")
 	card.ManaCost = ""

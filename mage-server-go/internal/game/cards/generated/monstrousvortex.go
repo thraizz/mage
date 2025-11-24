@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewMonstrousVortex creates a Monstrous Vortex
-//  - 
+//
+//	-
 func NewMonstrousVortex(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Monstrous Vortex")
 	card.ManaCost = ""

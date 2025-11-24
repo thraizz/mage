@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEverglades creates a Everglades
-//  - LAND
+//   - LAND
 func NewEverglades(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Everglades")
 	card.ManaCost = ""

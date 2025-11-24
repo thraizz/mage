@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewBahamutWardenOfLight creates a Bahamut Warden Of Light
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Flying
 func NewBahamutWardenOfLight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bahamut Warden Of Light")

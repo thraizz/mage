@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSummonEsperMaduin creates a Summon Esper Maduin
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
 func NewSummonEsperMaduin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Summon Esper Maduin")
 	card.ManaCost = ""

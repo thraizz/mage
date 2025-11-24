@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTeferiAkosaOfZhalfir creates a Teferi Akosa Of Zhalfir
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewTeferiAkosaOfZhalfir(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Teferi Akosa Of Zhalfir")
 	card.ManaCost = ""

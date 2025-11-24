@@ -36,7 +36,7 @@ func NewPowerOfFire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.AURA{T}: This creature deals 1 damage to any target.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

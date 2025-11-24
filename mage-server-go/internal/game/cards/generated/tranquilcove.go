@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTranquilCove creates a Tranquil Cove
-//  - LAND
+//   - LAND
 func NewTranquilCove(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tranquil Cove")
 	card.ManaCost = ""

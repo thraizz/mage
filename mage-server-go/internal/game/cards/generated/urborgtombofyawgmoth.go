@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUrborgTombOfYawgmoth creates a Urborg Tomb Of Yawgmoth
-//  - LAND
+//   - LAND
 func NewUrborgTombOfYawgmoth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Urborg Tomb Of Yawgmoth")
 	card.ManaCost = ""

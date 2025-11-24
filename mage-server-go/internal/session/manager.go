@@ -17,7 +17,9 @@ type Manager interface {
 	UpdateActivity(id string)
 	CleanupExpiredSessions(ctx context.Context)
 	GetActiveSessions() int
+	ActiveSessionCount() int // Alias for GetActiveSessions for consistency
 	GetSessionsByUser(userID string) []*Session
+	GetAllSessionIDs() []string
 	CloseAll()
 }
 
@@ -140,6 +142,11 @@ func (m *manager) GetActiveSessions() int {
 	return len(m.sessions)
 }
 
+// ActiveSessionCount returns the count of active sessions (alias for GetActiveSessions)
+func (m *manager) ActiveSessionCount() int {
+	return m.GetActiveSessions()
+}
+
 // GetSessionsByUser returns all sessions for a given user ID
 func (m *manager) GetSessionsByUser(userID string) []*Session {
 	m.mu.RLock()
@@ -152,6 +159,18 @@ func (m *manager) GetSessionsByUser(userID string) []*Session {
 		}
 	}
 	return sessions
+}
+
+// GetAllSessionIDs returns all session IDs
+func (m *manager) GetAllSessionIDs() []string {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	ids := make([]string, 0, len(m.sessions))
+	for id := range m.sessions {
+		ids = append(ids, id)
+	}
+	return ids
 }
 
 // CloseAll closes all sessions

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewKianneDeanOfSubstance creates a Kianne Dean Of Substance
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewKianneDeanOfSubstance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kianne Dean Of Substance")

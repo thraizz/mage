@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewNeedleSpires creates a Needle Spires
-//  - LAND
+//   - LAND
+//
 // DoubleStrike
 func NewNeedleSpires(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Needle Spires")

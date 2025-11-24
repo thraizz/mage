@@ -22,7 +22,7 @@ func NewGlyphOfDelusion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect()).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect(ability2)).
 		Build()
 	if err != nil {

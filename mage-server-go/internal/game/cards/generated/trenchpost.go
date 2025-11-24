@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTrenchpost creates a Trenchpost
-//  - LAND
+//   - LAND
 func NewTrenchpost(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Trenchpost")
 	card.ManaCost = ""

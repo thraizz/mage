@@ -22,8 +22,8 @@ func NewDaggerOfTheWorthy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(2,0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new AfflictAbility(1), AttachmentType.EQUIPMENT)).
+		AddEffect(abilities.NewBoostEquippedEffect(2, 0)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

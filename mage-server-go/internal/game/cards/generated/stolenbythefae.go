@@ -26,7 +26,7 @@ func NewStolenByTheFae(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0, GetXValue.instance)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewDeadlyDancer creates a Deadly Dancer
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewDeadlyDancer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Deadly Dancer")

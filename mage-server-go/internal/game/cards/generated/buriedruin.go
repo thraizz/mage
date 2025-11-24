@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBuriedRuin creates a Buried Ruin
-//  - LAND
+//   - LAND
 func NewBuriedRuin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Buried Ruin")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewBuriedRuin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddManaCost("{2}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

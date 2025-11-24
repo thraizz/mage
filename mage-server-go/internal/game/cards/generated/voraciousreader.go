@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVoraciousReader creates a Voracious Reader
-//  - CREATURE
+//   - CREATURE
 func NewVoraciousReader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Voracious Reader")
 	card.ManaCost = ""

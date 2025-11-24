@@ -29,7 +29,7 @@ func NewZopandrelHungerDominus(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(permanent.getPower().getValue(), permanent.getToughness().getValue())).
+		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

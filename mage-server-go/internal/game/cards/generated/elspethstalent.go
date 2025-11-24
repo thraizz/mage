@@ -37,7 +37,7 @@ func NewElspethsTalent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token2_0, 3)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new LoyaltyAbility(new CreateTokenEffect(token2_0, 3), 1), AttachmentType.AURA, null)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

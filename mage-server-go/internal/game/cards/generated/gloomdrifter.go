@@ -29,7 +29,7 @@ func NewGloomdrifter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(-2, -2, false)).
-		AddEffect(abilities.NewGrantAbilityEffect(new EntersBattlefieldTriggeredAbility( new BoostAllEffect( -2, -2, false )))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

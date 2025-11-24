@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpectatorSeating creates a Spectator Seating
-//  - LAND
+//   - LAND
 func NewSpectatorSeating(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spectator Seating")
 	card.ManaCost = ""

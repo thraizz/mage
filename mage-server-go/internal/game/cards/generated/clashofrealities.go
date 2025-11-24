@@ -21,27 +21,9 @@ func NewClashOfRealities(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(3)).
-		AddEffect(abilities.NewDamageEffect(3)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(ability1, filterSpiritWhen permanent enters the battlefield, you may have it deal 3 damage to target non-Spirit creature.\"")).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(ability2, filterNotSpiritWhen creature enters the battlefield, you may have it deal 3 damage to target Spirit creature.\"")).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability2)
+	// TODO: Complex grant ability effects need proper transpilation
+	// This card grants abilities to Spirit and non-Spirit creatures
+	// Temporarily stubbed until card transpiler is fixed
+	_ = card // Use card to avoid unused variable error
 	return card, nil
 }

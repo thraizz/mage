@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNicolBolasTheArisen creates a Nicol Bolas The Arisen
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewNicolBolasTheArisen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nicol Bolas The Arisen")
 	card.ManaCost = ""

@@ -26,7 +26,7 @@ func NewLullmageMentor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	token1_0, err := token.GetToken("MerfolkToken")

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewHowlpackAlpha creates a Howlpack Alpha
-//  - CREATURE
+//   - CREATURE
 func NewHowlpackAlpha(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Howlpack Alpha")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewHowlpackAlpha(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

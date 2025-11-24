@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOminousCemetery creates a Ominous Cemetery
-//  - LAND
+//   - LAND
 func NewOminousCemetery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ominous Cemetery")
 	card.ManaCost = ""

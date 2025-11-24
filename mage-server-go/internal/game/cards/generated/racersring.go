@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRacersRing creates a Racers Ring
-//  - LAND
+//   - LAND
 func NewRacersRing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Racers Ring")
 	card.ManaCost = ""

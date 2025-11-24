@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewMaliciousInvader creates a Malicious Invader
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewMaliciousInvader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Malicious Invader")

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewInevitableBetrayal creates a Inevitable Betrayal
-//  - SORCERY
+//   - SORCERY
 func NewInevitableBetrayal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Inevitable Betrayal")
 	card.ManaCost = ""

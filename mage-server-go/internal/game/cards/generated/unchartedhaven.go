@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUnchartedHaven creates a Uncharted Haven
-//  - LAND
+//   - LAND
 func NewUnchartedHaven(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Uncharted Haven")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewCrucibleOfTheSpiritDragon creates a Crucible Of The Spirit Dragon
-//  - LAND
+//   - LAND
 func NewCrucibleOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crucible Of The Spirit Dragon")
 	card.ManaCost = ""

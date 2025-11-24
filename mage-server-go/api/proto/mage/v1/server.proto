@@ -99,13 +99,22 @@ service MageServer {
   // Check if user is table owner
   rpc TableIsOwner(TableIsOwnerRequest) returns (TableIsOwnerResponse);
 
-  // ==================== Deck Management (2 methods) ====================
+  // ==================== Deck Management (5 methods) ====================
 
   // Submit deck for a table/tournament
   rpc DeckSubmit(DeckSubmitRequest) returns (DeckSubmitResponse);
 
   // Save deck to database
   rpc DeckSave(DeckSaveRequest) returns (DeckSaveResponse);
+
+  // List user's decks (optionally filtered by format)
+  rpc DeckList(DeckListRequest) returns (DeckListResponse);
+
+  // Delete a deck
+  rpc DeckDelete(DeckDeleteRequest) returns (DeckDeleteResponse);
+
+  // Get deck details by ID
+  rpc DeckGet(DeckGetRequest) returns (DeckGetResponse);
 
   // ==================== Game Execution (12 methods) ====================
 
@@ -198,6 +207,14 @@ service MageServer {
 
   // Find chat by room
   rpc ChatFindByRoom(ChatFindByRoomRequest) returns (ChatFindByRoomResponse);
+
+  // ==================== Match History (2 methods) ====================
+
+  // Get user's match history (paginated)
+  rpc GetMatchHistory(GetMatchHistoryRequest) returns (GetMatchHistoryResponse);
+
+  // Get specific match details by ID
+  rpc GetMatchById(GetMatchByIdRequest) returns (GetMatchByIdResponse);
 
   // ==================== Replay (6 methods) ====================
 

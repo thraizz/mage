@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDreadOsseosaur creates a Dread Osseosaur
-//  - CREATURE
+//   - CREATURE
 func NewDreadOsseosaur(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dread Osseosaur")
 	card.ManaCost = ""

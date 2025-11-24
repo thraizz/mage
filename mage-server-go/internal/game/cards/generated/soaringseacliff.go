@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewSoaringSeacliff creates a Soaring Seacliff
-//  - LAND
+//   - LAND
 func NewSoaringSeacliff(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Soaring Seacliff")
 	card.ManaCost = ""

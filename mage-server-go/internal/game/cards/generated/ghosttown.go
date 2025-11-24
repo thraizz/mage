@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGhostTown creates a Ghost Town
-//  - LAND
+//   - LAND
 func NewGhostTown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ghost Town")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewGhostTown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

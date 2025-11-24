@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCabarettiCourtyard creates a Cabaretti Courtyard
-//  - LAND
+//   - LAND
 func NewCabarettiCourtyard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cabaretti Courtyard")
 	card.ManaCost = ""

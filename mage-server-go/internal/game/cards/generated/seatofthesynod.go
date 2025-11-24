@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSeatOfTheSynod creates a Seat Of The Synod
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
 func NewSeatOfTheSynod(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seat Of The Synod")
 	card.ManaCost = ""

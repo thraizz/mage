@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLakeOfTheDead creates a Lake Of The Dead
-//  - LAND
+//   - LAND
 func NewLakeOfTheDead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lake Of The Dead")
 	card.ManaCost = ""

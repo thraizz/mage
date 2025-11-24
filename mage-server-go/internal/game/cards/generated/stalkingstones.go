@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStalkingStones creates a Stalking Stones
-//  - LAND
+//   - LAND
 func NewStalkingStones(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Stalking Stones")
 	card.ManaCost = ""

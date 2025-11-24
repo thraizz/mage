@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMastercraftRaptor creates a Mastercraft Raptor
-//  - ARTIFACT CREATURE
+//   - ARTIFACT CREATURE
 func NewMastercraftRaptor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mastercraft Raptor")
 	card.ManaCost = ""

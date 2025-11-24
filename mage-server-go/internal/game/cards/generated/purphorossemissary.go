@@ -34,7 +34,7 @@ func NewPurphorossEmissary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(3,3)).
+		AddEffect(abilities.NewBoostEnchantedEffect(3, 3)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("MenaceAbility", abilities.AttachmentTypeAura)).
 		Build()
 	if err != nil {

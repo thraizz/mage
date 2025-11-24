@@ -22,7 +22,7 @@ func NewNevinyrralsDisk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDestroyEffect(filter, false)).
+		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

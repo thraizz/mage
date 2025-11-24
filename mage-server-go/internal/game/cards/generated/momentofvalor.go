@@ -22,8 +22,8 @@ func NewMomentOfValor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
+		// TODO: UntapTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(1, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility")).
 		AddTarget(abilities.NewCreatureTargetFilter()).

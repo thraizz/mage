@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLeylineSurge creates a Leyline Surge
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewLeylineSurge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Leyline Surge")
 	card.ManaCost = ""

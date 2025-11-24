@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMirrodinsCore creates a Mirrodins Core
-//  - LAND
+//   - LAND
 func NewMirrodinsCore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mirrodins Core")
 	card.ManaCost = ""

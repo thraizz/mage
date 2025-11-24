@@ -32,7 +32,7 @@ func NewPoulticeSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - AddTapCost()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect({2}, {T}: Regenerate target Sliver.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

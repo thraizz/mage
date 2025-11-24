@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIceFloe creates a Ice Floe
-//  - LAND
+//   - LAND
 func NewIceFloe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ice Floe")
 	card.ManaCost = ""
@@ -22,7 +22,7 @@ func NewIceFloe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

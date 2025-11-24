@@ -21,7 +21,7 @@ func NewPlayOfTheGame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileAllEffect(abilities.NewPermanentTargetFilter())).
+		// TODO: ExileAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

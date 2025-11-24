@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWitchEnchanter creates a Witch Enchanter
-//  - CREATURE
+//   - CREATURE
 func NewWitchEnchanter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Witch Enchanter")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewWitchEnchanter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

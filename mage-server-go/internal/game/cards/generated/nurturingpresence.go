@@ -33,7 +33,7 @@ func NewNurturingPresence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new EntersBattlefieldControlledTriggeredAbility( new BoostSourceEffect(1, 1) .setText(" creature gets +1/+1 until end of turn"), ), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

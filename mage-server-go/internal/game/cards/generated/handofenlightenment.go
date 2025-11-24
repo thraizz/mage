@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewHandOfEnlightenment creates a Hand Of Enlightenment
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // FirstStrike
 func NewHandOfEnlightenment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hand Of Enlightenment")

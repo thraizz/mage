@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDeathbonnetHulk creates a Deathbonnet Hulk
-//  - CREATURE
+//   - CREATURE
 func NewDeathbonnetHulk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Deathbonnet Hulk")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPortraitOfMichiko creates a Portrait Of Michiko
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
 func NewPortraitOfMichiko(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Portrait Of Michiko")
 	card.ManaCost = ""

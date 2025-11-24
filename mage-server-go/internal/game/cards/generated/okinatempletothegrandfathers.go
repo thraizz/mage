@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOkinaTempleToTheGrandfathers creates a Okina Temple To The Grandfathers
-//  - LAND
+//   - LAND
 func NewOkinaTempleToTheGrandfathers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Okina Temple To The Grandfathers")
 	card.ManaCost = ""

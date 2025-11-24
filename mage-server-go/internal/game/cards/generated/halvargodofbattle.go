@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewHalvarGodOfBattle creates a Halvar God Of Battle
-//  - CREATURE
+//   - CREATURE
 func NewHalvarGodOfBattle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Halvar God Of Battle")
 	card.ManaCost = ""

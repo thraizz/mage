@@ -25,8 +25,8 @@ func NewDawnbringerCleric(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(2)).
-		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
+		// TODO: ExileTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

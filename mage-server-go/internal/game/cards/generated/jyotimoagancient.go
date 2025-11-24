@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewJyotiMoagAncient creates a Jyoti Moag Ancient
-//  - 
+//
+//	-
 func NewJyotiMoagAncient(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jyoti Moag Ancient")
 	card.ManaCost = ""
@@ -36,7 +37,7 @@ func NewJyotiMoagAncient(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(SourcePermanentPowerValue.NOT_NEGATIVE, SourcePermanentPowerValue.NOT_NEGATIVE, filter, false)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

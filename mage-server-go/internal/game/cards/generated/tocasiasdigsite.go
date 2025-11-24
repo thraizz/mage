@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTocasiasDigSite creates a Tocasias Dig Site
-//  - LAND
+//   - LAND
 func NewTocasiasDigSite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tocasias Dig Site")
 	card.ManaCost = ""

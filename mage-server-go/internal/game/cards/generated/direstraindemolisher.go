@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDireStrainDemolisher creates a Dire Strain Demolisher
-//  - CREATURE
+//   - CREATURE
 func NewDireStrainDemolisher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dire Strain Demolisher")
 	card.ManaCost = ""

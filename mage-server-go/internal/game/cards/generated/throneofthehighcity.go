@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewThroneOfTheHighCity creates a Throne Of The High City
-//  - LAND
+//   - LAND
 func NewThroneOfTheHighCity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Throne Of The High City")
 	card.ManaCost = ""

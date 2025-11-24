@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewFearsomeWerewolf creates a Fearsome Werewolf
-//  - CREATURE
+//   - CREATURE
+//
 // Menace
 func NewFearsomeWerewolf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fearsome Werewolf")

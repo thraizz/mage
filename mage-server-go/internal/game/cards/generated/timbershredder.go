@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewTimberShredder creates a Timber Shredder
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewTimberShredder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Timber Shredder")

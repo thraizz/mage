@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewResurgentBelief creates a Resurgent Belief
-//  - SORCERY
+//   - SORCERY
 func NewResurgentBelief(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Resurgent Belief")
 	card.ManaCost = ""

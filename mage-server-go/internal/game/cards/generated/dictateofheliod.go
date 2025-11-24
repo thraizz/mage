@@ -24,7 +24,7 @@ func NewDictateOfHeliod(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2,2)).
+		AddEffect(abilities.NewBoostEffect(2, 2)).
 		Build()
 	if err != nil {
 		return nil, err

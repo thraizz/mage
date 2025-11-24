@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewGoldmireBridge creates a Goldmire Bridge
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
+//
 // Indestructible
 func NewGoldmireBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Goldmire Bridge")

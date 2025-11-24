@@ -22,7 +22,7 @@ func NewAbsorb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: CounterTargetEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(3)).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()

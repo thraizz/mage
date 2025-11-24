@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewBloodswornKnight creates a Bloodsworn Knight
-//  - CREATURE
+//   - CREATURE
 func NewBloodswornKnight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bloodsworn Knight")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewBloodswornKnight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

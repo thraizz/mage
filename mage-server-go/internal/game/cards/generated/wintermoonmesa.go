@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWintermoonMesa creates a Wintermoon Mesa
-//  - LAND
+//   - LAND
 func NewWintermoonMesa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wintermoon Mesa")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewWintermoonMesa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewAlrundGodOfTheCosmos creates a Alrund God Of The Cosmos
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewAlrundGodOfTheCosmos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Alrund God Of The Cosmos")
@@ -25,7 +26,7 @@ func NewAlrundGodOfTheCosmos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(AlrundGodOfTheCosmosValue.instance, AlrundGodOfTheCosmosValue.instance)).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIncitedRabble creates a Incited Rabble
-//  - CREATURE
+//   - CREATURE
 func NewIncitedRabble(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Incited Rabble")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHavengulLaboratory creates a Havengul Laboratory
-//  - LAND
+//   - LAND
 func NewHavengulLaboratory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Havengul Laboratory")
 	card.ManaCost = ""

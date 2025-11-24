@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCopperlineGorge creates a Copperline Gorge
-//  - LAND
+//   - LAND
 func NewCopperlineGorge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Copperline Gorge")
 	card.ManaCost = ""

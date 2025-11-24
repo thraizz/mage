@@ -5,8 +5,8 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/token"
 	"github.com/magefree/mage-server-go/internal/game/effects"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -38,7 +38,7 @@ func NewKorozdaGuildmage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0,SacrificeCostCreaturesToughness.instance)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0, SacrificeCostCreaturesToughness.instance)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

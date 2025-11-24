@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewAwakenedSkyclave creates a Awakened Skyclave
-//  - CREATURE
+//   - CREATURE
+//
 // Vigilance, Haste
 func NewAwakenedSkyclave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Awakened Skyclave")

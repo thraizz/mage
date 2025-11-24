@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMercadianBazaar creates a Mercadian Bazaar
-//  - LAND
+//   - LAND
 func NewMercadianBazaar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mercadian Bazaar")
 	card.ManaCost = ""

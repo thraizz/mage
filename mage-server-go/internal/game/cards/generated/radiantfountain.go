@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRadiantFountain creates a Radiant Fountain
-//  - LAND
+//   - LAND
 func NewRadiantFountain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Radiant Fountain")
 	card.ManaCost = ""

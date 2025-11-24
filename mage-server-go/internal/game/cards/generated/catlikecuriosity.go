@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCatlikeCuriosity creates a Catlike Curiosity
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewCatlikeCuriosity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Catlike Curiosity")
 	card.ManaCost = ""
@@ -32,7 +32,7 @@ func NewCatlikeCuriosity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new DealsCombatDamageToAPlayerTriggeredAbility( new DrawCardSourceControllerEffect(1), false ).setTriggerPhrase("Whenever creature deals combat damage to a player, "), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

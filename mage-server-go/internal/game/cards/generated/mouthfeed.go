@@ -22,8 +22,8 @@ func NewMouthFeed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect()).
-		AddEffect(abilities.NewCreateTokenEffect(new HippoToken2())).
+		// TODO: DrawCardSourceControllerEffect with complex parameters
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

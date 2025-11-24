@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSuburbanSanctuary creates a Suburban Sanctuary
-//  - LAND
+//   - LAND
 func NewSuburbanSanctuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Suburban Sanctuary")
 	card.ManaCost = ""

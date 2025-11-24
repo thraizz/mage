@@ -31,8 +31,8 @@ func NewKaldraCompleat(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddEffect(abilities.NewGainAbilityAttachedEffect("TrampleAbility", abilities.AttachmentTypeEquipment)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("IndestructibleAbility", abilities.AttachmentTypeEquipment)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("HasteAbility", abilities.AttachmentTypeEquipment)).
-		AddEffect(abilities.NewExileTargetEffect()).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new DealsDamageToACreatureTriggeredAbility( // if a creature is dealt lethal damage, it is dies as a state-based action and can't be found to exile new ExileTargetEffect(null, Zone.BATTLEFIELD).setToSourceExileZone(true), true, false, true, ), AttachmentType.EQUIPMENTWhenever creature deals combat damage to a creature, exile that creature.\"")).
+		// TODO: ExileTargetEffect with complex parameters
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

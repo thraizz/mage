@@ -26,7 +26,7 @@ func NewPredatoryUrge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		AddEffect(abilities.NewDamageEffect()).
+		// TODO: DamageEachOtherEffect with complex parameters
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
@@ -36,7 +36,7 @@ func NewPredatoryUrge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDamageEffect()).
+		// TODO: DamageEachOtherEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

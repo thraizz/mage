@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTombFortress creates a Tomb Fortress
-//  - LAND
+//   - LAND
 func NewTombFortress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tomb Fortress")
 	card.ManaCost = ""

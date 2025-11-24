@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMirrex creates a Mirrex
-//  - LAND
+//   - LAND
 func NewMirrex(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mirrex")
 	card.ManaCost = ""

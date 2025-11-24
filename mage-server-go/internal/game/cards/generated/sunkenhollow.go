@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSunkenHollow creates a Sunken Hollow
-//  - LAND
+//   - LAND
 func NewSunkenHollow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sunken Hollow")
 	card.ManaCost = ""

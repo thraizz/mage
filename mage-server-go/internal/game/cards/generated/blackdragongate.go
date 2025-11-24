@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBlackDragonGate creates a Black Dragon Gate
-//  - LAND
+//   - LAND
 func NewBlackDragonGate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Black Dragon Gate")
 	card.ManaCost = ""

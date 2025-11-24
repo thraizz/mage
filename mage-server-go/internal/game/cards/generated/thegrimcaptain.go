@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewTheGrimCaptain creates a The Grim Captain
-//  - CREATURE
+//   - CREATURE
+//
 // Trample, Lifelink, Hexproof
 func NewTheGrimCaptain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Grim Captain")

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIdyllicGrange creates a Idyllic Grange
-//  - LAND
+//   - LAND
 func NewIdyllicGrange(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Idyllic Grange")
 	card.ManaCost = ""

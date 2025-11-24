@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShivaWardenOfIce creates a Shiva Warden Of Ice
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
 func NewShivaWardenOfIce(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shiva Warden Of Ice")
 	card.ManaCost = ""

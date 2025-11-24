@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPlarggDeanOfChaos creates a Plargg Dean Of Chaos
-//  - CREATURE
+//   - CREATURE
 func NewPlarggDeanOfChaos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Plargg Dean Of Chaos")
 	card.ManaCost = ""

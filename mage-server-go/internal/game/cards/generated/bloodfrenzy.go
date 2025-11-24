@@ -22,7 +22,7 @@ func NewBloodFrenzy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(4, 0)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetAtBeginningOfNextEndStepEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

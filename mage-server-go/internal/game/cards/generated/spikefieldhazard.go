@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpikefieldHazard creates a Spikefield Hazard
-//  - INSTANT
+//   - INSTANT
 func NewSpikefieldHazard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spikefield Hazard")
 	card.ManaCost = ""

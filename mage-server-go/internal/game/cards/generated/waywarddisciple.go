@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWaywardDisciple creates a Wayward Disciple
-//  - CREATURE
+//   - CREATURE
 func NewWaywardDisciple(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wayward Disciple")
 	card.ManaCost = ""

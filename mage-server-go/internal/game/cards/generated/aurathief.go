@@ -27,7 +27,7 @@ func NewAuraThief(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlAllEffect(abilities.DurationCustom, abilities.NewPermanentTargetFilter())).
+		// TODO: GainControlAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

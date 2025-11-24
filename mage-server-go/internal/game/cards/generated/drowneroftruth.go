@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewDrownerOfTruth creates a Drowner Of Truth
-//  - CREATURE
+//   - CREATURE
 func NewDrownerOfTruth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Drowner Of Truth")
 	card.ManaCost = ""

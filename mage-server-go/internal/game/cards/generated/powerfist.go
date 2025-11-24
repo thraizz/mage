@@ -30,7 +30,7 @@ func NewPowerFist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("TrampleAbility", abilities.AttachmentTypeEquipment)).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), SavedDamageValue.MANY, false)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new DealsCombatDamageToAPlayerTriggeredAbility(new AddCountersSourceEffect( counters.CounterTypeP1P1.CreateInstance(1), SavedDamageValue.MANY, false ).setText("put that many +1/+1 counters on it"), false, true), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -29,7 +29,7 @@ func NewOrochiHatchery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{5}").
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, new CountersSourceCount(CounterType.CHARGE))).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

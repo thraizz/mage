@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStormcarvedCoast creates a Stormcarved Coast
-//  - LAND
+//   - LAND
 func NewStormcarvedCoast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Stormcarved Coast")
 	card.ManaCost = ""

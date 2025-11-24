@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMaladyInvoker creates a Malady Invoker
-//  - CREATURE
+//   - CREATURE
 func NewMaladyInvoker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Malady Invoker")
 	card.ManaCost = ""

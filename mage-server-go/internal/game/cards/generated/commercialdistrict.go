@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCommercialDistrict creates a Commercial District
-//  - LAND
+//   - LAND
 func NewCommercialDistrict(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Commercial District")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSovereignsMacuahuitl creates a Sovereigns Macuahuitl
-//  - ARTIFACT
+//   - ARTIFACT
 func NewSovereignsMacuahuitl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sovereigns Macuahuitl")
 	card.ManaCost = ""

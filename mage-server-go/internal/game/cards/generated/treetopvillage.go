@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewTreetopVillage creates a Treetop Village
-//  - LAND
+//   - LAND
+//
 // Trample
 func NewTreetopVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Treetop Village")

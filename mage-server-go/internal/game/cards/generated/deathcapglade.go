@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDeathcapGlade creates a Deathcap Glade
-//  - LAND
+//   - LAND
 func NewDeathcapGlade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Deathcap Glade")
 	card.ManaCost = ""

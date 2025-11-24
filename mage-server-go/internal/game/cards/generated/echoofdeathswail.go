@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewEchoOfDeathsWail creates a Echo Of Deaths Wail
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Flying, Haste
 func NewEchoOfDeathsWail(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Echo Of Deaths Wail")
@@ -29,7 +30,7 @@ func NewEchoOfDeathsWail(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlAllEffect(abilities.DurationCustom, abilities.NewAnyTargetFilter())).
+		// TODO: GainControlAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

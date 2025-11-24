@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBarkchannelPathway creates a Barkchannel Pathway
-//  - LAND
+//   - LAND
 func NewBarkchannelPathway(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Barkchannel Pathway")
 	card.ManaCost = ""

@@ -14,7 +14,7 @@ func init() {
 }
 
 // NewGristThePlagueSwarm creates a Grist The Plague Swarm
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewGristThePlagueSwarm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grist The Plague Swarm")
 	card.ManaCost = ""
@@ -30,7 +30,7 @@ func NewGristThePlagueSwarm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("deathtouch", 1))).
 		Build()

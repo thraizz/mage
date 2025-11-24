@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewHallOfTagsin creates a Hall Of Tagsin
-//  - LAND
+//   - LAND
 func NewHallOfTagsin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hall Of Tagsin")
 	card.ManaCost = ""

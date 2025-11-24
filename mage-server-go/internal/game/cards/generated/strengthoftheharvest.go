@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStrengthOfTheHarvest creates a Strength Of The Harvest
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewStrengthOfTheHarvest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Strength Of The Harvest")
 	card.ManaCost = ""

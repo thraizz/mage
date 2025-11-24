@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDemonPossessedWitch creates a Demon Possessed Witch
-//  - CREATURE
+//   - CREATURE
 func NewDemonPossessedWitch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Demon Possessed Witch")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewDemonPossessedWitch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

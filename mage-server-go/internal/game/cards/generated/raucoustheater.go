@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRaucousTheater creates a Raucous Theater
-//  - LAND
+//   - LAND
 func NewRaucousTheater(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Raucous Theater")
 	card.ManaCost = ""

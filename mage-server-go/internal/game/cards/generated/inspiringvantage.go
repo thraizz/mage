@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewInspiringVantage creates a Inspiring Vantage
-//  - LAND
+//   - LAND
 func NewInspiringVantage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Inspiring Vantage")
 	card.ManaCost = ""

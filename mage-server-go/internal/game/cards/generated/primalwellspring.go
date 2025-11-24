@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPrimalWellspring creates a Primal Wellspring
-//  - LAND
+//   - LAND
 func NewPrimalWellspring(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Primal Wellspring")
 	card.ManaCost = ""

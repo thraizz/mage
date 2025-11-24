@@ -23,7 +23,7 @@ func NewWretchedConfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		AddEffect(abilities.NewBoostEffect(-2, -2)).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

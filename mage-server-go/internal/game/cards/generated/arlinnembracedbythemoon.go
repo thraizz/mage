@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewArlinnEmbracedByTheMoon creates a Arlinn Embraced By The Moon
-//  - PLANESWALKER
+//   - PLANESWALKER
 func NewArlinnEmbracedByTheMoon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Arlinn Embraced By The Moon")
 	card.ManaCost = ""

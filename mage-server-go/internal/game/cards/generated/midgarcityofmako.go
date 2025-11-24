@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMidgarCityOfMako creates a Midgar City Of Mako
-//  - LAND
+//   - LAND
 func NewMidgarCityOfMako(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Midgar City Of Mako")
 	card.ManaCost = ""

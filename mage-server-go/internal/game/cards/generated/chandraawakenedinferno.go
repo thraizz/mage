@@ -31,7 +31,7 @@ func NewChandraAwakenedInferno(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(3, filter)).
+		// TODO: DamageAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

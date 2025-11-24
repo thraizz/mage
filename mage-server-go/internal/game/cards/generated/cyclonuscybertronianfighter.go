@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewCyclonusCybertronianFighter creates a Cyclonus Cybertronian Fighter
-//  - ARTIFACT
+//   - ARTIFACT
+//
 // Flying
 func NewCyclonusCybertronianFighter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cyclonus Cybertronian Fighter")

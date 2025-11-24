@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBadRiver creates a Bad River
-//  - LAND
+//   - LAND
 func NewBadRiver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bad River")
 	card.ManaCost = ""

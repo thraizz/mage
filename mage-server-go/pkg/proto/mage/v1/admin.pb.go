@@ -605,6 +605,7 @@ type AdminToggleActivateUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	NewStatus     bool                   `protobuf:"varint,3,opt,name=new_status,json=newStatus,proto3" json:"new_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -653,12 +654,19 @@ func (x *AdminToggleActivateUserResponse) GetError() string {
 	return ""
 }
 
+func (x *AdminToggleActivateUserResponse) GetNewStatus() bool {
+	if x != nil {
+		return x.NewStatus
+	}
+	return false
+}
+
 type AdminEndUserSessionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	UserName      string                 `protobuf:"bytes,2,opt,name=user_name,json=userName,proto3" json:"user_name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	SessionId       string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	TargetSessionId string                 `protobuf:"bytes,2,opt,name=target_session_id,json=targetSessionId,proto3" json:"target_session_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *AdminEndUserSessionRequest) Reset() {
@@ -698,9 +706,9 @@ func (x *AdminEndUserSessionRequest) GetSessionId() string {
 	return ""
 }
 
-func (x *AdminEndUserSessionRequest) GetUserName() string {
+func (x *AdminEndUserSessionRequest) GetTargetSessionId() string {
 	if x != nil {
-		return x.UserName
+		return x.TargetSessionId
 	}
 	return ""
 }
@@ -914,11 +922,12 @@ func (x *AdminSendBroadcastMessageRequest) GetMessage() string {
 }
 
 type AdminSendBroadcastMessageResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Success        bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error          string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	RecipientCount int32                  `protobuf:"varint,3,opt,name=recipient_count,json=recipientCount,proto3" json:"recipient_count,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *AdminSendBroadcastMessageResponse) Reset() {
@@ -965,6 +974,13 @@ func (x *AdminSendBroadcastMessageResponse) GetError() string {
 	return ""
 }
 
+func (x *AdminSendBroadcastMessageResponse) GetRecipientCount() int32 {
+	if x != nil {
+		return x.RecipientCount
+	}
+	return 0
+}
+
 var File_mage_v1_admin_proto protoreflect.FileDescriptor
 
 const file_mage_v1_admin_proto_rawDesc = "" +
@@ -1009,14 +1025,16 @@ const file_mage_v1_admin_proto_rawDesc = "" +
 	"\x1eAdminToggleActivateUserRequest\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x1b\n" +
-	"\tuser_name\x18\x02 \x01(\tR\buserName\"Q\n" +
+	"\tuser_name\x18\x02 \x01(\tR\buserName\"p\n" +
 	"\x1fAdminToggleActivateUserResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error\"X\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1d\n" +
+	"\n" +
+	"new_status\x18\x03 \x01(\bR\tnewStatus\"g\n" +
 	"\x1aAdminEndUserSessionRequest\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x1b\n" +
-	"\tuser_name\x18\x02 \x01(\tR\buserName\"M\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12*\n" +
+	"\x11target_session_id\x18\x02 \x01(\tR\x0ftargetSessionId\"M\n" +
 	"\x1bAdminEndUserSessionResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\"S\n" +
@@ -1030,10 +1048,11 @@ const file_mage_v1_admin_proto_rawDesc = "" +
 	" AdminSendBroadcastMessageRequest\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"S\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"|\n" +
 	"!AdminSendBroadcastMessageResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05errorB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
+	"\x05error\x18\x02 \x01(\tR\x05error\x12'\n" +
+	"\x0frecipient_count\x18\x03 \x01(\x05R\x0erecipientCountB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
 
 var (
 	file_mage_v1_admin_proto_rawDescOnce sync.Once

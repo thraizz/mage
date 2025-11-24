@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWoodedFoothills creates a Wooded Foothills
-//  - LAND
+//   - LAND
 func NewWoodedFoothills(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Wooded Foothills")
 	card.ManaCost = ""

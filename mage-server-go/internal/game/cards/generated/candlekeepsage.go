@@ -25,7 +25,7 @@ func NewCandlekeepSage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGrantAbilityEffect(new EntersBattlefieldOrLeavesSourceTriggeredAbility( new DrawCardSourceControllerEffect(1), false ).setTriggerPhrase("When creature enters or leaves the battlefield, "))).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

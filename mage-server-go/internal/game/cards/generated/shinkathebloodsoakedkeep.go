@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewShinkaTheBloodsoakedKeep creates a Shinka The Bloodsoaked Keep
-//  - LAND
+//   - LAND
 func NewShinkaTheBloodsoakedKeep(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shinka The Bloodsoaked Keep")
 	card.ManaCost = ""

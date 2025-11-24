@@ -14,7 +14,7 @@ func init() {
 }
 
 // NewHellionCrucible creates a Hellion Crucible
-//  - LAND
+//   - LAND
 func NewHellionCrucible(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hellion Crucible")
 	card.ManaCost = ""
@@ -32,7 +32,7 @@ func NewHellionCrucible(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCreateTokenEffect(new HellionToken(true), 1)).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

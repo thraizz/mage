@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDesertedTemple creates a Deserted Temple
-//  - LAND
+//   - LAND
 func NewDesertedTemple(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Deserted Temple")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewDesertedTemple(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

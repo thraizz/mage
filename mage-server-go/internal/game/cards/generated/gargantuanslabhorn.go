@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewGargantuanSlabhorn creates a Gargantuan Slabhorn
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewGargantuanSlabhorn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gargantuan Slabhorn")
@@ -28,7 +29,7 @@ func NewGargantuanSlabhorn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new WardAbility(), filter, true)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

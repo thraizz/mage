@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSnowCoveredIsland creates a Snow Covered Island
-//  - LAND
+//   - LAND
 func NewSnowCoveredIsland(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Snow Covered Island")
 	card.ManaCost = ""

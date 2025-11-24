@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewLocusOfEnlightenment creates a Locus Of Enlightenment
-//  - ARTIFACT
+//   - ARTIFACT
 func NewLocusOfEnlightenment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Locus Of Enlightenment")
 	card.ManaCost = ""

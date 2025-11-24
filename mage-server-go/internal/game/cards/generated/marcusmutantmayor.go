@@ -12,7 +12,9 @@ func init() {
 }
 
 // NewMarcusMutantMayor creates a Marcus Mutant Mayor
-//  - 
+//
+//	-
+//
 // Vigilance, Trample
 func NewMarcusMutantMayor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Marcus Mutant Mayor")

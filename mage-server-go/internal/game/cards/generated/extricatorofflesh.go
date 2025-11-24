@@ -5,8 +5,8 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/token"
 	"github.com/magefree/mage-server-go/internal/game/effects"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -14,7 +14,8 @@ func init() {
 }
 
 // NewExtricatorOfFlesh creates a Extricator Of Flesh
-//  - CREATURE
+//   - CREATURE
+//
 // Vigilance
 func NewExtricatorOfFlesh(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Extricator Of Flesh")

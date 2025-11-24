@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVividMeadow creates a Vivid Meadow
-//  - LAND
+//   - LAND
 func NewVividMeadow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vivid Meadow")
 	card.ManaCost = ""

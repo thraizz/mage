@@ -29,7 +29,7 @@ func NewKilnmouthDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDamageEffect(new CountersSourceCount(CounterType.P1P1))).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

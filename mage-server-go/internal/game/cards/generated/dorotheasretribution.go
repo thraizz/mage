@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDorotheasRetribution creates a Dorotheas Retribution
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewDorotheasRetribution(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dorotheas Retribution")
 	card.ManaCost = ""
@@ -31,7 +31,7 @@ func NewDorotheasRetribution(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new AttacksTriggeredAbility(new DorotheasRetributionEffect()) .setTriggerPhrase("Whenever creature attacks, "), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

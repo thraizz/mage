@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewLudevicsAbomination creates a Ludevics Abomination
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewLudevicsAbomination(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ludevics Abomination")

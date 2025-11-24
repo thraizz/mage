@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewChillingChronicle creates a Chilling Chronicle
-//  - ARTIFACT
+//   - ARTIFACT
 func NewChillingChronicle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Chilling Chronicle")
 	card.ManaCost = ""

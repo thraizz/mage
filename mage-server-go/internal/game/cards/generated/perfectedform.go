@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewPerfectedForm creates a Perfected Form
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewPerfectedForm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Perfected Form")

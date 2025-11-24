@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGrandColiseum creates a Grand Coliseum
-//  - LAND
+//   - LAND
 func NewGrandColiseum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Grand Coliseum")
 	card.ManaCost = ""

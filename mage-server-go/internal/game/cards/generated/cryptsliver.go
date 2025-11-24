@@ -31,7 +31,7 @@ func NewCryptSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	//   - AddTapCost()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filter)).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

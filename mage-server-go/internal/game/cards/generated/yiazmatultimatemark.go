@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewYiazmatUltimateMark creates a Yiazmat Ultimate Mark
-//  - CREATURE
+//   - CREATURE
 func NewYiazmatUltimateMark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Yiazmat Ultimate Mark")
 	card.ManaCost = ""
@@ -27,7 +27,7 @@ func NewYiazmatUltimateMark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

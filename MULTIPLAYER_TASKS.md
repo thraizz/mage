@@ -2098,6 +2098,7 @@ Add sound effects for game events.
 - [ ] Sounds can be toggled on/off
 - [ ] Use Web Audio API or Howler.js
 - [ ] Sounds are subtle and not annoying
+- [ ] TTS for "Match Started", "Your Game Can Start" etc
 
 **Files to Create:**
 - `src/lib/utils/sound.ts`

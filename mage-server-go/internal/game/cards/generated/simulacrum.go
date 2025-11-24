@@ -21,9 +21,9 @@ func NewSimulacrum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(new SimulacrumAmount(), true, true)).
-		AddEffect(abilities.NewGainLifeEffect(new SimulacrumAmount())).
-		AddEffect(abilities.NewDamageEffect(new SimulacrumAmount(), true, true)).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: GainLifeEffect with complex parameters
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

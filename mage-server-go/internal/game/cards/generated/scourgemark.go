@@ -26,7 +26,7 @@ func NewScourgemark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewBoostEnchantedEffect(1,0)).
+		AddEffect(abilities.NewBoostEnchantedEffect(1, 0)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func NewScourgemark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(1,0)).
+		AddEffect(abilities.NewBoostEnchantedEffect(1, 0)).
 		Build()
 	if err != nil {
 		return nil, err

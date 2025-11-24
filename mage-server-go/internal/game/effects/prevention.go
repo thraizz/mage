@@ -168,7 +168,7 @@ func NewIndestructiblePreventionEffect(sourceID, permanentID string) *Indestruct
 }
 
 func (e *IndestructiblePreventionEffect) ChecksEventType(eventType rules.EventType) bool {
-	return eventType == rules.EventDestroy ||
+	return eventType == rules.EventDestroyPermanent ||
 		eventType == rules.EventZoneChange // Prevent going to graveyard from lethal damage
 }
 
@@ -199,7 +199,7 @@ func (e *IndestructiblePreventionEffect) Applies(event rules.Event, gameID strin
 
 func (e *IndestructiblePreventionEffect) ReplaceEvent(event rules.Event, gameID string) (rules.Event, bool) {
 	// Prevent destruction
-	if event.Type == rules.EventDestroy {
+	if event.Type == rules.EventDestroyPermanent {
 		// Add metadata
 		if event.Metadata == nil {
 			event.Metadata = make(map[string]string)

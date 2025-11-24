@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewPolukranosEngineOfRuin creates a Polukranos Engine Of Ruin
-//  - CREATURE
+//   - CREATURE
+//
 // Reach, Lifelink
 func NewPolukranosEngineOfRuin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Polukranos Engine Of Ruin")

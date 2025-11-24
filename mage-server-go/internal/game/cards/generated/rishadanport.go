@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRishadanPort creates a Rishadan Port
-//  - LAND
+//   - LAND
 func NewRishadanPort(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Rishadan Port")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewRishadanPort(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddTapCost().
-		AddEffect(abilities.NewTapEffect()).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

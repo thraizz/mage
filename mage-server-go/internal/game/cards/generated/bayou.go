@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBayou creates a Bayou
-//  - LAND
+//   - LAND
 func NewBayou(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bayou")
 	card.ManaCost = ""

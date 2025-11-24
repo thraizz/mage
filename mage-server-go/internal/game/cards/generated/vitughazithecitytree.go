@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewVituGhaziTheCityTree creates a Vitu Ghazi The City Tree
-//  - LAND
+//   - LAND
 func NewVituGhaziTheCityTree(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vitu Ghazi The City Tree")
 	card.ManaCost = ""

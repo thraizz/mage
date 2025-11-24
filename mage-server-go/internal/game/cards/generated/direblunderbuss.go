@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDireBlunderbuss creates a Dire Blunderbuss
-//  - ARTIFACT
+//   - ARTIFACT
 func NewDireBlunderbuss(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dire Blunderbuss")
 	card.ManaCost = ""

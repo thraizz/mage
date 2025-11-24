@@ -36,7 +36,7 @@ func NewCausticTar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(tarAbility, AttachmentType.AURA{T}: Target player loses 3 life.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

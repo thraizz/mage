@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewSpoilsOfBlood creates a Spoils Of Blood
-//  - 
+//
+//	-
 func NewSpoilsOfBlood(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spoils Of Blood")
 	card.ManaCost = ""

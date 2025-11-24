@@ -29,7 +29,7 @@ func NewAstrologiansPlanisphere(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new OrTriggeredAbility( Zone.BATTLEFIELD, new AddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1)), new SpellCastControllerTriggeredAbility(null, false), new DrawNthCardTriggeredAbility(null, false, 3) ), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

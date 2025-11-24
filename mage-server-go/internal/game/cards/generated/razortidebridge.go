@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewRazortideBridge creates a Razortide Bridge
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
+//
 // Indestructible
 func NewRazortideBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Razortide Bridge")

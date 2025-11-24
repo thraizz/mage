@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMazeOfIth creates a Maze Of Ith
-//  - LAND
+//   - LAND
 func NewMazeOfIth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Maze Of Ith")
 	card.ManaCost = ""
@@ -22,7 +22,7 @@ func NewMazeOfIth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

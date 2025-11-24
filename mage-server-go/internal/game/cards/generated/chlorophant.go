@@ -34,7 +34,7 @@ func NewChlorophant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddEffect(abilities.NewGrantAbilityEffect(new BeginningOfUpkeepTriggeredAbility( new AddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1)) .setText("put another +1/+1 counter on {}"), true ))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

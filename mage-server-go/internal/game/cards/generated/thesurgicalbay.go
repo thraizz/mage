@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheSurgicalBay creates a The Surgical Bay
-//  - LAND
+//   - LAND
 func NewTheSurgicalBay(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Surgical Bay")
 	card.ManaCost = ""

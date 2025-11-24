@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGaeasCradle creates a Gaeas Cradle
-//  - LAND
+//   - LAND
 func NewGaeasCradle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gaeas Cradle")
 	card.ManaCost = ""

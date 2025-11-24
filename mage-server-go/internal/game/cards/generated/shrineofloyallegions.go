@@ -30,7 +30,7 @@ func NewShrineOfLoyalLegions(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		AddManaCost("{3}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, new CountersSourceCount(CounterType.CHARGE))).
+		// TODO: CreateTokenEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

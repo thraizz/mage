@@ -27,7 +27,7 @@ func NewFungusSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddEffect(abilities.NewGrantAbilityEffect(new DealtDamageToSourceTriggeredAbility(new AddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1)), false), filterWhenever creature is dealt damage, put a +1/+1 counter on it.\"")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

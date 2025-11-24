@@ -24,19 +24,9 @@ func NewHarmonicSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filterSliverWhen permanent enters the battlefield, destroy target artifact or enchantment.\"")).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
+	// TODO: Complex grant ability effects need proper transpilation
+	// This card grants "When this enters, destroy target artifact or enchantment" to all Slivers
+	// Temporarily stubbed until card transpiler is fixed
+	_ = card // Use card to avoid unused variable error
 	return card, nil
 }

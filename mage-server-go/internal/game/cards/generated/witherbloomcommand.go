@@ -21,7 +21,7 @@ func NewWitherbloomCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(-3, -1)).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).

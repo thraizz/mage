@@ -41,7 +41,7 @@ func NewSpawningGrounds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilityToGain, AttachmentType.AURA{T}: Create a 5/5 green Beast creature token with trample.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

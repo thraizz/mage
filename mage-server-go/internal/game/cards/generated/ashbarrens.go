@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAshBarrens creates a Ash Barrens
-//  - LAND
+//   - LAND
 func NewAshBarrens(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ash Barrens")
 	card.ManaCost = ""

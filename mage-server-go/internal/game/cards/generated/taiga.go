@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTaiga creates a Taiga
-//  - LAND
+//   - LAND
 func NewTaiga(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Taiga")
 	card.ManaCost = ""

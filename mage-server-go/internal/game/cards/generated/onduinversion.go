@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewOnduInversion creates a Ondu Inversion
-//  - SORCERY
+//   - SORCERY
 func NewOnduInversion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ondu Inversion")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewOnduInversion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

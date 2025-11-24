@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRiptideLaboratory creates a Riptide Laboratory
-//  - LAND
+//   - LAND
 func NewRiptideLaboratory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Riptide Laboratory")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewRiptideLaboratory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

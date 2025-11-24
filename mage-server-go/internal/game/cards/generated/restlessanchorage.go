@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewRestlessAnchorage creates a Restless Anchorage
-//  - LAND
+//   - LAND
+//
 // Flying
 func NewRestlessAnchorage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Restless Anchorage")

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewDireStrainAnarchist creates a Dire Strain Anarchist
-//  - CREATURE
+//   - CREATURE
+//
 // Haste
 func NewDireStrainAnarchist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dire Strain Anarchist")

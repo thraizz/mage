@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMinasTirith creates a Minas Tirith
-//  - LAND
+//   - LAND
 func NewMinasTirith(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Minas Tirith")
 	card.ManaCost = ""

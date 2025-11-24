@@ -36,7 +36,7 @@ func NewTetzimocPrimalDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect(filter)).
+		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

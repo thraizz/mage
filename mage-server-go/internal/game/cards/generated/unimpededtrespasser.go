@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewUnimpededTrespasser creates a Unimpeded Trespasser
-//  - CREATURE
+//   - CREATURE
 func NewUnimpededTrespasser(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Unimpeded Trespasser")
 	card.ManaCost = ""

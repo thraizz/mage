@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewAwakenTheMaelstrom creates a Awaken The Maelstrom
-//  - SORCERY
+//   - SORCERY
 func NewAwakenTheMaelstrom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Awaken The Maelstrom")
 	card.ManaCost = ""
@@ -22,7 +22,7 @@ func NewAwakenTheMaelstrom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(2)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

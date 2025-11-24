@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFireLitThicket creates a Fire Lit Thicket
-//  - LAND
+//   - LAND
 func NewFireLitThicket(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fire Lit Thicket")
 	card.ManaCost = ""

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewSilverbluffBridge creates a Silverbluff Bridge
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
+//
 // Indestructible
 func NewSilverbluffBridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Silverbluff Bridge")

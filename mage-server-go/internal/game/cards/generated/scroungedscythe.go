@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewScroungedScythe creates a Scrounged Scythe
-//  - ARTIFACT
+//   - ARTIFACT
 func NewScroungedScythe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Scrounged Scythe")
 	card.ManaCost = ""
@@ -34,7 +34,7 @@ func NewScroungedScythe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new MenaceAbility(false), AttachmentType.EQUIPMENT)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.EQUIPMENT)).
 		Build()
 	if err != nil {
 		return nil, err

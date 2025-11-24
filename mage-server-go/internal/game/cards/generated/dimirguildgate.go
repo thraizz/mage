@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDimirGuildgate creates a Dimir Guildgate
-//  - LAND
+//   - LAND
 func NewDimirGuildgate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dimir Guildgate")
 	card.ManaCost = ""

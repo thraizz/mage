@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewVillageReavers creates a Village Reavers
-//  - CREATURE
+//   - CREATURE
 func NewVillageReavers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Village Reavers")
 	card.ManaCost = ""

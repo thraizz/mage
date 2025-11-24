@@ -23,7 +23,7 @@ func NewPlateArmor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(3, 3)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new WardAbility(), AttachmentType.EQUIPMENT + "counter it unless that player pays {1}.)</i>")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

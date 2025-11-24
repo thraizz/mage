@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBasiliskGate creates a Basilisk Gate
-//  - LAND
+//   - LAND
 func NewBasiliskGate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Basilisk Gate")
 	card.ManaCost = ""

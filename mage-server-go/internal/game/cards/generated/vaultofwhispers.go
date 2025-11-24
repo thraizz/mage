@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewVaultOfWhispers creates a Vault Of Whispers
-//  - ARTIFACT LAND
+//   - ARTIFACT LAND
 func NewVaultOfWhispers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Vault Of Whispers")
 	card.ManaCost = ""

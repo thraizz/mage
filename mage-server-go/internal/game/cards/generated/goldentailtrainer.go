@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewGoldenTailTrainer creates a Golden Tail Trainer
-//  - 
+//
+//	-
 func NewGoldenTailTrainer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Golden Tail Trainer")
 	card.ManaCost = ""

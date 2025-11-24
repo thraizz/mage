@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewMarchesaResoluteMonarch creates a Marchesa Resolute Monarch
-//  - CREATURE
+//   - CREATURE
+//
 // Deathtouch
 func NewMarchesaResoluteMonarch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Marchesa Resolute Monarch")

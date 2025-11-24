@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBallistaWielder creates a Ballista Wielder
-//  - CREATURE
+//   - CREATURE
 func NewBallistaWielder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Ballista Wielder")
 	card.ManaCost = ""

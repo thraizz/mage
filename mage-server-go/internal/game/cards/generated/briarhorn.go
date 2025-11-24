@@ -27,7 +27,7 @@ func NewBriarhorn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(3,3)).
+		AddEffect(abilities.NewBoostEffect(3, 3)).
 		Build()
 	if err != nil {
 		return nil, err

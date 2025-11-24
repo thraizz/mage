@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewForsakenCrossroads creates a Forsaken Crossroads
-//  - LAND
+//   - LAND
 func NewForsakenCrossroads(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Forsaken Crossroads")
 	card.ManaCost = ""

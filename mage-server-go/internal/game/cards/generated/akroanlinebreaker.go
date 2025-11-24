@@ -25,7 +25,7 @@ func NewAkroanLineBreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2,0)).
+		AddEffect(abilities.NewBoostEffect(2, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("IntimidateAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {

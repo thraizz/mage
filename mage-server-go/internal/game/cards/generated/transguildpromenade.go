@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTransguildPromenade creates a Transguild Promenade
-//  - LAND
+//   - LAND
 func NewTransguildPromenade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Transguild Promenade")
 	card.ManaCost = ""

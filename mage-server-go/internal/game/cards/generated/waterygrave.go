@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWateryGrave creates a Watery Grave
-//  - LAND
+//   - LAND
 func NewWateryGrave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Watery Grave")
 	card.ManaCost = ""

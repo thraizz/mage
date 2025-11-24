@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSunderingEruption creates a Sundering Eruption
-//  - SORCERY
+//   - SORCERY
 func NewSunderingEruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sundering Eruption")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewSunderingEruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "R")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewInheritedFiend creates a Inherited Fiend
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewInheritedFiend(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Inherited Fiend")
@@ -28,7 +29,7 @@ func NewInheritedFiend(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
 		Build()
 	card.AddAbility(ability1)

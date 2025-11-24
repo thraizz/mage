@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSeachromeCoast creates a Seachrome Coast
-//  - LAND
+//   - LAND
 func NewSeachromeCoast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seachrome Coast")
 	card.ManaCost = ""

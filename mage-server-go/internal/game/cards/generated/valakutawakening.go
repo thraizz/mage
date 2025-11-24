@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewValakutAwakening creates a Valakut Awakening
-//  - INSTANT
+//   - INSTANT
 func NewValakutAwakening(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Valakut Awakening")
 	card.ManaCost = ""

@@ -21,7 +21,7 @@ func NewBrotherhoodsEnd(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(3, filter)).
+		// TODO: DamageAllEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect(filter2)).
 		Build()
 	if err != nil {

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShefetDunes creates a Shefet Dunes
-//  - LAND
+//   - LAND
 func NewShefetDunes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shefet Dunes")
 	card.ManaCost = ""

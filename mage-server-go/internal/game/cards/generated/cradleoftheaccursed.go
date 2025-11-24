@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewCradleOfTheAccursed creates a Cradle Of The Accursed
-//  - LAND
+//   - LAND
 func NewCradleOfTheAccursed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Cradle Of The Accursed")
 	card.ManaCost = ""

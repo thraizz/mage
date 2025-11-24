@@ -29,7 +29,7 @@ func NewAzlaskTheSwellingScourge(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(SourceControllerCountersCount.EXPERIENCE, SourceControllerCountersCount.EXPERIENCE)).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect(new AnnihilatorAbility(1), filter2)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

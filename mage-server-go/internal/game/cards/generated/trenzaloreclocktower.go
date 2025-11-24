@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTrenzaloreClocktower creates a Trenzalore Clocktower
-//  - LAND
+//   - LAND
 func NewTrenzaloreClocktower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Trenzalore Clocktower")
 	card.ManaCost = ""

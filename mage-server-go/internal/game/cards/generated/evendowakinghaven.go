@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEvendoWakingHaven creates a Evendo Waking Haven
-//  - LAND
+//   - LAND
 func NewEvendoWakingHaven(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Evendo Waking Haven")
 	card.ManaCost = ""

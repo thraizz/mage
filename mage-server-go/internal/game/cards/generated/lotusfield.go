@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewLotusField creates a Lotus Field
-//  - LAND
+//   - LAND
+//
 // Hexproof
 func NewLotusField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Lotus Field")

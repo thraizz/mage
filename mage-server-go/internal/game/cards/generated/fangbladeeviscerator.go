@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewFangbladeEviscerator creates a Fangblade Eviscerator
-//  - CREATURE
+//   - CREATURE
 func NewFangbladeEviscerator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fangblade Eviscerator")
 	card.ManaCost = ""

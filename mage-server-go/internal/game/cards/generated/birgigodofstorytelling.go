@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBirgiGodOfStorytelling creates a Birgi God Of Storytelling
-//  - CREATURE
+//   - CREATURE
 func NewBirgiGodOfStorytelling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Birgi God Of Storytelling")
 	card.ManaCost = ""

@@ -28,7 +28,7 @@ func NewTerohsVanguard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new EntersBattlefieldTriggeredAbility( new GainAbilityControlledEffect( ProtectionAbility.from(ObjectColor.BLACK), ) ))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect(ProtectionAbility.from(ObjectColor.BLACK))).
 		Build()
 	if err != nil {

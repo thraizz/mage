@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHavengulMystery creates a Havengul Mystery
-//  - LAND
+//   - LAND
 func NewHavengulMystery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Havengul Mystery")
 	card.ManaCost = ""

@@ -31,7 +31,7 @@ func NewLunaticPandora(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{6}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpiresOfOrazca creates a Spires Of Orazca
-//  - LAND
+//   - LAND
 func NewSpiresOfOrazca(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spires Of Orazca")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewSpiresOfOrazca(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

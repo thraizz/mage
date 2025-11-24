@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewArchwayOfInnovation creates a Archway Of Innovation
-//  - LAND
+//   - LAND
 func NewArchwayOfInnovation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Archway Of Innovation")
 	card.ManaCost = ""

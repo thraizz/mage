@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHagraMauling creates a Hagra Mauling
-//  - INSTANT
+//   - INSTANT
 func NewHagraMauling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hagra Mauling")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewHagraMauling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

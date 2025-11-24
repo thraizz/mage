@@ -25,8 +25,8 @@ func NewFelineSovereign(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new ProtectionAbility(filterProtectionFromDogs), filterCat, true)).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: GainAbilityAllEffect with complex parameters
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func NewFelineSovereign(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1, filterCat, true)).
-		AddEffect(abilities.NewGrantAbilityEffect(new ProtectionAbility(filterProtectionFromDogs), filterCat, true)).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -29,7 +29,7 @@ func NewShelobChildOfUngoliant(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new WardAbility(new ManaCostsImpl<>("{2}")), filterSpiders)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

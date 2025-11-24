@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewDemolitionField creates a Demolition Field
-//  - LAND
+//   - LAND
 func NewDemolitionField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Demolition Field")
 	card.ManaCost = ""
@@ -26,8 +26,8 @@ func NewDemolitionField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{2}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: DestroyTargetEffect with complex parameters
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

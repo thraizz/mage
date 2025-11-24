@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMudflatVillage creates a Mudflat Village
-//  - LAND
+//   - LAND
 func NewMudflatVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mudflat Village")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewMudflatVillage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

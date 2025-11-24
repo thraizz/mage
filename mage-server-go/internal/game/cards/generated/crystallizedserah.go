@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewCrystallizedSerah creates a Crystallized Serah
-//  - ARTIFACT
+//   - ARTIFACT
 func NewCrystallizedSerah(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Crystallized Serah")
 	card.ManaCost = ""

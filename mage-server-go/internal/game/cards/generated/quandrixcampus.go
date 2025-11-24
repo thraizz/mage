@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewQuandrixCampus creates a Quandrix Campus
-//  - LAND
+//   - LAND
 func NewQuandrixCampus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Quandrix Campus")
 	card.ManaCost = ""

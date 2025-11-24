@@ -24,7 +24,7 @@ func NewBarrinsCodex(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDrawCardsEffect(new CountersSourceCount(CounterType.PAGE))).
+		// TODO: DrawCardSourceControllerEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

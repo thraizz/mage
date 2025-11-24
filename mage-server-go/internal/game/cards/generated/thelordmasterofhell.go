@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTheLordMasterOfHell creates a The Lord Master Of Hell
-//  - CREATURE
+//   - CREATURE
 func NewTheLordMasterOfHell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "The Lord Master Of Hell")
 	card.ManaCost = ""

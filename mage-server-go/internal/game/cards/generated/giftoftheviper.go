@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewGiftOfTheViper creates a Gift Of The Viper
-//  - 
+//
+//	-
 func NewGiftOfTheViper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gift Of The Viper")
 	card.ManaCost = ""

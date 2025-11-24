@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHiddenVolcano creates a Hidden Volcano
-//  - LAND
+//   - LAND
 func NewHiddenVolcano(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hidden Volcano")
 	card.ManaCost = ""

@@ -30,7 +30,7 @@ func NewMudTrooper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filter, false)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

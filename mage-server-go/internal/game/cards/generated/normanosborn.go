@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewNormanOsborn creates a Norman Osborn
-//  - CREATURE
+//   - CREATURE
+//
 // Flying, Menace
 func NewNormanOsborn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Norman Osborn")

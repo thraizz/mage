@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewJundPanorama creates a Jund Panorama
-//  - LAND
+//   - LAND
 func NewJundPanorama(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Jund Panorama")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewJundPanorama(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddManaCost("{1}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -36,7 +36,7 @@ func NewVerdantField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainAbility, AttachmentType.AURA{T}: Target creature gets +1/+1 until end of turn.\"")).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

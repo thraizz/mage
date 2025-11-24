@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBloodsoakedInsight creates a Bloodsoaked Insight
-//  - SORCERY
+//   - SORCERY
 func NewBloodsoakedInsight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bloodsoaked Insight")
 	card.ManaCost = ""

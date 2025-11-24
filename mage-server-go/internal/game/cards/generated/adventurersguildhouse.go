@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewAdventurersGuildhouse creates a Adventurers Guildhouse
-//  - LAND
+//   - LAND
 func NewAdventurersGuildhouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Adventurers Guildhouse")
 	card.ManaCost = ""
@@ -22,7 +22,7 @@ func NewAdventurersGuildhouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(filter)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

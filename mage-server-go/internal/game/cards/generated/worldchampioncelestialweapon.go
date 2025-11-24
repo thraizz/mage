@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWorldChampionCelestialWeapon creates a World Champion Celestial Weapon
-//  - ARTIFACT
+//   - ARTIFACT
 func NewWorldChampionCelestialWeapon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "World Champion Celestial Weapon")
 	card.ManaCost = ""

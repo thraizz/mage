@@ -25,7 +25,7 @@ func NewBlitzballStadium(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{3}").
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(BlitzballStadiumValue.instance)).
-		AddEffect(abilities.NewGrantAbilityEffect(new DealsCombatDamageToAPlayerTriggeredAbility(new DrawCardSourceControllerEffect(BlitzballStadiumValue.instance)))).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

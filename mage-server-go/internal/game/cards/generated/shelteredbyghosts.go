@@ -33,7 +33,7 @@ func NewShelteredByGhosts(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(1, 0)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("LifelinkAbility", abilities.AttachmentTypeAura)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new WardAbility(), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

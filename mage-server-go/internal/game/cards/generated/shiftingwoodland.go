@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShiftingWoodland creates a Shifting Woodland
-//  - LAND
+//   - LAND
 func NewShiftingWoodland(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shifting Woodland")
 	card.ManaCost = ""

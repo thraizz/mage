@@ -13,7 +13,8 @@ func init() {
 }
 
 // NewEsikaGodOfTheTree creates a Esika God Of The Tree
-//  - CREATURE
+//   - CREATURE
+//
 // Vigilance
 func NewEsikaGodOfTheTree(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Esika God Of The Tree")

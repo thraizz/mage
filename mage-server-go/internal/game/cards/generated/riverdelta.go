@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRiverDelta creates a River Delta
-//  - LAND
+//   - LAND
 func NewRiverDelta(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "River Delta")
 	card.ManaCost = ""

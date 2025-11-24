@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGoblinBurrows creates a Goblin Burrows
-//  - LAND
+//   - LAND
 func NewGoblinBurrows(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Goblin Burrows")
 	card.ManaCost = ""
@@ -24,7 +24,7 @@ func NewGoblinBurrows(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewBoostEffect(2,0)).
+		AddEffect(abilities.NewBoostEffect(2, 0)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

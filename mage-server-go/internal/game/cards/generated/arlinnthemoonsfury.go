@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewArlinnTheMoonsFury creates a Arlinn The Moons Fury
-//  - PLANESWALKER
+//   - PLANESWALKER
+//
 // Trample, Indestructible, Haste
 func NewArlinnTheMoonsFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Arlinn The Moons Fury")

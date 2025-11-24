@@ -34,7 +34,7 @@ func NewTakeFlight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddEffect(abilities.NewBoostEnchantedEffect(1, 0)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("FlyingAbility", abilities.AttachmentTypeAura)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new AttacksTriggeredAbility(new DrawCardSourceControllerEffect(1)) .setTriggerPhrase("Whenever creature attacks, "), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -1,80 +1,62 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
-This is a Go reimplementation of the MAGE (Magic Another Game Engine) server using a **hybrid gRPC + WebSocket architecture**:
-- **gRPC**: All 60+ request/response RPC methods (authentication, room management, table/game/tournament operations)
-- **WebSocket**: Server-to-client push events (game updates, chat messages, callbacks)
+**Go port of XMage (Magic: The Gathering simulator)** with hybrid gRPC + WebSocket architecture:
+- **gRPC**: 60+ request/response RPC methods (auth, room, table, game, tournament)
+- **WebSocket**: Server-to-client push events (game updates, chat, real-time notifications)
 - **Protocol Buffers**: Type-safe serialization for both protocols
 
-The server maintains API compatibility with the existing Java MAGE server to support existing clients.
+**Goals**: 100% MTG rule coverage, full test coverage, all 30,400+ cards supported.
 
 ## Essential Commands
 
 ```bash
 # Build and run
-make build              # Build server binary to bin/mage-server
-make run                # Build and run with config/config.yaml
+make proto              # MUST run before first build - generates protobuf code
+make build              # Build server binary
+make run                # Build and run with config.yaml
 
 # Testing
-make test               # Run all unit tests (57 tests)
-make test-integration   # Run integration tests
+make test               # All unit tests (82 tests)
+make test-integration   # Integration tests only
+go test -v -run TestName ./internal/package
 
 # Code quality
-make fmt                # Format with gofmt + goimports
-make lint               # Run golangci-lint
-make vet                # Run go vet
-
-# Protocol Buffers (REQUIRED before first build)
-make proto              # Generate Go code from .proto files
+make fmt                # gofmt + goimports
+make lint               # golangci-lint
 
 # Database
-make migrate-up         # Apply all migrations
+make migrate-up         # Apply migrations
 make migrate-down       # Rollback one migration
-make migrate-create NAME=feature_name  # Create new migration files
-
-# Development tools
-make tools              # Install protoc-gen-go, golangci-lint, goimports
-make deps               # Install Go dependencies
+make migrate-create NAME=feature_name
 ```
 
-### Running Specific Tests
+## Architecture
 
-```bash
-# Single test
-go test -v -run TestSessionCreation ./internal/session
+### Component Initialization Order
 
-# Package tests
-go test -v ./internal/rating
+**CRITICAL** - Initialize in this exact order:
 
-# With coverage
-go test -v -coverprofile=coverage.out ./internal/rating
-go tool cover -html=coverage.out
-```
-
-## Architecture & Design Patterns
-
-### Component Initialization Order (cmd/server/main.go)
-
-**CRITICAL**: Components must be initialized in this exact order to avoid dependency issues:
-
-```go
+**Server Components**:
 1. Config → Logger → Database
-2. Session Manager (starts background cleanup goroutine)
+2. Session Manager (starts cleanup goroutine)
 3. Repositories (User, Stats, Card)
 4. Domain Managers (User, Room, Chat, Table, Game, Tournament, Draft)
-5. External Services (Email client)
-6. Servers (gRPC + WebSocket) - currently commented pending protobuf generation
-```
+5. External Services (Email)
+6. Servers (gRPC + WebSocket)
+
+**Game Engine Components**:
+1. Core: `TurnManager`, `LayerSystem`, `AbilityRegistry`
+2. Managers: `PriorityManager`, `EnhancedStackManager`, `TargetSelectionManager`, `ContinuousEffectsManager`
+3. Integration: `PriorityManager.SetLayerManager(continuousEffectsMgr)`
+4. High-Level: `AbilityActivationManager` (needs all of the above)
 
 ### Manager Interface Pattern
 
-All components follow a **Manager interface pattern**:
+All components use this pattern:
 
 ```go
-// 1. Define interface in internal/<domain>/manager.go
 type Manager interface {
     Create(...) (*Entity, error)
     Get(id string) (*Entity, bool)
@@ -82,365 +64,474 @@ type Manager interface {
     Remove(id string)
 }
 
-// 2. Implement as private struct with logger
 type manager struct {
     data   map[string]*Entity
     mu     sync.RWMutex
     logger *zap.Logger
 }
-
-// 3. Constructor returns interface
-func NewManager(logger *zap.Logger) Manager {
-    return &manager{
-        data:   make(map[string]*Entity),
-        logger: logger,
-    }
-}
 ```
 
-**Key managers and their responsibilities**:
-- `session.Manager`: Session lifecycle with lease-based expiration (internal/session/manager.go)
-- `user.Manager`: User authentication, validation, registration (internal/user/manager.go)
-- `room.Manager`: Lobby and room system (internal/room/manager.go)
-- `table.Manager`: Table state and player management (internal/table/manager.go)
-- `game.Manager`: Game controller interface for game engine integration (internal/game/manager.go)
-- `tournament.Manager`: Swiss pairing algorithm, round management (internal/tournament/manager.go)
-- `draft.Manager`: Booster passing and pick handling (internal/draft/manager.go)
-- `chat.Manager`: Chat rooms and message history (internal/chat/manager.go)
+**Key Managers**:
+- `session.Manager`: Lease-based session expiration
+- `user.Manager`: Authentication, registration
+- `room.Manager`: Lobby system
+- `table.Manager`: Table state machine
+- `game.Manager`: Game controller (integrates with engine)
+- `tournament.Manager`: Swiss pairing, elimination brackets
+- `draft.Manager`: Booster draft mechanics
+- `chat.Manager`: Chat sessions
 
-### Session Management with Lease Mechanism
+### Session Management
 
-Sessions use a **lease-based expiration** instead of simple timeouts:
-
-```go
-type Session struct {
-    ID           string
-    UserID       string
-    IsAdmin      bool
-    LeaseUntil   time.Time      // Key field: lease expiration timestamp
-    CallbackChan chan interface{} // For WebSocket push events
-}
-```
-
-**How it works**:
-1. Each session has a `LeaseUntil` timestamp (not just LastActivity)
-2. `UpdateActivity()` extends the lease by `leasePeriod` (default 5 minutes)
-3. Background goroutine in `session.Manager` cleans up expired sessions
-4. Ping RPC method keeps sessions alive by calling `UpdateActivity()`
-
-**Location**: `internal/session/session.go:102-115` (lease logic), `internal/session/manager.go:87-104` (cleanup)
+**Lease-based expiration** (not simple timeouts):
+- `LeaseUntil` timestamp per session
+- `UpdateActivity()` extends lease by 5 minutes
+- Background goroutine cleans expired sessions
+- Ping RPC keeps sessions alive
 
 ### gRPC Interceptor Chain
-
-The gRPC server uses **ordered interceptors** for cross-cutting concerns (internal/server/interceptors.go):
 
 ```
 Request → RecoveryInterceptor → LoggingInterceptor → SessionValidationInterceptor
        → AdminInterceptor → MetricsInterceptor → Handler
 ```
 
-**Order matters**:
-1. **RecoveryInterceptor**: Panic recovery with stack traces (outermost - catches everything)
-2. **LoggingInterceptor**: Request/response logging with duration
-3. **SessionValidationInterceptor**: Validates session ID in metadata (fails early for invalid sessions)
-4. **AdminInterceptor**: Checks admin privileges for admin methods
-5. **MetricsInterceptor**: Prometheus metrics (request count, latency)
+### Authentication
 
-### WebSocket Callback System
+- **Password Hashing**: Argon2id (time=1, memory=64MB, threads=4, keyLen=32)
+- **Format**: `$argon2id$v=19$m=65536,t=1,p=4$<salt>$<hash>`
+- **Validation**: Username 3-16 chars, Password 8+ chars with complexity
 
-Real-time event delivery from server → client:
+### Database
 
+- **Driver**: pgx (not lib/pq)
+- **Connection pooling**: max_conns=25, min_conns=5
+- **Repositories**: UserRepository, StatsRepository, CardRepository
+
+### Rating System
+
+- **Algorithm**: Glicko-2
+- **Defaults**: rating=1500, deviation=350, volatility=0.06
+- **Location**: `internal/rating/glicko.go`
+
+### Tournament & Draft
+
+- **Swiss Pairing**: Score-based pairing with bye handling
+- **Draft**: Pick tracking, booster passing, configurable sets
+
+## Game Engine Integration
+
+### Card Implementation System
+
+**30,400+ generated cards** transpiled from Java XMage:
+```bash
+cd /Users/aron/dev/opensource/mage/mage-server-go
+python scripts/transpile_cards.py
 ```
-1. Client connects to /ws?sessionId=<id>
-2. Server validates session and retrieves CallbackChan from Session
-3. Server goroutine listens on CallbackChan
-4. Any component pushes events to session.CallbackChan
-5. WebSocket server marshals to JSON and sends to client
-```
 
-**Event types** (api/proto/mage/v1/websocket.proto): Chat messages, game updates, tournament updates, draft updates, table events
+**Structure**:
+- Location: `internal/game/cards/generated/`
+- Each card: Builder function returning `*game.Card`
+- Registration: `init()` functions → global registry
+- Complex cards: `internal/game/cards/manual/`
 
-**Location**: `internal/server/websocket.go:93-127` (connection handler), `internal/session/session.go:47` (CallbackChan field)
-
-### Authentication & Security
-
-**Password Hashing** (internal/auth/password.go):
-- **Argon2id** (not bcrypt) with parameters: time=1, memory=64MB, threads=4, keyLen=32
-- Format: `$argon2id$v=19$m=65536,t=1,p=4$<salt>$<hash>`
-
-**Password Reset** (internal/auth/token.go):
-- 6-digit numeric tokens with TTL (default 1 hour)
-- In-memory token store (TokenStore)
-- Single-use tokens (consumed on use)
-
-**Validation** (internal/user/validator.go:17-67):
-- Username: 3-16 chars, alphanumeric + underscore/hyphen
-- Password: 8+ chars, requires uppercase, lowercase, digit, special char
-- Email: RFC 5322 format
-
-### Database Layer (Repository Pattern)
-
-Uses **pgx** (not lib/pq) with connection pooling:
-
+**Example**:
 ```go
-type DB struct {
-    Pool *pgxpool.Pool  // pgx connection pool
+func NewLightningBolt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
+    card := game.NewCard(ownerID, "Lightning Bolt")
+    card.ManaCost = "{R}"
+    card.Types = []string{"INSTANT"}
+
+    ability := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+        AddTarget(abilities.NewAnyTarget()).
+        AddEffect(abilities.NewDamageEffect(3)).
+        Build()
+    card.AddAbility(ability)
+    return card, nil
 }
 ```
 
-**Repositories**:
-- `repository.UserRepository`: User CRUD operations (internal/repository/users.go)
-- `repository.StatsRepository`: Glicko rating system, win/loss tracking (internal/repository/stats.go)
-- `repository.CardRepository`: Card data with caching layer (internal/repository/cards.go)
+### Abilities System
 
-**Connection pooling** (config.yaml):
-```yaml
-database:
-  max_conns: 25
-  min_conns: 5
-  max_conn_lifetime: 1h
+**6 Ability Types** (`internal/game/abilities/`):
+1. **Spell Abilities**: Instants and sorceries
+2. **Activated Abilities**: Cost: Effect (e.g., "{T}: Add {G}")
+3. **Triggered Abilities**: When/Whenever/At triggers
+4. **Static Abilities**: Continuous effects with layers (Rule 613)
+5. **Mana Abilities**: Special timing, don't use stack
+6. **Keyword Abilities**: Flying, trample, etc.
+
+**Builder Pattern**:
+```go
+// Activated ability
+ability := abilities.NewActivatedAbilityBuilder(sourceID).
+    AddCost(abilities.NewManaCost("{2}{U}")).
+    AddCost(abilities.NewTapCost()).
+    AddTarget(abilities.NewCreatureTarget()).
+    AddEffect(abilities.NewTapEffect()).
+    Build()
+
+// Triggered ability
+ability := abilities.NewTriggeredAbilityBuilder(sourceID).
+    SetTrigger(abilities.NewEntersBattlefieldTrigger(sourceID)).
+    AddEffect(abilities.NewDrawCardsEffect(1)).
+    Build()
+
+// Static ability
+ability := abilities.NewSimpleStaticAbility(sourceID, abilities.ZoneBattlefield).
+    AddEffect(abilities.NewBoostEffect(1, 1)).
+    Build()
 ```
 
-### Rating System (Glicko-2)
+**40+ Effects** organized by category:
+- **Damage**: DamageEffect, LifeGainEffect, LoseLifeEffect
+- **Card Draw**: DrawCardsEffect, DiscardEffect
+- **Permanents**: DestroyEffect, TapEffect, UntapEffect
+- **P/T Modification**: BoostEffect (layer 7)
+- **Mana**: AddManaEffect
+- **Counters**: AddCounterEffect, RemoveCounterEffect
+- **Tokens**: CreateTokenEffect
+- **Attachment**: AttachEffect, GainAbilityAttachedEffect
+- **Special**: CounterSpellEffect, SearchLibraryEffect
 
-**Implementation** (internal/rating/glicko.go):
-- Default: rating=1500, deviation=350, volatility=0.06
-- Updates after each match with opponent rating/deviation
-- Handles inactivity (deviation increases over time)
+**Cost System**:
+- `ManaCost`: Parses "{2}{U}{U}", integrates with mana pool
+- `TapCost`: Tap source permanent
+- `SacrificeCost`: Sacrifice permanents with filters
+- `DiscardTargetCost`: Discard cards matching filter
+- `PayLifeCost`: Pay life points
 
-**Key functions**:
-- `g(φ)`: Deviation impact on rating change (internal/rating/glicko.go:113-120)
-- `E(μ, μj, φj)`: Expected score against opponent (internal/rating/glicko.go:123-130)
-- `Δ`: Performance-based rating change (internal/rating/glicko.go:133-147)
+**Target System**:
+- `TargetFilter`: Battlefield permanents (creature, player, any, etc.)
+- `CardFilter`: Hand/graveyard cards (artifact card, creature card, etc.)
+- `TargetRequirement`: Min/max targets, targeting mode
 
-### Tournament System (Swiss Pairing)
+**Trigger System**:
+- `EntersBattlefieldTrigger`: When permanent enters
+- `LeavesBattlefieldTrigger`: When permanent leaves
+- `DiesTrigger`: When creature/planeswalker dies
+- `BecomesTappedTrigger`: When permanent becomes tapped
+- `DealsDamageTrigger`: When source deals damage
+- `DrawCardTrigger`: When player draws
+- `SpellCastTrigger`: When spell is cast
 
-**Algorithm** (internal/tournament/manager.go:154-231):
-1. Players paired by score (highest vs highest in each score bracket)
-2. Bye handling for odd players (lowest-rated unpaired player gets bye)
-3. Match results tracked (win/loss/draw)
-4. Standings calculation with tiebreakers
+**Layer System** (Rule 613):
+```
+Layer 1: Copy effects
+Layer 2: Control-changing effects
+Layer 3: Text-changing effects
+Layer 4: Type-changing effects
+Layer 5: Color-changing effects
+Layer 6: Ability-adding/removing effects
+Layer 7: Power/toughness effects (7a: CDA, 7b: Set, 7c: Modify, 7d: Counters, 7e: Switch)
+```
 
-### Draft System
+**Zone System**:
+- `ZoneLibrary`, `ZoneHand`, `ZoneBattlefield`, `ZoneGraveyard`
+- `ZoneStack`, `ZoneExile`, `ZoneCommand`, `ZoneOutside`
 
-**Mechanics** (internal/draft/manager.go):
-- Configurable sets, packs per player, cards per pack
-- Pick tracking per player
-- Booster passing direction alternates by pack
-- Completion detection: `CurrentPack > NumPacks`
+**Duration System**:
+- `DurationUntilEndOfTurn`, `DurationPermanent`
+- `DurationWhileOnBattlefield`, `DurationUntilEndOfCombat`
+- `DurationWhileInGraveyard`, `DurationWhileInHand`, `DurationWhileInExile`
+
+### Engine Integration Components
+
+**Stack Management** (`internal/game/engine_stack.go`):
+- `EnhancedStackManager`: Wraps rules stack with abilities integration
+- `StackObject`: Stores spell/ability with full context (targets, choices)
+- `PushSpell()`, `PushActivatedAbility()`, `PushTriggeredAbility()`
+- `ResolveTop()`: Resolves with automatic SBA checks
+- `Counter()`: Removes object from stack (counterspells)
+- Implements Rule 405 (Stack), Rule 608 (Resolution)
+
+**Ability Registry** (`internal/game/ability_registry.go`):
+- `AbilityRegistry`: Thread-safe UUID → ability mapping
+- `RegisterAbility()`: Register when card enters play
+- `GetAbility()`: Retrieve by ID for activation
+- `GetAbilitiesBySource()`: Get all abilities of a card
+- `UnregisterSource()`: Cleanup when card leaves
+- `AbilityMetadata`: Tracks controller, zone, index
+
+**Target Selection** (`internal/game/engine_targeting.go`):
+- `TargetSelectionManager`: Handles targeting workflow
+- `ValidateTargets()`: Checks legality, count, duplicates
+- `GetLegalTargets()`: Calculates from filters
+- `CreateTargetRequest()`: Builds from ability
+- `AutoSelectTargets()`: Optimizes single legal choice
+- `CheckTargetingRestrictions()`: Hexproof/shroud/protection
+- `ValidateDivision()`: For "distribute X" effects
+- Implements Rule 115 (Targets)
+
+**Layer Recalculation** (`internal/game/engine_layers.go`):
+- `ContinuousEffectsManager`: Implements Rule 613
+- `RecalculateAll()`: Processes all static abilities
+- `processPermanent()`: Extracts static abilities
+- `convertToContinuousEffect()`: Converts to layer effects
+- `ApplyToCard()`: Applies all layers to card
+- `RemoveSourceEffects()`: Cleanup on zone change
+- Integrates abilities with effects layer system
+- Called before every SBA check
+
+**Ability Activation** (`internal/game/engine_abilities.go`):
+- `AbilityActivationManager`: Manages activation workflow
+- `ActivateAbility()`: Full Rule 602 sequence
+- `CastSpell()`: Full Rule 601 sequence
+- `ActivateManaAbility()`: Rule 605 (no stack)
+- `payCosts()`: Ordered cost payment (mana first)
+- `CheckActivationRestrictions()`: Timing validation
+- Integrates with stack, registry, targeting
+
+**Priority Integration** (`internal/game/engine_priority.go`):
+- `PriorityManager`: Integrates SBAs + layers + turn structure
+- `SetLayerManager()`: Connects layer system
+- `CheckStateBasedActions()`: Now recalculates layers first
+- `GivePriority()`: Checks SBAs before giving priority
+- Sequence: Layers → SBAs → Execute → Repeat if needed
+
+**Combat Integration** (`internal/game/engine_combat.go`):
+- `CombatIntegrationManager`: Connects combat to triggered abilities
+- `OnDeclareAttackers()`: Triggers "When X attacks"
+- `OnDeclareBlockers()`: Triggers "When X blocks" and "becomes blocked"
+- `OnCombatDamage()`: Triggers combat damage abilities
+- `CheckCombatKeywordAbilities()`: Extracts flying, first strike, etc.
+- `CanAttack()` / `CanBlock()`: Ability-based restrictions
+- Added triggers: AttacksTrigger, BlocksTrigger, BecomesBlockedTrigger, DealsCombatDamageTrigger
+- Implements Rule 508-510 (Combat steps)
+
+### Game Engine Architecture
+
+**Turn Structure** (`internal/game/rules/turn.go`):
+- `TurnManager`: Tracks phase/step progression
+- Full turn sequence: Untap → Upkeep → Draw → Main1 → Combat (BeginCombat, DeclareAttackers, DeclareBlockers, [FirstStrikeDamage], CombatDamage, EndCombat) → Main2 → End → Cleanup
+- Dynamic first strike step insertion
+- Active and priority player tracking
+
+**Event System** (`internal/game/rules/events.go`):
+- 200+ `EventType` constants
+- Phase/step events, zone changes, damage/life, card play, combat
+- Event adapter bridges to abilities system (`internal/game/engine_events.go`)
+
+**State-Based Actions** (`internal/game/rules/state_based_actions.go`):
+Implements Rule 704 - automatic game actions:
+- Player life ≤ 0 (704.5a)
+- Poison counters ≥ 10 (704.5b)
+- Creature toughness ≤ 0 (704.5f)
+- Lethal damage (704.5g)
+- Deathtouch damage (704.5h)
+- Planeswalker loyalty = 0 (704.5i)
+- Legend rule (704.5j)
+- Aura/Equipment attachment validity (704.5k, 704.5m)
+- Counter annihilation: +1/+1 and -1/-1 (704.5q)
+
+**Priority System** (`internal/game/engine_priority.go`):
+- `PriorityManager`: Integrates SBAs with turn structure
+- Checks SBAs when giving priority (Rule 117.5)
+- Checks SBAs after spell/ability resolves (Rule 608.2k)
+- Handles priority passing and step advancement
+
+**Mana System** (`internal/game/mana/pool.go`):
+- `ManaPool`: Thread-safe with regular + floating mana
+- Automatic emptying at step/phase boundaries
+- Integrated with `ManaCost.CanPay()` and `ManaCost.Pay()`
+
+**Rules Engine** (`internal/game/rules/`):
+- `Stack`: Spell/ability stack management
+- `TriggerManager`: Trigger collection and resolution
+- `PriorityManager`: Priority passing rounds
+- `ResolutionContext`: Nested resolution tracking
+
+**Effects System** (`internal/game/effects/`):
+- `Layer`: Continuous effects layer system (Rule 613)
+- `ReplacementEffect`: Replacement effects
+- `StaticEffects`: Static ability tracking
+
+### Integration Status
+
+**✅ Completed**:
+- Event adapter (rules → abilities events)
+- State-based actions checker (Rule 704)
+- Priority manager with SBA integration
+- Mana cost payment (CanPay/Pay with mana pool)
+- 40+ effect implementations
+- Complete trigger system including combat triggers
+- Static abilities with layers
+- Cost system with filters
+- **Combat integration** (Rule 508-510, triggered abilities)
+- **Stack management system** (Rule 405, 608)
+- **Ability retrieval registry** (UUID-based mapping)
+- **Target selection and validation** (Rule 115)
+- **Continuous effects layer recalculation** (Rule 613)
+- **Spell casting workflow** (Rule 601)
+
+**📋 Remaining**:
+- Comprehensive integration tests
+- Push triggered combat abilities to stack
+- Modal spell support
+- Cost modifications (increases/reductions)
+
+### Key Files
+
+**Abilities**:
+- `internal/game/abilities/ability.go` - Core interfaces
+- `internal/game/abilities/activated.go` - Activated abilities
+- `internal/game/abilities/triggered.go` - Triggered abilities
+- `internal/game/abilities/static.go` - Static abilities, layers, zones
+- `internal/game/abilities/effects.go` - 40+ effect implementations
+- `internal/game/abilities/costs.go` - Cost system with mana integration
+- `internal/game/abilities/targets.go` - Target and filter system
+- `internal/game/abilities/enchanted_effects.go` - Aura/Equipment effects
+
+**Engine**:
+- `internal/game/mage_engine.go` - Main game engine
+- `internal/game/game_context.go` - GameContext implementation
+- `internal/game/engine_events.go` - Event adapter
+- `internal/game/engine_priority.go` - Priority + SBA + layer integration
+- `internal/game/engine_combat.go` - Combat integration with triggered abilities
+- `internal/game/engine_stack.go` - Enhanced stack with abilities integration
+- `internal/game/engine_targeting.go` - Target selection and validation
+- `internal/game/engine_layers.go` - Continuous effects layer recalculation
+- `internal/game/engine_abilities.go` - Ability activation and spell casting
+- `internal/game/ability_registry.go` - Ability ID to object mapping
+
+**Rules**:
+- `internal/game/rules/turn.go` - Turn structure
+- `internal/game/rules/events.go` - 200+ event types
+- `internal/game/rules/state_based_actions.go` - SBA checker (Rule 704)
+- `internal/game/rules/priority.go` - Priority windows
+- `internal/game/rules/stack.go` - Stack management
+
+**Mana**:
+- `internal/game/mana/pool.go` - Mana pool with GetAmount/SpendMana
+
+**Cards**:
+- `internal/game/cards/generated/` - 30,400+ transpiled cards
+- `internal/game/cards/manual/` - Complex manual implementations
+- Example: `internal/game/cards/generated/psychicoverload.go`
+
+### Complex Card Example (Psychic Overload)
+
+```go
+// Enchant permanent
+ability0 := abilities.NewEnchantAbility(card.ID,
+    abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter()))
+
+// Spell ability: Attach
+ability1 := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+    AddTarget(abilities.NewPermanentTarget()).
+    AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
+    Build()
+
+// Triggered: ETB tap enchanted permanent
+ability2 := abilities.NewTriggeredAbilityBuilder(card.ID).
+    SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+    AddEffect(abilities.NewTapEnchantedEffect()).
+    Build()
+
+// Static: Doesn't untap
+ability3 := abilities.NewSimpleStaticAbility(card.ID, abilities.ZoneBattlefield).
+    AddEffect(abilities.NewDontUntapInControllersUntapStepEnchantedEffect()).
+    Build()
+
+// Static: Grant activated ability to enchanted permanent
+grantedAbility := abilities.NewActivatedAbilityBuilder(card.ID).
+    AddCost(abilities.NewDiscardTargetCost(2, abilities.NewArtifactCardFilter())).
+    AddEffect(abilities.NewUntapSourceEffect()).
+    Build()
+
+ability4 := abilities.NewSimpleStaticAbility(card.ID, abilities.ZoneBattlefield).
+    AddEffect(abilities.NewGainAbilityAttachedEffect(
+        grantedAbility,
+        abilities.AttachmentTypeAura,
+        abilities.DurationWhileOnBattlefield,
+        "Enchanted permanent has \"Discard two artifact cards: Untap this permanent.\"",
+    )).
+    Build()
+```
 
 ## Protocol Buffers
 
-### Generating Protobuf Code
+**CRITICAL**: Run `make proto` before first build to generate Go code from `.proto` files.
 
-**CRITICAL**: Run this before first build or after any `.proto` changes:
-```bash
-make proto
-```
+**Proto files**: `api/proto/mage/v1/*.proto`
+**Generated code**: `pkg/proto/mage/v1/`
 
-This runs `scripts/generate_proto.sh` which:
-1. Generates Go structs from `.proto` files in `api/proto/mage/v1/`
-2. Outputs to `pkg/proto/mage/v1/`
-3. Generates gRPC service stubs
-
-**Proto organization**:
-- `server.proto`: Main MageServer service (60+ RPC methods)
-- Domain-specific: `auth.proto`, `room.proto`, `table.proto`, `game.proto`, `tournament.proto`, `draft.proto`
-- `chat.proto`, `admin.proto`: Chat and admin messages
-- `models.proto`: Shared data models
-- `websocket.proto`: WebSocket event types
-
-**Import path** in Go code:
+**Import in Go**:
 ```go
 import pb "github.com/magefree/mage-server-go/pkg/proto/mage/v1"
 ```
 
-### Current Protobuf Status
-
-**IMPORTANT**: The server structure is complete but gRPC/WebSocket servers are **not started** until protobuf code is generated. See commented code in `cmd/server/main.go:151-200` for server initialization that activates after `make proto`.
-
-## Common Workflows
-
-### Adding a New RPC Method
-
-1. Add method to `api/proto/mage/v1/server.proto` service definition
-2. Define request/response messages in appropriate proto file
-3. Run `make proto` to regenerate code
-4. Implement method in `internal/server/grpc.go`
-5. Add business logic to domain managers if needed
-
-### Adding a New WebSocket Event
-
-1. Define event message in `api/proto/mage/v1/websocket.proto`
-2. Run `make proto`
-3. Send event via `session.CallbackChan` from any component:
-   ```go
-   if sess, ok := s.sessionMgr.GetSession(sessionID); ok {
-       sess.CallbackChan <- &pb.GameUpdateEvent{...}
-   }
-   ```
-
-### Adding a Database Migration
-
-```bash
-make migrate-create NAME=add_feature
-# Edit migrations/NNNN_add_feature.up.sql
-# Edit migrations/NNNN_add_feature.down.sql
-make migrate-up
-```
-
-### Adding a New Manager
-
-1. Define interface in `internal/<domain>/manager.go`
-2. Implement struct with logger and data structures
-3. Add to initialization in `cmd/server/main.go` (respect initialization order)
-4. Wire into gRPC server methods as needed
-
-## Code Style & Conventions
-
-**Critical conventions for this codebase**:
+## Code Conventions
 
 1. **Interfaces before implementations**: Define Manager interfaces, implement as private structs
-2. **Constructor pattern**: `NewManager()` functions for all components
-3. **Context propagation**: All I/O operations accept `context.Context`
-4. **Structured logging**: Use `zap.Logger` with typed fields
-   ```go
-   logger.Info("user connected",
-       zap.String("user", userName),
-       zap.String("session", sessionID))
-   ```
-5. **Error wrapping**: Use `fmt.Errorf("context: %w", err)` for error chains
-6. **Mutex discipline**: Use `sync.RWMutex` for read-heavy data structures
-   ```go
-   m.mu.RLock()         // For reads
-   defer m.mu.RUnlock()
-
-   m.mu.Lock()          // For writes
-   defer m.mu.Unlock()
-   ```
+2. **Constructor pattern**: `NewManager()` returns interface
+3. **Context propagation**: All I/O accepts `context.Context`
+4. **Structured logging**: `zap.Logger` with typed fields
+5. **Error wrapping**: `fmt.Errorf("context: %w", err)`
+6. **Mutex discipline**: `sync.RWMutex` for read-heavy structures
 
 ## Testing
 
-### Test Organization
+**82 tests total**:
+- Authentication (Argon2id) - 4 tests
+- Session management - 6 tests
+- Rating (Glicko-2) - 9 tests
+- Draft mechanics - 8 tests
+- Tournament (Swiss) - 9 tests
+- Abilities system - 21 tests
+- Integration flows - 25 tests
 
-- **Unit tests** (36 tests): `*_test.go` next to implementation
-- **Integration tests** (21 tests): `internal/integration/*_test.go`
-- Integration tests use `-tags=integration` flag
-
-**Test coverage** (57 tests total):
-- ✅ Authentication (Argon2id) - 4 tests
-- ✅ Session management - 6 tests
-- ✅ Rating (Glicko-2) - 9 tests
-- ✅ Draft mechanics - 8 tests
-- ✅ Tournament (Swiss) - 9 tests
-- ✅ Integration flows - 21 tests
-
-**Components without tests** (require DB/network):
-- User Manager (needs database)
-- Repository Layer (needs database)
-- Server/gRPC (needs protobuf generation)
-- Table/Game/Room/Chat Managers
-- Email Service
-- WebSocket Server
-
-### Writing Tests
-
-**Unit test pattern**:
+**Test pattern**:
 ```go
 func TestFeature(t *testing.T) {
-    // Setup
     logger := zap.NewNop()
     mgr := NewManager(logger)
 
-    // Execute
     result, err := mgr.DoSomething()
 
-    // Assert
     require.NoError(t, err)
     assert.Equal(t, expected, result)
 }
 ```
 
-**Integration test pattern** (internal/integration/*_test.go):
-```go
-func TestCompleteFlow(t *testing.T) {
-    // Setup managers
-    sessionMgr := session.NewManager(5 * time.Second)
-    userMgr := user.NewManager(/* ... */)
-
-    // Test complete workflow
-    sess := sessionMgr.CreateSession(id, host)
-    user := userMgr.Register(/* ... */)
-    // ... test full flow
-}
-```
-
 ## Configuration
 
-Configuration loaded from YAML with environment variable overrides via **Viper**.
-
-**Key settings** (config/config.yaml):
+**Key settings** (`config/config.yaml`):
 ```yaml
 server:
   grpc:
-    address: "0.0.0.0:50051"
+    address: "0.0.0.0:17171"
   websocket:
-    address: "0.0.0.0:50052"
-  max_sessions: 1000
-  lease_period: 5m          # Session lease duration
+    address: "0.0.0.0:17179"
+  lease_period: 5m
 
 database:
   host: "localhost"
   port: 5432
-  user: "mage"
-  password: "mage"          # Override with DB_PASSWORD env var
+  max_conns: 25
 
 auth:
-  mode: "db"                # or "none" for testing
-  password_reset_token_ttl: 1h
+  mode: "optional"  # or "required"
 
 mail:
-  provider: "smtp"          # or "mailgun" or "none"
+  provider: "smtp"  # or "mailgun" or "none"
 ```
 
-**Environment variable overrides**:
-- `DB_PASSWORD`: Database password
-- `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`: SMTP settings
-- `MAILGUN_DOMAIN`, `MAILGUN_API_KEY`: Mailgun settings
+**Environment overrides**: `DB_PASSWORD`, `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`, `MAILGUN_DOMAIN`, `MAILGUN_API_KEY`
 
 ## Dependencies
 
-**Core**:
-- `google.golang.org/grpc`: gRPC framework
-- `google.golang.org/protobuf`: Protocol buffers
-- `github.com/gorilla/websocket`: WebSocket server
-- `github.com/jackc/pgx/v5`: PostgreSQL driver (not lib/pq)
-- `github.com/spf13/viper`: Configuration management
-- `go.uber.org/zap`: Structured logging (not logrus)
-- `golang.org/x/crypto`: Argon2id password hashing
-- `github.com/google/uuid`: UUID generation
+- `google.golang.org/grpc` - gRPC framework
+- `github.com/jackc/pgx/v5` - PostgreSQL driver
+- `github.com/gorilla/websocket` - WebSocket server
+- `go.uber.org/zap` - Structured logging
+- `github.com/google/uuid` - UUID generation
+- `golang.org/x/crypto` - Argon2id hashing
 
-## Known Issues & Next Steps
+## References
 
-### Current Limitations
-
-1. **No protobuf code generated**: Run `make proto` before first build
-2. **gRPC/WebSocket servers not started**: Uncomment code in `main.go` after protobuf generation
-3. **Game engine interface not implemented**: Game controller is a stub awaiting integration
-4. **No database integration tests**: Requires testcontainers setup
-5. **Card repository not populated**: Requires card data import
-
-### Implementation Priority
-
-1. Generate protobuf code (`make proto`)
-2. Implement remaining gRPC methods (currently stubbed)
-3. Integrate game engine (external library or custom)
-4. Add database integration tests with testcontainers
-5. Performance testing (load testing, profiling)
-
-## Additional Resources
-
-- **Implementation Plan**: See `../GO_SERVER_IMPLEMENTATION.md` for complete 28-week plan
-- **Test Coverage Report**: See `TEST_COVERAGE.md` for detailed test breakdown
-- **Protocol Buffers**: `api/proto/mage/v1/*.proto` for API definitions
-- **Java Server Reference**: https://github.com/magefree/mage
+- **MTG Rules**: `/Users/aron/dev/opensource/mage/RULES.txt`
+- **Engine Gap Analysis**: `ENGINE_GAP_ANALYSIS.md` (missing systems, priority roadmap)
+- **Integration Summary**: `INTEGRATION_WORK_SUMMARY.md` (completed work, 6 major systems)
+- **Integration Status**: `ABILITIES_INTEGRATION_STATUS.md` (detailed status, test coverage)
+- **Java XMage**: https://github.com/magefree/mage

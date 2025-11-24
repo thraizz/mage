@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewBenevolentGeist creates a Benevolent Geist
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewBenevolentGeist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Benevolent Geist")

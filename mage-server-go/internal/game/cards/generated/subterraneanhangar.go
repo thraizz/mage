@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSubterraneanHangar creates a Subterranean Hangar
-//  - LAND
+//   - LAND
 func NewSubterraneanHangar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Subterranean Hangar")
 	card.ManaCost = ""

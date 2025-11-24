@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTwilightMire creates a Twilight Mire
-//  - LAND
+//   - LAND
 func NewTwilightMire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Twilight Mire")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewMorphicPool creates a Morphic Pool
-//  - LAND
+//   - LAND
 func NewMorphicPool(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Morphic Pool")
 	card.ManaCost = ""

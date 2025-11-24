@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMinesOfMoria creates a Mines Of Moria
-//  - LAND
+//   - LAND
 func NewMinesOfMoria(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Mines Of Moria")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSavaiTriome creates a Savai Triome
-//  - LAND
+//   - LAND
 func NewSavaiTriome(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Savai Triome")
 	card.ManaCost = ""

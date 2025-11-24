@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewAdantoTheFirstFort creates a Adanto The First Fort
-//  - LAND
+//   - LAND
 func NewAdantoTheFirstFort(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Adanto The First Fort")
 	card.ManaCost = ""

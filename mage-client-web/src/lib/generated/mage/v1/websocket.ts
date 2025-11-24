@@ -5,316 +5,309 @@
 // source: mage/v1/websocket.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
-import { Any } from '../../google/protobuf/any';
-import {
-	AbilityView,
-	CardView,
-	ChatMessage,
-	DraftPickView,
-	GameView,
-	TournamentView
-} from './models';
+import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { Any } from "../../google/protobuf/any";
+import { AbilityView, CardView, ChatMessage, DraftPickView, GameView, TournamentView } from "./models";
 
 /** CallbackMethod enumerates all possible server callbacks */
 export enum CallbackMethod {
-	CALLBACK_METHOD_UNSPECIFIED = 0,
-	/** CHATMESSAGE - Chat and Messages */
-	CHATMESSAGE = 1,
-	SHOW_USERMESSAGE = 2,
-	SERVER_MESSAGE = 3,
-	/** JOINED_TABLE - Table Events */
-	JOINED_TABLE = 10,
-	TABLE_WAITING = 11,
-	/** START_TOURNAMENT - Tournament Events */
-	START_TOURNAMENT = 20,
-	TOURNAMENT_INIT = 21,
-	TOURNAMENT_UPDATE = 22,
-	TOURNAMENT_OVER = 23,
-	/** START_DRAFT - Draft and Sideboard Events */
-	START_DRAFT = 30,
-	SIDEBOARD = 31,
-	CONSTRUCT = 32,
-	DRAFT_OVER = 33,
-	DRAFT_INIT = 34,
-	DRAFT_PICK = 35,
-	DRAFT_UPDATE = 36,
-	/** SHOW_TOURNAMENT - Watch Events */
-	SHOW_TOURNAMENT = 40,
-	WATCHGAME = 41,
-	/** VIEW_LIMITED_DECK - Deck View Events */
-	VIEW_LIMITED_DECK = 50,
-	VIEW_SIDEBOARD = 51,
-	/** USER_REQUEST_DIALOG - User Interaction Events */
-	USER_REQUEST_DIALOG = 60,
-	GAME_REDRAW_GUI = 61,
-	/** START_GAME - Game Events */
-	START_GAME = 70,
-	GAME_INIT = 71,
-	GAME_UPDATE_AND_INFORM = 72,
-	GAME_INFORM_PERSONAL = 73,
-	GAME_ERROR = 74,
-	GAME_UPDATE = 75,
-	GAME_TARGET = 76,
-	GAME_CHOOSE_ABILITY = 77,
-	GAME_CHOOSE_PILE = 78,
-	GAME_CHOOSE_CHOICE = 79,
-	GAME_ASK = 80,
-	GAME_SELECT = 81,
-	GAME_PLAY_MANA = 82,
-	GAME_PLAY_XMANA = 83,
-	GAME_GET_AMOUNT = 84,
-	GAME_GET_MULTI_AMOUNT = 85,
-	GAME_OVER = 86,
-	END_GAME_INFO = 87,
-	/** REPLAY_GAME - Replay Events */
-	REPLAY_GAME = 90,
-	REPLAY_INIT = 91,
-	REPLAY_UPDATE = 92,
-	REPLAY_DONE = 93,
-	UNRECOGNIZED = -1
+  CALLBACK_METHOD_UNSPECIFIED = 0,
+  /** CHATMESSAGE - Chat and Messages */
+  CHATMESSAGE = 1,
+  SHOW_USERMESSAGE = 2,
+  SERVER_MESSAGE = 3,
+  /** JOINED_TABLE - Table Events */
+  JOINED_TABLE = 10,
+  TABLE_WAITING = 11,
+  /** START_TOURNAMENT - Tournament Events */
+  START_TOURNAMENT = 20,
+  TOURNAMENT_INIT = 21,
+  TOURNAMENT_UPDATE = 22,
+  TOURNAMENT_OVER = 23,
+  /** START_DRAFT - Draft and Sideboard Events */
+  START_DRAFT = 30,
+  SIDEBOARD = 31,
+  CONSTRUCT = 32,
+  DRAFT_OVER = 33,
+  DRAFT_INIT = 34,
+  DRAFT_PICK = 35,
+  DRAFT_UPDATE = 36,
+  /** SHOW_TOURNAMENT - Watch Events */
+  SHOW_TOURNAMENT = 40,
+  WATCHGAME = 41,
+  /** VIEW_LIMITED_DECK - Deck View Events */
+  VIEW_LIMITED_DECK = 50,
+  VIEW_SIDEBOARD = 51,
+  /** USER_REQUEST_DIALOG - User Interaction Events */
+  USER_REQUEST_DIALOG = 60,
+  GAME_REDRAW_GUI = 61,
+  /** START_GAME - Game Events */
+  START_GAME = 70,
+  GAME_INIT = 71,
+  GAME_UPDATE_AND_INFORM = 72,
+  GAME_INFORM_PERSONAL = 73,
+  GAME_ERROR = 74,
+  GAME_UPDATE = 75,
+  GAME_TARGET = 76,
+  GAME_CHOOSE_ABILITY = 77,
+  GAME_CHOOSE_PILE = 78,
+  GAME_CHOOSE_CHOICE = 79,
+  GAME_ASK = 80,
+  GAME_SELECT = 81,
+  GAME_PLAY_MANA = 82,
+  GAME_PLAY_XMANA = 83,
+  GAME_GET_AMOUNT = 84,
+  GAME_GET_MULTI_AMOUNT = 85,
+  GAME_OVER = 86,
+  END_GAME_INFO = 87,
+  /** REPLAY_GAME - Replay Events */
+  REPLAY_GAME = 90,
+  REPLAY_INIT = 91,
+  REPLAY_UPDATE = 92,
+  REPLAY_DONE = 93,
+  UNRECOGNIZED = -1,
 }
 
 export function callbackMethodFromJSON(object: any): CallbackMethod {
-	switch (object) {
-		case 0:
-		case 'CALLBACK_METHOD_UNSPECIFIED':
-			return CallbackMethod.CALLBACK_METHOD_UNSPECIFIED;
-		case 1:
-		case 'CHATMESSAGE':
-			return CallbackMethod.CHATMESSAGE;
-		case 2:
-		case 'SHOW_USERMESSAGE':
-			return CallbackMethod.SHOW_USERMESSAGE;
-		case 3:
-		case 'SERVER_MESSAGE':
-			return CallbackMethod.SERVER_MESSAGE;
-		case 10:
-		case 'JOINED_TABLE':
-			return CallbackMethod.JOINED_TABLE;
-		case 11:
-		case 'TABLE_WAITING':
-			return CallbackMethod.TABLE_WAITING;
-		case 20:
-		case 'START_TOURNAMENT':
-			return CallbackMethod.START_TOURNAMENT;
-		case 21:
-		case 'TOURNAMENT_INIT':
-			return CallbackMethod.TOURNAMENT_INIT;
-		case 22:
-		case 'TOURNAMENT_UPDATE':
-			return CallbackMethod.TOURNAMENT_UPDATE;
-		case 23:
-		case 'TOURNAMENT_OVER':
-			return CallbackMethod.TOURNAMENT_OVER;
-		case 30:
-		case 'START_DRAFT':
-			return CallbackMethod.START_DRAFT;
-		case 31:
-		case 'SIDEBOARD':
-			return CallbackMethod.SIDEBOARD;
-		case 32:
-		case 'CONSTRUCT':
-			return CallbackMethod.CONSTRUCT;
-		case 33:
-		case 'DRAFT_OVER':
-			return CallbackMethod.DRAFT_OVER;
-		case 34:
-		case 'DRAFT_INIT':
-			return CallbackMethod.DRAFT_INIT;
-		case 35:
-		case 'DRAFT_PICK':
-			return CallbackMethod.DRAFT_PICK;
-		case 36:
-		case 'DRAFT_UPDATE':
-			return CallbackMethod.DRAFT_UPDATE;
-		case 40:
-		case 'SHOW_TOURNAMENT':
-			return CallbackMethod.SHOW_TOURNAMENT;
-		case 41:
-		case 'WATCHGAME':
-			return CallbackMethod.WATCHGAME;
-		case 50:
-		case 'VIEW_LIMITED_DECK':
-			return CallbackMethod.VIEW_LIMITED_DECK;
-		case 51:
-		case 'VIEW_SIDEBOARD':
-			return CallbackMethod.VIEW_SIDEBOARD;
-		case 60:
-		case 'USER_REQUEST_DIALOG':
-			return CallbackMethod.USER_REQUEST_DIALOG;
-		case 61:
-		case 'GAME_REDRAW_GUI':
-			return CallbackMethod.GAME_REDRAW_GUI;
-		case 70:
-		case 'START_GAME':
-			return CallbackMethod.START_GAME;
-		case 71:
-		case 'GAME_INIT':
-			return CallbackMethod.GAME_INIT;
-		case 72:
-		case 'GAME_UPDATE_AND_INFORM':
-			return CallbackMethod.GAME_UPDATE_AND_INFORM;
-		case 73:
-		case 'GAME_INFORM_PERSONAL':
-			return CallbackMethod.GAME_INFORM_PERSONAL;
-		case 74:
-		case 'GAME_ERROR':
-			return CallbackMethod.GAME_ERROR;
-		case 75:
-		case 'GAME_UPDATE':
-			return CallbackMethod.GAME_UPDATE;
-		case 76:
-		case 'GAME_TARGET':
-			return CallbackMethod.GAME_TARGET;
-		case 77:
-		case 'GAME_CHOOSE_ABILITY':
-			return CallbackMethod.GAME_CHOOSE_ABILITY;
-		case 78:
-		case 'GAME_CHOOSE_PILE':
-			return CallbackMethod.GAME_CHOOSE_PILE;
-		case 79:
-		case 'GAME_CHOOSE_CHOICE':
-			return CallbackMethod.GAME_CHOOSE_CHOICE;
-		case 80:
-		case 'GAME_ASK':
-			return CallbackMethod.GAME_ASK;
-		case 81:
-		case 'GAME_SELECT':
-			return CallbackMethod.GAME_SELECT;
-		case 82:
-		case 'GAME_PLAY_MANA':
-			return CallbackMethod.GAME_PLAY_MANA;
-		case 83:
-		case 'GAME_PLAY_XMANA':
-			return CallbackMethod.GAME_PLAY_XMANA;
-		case 84:
-		case 'GAME_GET_AMOUNT':
-			return CallbackMethod.GAME_GET_AMOUNT;
-		case 85:
-		case 'GAME_GET_MULTI_AMOUNT':
-			return CallbackMethod.GAME_GET_MULTI_AMOUNT;
-		case 86:
-		case 'GAME_OVER':
-			return CallbackMethod.GAME_OVER;
-		case 87:
-		case 'END_GAME_INFO':
-			return CallbackMethod.END_GAME_INFO;
-		case 90:
-		case 'REPLAY_GAME':
-			return CallbackMethod.REPLAY_GAME;
-		case 91:
-		case 'REPLAY_INIT':
-			return CallbackMethod.REPLAY_INIT;
-		case 92:
-		case 'REPLAY_UPDATE':
-			return CallbackMethod.REPLAY_UPDATE;
-		case 93:
-		case 'REPLAY_DONE':
-			return CallbackMethod.REPLAY_DONE;
-		case -1:
-		case 'UNRECOGNIZED':
-		default:
-			return CallbackMethod.UNRECOGNIZED;
-	}
+  switch (object) {
+    case 0:
+    case "CALLBACK_METHOD_UNSPECIFIED":
+      return CallbackMethod.CALLBACK_METHOD_UNSPECIFIED;
+    case 1:
+    case "CHATMESSAGE":
+      return CallbackMethod.CHATMESSAGE;
+    case 2:
+    case "SHOW_USERMESSAGE":
+      return CallbackMethod.SHOW_USERMESSAGE;
+    case 3:
+    case "SERVER_MESSAGE":
+      return CallbackMethod.SERVER_MESSAGE;
+    case 10:
+    case "JOINED_TABLE":
+      return CallbackMethod.JOINED_TABLE;
+    case 11:
+    case "TABLE_WAITING":
+      return CallbackMethod.TABLE_WAITING;
+    case 20:
+    case "START_TOURNAMENT":
+      return CallbackMethod.START_TOURNAMENT;
+    case 21:
+    case "TOURNAMENT_INIT":
+      return CallbackMethod.TOURNAMENT_INIT;
+    case 22:
+    case "TOURNAMENT_UPDATE":
+      return CallbackMethod.TOURNAMENT_UPDATE;
+    case 23:
+    case "TOURNAMENT_OVER":
+      return CallbackMethod.TOURNAMENT_OVER;
+    case 30:
+    case "START_DRAFT":
+      return CallbackMethod.START_DRAFT;
+    case 31:
+    case "SIDEBOARD":
+      return CallbackMethod.SIDEBOARD;
+    case 32:
+    case "CONSTRUCT":
+      return CallbackMethod.CONSTRUCT;
+    case 33:
+    case "DRAFT_OVER":
+      return CallbackMethod.DRAFT_OVER;
+    case 34:
+    case "DRAFT_INIT":
+      return CallbackMethod.DRAFT_INIT;
+    case 35:
+    case "DRAFT_PICK":
+      return CallbackMethod.DRAFT_PICK;
+    case 36:
+    case "DRAFT_UPDATE":
+      return CallbackMethod.DRAFT_UPDATE;
+    case 40:
+    case "SHOW_TOURNAMENT":
+      return CallbackMethod.SHOW_TOURNAMENT;
+    case 41:
+    case "WATCHGAME":
+      return CallbackMethod.WATCHGAME;
+    case 50:
+    case "VIEW_LIMITED_DECK":
+      return CallbackMethod.VIEW_LIMITED_DECK;
+    case 51:
+    case "VIEW_SIDEBOARD":
+      return CallbackMethod.VIEW_SIDEBOARD;
+    case 60:
+    case "USER_REQUEST_DIALOG":
+      return CallbackMethod.USER_REQUEST_DIALOG;
+    case 61:
+    case "GAME_REDRAW_GUI":
+      return CallbackMethod.GAME_REDRAW_GUI;
+    case 70:
+    case "START_GAME":
+      return CallbackMethod.START_GAME;
+    case 71:
+    case "GAME_INIT":
+      return CallbackMethod.GAME_INIT;
+    case 72:
+    case "GAME_UPDATE_AND_INFORM":
+      return CallbackMethod.GAME_UPDATE_AND_INFORM;
+    case 73:
+    case "GAME_INFORM_PERSONAL":
+      return CallbackMethod.GAME_INFORM_PERSONAL;
+    case 74:
+    case "GAME_ERROR":
+      return CallbackMethod.GAME_ERROR;
+    case 75:
+    case "GAME_UPDATE":
+      return CallbackMethod.GAME_UPDATE;
+    case 76:
+    case "GAME_TARGET":
+      return CallbackMethod.GAME_TARGET;
+    case 77:
+    case "GAME_CHOOSE_ABILITY":
+      return CallbackMethod.GAME_CHOOSE_ABILITY;
+    case 78:
+    case "GAME_CHOOSE_PILE":
+      return CallbackMethod.GAME_CHOOSE_PILE;
+    case 79:
+    case "GAME_CHOOSE_CHOICE":
+      return CallbackMethod.GAME_CHOOSE_CHOICE;
+    case 80:
+    case "GAME_ASK":
+      return CallbackMethod.GAME_ASK;
+    case 81:
+    case "GAME_SELECT":
+      return CallbackMethod.GAME_SELECT;
+    case 82:
+    case "GAME_PLAY_MANA":
+      return CallbackMethod.GAME_PLAY_MANA;
+    case 83:
+    case "GAME_PLAY_XMANA":
+      return CallbackMethod.GAME_PLAY_XMANA;
+    case 84:
+    case "GAME_GET_AMOUNT":
+      return CallbackMethod.GAME_GET_AMOUNT;
+    case 85:
+    case "GAME_GET_MULTI_AMOUNT":
+      return CallbackMethod.GAME_GET_MULTI_AMOUNT;
+    case 86:
+    case "GAME_OVER":
+      return CallbackMethod.GAME_OVER;
+    case 87:
+    case "END_GAME_INFO":
+      return CallbackMethod.END_GAME_INFO;
+    case 90:
+    case "REPLAY_GAME":
+      return CallbackMethod.REPLAY_GAME;
+    case 91:
+    case "REPLAY_INIT":
+      return CallbackMethod.REPLAY_INIT;
+    case 92:
+    case "REPLAY_UPDATE":
+      return CallbackMethod.REPLAY_UPDATE;
+    case 93:
+    case "REPLAY_DONE":
+      return CallbackMethod.REPLAY_DONE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return CallbackMethod.UNRECOGNIZED;
+  }
 }
 
 export function callbackMethodToJSON(object: CallbackMethod): string {
-	switch (object) {
-		case CallbackMethod.CALLBACK_METHOD_UNSPECIFIED:
-			return 'CALLBACK_METHOD_UNSPECIFIED';
-		case CallbackMethod.CHATMESSAGE:
-			return 'CHATMESSAGE';
-		case CallbackMethod.SHOW_USERMESSAGE:
-			return 'SHOW_USERMESSAGE';
-		case CallbackMethod.SERVER_MESSAGE:
-			return 'SERVER_MESSAGE';
-		case CallbackMethod.JOINED_TABLE:
-			return 'JOINED_TABLE';
-		case CallbackMethod.TABLE_WAITING:
-			return 'TABLE_WAITING';
-		case CallbackMethod.START_TOURNAMENT:
-			return 'START_TOURNAMENT';
-		case CallbackMethod.TOURNAMENT_INIT:
-			return 'TOURNAMENT_INIT';
-		case CallbackMethod.TOURNAMENT_UPDATE:
-			return 'TOURNAMENT_UPDATE';
-		case CallbackMethod.TOURNAMENT_OVER:
-			return 'TOURNAMENT_OVER';
-		case CallbackMethod.START_DRAFT:
-			return 'START_DRAFT';
-		case CallbackMethod.SIDEBOARD:
-			return 'SIDEBOARD';
-		case CallbackMethod.CONSTRUCT:
-			return 'CONSTRUCT';
-		case CallbackMethod.DRAFT_OVER:
-			return 'DRAFT_OVER';
-		case CallbackMethod.DRAFT_INIT:
-			return 'DRAFT_INIT';
-		case CallbackMethod.DRAFT_PICK:
-			return 'DRAFT_PICK';
-		case CallbackMethod.DRAFT_UPDATE:
-			return 'DRAFT_UPDATE';
-		case CallbackMethod.SHOW_TOURNAMENT:
-			return 'SHOW_TOURNAMENT';
-		case CallbackMethod.WATCHGAME:
-			return 'WATCHGAME';
-		case CallbackMethod.VIEW_LIMITED_DECK:
-			return 'VIEW_LIMITED_DECK';
-		case CallbackMethod.VIEW_SIDEBOARD:
-			return 'VIEW_SIDEBOARD';
-		case CallbackMethod.USER_REQUEST_DIALOG:
-			return 'USER_REQUEST_DIALOG';
-		case CallbackMethod.GAME_REDRAW_GUI:
-			return 'GAME_REDRAW_GUI';
-		case CallbackMethod.START_GAME:
-			return 'START_GAME';
-		case CallbackMethod.GAME_INIT:
-			return 'GAME_INIT';
-		case CallbackMethod.GAME_UPDATE_AND_INFORM:
-			return 'GAME_UPDATE_AND_INFORM';
-		case CallbackMethod.GAME_INFORM_PERSONAL:
-			return 'GAME_INFORM_PERSONAL';
-		case CallbackMethod.GAME_ERROR:
-			return 'GAME_ERROR';
-		case CallbackMethod.GAME_UPDATE:
-			return 'GAME_UPDATE';
-		case CallbackMethod.GAME_TARGET:
-			return 'GAME_TARGET';
-		case CallbackMethod.GAME_CHOOSE_ABILITY:
-			return 'GAME_CHOOSE_ABILITY';
-		case CallbackMethod.GAME_CHOOSE_PILE:
-			return 'GAME_CHOOSE_PILE';
-		case CallbackMethod.GAME_CHOOSE_CHOICE:
-			return 'GAME_CHOOSE_CHOICE';
-		case CallbackMethod.GAME_ASK:
-			return 'GAME_ASK';
-		case CallbackMethod.GAME_SELECT:
-			return 'GAME_SELECT';
-		case CallbackMethod.GAME_PLAY_MANA:
-			return 'GAME_PLAY_MANA';
-		case CallbackMethod.GAME_PLAY_XMANA:
-			return 'GAME_PLAY_XMANA';
-		case CallbackMethod.GAME_GET_AMOUNT:
-			return 'GAME_GET_AMOUNT';
-		case CallbackMethod.GAME_GET_MULTI_AMOUNT:
-			return 'GAME_GET_MULTI_AMOUNT';
-		case CallbackMethod.GAME_OVER:
-			return 'GAME_OVER';
-		case CallbackMethod.END_GAME_INFO:
-			return 'END_GAME_INFO';
-		case CallbackMethod.REPLAY_GAME:
-			return 'REPLAY_GAME';
-		case CallbackMethod.REPLAY_INIT:
-			return 'REPLAY_INIT';
-		case CallbackMethod.REPLAY_UPDATE:
-			return 'REPLAY_UPDATE';
-		case CallbackMethod.REPLAY_DONE:
-			return 'REPLAY_DONE';
-		case CallbackMethod.UNRECOGNIZED:
-		default:
-			return 'UNRECOGNIZED';
-	}
+  switch (object) {
+    case CallbackMethod.CALLBACK_METHOD_UNSPECIFIED:
+      return "CALLBACK_METHOD_UNSPECIFIED";
+    case CallbackMethod.CHATMESSAGE:
+      return "CHATMESSAGE";
+    case CallbackMethod.SHOW_USERMESSAGE:
+      return "SHOW_USERMESSAGE";
+    case CallbackMethod.SERVER_MESSAGE:
+      return "SERVER_MESSAGE";
+    case CallbackMethod.JOINED_TABLE:
+      return "JOINED_TABLE";
+    case CallbackMethod.TABLE_WAITING:
+      return "TABLE_WAITING";
+    case CallbackMethod.START_TOURNAMENT:
+      return "START_TOURNAMENT";
+    case CallbackMethod.TOURNAMENT_INIT:
+      return "TOURNAMENT_INIT";
+    case CallbackMethod.TOURNAMENT_UPDATE:
+      return "TOURNAMENT_UPDATE";
+    case CallbackMethod.TOURNAMENT_OVER:
+      return "TOURNAMENT_OVER";
+    case CallbackMethod.START_DRAFT:
+      return "START_DRAFT";
+    case CallbackMethod.SIDEBOARD:
+      return "SIDEBOARD";
+    case CallbackMethod.CONSTRUCT:
+      return "CONSTRUCT";
+    case CallbackMethod.DRAFT_OVER:
+      return "DRAFT_OVER";
+    case CallbackMethod.DRAFT_INIT:
+      return "DRAFT_INIT";
+    case CallbackMethod.DRAFT_PICK:
+      return "DRAFT_PICK";
+    case CallbackMethod.DRAFT_UPDATE:
+      return "DRAFT_UPDATE";
+    case CallbackMethod.SHOW_TOURNAMENT:
+      return "SHOW_TOURNAMENT";
+    case CallbackMethod.WATCHGAME:
+      return "WATCHGAME";
+    case CallbackMethod.VIEW_LIMITED_DECK:
+      return "VIEW_LIMITED_DECK";
+    case CallbackMethod.VIEW_SIDEBOARD:
+      return "VIEW_SIDEBOARD";
+    case CallbackMethod.USER_REQUEST_DIALOG:
+      return "USER_REQUEST_DIALOG";
+    case CallbackMethod.GAME_REDRAW_GUI:
+      return "GAME_REDRAW_GUI";
+    case CallbackMethod.START_GAME:
+      return "START_GAME";
+    case CallbackMethod.GAME_INIT:
+      return "GAME_INIT";
+    case CallbackMethod.GAME_UPDATE_AND_INFORM:
+      return "GAME_UPDATE_AND_INFORM";
+    case CallbackMethod.GAME_INFORM_PERSONAL:
+      return "GAME_INFORM_PERSONAL";
+    case CallbackMethod.GAME_ERROR:
+      return "GAME_ERROR";
+    case CallbackMethod.GAME_UPDATE:
+      return "GAME_UPDATE";
+    case CallbackMethod.GAME_TARGET:
+      return "GAME_TARGET";
+    case CallbackMethod.GAME_CHOOSE_ABILITY:
+      return "GAME_CHOOSE_ABILITY";
+    case CallbackMethod.GAME_CHOOSE_PILE:
+      return "GAME_CHOOSE_PILE";
+    case CallbackMethod.GAME_CHOOSE_CHOICE:
+      return "GAME_CHOOSE_CHOICE";
+    case CallbackMethod.GAME_ASK:
+      return "GAME_ASK";
+    case CallbackMethod.GAME_SELECT:
+      return "GAME_SELECT";
+    case CallbackMethod.GAME_PLAY_MANA:
+      return "GAME_PLAY_MANA";
+    case CallbackMethod.GAME_PLAY_XMANA:
+      return "GAME_PLAY_XMANA";
+    case CallbackMethod.GAME_GET_AMOUNT:
+      return "GAME_GET_AMOUNT";
+    case CallbackMethod.GAME_GET_MULTI_AMOUNT:
+      return "GAME_GET_MULTI_AMOUNT";
+    case CallbackMethod.GAME_OVER:
+      return "GAME_OVER";
+    case CallbackMethod.END_GAME_INFO:
+      return "END_GAME_INFO";
+    case CallbackMethod.REPLAY_GAME:
+      return "REPLAY_GAME";
+    case CallbackMethod.REPLAY_INIT:
+      return "REPLAY_INIT";
+    case CallbackMethod.REPLAY_UPDATE:
+      return "REPLAY_UPDATE";
+    case CallbackMethod.REPLAY_DONE:
+      return "REPLAY_DONE";
+    case CallbackMethod.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 /**
@@ -322,3796 +315,3709 @@ export function callbackMethodToJSON(object: CallbackMethod): string {
  * This mirrors Java's ClientCallback system
  */
 export interface ServerEvent {
-	sessionId: string;
-	/** UUID as string (table, game, tournament, etc.) */
-	objectId: string;
-	method: CallbackMethod;
-	/** Polymorphic payload */
-	data?: Any | undefined;
-	messageId: number;
-	compressed: boolean;
+  sessionId: string;
+  /** UUID as string (table, game, tournament, etc.) */
+  objectId: string;
+  method: CallbackMethod;
+  /** Polymorphic payload */
+  data?: Any | undefined;
+  messageId: number;
+  compressed: boolean;
 }
 
 export interface ChatMessageData {
-	message?: ChatMessage | undefined;
-	chatId: string;
+  message?: ChatMessage | undefined;
+  chatId: string;
 }
 
 export interface UserMessageData {
-	title: string;
-	message: string;
+  title: string;
+  message: string;
 }
 
 export interface ServerMessageData {
-	message: string;
-	isError: boolean;
+  message: string;
+  isError: boolean;
 }
 
 export interface JoinedTableData {
-	tableId: string;
-	roomId: string;
-	isTournament: boolean;
+  tableId: string;
+  roomId: string;
+  isTournament: boolean;
 }
 
 export interface TournamentInitData {
-	tournament?: TournamentView | undefined;
+  tournament?: TournamentView | undefined;
 }
 
 export interface TournamentUpdateData {
-	tournament?: TournamentView | undefined;
+  tournament?: TournamentView | undefined;
 }
 
 export interface TournamentOverData {
-	tournament?: TournamentView | undefined;
+  tournament?: TournamentView | undefined;
 }
 
 export interface StartDraftData {
-	draftId: string;
+  draftId: string;
 }
 
 export interface DraftInitData {
-	draftPick?: DraftPickView | undefined;
+  draftPick?: DraftPickView | undefined;
 }
 
 export interface DraftPickData {
-	draftPick?: DraftPickView | undefined;
+  draftPick?: DraftPickView | undefined;
 }
 
 export interface DraftUpdateData {
-	draftPick?: DraftPickView | undefined;
+  draftPick?: DraftPickView | undefined;
 }
 
 export interface SideboardData {
-	deckName: string;
-	deck: CardView[];
-	sideboard: CardView[];
-	remainingTime: number;
+  deckName: string;
+  deck: CardView[];
+  sideboard: CardView[];
+  remainingTime: number;
 }
 
 export interface ConstructData {
-	deckName: string;
-	cards: CardView[];
-	remainingTime: number;
+  deckName: string;
+  cards: CardView[];
+  remainingTime: number;
 }
 
 export interface WatchGameData {
-	gameId: string;
+  gameId: string;
 }
 
 export interface ShowTournamentData {
-	tournamentId: string;
+  tournamentId: string;
 }
 
 export interface ViewLimitedDeckData {
-	deck: CardView[];
-	sideboard: CardView[];
+  deck: CardView[];
+  sideboard: CardView[];
 }
 
 export interface UserRequestDialogData {
-	title: string;
-	message: string;
-	options: string[];
+  title: string;
+  message: string;
+  options: string[];
 }
 
 export interface StartGameData {
-	gameId: string;
-	playerNames: string[];
+  gameId: string;
+  playerNames: string[];
 }
 
 export interface GameInitData {
-	game?: GameView | undefined;
+  game?: GameView | undefined;
 }
 
 export interface GameUpdateData {
-	game?: GameView | undefined;
+  game?: GameView | undefined;
 }
 
 export interface GameUpdateAndInformData {
-	game?: GameView | undefined;
-	message: string;
+  game?: GameView | undefined;
+  message: string;
 }
 
 export interface GameInformPersonalData {
-	message: string;
+  message: string;
 }
 
 export interface GameErrorData {
-	error: string;
+  error: string;
 }
 
 export interface GameTargetData {
-	message: string;
-	targets: CardView[];
-	required: boolean;
-	options: { [key: string]: string };
+  message: string;
+  targets: CardView[];
+  required: boolean;
+  options: { [key: string]: string };
 }
 
 export interface GameTargetData_OptionsEntry {
-	key: string;
-	value: string;
+  key: string;
+  value: string;
 }
 
 export interface GameChooseAbilityData {
-	message: string;
-	abilities: AbilityView[];
+  message: string;
+  abilities: AbilityView[];
 }
 
 export interface GameChoosePileData {
-	message: string;
-	piles: PileView[];
+  message: string;
+  piles: PileView[];
 }
 
 export interface PileView {
-	name: string;
-	cards: CardView[];
+  name: string;
+  cards: CardView[];
 }
 
 export interface GameChoiceData {
-	message: string;
-	choices: string[];
+  message: string;
+  choices: string[];
 }
 
 export interface GameAskData {
-	message: string;
-	yesNo: boolean;
+  message: string;
+  yesNo: boolean;
 }
 
 export interface GameSelectData {
-	message: string;
-	options: { [key: string]: string };
+  message: string;
+  options: { [key: string]: string };
 }
 
 export interface GameSelectData_OptionsEntry {
-	key: string;
-	value: string;
+  key: string;
+  value: string;
 }
 
 export interface GamePlayManaData {
-	message: string;
-	manaOptions: ManaOption[];
+  message: string;
+  manaOptions: ManaOption[];
 }
 
 export interface ManaOption {
-	color: string;
-	amount: number;
+  color: string;
+  amount: number;
 }
 
 export interface GamePlayXManaData {
-	message: string;
-	available: number;
+  message: string;
+  available: number;
 }
 
 export interface GameGetAmountData {
-	message: string;
-	min: number;
-	max: number;
+  message: string;
+  min: number;
+  max: number;
 }
 
 export interface GameGetMultiAmountData {
-	message: string;
-	amounts: AmountRange[];
+  message: string;
+  amounts: AmountRange[];
 }
 
 export interface AmountRange {
-	label: string;
-	min: number;
-	max: number;
+  label: string;
+  min: number;
+  max: number;
 }
 
 export interface GameOverData {
-	winner: string;
-	results: PlayerResult[];
+  winner: string;
+  results: PlayerResult[];
 }
 
 export interface PlayerResult {
-	playerName: string;
-	wins: number;
-	losses: number;
-	quit: boolean;
+  playerName: string;
+  wins: number;
+  losses: number;
+  quit: boolean;
 }
 
 export interface EndGameInfoData {
-	gameId: string;
-	results: PlayerResult[];
+  gameId: string;
+  results: PlayerResult[];
 }
 
 export interface ReplayInitData {
-	gameId: string;
-	game?: GameView | undefined;
+  gameId: string;
+  game?: GameView | undefined;
 }
 
 export interface ReplayUpdateData {
-	game?: GameView | undefined;
+  game?: GameView | undefined;
 }
 
 export interface ReplayDoneData {
-	gameId: string;
+  gameId: string;
 }
 
 function createBaseServerEvent(): ServerEvent {
-	return {
-		sessionId: '',
-		objectId: '',
-		method: 0,
-		data: undefined,
-		messageId: 0,
-		compressed: false
-	};
+  return { sessionId: "", objectId: "", method: 0, data: undefined, messageId: 0, compressed: false };
 }
 
 export const ServerEvent: MessageFns<ServerEvent> = {
-	encode(message: ServerEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.objectId !== '') {
-			writer.uint32(18).string(message.objectId);
-		}
-		if (message.method !== 0) {
-			writer.uint32(24).int32(message.method);
-		}
-		if (message.data !== undefined) {
-			Any.encode(message.data, writer.uint32(34).fork()).join();
-		}
-		if (message.messageId !== 0) {
-			writer.uint32(40).int32(message.messageId);
-		}
-		if (message.compressed !== false) {
-			writer.uint32(48).bool(message.compressed);
-		}
-		return writer;
-	},
+  encode(message: ServerEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.objectId !== "") {
+      writer.uint32(18).string(message.objectId);
+    }
+    if (message.method !== 0) {
+      writer.uint32(24).int32(message.method);
+    }
+    if (message.data !== undefined) {
+      Any.encode(message.data, writer.uint32(34).fork()).join();
+    }
+    if (message.messageId !== 0) {
+      writer.uint32(40).int32(message.messageId);
+    }
+    if (message.compressed !== false) {
+      writer.uint32(48).bool(message.compressed);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ServerEvent {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseServerEvent();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ServerEvent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.objectId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.objectId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.method = reader.int32() as any;
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.method = reader.int32() as any;
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.data = Any.decode(reader, reader.uint32());
-					continue;
-				}
-				case 5: {
-					if (tag !== 40) {
-						break;
-					}
+          message.data = Any.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
 
-					message.messageId = reader.int32();
-					continue;
-				}
-				case 6: {
-					if (tag !== 48) {
-						break;
-					}
+          message.messageId = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
 
-					message.compressed = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.compressed = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ServerEvent {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			objectId: isSet(object.objectId) ? globalThis.String(object.objectId) : '',
-			method: isSet(object.method) ? callbackMethodFromJSON(object.method) : 0,
-			data: isSet(object.data) ? Any.fromJSON(object.data) : undefined,
-			messageId: isSet(object.messageId) ? globalThis.Number(object.messageId) : 0,
-			compressed: isSet(object.compressed) ? globalThis.Boolean(object.compressed) : false
-		};
-	},
+  fromJSON(object: any): ServerEvent {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      objectId: isSet(object.objectId) ? globalThis.String(object.objectId) : "",
+      method: isSet(object.method) ? callbackMethodFromJSON(object.method) : 0,
+      data: isSet(object.data) ? Any.fromJSON(object.data) : undefined,
+      messageId: isSet(object.messageId) ? globalThis.Number(object.messageId) : 0,
+      compressed: isSet(object.compressed) ? globalThis.Boolean(object.compressed) : false,
+    };
+  },
 
-	toJSON(message: ServerEvent): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.objectId !== '') {
-			obj.objectId = message.objectId;
-		}
-		if (message.method !== 0) {
-			obj.method = callbackMethodToJSON(message.method);
-		}
-		if (message.data !== undefined) {
-			obj.data = Any.toJSON(message.data);
-		}
-		if (message.messageId !== 0) {
-			obj.messageId = Math.round(message.messageId);
-		}
-		if (message.compressed !== false) {
-			obj.compressed = message.compressed;
-		}
-		return obj;
-	},
+  toJSON(message: ServerEvent): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.objectId !== "") {
+      obj.objectId = message.objectId;
+    }
+    if (message.method !== 0) {
+      obj.method = callbackMethodToJSON(message.method);
+    }
+    if (message.data !== undefined) {
+      obj.data = Any.toJSON(message.data);
+    }
+    if (message.messageId !== 0) {
+      obj.messageId = Math.round(message.messageId);
+    }
+    if (message.compressed !== false) {
+      obj.compressed = message.compressed;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ServerEvent>): ServerEvent {
-		return ServerEvent.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ServerEvent>): ServerEvent {
-		const message = createBaseServerEvent();
-		message.sessionId = object.sessionId ?? '';
-		message.objectId = object.objectId ?? '';
-		message.method = object.method ?? 0;
-		message.data =
-			object.data !== undefined && object.data !== null ? Any.fromPartial(object.data) : undefined;
-		message.messageId = object.messageId ?? 0;
-		message.compressed = object.compressed ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<ServerEvent>): ServerEvent {
+    return ServerEvent.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ServerEvent>): ServerEvent {
+    const message = createBaseServerEvent();
+    message.sessionId = object.sessionId ?? "";
+    message.objectId = object.objectId ?? "";
+    message.method = object.method ?? 0;
+    message.data = (object.data !== undefined && object.data !== null) ? Any.fromPartial(object.data) : undefined;
+    message.messageId = object.messageId ?? 0;
+    message.compressed = object.compressed ?? false;
+    return message;
+  },
 };
 
 function createBaseChatMessageData(): ChatMessageData {
-	return { message: undefined, chatId: '' };
+  return { message: undefined, chatId: "" };
 }
 
 export const ChatMessageData: MessageFns<ChatMessageData> = {
-	encode(message: ChatMessageData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== undefined) {
-			ChatMessage.encode(message.message, writer.uint32(10).fork()).join();
-		}
-		if (message.chatId !== '') {
-			writer.uint32(18).string(message.chatId);
-		}
-		return writer;
-	},
+  encode(message: ChatMessageData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== undefined) {
+      ChatMessage.encode(message.message, writer.uint32(10).fork()).join();
+    }
+    if (message.chatId !== "") {
+      writer.uint32(18).string(message.chatId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatMessageData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatMessageData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatMessageData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatMessageData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = ChatMessage.decode(reader, reader.uint32());
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.message = ChatMessage.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.chatId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.chatId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatMessageData {
-		return {
-			message: isSet(object.message) ? ChatMessage.fromJSON(object.message) : undefined,
-			chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : ''
-		};
-	},
+  fromJSON(object: any): ChatMessageData {
+    return {
+      message: isSet(object.message) ? ChatMessage.fromJSON(object.message) : undefined,
+      chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : "",
+    };
+  },
 
-	toJSON(message: ChatMessageData): unknown {
-		const obj: any = {};
-		if (message.message !== undefined) {
-			obj.message = ChatMessage.toJSON(message.message);
-		}
-		if (message.chatId !== '') {
-			obj.chatId = message.chatId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatMessageData): unknown {
+    const obj: any = {};
+    if (message.message !== undefined) {
+      obj.message = ChatMessage.toJSON(message.message);
+    }
+    if (message.chatId !== "") {
+      obj.chatId = message.chatId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatMessageData>): ChatMessageData {
-		return ChatMessageData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatMessageData>): ChatMessageData {
-		const message = createBaseChatMessageData();
-		message.message =
-			object.message !== undefined && object.message !== null
-				? ChatMessage.fromPartial(object.message)
-				: undefined;
-		message.chatId = object.chatId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatMessageData>): ChatMessageData {
+    return ChatMessageData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatMessageData>): ChatMessageData {
+    const message = createBaseChatMessageData();
+    message.message = (object.message !== undefined && object.message !== null)
+      ? ChatMessage.fromPartial(object.message)
+      : undefined;
+    message.chatId = object.chatId ?? "";
+    return message;
+  },
 };
 
 function createBaseUserMessageData(): UserMessageData {
-	return { title: '', message: '' };
+  return { title: "", message: "" };
 }
 
 export const UserMessageData: MessageFns<UserMessageData> = {
-	encode(message: UserMessageData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.title !== '') {
-			writer.uint32(10).string(message.title);
-		}
-		if (message.message !== '') {
-			writer.uint32(18).string(message.message);
-		}
-		return writer;
-	},
+  encode(message: UserMessageData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.title !== "") {
+      writer.uint32(10).string(message.title);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): UserMessageData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseUserMessageData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): UserMessageData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUserMessageData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.title = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.title = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.message = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): UserMessageData {
-		return {
-			title: isSet(object.title) ? globalThis.String(object.title) : '',
-			message: isSet(object.message) ? globalThis.String(object.message) : ''
-		};
-	},
+  fromJSON(object: any): UserMessageData {
+    return {
+      title: isSet(object.title) ? globalThis.String(object.title) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+    };
+  },
 
-	toJSON(message: UserMessageData): unknown {
-		const obj: any = {};
-		if (message.title !== '') {
-			obj.title = message.title;
-		}
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		return obj;
-	},
+  toJSON(message: UserMessageData): unknown {
+    const obj: any = {};
+    if (message.title !== "") {
+      obj.title = message.title;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<UserMessageData>): UserMessageData {
-		return UserMessageData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<UserMessageData>): UserMessageData {
-		const message = createBaseUserMessageData();
-		message.title = object.title ?? '';
-		message.message = object.message ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<UserMessageData>): UserMessageData {
+    return UserMessageData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UserMessageData>): UserMessageData {
+    const message = createBaseUserMessageData();
+    message.title = object.title ?? "";
+    message.message = object.message ?? "";
+    return message;
+  },
 };
 
 function createBaseServerMessageData(): ServerMessageData {
-	return { message: '', isError: false };
+  return { message: "", isError: false };
 }
 
 export const ServerMessageData: MessageFns<ServerMessageData> = {
-	encode(message: ServerMessageData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		if (message.isError !== false) {
-			writer.uint32(16).bool(message.isError);
-		}
-		return writer;
-	},
+  encode(message: ServerMessageData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    if (message.isError !== false) {
+      writer.uint32(16).bool(message.isError);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ServerMessageData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseServerMessageData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ServerMessageData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessageData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.isError = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.isError = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ServerMessageData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			isError: isSet(object.isError) ? globalThis.Boolean(object.isError) : false
-		};
-	},
+  fromJSON(object: any): ServerMessageData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      isError: isSet(object.isError) ? globalThis.Boolean(object.isError) : false,
+    };
+  },
 
-	toJSON(message: ServerMessageData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.isError !== false) {
-			obj.isError = message.isError;
-		}
-		return obj;
-	},
+  toJSON(message: ServerMessageData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.isError !== false) {
+      obj.isError = message.isError;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ServerMessageData>): ServerMessageData {
-		return ServerMessageData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ServerMessageData>): ServerMessageData {
-		const message = createBaseServerMessageData();
-		message.message = object.message ?? '';
-		message.isError = object.isError ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<ServerMessageData>): ServerMessageData {
+    return ServerMessageData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ServerMessageData>): ServerMessageData {
+    const message = createBaseServerMessageData();
+    message.message = object.message ?? "";
+    message.isError = object.isError ?? false;
+    return message;
+  },
 };
 
 function createBaseJoinedTableData(): JoinedTableData {
-	return { tableId: '', roomId: '', isTournament: false };
+  return { tableId: "", roomId: "", isTournament: false };
 }
 
 export const JoinedTableData: MessageFns<JoinedTableData> = {
-	encode(message: JoinedTableData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.tableId !== '') {
-			writer.uint32(10).string(message.tableId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.isTournament !== false) {
-			writer.uint32(24).bool(message.isTournament);
-		}
-		return writer;
-	},
+  encode(message: JoinedTableData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.tableId !== "") {
+      writer.uint32(10).string(message.tableId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.isTournament !== false) {
+      writer.uint32(24).bool(message.isTournament);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): JoinedTableData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseJoinedTableData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): JoinedTableData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseJoinedTableData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.tableId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.isTournament = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.isTournament = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): JoinedTableData {
-		return {
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			isTournament: isSet(object.isTournament) ? globalThis.Boolean(object.isTournament) : false
-		};
-	},
+  fromJSON(object: any): JoinedTableData {
+    return {
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      isTournament: isSet(object.isTournament) ? globalThis.Boolean(object.isTournament) : false,
+    };
+  },
 
-	toJSON(message: JoinedTableData): unknown {
-		const obj: any = {};
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.isTournament !== false) {
-			obj.isTournament = message.isTournament;
-		}
-		return obj;
-	},
+  toJSON(message: JoinedTableData): unknown {
+    const obj: any = {};
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.isTournament !== false) {
+      obj.isTournament = message.isTournament;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<JoinedTableData>): JoinedTableData {
-		return JoinedTableData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<JoinedTableData>): JoinedTableData {
-		const message = createBaseJoinedTableData();
-		message.tableId = object.tableId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.isTournament = object.isTournament ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<JoinedTableData>): JoinedTableData {
+    return JoinedTableData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<JoinedTableData>): JoinedTableData {
+    const message = createBaseJoinedTableData();
+    message.tableId = object.tableId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.isTournament = object.isTournament ?? false;
+    return message;
+  },
 };
 
 function createBaseTournamentInitData(): TournamentInitData {
-	return { tournament: undefined };
+  return { tournament: undefined };
 }
 
 export const TournamentInitData: MessageFns<TournamentInitData> = {
-	encode(message: TournamentInitData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.tournament !== undefined) {
-			TournamentView.encode(message.tournament, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: TournamentInitData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.tournament !== undefined) {
+      TournamentView.encode(message.tournament, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TournamentInitData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTournamentInitData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TournamentInitData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTournamentInitData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.tournament = TournamentView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tournament = TournamentView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TournamentInitData {
-		return {
-			tournament: isSet(object.tournament) ? TournamentView.fromJSON(object.tournament) : undefined
-		};
-	},
+  fromJSON(object: any): TournamentInitData {
+    return { tournament: isSet(object.tournament) ? TournamentView.fromJSON(object.tournament) : undefined };
+  },
 
-	toJSON(message: TournamentInitData): unknown {
-		const obj: any = {};
-		if (message.tournament !== undefined) {
-			obj.tournament = TournamentView.toJSON(message.tournament);
-		}
-		return obj;
-	},
+  toJSON(message: TournamentInitData): unknown {
+    const obj: any = {};
+    if (message.tournament !== undefined) {
+      obj.tournament = TournamentView.toJSON(message.tournament);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TournamentInitData>): TournamentInitData {
-		return TournamentInitData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TournamentInitData>): TournamentInitData {
-		const message = createBaseTournamentInitData();
-		message.tournament =
-			object.tournament !== undefined && object.tournament !== null
-				? TournamentView.fromPartial(object.tournament)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<TournamentInitData>): TournamentInitData {
+    return TournamentInitData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TournamentInitData>): TournamentInitData {
+    const message = createBaseTournamentInitData();
+    message.tournament = (object.tournament !== undefined && object.tournament !== null)
+      ? TournamentView.fromPartial(object.tournament)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseTournamentUpdateData(): TournamentUpdateData {
-	return { tournament: undefined };
+  return { tournament: undefined };
 }
 
 export const TournamentUpdateData: MessageFns<TournamentUpdateData> = {
-	encode(message: TournamentUpdateData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.tournament !== undefined) {
-			TournamentView.encode(message.tournament, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: TournamentUpdateData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.tournament !== undefined) {
+      TournamentView.encode(message.tournament, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TournamentUpdateData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTournamentUpdateData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TournamentUpdateData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTournamentUpdateData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.tournament = TournamentView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tournament = TournamentView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TournamentUpdateData {
-		return {
-			tournament: isSet(object.tournament) ? TournamentView.fromJSON(object.tournament) : undefined
-		};
-	},
+  fromJSON(object: any): TournamentUpdateData {
+    return { tournament: isSet(object.tournament) ? TournamentView.fromJSON(object.tournament) : undefined };
+  },
 
-	toJSON(message: TournamentUpdateData): unknown {
-		const obj: any = {};
-		if (message.tournament !== undefined) {
-			obj.tournament = TournamentView.toJSON(message.tournament);
-		}
-		return obj;
-	},
+  toJSON(message: TournamentUpdateData): unknown {
+    const obj: any = {};
+    if (message.tournament !== undefined) {
+      obj.tournament = TournamentView.toJSON(message.tournament);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TournamentUpdateData>): TournamentUpdateData {
-		return TournamentUpdateData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TournamentUpdateData>): TournamentUpdateData {
-		const message = createBaseTournamentUpdateData();
-		message.tournament =
-			object.tournament !== undefined && object.tournament !== null
-				? TournamentView.fromPartial(object.tournament)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<TournamentUpdateData>): TournamentUpdateData {
+    return TournamentUpdateData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TournamentUpdateData>): TournamentUpdateData {
+    const message = createBaseTournamentUpdateData();
+    message.tournament = (object.tournament !== undefined && object.tournament !== null)
+      ? TournamentView.fromPartial(object.tournament)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseTournamentOverData(): TournamentOverData {
-	return { tournament: undefined };
+  return { tournament: undefined };
 }
 
 export const TournamentOverData: MessageFns<TournamentOverData> = {
-	encode(message: TournamentOverData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.tournament !== undefined) {
-			TournamentView.encode(message.tournament, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: TournamentOverData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.tournament !== undefined) {
+      TournamentView.encode(message.tournament, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TournamentOverData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTournamentOverData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TournamentOverData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTournamentOverData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.tournament = TournamentView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tournament = TournamentView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TournamentOverData {
-		return {
-			tournament: isSet(object.tournament) ? TournamentView.fromJSON(object.tournament) : undefined
-		};
-	},
+  fromJSON(object: any): TournamentOverData {
+    return { tournament: isSet(object.tournament) ? TournamentView.fromJSON(object.tournament) : undefined };
+  },
 
-	toJSON(message: TournamentOverData): unknown {
-		const obj: any = {};
-		if (message.tournament !== undefined) {
-			obj.tournament = TournamentView.toJSON(message.tournament);
-		}
-		return obj;
-	},
+  toJSON(message: TournamentOverData): unknown {
+    const obj: any = {};
+    if (message.tournament !== undefined) {
+      obj.tournament = TournamentView.toJSON(message.tournament);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TournamentOverData>): TournamentOverData {
-		return TournamentOverData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TournamentOverData>): TournamentOverData {
-		const message = createBaseTournamentOverData();
-		message.tournament =
-			object.tournament !== undefined && object.tournament !== null
-				? TournamentView.fromPartial(object.tournament)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<TournamentOverData>): TournamentOverData {
+    return TournamentOverData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TournamentOverData>): TournamentOverData {
+    const message = createBaseTournamentOverData();
+    message.tournament = (object.tournament !== undefined && object.tournament !== null)
+      ? TournamentView.fromPartial(object.tournament)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseStartDraftData(): StartDraftData {
-	return { draftId: '' };
+  return { draftId: "" };
 }
 
 export const StartDraftData: MessageFns<StartDraftData> = {
-	encode(message: StartDraftData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.draftId !== '') {
-			writer.uint32(10).string(message.draftId);
-		}
-		return writer;
-	},
+  encode(message: StartDraftData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.draftId !== "") {
+      writer.uint32(10).string(message.draftId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): StartDraftData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseStartDraftData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): StartDraftData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStartDraftData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.draftId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.draftId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): StartDraftData {
-		return { draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : '' };
-	},
+  fromJSON(object: any): StartDraftData {
+    return { draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : "" };
+  },
 
-	toJSON(message: StartDraftData): unknown {
-		const obj: any = {};
-		if (message.draftId !== '') {
-			obj.draftId = message.draftId;
-		}
-		return obj;
-	},
+  toJSON(message: StartDraftData): unknown {
+    const obj: any = {};
+    if (message.draftId !== "") {
+      obj.draftId = message.draftId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<StartDraftData>): StartDraftData {
-		return StartDraftData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<StartDraftData>): StartDraftData {
-		const message = createBaseStartDraftData();
-		message.draftId = object.draftId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<StartDraftData>): StartDraftData {
+    return StartDraftData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<StartDraftData>): StartDraftData {
+    const message = createBaseStartDraftData();
+    message.draftId = object.draftId ?? "";
+    return message;
+  },
 };
 
 function createBaseDraftInitData(): DraftInitData {
-	return { draftPick: undefined };
+  return { draftPick: undefined };
 }
 
 export const DraftInitData: MessageFns<DraftInitData> = {
-	encode(message: DraftInitData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.draftPick !== undefined) {
-			DraftPickView.encode(message.draftPick, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: DraftInitData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.draftPick !== undefined) {
+      DraftPickView.encode(message.draftPick, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DraftInitData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDraftInitData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DraftInitData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDraftInitData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.draftPick = DraftPickView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.draftPick = DraftPickView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DraftInitData {
-		return {
-			draftPick: isSet(object.draftPick) ? DraftPickView.fromJSON(object.draftPick) : undefined
-		};
-	},
+  fromJSON(object: any): DraftInitData {
+    return { draftPick: isSet(object.draftPick) ? DraftPickView.fromJSON(object.draftPick) : undefined };
+  },
 
-	toJSON(message: DraftInitData): unknown {
-		const obj: any = {};
-		if (message.draftPick !== undefined) {
-			obj.draftPick = DraftPickView.toJSON(message.draftPick);
-		}
-		return obj;
-	},
+  toJSON(message: DraftInitData): unknown {
+    const obj: any = {};
+    if (message.draftPick !== undefined) {
+      obj.draftPick = DraftPickView.toJSON(message.draftPick);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DraftInitData>): DraftInitData {
-		return DraftInitData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DraftInitData>): DraftInitData {
-		const message = createBaseDraftInitData();
-		message.draftPick =
-			object.draftPick !== undefined && object.draftPick !== null
-				? DraftPickView.fromPartial(object.draftPick)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<DraftInitData>): DraftInitData {
+    return DraftInitData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DraftInitData>): DraftInitData {
+    const message = createBaseDraftInitData();
+    message.draftPick = (object.draftPick !== undefined && object.draftPick !== null)
+      ? DraftPickView.fromPartial(object.draftPick)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseDraftPickData(): DraftPickData {
-	return { draftPick: undefined };
+  return { draftPick: undefined };
 }
 
 export const DraftPickData: MessageFns<DraftPickData> = {
-	encode(message: DraftPickData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.draftPick !== undefined) {
-			DraftPickView.encode(message.draftPick, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: DraftPickData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.draftPick !== undefined) {
+      DraftPickView.encode(message.draftPick, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DraftPickData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDraftPickData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DraftPickData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDraftPickData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.draftPick = DraftPickView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.draftPick = DraftPickView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DraftPickData {
-		return {
-			draftPick: isSet(object.draftPick) ? DraftPickView.fromJSON(object.draftPick) : undefined
-		};
-	},
+  fromJSON(object: any): DraftPickData {
+    return { draftPick: isSet(object.draftPick) ? DraftPickView.fromJSON(object.draftPick) : undefined };
+  },
 
-	toJSON(message: DraftPickData): unknown {
-		const obj: any = {};
-		if (message.draftPick !== undefined) {
-			obj.draftPick = DraftPickView.toJSON(message.draftPick);
-		}
-		return obj;
-	},
+  toJSON(message: DraftPickData): unknown {
+    const obj: any = {};
+    if (message.draftPick !== undefined) {
+      obj.draftPick = DraftPickView.toJSON(message.draftPick);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DraftPickData>): DraftPickData {
-		return DraftPickData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DraftPickData>): DraftPickData {
-		const message = createBaseDraftPickData();
-		message.draftPick =
-			object.draftPick !== undefined && object.draftPick !== null
-				? DraftPickView.fromPartial(object.draftPick)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<DraftPickData>): DraftPickData {
+    return DraftPickData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DraftPickData>): DraftPickData {
+    const message = createBaseDraftPickData();
+    message.draftPick = (object.draftPick !== undefined && object.draftPick !== null)
+      ? DraftPickView.fromPartial(object.draftPick)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseDraftUpdateData(): DraftUpdateData {
-	return { draftPick: undefined };
+  return { draftPick: undefined };
 }
 
 export const DraftUpdateData: MessageFns<DraftUpdateData> = {
-	encode(message: DraftUpdateData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.draftPick !== undefined) {
-			DraftPickView.encode(message.draftPick, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: DraftUpdateData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.draftPick !== undefined) {
+      DraftPickView.encode(message.draftPick, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DraftUpdateData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDraftUpdateData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DraftUpdateData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDraftUpdateData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.draftPick = DraftPickView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.draftPick = DraftPickView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DraftUpdateData {
-		return {
-			draftPick: isSet(object.draftPick) ? DraftPickView.fromJSON(object.draftPick) : undefined
-		};
-	},
+  fromJSON(object: any): DraftUpdateData {
+    return { draftPick: isSet(object.draftPick) ? DraftPickView.fromJSON(object.draftPick) : undefined };
+  },
 
-	toJSON(message: DraftUpdateData): unknown {
-		const obj: any = {};
-		if (message.draftPick !== undefined) {
-			obj.draftPick = DraftPickView.toJSON(message.draftPick);
-		}
-		return obj;
-	},
+  toJSON(message: DraftUpdateData): unknown {
+    const obj: any = {};
+    if (message.draftPick !== undefined) {
+      obj.draftPick = DraftPickView.toJSON(message.draftPick);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DraftUpdateData>): DraftUpdateData {
-		return DraftUpdateData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DraftUpdateData>): DraftUpdateData {
-		const message = createBaseDraftUpdateData();
-		message.draftPick =
-			object.draftPick !== undefined && object.draftPick !== null
-				? DraftPickView.fromPartial(object.draftPick)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<DraftUpdateData>): DraftUpdateData {
+    return DraftUpdateData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DraftUpdateData>): DraftUpdateData {
+    const message = createBaseDraftUpdateData();
+    message.draftPick = (object.draftPick !== undefined && object.draftPick !== null)
+      ? DraftPickView.fromPartial(object.draftPick)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseSideboardData(): SideboardData {
-	return { deckName: '', deck: [], sideboard: [], remainingTime: 0 };
+  return { deckName: "", deck: [], sideboard: [], remainingTime: 0 };
 }
 
 export const SideboardData: MessageFns<SideboardData> = {
-	encode(message: SideboardData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.deckName !== '') {
-			writer.uint32(10).string(message.deckName);
-		}
-		for (const v of message.deck) {
-			CardView.encode(v!, writer.uint32(18).fork()).join();
-		}
-		for (const v of message.sideboard) {
-			CardView.encode(v!, writer.uint32(26).fork()).join();
-		}
-		if (message.remainingTime !== 0) {
-			writer.uint32(32).int32(message.remainingTime);
-		}
-		return writer;
-	},
+  encode(message: SideboardData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.deckName !== "") {
+      writer.uint32(10).string(message.deckName);
+    }
+    for (const v of message.deck) {
+      CardView.encode(v!, writer.uint32(18).fork()).join();
+    }
+    for (const v of message.sideboard) {
+      CardView.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.remainingTime !== 0) {
+      writer.uint32(32).int32(message.remainingTime);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SideboardData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSideboardData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SideboardData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSideboardData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.deckName = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.deckName = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.deck.push(CardView.decode(reader, reader.uint32()));
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.deck.push(CardView.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.sideboard.push(CardView.decode(reader, reader.uint32()));
-					continue;
-				}
-				case 4: {
-					if (tag !== 32) {
-						break;
-					}
+          message.sideboard.push(CardView.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
 
-					message.remainingTime = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.remainingTime = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SideboardData {
-		return {
-			deckName: isSet(object.deckName) ? globalThis.String(object.deckName) : '',
-			deck: globalThis.Array.isArray(object?.deck)
-				? object.deck.map((e: any) => CardView.fromJSON(e))
-				: [],
-			sideboard: globalThis.Array.isArray(object?.sideboard)
-				? object.sideboard.map((e: any) => CardView.fromJSON(e))
-				: [],
-			remainingTime: isSet(object.remainingTime) ? globalThis.Number(object.remainingTime) : 0
-		};
-	},
+  fromJSON(object: any): SideboardData {
+    return {
+      deckName: isSet(object.deckName) ? globalThis.String(object.deckName) : "",
+      deck: globalThis.Array.isArray(object?.deck) ? object.deck.map((e: any) => CardView.fromJSON(e)) : [],
+      sideboard: globalThis.Array.isArray(object?.sideboard)
+        ? object.sideboard.map((e: any) => CardView.fromJSON(e))
+        : [],
+      remainingTime: isSet(object.remainingTime) ? globalThis.Number(object.remainingTime) : 0,
+    };
+  },
 
-	toJSON(message: SideboardData): unknown {
-		const obj: any = {};
-		if (message.deckName !== '') {
-			obj.deckName = message.deckName;
-		}
-		if (message.deck?.length) {
-			obj.deck = message.deck.map((e) => CardView.toJSON(e));
-		}
-		if (message.sideboard?.length) {
-			obj.sideboard = message.sideboard.map((e) => CardView.toJSON(e));
-		}
-		if (message.remainingTime !== 0) {
-			obj.remainingTime = Math.round(message.remainingTime);
-		}
-		return obj;
-	},
+  toJSON(message: SideboardData): unknown {
+    const obj: any = {};
+    if (message.deckName !== "") {
+      obj.deckName = message.deckName;
+    }
+    if (message.deck?.length) {
+      obj.deck = message.deck.map((e) => CardView.toJSON(e));
+    }
+    if (message.sideboard?.length) {
+      obj.sideboard = message.sideboard.map((e) => CardView.toJSON(e));
+    }
+    if (message.remainingTime !== 0) {
+      obj.remainingTime = Math.round(message.remainingTime);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SideboardData>): SideboardData {
-		return SideboardData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SideboardData>): SideboardData {
-		const message = createBaseSideboardData();
-		message.deckName = object.deckName ?? '';
-		message.deck = object.deck?.map((e) => CardView.fromPartial(e)) || [];
-		message.sideboard = object.sideboard?.map((e) => CardView.fromPartial(e)) || [];
-		message.remainingTime = object.remainingTime ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<SideboardData>): SideboardData {
+    return SideboardData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SideboardData>): SideboardData {
+    const message = createBaseSideboardData();
+    message.deckName = object.deckName ?? "";
+    message.deck = object.deck?.map((e) => CardView.fromPartial(e)) || [];
+    message.sideboard = object.sideboard?.map((e) => CardView.fromPartial(e)) || [];
+    message.remainingTime = object.remainingTime ?? 0;
+    return message;
+  },
 };
 
 function createBaseConstructData(): ConstructData {
-	return { deckName: '', cards: [], remainingTime: 0 };
+  return { deckName: "", cards: [], remainingTime: 0 };
 }
 
 export const ConstructData: MessageFns<ConstructData> = {
-	encode(message: ConstructData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.deckName !== '') {
-			writer.uint32(10).string(message.deckName);
-		}
-		for (const v of message.cards) {
-			CardView.encode(v!, writer.uint32(18).fork()).join();
-		}
-		if (message.remainingTime !== 0) {
-			writer.uint32(24).int32(message.remainingTime);
-		}
-		return writer;
-	},
+  encode(message: ConstructData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.deckName !== "") {
+      writer.uint32(10).string(message.deckName);
+    }
+    for (const v of message.cards) {
+      CardView.encode(v!, writer.uint32(18).fork()).join();
+    }
+    if (message.remainingTime !== 0) {
+      writer.uint32(24).int32(message.remainingTime);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ConstructData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseConstructData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ConstructData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConstructData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.deckName = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.deckName = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.cards.push(CardView.decode(reader, reader.uint32()));
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.cards.push(CardView.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.remainingTime = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.remainingTime = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ConstructData {
-		return {
-			deckName: isSet(object.deckName) ? globalThis.String(object.deckName) : '',
-			cards: globalThis.Array.isArray(object?.cards)
-				? object.cards.map((e: any) => CardView.fromJSON(e))
-				: [],
-			remainingTime: isSet(object.remainingTime) ? globalThis.Number(object.remainingTime) : 0
-		};
-	},
+  fromJSON(object: any): ConstructData {
+    return {
+      deckName: isSet(object.deckName) ? globalThis.String(object.deckName) : "",
+      cards: globalThis.Array.isArray(object?.cards) ? object.cards.map((e: any) => CardView.fromJSON(e)) : [],
+      remainingTime: isSet(object.remainingTime) ? globalThis.Number(object.remainingTime) : 0,
+    };
+  },
 
-	toJSON(message: ConstructData): unknown {
-		const obj: any = {};
-		if (message.deckName !== '') {
-			obj.deckName = message.deckName;
-		}
-		if (message.cards?.length) {
-			obj.cards = message.cards.map((e) => CardView.toJSON(e));
-		}
-		if (message.remainingTime !== 0) {
-			obj.remainingTime = Math.round(message.remainingTime);
-		}
-		return obj;
-	},
+  toJSON(message: ConstructData): unknown {
+    const obj: any = {};
+    if (message.deckName !== "") {
+      obj.deckName = message.deckName;
+    }
+    if (message.cards?.length) {
+      obj.cards = message.cards.map((e) => CardView.toJSON(e));
+    }
+    if (message.remainingTime !== 0) {
+      obj.remainingTime = Math.round(message.remainingTime);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ConstructData>): ConstructData {
-		return ConstructData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ConstructData>): ConstructData {
-		const message = createBaseConstructData();
-		message.deckName = object.deckName ?? '';
-		message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
-		message.remainingTime = object.remainingTime ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<ConstructData>): ConstructData {
+    return ConstructData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConstructData>): ConstructData {
+    const message = createBaseConstructData();
+    message.deckName = object.deckName ?? "";
+    message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
+    message.remainingTime = object.remainingTime ?? 0;
+    return message;
+  },
 };
 
 function createBaseWatchGameData(): WatchGameData {
-	return { gameId: '' };
+  return { gameId: "" };
 }
 
 export const WatchGameData: MessageFns<WatchGameData> = {
-	encode(message: WatchGameData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.gameId !== '') {
-			writer.uint32(10).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: WatchGameData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.gameId !== "") {
+      writer.uint32(10).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): WatchGameData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseWatchGameData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): WatchGameData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseWatchGameData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): WatchGameData {
-		return { gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '' };
-	},
+  fromJSON(object: any): WatchGameData {
+    return { gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "" };
+  },
 
-	toJSON(message: WatchGameData): unknown {
-		const obj: any = {};
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: WatchGameData): unknown {
+    const obj: any = {};
+    if (message.gameId !== "") {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<WatchGameData>): WatchGameData {
-		return WatchGameData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<WatchGameData>): WatchGameData {
-		const message = createBaseWatchGameData();
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<WatchGameData>): WatchGameData {
+    return WatchGameData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<WatchGameData>): WatchGameData {
+    const message = createBaseWatchGameData();
+    message.gameId = object.gameId ?? "";
+    return message;
+  },
 };
 
 function createBaseShowTournamentData(): ShowTournamentData {
-	return { tournamentId: '' };
+  return { tournamentId: "" };
 }
 
 export const ShowTournamentData: MessageFns<ShowTournamentData> = {
-	encode(message: ShowTournamentData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.tournamentId !== '') {
-			writer.uint32(10).string(message.tournamentId);
-		}
-		return writer;
-	},
+  encode(message: ShowTournamentData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.tournamentId !== "") {
+      writer.uint32(10).string(message.tournamentId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ShowTournamentData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseShowTournamentData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ShowTournamentData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseShowTournamentData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.tournamentId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tournamentId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ShowTournamentData {
-		return {
-			tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : ''
-		};
-	},
+  fromJSON(object: any): ShowTournamentData {
+    return { tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : "" };
+  },
 
-	toJSON(message: ShowTournamentData): unknown {
-		const obj: any = {};
-		if (message.tournamentId !== '') {
-			obj.tournamentId = message.tournamentId;
-		}
-		return obj;
-	},
+  toJSON(message: ShowTournamentData): unknown {
+    const obj: any = {};
+    if (message.tournamentId !== "") {
+      obj.tournamentId = message.tournamentId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ShowTournamentData>): ShowTournamentData {
-		return ShowTournamentData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ShowTournamentData>): ShowTournamentData {
-		const message = createBaseShowTournamentData();
-		message.tournamentId = object.tournamentId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ShowTournamentData>): ShowTournamentData {
+    return ShowTournamentData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ShowTournamentData>): ShowTournamentData {
+    const message = createBaseShowTournamentData();
+    message.tournamentId = object.tournamentId ?? "";
+    return message;
+  },
 };
 
 function createBaseViewLimitedDeckData(): ViewLimitedDeckData {
-	return { deck: [], sideboard: [] };
+  return { deck: [], sideboard: [] };
 }
 
 export const ViewLimitedDeckData: MessageFns<ViewLimitedDeckData> = {
-	encode(message: ViewLimitedDeckData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		for (const v of message.deck) {
-			CardView.encode(v!, writer.uint32(10).fork()).join();
-		}
-		for (const v of message.sideboard) {
-			CardView.encode(v!, writer.uint32(18).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: ViewLimitedDeckData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.deck) {
+      CardView.encode(v!, writer.uint32(10).fork()).join();
+    }
+    for (const v of message.sideboard) {
+      CardView.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ViewLimitedDeckData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseViewLimitedDeckData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ViewLimitedDeckData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseViewLimitedDeckData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.deck.push(CardView.decode(reader, reader.uint32()));
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.deck.push(CardView.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.sideboard.push(CardView.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.sideboard.push(CardView.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ViewLimitedDeckData {
-		return {
-			deck: globalThis.Array.isArray(object?.deck)
-				? object.deck.map((e: any) => CardView.fromJSON(e))
-				: [],
-			sideboard: globalThis.Array.isArray(object?.sideboard)
-				? object.sideboard.map((e: any) => CardView.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): ViewLimitedDeckData {
+    return {
+      deck: globalThis.Array.isArray(object?.deck) ? object.deck.map((e: any) => CardView.fromJSON(e)) : [],
+      sideboard: globalThis.Array.isArray(object?.sideboard)
+        ? object.sideboard.map((e: any) => CardView.fromJSON(e))
+        : [],
+    };
+  },
 
-	toJSON(message: ViewLimitedDeckData): unknown {
-		const obj: any = {};
-		if (message.deck?.length) {
-			obj.deck = message.deck.map((e) => CardView.toJSON(e));
-		}
-		if (message.sideboard?.length) {
-			obj.sideboard = message.sideboard.map((e) => CardView.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: ViewLimitedDeckData): unknown {
+    const obj: any = {};
+    if (message.deck?.length) {
+      obj.deck = message.deck.map((e) => CardView.toJSON(e));
+    }
+    if (message.sideboard?.length) {
+      obj.sideboard = message.sideboard.map((e) => CardView.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ViewLimitedDeckData>): ViewLimitedDeckData {
-		return ViewLimitedDeckData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ViewLimitedDeckData>): ViewLimitedDeckData {
-		const message = createBaseViewLimitedDeckData();
-		message.deck = object.deck?.map((e) => CardView.fromPartial(e)) || [];
-		message.sideboard = object.sideboard?.map((e) => CardView.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<ViewLimitedDeckData>): ViewLimitedDeckData {
+    return ViewLimitedDeckData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ViewLimitedDeckData>): ViewLimitedDeckData {
+    const message = createBaseViewLimitedDeckData();
+    message.deck = object.deck?.map((e) => CardView.fromPartial(e)) || [];
+    message.sideboard = object.sideboard?.map((e) => CardView.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBaseUserRequestDialogData(): UserRequestDialogData {
-	return { title: '', message: '', options: [] };
+  return { title: "", message: "", options: [] };
 }
 
 export const UserRequestDialogData: MessageFns<UserRequestDialogData> = {
-	encode(message: UserRequestDialogData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.title !== '') {
-			writer.uint32(10).string(message.title);
-		}
-		if (message.message !== '') {
-			writer.uint32(18).string(message.message);
-		}
-		for (const v of message.options) {
-			writer.uint32(26).string(v!);
-		}
-		return writer;
-	},
+  encode(message: UserRequestDialogData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.title !== "") {
+      writer.uint32(10).string(message.title);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.options) {
+      writer.uint32(26).string(v!);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): UserRequestDialogData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseUserRequestDialogData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): UserRequestDialogData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUserRequestDialogData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.title = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.title = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.options.push(reader.string());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.options.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): UserRequestDialogData {
-		return {
-			title: isSet(object.title) ? globalThis.String(object.title) : '',
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			options: globalThis.Array.isArray(object?.options)
-				? object.options.map((e: any) => globalThis.String(e))
-				: []
-		};
-	},
+  fromJSON(object: any): UserRequestDialogData {
+    return {
+      title: isSet(object.title) ? globalThis.String(object.title) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      options: globalThis.Array.isArray(object?.options) ? object.options.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
 
-	toJSON(message: UserRequestDialogData): unknown {
-		const obj: any = {};
-		if (message.title !== '') {
-			obj.title = message.title;
-		}
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.options?.length) {
-			obj.options = message.options;
-		}
-		return obj;
-	},
+  toJSON(message: UserRequestDialogData): unknown {
+    const obj: any = {};
+    if (message.title !== "") {
+      obj.title = message.title;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.options?.length) {
+      obj.options = message.options;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<UserRequestDialogData>): UserRequestDialogData {
-		return UserRequestDialogData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<UserRequestDialogData>): UserRequestDialogData {
-		const message = createBaseUserRequestDialogData();
-		message.title = object.title ?? '';
-		message.message = object.message ?? '';
-		message.options = object.options?.map((e) => e) || [];
-		return message;
-	}
+  create(base?: DeepPartial<UserRequestDialogData>): UserRequestDialogData {
+    return UserRequestDialogData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UserRequestDialogData>): UserRequestDialogData {
+    const message = createBaseUserRequestDialogData();
+    message.title = object.title ?? "";
+    message.message = object.message ?? "";
+    message.options = object.options?.map((e) => e) || [];
+    return message;
+  },
 };
 
 function createBaseStartGameData(): StartGameData {
-	return { gameId: '', playerNames: [] };
+  return { gameId: "", playerNames: [] };
 }
 
 export const StartGameData: MessageFns<StartGameData> = {
-	encode(message: StartGameData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.gameId !== '') {
-			writer.uint32(10).string(message.gameId);
-		}
-		for (const v of message.playerNames) {
-			writer.uint32(18).string(v!);
-		}
-		return writer;
-	},
+  encode(message: StartGameData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.gameId !== "") {
+      writer.uint32(10).string(message.gameId);
+    }
+    for (const v of message.playerNames) {
+      writer.uint32(18).string(v!);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): StartGameData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseStartGameData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): StartGameData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseStartGameData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.playerNames.push(reader.string());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.playerNames.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): StartGameData {
-		return {
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			playerNames: globalThis.Array.isArray(object?.playerNames)
-				? object.playerNames.map((e: any) => globalThis.String(e))
-				: []
-		};
-	},
+  fromJSON(object: any): StartGameData {
+    return {
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "",
+      playerNames: globalThis.Array.isArray(object?.playerNames)
+        ? object.playerNames.map((e: any) => globalThis.String(e))
+        : [],
+    };
+  },
 
-	toJSON(message: StartGameData): unknown {
-		const obj: any = {};
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.playerNames?.length) {
-			obj.playerNames = message.playerNames;
-		}
-		return obj;
-	},
+  toJSON(message: StartGameData): unknown {
+    const obj: any = {};
+    if (message.gameId !== "") {
+      obj.gameId = message.gameId;
+    }
+    if (message.playerNames?.length) {
+      obj.playerNames = message.playerNames;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<StartGameData>): StartGameData {
-		return StartGameData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<StartGameData>): StartGameData {
-		const message = createBaseStartGameData();
-		message.gameId = object.gameId ?? '';
-		message.playerNames = object.playerNames?.map((e) => e) || [];
-		return message;
-	}
+  create(base?: DeepPartial<StartGameData>): StartGameData {
+    return StartGameData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<StartGameData>): StartGameData {
+    const message = createBaseStartGameData();
+    message.gameId = object.gameId ?? "";
+    message.playerNames = object.playerNames?.map((e) => e) || [];
+    return message;
+  },
 };
 
 function createBaseGameInitData(): GameInitData {
-	return { game: undefined };
+  return { game: undefined };
 }
 
 export const GameInitData: MessageFns<GameInitData> = {
-	encode(message: GameInitData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.game !== undefined) {
-			GameView.encode(message.game, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: GameInitData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.game !== undefined) {
+      GameView.encode(message.game, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameInitData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameInitData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameInitData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameInitData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.game = GameView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.game = GameView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameInitData {
-		return { game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined };
-	},
+  fromJSON(object: any): GameInitData {
+    return { game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined };
+  },
 
-	toJSON(message: GameInitData): unknown {
-		const obj: any = {};
-		if (message.game !== undefined) {
-			obj.game = GameView.toJSON(message.game);
-		}
-		return obj;
-	},
+  toJSON(message: GameInitData): unknown {
+    const obj: any = {};
+    if (message.game !== undefined) {
+      obj.game = GameView.toJSON(message.game);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameInitData>): GameInitData {
-		return GameInitData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameInitData>): GameInitData {
-		const message = createBaseGameInitData();
-		message.game =
-			object.game !== undefined && object.game !== null
-				? GameView.fromPartial(object.game)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<GameInitData>): GameInitData {
+    return GameInitData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameInitData>): GameInitData {
+    const message = createBaseGameInitData();
+    message.game = (object.game !== undefined && object.game !== null) ? GameView.fromPartial(object.game) : undefined;
+    return message;
+  },
 };
 
 function createBaseGameUpdateData(): GameUpdateData {
-	return { game: undefined };
+  return { game: undefined };
 }
 
 export const GameUpdateData: MessageFns<GameUpdateData> = {
-	encode(message: GameUpdateData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.game !== undefined) {
-			GameView.encode(message.game, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: GameUpdateData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.game !== undefined) {
+      GameView.encode(message.game, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameUpdateData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameUpdateData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameUpdateData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameUpdateData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.game = GameView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.game = GameView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameUpdateData {
-		return { game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined };
-	},
+  fromJSON(object: any): GameUpdateData {
+    return { game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined };
+  },
 
-	toJSON(message: GameUpdateData): unknown {
-		const obj: any = {};
-		if (message.game !== undefined) {
-			obj.game = GameView.toJSON(message.game);
-		}
-		return obj;
-	},
+  toJSON(message: GameUpdateData): unknown {
+    const obj: any = {};
+    if (message.game !== undefined) {
+      obj.game = GameView.toJSON(message.game);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameUpdateData>): GameUpdateData {
-		return GameUpdateData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameUpdateData>): GameUpdateData {
-		const message = createBaseGameUpdateData();
-		message.game =
-			object.game !== undefined && object.game !== null
-				? GameView.fromPartial(object.game)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<GameUpdateData>): GameUpdateData {
+    return GameUpdateData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameUpdateData>): GameUpdateData {
+    const message = createBaseGameUpdateData();
+    message.game = (object.game !== undefined && object.game !== null) ? GameView.fromPartial(object.game) : undefined;
+    return message;
+  },
 };
 
 function createBaseGameUpdateAndInformData(): GameUpdateAndInformData {
-	return { game: undefined, message: '' };
+  return { game: undefined, message: "" };
 }
 
 export const GameUpdateAndInformData: MessageFns<GameUpdateAndInformData> = {
-	encode(
-		message: GameUpdateAndInformData,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.game !== undefined) {
-			GameView.encode(message.game, writer.uint32(10).fork()).join();
-		}
-		if (message.message !== '') {
-			writer.uint32(18).string(message.message);
-		}
-		return writer;
-	},
+  encode(message: GameUpdateAndInformData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.game !== undefined) {
+      GameView.encode(message.game, writer.uint32(10).fork()).join();
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameUpdateAndInformData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameUpdateAndInformData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameUpdateAndInformData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameUpdateAndInformData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.game = GameView.decode(reader, reader.uint32());
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.game = GameView.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.message = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameUpdateAndInformData {
-		return {
-			game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined,
-			message: isSet(object.message) ? globalThis.String(object.message) : ''
-		};
-	},
+  fromJSON(object: any): GameUpdateAndInformData {
+    return {
+      game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+    };
+  },
 
-	toJSON(message: GameUpdateAndInformData): unknown {
-		const obj: any = {};
-		if (message.game !== undefined) {
-			obj.game = GameView.toJSON(message.game);
-		}
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		return obj;
-	},
+  toJSON(message: GameUpdateAndInformData): unknown {
+    const obj: any = {};
+    if (message.game !== undefined) {
+      obj.game = GameView.toJSON(message.game);
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameUpdateAndInformData>): GameUpdateAndInformData {
-		return GameUpdateAndInformData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameUpdateAndInformData>): GameUpdateAndInformData {
-		const message = createBaseGameUpdateAndInformData();
-		message.game =
-			object.game !== undefined && object.game !== null
-				? GameView.fromPartial(object.game)
-				: undefined;
-		message.message = object.message ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameUpdateAndInformData>): GameUpdateAndInformData {
+    return GameUpdateAndInformData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameUpdateAndInformData>): GameUpdateAndInformData {
+    const message = createBaseGameUpdateAndInformData();
+    message.game = (object.game !== undefined && object.game !== null) ? GameView.fromPartial(object.game) : undefined;
+    message.message = object.message ?? "";
+    return message;
+  },
 };
 
 function createBaseGameInformPersonalData(): GameInformPersonalData {
-	return { message: '' };
+  return { message: "" };
 }
 
 export const GameInformPersonalData: MessageFns<GameInformPersonalData> = {
-	encode(message: GameInformPersonalData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		return writer;
-	},
+  encode(message: GameInformPersonalData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameInformPersonalData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameInformPersonalData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameInformPersonalData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameInformPersonalData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.message = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameInformPersonalData {
-		return { message: isSet(object.message) ? globalThis.String(object.message) : '' };
-	},
+  fromJSON(object: any): GameInformPersonalData {
+    return { message: isSet(object.message) ? globalThis.String(object.message) : "" };
+  },
 
-	toJSON(message: GameInformPersonalData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		return obj;
-	},
+  toJSON(message: GameInformPersonalData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameInformPersonalData>): GameInformPersonalData {
-		return GameInformPersonalData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameInformPersonalData>): GameInformPersonalData {
-		const message = createBaseGameInformPersonalData();
-		message.message = object.message ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameInformPersonalData>): GameInformPersonalData {
+    return GameInformPersonalData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameInformPersonalData>): GameInformPersonalData {
+    const message = createBaseGameInformPersonalData();
+    message.message = object.message ?? "";
+    return message;
+  },
 };
 
 function createBaseGameErrorData(): GameErrorData {
-	return { error: '' };
+  return { error: "" };
 }
 
 export const GameErrorData: MessageFns<GameErrorData> = {
-	encode(message: GameErrorData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.error !== '') {
-			writer.uint32(10).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: GameErrorData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.error !== "") {
+      writer.uint32(10).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameErrorData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameErrorData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameErrorData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameErrorData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameErrorData {
-		return { error: isSet(object.error) ? globalThis.String(object.error) : '' };
-	},
+  fromJSON(object: any): GameErrorData {
+    return { error: isSet(object.error) ? globalThis.String(object.error) : "" };
+  },
 
-	toJSON(message: GameErrorData): unknown {
-		const obj: any = {};
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: GameErrorData): unknown {
+    const obj: any = {};
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameErrorData>): GameErrorData {
-		return GameErrorData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameErrorData>): GameErrorData {
-		const message = createBaseGameErrorData();
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameErrorData>): GameErrorData {
+    return GameErrorData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameErrorData>): GameErrorData {
+    const message = createBaseGameErrorData();
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseGameTargetData(): GameTargetData {
-	return { message: '', targets: [], required: false, options: {} };
+  return { message: "", targets: [], required: false, options: {} };
 }
 
 export const GameTargetData: MessageFns<GameTargetData> = {
-	encode(message: GameTargetData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		for (const v of message.targets) {
-			CardView.encode(v!, writer.uint32(18).fork()).join();
-		}
-		if (message.required !== false) {
-			writer.uint32(24).bool(message.required);
-		}
-		Object.entries(message.options).forEach(([key, value]) => {
-			GameTargetData_OptionsEntry.encode(
-				{ key: key as any, value },
-				writer.uint32(34).fork()
-			).join();
-		});
-		return writer;
-	},
+  encode(message: GameTargetData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    for (const v of message.targets) {
+      CardView.encode(v!, writer.uint32(18).fork()).join();
+    }
+    if (message.required !== false) {
+      writer.uint32(24).bool(message.required);
+    }
+    Object.entries(message.options).forEach(([key, value]) => {
+      GameTargetData_OptionsEntry.encode({ key: key as any, value }, writer.uint32(34).fork()).join();
+    });
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameTargetData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameTargetData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameTargetData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameTargetData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.targets.push(CardView.decode(reader, reader.uint32()));
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.targets.push(CardView.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.required = reader.bool();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.required = reader.bool();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					const entry4 = GameTargetData_OptionsEntry.decode(reader, reader.uint32());
-					if (entry4.value !== undefined) {
-						message.options[entry4.key] = entry4.value;
-					}
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          const entry4 = GameTargetData_OptionsEntry.decode(reader, reader.uint32());
+          if (entry4.value !== undefined) {
+            message.options[entry4.key] = entry4.value;
+          }
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameTargetData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			targets: globalThis.Array.isArray(object?.targets)
-				? object.targets.map((e: any) => CardView.fromJSON(e))
-				: [],
-			required: isSet(object.required) ? globalThis.Boolean(object.required) : false,
-			options: isObject(object.options)
-				? Object.entries(object.options).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-						acc[key] = String(value);
-						return acc;
-					}, {})
-				: {}
-		};
-	},
+  fromJSON(object: any): GameTargetData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      targets: globalThis.Array.isArray(object?.targets) ? object.targets.map((e: any) => CardView.fromJSON(e)) : [],
+      required: isSet(object.required) ? globalThis.Boolean(object.required) : false,
+      options: isObject(object.options)
+        ? Object.entries(object.options).reduce<{ [key: string]: string }>((acc, [key, value]) => {
+          acc[key] = String(value);
+          return acc;
+        }, {})
+        : {},
+    };
+  },
 
-	toJSON(message: GameTargetData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.targets?.length) {
-			obj.targets = message.targets.map((e) => CardView.toJSON(e));
-		}
-		if (message.required !== false) {
-			obj.required = message.required;
-		}
-		if (message.options) {
-			const entries = Object.entries(message.options);
-			if (entries.length > 0) {
-				obj.options = {};
-				entries.forEach(([k, v]) => {
-					obj.options[k] = v;
-				});
-			}
-		}
-		return obj;
-	},
+  toJSON(message: GameTargetData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.targets?.length) {
+      obj.targets = message.targets.map((e) => CardView.toJSON(e));
+    }
+    if (message.required !== false) {
+      obj.required = message.required;
+    }
+    if (message.options) {
+      const entries = Object.entries(message.options);
+      if (entries.length > 0) {
+        obj.options = {};
+        entries.forEach(([k, v]) => {
+          obj.options[k] = v;
+        });
+      }
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameTargetData>): GameTargetData {
-		return GameTargetData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameTargetData>): GameTargetData {
-		const message = createBaseGameTargetData();
-		message.message = object.message ?? '';
-		message.targets = object.targets?.map((e) => CardView.fromPartial(e)) || [];
-		message.required = object.required ?? false;
-		message.options = Object.entries(object.options ?? {}).reduce<{ [key: string]: string }>(
-			(acc, [key, value]) => {
-				if (value !== undefined) {
-					acc[key] = globalThis.String(value);
-				}
-				return acc;
-			},
-			{}
-		);
-		return message;
-	}
+  create(base?: DeepPartial<GameTargetData>): GameTargetData {
+    return GameTargetData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameTargetData>): GameTargetData {
+    const message = createBaseGameTargetData();
+    message.message = object.message ?? "";
+    message.targets = object.targets?.map((e) => CardView.fromPartial(e)) || [];
+    message.required = object.required ?? false;
+    message.options = Object.entries(object.options ?? {}).reduce<{ [key: string]: string }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = globalThis.String(value);
+      }
+      return acc;
+    }, {});
+    return message;
+  },
 };
 
 function createBaseGameTargetData_OptionsEntry(): GameTargetData_OptionsEntry {
-	return { key: '', value: '' };
+  return { key: "", value: "" };
 }
 
 export const GameTargetData_OptionsEntry: MessageFns<GameTargetData_OptionsEntry> = {
-	encode(
-		message: GameTargetData_OptionsEntry,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.key !== '') {
-			writer.uint32(10).string(message.key);
-		}
-		if (message.value !== '') {
-			writer.uint32(18).string(message.value);
-		}
-		return writer;
-	},
+  encode(message: GameTargetData_OptionsEntry, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameTargetData_OptionsEntry {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameTargetData_OptionsEntry();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameTargetData_OptionsEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameTargetData_OptionsEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.key = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.key = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.value = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.value = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameTargetData_OptionsEntry {
-		return {
-			key: isSet(object.key) ? globalThis.String(object.key) : '',
-			value: isSet(object.value) ? globalThis.String(object.value) : ''
-		};
-	},
+  fromJSON(object: any): GameTargetData_OptionsEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+    };
+  },
 
-	toJSON(message: GameTargetData_OptionsEntry): unknown {
-		const obj: any = {};
-		if (message.key !== '') {
-			obj.key = message.key;
-		}
-		if (message.value !== '') {
-			obj.value = message.value;
-		}
-		return obj;
-	},
+  toJSON(message: GameTargetData_OptionsEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== "") {
+      obj.value = message.value;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameTargetData_OptionsEntry>): GameTargetData_OptionsEntry {
-		return GameTargetData_OptionsEntry.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameTargetData_OptionsEntry>): GameTargetData_OptionsEntry {
-		const message = createBaseGameTargetData_OptionsEntry();
-		message.key = object.key ?? '';
-		message.value = object.value ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameTargetData_OptionsEntry>): GameTargetData_OptionsEntry {
+    return GameTargetData_OptionsEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameTargetData_OptionsEntry>): GameTargetData_OptionsEntry {
+    const message = createBaseGameTargetData_OptionsEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
+    return message;
+  },
 };
 
 function createBaseGameChooseAbilityData(): GameChooseAbilityData {
-	return { message: '', abilities: [] };
+  return { message: "", abilities: [] };
 }
 
 export const GameChooseAbilityData: MessageFns<GameChooseAbilityData> = {
-	encode(message: GameChooseAbilityData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		for (const v of message.abilities) {
-			AbilityView.encode(v!, writer.uint32(18).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: GameChooseAbilityData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    for (const v of message.abilities) {
+      AbilityView.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameChooseAbilityData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameChooseAbilityData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameChooseAbilityData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameChooseAbilityData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.abilities.push(AbilityView.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.abilities.push(AbilityView.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameChooseAbilityData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			abilities: globalThis.Array.isArray(object?.abilities)
-				? object.abilities.map((e: any) => AbilityView.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): GameChooseAbilityData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      abilities: globalThis.Array.isArray(object?.abilities)
+        ? object.abilities.map((e: any) => AbilityView.fromJSON(e))
+        : [],
+    };
+  },
 
-	toJSON(message: GameChooseAbilityData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.abilities?.length) {
-			obj.abilities = message.abilities.map((e) => AbilityView.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: GameChooseAbilityData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.abilities?.length) {
+      obj.abilities = message.abilities.map((e) => AbilityView.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameChooseAbilityData>): GameChooseAbilityData {
-		return GameChooseAbilityData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameChooseAbilityData>): GameChooseAbilityData {
-		const message = createBaseGameChooseAbilityData();
-		message.message = object.message ?? '';
-		message.abilities = object.abilities?.map((e) => AbilityView.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<GameChooseAbilityData>): GameChooseAbilityData {
+    return GameChooseAbilityData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameChooseAbilityData>): GameChooseAbilityData {
+    const message = createBaseGameChooseAbilityData();
+    message.message = object.message ?? "";
+    message.abilities = object.abilities?.map((e) => AbilityView.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBaseGameChoosePileData(): GameChoosePileData {
-	return { message: '', piles: [] };
+  return { message: "", piles: [] };
 }
 
 export const GameChoosePileData: MessageFns<GameChoosePileData> = {
-	encode(message: GameChoosePileData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		for (const v of message.piles) {
-			PileView.encode(v!, writer.uint32(18).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: GameChoosePileData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    for (const v of message.piles) {
+      PileView.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameChoosePileData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameChoosePileData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameChoosePileData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameChoosePileData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.piles.push(PileView.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.piles.push(PileView.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameChoosePileData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			piles: globalThis.Array.isArray(object?.piles)
-				? object.piles.map((e: any) => PileView.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): GameChoosePileData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      piles: globalThis.Array.isArray(object?.piles) ? object.piles.map((e: any) => PileView.fromJSON(e)) : [],
+    };
+  },
 
-	toJSON(message: GameChoosePileData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.piles?.length) {
-			obj.piles = message.piles.map((e) => PileView.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: GameChoosePileData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.piles?.length) {
+      obj.piles = message.piles.map((e) => PileView.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameChoosePileData>): GameChoosePileData {
-		return GameChoosePileData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameChoosePileData>): GameChoosePileData {
-		const message = createBaseGameChoosePileData();
-		message.message = object.message ?? '';
-		message.piles = object.piles?.map((e) => PileView.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<GameChoosePileData>): GameChoosePileData {
+    return GameChoosePileData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameChoosePileData>): GameChoosePileData {
+    const message = createBaseGameChoosePileData();
+    message.message = object.message ?? "";
+    message.piles = object.piles?.map((e) => PileView.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBasePileView(): PileView {
-	return { name: '', cards: [] };
+  return { name: "", cards: [] };
 }
 
 export const PileView: MessageFns<PileView> = {
-	encode(message: PileView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.name !== '') {
-			writer.uint32(10).string(message.name);
-		}
-		for (const v of message.cards) {
-			CardView.encode(v!, writer.uint32(18).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: PileView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    for (const v of message.cards) {
+      CardView.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): PileView {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBasePileView();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): PileView {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePileView();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.name = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.name = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.cards.push(CardView.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.cards.push(CardView.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): PileView {
-		return {
-			name: isSet(object.name) ? globalThis.String(object.name) : '',
-			cards: globalThis.Array.isArray(object?.cards)
-				? object.cards.map((e: any) => CardView.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): PileView {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      cards: globalThis.Array.isArray(object?.cards) ? object.cards.map((e: any) => CardView.fromJSON(e)) : [],
+    };
+  },
 
-	toJSON(message: PileView): unknown {
-		const obj: any = {};
-		if (message.name !== '') {
-			obj.name = message.name;
-		}
-		if (message.cards?.length) {
-			obj.cards = message.cards.map((e) => CardView.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: PileView): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.cards?.length) {
+      obj.cards = message.cards.map((e) => CardView.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<PileView>): PileView {
-		return PileView.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<PileView>): PileView {
-		const message = createBasePileView();
-		message.name = object.name ?? '';
-		message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<PileView>): PileView {
+    return PileView.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PileView>): PileView {
+    const message = createBasePileView();
+    message.name = object.name ?? "";
+    message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBaseGameChoiceData(): GameChoiceData {
-	return { message: '', choices: [] };
+  return { message: "", choices: [] };
 }
 
 export const GameChoiceData: MessageFns<GameChoiceData> = {
-	encode(message: GameChoiceData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		for (const v of message.choices) {
-			writer.uint32(18).string(v!);
-		}
-		return writer;
-	},
+  encode(message: GameChoiceData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    for (const v of message.choices) {
+      writer.uint32(18).string(v!);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameChoiceData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameChoiceData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameChoiceData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameChoiceData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.choices.push(reader.string());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.choices.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameChoiceData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			choices: globalThis.Array.isArray(object?.choices)
-				? object.choices.map((e: any) => globalThis.String(e))
-				: []
-		};
-	},
+  fromJSON(object: any): GameChoiceData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      choices: globalThis.Array.isArray(object?.choices) ? object.choices.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
 
-	toJSON(message: GameChoiceData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.choices?.length) {
-			obj.choices = message.choices;
-		}
-		return obj;
-	},
+  toJSON(message: GameChoiceData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.choices?.length) {
+      obj.choices = message.choices;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameChoiceData>): GameChoiceData {
-		return GameChoiceData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameChoiceData>): GameChoiceData {
-		const message = createBaseGameChoiceData();
-		message.message = object.message ?? '';
-		message.choices = object.choices?.map((e) => e) || [];
-		return message;
-	}
+  create(base?: DeepPartial<GameChoiceData>): GameChoiceData {
+    return GameChoiceData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameChoiceData>): GameChoiceData {
+    const message = createBaseGameChoiceData();
+    message.message = object.message ?? "";
+    message.choices = object.choices?.map((e) => e) || [];
+    return message;
+  },
 };
 
 function createBaseGameAskData(): GameAskData {
-	return { message: '', yesNo: false };
+  return { message: "", yesNo: false };
 }
 
 export const GameAskData: MessageFns<GameAskData> = {
-	encode(message: GameAskData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		if (message.yesNo !== false) {
-			writer.uint32(16).bool(message.yesNo);
-		}
-		return writer;
-	},
+  encode(message: GameAskData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    if (message.yesNo !== false) {
+      writer.uint32(16).bool(message.yesNo);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameAskData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameAskData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameAskData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameAskData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.yesNo = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.yesNo = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameAskData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			yesNo: isSet(object.yesNo) ? globalThis.Boolean(object.yesNo) : false
-		};
-	},
+  fromJSON(object: any): GameAskData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      yesNo: isSet(object.yesNo) ? globalThis.Boolean(object.yesNo) : false,
+    };
+  },
 
-	toJSON(message: GameAskData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.yesNo !== false) {
-			obj.yesNo = message.yesNo;
-		}
-		return obj;
-	},
+  toJSON(message: GameAskData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.yesNo !== false) {
+      obj.yesNo = message.yesNo;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameAskData>): GameAskData {
-		return GameAskData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameAskData>): GameAskData {
-		const message = createBaseGameAskData();
-		message.message = object.message ?? '';
-		message.yesNo = object.yesNo ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<GameAskData>): GameAskData {
+    return GameAskData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameAskData>): GameAskData {
+    const message = createBaseGameAskData();
+    message.message = object.message ?? "";
+    message.yesNo = object.yesNo ?? false;
+    return message;
+  },
 };
 
 function createBaseGameSelectData(): GameSelectData {
-	return { message: '', options: {} };
+  return { message: "", options: {} };
 }
 
 export const GameSelectData: MessageFns<GameSelectData> = {
-	encode(message: GameSelectData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		Object.entries(message.options).forEach(([key, value]) => {
-			GameSelectData_OptionsEntry.encode(
-				{ key: key as any, value },
-				writer.uint32(18).fork()
-			).join();
-		});
-		return writer;
-	},
+  encode(message: GameSelectData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    Object.entries(message.options).forEach(([key, value]) => {
+      GameSelectData_OptionsEntry.encode({ key: key as any, value }, writer.uint32(18).fork()).join();
+    });
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameSelectData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameSelectData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameSelectData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameSelectData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					const entry2 = GameSelectData_OptionsEntry.decode(reader, reader.uint32());
-					if (entry2.value !== undefined) {
-						message.options[entry2.key] = entry2.value;
-					}
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          const entry2 = GameSelectData_OptionsEntry.decode(reader, reader.uint32());
+          if (entry2.value !== undefined) {
+            message.options[entry2.key] = entry2.value;
+          }
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameSelectData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			options: isObject(object.options)
-				? Object.entries(object.options).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-						acc[key] = String(value);
-						return acc;
-					}, {})
-				: {}
-		};
-	},
+  fromJSON(object: any): GameSelectData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      options: isObject(object.options)
+        ? Object.entries(object.options).reduce<{ [key: string]: string }>((acc, [key, value]) => {
+          acc[key] = String(value);
+          return acc;
+        }, {})
+        : {},
+    };
+  },
 
-	toJSON(message: GameSelectData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.options) {
-			const entries = Object.entries(message.options);
-			if (entries.length > 0) {
-				obj.options = {};
-				entries.forEach(([k, v]) => {
-					obj.options[k] = v;
-				});
-			}
-		}
-		return obj;
-	},
+  toJSON(message: GameSelectData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.options) {
+      const entries = Object.entries(message.options);
+      if (entries.length > 0) {
+        obj.options = {};
+        entries.forEach(([k, v]) => {
+          obj.options[k] = v;
+        });
+      }
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameSelectData>): GameSelectData {
-		return GameSelectData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameSelectData>): GameSelectData {
-		const message = createBaseGameSelectData();
-		message.message = object.message ?? '';
-		message.options = Object.entries(object.options ?? {}).reduce<{ [key: string]: string }>(
-			(acc, [key, value]) => {
-				if (value !== undefined) {
-					acc[key] = globalThis.String(value);
-				}
-				return acc;
-			},
-			{}
-		);
-		return message;
-	}
+  create(base?: DeepPartial<GameSelectData>): GameSelectData {
+    return GameSelectData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameSelectData>): GameSelectData {
+    const message = createBaseGameSelectData();
+    message.message = object.message ?? "";
+    message.options = Object.entries(object.options ?? {}).reduce<{ [key: string]: string }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = globalThis.String(value);
+      }
+      return acc;
+    }, {});
+    return message;
+  },
 };
 
 function createBaseGameSelectData_OptionsEntry(): GameSelectData_OptionsEntry {
-	return { key: '', value: '' };
+  return { key: "", value: "" };
 }
 
 export const GameSelectData_OptionsEntry: MessageFns<GameSelectData_OptionsEntry> = {
-	encode(
-		message: GameSelectData_OptionsEntry,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.key !== '') {
-			writer.uint32(10).string(message.key);
-		}
-		if (message.value !== '') {
-			writer.uint32(18).string(message.value);
-		}
-		return writer;
-	},
+  encode(message: GameSelectData_OptionsEntry, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameSelectData_OptionsEntry {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameSelectData_OptionsEntry();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameSelectData_OptionsEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameSelectData_OptionsEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.key = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.key = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.value = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.value = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameSelectData_OptionsEntry {
-		return {
-			key: isSet(object.key) ? globalThis.String(object.key) : '',
-			value: isSet(object.value) ? globalThis.String(object.value) : ''
-		};
-	},
+  fromJSON(object: any): GameSelectData_OptionsEntry {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+    };
+  },
 
-	toJSON(message: GameSelectData_OptionsEntry): unknown {
-		const obj: any = {};
-		if (message.key !== '') {
-			obj.key = message.key;
-		}
-		if (message.value !== '') {
-			obj.value = message.value;
-		}
-		return obj;
-	},
+  toJSON(message: GameSelectData_OptionsEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== "") {
+      obj.value = message.value;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameSelectData_OptionsEntry>): GameSelectData_OptionsEntry {
-		return GameSelectData_OptionsEntry.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameSelectData_OptionsEntry>): GameSelectData_OptionsEntry {
-		const message = createBaseGameSelectData_OptionsEntry();
-		message.key = object.key ?? '';
-		message.value = object.value ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameSelectData_OptionsEntry>): GameSelectData_OptionsEntry {
+    return GameSelectData_OptionsEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameSelectData_OptionsEntry>): GameSelectData_OptionsEntry {
+    const message = createBaseGameSelectData_OptionsEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
+    return message;
+  },
 };
 
 function createBaseGamePlayManaData(): GamePlayManaData {
-	return { message: '', manaOptions: [] };
+  return { message: "", manaOptions: [] };
 }
 
 export const GamePlayManaData: MessageFns<GamePlayManaData> = {
-	encode(message: GamePlayManaData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		for (const v of message.manaOptions) {
-			ManaOption.encode(v!, writer.uint32(18).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: GamePlayManaData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    for (const v of message.manaOptions) {
+      ManaOption.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GamePlayManaData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGamePlayManaData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GamePlayManaData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGamePlayManaData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.manaOptions.push(ManaOption.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.manaOptions.push(ManaOption.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GamePlayManaData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			manaOptions: globalThis.Array.isArray(object?.manaOptions)
-				? object.manaOptions.map((e: any) => ManaOption.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): GamePlayManaData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      manaOptions: globalThis.Array.isArray(object?.manaOptions)
+        ? object.manaOptions.map((e: any) => ManaOption.fromJSON(e))
+        : [],
+    };
+  },
 
-	toJSON(message: GamePlayManaData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.manaOptions?.length) {
-			obj.manaOptions = message.manaOptions.map((e) => ManaOption.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: GamePlayManaData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.manaOptions?.length) {
+      obj.manaOptions = message.manaOptions.map((e) => ManaOption.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GamePlayManaData>): GamePlayManaData {
-		return GamePlayManaData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GamePlayManaData>): GamePlayManaData {
-		const message = createBaseGamePlayManaData();
-		message.message = object.message ?? '';
-		message.manaOptions = object.manaOptions?.map((e) => ManaOption.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<GamePlayManaData>): GamePlayManaData {
+    return GamePlayManaData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GamePlayManaData>): GamePlayManaData {
+    const message = createBaseGamePlayManaData();
+    message.message = object.message ?? "";
+    message.manaOptions = object.manaOptions?.map((e) => ManaOption.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBaseManaOption(): ManaOption {
-	return { color: '', amount: 0 };
+  return { color: "", amount: 0 };
 }
 
 export const ManaOption: MessageFns<ManaOption> = {
-	encode(message: ManaOption, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.color !== '') {
-			writer.uint32(10).string(message.color);
-		}
-		if (message.amount !== 0) {
-			writer.uint32(16).int32(message.amount);
-		}
-		return writer;
-	},
+  encode(message: ManaOption, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.color !== "") {
+      writer.uint32(10).string(message.color);
+    }
+    if (message.amount !== 0) {
+      writer.uint32(16).int32(message.amount);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ManaOption {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseManaOption();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ManaOption {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseManaOption();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.color = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.color = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.amount = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.amount = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ManaOption {
-		return {
-			color: isSet(object.color) ? globalThis.String(object.color) : '',
-			amount: isSet(object.amount) ? globalThis.Number(object.amount) : 0
-		};
-	},
+  fromJSON(object: any): ManaOption {
+    return {
+      color: isSet(object.color) ? globalThis.String(object.color) : "",
+      amount: isSet(object.amount) ? globalThis.Number(object.amount) : 0,
+    };
+  },
 
-	toJSON(message: ManaOption): unknown {
-		const obj: any = {};
-		if (message.color !== '') {
-			obj.color = message.color;
-		}
-		if (message.amount !== 0) {
-			obj.amount = Math.round(message.amount);
-		}
-		return obj;
-	},
+  toJSON(message: ManaOption): unknown {
+    const obj: any = {};
+    if (message.color !== "") {
+      obj.color = message.color;
+    }
+    if (message.amount !== 0) {
+      obj.amount = Math.round(message.amount);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ManaOption>): ManaOption {
-		return ManaOption.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ManaOption>): ManaOption {
-		const message = createBaseManaOption();
-		message.color = object.color ?? '';
-		message.amount = object.amount ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<ManaOption>): ManaOption {
+    return ManaOption.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ManaOption>): ManaOption {
+    const message = createBaseManaOption();
+    message.color = object.color ?? "";
+    message.amount = object.amount ?? 0;
+    return message;
+  },
 };
 
 function createBaseGamePlayXManaData(): GamePlayXManaData {
-	return { message: '', available: 0 };
+  return { message: "", available: 0 };
 }
 
 export const GamePlayXManaData: MessageFns<GamePlayXManaData> = {
-	encode(message: GamePlayXManaData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		if (message.available !== 0) {
-			writer.uint32(16).int32(message.available);
-		}
-		return writer;
-	},
+  encode(message: GamePlayXManaData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    if (message.available !== 0) {
+      writer.uint32(16).int32(message.available);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GamePlayXManaData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGamePlayXManaData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GamePlayXManaData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGamePlayXManaData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.available = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.available = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GamePlayXManaData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			available: isSet(object.available) ? globalThis.Number(object.available) : 0
-		};
-	},
+  fromJSON(object: any): GamePlayXManaData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      available: isSet(object.available) ? globalThis.Number(object.available) : 0,
+    };
+  },
 
-	toJSON(message: GamePlayXManaData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.available !== 0) {
-			obj.available = Math.round(message.available);
-		}
-		return obj;
-	},
+  toJSON(message: GamePlayXManaData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.available !== 0) {
+      obj.available = Math.round(message.available);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GamePlayXManaData>): GamePlayXManaData {
-		return GamePlayXManaData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GamePlayXManaData>): GamePlayXManaData {
-		const message = createBaseGamePlayXManaData();
-		message.message = object.message ?? '';
-		message.available = object.available ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<GamePlayXManaData>): GamePlayXManaData {
+    return GamePlayXManaData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GamePlayXManaData>): GamePlayXManaData {
+    const message = createBaseGamePlayXManaData();
+    message.message = object.message ?? "";
+    message.available = object.available ?? 0;
+    return message;
+  },
 };
 
 function createBaseGameGetAmountData(): GameGetAmountData {
-	return { message: '', min: 0, max: 0 };
+  return { message: "", min: 0, max: 0 };
 }
 
 export const GameGetAmountData: MessageFns<GameGetAmountData> = {
-	encode(message: GameGetAmountData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		if (message.min !== 0) {
-			writer.uint32(16).int32(message.min);
-		}
-		if (message.max !== 0) {
-			writer.uint32(24).int32(message.max);
-		}
-		return writer;
-	},
+  encode(message: GameGetAmountData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    if (message.min !== 0) {
+      writer.uint32(16).int32(message.min);
+    }
+    if (message.max !== 0) {
+      writer.uint32(24).int32(message.max);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameGetAmountData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameGetAmountData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameGetAmountData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameGetAmountData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.min = reader.int32();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.min = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.max = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.max = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameGetAmountData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			min: isSet(object.min) ? globalThis.Number(object.min) : 0,
-			max: isSet(object.max) ? globalThis.Number(object.max) : 0
-		};
-	},
+  fromJSON(object: any): GameGetAmountData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      min: isSet(object.min) ? globalThis.Number(object.min) : 0,
+      max: isSet(object.max) ? globalThis.Number(object.max) : 0,
+    };
+  },
 
-	toJSON(message: GameGetAmountData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.min !== 0) {
-			obj.min = Math.round(message.min);
-		}
-		if (message.max !== 0) {
-			obj.max = Math.round(message.max);
-		}
-		return obj;
-	},
+  toJSON(message: GameGetAmountData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.min !== 0) {
+      obj.min = Math.round(message.min);
+    }
+    if (message.max !== 0) {
+      obj.max = Math.round(message.max);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameGetAmountData>): GameGetAmountData {
-		return GameGetAmountData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameGetAmountData>): GameGetAmountData {
-		const message = createBaseGameGetAmountData();
-		message.message = object.message ?? '';
-		message.min = object.min ?? 0;
-		message.max = object.max ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<GameGetAmountData>): GameGetAmountData {
+    return GameGetAmountData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameGetAmountData>): GameGetAmountData {
+    const message = createBaseGameGetAmountData();
+    message.message = object.message ?? "";
+    message.min = object.min ?? 0;
+    message.max = object.max ?? 0;
+    return message;
+  },
 };
 
 function createBaseGameGetMultiAmountData(): GameGetMultiAmountData {
-	return { message: '', amounts: [] };
+  return { message: "", amounts: [] };
 }
 
 export const GameGetMultiAmountData: MessageFns<GameGetMultiAmountData> = {
-	encode(message: GameGetMultiAmountData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.message !== '') {
-			writer.uint32(10).string(message.message);
-		}
-		for (const v of message.amounts) {
-			AmountRange.encode(v!, writer.uint32(18).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: GameGetMultiAmountData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    for (const v of message.amounts) {
+      AmountRange.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameGetMultiAmountData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameGetMultiAmountData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameGetMultiAmountData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameGetMultiAmountData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.amounts.push(AmountRange.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.amounts.push(AmountRange.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameGetMultiAmountData {
-		return {
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			amounts: globalThis.Array.isArray(object?.amounts)
-				? object.amounts.map((e: any) => AmountRange.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): GameGetMultiAmountData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      amounts: globalThis.Array.isArray(object?.amounts) ? object.amounts.map((e: any) => AmountRange.fromJSON(e)) : [],
+    };
+  },
 
-	toJSON(message: GameGetMultiAmountData): unknown {
-		const obj: any = {};
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.amounts?.length) {
-			obj.amounts = message.amounts.map((e) => AmountRange.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: GameGetMultiAmountData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.amounts?.length) {
+      obj.amounts = message.amounts.map((e) => AmountRange.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameGetMultiAmountData>): GameGetMultiAmountData {
-		return GameGetMultiAmountData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameGetMultiAmountData>): GameGetMultiAmountData {
-		const message = createBaseGameGetMultiAmountData();
-		message.message = object.message ?? '';
-		message.amounts = object.amounts?.map((e) => AmountRange.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<GameGetMultiAmountData>): GameGetMultiAmountData {
+    return GameGetMultiAmountData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameGetMultiAmountData>): GameGetMultiAmountData {
+    const message = createBaseGameGetMultiAmountData();
+    message.message = object.message ?? "";
+    message.amounts = object.amounts?.map((e) => AmountRange.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBaseAmountRange(): AmountRange {
-	return { label: '', min: 0, max: 0 };
+  return { label: "", min: 0, max: 0 };
 }
 
 export const AmountRange: MessageFns<AmountRange> = {
-	encode(message: AmountRange, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.label !== '') {
-			writer.uint32(10).string(message.label);
-		}
-		if (message.min !== 0) {
-			writer.uint32(16).int32(message.min);
-		}
-		if (message.max !== 0) {
-			writer.uint32(24).int32(message.max);
-		}
-		return writer;
-	},
+  encode(message: AmountRange, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.label !== "") {
+      writer.uint32(10).string(message.label);
+    }
+    if (message.min !== 0) {
+      writer.uint32(16).int32(message.min);
+    }
+    if (message.max !== 0) {
+      writer.uint32(24).int32(message.max);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AmountRange {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAmountRange();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AmountRange {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAmountRange();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.label = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.label = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.min = reader.int32();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.min = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.max = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.max = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AmountRange {
-		return {
-			label: isSet(object.label) ? globalThis.String(object.label) : '',
-			min: isSet(object.min) ? globalThis.Number(object.min) : 0,
-			max: isSet(object.max) ? globalThis.Number(object.max) : 0
-		};
-	},
+  fromJSON(object: any): AmountRange {
+    return {
+      label: isSet(object.label) ? globalThis.String(object.label) : "",
+      min: isSet(object.min) ? globalThis.Number(object.min) : 0,
+      max: isSet(object.max) ? globalThis.Number(object.max) : 0,
+    };
+  },
 
-	toJSON(message: AmountRange): unknown {
-		const obj: any = {};
-		if (message.label !== '') {
-			obj.label = message.label;
-		}
-		if (message.min !== 0) {
-			obj.min = Math.round(message.min);
-		}
-		if (message.max !== 0) {
-			obj.max = Math.round(message.max);
-		}
-		return obj;
-	},
+  toJSON(message: AmountRange): unknown {
+    const obj: any = {};
+    if (message.label !== "") {
+      obj.label = message.label;
+    }
+    if (message.min !== 0) {
+      obj.min = Math.round(message.min);
+    }
+    if (message.max !== 0) {
+      obj.max = Math.round(message.max);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AmountRange>): AmountRange {
-		return AmountRange.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AmountRange>): AmountRange {
-		const message = createBaseAmountRange();
-		message.label = object.label ?? '';
-		message.min = object.min ?? 0;
-		message.max = object.max ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<AmountRange>): AmountRange {
+    return AmountRange.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AmountRange>): AmountRange {
+    const message = createBaseAmountRange();
+    message.label = object.label ?? "";
+    message.min = object.min ?? 0;
+    message.max = object.max ?? 0;
+    return message;
+  },
 };
 
 function createBaseGameOverData(): GameOverData {
-	return { winner: '', results: [] };
+  return { winner: "", results: [] };
 }
 
 export const GameOverData: MessageFns<GameOverData> = {
-	encode(message: GameOverData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.winner !== '') {
-			writer.uint32(10).string(message.winner);
-		}
-		for (const v of message.results) {
-			PlayerResult.encode(v!, writer.uint32(18).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: GameOverData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.winner !== "") {
+      writer.uint32(10).string(message.winner);
+    }
+    for (const v of message.results) {
+      PlayerResult.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameOverData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameOverData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameOverData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameOverData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.winner = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.winner = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.results.push(PlayerResult.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.results.push(PlayerResult.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameOverData {
-		return {
-			winner: isSet(object.winner) ? globalThis.String(object.winner) : '',
-			results: globalThis.Array.isArray(object?.results)
-				? object.results.map((e: any) => PlayerResult.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): GameOverData {
+    return {
+      winner: isSet(object.winner) ? globalThis.String(object.winner) : "",
+      results: globalThis.Array.isArray(object?.results)
+        ? object.results.map((e: any) => PlayerResult.fromJSON(e))
+        : [],
+    };
+  },
 
-	toJSON(message: GameOverData): unknown {
-		const obj: any = {};
-		if (message.winner !== '') {
-			obj.winner = message.winner;
-		}
-		if (message.results?.length) {
-			obj.results = message.results.map((e) => PlayerResult.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: GameOverData): unknown {
+    const obj: any = {};
+    if (message.winner !== "") {
+      obj.winner = message.winner;
+    }
+    if (message.results?.length) {
+      obj.results = message.results.map((e) => PlayerResult.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameOverData>): GameOverData {
-		return GameOverData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameOverData>): GameOverData {
-		const message = createBaseGameOverData();
-		message.winner = object.winner ?? '';
-		message.results = object.results?.map((e) => PlayerResult.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<GameOverData>): GameOverData {
+    return GameOverData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameOverData>): GameOverData {
+    const message = createBaseGameOverData();
+    message.winner = object.winner ?? "";
+    message.results = object.results?.map((e) => PlayerResult.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBasePlayerResult(): PlayerResult {
-	return { playerName: '', wins: 0, losses: 0, quit: false };
+  return { playerName: "", wins: 0, losses: 0, quit: false };
 }
 
 export const PlayerResult: MessageFns<PlayerResult> = {
-	encode(message: PlayerResult, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.playerName !== '') {
-			writer.uint32(10).string(message.playerName);
-		}
-		if (message.wins !== 0) {
-			writer.uint32(16).int32(message.wins);
-		}
-		if (message.losses !== 0) {
-			writer.uint32(24).int32(message.losses);
-		}
-		if (message.quit !== false) {
-			writer.uint32(32).bool(message.quit);
-		}
-		return writer;
-	},
+  encode(message: PlayerResult, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.playerName !== "") {
+      writer.uint32(10).string(message.playerName);
+    }
+    if (message.wins !== 0) {
+      writer.uint32(16).int32(message.wins);
+    }
+    if (message.losses !== 0) {
+      writer.uint32(24).int32(message.losses);
+    }
+    if (message.quit !== false) {
+      writer.uint32(32).bool(message.quit);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): PlayerResult {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBasePlayerResult();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): PlayerResult {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePlayerResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.playerName = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.playerName = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.wins = reader.int32();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.wins = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.losses = reader.int32();
-					continue;
-				}
-				case 4: {
-					if (tag !== 32) {
-						break;
-					}
+          message.losses = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
 
-					message.quit = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.quit = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): PlayerResult {
-		return {
-			playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : '',
-			wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
-			losses: isSet(object.losses) ? globalThis.Number(object.losses) : 0,
-			quit: isSet(object.quit) ? globalThis.Boolean(object.quit) : false
-		};
-	},
+  fromJSON(object: any): PlayerResult {
+    return {
+      playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : "",
+      wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
+      losses: isSet(object.losses) ? globalThis.Number(object.losses) : 0,
+      quit: isSet(object.quit) ? globalThis.Boolean(object.quit) : false,
+    };
+  },
 
-	toJSON(message: PlayerResult): unknown {
-		const obj: any = {};
-		if (message.playerName !== '') {
-			obj.playerName = message.playerName;
-		}
-		if (message.wins !== 0) {
-			obj.wins = Math.round(message.wins);
-		}
-		if (message.losses !== 0) {
-			obj.losses = Math.round(message.losses);
-		}
-		if (message.quit !== false) {
-			obj.quit = message.quit;
-		}
-		return obj;
-	},
+  toJSON(message: PlayerResult): unknown {
+    const obj: any = {};
+    if (message.playerName !== "") {
+      obj.playerName = message.playerName;
+    }
+    if (message.wins !== 0) {
+      obj.wins = Math.round(message.wins);
+    }
+    if (message.losses !== 0) {
+      obj.losses = Math.round(message.losses);
+    }
+    if (message.quit !== false) {
+      obj.quit = message.quit;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<PlayerResult>): PlayerResult {
-		return PlayerResult.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<PlayerResult>): PlayerResult {
-		const message = createBasePlayerResult();
-		message.playerName = object.playerName ?? '';
-		message.wins = object.wins ?? 0;
-		message.losses = object.losses ?? 0;
-		message.quit = object.quit ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<PlayerResult>): PlayerResult {
+    return PlayerResult.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PlayerResult>): PlayerResult {
+    const message = createBasePlayerResult();
+    message.playerName = object.playerName ?? "";
+    message.wins = object.wins ?? 0;
+    message.losses = object.losses ?? 0;
+    message.quit = object.quit ?? false;
+    return message;
+  },
 };
 
 function createBaseEndGameInfoData(): EndGameInfoData {
-	return { gameId: '', results: [] };
+  return { gameId: "", results: [] };
 }
 
 export const EndGameInfoData: MessageFns<EndGameInfoData> = {
-	encode(message: EndGameInfoData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.gameId !== '') {
-			writer.uint32(10).string(message.gameId);
-		}
-		for (const v of message.results) {
-			PlayerResult.encode(v!, writer.uint32(18).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: EndGameInfoData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.gameId !== "") {
+      writer.uint32(10).string(message.gameId);
+    }
+    for (const v of message.results) {
+      PlayerResult.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): EndGameInfoData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseEndGameInfoData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): EndGameInfoData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEndGameInfoData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.results.push(PlayerResult.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.results.push(PlayerResult.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): EndGameInfoData {
-		return {
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			results: globalThis.Array.isArray(object?.results)
-				? object.results.map((e: any) => PlayerResult.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): EndGameInfoData {
+    return {
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "",
+      results: globalThis.Array.isArray(object?.results)
+        ? object.results.map((e: any) => PlayerResult.fromJSON(e))
+        : [],
+    };
+  },
 
-	toJSON(message: EndGameInfoData): unknown {
-		const obj: any = {};
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.results?.length) {
-			obj.results = message.results.map((e) => PlayerResult.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: EndGameInfoData): unknown {
+    const obj: any = {};
+    if (message.gameId !== "") {
+      obj.gameId = message.gameId;
+    }
+    if (message.results?.length) {
+      obj.results = message.results.map((e) => PlayerResult.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<EndGameInfoData>): EndGameInfoData {
-		return EndGameInfoData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<EndGameInfoData>): EndGameInfoData {
-		const message = createBaseEndGameInfoData();
-		message.gameId = object.gameId ?? '';
-		message.results = object.results?.map((e) => PlayerResult.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<EndGameInfoData>): EndGameInfoData {
+    return EndGameInfoData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<EndGameInfoData>): EndGameInfoData {
+    const message = createBaseEndGameInfoData();
+    message.gameId = object.gameId ?? "";
+    message.results = object.results?.map((e) => PlayerResult.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBaseReplayInitData(): ReplayInitData {
-	return { gameId: '', game: undefined };
+  return { gameId: "", game: undefined };
 }
 
 export const ReplayInitData: MessageFns<ReplayInitData> = {
-	encode(message: ReplayInitData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.gameId !== '') {
-			writer.uint32(10).string(message.gameId);
-		}
-		if (message.game !== undefined) {
-			GameView.encode(message.game, writer.uint32(18).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: ReplayInitData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.gameId !== "") {
+      writer.uint32(10).string(message.gameId);
+    }
+    if (message.game !== undefined) {
+      GameView.encode(message.game, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayInitData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayInitData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayInitData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayInitData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.game = GameView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.game = GameView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayInitData {
-		return {
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined
-		};
-	},
+  fromJSON(object: any): ReplayInitData {
+    return {
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "",
+      game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined,
+    };
+  },
 
-	toJSON(message: ReplayInitData): unknown {
-		const obj: any = {};
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.game !== undefined) {
-			obj.game = GameView.toJSON(message.game);
-		}
-		return obj;
-	},
+  toJSON(message: ReplayInitData): unknown {
+    const obj: any = {};
+    if (message.gameId !== "") {
+      obj.gameId = message.gameId;
+    }
+    if (message.game !== undefined) {
+      obj.game = GameView.toJSON(message.game);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayInitData>): ReplayInitData {
-		return ReplayInitData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayInitData>): ReplayInitData {
-		const message = createBaseReplayInitData();
-		message.gameId = object.gameId ?? '';
-		message.game =
-			object.game !== undefined && object.game !== null
-				? GameView.fromPartial(object.game)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<ReplayInitData>): ReplayInitData {
+    return ReplayInitData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayInitData>): ReplayInitData {
+    const message = createBaseReplayInitData();
+    message.gameId = object.gameId ?? "";
+    message.game = (object.game !== undefined && object.game !== null) ? GameView.fromPartial(object.game) : undefined;
+    return message;
+  },
 };
 
 function createBaseReplayUpdateData(): ReplayUpdateData {
-	return { game: undefined };
+  return { game: undefined };
 }
 
 export const ReplayUpdateData: MessageFns<ReplayUpdateData> = {
-	encode(message: ReplayUpdateData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.game !== undefined) {
-			GameView.encode(message.game, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: ReplayUpdateData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.game !== undefined) {
+      GameView.encode(message.game, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayUpdateData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayUpdateData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayUpdateData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayUpdateData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.game = GameView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.game = GameView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayUpdateData {
-		return { game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined };
-	},
+  fromJSON(object: any): ReplayUpdateData {
+    return { game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined };
+  },
 
-	toJSON(message: ReplayUpdateData): unknown {
-		const obj: any = {};
-		if (message.game !== undefined) {
-			obj.game = GameView.toJSON(message.game);
-		}
-		return obj;
-	},
+  toJSON(message: ReplayUpdateData): unknown {
+    const obj: any = {};
+    if (message.game !== undefined) {
+      obj.game = GameView.toJSON(message.game);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayUpdateData>): ReplayUpdateData {
-		return ReplayUpdateData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayUpdateData>): ReplayUpdateData {
-		const message = createBaseReplayUpdateData();
-		message.game =
-			object.game !== undefined && object.game !== null
-				? GameView.fromPartial(object.game)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<ReplayUpdateData>): ReplayUpdateData {
+    return ReplayUpdateData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayUpdateData>): ReplayUpdateData {
+    const message = createBaseReplayUpdateData();
+    message.game = (object.game !== undefined && object.game !== null) ? GameView.fromPartial(object.game) : undefined;
+    return message;
+  },
 };
 
 function createBaseReplayDoneData(): ReplayDoneData {
-	return { gameId: '' };
+  return { gameId: "" };
 }
 
 export const ReplayDoneData: MessageFns<ReplayDoneData> = {
-	encode(message: ReplayDoneData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.gameId !== '') {
-			writer.uint32(10).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: ReplayDoneData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.gameId !== "") {
+      writer.uint32(10).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayDoneData {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayDoneData();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayDoneData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayDoneData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayDoneData {
-		return { gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '' };
-	},
+  fromJSON(object: any): ReplayDoneData {
+    return { gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "" };
+  },
 
-	toJSON(message: ReplayDoneData): unknown {
-		const obj: any = {};
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayDoneData): unknown {
+    const obj: any = {};
+    if (message.gameId !== "") {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayDoneData>): ReplayDoneData {
-		return ReplayDoneData.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayDoneData>): ReplayDoneData {
-		const message = createBaseReplayDoneData();
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayDoneData>): ReplayDoneData {
+    return ReplayDoneData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayDoneData>): ReplayDoneData {
+    const message = createBaseReplayDoneData();
+    message.gameId = object.gameId ?? "";
+    return message;
+  },
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-	? T
-	: T extends globalThis.Array<infer U>
-		? globalThis.Array<DeepPartial<U>>
-		: T extends ReadonlyArray<infer U>
-			? ReadonlyArray<DeepPartial<U>>
-			: T extends {}
-				? { [K in keyof T]?: DeepPartial<T[K]> }
-				: Partial<T>;
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
 
 function isObject(value: any): boolean {
-	return typeof value === 'object' && value !== null;
+  return typeof value === "object" && value !== null;
 }
 
 function isSet(value: any): boolean {
-	return value !== null && value !== undefined;
+  return value !== null && value !== undefined;
 }
 
 interface MessageFns<T> {
-	encode(message: T, writer?: BinaryWriter): BinaryWriter;
-	decode(input: BinaryReader | Uint8Array, length?: number): T;
-	fromJSON(object: any): T;
-	toJSON(message: T): unknown;
-	create(base?: DeepPartial<T>): T;
-	fromPartial(object: DeepPartial<T>): T;
+  encode(message: T, writer?: BinaryWriter): BinaryWriter;
+  decode(input: BinaryReader | Uint8Array, length?: number): T;
+  fromJSON(object: any): T;
+  toJSON(message: T): unknown;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }

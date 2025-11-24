@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewKaslemsStrider creates a Kaslems Strider
-//  - ARTIFACT CREATURE
+//   - ARTIFACT CREATURE
 func NewKaslemsStrider(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Kaslems Strider")
 	card.ManaCost = ""

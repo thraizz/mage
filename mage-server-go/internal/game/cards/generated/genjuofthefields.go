@@ -33,11 +33,11 @@ func NewGenjuOfTheFields(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddEffect(abilities.NewGainLifeEffect(SavedDamageValue.MUCH)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new DealsDamageSourceTriggeredAbility(new GainLifeEffect(SavedDamageValue.MUCH)), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		// TODO: ReturnToHandSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

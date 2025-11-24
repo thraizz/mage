@@ -38,7 +38,7 @@ func NewCatharsCall(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect("VigilanceAbility", abilities.AttachmentTypeAura)).
 		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(new BeginningOfEndStepTriggeredAbility( new CreateTokenEffect(token2_0) ), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

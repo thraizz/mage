@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewCastleArdenvale creates a Castle Ardenvale
-//  - LAND
+//   - LAND
 func NewCastleArdenvale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Castle Ardenvale")
 	card.ManaCost = ""

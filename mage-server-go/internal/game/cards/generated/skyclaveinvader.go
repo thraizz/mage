@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewSkyclaveInvader creates a Skyclave Invader
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewSkyclaveInvader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Skyclave Invader")

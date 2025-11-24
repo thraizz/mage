@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGraypeltRefuge creates a Graypelt Refuge
-//  - LAND
+//   - LAND
 func NewGraypeltRefuge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Graypelt Refuge")
 	card.ManaCost = ""

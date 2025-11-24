@@ -32,7 +32,7 @@ func NewKoboldDrillSergeant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(0, 1, filter, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationWhileOnBattlefield)).
 		Build()
 	if err != nil {

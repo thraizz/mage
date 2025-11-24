@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewFireNationPalace creates a Fire Nation Palace
-//  - LAND
+//   - LAND
 func NewFireNationPalace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fire Nation Palace")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewFireNationPalace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewGrantAbilityEffect(new FirebendingAbility(4))).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

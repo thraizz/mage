@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBucolicRanch creates a Bucolic Ranch
-//  - LAND
+//   - LAND
 func NewBucolicRanch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Bucolic Ranch")
 	card.ManaCost = ""

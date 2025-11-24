@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewToralfGodOfFury creates a Toralf God Of Fury
-//  - CREATURE
+//   - CREATURE
+//
 // Trample
 func NewToralfGodOfFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Toralf God Of Fury")

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewPlazaOfHarmony creates a Plaza Of Harmony
-//  - LAND
+//   - LAND
 func NewPlazaOfHarmony(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Plaza Of Harmony")
 	card.ManaCost = ""

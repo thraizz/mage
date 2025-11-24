@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHinterlandScourge creates a Hinterland Scourge
-//  - CREATURE
+//   - CREATURE
 func NewHinterlandScourge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Hinterland Scourge")
 	card.ManaCost = ""

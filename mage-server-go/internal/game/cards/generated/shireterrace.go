@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewShireTerrace creates a Shire Terrace
-//  - LAND
+//   - LAND
 func NewShireTerrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Shire Terrace")
 	card.ManaCost = ""
@@ -26,7 +26,7 @@ func NewShireTerrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddManaCost("{1}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

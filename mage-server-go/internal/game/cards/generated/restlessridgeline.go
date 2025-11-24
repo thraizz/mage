@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRestlessRidgeline creates a Restless Ridgeline
-//  - LAND
+//   - LAND
 func NewRestlessRidgeline(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Restless Ridgeline")
 	card.ManaCost = ""

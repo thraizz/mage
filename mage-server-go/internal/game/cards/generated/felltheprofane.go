@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFellTheProfane creates a Fell The Profane
-//  - INSTANT
+//   - INSTANT
 func NewFellTheProfane(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fell The Profane")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewFellTheProfane(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

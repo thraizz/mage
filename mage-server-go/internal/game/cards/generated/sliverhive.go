@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSliverHive creates a Sliver Hive
-//  - LAND
+//   - LAND
 func NewSliverHive(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sliver Hive")
 	card.ManaCost = ""

@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewRazorvergeThicket creates a Razorverge Thicket
-//  - LAND
+//   - LAND
 func NewRazorvergeThicket(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Razorverge Thicket")
 	card.ManaCost = ""

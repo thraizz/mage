@@ -31,7 +31,7 @@ func NewEDELonesomeEyebot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDrawCardsEffect(new IntPlusDynamicValue(1, new CountersSourceCount(CounterType.QUEST)))).
+		// TODO: DrawCardSourceControllerEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

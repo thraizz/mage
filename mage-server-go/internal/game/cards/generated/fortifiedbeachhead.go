@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFortifiedBeachhead creates a Fortified Beachhead
-//  - LAND
+//   - LAND
 func NewFortifiedBeachhead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Fortified Beachhead")
 	card.ManaCost = ""
@@ -27,7 +27,7 @@ func NewFortifiedBeachhead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{5}").
 		AddTapCost().
-		AddEffect(abilities.NewBoostEffect(1, 1, filter)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

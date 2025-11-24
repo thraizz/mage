@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSparasHeadquarters creates a Sparas Headquarters
-//  - LAND
+//   - LAND
 func NewSparasHeadquarters(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Sparas Headquarters")
 	card.ManaCost = ""

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewDwarvenMine creates a Dwarven Mine
-//  - LAND
+//   - LAND
 func NewDwarvenMine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Dwarven Mine")
 	card.ManaCost = ""

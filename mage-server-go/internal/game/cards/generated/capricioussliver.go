@@ -25,7 +25,7 @@ func NewCapriciousSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(new DealsCombatDamageToAPlayerTriggeredAbility( new ExileTopXMayPlayUntilEffect(1).withTextOptions("that card", true), false ).setTriggerPhrase("Whenever creature deals combat damage to a player, "))).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

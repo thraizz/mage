@@ -26,7 +26,7 @@ func NewMagetaTheLion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDestroyEffect(filter, true)).
+		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -13,7 +13,7 @@ func init() {
 }
 
 // NewMoltenSlagheap creates a Molten Slagheap
-//  - LAND
+//   - LAND
 func NewMoltenSlagheap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Molten Slagheap")
 	card.ManaCost = ""

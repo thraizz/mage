@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTectonicEdge creates a Tectonic Edge
-//  - LAND
+//   - LAND
 func NewTectonicEdge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tectonic Edge")
 	card.ManaCost = ""

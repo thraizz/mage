@@ -32,7 +32,7 @@ func NewJoragaWarcaller(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(new CountersSourceCount(CounterType.P1P1), new CountersSourceCount(CounterType.P1P1), filter, true, rule)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

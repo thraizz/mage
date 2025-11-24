@@ -29,7 +29,7 @@ func NewGoblinSharpshooter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
+		// TODO: UntapSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

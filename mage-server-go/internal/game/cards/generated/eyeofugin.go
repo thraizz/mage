@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewEyeOfUgin creates a Eye Of Ugin
-//  - LAND
+//   - LAND
 func NewEyeOfUgin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Eye Of Ugin")
 	card.ManaCost = ""
@@ -23,7 +23,7 @@ func NewEyeOfUgin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

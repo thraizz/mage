@@ -28,7 +28,7 @@ func NewWireflyHive(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddTapCost().
-		AddEffect(abilities.NewDestroyEffect(filter)).
+		// TODO: DestroyAllEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)

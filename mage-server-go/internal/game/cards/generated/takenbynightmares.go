@@ -21,7 +21,7 @@ func NewTakenByNightmares(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
+		// TODO: ExileTargetEffect with complex parameters
 		AddEffect(abilities.NewScryEffect(1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

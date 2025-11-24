@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSeethingLandscape creates a Seething Landscape
-//  - LAND
+//   - LAND
 func NewSeethingLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seething Landscape")
 	card.ManaCost = ""
@@ -25,7 +25,7 @@ func NewSeethingLandscape(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewSearchLibraryPutInPlayEffect(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter()), true)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

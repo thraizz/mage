@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTranceKujaFateDefied creates a Trance Kuja Fate Defied
-//  - CREATURE
+//   - CREATURE
 func NewTranceKujaFateDefied(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Trance Kuja Fate Defied")
 	card.ManaCost = ""

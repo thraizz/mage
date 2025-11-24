@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewNovijenHeartOfProgress creates a Novijen Heart Of Progress
-//  - LAND
+//   - LAND
 func NewNovijenHeartOfProgress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Novijen Heart Of Progress")
 	card.ManaCost = ""

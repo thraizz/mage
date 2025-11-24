@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewNamelessConqueror creates a Nameless Conqueror
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Trample, Haste
 func NewNamelessConqueror(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Nameless Conqueror")

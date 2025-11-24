@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStormChargedSlasher creates a Storm Charged Slasher
-//  - CREATURE
+//   - CREATURE
 func NewStormChargedSlasher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Storm Charged Slasher")
 	card.ManaCost = ""

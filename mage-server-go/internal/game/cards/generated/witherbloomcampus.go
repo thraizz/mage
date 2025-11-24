@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewWitherbloomCampus creates a Witherbloom Campus
-//  - LAND
+//   - LAND
 func NewWitherbloomCampus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Witherbloom Campus")
 	card.ManaCost = ""

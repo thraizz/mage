@@ -21,11 +21,11 @@ func NewAustereCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyAllEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect(filter3orLess)).
 		AddEffect(abilities.NewDestroyEffect(filter4orMore)).
-		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyAllEffect with complex parameters
+		// TODO: DestroyAllEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect(filter3orLess)).
 		AddEffect(abilities.NewDestroyEffect(filter4orMore)).
 		Build()

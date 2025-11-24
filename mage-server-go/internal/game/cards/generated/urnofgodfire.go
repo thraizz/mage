@@ -24,7 +24,7 @@ func NewUrnOfGodfire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddManaCost("{6}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: DestroyTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

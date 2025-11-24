@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewFrontierBivouac creates a Frontier Bivouac
-//  - LAND
+//   - LAND
 func NewFrontierBivouac(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Frontier Bivouac")
 	card.ManaCost = ""

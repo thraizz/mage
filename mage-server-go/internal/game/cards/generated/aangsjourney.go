@@ -22,7 +22,7 @@ func NewAangsJourney(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSearchLibraryPutInHandEffect(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter()), true)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(2)).
 		Build()
 	if err != nil {

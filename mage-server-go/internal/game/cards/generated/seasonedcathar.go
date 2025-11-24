@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewSeasonedCathar creates a Seasoned Cathar
-//  - CREATURE
+//   - CREATURE
+//
 // Lifelink
 func NewSeasonedCathar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Seasoned Cathar")

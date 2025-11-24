@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSimicGuildgate creates a Simic Guildgate
-//  - LAND
+//   - LAND
 func NewSimicGuildgate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Simic Guildgate")
 	card.ManaCost = ""

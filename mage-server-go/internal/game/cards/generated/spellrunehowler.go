@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewSpellruneHowler creates a Spellrune Howler
-//  - CREATURE
+//   - CREATURE
 func NewSpellruneHowler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Spellrune Howler")
 	card.ManaCost = ""

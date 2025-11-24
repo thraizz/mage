@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewIzzetGuildgate creates a Izzet Guildgate
-//  - LAND
+//   - LAND
 func NewIzzetGuildgate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Izzet Guildgate")
 	card.ManaCost = ""

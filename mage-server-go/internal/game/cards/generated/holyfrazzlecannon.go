@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewHolyFrazzleCannon creates a Holy Frazzle Cannon
-//  - ARTIFACT
+//   - ARTIFACT
 func NewHolyFrazzleCannon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Holy Frazzle Cannon")
 	card.ManaCost = ""

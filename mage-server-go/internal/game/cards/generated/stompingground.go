@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStompingGround creates a Stomping Ground
-//  - LAND
+//   - LAND
 func NewStompingGround(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Stomping Ground")
 	card.ManaCost = ""

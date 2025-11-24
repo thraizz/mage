@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewStranglingGrasp creates a Strangling Grasp
-//  - ENCHANTMENT
+//   - ENCHANTMENT
 func NewStranglingGrasp(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Strangling Grasp")
 	card.ManaCost = ""

@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewHeirToTheNight creates a Heir To The Night
-//  - CREATURE
+//   - CREATURE
+//
 // Flying
 func NewHeirToTheNight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Heir To The Night")

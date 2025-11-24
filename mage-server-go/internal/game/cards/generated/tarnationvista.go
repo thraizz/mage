@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewTarnationVista creates a Tarnation Vista
-//  - LAND
+//   - LAND
 func NewTarnationVista(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Tarnation Vista")
 	card.ManaCost = ""

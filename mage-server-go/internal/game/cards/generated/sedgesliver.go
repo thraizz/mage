@@ -24,22 +24,9 @@ func NewSedgeSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement activated ability with unmapped effects
-	//   - RegenerateSourceEffect()
-	// card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(boost, filterThis creature gets +1/+1 as long as you control a Swamp.\"")).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(regenerate, filterSlivers{B}: Regenerate permanent.\"")).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability2)
+	// TODO: Complex grant ability effects need proper transpilation
+	// This card grants +1/+1 as long as you control a Swamp and regenerate ability to all Slivers
+	// Temporarily stubbed until card transpiler is fixed
+	_ = card // Use card to avoid unused variable error
 	return card, nil
 }

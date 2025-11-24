@@ -300,6 +300,32 @@ func (gc *GameContext) AddMana(playerID uuid.UUID, mana *abilities.Mana) error {
 	return nil
 }
 
+// GetManaPool returns a player's mana pool for cost payment.
+func (gc *GameContext) GetManaPool(playerID uuid.UUID) abilities.ManaPoolInterface {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		gc.logger.Error("game not found when getting mana pool",
+			zap.String("game_id", gc.gameID.String()))
+		return nil
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	player, ok := gameState.players[playerID.String()]
+	if !ok {
+		gc.logger.Error("player not found when getting mana pool",
+			zap.String("player_id", playerID.String()))
+		return nil
+	}
+
+	// Return the player's mana pool which implements ManaPoolInterface
+	return player.ManaPool
+}
+
 // TapPermanent taps a permanent.
 func (gc *GameContext) TapPermanent(permanentID uuid.UUID) error {
 	gc.engine.mu.RLock()

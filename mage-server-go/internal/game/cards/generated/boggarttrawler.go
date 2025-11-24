@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewBoggartTrawler creates a Boggart Trawler
-//  - CREATURE
+//   - CREATURE
 func NewBoggartTrawler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Boggart Trawler")
 	card.ManaCost = ""

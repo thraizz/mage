@@ -25,7 +25,7 @@ func NewKamiOfTwistedReflection(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ReturnToHandTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

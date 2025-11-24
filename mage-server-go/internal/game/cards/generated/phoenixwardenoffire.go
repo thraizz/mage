@@ -12,7 +12,8 @@ func init() {
 }
 
 // NewPhoenixWardenOfFire creates a Phoenix Warden Of Fire
-//  - ENCHANTMENT CREATURE
+//   - ENCHANTMENT CREATURE
+//
 // Flying, Lifelink
 func NewPhoenixWardenOfFire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Phoenix Warden Of Fire")

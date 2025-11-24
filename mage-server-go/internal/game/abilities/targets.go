@@ -149,6 +149,11 @@ func NewPermanentTargetFilterWithType(cardType string) *PermanentTargetFilter {
 	return &PermanentTargetFilter{Type: cardType}
 }
 
+// NewPermanentTarget is a convenience function for creating a single permanent target
+func NewPermanentTarget() TargetFilter {
+	return NewPermanentTargetFilter()
+}
+
 func (f *PermanentTargetFilter) Matches(targetID uuid.UUID, game GameContext) bool {
 	// TODO: Check if target is a permanent
 	// TODO: Check type if specified
@@ -331,4 +336,93 @@ func (f *OrFilter) GetDescription() string {
 	}
 	desc += " or " + f.Filters[len(f.Filters)-1].GetDescription()
 	return desc
+}
+
+// ========================================
+// Card Filter (for cards in hand/graveyard)
+// ========================================
+
+// CardFilter determines what cards match (used for discard, search, etc.)
+// This is similar to TargetFilter but for cards not on battlefield
+type CardFilter interface {
+	// Matches checks if a card matches this filter
+	Matches(cardID uuid.UUID, game GameContext) bool
+
+	// GetDescription returns a description of what this filter matches
+	GetDescription() string
+}
+
+// ArtifactCardFilter matches artifact cards
+type ArtifactCardFilter struct{}
+
+// NewArtifactCardFilter creates a new artifact card filter
+func NewArtifactCardFilter() *ArtifactCardFilter {
+	return &ArtifactCardFilter{}
+}
+
+// Matches checks if the card is an artifact
+func (f *ArtifactCardFilter) Matches(cardID uuid.UUID, game GameContext) bool {
+	// TODO: Check if card is an artifact
+	return true
+}
+
+// GetDescription returns the description
+func (f *ArtifactCardFilter) GetDescription() string {
+	return "artifact card"
+}
+
+// CreatureCardFilter matches creature cards
+type CreatureCardFilter struct{}
+
+// NewCreatureCardFilter creates a new creature card filter
+func NewCreatureCardFilter() *CreatureCardFilter {
+	return &CreatureCardFilter{}
+}
+
+// Matches checks if the card is a creature
+func (f *CreatureCardFilter) Matches(cardID uuid.UUID, game GameContext) bool {
+	// TODO: Check if card is a creature
+	return true
+}
+
+// GetDescription returns the description
+func (f *CreatureCardFilter) GetDescription() string {
+	return "creature card"
+}
+
+// LandCardFilter matches land cards
+type LandCardFilter struct{}
+
+// NewLandCardFilter creates a new land card filter
+func NewLandCardFilter() *LandCardFilter {
+	return &LandCardFilter{}
+}
+
+// Matches checks if the card is a land
+func (f *LandCardFilter) Matches(cardID uuid.UUID, game GameContext) bool {
+	// TODO: Check if card is a land
+	return true
+}
+
+// GetDescription returns the description
+func (f *LandCardFilter) GetDescription() string {
+	return "land card"
+}
+
+// AnyCardFilter matches any card
+type AnyCardFilter struct{}
+
+// NewAnyCardFilter creates a new any card filter
+func NewAnyCardFilter() *AnyCardFilter {
+	return &AnyCardFilter{}
+}
+
+// Matches always returns true
+func (f *AnyCardFilter) Matches(cardID uuid.UUID, game GameContext) bool {
+	return true
+}
+
+// GetDescription returns the description
+func (f *AnyCardFilter) GetDescription() string {
+	return "card"
 }

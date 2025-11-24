@@ -12,7 +12,7 @@ func init() {
 }
 
 // NewGruulTurf creates a Gruul Turf
-//  - LAND
+//   - LAND
 func NewGruulTurf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card := game.NewCard(ownerID, "Gruul Turf")
 	card.ManaCost = ""
