@@ -8,6 +8,7 @@
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import CreateTableModal from '$lib/components/CreateTableModal.svelte';
 	import OnlinePlayersList from '$lib/components/OnlinePlayersList.svelte';
+	import LobbyChat from '$lib/components/LobbyChat.svelte';
 
 	// State
 	let tables = $state<Table[]>([]);
@@ -286,7 +287,7 @@
 	<!-- Main Content with Sidebar -->
 	<div class="lobby-main">
 		<!-- Sidebar: Online Players -->
-		<aside class="sidebar">
+		<aside class="sidebar sidebar-left">
 			<OnlinePlayersList
 				bind:players={onlinePlayers}
 				bind:isOpen={playersListOpen}
@@ -339,6 +340,11 @@
 				</div>
 			{/if}
 		</div>
+
+		<!-- Sidebar: Chat -->
+		<aside class="sidebar sidebar-right">
+			<LobbyChat />
+		</aside>
 	</div>
 </div>
 
@@ -473,6 +479,16 @@
 	.sidebar {
 		width: 300px;
 		flex-shrink: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.sidebar-left {
+		padding: 1.5rem 0 1.5rem 1.5rem;
+	}
+
+	.sidebar-right {
+		padding: 1.5rem 1.5rem 1.5rem 0;
 	}
 
 	/* Content */
@@ -480,6 +496,7 @@
 		flex: 1;
 		padding: 2rem;
 		overflow-y: auto;
+		min-width: 0; /* Allow flexbox to shrink below content size */
 	}
 
 	/* Loading State */
@@ -796,6 +813,11 @@
 
 		.sidebar {
 			width: 100%;
+		}
+
+		.sidebar-left,
+		.sidebar-right {
+			padding: 1rem;
 		}
 
 		.lobby-content {
