@@ -5,10 +5,11 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { RegisterData } from '$lib/types/auth';
+	import { getMageClient } from '$lib/grpc/client';
+	import { createSessionToken } from '$lib/utils/jwt';
 
 	// Form state
 	let username = '';
-	let email = '';
 	let password = '';
 	let confirmPassword = '';
 	let isLoading = false;
@@ -17,7 +18,6 @@
 
 	// Validation errors
 	let usernameError = '';
-	let emailError = '';
 	let passwordError = '';
 	let confirmPasswordError = '';
 
@@ -48,17 +48,6 @@
 		return '';
 	}
 
-	function validateEmail(value: string): string {
-		if (!value) {
-			return 'Email is required';
-		}
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(value)) {
-			return 'Please enter a valid email address';
-		}
-		return '';
-	}
-
 	function validatePassword(value: string): string {
 		if (!value) {
 			return 'Password is required';
@@ -81,23 +70,16 @@
 
 	function validateForm(): boolean {
 		usernameError = validateUsername(username);
-		emailError = validateEmail(email);
 		passwordError = validatePassword(password);
 		confirmPasswordError = validateConfirmPassword(confirmPassword, password);
 
-		return !usernameError && !emailError && !passwordError && !confirmPasswordError;
+		return !usernameError && !passwordError && !confirmPasswordError;
 	}
 
 	// Real-time validation on blur
 	function handleUsernameBlur() {
 		if (username) {
 			usernameError = validateUsername(username);
-		}
-	}
-
-	function handleEmailBlur() {
-		if (email) {
-			emailError = validateEmail(email);
 		}
 	}
 
@@ -116,11 +98,6 @@
 	// Clear individual errors on input
 	function handleUsernameInput() {
 		if (usernameError) usernameError = '';
-		if (errorMessage) errorMessage = '';
-	}
-
-	function handleEmailInput() {
-		if (emailError) emailError = '';
 		if (errorMessage) errorMessage = '';
 	}
 
@@ -146,21 +123,42 @@
 		successMessage = '';
 
 		try {
-			const registerData: RegisterData = {
-				username,
-				email,
-				password
-			};
+			// Register user using real gRPC client
+			const client = getMageClient();
+			const registerResponse = await client.register(username, password);
 
-			// TODO: Replace with actual API call when backend is ready
-			await simulateRegister(registerData);
+			if (!registerResponse.success) {
+				throw new Error(registerResponse.error || 'Registration failed');
+			}
 
-			// Show success message and toast
+			// Show success message
 			successMessage = 'Account created successfully! Logging you in...';
 			toast.success('Account created successfully!');
 
 			// Auto-login after successful registration
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			await new Promise((resolve) => setTimeout(resolve, 500));
+			
+			const loginResponse = await client.connectUser(username, password);
+
+			if (!loginResponse.success) {
+				// Registration succeeded but login failed - redirect to login page
+				toast.warning('Please log in with your new account');
+				goto('/login');
+				return;
+			}
+
+			// Create a session-based token from server response
+			const token = createSessionToken(
+				loginResponse.sessionId,
+				loginResponse.userId,
+				username
+			);
+
+			// Store in auth store
+			auth.login(token, {
+				id: loginResponse.userId,
+				username: username
+			});
 
 			// Redirect to original URL or lobby
 			goto(returnUrl);
@@ -175,47 +173,6 @@
 		} finally {
 			isLoading = false;
 		}
-	}
-
-	// Simulated registration function - replace with actual API call
-	async function simulateRegister(data: RegisterData): Promise<void> {
-		// Simulate network delay
-		await new Promise((resolve) => setTimeout(resolve, 1500));
-
-		// Simulate username already taken error (for demo)
-		if (data.username.toLowerCase() === 'admin' || data.username.toLowerCase() === 'test') {
-			throw new Error('Username already taken. Please choose another one.');
-		}
-
-		// Simulate email already registered error (for demo)
-		if (data.email === 'taken@example.com') {
-			throw new Error('Email already registered. Please use another email or login.');
-		}
-
-		// Create a mock JWT token with expiry in 24 hours
-		const now = Math.floor(Date.now() / 1000);
-		const exp = now + 86400; // 24 hours
-		const payload = {
-			sub: 'user-' + Math.random().toString(36).substr(2, 9),
-			username: data.username,
-			email: data.email,
-			exp,
-			iat: now
-		};
-
-		// Simple base64 encoding for demo (not secure, just for simulation)
-		const payloadStr = JSON.stringify(payload);
-		const encodedPayload = btoa(payloadStr);
-		const mockToken = `mock.${encodedPayload}.signature`;
-
-		// Auto-login after registration
-		auth.login(mockToken, {
-			id: payload.sub,
-			username: payload.username,
-			email: payload.email
-		});
-
-		console.log('Registration successful:', payload.username);
 	}
 </script>
 
@@ -265,26 +222,7 @@
 			</div>
 
 			<div class="form-group">
-				<label for="email">Email</label>
-				<input
-					type="email"
-					id="email"
-					name="email"
-					bind:value={email}
-					on:input={handleEmailInput}
-					on:blur={handleEmailBlur}
-					placeholder="Enter your email address"
-					disabled={isLoading}
-					aria-required="true"
-					aria-invalid={emailError ? 'true' : 'false'}
-					aria-describedby={emailError ? 'email-error' : undefined}
-				/>
-				{#if emailError}
-					<span class="field-error" id="email-error" role="alert">{emailError}</span>
-				{/if}
-			</div>
-
-			<div class="form-group">
+				<label for="password">Password</label>
 				<label for="password">Password</label>
 				<input
 					type="password"

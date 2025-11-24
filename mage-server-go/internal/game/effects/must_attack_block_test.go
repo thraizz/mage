@@ -44,7 +44,7 @@ func TestMustAttackEffectAppliesTo(t *testing.T) {
 // TestMustBeBlockedEffect tests the MustBeBlockedEffect creation and behavior
 func TestMustBeBlockedEffect(t *testing.T) {
 	sourceID := "attacker-1"
-	attackerID := "" // Empty means source itself
+	attackerID := ""        // Empty means source itself
 	targetIDs := []string{} // Empty means all able blockers
 	duration := DurationWhileOnBattlefield
 

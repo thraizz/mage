@@ -68,9 +68,9 @@ func TestManaCost_CanPay(t *testing.T) {
 	pool.Add(ManaGreen, 1)
 
 	tests := []struct {
-		cost     string
-		xValue   int
-		canPay   bool
+		cost   string
+		xValue int
+		canPay bool
 	}{
 		{"{G}", 0, true},
 		{"{U}", 0, true},
@@ -78,8 +78,8 @@ func TestManaCost_CanPay(t *testing.T) {
 		{"{R}", 0, false},
 		{"{1}{G}", 0, true}, // 1 generic + 1 green, pool has 1 green + 2 blue + 1 white = 4 total, need 2
 		{"{3}{G}", 0, true}, // 3 generic + 1 green, pool has 1 green + 2 blue + 1 white = 4 total, need 4 (1 green + 3 generic from blue/white)
-		{"{X}{G}", 0, true},  // X=0 means 0 generic + 1 green
-		{"{X}{G}", 1, true},  // X=1 means 1 generic + 1 green, pool has 4 total, need 2
+		{"{X}{G}", 0, true}, // X=0 means 0 generic + 1 green
+		{"{X}{G}", 1, true}, // X=1 means 1 generic + 1 green, pool has 4 total, need 2
 		{"{X}{G}", 2, true}, // X=2 means 2 generic + 1 green, pool has 4 total (1 green + 2 blue + 1 white), need 3 (1 green + 2 generic from blue/white)
 	}
 

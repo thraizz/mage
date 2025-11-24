@@ -100,6 +100,18 @@ type GameContext interface {
 	// UntapPermanent untaps a permanent
 	UntapPermanent(permanentID uuid.UUID) error
 
+	// SacrificePermanent sacrifices a permanent (moves to graveyard, triggers dies events)
+	SacrificePermanent(permanentID uuid.UUID) error
+
+	// DiscardCard discards a card from a player's hand
+	DiscardCard(playerID uuid.UUID, cardID uuid.UUID) error
+
+	// GetPlayerHand returns the cards in a player's hand
+	GetPlayerHand(playerID uuid.UUID) ([]interface{}, error)
+
+	// GetPermanentsControlledByPlayer returns all permanents controlled by a player
+	GetPermanentsControlledByPlayer(playerID uuid.UUID) ([]interface{}, error)
+
 	// TODO: Add more methods as needed
 }
 

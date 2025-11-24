@@ -692,9 +692,24 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 		}, nil
 	}
 
+	// Convert DeckCard messages to card name strings for internal representation
+	mainDeckNames := make([]string, 0)
+	for _, card := range deck.GetMainDeck() {
+		for i := int32(0); i < card.GetQuantity(); i++ {
+			mainDeckNames = append(mainDeckNames, card.GetName())
+		}
+	}
+
+	sideboardNames := make([]string, 0)
+	for _, card := range deck.GetSideboard() {
+		for i := int32(0); i < card.GetQuantity(); i++ {
+			sideboardNames = append(sideboardNames, card.GetName())
+		}
+	}
+
 	deckList := table.DeckList{
-		MainDeck:  append([]string(nil), deck.GetMainDeck()...),
-		Sideboard: append([]string(nil), deck.GetSideboard()...),
+		MainDeck:  mainDeckNames,
+		Sideboard: sideboardNames,
 	}
 
 	if err := tbl.SubmitDeck(username, deckList); err != nil {
@@ -778,14 +793,29 @@ func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb
 		}, nil
 	}
 
+	// Convert DeckCard messages to card name strings for storage
+	mainDeckNames = make([]string, 0)
+	for _, card := range deck.GetMainDeck() {
+		for i := int32(0); i < card.GetQuantity(); i++ {
+			mainDeckNames = append(mainDeckNames, card.GetName())
+		}
+	}
+
+	sideboardNames = make([]string, 0)
+	for _, card := range deck.GetSideboard() {
+		for i := int32(0); i < card.GetQuantity(); i++ {
+			sideboardNames = append(sideboardNames, card.GetName())
+		}
+	}
+
 	// Create deck in repository
 	deckModel := &repository.Deck{
 		UserID:      user.ID,
 		Name:        deckName,
 		Format:      format,
 		Description: strings.TrimSpace(req.GetDescription()),
-		MainDeck:    append([]string(nil), deck.GetMainDeck()...),
-		Sideboard:   append([]string(nil), deck.GetSideboard()...),
+		MainDeck:    mainDeckNames,
+		Sideboard:   sideboardNames,
 	}
 
 	if err := s.deckRepo.Create(ctx, deckModel); err != nil {
@@ -1050,6 +1080,33 @@ func (s *mageServer) DeckGet(ctx context.Context, req *pb.DeckGetRequest) (*pb.D
 		zap.Int64("deck_id", req.GetDeckId()),
 	)
 
+	// Convert card names to DeckCard messages with metadata
+	mainDeckCards, err := s.buildDeckCardsWithMetadata(ctx, deck.MainDeck)
+	if err != nil {
+		s.logger.Error("failed to build main deck cards with metadata",
+			zap.String("username", username),
+			zap.Int64("deck_id", req.GetDeckId()),
+			zap.Error(err),
+		)
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   "failed to fetch card metadata",
+		}, nil
+	}
+
+	sideboardCards, err := s.buildDeckCardsWithMetadata(ctx, deck.Sideboard)
+	if err != nil {
+		s.logger.Error("failed to build sideboard cards with metadata",
+			zap.String("username", username),
+			zap.Int64("deck_id", req.GetDeckId()),
+			zap.Error(err),
+		)
+		return &pb.DeckGetResponse{
+			Success: false,
+			Error:   "failed to fetch card metadata",
+		}, nil
+	}
+
 	return &pb.DeckGetResponse{
 		Success: true,
 		Info: &pb.DeckInfo{
@@ -1063,8 +1120,109 @@ func (s *mageServer) DeckGet(ctx context.Context, req *pb.DeckGetRequest) (*pb.D
 			UpdatedAt:      deck.UpdatedAt.Unix(),
 		},
 		Deck: &pb.DeckCardLists{
-			MainDeck:  append([]string(nil), deck.MainDeck...),
-			Sideboard: append([]string(nil), deck.Sideboard...),
+			MainDeck:  mainDeckCards,
+			Sideboard: sideboardCards,
 		},
 	}, nil
+}
+
+// buildDeckCardsWithMetadata converts card names to DeckCard messages with full metadata
+func (s *mageServer) buildDeckCardsWithMetadata(ctx context.Context, cardNames []string) ([]*pb.DeckCard, error) {
+	// Count card quantities
+	cardQuantities := make(map[string]int32)
+	for _, cardName := range cardNames {
+		cardQuantities[cardName]++
+	}
+
+	// Build DeckCard messages with metadata
+	var deckCards []*pb.DeckCard
+	for cardName, quantity := range cardQuantities {
+		// Look up card metadata from database
+		cards, err := s.cardRepo.GetByName(ctx, cardName)
+		if err != nil {
+			s.logger.Warn("failed to get card metadata",
+				zap.String("card_name", cardName),
+				zap.Error(err),
+			)
+			// Continue with minimal data if card not found
+			deckCards = append(deckCards, &pb.DeckCard{
+				Name:     cardName,
+				Quantity: quantity,
+			})
+			continue
+		}
+
+		if len(cards) == 0 {
+			// Card not in database, use minimal data
+			deckCards = append(deckCards, &pb.DeckCard{
+				Name:     cardName,
+				Quantity: quantity,
+			})
+			continue
+		}
+
+		// Use first printing (could be enhanced to allow set selection)
+		cardData := cards[0]
+
+		// Parse types from card type string (e.g., "Creature - Human Wizard" -> ["CREATURE"])
+		types := parseCardTypes(cardData.CardType)
+
+		// Parse colors from mana cost (e.g., "{2}{U}{U}" -> ["U"])
+		colors := parseColorsFromManaCost(cardData.ManaCost)
+
+		deckCards = append(deckCards, &pb.DeckCard{
+			Name:      cardData.Name,
+			ManaCost:  cardData.ManaCost,
+			CardType:  cardData.CardType,
+			Types:     types,
+			Colors:    colors,
+			Power:     cardData.Power,
+			Toughness: cardData.Toughness,
+			Quantity:  quantity,
+		})
+	}
+
+	return deckCards, nil
+}
+
+// parseCardTypes extracts main card types from the card type string
+func parseCardTypes(cardType string) []string {
+	// Simple implementation: extract basic types
+	// e.g., "Creature - Human Wizard" -> ["CREATURE"]
+	// e.g., "Legendary Artifact" -> ["ARTIFACT"]
+	var types []string
+
+	cardTypeUpper := strings.ToUpper(cardType)
+
+	basicTypes := []string{"CREATURE", "INSTANT", "SORCERY", "ENCHANTMENT", "ARTIFACT", "PLANESWALKER", "LAND", "BATTLE"}
+	for _, t := range basicTypes {
+		if strings.Contains(cardTypeUpper, t) {
+			types = append(types, t)
+		}
+	}
+
+	return types
+}
+
+// parseColorsFromManaCost extracts color identity from mana cost
+func parseColorsFromManaCost(manaCost string) []string {
+	// Extract color symbols from mana cost
+	// e.g., "{2}{U}{U}" -> ["U"]
+	// e.g., "{W}{U}{B}{R}{G}" -> ["W", "U", "B", "R", "G"]
+	colorMap := make(map[string]bool)
+
+	// Look for single-letter color symbols
+	for _, color := range []string{"W", "U", "B", "R", "G"} {
+		if strings.Contains(manaCost, color) {
+			colorMap[color] = true
+		}
+	}
+
+	// Convert map to slice
+	var colors []string
+	for color := range colorMap {
+		colors = append(colors, color)
+	}
+
+	return colors
 }

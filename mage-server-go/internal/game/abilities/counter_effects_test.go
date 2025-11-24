@@ -123,12 +123,37 @@ func (m *mockCounterGameContext) AddMana(playerID uuid.UUID, mana *Mana) error {
 	return nil
 }
 
+func (m *mockCounterGameContext) GetManaPool(playerID uuid.UUID) ManaPoolInterface {
+	return nil
+}
+
 func (m *mockCounterGameContext) TapPermanent(permanentID uuid.UUID) error {
 	return nil
 }
 
 func (m *mockCounterGameContext) UntapPermanent(permanentID uuid.UUID) error {
 	return nil
+}
+
+func (m *mockCounterGameContext) SacrificePermanent(permanentID uuid.UUID) error {
+	delete(m.permanents, permanentID)
+	return nil
+}
+
+func (m *mockCounterGameContext) DiscardCard(playerID uuid.UUID, cardID uuid.UUID) error {
+	return nil
+}
+
+func (m *mockCounterGameContext) GetPlayerHand(playerID uuid.UUID) ([]interface{}, error) {
+	return nil, nil
+}
+
+func (m *mockCounterGameContext) GetPermanentsControlledByPlayer(playerID uuid.UUID) ([]interface{}, error) {
+	var result []interface{}
+	for _, perm := range m.permanents {
+		result = append(result, perm)
+	}
+	return result, nil
 }
 
 // ========================================

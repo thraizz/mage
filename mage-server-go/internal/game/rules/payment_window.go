@@ -47,30 +47,30 @@ type Cost struct {
 
 // PaymentState tracks the state of paying costs for a spell/ability
 type PaymentState struct {
-	mu                sync.RWMutex
-	spellOrAbilityID  string
-	controllerID      string
-	costs             []Cost
-	currentStep       PaymentStep
-	allowManaAbilities bool
+	mu                  sync.RWMutex
+	spellOrAbilityID    string
+	controllerID        string
+	costs               []Cost
+	currentStep         PaymentStep
+	allowManaAbilities  bool
 	allowSpecialActions bool
-	paidCosts         map[CostType]bool
-	totalManaPaid     int
-	manaRemaining     int
+	paidCosts           map[CostType]bool
+	totalManaPaid       int
+	manaRemaining       int
 }
 
 // NewPaymentState creates a new payment state
 func NewPaymentState(spellOrAbilityID string, controllerID string, costs []Cost) *PaymentState {
 	return &PaymentState{
-		spellOrAbilityID:   spellOrAbilityID,
-		controllerID:       controllerID,
-		costs:              costs,
-		currentStep:        PaymentStepBefore,
-		allowManaAbilities: true,
+		spellOrAbilityID:    spellOrAbilityID,
+		controllerID:        controllerID,
+		costs:               costs,
+		currentStep:         PaymentStepBefore,
+		allowManaAbilities:  true,
 		allowSpecialActions: true,
-		paidCosts:          make(map[CostType]bool),
-		totalManaPaid:      0,
-		manaRemaining:      0,
+		paidCosts:           make(map[CostType]bool),
+		totalManaPaid:       0,
+		manaRemaining:       0,
 	}
 }
 
@@ -178,9 +178,9 @@ func (ps *PaymentState) GetCosts() []Cost {
 
 // PaymentWindowManager manages payment windows during spell/ability casting
 type PaymentWindowManager struct {
-	mu               sync.RWMutex
-	activePayment    *PaymentState
-	paymentHistory   []string // IDs of spells/abilities paid for
+	mu             sync.RWMutex
+	activePayment  *PaymentState
+	paymentHistory []string // IDs of spells/abilities paid for
 }
 
 // NewPaymentWindowManager creates a new payment window manager
@@ -270,23 +270,23 @@ const (
 
 // Choice represents a choice that must be made during resolution
 type Choice struct {
-	Type        ChoiceType
-	PlayerID    string
-	Prompt      string
-	Options     []string
-	MinChoices  int
-	MaxChoices  int
-	Result      []string // Chosen options
-	Made        bool
+	Type       ChoiceType
+	PlayerID   string
+	Prompt     string
+	Options    []string
+	MinChoices int
+	MaxChoices int
+	Result     []string // Chosen options
+	Made       bool
 }
 
 // ChoiceManager manages choices during resolution
 // Per Rule 608.2: Choices are made during resolution
 type ChoiceManager struct {
-	mu              sync.RWMutex
-	pendingChoices  []Choice
-	madeChoices     []Choice
-	currentChoice   *Choice
+	mu             sync.RWMutex
+	pendingChoices []Choice
+	madeChoices    []Choice
+	currentChoice  *Choice
 }
 
 // NewChoiceManager creates a new choice manager

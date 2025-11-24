@@ -26,12 +26,8 @@ func NewRagingSwordtooth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DamageAllEffect with complex parameters
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(1, "it", filter)
+	// card.AddAbility(ability1)
 	return card, nil
 }

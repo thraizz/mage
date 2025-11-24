@@ -9,6 +9,7 @@ export interface Deck {
 	cardCount: number;
 	createdAt: number;
 	updatedAt: number;
+	lastModified?: string; // Human-readable format
 	isValid: boolean;
 	mainDeck: DeckCard[];
 	sideboard: DeckCard[];

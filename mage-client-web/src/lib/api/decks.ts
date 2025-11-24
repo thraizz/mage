@@ -60,7 +60,7 @@ function convertCardListsToDeckCards(cardLists: DeckCardLists) {
  */
 export async function fetchUserDecks(format?: string): Promise<Deck[]> {
 	const client = getMageClient();
-	const sessionId = client.getSessionId();
+	const sessionId = await client.ensureSessionId();
 
 	if (!sessionId) {
 		throw new Error('No active session - please login first');
@@ -71,13 +71,26 @@ export async function fetchUserDecks(format?: string): Promise<Deck[]> {
 		format: format || ''
 	};
 
-	const response = await client.call<DeckListRequest, DeckListResponse>('DeckList', request);
+	try {
+		const response = await client.call<DeckListRequest, DeckListResponse>('DeckList', request);
 
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to fetch decks');
+		if (!response.success) {
+			// Check if error indicates session expired
+			const errorMsg = response.error || 'Failed to fetch decks';
+			if (errorMsg.toLowerCase().includes('session') || errorMsg.toLowerCase().includes('expired')) {
+				throw new Error('Session expired - please login again');
+			}
+			throw new Error(errorMsg);
+		}
+
+		return response.decks.map(convertDeckInfoToDeck);
+	} catch (error) {
+		// Handle network or other errors
+		if (error instanceof Error) {
+			throw error;
+		}
+		throw new Error('Failed to fetch decks - network error');
 	}
-
-	return response.decks.map(convertDeckInfoToDeck);
 }
 
 /**
@@ -85,7 +98,7 @@ export async function fetchUserDecks(format?: string): Promise<Deck[]> {
  */
 export async function getDeckDetails(deckId: string): Promise<Deck> {
 	const client = getMageClient();
-	const sessionId = client.getSessionId();
+	const sessionId = await client.ensureSessionId();
 
 	if (!sessionId) {
 		throw new Error('No active session - please login first');
@@ -121,7 +134,7 @@ export async function getDeckDetails(deckId: string): Promise<Deck> {
  */
 export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 	const client = getMageClient();
-	const sessionId = client.getSessionId();
+	const sessionId = await client.ensureSessionId();
 
 	if (!sessionId) {
 		throw new Error('No active session - please login first');
@@ -185,6 +198,10 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 		throw new Error(response.error || 'Failed to save deck');
 	}
 
+	if (!response.deckId) {
+		throw new Error('Deck saved but no deck ID returned from server');
+	}
+
 	// Return a basic deck object - caller should refetch to get full details
 	return {
 		id: response.deckId.toString(),
@@ -204,7 +221,7 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
  */
 export async function deleteDeck(deckId: string): Promise<void> {
 	const client = getMageClient();
-	const sessionId = client.getSessionId();
+	const sessionId = await client.ensureSessionId();
 
 	if (!sessionId) {
 		throw new Error('No active session - please login first');

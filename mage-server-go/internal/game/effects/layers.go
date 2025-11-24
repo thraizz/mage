@@ -175,13 +175,13 @@ func (ls *LayerSystem) GetEffectsForCard(cardID string) []ContinuousEffect {
 	if ls == nil || cardID == "" {
 		return nil
 	}
-	
+
 	ls.mu.RLock()
 	defer ls.mu.RUnlock()
-	
+
 	var result []ContinuousEffect
 	snapshot := &Snapshot{CardID: cardID}
-	
+
 	for _, layerMap := range ls.effects {
 		for _, effect := range layerMap {
 			if effect.AppliesTo(snapshot) {
@@ -189,7 +189,7 @@ func (ls *LayerSystem) GetEffectsForCard(cardID string) []ContinuousEffect {
 			}
 		}
 	}
-	
+
 	return result
 }
 
@@ -199,12 +199,12 @@ func (ls *LayerSystem) HasEffectType(cardID string, checkFunc func(ContinuousEff
 	if ls == nil || cardID == "" || checkFunc == nil {
 		return false
 	}
-	
+
 	ls.mu.RLock()
 	defer ls.mu.RUnlock()
-	
+
 	snapshot := &Snapshot{CardID: cardID}
-	
+
 	for _, layerMap := range ls.effects {
 		for _, effect := range layerMap {
 			if effect.AppliesTo(snapshot) && checkFunc(effect) {
@@ -212,6 +212,6 @@ func (ls *LayerSystem) HasEffectType(cardID string, checkFunc func(ContinuousEff
 			}
 		}
 	}
-	
+
 	return false
 }

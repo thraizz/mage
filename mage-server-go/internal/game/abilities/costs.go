@@ -3,10 +3,21 @@ package abilities
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"strings"
 
 	"github.com/google/uuid"
 )
+
+// internalCard is a forward declaration for the game engine's card type
+// We need this to work with cards returned from GameContext
+type internalCard struct {
+	ID         string
+	Name       string
+	Type       string
+	SubTypes   []string
+	SuperTypes []string
+}
 
 // Cost represents a cost that must be paid to activate an ability
 type Cost interface {
@@ -284,13 +295,86 @@ func NewSacrificeSourceCost() *SacrificeCost {
 }
 
 func (c *SacrificeCost) CanPay(ctx context.Context, game GameContext, playerID uuid.UUID) bool {
-	// TODO: Check if player has enough permanents to sacrifice
-	return true
+	// Get all permanents controlled by the player
+	permanents, err := game.GetPermanentsControlledByPlayer(playerID)
+	if err != nil {
+		return false
+	}
+
+	// Special case: sacrificing source
+	if c.Filter == "source" {
+		// For source sacrifice, we need at least one permanent (the source itself)
+		// This will be validated during actual payment
+		return len(permanents) > 0
+	}
+
+	// Count permanents that match the filter
+	matchCount := 0
+	for _, perm := range permanents {
+		card, ok := perm.(*internalCard)
+		if !ok {
+			continue
+		}
+
+		if permanentMatchesFilter(card, c.Filter) {
+			matchCount++
+		}
+	}
+
+	return matchCount >= c.Amount
 }
 
 func (c *SacrificeCost) Pay(ctx context.Context, game GameContext, playerID uuid.UUID) error {
-	// TODO: Sacrifice permanents
-	return fmt.Errorf("sacrifice cost not yet implemented")
+	// First check if we can pay
+	if !c.CanPay(ctx, game, playerID) {
+		return fmt.Errorf("insufficient permanents to sacrifice")
+	}
+
+	// Get all permanents controlled by the player
+	permanents, err := game.GetPermanentsControlledByPlayer(playerID)
+	if err != nil {
+		return fmt.Errorf("failed to get permanents: %w", err)
+	}
+
+	// Special case: sacrificing source
+	// For now, we don't have a way to identify the source in this context
+	// This will need to be handled by the ability activation system
+	if c.Filter == "source" {
+		// The ability activation system should pass the source ID somehow
+		// For now, return an error indicating this needs special handling
+		return fmt.Errorf("sacrifice source cost requires special handling by ability system")
+	}
+
+	// Collect permanents that match the filter
+	var candidates []uuid.UUID
+	for _, perm := range permanents {
+		card, ok := perm.(*internalCard)
+		if !ok {
+			continue
+		}
+
+		if permanentMatchesFilter(card, c.Filter) {
+			id, err := uuid.Parse(card.ID)
+			if err != nil {
+				continue
+			}
+			candidates = append(candidates, id)
+		}
+	}
+
+	if len(candidates) < c.Amount {
+		return fmt.Errorf("not enough permanents matching filter '%s'", c.Filter)
+	}
+
+	// TODO: In a real implementation, we'd need player input to choose which permanents to sacrifice
+	// For now, just sacrifice the first N that match
+	for i := 0; i < c.Amount && i < len(candidates); i++ {
+		if err := game.SacrificePermanent(candidates[i]); err != nil {
+			return fmt.Errorf("failed to sacrifice permanent: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func (c *SacrificeCost) String() string {
@@ -328,13 +412,62 @@ func NewDiscardCostRandom(amount int) *DiscardCost {
 }
 
 func (c *DiscardCost) CanPay(ctx context.Context, game GameContext, playerID uuid.UUID) bool {
-	// TODO: Check if player has enough cards to discard
-	return true
+	// Get player's hand
+	hand, err := game.GetPlayerHand(playerID)
+	if err != nil {
+		return false
+	}
+
+	// Check if player has enough cards to discard
+	return len(hand) >= c.Amount
 }
 
 func (c *DiscardCost) Pay(ctx context.Context, game GameContext, playerID uuid.UUID) error {
-	// TODO: Discard cards
-	return fmt.Errorf("discard cost not yet implemented")
+	// First check if we can pay
+	if !c.CanPay(ctx, game, playerID) {
+		return fmt.Errorf("insufficient cards in hand to discard")
+	}
+
+	// Get player's hand
+	hand, err := game.GetPlayerHand(playerID)
+	if err != nil {
+		return fmt.Errorf("failed to get player hand: %w", err)
+	}
+
+	// Collect card IDs
+	var cardIDs []uuid.UUID
+	for _, cardIface := range hand {
+		card, ok := cardIface.(*internalCard)
+		if !ok {
+			continue
+		}
+		id, err := uuid.Parse(card.ID)
+		if err != nil {
+			continue
+		}
+		cardIDs = append(cardIDs, id)
+	}
+
+	if len(cardIDs) < c.Amount {
+		return fmt.Errorf("not enough cards in hand")
+	}
+
+	// If random, shuffle the card IDs
+	if c.Random {
+		rand.Shuffle(len(cardIDs), func(i, j int) {
+			cardIDs[i], cardIDs[j] = cardIDs[j], cardIDs[i]
+		})
+	}
+
+	// TODO: In a real implementation, we'd need player input to choose which cards to discard
+	// For now, just discard the first N cards (or N random cards if Random is true)
+	for i := 0; i < c.Amount && i < len(cardIDs); i++ {
+		if err := game.DiscardCard(playerID, cardIDs[i]); err != nil {
+			return fmt.Errorf("failed to discard card: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func (c *DiscardCost) String() string {
@@ -474,14 +607,71 @@ func NewDiscardTargetCost(amount int, filter CardFilter) *DiscardTargetCost {
 
 // CanPay checks if the player can pay this cost
 func (c *DiscardTargetCost) CanPay(ctx context.Context, game GameContext, playerID uuid.UUID) bool {
-	// TODO: Check if player has enough cards matching the filter
-	return true
+	// Get player's hand
+	hand, err := game.GetPlayerHand(playerID)
+	if err != nil {
+		return false
+	}
+
+	// Count cards that match the filter
+	matchCount := 0
+	for _, cardIface := range hand {
+		card, ok := cardIface.(*internalCard)
+		if !ok {
+			continue
+		}
+
+		if cardMatchesFilter(card, c.filter) {
+			matchCount++
+		}
+	}
+
+	return matchCount >= c.amount
 }
 
 // Pay pays this cost (discards the specified cards)
 func (c *DiscardTargetCost) Pay(ctx context.Context, game GameContext, playerID uuid.UUID) error {
-	// TODO: Discard cards matching the filter
-	return fmt.Errorf("discard target cost not yet implemented")
+	// First check if we can pay
+	if !c.CanPay(ctx, game, playerID) {
+		return fmt.Errorf("insufficient cards matching filter to discard")
+	}
+
+	// Get player's hand
+	hand, err := game.GetPlayerHand(playerID)
+	if err != nil {
+		return fmt.Errorf("failed to get player hand: %w", err)
+	}
+
+	// Collect cards that match the filter
+	var candidates []uuid.UUID
+	for _, cardIface := range hand {
+		card, ok := cardIface.(*internalCard)
+		if !ok {
+			continue
+		}
+
+		if cardMatchesFilter(card, c.filter) {
+			id, err := uuid.Parse(card.ID)
+			if err != nil {
+				continue
+			}
+			candidates = append(candidates, id)
+		}
+	}
+
+	if len(candidates) < c.amount {
+		return fmt.Errorf("not enough cards matching filter in hand")
+	}
+
+	// TODO: In a real implementation, we'd need player input to choose which cards to discard
+	// For now, just discard the first N that match
+	for i := 0; i < c.amount && i < len(candidates); i++ {
+		if err := game.DiscardCard(playerID, candidates[i]); err != nil {
+			return fmt.Errorf("failed to discard card: %w", err)
+		}
+	}
+
+	return nil
 }
 
 // String returns a text representation
@@ -495,4 +685,86 @@ func (c *DiscardTargetCost) String() string {
 		return fmt.Sprintf("Discard a %s", filterDesc)
 	}
 	return fmt.Sprintf("Discard %d %ss", c.amount, filterDesc)
+}
+
+// ========================================
+// Helper Functions
+// ========================================
+
+// permanentMatchesFilter checks if a permanent matches a type filter string
+func permanentMatchesFilter(card *internalCard, filter string) bool {
+	if filter == "" || filter == "permanent" {
+		return true
+	}
+
+	// Normalize filter to uppercase for comparison
+	filterUpper := strings.ToUpper(filter)
+	typeUpper := strings.ToUpper(card.Type)
+
+	// Check main types
+	if strings.Contains(typeUpper, filterUpper) {
+		return true
+	}
+
+	// Check subtypes
+	for _, subType := range card.SubTypes {
+		if strings.EqualFold(subType, filter) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// cardMatchesFilter checks if a card matches a card filter
+// Note: This is a simplified version that checks based on card type
+// The actual CardFilter.Matches() method requires a GameContext and UUID
+func cardMatchesFilter(card *internalCard, filter CardFilter) bool {
+	if filter == nil {
+		return true
+	}
+
+	// Since we can't call filter.Matches() without a GameContext,
+	// we do a simplified type check based on the filter's description
+	// This is a temporary solution until we can pass GameContext through
+	filterDesc := filter.GetDescription()
+	typeUpper := strings.ToUpper(card.Type)
+
+	// Check for artifact
+	if strings.Contains(filterDesc, "artifact") || strings.Contains(filterDesc, "Artifact") {
+		return strings.Contains(typeUpper, "ARTIFACT")
+	}
+
+	// Check for creature
+	if strings.Contains(filterDesc, "creature") || strings.Contains(filterDesc, "Creature") {
+		return strings.Contains(typeUpper, "CREATURE")
+	}
+
+	// Check for land
+	if strings.Contains(filterDesc, "land") || strings.Contains(filterDesc, "Land") {
+		return strings.Contains(typeUpper, "LAND")
+	}
+
+	// Check for instant
+	if strings.Contains(filterDesc, "instant") || strings.Contains(filterDesc, "Instant") {
+		return strings.Contains(typeUpper, "INSTANT")
+	}
+
+	// Check for sorcery
+	if strings.Contains(filterDesc, "sorcery") || strings.Contains(filterDesc, "Sorcery") {
+		return strings.Contains(typeUpper, "SORCERY")
+	}
+
+	// Check for enchantment
+	if strings.Contains(filterDesc, "enchantment") || strings.Contains(filterDesc, "Enchantment") {
+		return strings.Contains(typeUpper, "ENCHANTMENT")
+	}
+
+	// Check for planeswalker
+	if strings.Contains(filterDesc, "planeswalker") || strings.Contains(filterDesc, "Planeswalker") {
+		return strings.Contains(typeUpper, "PLANESWALKER")
+	}
+
+	// Default: accept any card
+	return true
 }

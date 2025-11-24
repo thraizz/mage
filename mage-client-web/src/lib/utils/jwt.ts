@@ -90,6 +90,64 @@ export function getUserFromToken(
 	return {
 		id: payload.sub,
 		username: payload.username,
-		email: payload.email
+		email: payload.email || `${payload.username}@example.com`
 	};
+}
+
+/**
+ * Extract session ID from JWT token
+ *
+ * @param token - JWT token string
+ * @returns Session ID or null if not found
+ */
+export function getSessionIdFromToken(token: string): string | null {
+	const payload = decodeJwt(token);
+	if (!payload) {
+		return null;
+	}
+	return payload.sessionId || null;
+}
+
+/**
+ * Create a session-based token from server response
+ * This creates a JWT-like token containing session information
+ *
+ * @param sessionId - Session ID from server
+ * @param userId - User ID from server
+ * @param username - Username
+ * @param email - Optional email address
+ * @param expiresIn - Expiration time in seconds (default: 24 hours)
+ * @returns JWT-formatted token string
+ */
+export function createSessionToken(
+	sessionId: string,
+	userId: string,
+	username: string,
+	email?: string,
+	expiresIn: number = 86400 // 24 hours
+): string {
+	const now = Math.floor(Date.now() / 1000);
+	const exp = now + expiresIn;
+	
+	const payload = {
+		sub: userId,
+		sessionId: sessionId, // Store sessionId in payload
+		username: username,
+		email: email || `${username}@example.com`,
+		exp,
+		iat: now
+	};
+	
+	const payloadStr = JSON.stringify(payload);
+	const encodedPayload = btoa(payloadStr);
+	
+	// Create a JWT-like token: header.payload.signature
+	// For session tokens, we use "session" as the header type
+	const header = btoa(JSON.stringify({ typ: 'JWT', alg: 'session' }));
+	
+	// Use sessionId as part of the signature for validation
+	// In a real implementation, this would be signed by the server
+	const signature = btoa(sessionId).slice(0, 16); // Truncate for consistency
+	
+	return `${header}.${encodedPayload}.${signature}`;
 }

@@ -154,8 +154,8 @@ class AbilityMapper:
         # Direct damage
         'DamageTargetEffect': ('DamageEffect', 'abilities.NewDamageEffect'),
         'DamageTargetControllerEffect': ('DamageEffect', 'abilities.NewDamageEffect'),
-        'DamageAllEffect': ('DamageEffect', 'abilities.NewDamageEffect'),
-        'DamageEachOtherEffect': ('DamageEffect', 'abilities.NewDamageEffect'),
+        'DamageAllEffect': ('TODO', 'nil'),  # Needs DamageAllEffect implementation with filter support
+        'DamageEachOtherEffect': ('TODO', 'nil'),  # Complex multi-target damage
 
         # Card draw
         'DrawCardSourceControllerEffect': ('DrawCardsEffect', 'abilities.NewDrawCardsEffect'),
@@ -310,7 +310,11 @@ class AbilityMapper:
     TARGET_MAP = {
         'TargetAnyTarget': 'abilities.NewAnyTargetFilter()',
         'TargetCreaturePermanent': 'abilities.NewCreatureTargetFilter()',
+        'TargetArtifactPermanent': 'abilities.NewArtifactTargetFilter()',
+        'TargetEnchantmentPermanent': 'abilities.NewEnchantmentTargetFilter()',
+        'TargetLandPermanent': 'abilities.NewLandTargetFilter()',
         'TargetPlayer': 'abilities.NewPlayerTargetFilter()',
+        'TargetPlayerOrPlaneswalker': 'abilities.NewAnyTargetFilter()',
         'TargetSpell': 'abilities.NewSpellTargetFilter()',
         'TargetPermanent': 'abilities.NewPermanentTargetFilter()',
         'TargetOpponent': 'abilities.NewOpponentTargetFilter()',
@@ -721,9 +725,30 @@ class JavaCardParser:
                     if params is not None:
                         effects.append((effect_class, params, go_func))
 
-                # Extract targets
-                for target_class, go_target in AbilityMapper.TARGET_MAP.items():
+                # Extract targets (with support for count parameter)
+                for target_class, go_filter in AbilityMapper.TARGET_MAP.items():
+                    # Check for parameterized constructor: new TargetArtifactPermanent(2)
+                    param_match = re.search(rf'new {target_class}\((\d+)\)', line)
+                    if param_match:
+                        count = param_match.group(1)
+                        # Create TargetRequirement with specific count
+                        go_target = f'abilities.NewTargetRequirement({count}, {count}, {go_filter})'
+                        targets.append(go_target)
+                        continue
+
+                    # Check for two-param constructor: new TargetCreaturePermanent(1, 4) (min, max)
+                    two_param_match = re.search(rf'new {target_class}\((\d+),\s*(\d+)\)', line)
+                    if two_param_match:
+                        min_count = two_param_match.group(1)
+                        max_count = two_param_match.group(2)
+                        go_target = f'abilities.NewTargetRequirement({min_count}, {max_count}, {go_filter})'
+                        targets.append(go_target)
+                        continue
+
+                    # Check for default constructor: new TargetCreaturePermanent()
                     if f'new {target_class}()' in line:
+                        # Default: 1 target required
+                        go_target = f'abilities.NewTargetRequirement(1, 1, {go_filter})'
                         targets.append(go_target)
 
             if effects or targets:
@@ -1310,18 +1335,19 @@ func init() {{
                 lines.append(f'\t\tAddEffect({effect_call}).')
                 continue
 
-            # Check if params are malformed (empty, double parens, Java constructors, etc)
+            # Check if params are malformed (double parens, Java constructors, etc)
             # If so, use TODO comment instead of generating broken code
-            if (re.search(r'\(\s*\)', params_clean) or          # Empty params
+            # NOTE: Empty string is OK for effects that take no parameters
+            if (re.search(r'\(\s*\)', params_clean) or          # Empty parens (malformed)
                 re.search(r'\{[^}]*\}', params_clean) or        # Unescaped braces
                 re.search(r'/\*.*?\*/', params_clean) or        # Contains TODO marker
                 re.search(r'\bnew\s+[A-Z]', params_clean) or    # Java 'new' keyword (unconverted constructor)
                 re.search(r'filter\b', params_clean) or         # Undefined filter variable
-                re.search(r'CounterType\.', params_clean) or    # Java enum reference
-                params_clean.strip() == ''):                     # Completely empty
+                re.search(r'CounterType\.', params_clean)):     # Java enum reference
                 # Generate TODO instead of broken code
                 lines.append(f'\t\t// TODO: {java_effect_class} with complex parameters')
             else:
+                # Empty string is OK - means no parameters
                 lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
 
         # Add targets
@@ -1423,18 +1449,19 @@ func init() {{
                 lines.append(f'\t\tAddEffect({effect_call}).')
                 continue
 
-            # Check if params are malformed (empty, double parens, Java constructors, etc)
+            # Check if params are malformed (double parens, Java constructors, etc)
             # If so, use TODO comment instead of generating broken code
-            if (re.search(r'\(\s*\)', params_clean) or          # Empty params
+            # NOTE: Empty string is OK for effects that take no parameters
+            if (re.search(r'\(\s*\)', params_clean) or          # Empty parens (malformed)
                 re.search(r'\{[^}]*\}', params_clean) or        # Unescaped braces
                 re.search(r'/\*.*?\*/', params_clean) or        # Contains TODO marker
                 re.search(r'\bnew\s+[A-Z]', params_clean) or    # Java 'new' keyword (unconverted constructor)
                 re.search(r'filter\b', params_clean) or         # Undefined filter variable
-                re.search(r'CounterType\.', params_clean) or    # Java enum reference
-                params_clean.strip() == ''):                     # Completely empty
+                re.search(r'CounterType\.', params_clean)):     # Java enum reference
                 # Generate TODO instead of broken code
                 lines.append(f'\t\t// TODO: {java_effect_class} with complex parameters')
             else:
+                # Empty string is OK - means no parameters
                 lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
 
         # Add targets
@@ -1545,6 +1572,24 @@ func init() {{
                 # Amount case: NewCreateTokenEffectAmount(token, amount)
                 return f'{token_var}, {amount}'
 
+        # Special handling for DamageAllEffect with dynamic values or filters
+        if effect_class == 'DamageAllEffect':
+            # Check if first param is a dynamic value (ends with Count, Value, etc)
+            if re.search(r'\w+(Count|Value)\.', params):
+                # Has dynamic value - return TODO
+                return '/* TODO: dynamic damage amount */'
+
+            # Extract numeric damage amount
+            amount_match = re.search(r'(\d+)', params)
+            if amount_match:
+                amount = amount_match.group(1)
+                # Check for filter parameter
+                filter_expr = self._extract_filter_from_target(params)
+                if filter_expr and filter_expr != 'abilities.NewAnyTargetFilter()':
+                    return f'{amount}, {filter_expr}'
+                return amount
+            return '1'
+
         # Special handling for MillCardsTargetEffect
         if effect_class == 'MillCardsTargetEffect':
             # Extract the number of cards to mill - just look for numeric parameter
@@ -1602,6 +1647,15 @@ func init() {{
             # Parse filter from params
             filter_expr = self._extract_filter_from_target(params)
             return f'{duration}, {filter_expr}'
+
+        # Special handling for DestroyTargetEffect - no parameters needed
+        if effect_class == 'DestroyTargetEffect':
+            return ''
+
+        # Special handling for DestroyAllEffect - extract filter only
+        if effect_class == 'DestroyAllEffect':
+            filter_expr = self._extract_filter_from_target(params)
+            return filter_expr if filter_expr else ''
 
         # Special handling for ReturnToHandTargetEffect - no parameters needed
         if effect_class == 'ReturnToHandTargetEffect':

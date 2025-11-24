@@ -141,9 +141,23 @@
 	}
 
 	// Load tables and online players on mount
+	// Wait for auth to be ready before making API calls
 	onMount(() => {
-		loadTables();
-		loadOnlinePlayers();
+		// Wait for auth to be authenticated and sessionId to be available
+		const checkAuth = () => {
+			if ($auth.isAuthenticated) {
+				// Give a small delay to ensure sessionId is restored
+				setTimeout(() => {
+					loadTables();
+					loadOnlinePlayers();
+				}, 100);
+			} else {
+				// Wait a bit and check again
+				setTimeout(checkAuth, 100);
+			}
+		};
+		
+		checkAuth();
 	});
 </script>
 

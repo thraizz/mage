@@ -152,9 +152,21 @@ message DeckSubmitRequest {
   DeckCardLists deck = 3;
 }
 
+// DeckCard contains a card name and its full metadata
+message DeckCard {
+  string name = 1;
+  string mana_cost = 2;      // e.g., "{2}{U}{U}"
+  string card_type = 3;      // e.g., "Creature - Human Wizard"
+  repeated string types = 4; // e.g., ["CREATURE", "INSTANT"]
+  repeated string colors = 5; // e.g., ["U", "W"] (W=White, U=Blue, B=Black, R=Red, G=Green)
+  string power = 6;          // For creatures, e.g., "2"
+  string toughness = 7;      // For creatures, e.g., "3"
+  int32 quantity = 8;        // Number of copies in the deck
+}
+
 message DeckCardLists {
-  repeated string main_deck = 1;
-  repeated string sideboard = 2;
+  repeated DeckCard main_deck = 1;
+  repeated DeckCard sideboard = 2;
 }
 
 message DeckSubmitResponse {

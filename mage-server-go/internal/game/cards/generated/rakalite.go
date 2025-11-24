@@ -22,7 +22,7 @@ func NewRakalite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
-		// TODO: ReturnToHandSourceEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

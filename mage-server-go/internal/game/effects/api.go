@@ -99,10 +99,10 @@ func (m *EffectManager) RemoveEffectsFromSource(sourceID string) {
 	if m.layerSystem == nil || sourceID == "" {
 		return
 	}
-	
+
 	// Collect effect IDs to remove
 	var toRemove []string
-	
+
 	m.layerSystem.mu.RLock()
 	for _, layerMap := range m.layerSystem.effects {
 		for id, effect := range layerMap {
@@ -114,7 +114,7 @@ func (m *EffectManager) RemoveEffectsFromSource(sourceID string) {
 		}
 	}
 	m.layerSystem.mu.RUnlock()
-	
+
 	// Remove effects
 	for _, id := range toRemove {
 		m.layerSystem.RemoveEffect(id)

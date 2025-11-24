@@ -5,10 +5,11 @@
 ## 🚀 Features
 
 - ⚡ **Lightning Fast** - SvelteKit compiles to vanilla JS (~3KB runtime)
-- 🔄 **Real-time** - WebSocket connection to Go server
+- 🔄 **Real-time** - gRPC + WebSocket connection to Go server
 - 🎨 **Beautiful UI** - Gradient cards, smooth animations
 - 📱 **Responsive** - Works on desktop and mobile
-- 🎯 **Type-safe** - Full TypeScript support
+- 🎯 **Type-safe** - Full TypeScript support with auto-generated proto types
+- ✅ **Production Ready** - Full gRPC integration with server
 
 ## 🏗️ Tech Stack
 
@@ -16,7 +17,8 @@
 - **Language**: TypeScript
 - **Build Tool**: Vite 7
 - **Package Manager**: Bun
-- **Networking**: WebSocket (native)
+- **Networking**: gRPC over HTTP/JSON + WebSocket
+- **Protocol**: Protocol Buffers (auto-generated TypeScript)
 - **Styling**: Vanilla CSS (no framework overhead)
 
 ## 📦 Installation
@@ -37,14 +39,14 @@ bun run preview
 
 ## 🎯 Quick Start
 
-### 1. Start the Go WebSocket Server
+### 1. Start the Go gRPC Server
 
 ```bash
 cd ../mage-server-go
-go run cmd/web-demo/main.go
+go run cmd/server/main.go
 ```
 
-Server will start on `ws://localhost:8080/ws`
+Server will start on `http://localhost:17171` (gRPC) and WebSocket endpoint (TBD)
 
 ### 2. Start the Svelte Client
 
@@ -57,31 +59,47 @@ Client will be available at `http://localhost:5173`
 ### 3. Play!
 
 1. Open browser to `http://localhost:5173`
-2. Enter your player ID (e.g., "player1")
-3. Click "Create New Game" or "Join Game"
-4. See demo battlefield with creatures
-5. Click cards to select them
-6. Click "Attack" to declare attackers
-7. Click "Pass Priority" to end turn
+2. Register a new account or login as guest
+3. Browse tables in the lobby
+4. Create a new table or join an existing one
+5. Upload a deck from your collection
+6. Wait for other players or start the game
+7. Play Magic: The Gathering online!
 
-## 🎮 Demo Features
+## 🎮 Current Features
 
-The demo includes:
+The client currently supports:
 
-- **4 creatures on battlefield**:
-  - Grizzly Bears (2/2)
-  - Serra Angel (4/4, Flying, Vigilance)
-  - Shivan Dragon (5/5, Flying)
-  - Llanowar Elves (1/1, Tapped)
+- **✅ User Authentication**:
+  - Registration with email
+  - Login with credentials
+  - Guest login
+  - Session persistence with JWT
 
-- **2 players**:
-  - Alice (20 life)
-  - Bob (20 life)
+- **✅ Lobby System**:
+  - View all active tables
+  - Create new tables with custom settings
+  - Join existing tables
+  - View online players
+  - Real-time chat messaging
 
-- **Combat actions**:
-  - Declare attackers
-  - Visual feedback (red glow for attacking)
-  - Tap creatures when attacking
+- **✅ Deck Management**:
+  - List your decks
+  - Upload new decks
+  - View deck details
+  - Delete decks
+  - Filter by format
+
+- **✅ Table Lobby**:
+  - View table details
+  - Toggle ready status
+  - Leave table
+  - Start game (host)
+
+- **🔜 Game Play** (requires WebSocket):
+  - Real-time game state updates
+  - Declare attackers/blockers
+  - Cast spells and activate abilities
   - Pass priority / end turn
 
 ## 📁 Project Structure

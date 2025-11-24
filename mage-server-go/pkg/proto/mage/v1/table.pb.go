@@ -1437,17 +1437,118 @@ func (x *DeckSubmitRequest) GetDeck() *DeckCardLists {
 	return nil
 }
 
+// DeckCard contains a card name and its full metadata
+type DeckCard struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	ManaCost      string                 `protobuf:"bytes,2,opt,name=mana_cost,json=manaCost,proto3" json:"mana_cost,omitempty"` // e.g., "{2}{U}{U}"
+	CardType      string                 `protobuf:"bytes,3,opt,name=card_type,json=cardType,proto3" json:"card_type,omitempty"` // e.g., "Creature - Human Wizard"
+	Types         []string               `protobuf:"bytes,4,rep,name=types,proto3" json:"types,omitempty"`                       // e.g., ["CREATURE", "INSTANT"]
+	Colors        []string               `protobuf:"bytes,5,rep,name=colors,proto3" json:"colors,omitempty"`                     // e.g., ["U", "W"] (W=White, U=Blue, B=Black, R=Red, G=Green)
+	Power         string                 `protobuf:"bytes,6,opt,name=power,proto3" json:"power,omitempty"`                       // For creatures, e.g., "2"
+	Toughness     string                 `protobuf:"bytes,7,opt,name=toughness,proto3" json:"toughness,omitempty"`               // For creatures, e.g., "3"
+	Quantity      int32                  `protobuf:"varint,8,opt,name=quantity,proto3" json:"quantity,omitempty"`                // Number of copies in the deck
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeckCard) Reset() {
+	*x = DeckCard{}
+	mi := &file_mage_v1_table_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeckCard) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeckCard) ProtoMessage() {}
+
+func (x *DeckCard) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_table_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeckCard.ProtoReflect.Descriptor instead.
+func (*DeckCard) Descriptor() ([]byte, []int) {
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *DeckCard) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DeckCard) GetManaCost() string {
+	if x != nil {
+		return x.ManaCost
+	}
+	return ""
+}
+
+func (x *DeckCard) GetCardType() string {
+	if x != nil {
+		return x.CardType
+	}
+	return ""
+}
+
+func (x *DeckCard) GetTypes() []string {
+	if x != nil {
+		return x.Types
+	}
+	return nil
+}
+
+func (x *DeckCard) GetColors() []string {
+	if x != nil {
+		return x.Colors
+	}
+	return nil
+}
+
+func (x *DeckCard) GetPower() string {
+	if x != nil {
+		return x.Power
+	}
+	return ""
+}
+
+func (x *DeckCard) GetToughness() string {
+	if x != nil {
+		return x.Toughness
+	}
+	return ""
+}
+
+func (x *DeckCard) GetQuantity() int32 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
 type DeckCardLists struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	MainDeck      []string               `protobuf:"bytes,1,rep,name=main_deck,json=mainDeck,proto3" json:"main_deck,omitempty"`
-	Sideboard     []string               `protobuf:"bytes,2,rep,name=sideboard,proto3" json:"sideboard,omitempty"`
+	MainDeck      []*DeckCard            `protobuf:"bytes,1,rep,name=main_deck,json=mainDeck,proto3" json:"main_deck,omitempty"`
+	Sideboard     []*DeckCard            `protobuf:"bytes,2,rep,name=sideboard,proto3" json:"sideboard,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeckCardLists) Reset() {
 	*x = DeckCardLists{}
-	mi := &file_mage_v1_table_proto_msgTypes[22]
+	mi := &file_mage_v1_table_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1459,7 +1560,7 @@ func (x *DeckCardLists) String() string {
 func (*DeckCardLists) ProtoMessage() {}
 
 func (x *DeckCardLists) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[22]
+	mi := &file_mage_v1_table_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1472,17 +1573,17 @@ func (x *DeckCardLists) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckCardLists.ProtoReflect.Descriptor instead.
 func (*DeckCardLists) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{22}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{23}
 }
 
-func (x *DeckCardLists) GetMainDeck() []string {
+func (x *DeckCardLists) GetMainDeck() []*DeckCard {
 	if x != nil {
 		return x.MainDeck
 	}
 	return nil
 }
 
-func (x *DeckCardLists) GetSideboard() []string {
+func (x *DeckCardLists) GetSideboard() []*DeckCard {
 	if x != nil {
 		return x.Sideboard
 	}
@@ -1499,7 +1600,7 @@ type DeckSubmitResponse struct {
 
 func (x *DeckSubmitResponse) Reset() {
 	*x = DeckSubmitResponse{}
-	mi := &file_mage_v1_table_proto_msgTypes[23]
+	mi := &file_mage_v1_table_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1511,7 +1612,7 @@ func (x *DeckSubmitResponse) String() string {
 func (*DeckSubmitResponse) ProtoMessage() {}
 
 func (x *DeckSubmitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[23]
+	mi := &file_mage_v1_table_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1524,7 +1625,7 @@ func (x *DeckSubmitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckSubmitResponse.ProtoReflect.Descriptor instead.
 func (*DeckSubmitResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{23}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *DeckSubmitResponse) GetSuccess() bool {
@@ -1554,7 +1655,7 @@ type DeckSaveRequest struct {
 
 func (x *DeckSaveRequest) Reset() {
 	*x = DeckSaveRequest{}
-	mi := &file_mage_v1_table_proto_msgTypes[24]
+	mi := &file_mage_v1_table_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1566,7 +1667,7 @@ func (x *DeckSaveRequest) String() string {
 func (*DeckSaveRequest) ProtoMessage() {}
 
 func (x *DeckSaveRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[24]
+	mi := &file_mage_v1_table_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1579,7 +1680,7 @@ func (x *DeckSaveRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckSaveRequest.ProtoReflect.Descriptor instead.
 func (*DeckSaveRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{24}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *DeckSaveRequest) GetSessionId() string {
@@ -1628,7 +1729,7 @@ type DeckSaveResponse struct {
 
 func (x *DeckSaveResponse) Reset() {
 	*x = DeckSaveResponse{}
-	mi := &file_mage_v1_table_proto_msgTypes[25]
+	mi := &file_mage_v1_table_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1640,7 +1741,7 @@ func (x *DeckSaveResponse) String() string {
 func (*DeckSaveResponse) ProtoMessage() {}
 
 func (x *DeckSaveResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[25]
+	mi := &file_mage_v1_table_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1653,7 +1754,7 @@ func (x *DeckSaveResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckSaveResponse.ProtoReflect.Descriptor instead.
 func (*DeckSaveResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{25}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *DeckSaveResponse) GetSuccess() bool {
@@ -1687,7 +1788,7 @@ type DeckListRequest struct {
 
 func (x *DeckListRequest) Reset() {
 	*x = DeckListRequest{}
-	mi := &file_mage_v1_table_proto_msgTypes[26]
+	mi := &file_mage_v1_table_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1699,7 +1800,7 @@ func (x *DeckListRequest) String() string {
 func (*DeckListRequest) ProtoMessage() {}
 
 func (x *DeckListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[26]
+	mi := &file_mage_v1_table_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1712,7 +1813,7 @@ func (x *DeckListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckListRequest.ProtoReflect.Descriptor instead.
 func (*DeckListRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{26}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *DeckListRequest) GetSessionId() string {
@@ -1745,7 +1846,7 @@ type DeckInfo struct {
 
 func (x *DeckInfo) Reset() {
 	*x = DeckInfo{}
-	mi := &file_mage_v1_table_proto_msgTypes[27]
+	mi := &file_mage_v1_table_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1757,7 +1858,7 @@ func (x *DeckInfo) String() string {
 func (*DeckInfo) ProtoMessage() {}
 
 func (x *DeckInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[27]
+	mi := &file_mage_v1_table_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1770,7 +1871,7 @@ func (x *DeckInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckInfo.ProtoReflect.Descriptor instead.
 func (*DeckInfo) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{27}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *DeckInfo) GetId() int64 {
@@ -1840,7 +1941,7 @@ type DeckListResponse struct {
 
 func (x *DeckListResponse) Reset() {
 	*x = DeckListResponse{}
-	mi := &file_mage_v1_table_proto_msgTypes[28]
+	mi := &file_mage_v1_table_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1852,7 +1953,7 @@ func (x *DeckListResponse) String() string {
 func (*DeckListResponse) ProtoMessage() {}
 
 func (x *DeckListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[28]
+	mi := &file_mage_v1_table_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1865,7 +1966,7 @@ func (x *DeckListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckListResponse.ProtoReflect.Descriptor instead.
 func (*DeckListResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{28}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *DeckListResponse) GetSuccess() bool {
@@ -1899,7 +2000,7 @@ type DeckDeleteRequest struct {
 
 func (x *DeckDeleteRequest) Reset() {
 	*x = DeckDeleteRequest{}
-	mi := &file_mage_v1_table_proto_msgTypes[29]
+	mi := &file_mage_v1_table_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1911,7 +2012,7 @@ func (x *DeckDeleteRequest) String() string {
 func (*DeckDeleteRequest) ProtoMessage() {}
 
 func (x *DeckDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[29]
+	mi := &file_mage_v1_table_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1924,7 +2025,7 @@ func (x *DeckDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckDeleteRequest.ProtoReflect.Descriptor instead.
 func (*DeckDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{29}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *DeckDeleteRequest) GetSessionId() string {
@@ -1951,7 +2052,7 @@ type DeckDeleteResponse struct {
 
 func (x *DeckDeleteResponse) Reset() {
 	*x = DeckDeleteResponse{}
-	mi := &file_mage_v1_table_proto_msgTypes[30]
+	mi := &file_mage_v1_table_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1963,7 +2064,7 @@ func (x *DeckDeleteResponse) String() string {
 func (*DeckDeleteResponse) ProtoMessage() {}
 
 func (x *DeckDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[30]
+	mi := &file_mage_v1_table_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1976,7 +2077,7 @@ func (x *DeckDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckDeleteResponse.ProtoReflect.Descriptor instead.
 func (*DeckDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{30}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *DeckDeleteResponse) GetSuccess() bool {
@@ -2003,7 +2104,7 @@ type DeckGetRequest struct {
 
 func (x *DeckGetRequest) Reset() {
 	*x = DeckGetRequest{}
-	mi := &file_mage_v1_table_proto_msgTypes[31]
+	mi := &file_mage_v1_table_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2015,7 +2116,7 @@ func (x *DeckGetRequest) String() string {
 func (*DeckGetRequest) ProtoMessage() {}
 
 func (x *DeckGetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[31]
+	mi := &file_mage_v1_table_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2028,7 +2129,7 @@ func (x *DeckGetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckGetRequest.ProtoReflect.Descriptor instead.
 func (*DeckGetRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{31}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *DeckGetRequest) GetSessionId() string {
@@ -2057,7 +2158,7 @@ type DeckGetResponse struct {
 
 func (x *DeckGetResponse) Reset() {
 	*x = DeckGetResponse{}
-	mi := &file_mage_v1_table_proto_msgTypes[32]
+	mi := &file_mage_v1_table_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2069,7 +2170,7 @@ func (x *DeckGetResponse) String() string {
 func (*DeckGetResponse) ProtoMessage() {}
 
 func (x *DeckGetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_table_proto_msgTypes[32]
+	mi := &file_mage_v1_table_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2082,7 +2183,7 @@ func (x *DeckGetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeckGetResponse.ProtoReflect.Descriptor instead.
 func (*DeckGetResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_table_proto_rawDescGZIP(), []int{32}
+	return file_mage_v1_table_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *DeckGetResponse) GetSuccess() bool {
@@ -2237,10 +2338,19 @@ const file_mage_v1_table_proto_rawDesc = "" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x19\n" +
 	"\btable_id\x18\x02 \x01(\tR\atableId\x12*\n" +
-	"\x04deck\x18\x03 \x01(\v2\x16.mage.v1.DeckCardListsR\x04deck\"J\n" +
-	"\rDeckCardLists\x12\x1b\n" +
-	"\tmain_deck\x18\x01 \x03(\tR\bmainDeck\x12\x1c\n" +
-	"\tsideboard\x18\x02 \x03(\tR\tsideboard\"D\n" +
+	"\x04deck\x18\x03 \x01(\v2\x16.mage.v1.DeckCardListsR\x04deck\"\xd6\x01\n" +
+	"\bDeckCard\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
+	"\tmana_cost\x18\x02 \x01(\tR\bmanaCost\x12\x1b\n" +
+	"\tcard_type\x18\x03 \x01(\tR\bcardType\x12\x14\n" +
+	"\x05types\x18\x04 \x03(\tR\x05types\x12\x16\n" +
+	"\x06colors\x18\x05 \x03(\tR\x06colors\x12\x14\n" +
+	"\x05power\x18\x06 \x01(\tR\x05power\x12\x1c\n" +
+	"\ttoughness\x18\a \x01(\tR\ttoughness\x12\x1a\n" +
+	"\bquantity\x18\b \x01(\x05R\bquantity\"p\n" +
+	"\rDeckCardLists\x12.\n" +
+	"\tmain_deck\x18\x01 \x03(\v2\x11.mage.v1.DeckCardR\bmainDeck\x12/\n" +
+	"\tsideboard\x18\x02 \x03(\v2\x11.mage.v1.DeckCardR\tsideboard\"D\n" +
 	"\x12DeckSubmitResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\"\xb3\x01\n" +
@@ -2303,7 +2413,7 @@ func file_mage_v1_table_proto_rawDescGZIP() []byte {
 	return file_mage_v1_table_proto_rawDescData
 }
 
-var file_mage_v1_table_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
+var file_mage_v1_table_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
 var file_mage_v1_table_proto_goTypes = []any{
 	(*RoomCreateTableRequest)(nil),             // 0: mage.v1.RoomCreateTableRequest
 	(*RoomCreateTableResponse)(nil),            // 1: mage.v1.RoomCreateTableResponse
@@ -2327,32 +2437,35 @@ var file_mage_v1_table_proto_goTypes = []any{
 	(*TableIsOwnerRequest)(nil),                // 19: mage.v1.TableIsOwnerRequest
 	(*TableIsOwnerResponse)(nil),               // 20: mage.v1.TableIsOwnerResponse
 	(*DeckSubmitRequest)(nil),                  // 21: mage.v1.DeckSubmitRequest
-	(*DeckCardLists)(nil),                      // 22: mage.v1.DeckCardLists
-	(*DeckSubmitResponse)(nil),                 // 23: mage.v1.DeckSubmitResponse
-	(*DeckSaveRequest)(nil),                    // 24: mage.v1.DeckSaveRequest
-	(*DeckSaveResponse)(nil),                   // 25: mage.v1.DeckSaveResponse
-	(*DeckListRequest)(nil),                    // 26: mage.v1.DeckListRequest
-	(*DeckInfo)(nil),                           // 27: mage.v1.DeckInfo
-	(*DeckListResponse)(nil),                   // 28: mage.v1.DeckListResponse
-	(*DeckDeleteRequest)(nil),                  // 29: mage.v1.DeckDeleteRequest
-	(*DeckDeleteResponse)(nil),                 // 30: mage.v1.DeckDeleteResponse
-	(*DeckGetRequest)(nil),                     // 31: mage.v1.DeckGetRequest
-	(*DeckGetResponse)(nil),                    // 32: mage.v1.DeckGetResponse
-	(*MatchOptions)(nil),                       // 33: mage.v1.MatchOptions
+	(*DeckCard)(nil),                           // 22: mage.v1.DeckCard
+	(*DeckCardLists)(nil),                      // 23: mage.v1.DeckCardLists
+	(*DeckSubmitResponse)(nil),                 // 24: mage.v1.DeckSubmitResponse
+	(*DeckSaveRequest)(nil),                    // 25: mage.v1.DeckSaveRequest
+	(*DeckSaveResponse)(nil),                   // 26: mage.v1.DeckSaveResponse
+	(*DeckListRequest)(nil),                    // 27: mage.v1.DeckListRequest
+	(*DeckInfo)(nil),                           // 28: mage.v1.DeckInfo
+	(*DeckListResponse)(nil),                   // 29: mage.v1.DeckListResponse
+	(*DeckDeleteRequest)(nil),                  // 30: mage.v1.DeckDeleteRequest
+	(*DeckDeleteResponse)(nil),                 // 31: mage.v1.DeckDeleteResponse
+	(*DeckGetRequest)(nil),                     // 32: mage.v1.DeckGetRequest
+	(*DeckGetResponse)(nil),                    // 33: mage.v1.DeckGetResponse
+	(*MatchOptions)(nil),                       // 34: mage.v1.MatchOptions
 }
 var file_mage_v1_table_proto_depIdxs = []int32{
-	33, // 0: mage.v1.RoomCreateTableRequest.match_options:type_name -> mage.v1.MatchOptions
+	34, // 0: mage.v1.RoomCreateTableRequest.match_options:type_name -> mage.v1.MatchOptions
 	3,  // 1: mage.v1.RoomCreateTournamentRequest.tournament_options:type_name -> mage.v1.TournamentOptions
-	22, // 2: mage.v1.DeckSubmitRequest.deck:type_name -> mage.v1.DeckCardLists
-	22, // 3: mage.v1.DeckSaveRequest.deck:type_name -> mage.v1.DeckCardLists
-	27, // 4: mage.v1.DeckListResponse.decks:type_name -> mage.v1.DeckInfo
-	27, // 5: mage.v1.DeckGetResponse.info:type_name -> mage.v1.DeckInfo
-	22, // 6: mage.v1.DeckGetResponse.deck:type_name -> mage.v1.DeckCardLists
-	7,  // [7:7] is the sub-list for method output_type
-	7,  // [7:7] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	23, // 2: mage.v1.DeckSubmitRequest.deck:type_name -> mage.v1.DeckCardLists
+	22, // 3: mage.v1.DeckCardLists.main_deck:type_name -> mage.v1.DeckCard
+	22, // 4: mage.v1.DeckCardLists.sideboard:type_name -> mage.v1.DeckCard
+	23, // 5: mage.v1.DeckSaveRequest.deck:type_name -> mage.v1.DeckCardLists
+	28, // 6: mage.v1.DeckListResponse.decks:type_name -> mage.v1.DeckInfo
+	28, // 7: mage.v1.DeckGetResponse.info:type_name -> mage.v1.DeckInfo
+	23, // 8: mage.v1.DeckGetResponse.deck:type_name -> mage.v1.DeckCardLists
+	9,  // [9:9] is the sub-list for method output_type
+	9,  // [9:9] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_table_proto_init() }
@@ -2367,7 +2480,7 @@ func file_mage_v1_table_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_table_proto_rawDesc), len(file_mage_v1_table_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   33,
+			NumMessages:   34,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

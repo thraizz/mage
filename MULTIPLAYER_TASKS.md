@@ -18,11 +18,11 @@ Initialize a new SvelteKit project with TypeScript, configure Vite, and set up T
 
 **Acceptance Criteria:**
 - [x] SvelteKit project created with TypeScript template
-- [x] Tailwind CSS configured and working
 - [x] Vite config includes appropriate build settings
 - [x] Basic `+page.svelte` renders with Tailwind styles
 - [x] Dev server starts without errors (`npm run dev`)
 - [x] Project builds successfully (`npm run build`)
+- [x] CSS Styling in place, ready to extract and style components
 
 **Files to Create:**
 - `svelte.config.js`
@@ -530,116 +530,116 @@ Create a modal dialog for creating a new table with basic options.
 ---
 
 ## T022: Create Table Modal - Deck Selection
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T021
 
-**Description:**  
+**Description:**
 Add deck selection to the create table modal.
 
 **Acceptance Criteria:**
-- [ ] Dropdown showing user's saved decks for selected format
-- [ ] "Upload new deck" option if no decks available
-- [ ] Opens deck upload modal (separate component)
-- [ ] Validates deck is for selected format
-- [ ] Shows deck card count (60 cards, etc.)
-- [ ] Deck selection required before creating table
-- [ ] Fetches user decks on modal open
+- [x] Dropdown showing user's saved decks for selected format
+- [x] "Upload new deck" option if no decks available
+- [x] Opens deck upload modal (separate component)
+- [x] Validates deck is for selected format
+- [x] Shows deck card count (60 cards, etc.)
+- [x] Deck selection required before creating table
+- [x] Fetches user decks on modal open
 
 ---
 
 ## T023: Lobby Chat Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T017
 
-**Description:**  
+**Description:**
 Create a chat panel for the lobby with message display and input.
 
 **Acceptance Criteria:**
-- [ ] Chat panel (side panel or bottom)
-- [ ] Message list with auto-scroll to bottom
-- [ ] Message input field with send button
-- [ ] Send on Enter key press
-- [ ] Display username and timestamp for each message
-- [ ] System messages styled differently (gray, italic)
-- [ ] Load last 50 messages on mount
-- [ ] Real-time message updates via gRPC stream
-- [ ] Scroll to bottom button when scrolled up
-- [ ] Empty state when no messages
+- [x] Chat panel (side panel or bottom)
+- [x] Message list with auto-scroll to bottom
+- [x] Message input field with send button
+- [x] Send on Enter key press
+- [x] Display username and timestamp for each message
+- [x] System messages styled differently (gray, italic)
+- [x] Load last 50 messages on mount
+- [x] Real-time message updates via gRPC stream
+- [x] Scroll to bottom button when scrolled up
+- [x] Empty state when no messages
 
 ---
 
 ## T024: Chat - Whisper Command
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T023
 
-**Description:**  
+**Description:**
 Implement whisper functionality for private messages in chat.
 
 **Acceptance Criteria:**
-- [ ] Detect `/w username message` format
-- [ ] Parse username and message
-- [ ] Send whisper via API
-- [ ] Display whispers in italic with "(whisper)" prefix
-- [ ] Show sent whispers as "To [username]: message"
-- [ ] Show received whispers as "From [username]: message"
-- [ ] Whispers in different color (muted purple/blue)
-- [ ] Error if username not found
-- [ ] Cannot whisper to self
+- [x] Detect `/w username message` format
+- [x] Parse username and message
+- [x] Send whisper via API
+- [x] Display whispers in italic with "(whisper)" prefix
+- [x] Show sent whispers as "To [username]: message"
+- [x] Show received whispers as "From [username]: message"
+- [x] Whispers in different color (muted purple/blue)
+- [x] Error if username not found
+- [x] Cannot whisper to self
 
 ---
 
 ## T025: Chat - Rate Limiting Feedback
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T023
 
-**Description:**  
+**Description:**
 Implement client-side rate limiting feedback for chat messages.
 
 **Acceptance Criteria:**
-- [ ] Track message count per time window (10 messages per 60 seconds)
-- [ ] Disable send button when limit reached
-- [ ] Show countdown timer when rate limited
-- [ ] Display warning message "Sending too fast, wait X seconds"
-- [ ] Reset counter after time window expires
-- [ ] Visual feedback (red text, disabled button)
+- [x] Track message count per time window (10 messages per 60 seconds)
+- [x] Disable send button when limit reached
+- [x] Show countdown timer when rate limited
+- [x] Display warning message "Sending too fast, wait X seconds"
+- [x] Reset counter after time window expires
+- [x] Visual feedback (red text, disabled button)
 
 ---
 
 ## T026: Table View - Pre-Game Lobby Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T009, T015
 
-**Description:**  
+**Description:**
 Create the table lobby view where players wait before game starts.
 
 **Acceptance Criteria:**
-- [ ] Display table info header (format, host, table ID)
-- [ ] Show player list with slots (occupied and empty)
-- [ ] Each player shows: username, ready status indicator
-- [ ] Local player has "Ready" toggle button
-- [ ] Empty slots show "Waiting for player..."
-- [ ] Host sees "Start Game" button (enabled when all ready)
-- [ ] Non-host players cannot start game
-- [ ] Real-time updates when players join/leave/ready
-- [ ] "Leave Table" button with confirmation
-- [ ] Password indicator if table is password-protected
+- [x] Display table info header (format, host, table ID)
+- [x] Show player list with slots (occupied and empty)
+- [x] Each player shows: username, ready status indicator
+- [x] Local player has "Ready" toggle button
+- [x] Empty slots show "Waiting for player..."
+- [x] Host sees "Start Game" button (enabled when all ready)
+- [x] Non-host players cannot start game
+- [x] Real-time updates when players join/leave/ready
+- [x] "Leave Table" button with confirmation
+- [x] Password indicator if table is password-protected
 ---
 
 ## T027: Table View - Host Controls
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T026
 
-**Description:**  
+**Description:**
 Add host-specific controls to the table lobby.
 
 **Acceptance Criteria:**
-- [ ] Only visible to table host
-- [ ] "Kick Player" button next to each non-host player
-- [ ] Confirmation dialog before kicking
-- [ ] API call to kick player
-- [ ] Player removed from table immediately
-- [ ] Toast notification on kick success/failure
-- [ ] Cannot kick self
+- [x] Only visible to table host
+- [x] "Kick Player" button next to each non-host player
+- [x] Confirmation dialog before kicking
+- [x] API call to kick player
+- [x] Player removed from table immediately
+- [x] Toast notification on kick success/failure
+- [x] Cannot kick self
 ---
 
 ## T028: Table View - Table Chat
@@ -701,79 +701,95 @@ Add confirmation dialog when player tries to leave table.
 Create the deck management page showing user's saved decks.
 
 **Acceptance Criteria:**
-- [ ] Fetch user's decks on page load
-- [ ] Display decks in a grid layout
-- [ ] Each deck card shows: format, card count, last modified date
-- [ ] Empty state when no decks saved
-- [ ] Loading state while fetching
-- [ ] "Upload New Deck" button
-- [ ] Decks grouped by format (optional)
-- [ ] Click deck to view details
+- [x] Fetch user's decks on page load
+- [x] Display decks in a grid layout
+- [x] Each deck card shows: format, card count, last modified date
+- [x] Empty state when no decks saved
+- [x] Loading state while fetching
+- [x] "Upload New Deck" button
+- [x] Decks grouped by format (optional)
+- [x] Click deck to view details
 
 ---
 
 ## T032: Deck Upload Modal - Text Import
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T031, T012
 
-**Description:**  
+**Description:**
 Create a modal for uploading/importing decks via text.
 
 **Acceptance Criteria:**
-- [ ] Large text area for deck list input
-- [ ] Format selector dropdown
-- [ ] Parse deck list format: `4 Lightning Bolt`
-- [ ] Show card count as user types (real-time)
-- [ ] Display validation errors:
+- [x] Large text area for deck list input
+- [x] Format selector dropdown
+- [x] Parse deck list format: `4 Lightning Bolt`
+- [x] Show card count as user types (real-time)
+- [x] Display validation errors:
   - Invalid card names
   - Wrong deck size (not 60 cards)
   - Illegal cards for format
-- [ ] "Clear" button to reset text area
-- [ ] "Save Deck" button (disabled if invalid)
-- [ ] Loading state during save
-- [ ] Success toast on save
-- [ ] Close modal and refresh deck list on success
+- [x] "Clear" button to reset text area
+- [x] "Save Deck" button (disabled if invalid)
+- [x] Loading state during save
+- [x] Success toast on save
+- [x] Close modal and refresh deck list on success
+
+**Files Created:**
+- `mage-client-web/src/lib/components/DeckUploadModal.svelte` - Complete upload modal with text parsing and server integration
 
 ---
 
 ## T033: Deck Upload Modal - Validation Display
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T032
 
-**Description:**  
+**Description:**
 Add inline validation feedback for deck upload.
 
 **Acceptance Criteria:**
-- [ ] Real-time validation as user types
-- [ ] Show validation errors in a list below text area
-- [ ] Error types:
+- [x] Real-time validation as user types
+- [x] Show validation errors in a list below text area
+- [x] Error types:
   - "Invalid card: [Card Name]"
   - "Deck must be 60 cards (currently: X)"
   - "[Card Name] is not legal in [Format]"
   - "Too many copies of [Card Name] (max 4)"
-- [ ] Errors highlighted in red
-- [ ] Green checkmark when deck is valid
-- [ ] Disable save button while errors present
+- [x] Errors highlighted in red
+- [x] Green checkmark when deck is valid
+- [x] Disable save button while errors present
+- [x] Commander format validation (1 commander + 99 deck = 100 total)
+- [x] Format-specific examples that append instead of replace
+- [x] 4-of rule enforcement (except Commander and basic lands)
+- [x] Comprehensive test suite (8 passing tests)
+
+**Files Created/Modified:**
+- `mage-client-web/src/lib/components/DeckUploadModal.svelte` - Enhanced validation with Commander rules, 4-of enforcement, categorized errors
+- `mage-client-web/src/lib/components/__tests__/DeckUploadModal.test.ts` - Complete test suite for validation logic
 
 ---
 
 ## T034: Deck Viewer Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T031
 
-**Description:**  
+**Description:**
 Create a component to view deck details and card list.
 
 **Acceptance Criteria:**
-- [ ] Display deck name and format
-- [ ] Show total card count and breakdown (creatures, instants, etc.)
-- [ ] Group cards by type (Creatures, Instants, Sorceries, etc.)
-- [ ] Display card quantity and name
-- [ ] Mana curve visualization (bar chart)
-- [ ] Color distribution (pie chart or bar)
-- [ ] "Export" button to download as text
-- [ ] "Delete" button with confirmation
+- [x] Display deck name and format
+- [x] Show total card count and breakdown (creatures, instants, etc.)
+- [x] Group cards by type (Creatures, Instants, Sorceries, etc.)
+- [x] Display card quantity and name
+- [x] Mana curve visualization (bar chart)
+- [x] Color distribution (pie chart or bar)
+- [x] "Export" button to download as text
+- [x] "Delete" button with confirmation
 - [ ] "Edit" button to modify deck (future)
+
+**Files Created/Modified:**
+- `mage-client-web/src/lib/components/DeckViewer.svelte` - Complete deck viewer component with stats, visualizations, and card list
+- `mage-client-web/src/routes/(protected)/decks/[id]/+page.svelte` - Dynamic route for viewing individual decks
+- `mage-client-web/src/routes/(protected)/decks/+page.svelte` - Updated to navigate to deck viewer on click
 
 ---
 

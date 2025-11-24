@@ -378,6 +378,137 @@ func (gc *GameContext) UntapPermanent(permanentID uuid.UUID) error {
 	return fmt.Errorf("permanent %s not found", permanentID)
 }
 
+// SacrificePermanent sacrifices a permanent (moves to graveyard, triggers dies events).
+func (gc *GameContext) SacrificePermanent(permanentID uuid.UUID) error {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return fmt.Errorf("game %s not found", gc.gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	// Find and remove the permanent from the battlefield
+	for i, permanent := range gameState.battlefield {
+		if permanent.ID == permanentID.String() {
+			// Remove from battlefield
+			gameState.battlefield = append(gameState.battlefield[:i], gameState.battlefield[i+1:]...)
+
+			// Add to graveyard (tokens don't go to graveyard)
+			if !permanent.IsToken {
+				// Find the owner and add to their graveyard
+				if owner, ok := gameState.players[permanent.OwnerID]; ok {
+					owner.Graveyard = append(owner.Graveyard, permanent)
+					gc.logger.Info("permanent sacrificed and sent to graveyard",
+						zap.String("permanent", permanent.Name),
+						zap.String("owner", permanent.OwnerID))
+				}
+			} else {
+				gc.logger.Info("token sacrificed and removed from game",
+					zap.String("token", permanent.Name),
+					zap.String("owner", permanent.OwnerID))
+			}
+
+			// TODO: Trigger dies events for creatures/planeswalkers
+			return nil
+		}
+	}
+
+	return fmt.Errorf("permanent %s not found", permanentID)
+}
+
+// DiscardCard discards a card from a player's hand.
+func (gc *GameContext) DiscardCard(playerID uuid.UUID, cardID uuid.UUID) error {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return fmt.Errorf("game %s not found", gc.gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	player, ok := gameState.players[playerID.String()]
+	if !ok {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Find and remove the card from hand
+	for i, card := range player.Hand {
+		if card.ID == cardID.String() {
+			// Remove from hand
+			player.Hand = append(player.Hand[:i], player.Hand[i+1:]...)
+
+			// Add to graveyard
+			player.Graveyard = append(player.Graveyard, card)
+
+			gc.logger.Info("card discarded",
+				zap.String("card", card.Name),
+				zap.String("player", playerID.String()))
+
+			// TODO: Trigger discard events
+			return nil
+		}
+	}
+
+	return fmt.Errorf("card %s not found in player's hand", cardID)
+}
+
+// GetPlayerHand returns the cards in a player's hand.
+func (gc *GameContext) GetPlayerHand(playerID uuid.UUID) ([]interface{}, error) {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return nil, fmt.Errorf("game %s not found", gc.gameID)
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	player, ok := gameState.players[playerID.String()]
+	if !ok {
+		return nil, fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Convert to []interface{}
+	hand := make([]interface{}, len(player.Hand))
+	for i, card := range player.Hand {
+		hand[i] = card
+	}
+
+	return hand, nil
+}
+
+// GetPermanentsControlledByPlayer returns all permanents controlled by a player.
+func (gc *GameContext) GetPermanentsControlledByPlayer(playerID uuid.UUID) ([]interface{}, error) {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return nil, fmt.Errorf("game %s not found", gc.gameID)
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	permanents := make([]interface{}, 0)
+	for _, permanent := range gameState.battlefield {
+		if permanent.ControllerID == playerID.String() {
+			permanents = append(permanents, permanent)
+		}
+	}
+
+	return permanents, nil
+}
+
 // ==============================================================================
 // abilities.CounterGameContext interface implementation
 // ==============================================================================

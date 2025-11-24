@@ -165,24 +165,24 @@ const (
 	EventCountered    EventType = "COUNTERED"
 
 	// Combat events
-	EventDeclaringAttackers  EventType = "DECLARING_ATTACKERS"
-	EventDeclaredAttackers   EventType = "DECLARED_ATTACKERS"
-	EventDeclareAttacker     EventType = "DECLARE_ATTACKER"
-	EventAttackerDeclared    EventType = "ATTACKER_DECLARED"
-	EventDefenderAttacked    EventType = "DEFENDER_ATTACKED"
-	EventDeclaringBlockers   EventType = "DECLARING_BLOCKERS"
-	EventDeclaredBlockers    EventType = "DECLARED_BLOCKERS"
-	EventDeclareBlocker      EventType = "DECLARE_BLOCKER"
-	EventBlockerDeclared     EventType = "BLOCKER_DECLARED"
-	EventCreatureBlocked     EventType = "CREATURE_BLOCKED"
-	EventCreatureBlocks      EventType = "CREATURE_BLOCKS"
+	EventDeclaringAttackers   EventType = "DECLARING_ATTACKERS"
+	EventDeclaredAttackers    EventType = "DECLARED_ATTACKERS"
+	EventDeclareAttacker      EventType = "DECLARE_ATTACKER"
+	EventAttackerDeclared     EventType = "ATTACKER_DECLARED"
+	EventDefenderAttacked     EventType = "DEFENDER_ATTACKED"
+	EventDeclaringBlockers    EventType = "DECLARING_BLOCKERS"
+	EventDeclaredBlockers     EventType = "DECLARED_BLOCKERS"
+	EventDeclareBlocker       EventType = "DECLARE_BLOCKER"
+	EventBlockerDeclared      EventType = "BLOCKER_DECLARED"
+	EventCreatureBlocked      EventType = "CREATURE_BLOCKED"
+	EventCreatureBlocks       EventType = "CREATURE_BLOCKS"
 	EventBatchBlockNoncombat  EventType = "BATCH_BLOCK_NONCOMBAT"
 	EventUnblockedAttacker    EventType = "UNBLOCKED_ATTACKER"
 	EventCombatDamageAssigned EventType = "COMBAT_DAMAGE_ASSIGNED"
 	EventCombatDamageApplied  EventType = "COMBAT_DAMAGE_APPLIED"
 	EventSelectedAttacker     EventType = "SELECTED_ATTACKER"
-	EventSelectedBlocker     EventType = "SELECTED_BLOCKER"
-	EventRemovedFromCombat   EventType = "REMOVED_FROM_COMBAT"
+	EventSelectedBlocker      EventType = "SELECTED_BLOCKER"
+	EventRemovedFromCombat    EventType = "REMOVED_FROM_COMBAT"
 
 	// Library events
 	EventSearchLibrary   EventType = "SEARCH_LIBRARY"
@@ -570,13 +570,13 @@ func (bus *EventBus) PublishBatch(events []Event) {
 // NewEvent creates a new event with common fields populated.
 func NewEvent(eventType EventType, targetID, sourceID, controllerID string) Event {
 	return Event{
-		Type:        eventType,
-		TargetID:    targetID,
-		SourceID:    sourceID,
-		Controller:  controllerID,
-		PlayerID:    controllerID,
-		Timestamp:   time.Now(),
-		Metadata:    make(map[string]string),
+		Type:           eventType,
+		TargetID:       targetID,
+		SourceID:       sourceID,
+		Controller:     controllerID,
+		PlayerID:       controllerID,
+		Timestamp:      time.Now(),
+		Metadata:       make(map[string]string),
 		AppliedEffects: make([]string, 0),
 	}
 }

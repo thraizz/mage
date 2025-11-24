@@ -54,11 +54,11 @@ type ReplacementEffect interface {
 
 // BaseReplacementEffect provides common functionality for replacement effects
 type BaseReplacementEffect struct {
-	id               string
-	sourceID         string
-	duration         Duration
-	selfReplacement  bool
-	selfScope        bool
+	id              string
+	sourceID        string
+	duration        Duration
+	selfReplacement bool
+	selfScope       bool
 }
 
 // NewBaseReplacementEffect creates a new base replacement effect

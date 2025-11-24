@@ -101,9 +101,9 @@ func TestPriorityWindowManager(t *testing.T) {
 		pwm := NewPriorityWindowManager()
 
 		window := PriorityWindow{
-			Type:     PriorityWindowManaPayment,
-			PlayerID: "player-1",
-			Context:  "Paying for Lightning Bolt",
+			Type:           PriorityWindowManaPayment,
+			PlayerID:       "player-1",
+			Context:        "Paying for Lightning Bolt",
 			AllowedActions: []ActionType{ActionActivateMana},
 		}
 
@@ -173,9 +173,9 @@ func TestResolutionWithPriorityWindows(t *testing.T) {
 
 		// Open mana payment window
 		window := PriorityWindow{
-			Type:     PriorityWindowManaPayment,
-			PlayerID: "player-1",
-			Context:  "Paying {R} for Lightning Bolt",
+			Type:           PriorityWindowManaPayment,
+			PlayerID:       "player-1",
+			Context:        "Paying {R} for Lightning Bolt",
 			AllowedActions: []ActionType{ActionActivateMana},
 		}
 		pwm.OpenWindow(window)

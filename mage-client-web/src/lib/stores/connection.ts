@@ -1,13 +1,16 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import type {
 	ConnectionState,
 	ConnectionOptions,
 	ConnectionEvent,
 	ConnectionEventCallback
 } from '$lib/types/connection';
+import { auth } from './auth';
+import { getMageClient } from '$lib/grpc/client';
 
 /**
  * Default connection options
+ * Note: healthCheckInterval is 60 seconds to keep sessions alive (server lease period is 120 seconds)
  */
 const DEFAULT_OPTIONS: Required<ConnectionOptions> = {
 	autoReconnect: true,
@@ -15,7 +18,7 @@ const DEFAULT_OPTIONS: Required<ConnectionOptions> = {
 	reconnectDelay: 1000,
 	maxReconnectDelay: 30000,
 	enableHealthCheck: true,
-	healthCheckInterval: 30000,
+	healthCheckInterval: 60000, // Ping every 60 seconds (server lease is 120 seconds)
 	healthCheckTimeout: 5000
 };
 
@@ -120,7 +123,7 @@ function createConnectionStore() {
 	/**
 	 * Send ping and wait for pong
 	 */
-	function sendPing(): void {
+	async function sendPing(): Promise<void> {
 		if (waitingForPong) {
 			// Previous ping timed out - connection may be dead
 			handleConnectionLost(new Error('Health check timeout'));
@@ -137,10 +140,23 @@ function createConnectionStore() {
 			}
 		}, options.healthCheckTimeout);
 
-		// In a real implementation, this would send a ping to the server
-		// For now, we'll simulate it with a mock
-		if (import.meta.env.DEV) {
-			console.log('[Connection] Ping sent');
+		// Call the server Ping RPC to keep session alive
+		try {
+			const client = getMageClient();
+			const response = await client.ping();
+			
+			// Check if ping was successful
+			if (response.success) {
+				handlePong();
+			} else {
+				// Ping failed - connection may be lost
+				console.error('[Connection] Ping failed: server returned success=false');
+				handleConnectionLost(new Error('Ping failed'));
+			}
+		} catch (error) {
+			console.error('[Connection] Ping failed:', error);
+			// Ping error - connection may be lost
+			handleConnectionLost(error instanceof Error ? error : new Error('Ping failed'));
 		}
 	}
 
@@ -256,24 +272,78 @@ function createConnectionStore() {
 			error: null
 		}));
 
-		// Simulate connection (in real implementation, this would establish gRPC/WebSocket connection)
-		setTimeout(() => {
+		// Check if user is authenticated
+		const authState = get(auth);
+		if (!authState.isAuthenticated) {
+			// User is not authenticated, set to disconnected
 			update((state) => ({
 				...state,
-				status: 'connected',
-				lastConnected: Date.now(),
-				reconnectAttempt: 0,
-				error: null
+				status: 'disconnected',
+				error: 'Not authenticated. Please log in.',
+				lastDisconnected: Date.now()
 			}));
 
 			emitEvent({
-				type: 'connected',
-				timestamp: Date.now()
+				type: 'disconnected',
+				timestamp: Date.now(),
+				error: new Error('Not authenticated')
 			});
+			return;
+		}
 
-			// Start health check
-			startHealthCheck();
-		}, 500);
+		// User is authenticated, set to connected
+		// In a real implementation, this would establish gRPC/WebSocket connection
+		// For now, we'll set it to connected since the user is authenticated
+		update((state) => ({
+			...state,
+			status: 'connected',
+			lastConnected: Date.now(),
+			reconnectAttempt: 0,
+			error: null
+		}));
+
+		emitEvent({
+			type: 'connected',
+			timestamp: Date.now()
+		});
+
+		// Start health check
+		startHealthCheck();
+	}
+
+	// Subscribe to auth changes to update connection status
+	let authUnsubscribe: (() => void) | null = null;
+	let currentConnectionState: ConnectionState = INITIAL_STATE;
+
+	function setupAuthListener(): void {
+		if (authUnsubscribe) {
+			authUnsubscribe();
+		}
+
+		// Update current state whenever connection state changes
+		const unsubscribeConnection = subscribe((state) => {
+			currentConnectionState = state;
+		});
+
+		authUnsubscribe = auth.subscribe((authState) => {
+			// If user logs in and we're disconnected, connect
+			if (authState.isAuthenticated && currentConnectionState.status === 'disconnected') {
+				doConnect();
+			}
+			// If user logs out and we're connected, disconnect
+			else if (!authState.isAuthenticated && currentConnectionState.status === 'connected') {
+				handleConnectionLost(new Error('User logged out'));
+			}
+		});
+
+		// Return cleanup function that unsubscribes both
+		return () => {
+			if (authUnsubscribe) {
+				authUnsubscribe();
+				authUnsubscribe = null;
+			}
+			unsubscribeConnection();
+		};
 	}
 
 	return {
@@ -284,6 +354,26 @@ function createConnectionStore() {
 		 */
 		initialize(opts: ConnectionOptions = {}): void {
 			options = { ...DEFAULT_OPTIONS, ...opts };
+			// Set up auth listener when initializing
+			if (!authUnsubscribe) {
+				setupAuthListener();
+			}
+			// Check current auth state and update connection status accordingly
+			const authState = get(auth);
+			const currentState = get({ subscribe });
+			if (authState.isAuthenticated && currentState.status === 'disconnected') {
+				// User is authenticated but connection shows disconnected, update it
+				update((state) => ({
+					...state,
+					status: 'connected',
+					lastConnected: Date.now(),
+					error: null
+				}));
+				startHealthCheck();
+			} else if (!authState.isAuthenticated && currentState.status === 'connected') {
+				// User is not authenticated but connection shows connected, disconnect
+				handleConnectionLost(new Error('Not authenticated'));
+			}
 		},
 
 		/**
@@ -363,6 +453,10 @@ function createConnectionStore() {
 		reset(): void {
 			clearTimers();
 			stopHealthCheck();
+			if (authUnsubscribe) {
+				authUnsubscribe();
+				authUnsubscribe = null;
+			}
 			set(INITIAL_STATE);
 		}
 	};

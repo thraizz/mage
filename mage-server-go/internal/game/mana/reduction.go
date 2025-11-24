@@ -2,10 +2,10 @@ package mana
 
 // CostReduction represents a cost reduction effect.
 type CostReduction struct {
-	ID              string
+	ID               string
 	GenericReduction int
 	ColoredReduction map[ManaType]int
-	AppliesTo       func(cardID string, cost *ManaCost) bool // Function to check if reduction applies
+	AppliesTo        func(cardID string, cost *ManaCost) bool // Function to check if reduction applies
 }
 
 // CostReductionManager manages cost reduction effects.

@@ -1,176 +1,216 @@
 import type { Table, CreateTableRequest, GameFormat } from '$lib/types/table';
 import type { OnlinePlayer } from '$lib/types/player';
+import { getMageClient } from '$lib/grpc/client';
+import type { TableView } from '$lib/generated/mage/v1/models';
+import type {
+	RoomCreateTableRequest,
+	RoomCreateTableResponse,
+	RoomJoinTableRequest,
+	RoomJoinTableResponse,
+	RoomLeaveTableOrTournamentRequest,
+	RoomLeaveTableOrTournamentResponse
+} from '$lib/generated/mage/v1/table';
+import type { RoomGetUsersResponse } from '$lib/generated/mage/v1/room';
 
 /**
- * Mock table data for development
+ * Convert TableView from proto to our Table type
  */
-const MOCK_TABLES: Table[] = [
-	{
-		id: '1',
-		name: 'Commander Night',
-		format: 'Commander',
-		hostUsername: 'alice',
-		players: [
-			{ id: 'p1', username: 'alice', isHost: true, isReady: true, joinedAt: Date.now() - 300000 },
-			{ id: 'p2', username: 'bob', isHost: false, isReady: true, joinedAt: Date.now() - 240000 },
-			{
-				id: 'p3',
-				username: 'charlie',
-				isHost: false,
-				isReady: false,
-				joinedAt: Date.now() - 120000
-			}
-		],
-		maxPlayers: 4,
-		status: 'waiting',
-		hasPassword: false,
-		createdAt: Date.now() - 300000
-	},
-	{
-		id: '2',
-		name: 'Standard Ranked',
-		format: 'Standard',
-		hostUsername: 'dave',
-		players: [
-			{ id: 'p4', username: 'dave', isHost: true, isReady: true, joinedAt: Date.now() - 180000 },
-			{ id: 'p5', username: 'eve', isHost: false, isReady: true, joinedAt: Date.now() - 90000 }
-		],
-		maxPlayers: 2,
-		status: 'ready',
-		hasPassword: false,
-		createdAt: Date.now() - 180000
-	},
-	{
-		id: '3',
-		name: 'Modern Tournament',
-		format: 'Modern',
-		hostUsername: 'frank',
-		players: [
-			{ id: 'p6', username: 'frank', isHost: true, isReady: true, joinedAt: Date.now() - 600000 },
-			{ id: 'p7', username: 'grace', isHost: false, isReady: true, joinedAt: Date.now() - 540000 }
-		],
-		maxPlayers: 2,
-		status: 'playing',
-		hasPassword: true,
-		createdAt: Date.now() - 600000,
-		startedAt: Date.now() - 60000
-	},
-	{
-		id: '4',
-		name: 'Casual Legacy',
-		format: 'Legacy',
-		hostUsername: 'henry',
-		players: [
-			{ id: 'p8', username: 'henry', isHost: true, isReady: false, joinedAt: Date.now() - 60000 }
-		],
-		maxPlayers: 2,
-		status: 'waiting',
-		hasPassword: false,
-		createdAt: Date.now() - 60000
-	},
-	{
-		id: '5',
-		name: 'Pioneer League',
-		format: 'Pioneer',
-		hostUsername: 'iris',
-		players: [
-			{ id: 'p9', username: 'iris', isHost: true, isReady: true, joinedAt: Date.now() - 420000 }
-		],
-		maxPlayers: 4,
-		status: 'waiting',
-		hasPassword: false,
-		createdAt: Date.now() - 420000
-	},
-	{
-		id: '6',
-		name: 'Pauper Fun',
-		format: 'Pauper',
-		hostUsername: 'jack',
-		players: [
-			{ id: 'p10', username: 'jack', isHost: true, isReady: true, joinedAt: Date.now() - 150000 },
-			{ id: 'p11', username: 'kate', isHost: false, isReady: true, joinedAt: Date.now() - 100000 },
-			{ id: 'p12', username: 'liam', isHost: false, isReady: true, joinedAt: Date.now() - 50000 },
-			{ id: 'p13', username: 'mia', isHost: false, isReady: false, joinedAt: Date.now() - 25000 }
-		],
-		maxPlayers: 4,
-		status: 'waiting',
-		hasPassword: false,
-		createdAt: Date.now() - 150000
+function convertTableViewToTable(view: TableView): Table {
+	// Parse table status from tableStateText
+	let status: 'waiting' | 'ready' | 'playing' | 'finished' = 'waiting';
+	const stateText = view.tableStateText.toLowerCase();
+	if (stateText.includes('playing') || stateText.includes('started')) {
+		status = 'playing';
+	} else if (stateText.includes('ready') || stateText.includes('starting')) {
+		status = 'ready';
+	} else if (stateText.includes('finish') || stateText.includes('complete')) {
+		status = 'finished';
 	}
-];
+
+	// Convert seats to players
+	const players = view.seats
+		.filter((seat) => seat.playerName) // Only include occupied seats
+		.map((seat, index) => ({
+			id: `${view.tableId}-${seat.seatNumber}`,
+			username: seat.playerName,
+			isHost: index === 0, // First player is typically the host
+			isReady: status !== 'waiting', // Assume ready if game is not waiting
+			joinedAt: view.createTime?.getTime() || Date.now()
+		}));
+
+	return {
+		id: view.tableId,
+		name: view.tableName || view.matchOptions?.name || 'Unnamed Table',
+		format: (view.matchOptions?.gameType || view.gameType || 'Unknown') as GameFormat,
+		hostUsername: view.controllerName,
+		players,
+		maxPlayers: view.numSeats,
+		status,
+		hasPassword: !!view.password,
+		createdAt: view.createTime?.getTime() || Date.now(),
+		startedAt: status === 'playing' ? Date.now() : undefined
+	};
+}
 
 /**
  * Fetch all tables from the lobby
  */
 export async function fetchTables(): Promise<Table[]> {
-	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 500));
+	const client = getMageClient();
+	
+	// Ensure sessionId is available (will restore from token if needed)
+	const sessionId = await client.ensureSessionId();
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
 
-	// In production, this would be:
-	// const response = await grpcCall(lobbyService.listTables, {}, 'LobbyService.listTables');
-	// return response.tables;
+	// Get main room ID first
+	const roomResponse = await client.getMainRoomId();
+	if (!roomResponse.roomId) {
+		throw new Error('Failed to get main room ID');
+	}
 
-	return MOCK_TABLES;
+	// Get all tables in the room
+	const response = await client.getAllTables(roomResponse.roomId);
+	
+	// Convert TableView[] to Table[]
+	return response.tables.map(convertTableViewToTable);
 }
 
 /**
  * Create a new table
  */
 export async function createTable(request: CreateTableRequest): Promise<Table> {
-	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 800));
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
 
-	// In production, this would be:
-	// const response = await grpcCall(lobbyService.createTable, request, 'LobbyService.createTable');
-	// return response.table;
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
 
-	const newTable: Table = {
-		id: `table-${Date.now()}`,
+	// Get main room ID
+	const roomResponse = await client.getMainRoomId();
+	if (!roomResponse.roomId) {
+		throw new Error('Failed to get main room ID');
+	}
+
+	// Create match options
+	const matchOptions = {
 		name: request.name || `${request.format} Game`,
+		gameType: request.format,
+		deckType: 'Constructed',
+		limited: false,
+		winsNeeded: 2,
+		freeMulligans: 0,
+		priorityTime: 0,
+		rated: false,
+		banlist: [],
+		skillLevel: 'Casual',
+		rangeOfInfluence: false,
+		planeChase: false,
+		rollbackTurnsAllowed: true,
+		embedDeckInSavedGame: 0
+	};
+
+	const createRequest: RoomCreateTableRequest = {
+		sessionId,
+		roomId: roomResponse.roomId,
+		matchOptions
+	};
+
+	const response = await client.call<RoomCreateTableRequest, RoomCreateTableResponse>(
+		'RoomCreateTable',
+		createRequest
+	);
+
+	if (!response.success) {
+		throw new Error(response.error || 'Failed to create table');
+	}
+
+	// Return a basic table object - the client should refetch to get full details
+	return {
+		id: response.tableId,
+		name: matchOptions.name,
 		format: request.format,
-		hostUsername: 'currentuser', // This would come from auth store
-		players: [
-			{
-				id: 'current',
-				username: 'currentuser',
-				isHost: true,
-				isReady: false,
-				joinedAt: Date.now()
-			}
-		],
+		hostUsername: 'You', // Current user
+		players: [],
 		maxPlayers: request.maxPlayers,
 		status: 'waiting',
 		hasPassword: !!request.password,
 		createdAt: Date.now()
 	};
-
-	return newTable;
 }
 
 /**
  * Join an existing table
  */
 export async function joinTable(tableId: string, password?: string): Promise<void> {
-	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 600));
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
 
-	// In production, this would be:
-	// await grpcCall(lobbyService.joinTable, { tableId, password }, 'LobbyService.joinTable');
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
 
-	console.log(`Joining table ${tableId}`, { password });
+	// Get main room ID
+	const roomResponse = await client.getMainRoomId();
+	if (!roomResponse.roomId) {
+		throw new Error('Failed to get main room ID');
+	}
+
+	const joinRequest: RoomJoinTableRequest = {
+		sessionId,
+		roomId: roomResponse.roomId,
+		tableId,
+		name: 'Player', // Player name - could be from auth store
+		playerType: 'Human',
+		skill: 1,
+		deckType: 'Constructed',
+		deck: '', // Deck will be selected later
+		password: password || ''
+	};
+
+	const response = await client.call<RoomJoinTableRequest, RoomJoinTableResponse>(
+		'RoomJoinTable',
+		joinRequest
+	);
+
+	if (!response.success) {
+		throw new Error(response.error || 'Failed to join table');
+	}
 }
 
 /**
  * Leave a table
  */
 export async function leaveTable(tableId: string): Promise<void> {
-	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 400));
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
 
-	// In production, this would be:
-	// await grpcCall(lobbyService.leaveTable, { tableId }, 'LobbyService.leaveTable');
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
 
-	console.log(`Leaving table ${tableId}`);
+	// Get main room ID
+	const roomResponse = await client.getMainRoomId();
+	if (!roomResponse.roomId) {
+		throw new Error('Failed to get main room ID');
+	}
+
+	const leaveRequest: RoomLeaveTableOrTournamentRequest = {
+		sessionId,
+		roomId: roomResponse.roomId,
+		tableId
+	};
+
+	const response = await client.call<
+		RoomLeaveTableOrTournamentRequest,
+		RoomLeaveTableOrTournamentResponse
+	>('RoomLeaveTableOrTournament', leaveRequest);
+
+	if (!response.success) {
+		throw new Error(response.error || 'Failed to leave table');
+	}
 }
 
 /**
@@ -195,45 +235,36 @@ export function getGameFormats(): GameFormat[] {
 }
 
 /**
- * Mock online players data for development
- */
-const MOCK_ONLINE_PLAYERS: OnlinePlayer[] = [
-	{ id: 'u1', username: 'alice', isCurrentUser: false, joinedAt: Date.now() - 300000 },
-	{ id: 'u2', username: 'bob', isCurrentUser: false, joinedAt: Date.now() - 240000 },
-	{ id: 'u3', username: 'charlie', isCurrentUser: false, joinedAt: Date.now() - 120000 },
-	{ id: 'u4', username: 'dave', isCurrentUser: false, joinedAt: Date.now() - 180000 },
-	{ id: 'u5', username: 'eve', isCurrentUser: false, joinedAt: Date.now() - 90000 },
-	{ id: 'u6', username: 'frank', isCurrentUser: false, joinedAt: Date.now() - 600000 },
-	{ id: 'u7', username: 'grace', isCurrentUser: false, joinedAt: Date.now() - 540000 },
-	{ id: 'u8', username: 'henry', isCurrentUser: false, joinedAt: Date.now() - 60000 },
-	{ id: 'u9', username: 'iris', isCurrentUser: false, joinedAt: Date.now() - 420000 },
-	{ id: 'u10', username: 'jack', isCurrentUser: false, joinedAt: Date.now() - 150000 },
-	{ id: 'u11', username: 'kate', isCurrentUser: false, joinedAt: Date.now() - 100000 },
-	{ id: 'u12', username: 'liam', isCurrentUser: false, joinedAt: Date.now() - 50000 },
-	{ id: 'u13', username: 'mia', isCurrentUser: false, joinedAt: Date.now() - 25000 }
-];
-
-/**
  * Fetch online players in the lobby
  */
 export async function fetchOnlinePlayers(currentUsername?: string): Promise<OnlinePlayer[]> {
-	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 400));
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
 
-	// In production, this would be:
-	// const response = await grpcCall(lobbyService.listOnlinePlayers, {}, 'LobbyService.listOnlinePlayers');
-	// return response.players;
-
-	// Add current user and mark them
-	const players = [...MOCK_ONLINE_PLAYERS];
-	if (currentUsername) {
-		players.unshift({
-			id: 'current',
-			username: currentUsername,
-			isCurrentUser: true,
-			joinedAt: Date.now()
-		});
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
 	}
 
-	return players;
+	// Get main room ID
+	const roomResponse = await client.getMainRoomId();
+	if (!roomResponse.roomId) {
+		throw new Error('Failed to get main room ID');
+	}
+
+	// Get users in the room
+	const response = await client.call<{ sessionId: string; roomId: string }, RoomGetUsersResponse>(
+		'RoomGetUsers',
+		{
+			sessionId,
+			roomId: roomResponse.roomId
+		}
+	);
+
+	// Convert UserView[] to OnlinePlayer[]
+	return response.users.map((user) => ({
+		id: user.userName, // Use username as ID since we don't have user ID
+		username: user.userName,
+		isCurrentUser: user.userName === currentUsername,
+		joinedAt: user.connectedAt?.getTime() || Date.now()
+	}));
 }

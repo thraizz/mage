@@ -43,6 +43,7 @@ type mageServer struct {
 	userRepo         *repository.UserRepository
 	statsRepo        *repository.StatsRepository
 	deckRepo         *repository.DeckRepository
+	cardRepo         *repository.CardRepository
 	matchHistoryRepo *repository.MatchHistoryRepository
 	roomMgr          *room.Manager
 	chatMgr          *chat.Manager
@@ -74,6 +75,7 @@ func NewMageServer(
 	userRepo *repository.UserRepository,
 	statsRepo *repository.StatsRepository,
 	deckRepo *repository.DeckRepository,
+	cardRepo *repository.CardRepository,
 	matchHistoryRepo *repository.MatchHistoryRepository,
 	roomMgr *room.Manager,
 	chatMgr *chat.Manager,
@@ -96,6 +98,7 @@ func NewMageServer(
 		userRepo:         userRepo,
 		statsRepo:        statsRepo,
 		deckRepo:         deckRepo,
+		cardRepo:         cardRepo,
 		matchHistoryRepo: matchHistoryRepo,
 		roomMgr:          roomMgr,
 		chatMgr:          chatMgr,

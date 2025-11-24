@@ -97,7 +97,7 @@ type CreaturesDiedWatcher struct {
 // NewCreaturesDiedWatcher creates a new creatures died watcher.
 func NewCreaturesDiedWatcher() *CreaturesDiedWatcher {
 	w := &CreaturesDiedWatcher{
-		BaseWatcher:              rules.NewBaseWatcher(rules.WatcherScopeGame),
+		BaseWatcher:               rules.NewBaseWatcher(rules.WatcherScopeGame),
 		creaturesDiedByController: make(map[string]int),
 		creaturesDiedByOwner:      make(map[string]int),
 	}

@@ -704,3 +704,85 @@ func engineColorToString(color string) string {
 		return "BLACK"
 	}
 }
+
+// ==================== Replay Methods (Stubs) ====================
+
+// ReplayInit initializes a replay session for a completed game
+func (s *mageServer) ReplayInit(ctx context.Context, req *pb.ReplayInitRequest) (*pb.ReplayInitResponse, error) {
+	// TODO: Implement replay functionality
+	// For now, return not implemented
+	s.logger.Debug("ReplayInit called (not yet implemented)",
+		zap.String("session_id", req.GetSessionId()),
+		zap.String("game_id", req.GetGameId()),
+	)
+	return &pb.ReplayInitResponse{
+		Success: false,
+		Error:   "Replay functionality not yet implemented",
+	}, nil
+}
+
+// ReplayStart starts playing a replay
+func (s *mageServer) ReplayStart(ctx context.Context, req *pb.ReplayStartRequest) (*pb.ReplayStartResponse, error) {
+	// TODO: Implement replay functionality
+	s.logger.Debug("ReplayStart called (not yet implemented)",
+		zap.String("session_id", req.GetSessionId()),
+		zap.String("game_id", req.GetGameId()),
+	)
+	return &pb.ReplayStartResponse{
+		Success: false,
+		Error:   "Replay functionality not yet implemented",
+	}, nil
+}
+
+// ReplayStop stops playing a replay
+func (s *mageServer) ReplayStop(ctx context.Context, req *pb.ReplayStopRequest) (*pb.ReplayStopResponse, error) {
+	// TODO: Implement replay functionality
+	s.logger.Debug("ReplayStop called (not yet implemented)",
+		zap.String("session_id", req.GetSessionId()),
+		zap.String("game_id", req.GetGameId()),
+	)
+	return &pb.ReplayStopResponse{
+		Success: false,
+		Error:   "Replay functionality not yet implemented",
+	}, nil
+}
+
+// ReplayNext advances replay to next step
+func (s *mageServer) ReplayNext(ctx context.Context, req *pb.ReplayNextRequest) (*pb.ReplayNextResponse, error) {
+	// TODO: Implement replay functionality
+	s.logger.Debug("ReplayNext called (not yet implemented)",
+		zap.String("session_id", req.GetSessionId()),
+		zap.String("game_id", req.GetGameId()),
+	)
+	return &pb.ReplayNextResponse{
+		Success: false,
+		Error:   "Replay functionality not yet implemented",
+	}, nil
+}
+
+// ReplayPrevious goes back to previous step in replay
+func (s *mageServer) ReplayPrevious(ctx context.Context, req *pb.ReplayPreviousRequest) (*pb.ReplayPreviousResponse, error) {
+	// TODO: Implement replay functionality
+	s.logger.Debug("ReplayPrevious called (not yet implemented)",
+		zap.String("session_id", req.GetSessionId()),
+		zap.String("game_id", req.GetGameId()),
+	)
+	return &pb.ReplayPreviousResponse{
+		Success: false,
+		Error:   "Replay functionality not yet implemented",
+	}, nil
+}
+
+// ReplaySkipForward skips forward by specified number of steps
+func (s *mageServer) ReplaySkipForward(ctx context.Context, req *pb.ReplaySkipForwardRequest) (*pb.ReplaySkipForwardResponse, error) {
+	// TODO: Implement replay functionality
+	s.logger.Debug("ReplaySkipForward called (not yet implemented)",
+		zap.String("session_id", req.GetSessionId()),
+		zap.String("game_id", req.GetGameId()),
+		zap.Int32("steps", req.GetSteps()),
+	)
+	return &pb.ReplaySkipForwardResponse{
+		Success: false,
+		Error:   "Replay functionality not yet implemented",
+	}, nil
+}

@@ -4,7 +4,8 @@
 
 import { writable } from 'svelte/store';
 import type { AuthState, User } from '$lib/types/auth';
-import { isTokenExpired, getUserFromToken } from '$lib/utils/jwt';
+import { isTokenExpired, getUserFromToken, getSessionIdFromToken } from '$lib/utils/jwt';
+import { getMageClient } from '$lib/grpc/client';
 
 // Storage key for persisting auth state
 const AUTH_STORAGE_KEY = 'mage_auth_token';
@@ -41,6 +42,21 @@ function createAuthStore() {
 				return;
 			}
 
+			// Extract sessionId from token and set it in gRPC client
+			// This ensures sessionId is always available even if it wasn't set during login
+			const sessionId = getSessionIdFromToken(token);
+			if (sessionId) {
+				const client = getMageClient();
+				const currentSessionId = client.getSessionId();
+				// Only set if not already set (to avoid overwriting a valid session)
+				if (!currentSessionId || currentSessionId !== sessionId) {
+					client.setSessionId(sessionId);
+					console.log('Session ID set in gRPC client:', sessionId);
+				}
+			} else {
+				console.warn('No sessionId found in token during login');
+			}
+
 			// Store token in localStorage
 			if (typeof window !== 'undefined') {
 				localStorage.setItem(AUTH_STORAGE_KEY, token);
@@ -61,6 +77,10 @@ function createAuthStore() {
 		 * Removes token from localStorage and resets store
 		 */
 		logout() {
+			// Clear session from gRPC client
+			const client = getMageClient();
+			client.clearSession();
+
 			// Remove token from localStorage
 			if (typeof window !== 'undefined') {
 				localStorage.removeItem(AUTH_STORAGE_KEY);
@@ -104,6 +124,16 @@ function createAuthStore() {
 				console.error('Failed to decode user from token');
 				localStorage.removeItem(AUTH_STORAGE_KEY);
 				return false;
+			}
+
+			// Extract sessionId from token and set it in gRPC client
+			const sessionId = getSessionIdFromToken(token);
+			if (sessionId) {
+				const client = getMageClient();
+				client.setSessionId(sessionId);
+				console.log('Session ID restored to gRPC client:', sessionId);
+			} else {
+				console.warn('No sessionId found in token - session may not work properly');
 			}
 
 			// Restore auth state

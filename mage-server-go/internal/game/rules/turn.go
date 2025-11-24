@@ -130,12 +130,12 @@ func buildTurnSequence(hasFirstStrike bool) []turnEntry {
 
 // TurnManager tracks active/priority player and turn progression.
 type TurnManager struct {
-	orderIndex      int
-	turnNumber      int
-	activePlayer    string
-	priorityPlayer  string
-	sequence        []turnEntry // Dynamic turn sequence
-	hasFirstStrike  bool         // Whether current turn sequence includes first strike step
+	orderIndex     int
+	turnNumber     int
+	activePlayer   string
+	priorityPlayer string
+	sequence       []turnEntry // Dynamic turn sequence
+	hasFirstStrike bool        // Whether current turn sequence includes first strike step
 }
 
 // NewTurnManager creates a new turn manager initialized at turn 1, untap step.

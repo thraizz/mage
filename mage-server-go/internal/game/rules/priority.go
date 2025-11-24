@@ -8,21 +8,21 @@ import (
 // ResolutionContext tracks what spell/ability is currently resolving
 // and allows nested resolution (e.g., casting copies during resolution)
 type ResolutionContext struct {
-	mu                sync.RWMutex
-	resolvingStack    []string // Stack of resolving item IDs (innermost at end)
-	depth             int      // Current resolution depth
-	maxDepth          int      // Maximum allowed depth (prevent infinite recursion)
-	allowManaAbilities bool     // Whether mana abilities can be activated
-	allowSpecialActions bool    // Whether special actions can be taken
+	mu                  sync.RWMutex
+	resolvingStack      []string // Stack of resolving item IDs (innermost at end)
+	depth               int      // Current resolution depth
+	maxDepth            int      // Maximum allowed depth (prevent infinite recursion)
+	allowManaAbilities  bool     // Whether mana abilities can be activated
+	allowSpecialActions bool     // Whether special actions can be taken
 }
 
 // NewResolutionContext creates a new resolution context
 func NewResolutionContext() *ResolutionContext {
 	return &ResolutionContext{
-		resolvingStack: make([]string, 0, 8),
-		depth:          0,
-		maxDepth:       10, // Prevent infinite recursion
-		allowManaAbilities: false,
+		resolvingStack:      make([]string, 0, 8),
+		depth:               0,
+		maxDepth:            10, // Prevent infinite recursion
+		allowManaAbilities:  false,
 		allowSpecialActions: false,
 	}
 }
@@ -127,9 +127,9 @@ func (rc *ResolutionContext) Reset() {
 
 // PriorityWindow represents a window during resolution where players can take actions
 type PriorityWindow struct {
-	Type        PriorityWindowType
-	PlayerID    string // Player who has the window
-	Context     string // Description of what's happening
+	Type           PriorityWindowType
+	PlayerID       string       // Player who has the window
+	Context        string       // Description of what's happening
 	AllowedActions []ActionType // What actions are allowed in this window
 }
 

@@ -57,12 +57,12 @@ func TestCreaturesDiedWatcher(t *testing.T) {
 
 	// Watch a creature dies event
 	event := rules.Event{
-		Type:        rules.EventPermanentDies,
-		TargetID:    "creature1",
-		SourceID:    "creature1",
-		Controller:  "player1",
-		PlayerID:    "player1",
-		Timestamp:   time.Now(),
+		Type:       rules.EventPermanentDies,
+		TargetID:   "creature1",
+		SourceID:   "creature1",
+		Controller: "player1",
+		PlayerID:   "player1",
+		Timestamp:  time.Now(),
 		Metadata: map[string]string{
 			"owner_id": "player1",
 		},

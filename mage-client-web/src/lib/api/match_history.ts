@@ -90,7 +90,7 @@ export async function fetchMatchHistory(
 	offset: number = 0
 ): Promise<MatchHistoryList> {
 	const client = getMageClient();
-	const sessionId = client.getSessionId();
+	const sessionId = await client.ensureSessionId();
 
 	if (!sessionId) {
 		throw new Error('No active session - please login first');
@@ -125,7 +125,7 @@ export async function fetchMatchHistory(
  */
 export async function getMatchDetails(matchId: number): Promise<MatchDetails> {
 	const client = getMageClient();
-	const sessionId = client.getSessionId();
+	const sessionId = await client.ensureSessionId();
 
 	if (!sessionId) {
 		throw new Error('No active session - please login first');

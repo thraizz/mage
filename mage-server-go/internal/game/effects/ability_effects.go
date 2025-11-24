@@ -10,11 +10,11 @@ import (
 // GrantAbilityEffect grants an ability to target permanents
 // Per Java GainAbilityTargetEffect
 type GrantAbilityEffect struct {
-	id           string
-	sourceID     string
-	abilityID    string // The ability being granted (e.g., "FlyingAbility")
-	targetIDs    []string // IDs of affected permanents
-	duration     Duration // How long the effect lasts
+	id        string
+	sourceID  string
+	abilityID string   // The ability being granted (e.g., "FlyingAbility")
+	targetIDs []string // IDs of affected permanents
+	duration  Duration // How long the effect lasts
 }
 
 // NewGrantAbilityEffect creates a new ability-granting effect
@@ -58,14 +58,14 @@ func (e *GrantAbilityEffect) AppliesTo(snapshot *Snapshot) bool {
 	if snapshot == nil {
 		return false
 	}
-	
+
 	// Check if this snapshot is one of the targets
 	for _, targetID := range e.targetIDs {
 		if snapshot.CardID == targetID {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -136,13 +136,13 @@ func (e *CantAttackEffect) AppliesTo(snapshot *Snapshot) bool {
 	if snapshot == nil {
 		return false
 	}
-	
+
 	for _, targetID := range e.targetIDs {
 		if snapshot.CardID == targetID {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -205,13 +205,13 @@ func (e *CantBlockEffect) AppliesTo(snapshot *Snapshot) bool {
 	if snapshot == nil {
 		return false
 	}
-	
+
 	for _, targetID := range e.targetIDs {
 		if snapshot.CardID == targetID {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -274,13 +274,13 @@ func (e *MustAttackEffect) AppliesTo(snapshot *Snapshot) bool {
 	if snapshot == nil {
 		return false
 	}
-	
+
 	for _, targetID := range e.targetIDs {
 		if snapshot.CardID == targetID {
 			return true
 		}
 	}
-	
+
 	return false
 }
 

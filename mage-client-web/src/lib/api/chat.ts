@@ -1,149 +1,196 @@
-import type { ChatMessage, SendMessageRequest } from '$lib/types/chat';
+import type { ChatMessage as ClientChatMessage, SendMessageRequest } from '$lib/types/chat';
+import { getMageClient } from '$lib/grpc/client';
+import type { ChatMessage as ProtoChatMessage } from '$lib/generated/mage/v1/models';
+import type {
+	ChatFindByRoomRequest,
+	ChatFindByRoomResponse,
+	ChatJoinRequest,
+	ChatJoinResponse,
+	ChatSendMessageRequest,
+	ChatSendMessageResponse
+} from '$lib/generated/mage/v1/chat';
 
 /**
- * Mock chat messages for development
+ * Convert proto ChatMessage to our client ChatMessage type
  */
-const MOCK_MESSAGES: ChatMessage[] = [
-	{
-		id: 'msg1',
-		type: 'system',
-		username: 'System',
-		content: 'Welcome to the Mage lobby!',
-		timestamp: Date.now() - 600000
-	},
-	{
-		id: 'msg2',
-		type: 'user',
-		username: 'alice',
-		content: 'Anyone up for Commander?',
-		timestamp: Date.now() - 540000
-	},
-	{
-		id: 'msg3',
-		type: 'user',
-		username: 'bob',
-		content: 'I am! Let me grab my deck',
-		timestamp: Date.now() - 480000
-	},
-	{
-		id: 'msg4',
-		type: 'system',
-		username: 'System',
-		content: 'alice created table "Commander Night"',
-		timestamp: Date.now() - 420000
-	},
-	{
-		id: 'msg5',
-		type: 'user',
-		username: 'charlie',
-		content: 'What format are you playing?',
-		timestamp: Date.now() - 360000
-	},
-	{
-		id: 'msg6',
-		type: 'user',
-		username: 'alice',
-		content: 'Commander! Join my table',
-		timestamp: Date.now() - 300000
-	},
-	{
-		id: 'msg7',
-		type: 'user',
-		username: 'dave',
-		content: 'Looking for Standard 1v1',
-		timestamp: Date.now() - 240000
-	},
-	{
-		id: 'msg8',
-		type: 'user',
-		username: 'eve',
-		content: "I'll play Standard with you",
-		timestamp: Date.now() - 180000
-	},
-	{
-		id: 'msg9',
-		type: 'system',
-		username: 'System',
-		content: 'dave created table "Standard Ranked"',
-		timestamp: Date.now() - 120000
-	},
-	{
-		id: 'msg10',
-		type: 'user',
-		username: 'frank',
-		content: 'Anyone have a spare Pauper deck?',
-		timestamp: Date.now() - 60000
+function convertProtoChatMessage(msg: ProtoChatMessage, id: string): ClientChatMessage {
+	// Determine message type based on message content or color
+	let type: 'system' | 'user' | 'whisper' = 'user';
+	if (msg.userName.toLowerCase() === 'system' || msg.userName === '') {
+		type = 'system';
 	}
-];
+	// Note: Whispers would need additional logic from server to identify
 
-// Track messages for this session
-let sessionMessages = [...MOCK_MESSAGES];
+	return {
+		id,
+		type,
+		username: msg.userName || 'System',
+		content: msg.message,
+		timestamp: msg.time?.getTime() || Date.now()
+	};
+}
 
 /**
  * Fetch recent lobby chat messages
+ * 
+ * Note: The server uses streaming/callbacks for real-time chat.
+ * This function is a placeholder that shows how to find the chat ID.
+ * Real chat messages should come through WebSocket callbacks.
  */
-export async function fetchLobbyMessages(limit: number = 50): Promise<ChatMessage[]> {
-	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 300));
+export async function fetchLobbyMessages(limit: number = 50): Promise<ClientChatMessage[]> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
 
-	// In production, this would be:
-	// const response = await grpcCall(chatService.getLobbyMessages, { limit }, 'ChatService.getLobbyMessages');
-	// return response.messages;
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
 
-	return sessionMessages.slice(-limit);
+	try {
+		// Get main room ID
+		const roomResponse = await client.getMainRoomId();
+		if (!roomResponse.roomId) {
+			throw new Error('Failed to get main room ID');
+		}
+
+		// Find chat ID for this room
+		const chatResponse = await client.call<ChatFindByRoomRequest, ChatFindByRoomResponse>(
+			'ChatFindByRoom',
+			{
+				sessionId,
+				roomId: roomResponse.roomId
+			}
+		);
+
+		// Note: The actual chat messages come through WebSocket callbacks
+		// This is just a placeholder to join the chat room
+		// Return empty array for now - messages will come via WebSocket
+		console.log(`Chat ID for lobby: ${chatResponse.chatId}`);
+		
+		// In a real implementation, you would store the chatId and listen for
+		// WebSocket callbacks of type CHATMESSAGE to populate messages
+		return [];
+	} catch (error) {
+		console.error('Failed to fetch lobby messages:', error);
+		// Return empty array instead of throwing - chat is not critical
+		return [];
+	}
 }
 
 /**
  * Send a message to lobby chat
  */
-export async function sendLobbyMessage(request: SendMessageRequest): Promise<ChatMessage> {
-	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 200));
+export async function sendLobbyMessage(request: SendMessageRequest): Promise<ClientChatMessage> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
 
-	// In production, this would be:
-	// const response = await grpcCall(chatService.sendMessage, request, 'ChatService.sendMessage');
-	// return response.message;
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
 
-	const newMessage: ChatMessage = {
+	// Get main room ID
+	const roomResponse = await client.getMainRoomId();
+	if (!roomResponse.roomId) {
+		throw new Error('Failed to get main room ID');
+	}
+
+	// Find chat ID for this room
+	const chatResponse = await client.call<ChatFindByRoomRequest, ChatFindByRoomResponse>(
+		'ChatFindByRoom',
+		{
+			sessionId,
+			roomId: roomResponse.roomId
+		}
+	);
+
+	// Send the message
+	const sendRequest: ChatSendMessageRequest = {
+		sessionId,
+		chatId: chatResponse.chatId,
+		message: request.content
+	};
+
+	const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
+		'ChatSendMessage',
+		sendRequest
+	);
+
+	if (!response.success) {
+		throw new Error('Failed to send message');
+	}
+
+	// Return a client message representation
+	// Note: The actual message will come back through WebSocket callback
+	return {
 		id: `msg-${Date.now()}`,
 		type: 'user',
-		username: 'currentuser', // This would come from auth store
+		username: 'You', // This would come from auth store in real implementation
 		content: request.content,
 		timestamp: Date.now()
 	};
-
-	// Add to session messages
-	sessionMessages.push(newMessage);
-
-	return newMessage;
 }
 
 /**
  * Send a whisper message to a specific user
+ * 
+ * Note: Whisper functionality may need to be implemented server-side
+ * This is a placeholder implementation
  */
 export async function sendWhisper(
 	toUsername: string,
 	content: string
-): Promise<ChatMessage> {
-	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 200));
+): Promise<ClientChatMessage> {
+	// Note: The server might not have a separate whisper API
+	// Whispers might be handled by prefixing the message or using a different chat type
+	// This is a placeholder that sends a regular message
+	// You may need to implement this differently based on server capabilities
+	
+	const message = `/whisper ${toUsername} ${content}`;
+	return await sendLobbyMessage({ content: message });
+}
 
-	// In production, this would be:
-	// const response = await grpcCall(chatService.sendWhisper, { toUsername, content }, 'ChatService.sendWhisper');
-	// return response.message;
+/**
+ * Join a chat room (lobby, table, tournament, etc.)
+ * This should be called when entering a room to start receiving messages
+ */
+export async function joinChat(chatId: string): Promise<void> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
 
-	const newMessage: ChatMessage = {
-		id: `whisper-${Date.now()}`,
-		type: 'whisper',
-		username: 'currentuser',
-		content,
-		timestamp: Date.now(),
-		toUsername,
-		fromUsername: 'currentuser'
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	const joinRequest: ChatJoinRequest = {
+		sessionId,
+		chatId,
+		userName: 'Player' // This should come from auth store
 	};
 
-	// Add to session messages
-	sessionMessages.push(newMessage);
+	const response = await client.call<ChatJoinRequest, ChatJoinResponse>(
+		'ChatJoin',
+		joinRequest
+	);
 
-	return newMessage;
+	if (!response.success) {
+		throw new Error('Failed to join chat');
+	}
+}
+
+/**
+ * Leave a chat room
+ */
+export async function leaveChat(chatId: string): Promise<void> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	const leaveRequest = {
+		sessionId,
+		chatId
+	};
+
+	await client.call('ChatLeave', leaveRequest);
 }

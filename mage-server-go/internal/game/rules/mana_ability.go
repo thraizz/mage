@@ -9,9 +9,9 @@ import (
 // Per Rule 605.3c: Once a player begins to activate a mana ability,
 // that ability can't be activated again until it has resolved.
 type ManaAbilityActivationContext struct {
-	mu                    sync.RWMutex
-	activatingAbilities   map[string]bool // abilityID -> is currently activating
-	resolvedThisWindow    map[string]int  // abilityID -> count of resolutions in current window
+	mu                  sync.RWMutex
+	activatingAbilities map[string]bool // abilityID -> is currently activating
+	resolvedThisWindow  map[string]int  // abilityID -> count of resolutions in current window
 }
 
 // NewManaAbilityActivationContext creates a new mana ability activation context
@@ -88,9 +88,9 @@ func (maac *ManaAbilityActivationContext) Reset() {
 // ManaAbility represents a mana ability that can be activated
 type ManaAbility struct {
 	ID           string
-	SourceID     string // Card/permanent that has this ability
-	ControllerID string // Player who controls the source
-	Text         string // Ability text
+	SourceID     string       // Card/permanent that has this ability
+	ControllerID string       // Player who controls the source
+	Text         string       // Ability text
 	Activate     func() error // Function to execute the ability
 }
 
@@ -108,19 +108,19 @@ type TriggeredManaAbility struct {
 
 // ManaAbilityManager manages mana ability activation and triggered mana abilities
 type ManaAbilityManager struct {
-	mu                     sync.RWMutex
-	activationContext      *ManaAbilityActivationContext
-	triggeredQueue         []TriggeredManaAbility // Queue of triggered mana abilities waiting to resolve
-	canActivateDuringCast  bool                    // Whether mana abilities can be activated during casting
-	canActivateDuringResolve bool                  // Whether mana abilities can be activated during resolution
+	mu                       sync.RWMutex
+	activationContext        *ManaAbilityActivationContext
+	triggeredQueue           []TriggeredManaAbility // Queue of triggered mana abilities waiting to resolve
+	canActivateDuringCast    bool                   // Whether mana abilities can be activated during casting
+	canActivateDuringResolve bool                   // Whether mana abilities can be activated during resolution
 }
 
 // NewManaAbilityManager creates a new mana ability manager
 func NewManaAbilityManager() *ManaAbilityManager {
 	return &ManaAbilityManager{
-		activationContext:      NewManaAbilityActivationContext(),
-		triggeredQueue:         make([]TriggeredManaAbility, 0, 8),
-		canActivateDuringCast:  true,  // Rule 117.1d - can activate when casting
+		activationContext:        NewManaAbilityActivationContext(),
+		triggeredQueue:           make([]TriggeredManaAbility, 0, 8),
+		canActivateDuringCast:    true,  // Rule 117.1d - can activate when casting
 		canActivateDuringResolve: false, // Generally false unless in payment window
 	}
 }

@@ -80,11 +80,11 @@ func (ts *TargetSelection) Validate() error {
 // This is a simplified parser - full implementation would parse actual card text.
 func ParseTargetRequirements(cardType string, rulesText string) []TargetRequirement {
 	requirements := []TargetRequirement{}
-	
+
 	// Simple heuristic-based parsing
 	// In a full implementation, this would parse actual card rules text
 	text := strings.ToLower(rulesText)
-	
+
 	// Check for common targeting patterns
 	if strings.Contains(text, "target creature") {
 		requirements = append(requirements, TargetRequirement{
@@ -122,7 +122,7 @@ func ParseTargetRequirements(cardType string, rulesText string) []TargetRequirem
 			Description: "target permanent",
 		})
 	}
-	
+
 	// Check for "up to X targets" patterns
 	if strings.Contains(text, "up to") {
 		for _, req := range requirements {
@@ -130,7 +130,7 @@ func ParseTargetRequirements(cardType string, rulesText string) []TargetRequirem
 			req.MinTargets = 0
 		}
 	}
-	
+
 	return requirements
 }
 

@@ -122,9 +122,9 @@ func TestZoneChangeReplacementEffect_ExileInsteadOfGraveyard(t *testing.T) {
 func TestZoneChangeReplacementEffect_SpecificCard(t *testing.T) {
 	effect := NewZoneChangeReplacementEffect(
 		"source1",
-		-1, // any from zone
-		-1, // any to zone
-		5,  // exile
+		-1,              // any from zone
+		-1,              // any to zone
+		5,               // exile
 		"specific_card", // only this card
 		"",
 		"",
@@ -297,11 +297,11 @@ func TestDamagePreventionEffect_PlayerDamage(t *testing.T) {
 func TestZoneChangeReplacementEffect_SelfScope(t *testing.T) {
 	// Test self-scope for "enters the battlefield" effects
 	effect := NewZoneChangeReplacementEffect(
-		"card1",    // source
-		-1,         // any from zone
-		2,          // to battlefield
-		2,          // stay on battlefield (modify properties)
-		"card1",    // the card itself
+		"card1", // source
+		-1,      // any from zone
+		2,       // to battlefield
+		2,       // stay on battlefield (modify properties)
+		"card1", // the card itself
 		"",
 		"",
 		DurationPermanent,

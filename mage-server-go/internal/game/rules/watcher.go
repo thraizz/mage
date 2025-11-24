@@ -244,10 +244,10 @@ func (wr *WatcherRegistry) Clear() {
 // Uses reflection to get the type name for better uniqueness.
 func (wr *WatcherRegistry) generateKey(watcher Watcher) string {
 	scope := watcher.GetScope()
-	
+
 	// Use reflection to get type name
 	typeName := getWatcherTypeName(watcher)
-	
+
 	switch scope {
 	case WatcherScopeGame:
 		return typeName

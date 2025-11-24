@@ -44,6 +44,51 @@ const defaultConfig: GrpcClientConfig = {
 };
 
 /**
+ * Storage key for persisting session ID
+ */
+const SESSION_STORAGE_KEY = 'mage_session_id';
+
+/**
+ * Converts a snake_case string to camelCase
+ */
+function snakeToCamel(str: string): string {
+	return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+/**
+ * Recursively converts all snake_case keys in an object to camelCase
+ * Handles nested objects and arrays
+ */
+function convertSnakeToCamel<T>(obj: unknown): T {
+	if (obj === null || obj === undefined) {
+		return obj as T;
+	}
+
+	// Handle arrays
+	if (Array.isArray(obj)) {
+		return obj.map(convertSnakeToCamel) as T;
+	}
+
+	// Handle primitive types
+	if (typeof obj !== 'object') {
+		return obj as T;
+	}
+
+	// Handle Date objects
+	if (obj instanceof Date) {
+		return obj as T;
+	}
+
+	// Convert object keys
+	const converted: Record<string, unknown> = {};
+	for (const [key, value] of Object.entries(obj)) {
+		const camelKey = snakeToCamel(key);
+		converted[camelKey] = convertSnakeToCamel(value);
+	}
+	return converted as T;
+}
+
+/**
  * Generic RPC method caller
  * Uses fetch() to make HTTP POST requests to gRPC-Web endpoints
  */
@@ -57,6 +102,7 @@ async function callRpc<TRequest, TResponse>(
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
+			'X-Grpc-Web': '1', // Indicate this is a gRPC-Web request
 			...headers
 		},
 		body: JSON.stringify(request)
@@ -67,7 +113,12 @@ async function callRpc<TRequest, TResponse>(
 		throw new Error(`RPC ${method} failed: ${response.statusText} - ${errorText}`);
 	}
 
-	return await response.json();
+	const jsonResponse = await response.json();
+	
+	// Convert snake_case keys to camelCase
+	// The server uses UseProtoNames: true which returns snake_case JSON
+	// but TypeScript interfaces expect camelCase
+	return convertSnakeToCamel<TResponse>(jsonResponse);
 }
 
 /**
@@ -80,13 +131,19 @@ export class MageClient {
 
 	constructor(config?: Partial<GrpcClientConfig>) {
 		this.config = { ...defaultConfig, ...config };
+		// Restore session ID from localStorage if available
+		this.loadSessionFromStorage();
 	}
 
 	/**
 	 * Set session ID for authenticated requests
+	 * Also persists to localStorage
 	 */
 	setSessionId(sessionId: string) {
 		this.sessionId = sessionId;
+		if (typeof window !== 'undefined') {
+			localStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+		}
 	}
 
 	/**
@@ -97,10 +154,60 @@ export class MageClient {
 	}
 
 	/**
+	 * Ensure session ID is available, trying to restore from token if needed
+	 * This is useful when sessionId might not be set yet (e.g., after page refresh)
+	 */
+	async ensureSessionId(): Promise<string | null> {
+		// If we already have a sessionId, return it
+		if (this.sessionId) {
+			return this.sessionId;
+		}
+
+		// Try to restore from localStorage token
+		if (typeof window !== 'undefined') {
+			try {
+				const { getSessionIdFromToken } = await import('$lib/utils/jwt');
+				const AUTH_STORAGE_KEY = 'mage_auth_token';
+				const token = localStorage.getItem(AUTH_STORAGE_KEY);
+				if (token) {
+					const sessionId = getSessionIdFromToken(token);
+					if (sessionId) {
+						this.setSessionId(sessionId);
+						return sessionId;
+					}
+				}
+			} catch (error) {
+				console.error('Failed to restore sessionId from token:', error);
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Clear session ID (logout)
+	 * Also removes from localStorage
 	 */
 	clearSession() {
 		this.sessionId = null;
+		if (typeof window !== 'undefined') {
+			localStorage.removeItem(SESSION_STORAGE_KEY);
+		}
+	}
+
+	/**
+	 * Load session ID from localStorage
+	 * Called automatically on client creation
+	 * Note: Session ID is also restored from auth token by auth store when auth is loaded
+	 */
+	private loadSessionFromStorage() {
+		if (typeof window !== 'undefined') {
+			const storedSessionId = localStorage.getItem(SESSION_STORAGE_KEY);
+			if (storedSessionId) {
+				this.sessionId = storedSessionId;
+				console.log('Session ID restored from localStorage');
+			}
+		}
 	}
 
 	// ==================== Authentication & Connection ====================
@@ -129,8 +236,23 @@ export class MageClient {
 			this.config.headers
 		);
 
-		if (response.success && response.sessionId) {
-			this.setSessionId(response.sessionId);
+		// Debug logging in dev mode
+		if (import.meta.env.DEV) {
+			console.log('[MageClient] ConnectUser response:', {
+				success: response.success,
+				sessionId: response.sessionId,
+				userId: response.userId,
+				error: response.error
+			});
+		}
+
+		// Set sessionId if we got one (even if it's just an empty string, we'll handle that)
+		if (response.success) {
+			if (response.sessionId && response.sessionId.trim() !== '') {
+				this.setSessionId(response.sessionId);
+			} else {
+				console.warn('[MageClient] ConnectUser succeeded but sessionId is empty or missing');
+			}
 		}
 
 		return response;
@@ -138,12 +260,13 @@ export class MageClient {
 
 	/**
 	 * Register a new user
+	 * Email is optional
 	 */
-	async register(userName: string, password: string, email: string): Promise<AuthRegisterResponse> {
+	async register(userName: string, password: string, email?: string): Promise<AuthRegisterResponse> {
 		const request: AuthRegisterRequest = {
 			userName,
 			password,
-			email
+			email: email || ''
 		};
 
 		return await callRpc<AuthRegisterRequest, AuthRegisterResponse>(

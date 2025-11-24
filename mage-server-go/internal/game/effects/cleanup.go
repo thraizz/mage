@@ -42,13 +42,13 @@ func CleanupEndOfCombatEffects(system *LayerSystem) {
 	if system == nil {
 		return
 	}
-	
+
 	system.mu.Lock()
 	defer system.mu.Unlock()
-	
+
 	// Collect IDs of effects to remove
 	var toRemove []string
-	
+
 	for layer, effectMap := range system.effects {
 		for id, effect := range effectMap {
 			// Check if effect has duration
@@ -60,7 +60,7 @@ func CleanupEndOfCombatEffects(system *LayerSystem) {
 		}
 		_ = layer // Suppress unused warning
 	}
-	
+
 	// Remove expired effects
 	for _, id := range toRemove {
 		if layer, ok := system.index[id]; ok {
@@ -81,13 +81,13 @@ func CleanupEndOfTurnEffects(system *LayerSystem) {
 	if system == nil {
 		return
 	}
-	
+
 	system.mu.Lock()
 	defer system.mu.Unlock()
-	
+
 	// Collect IDs of effects to remove
 	var toRemove []string
-	
+
 	for layer, effectMap := range system.effects {
 		for id, effect := range effectMap {
 			// Check if effect has duration
@@ -99,7 +99,7 @@ func CleanupEndOfTurnEffects(system *LayerSystem) {
 		}
 		_ = layer // Suppress unused warning
 	}
-	
+
 	// Remove expired effects
 	for _, id := range toRemove {
 		if layer, ok := system.index[id]; ok {
@@ -120,22 +120,22 @@ func CleanupSourceLeftBattlefieldEffects(system *LayerSystem, sourceID string) {
 	if system == nil || sourceID == "" {
 		return
 	}
-	
+
 	system.mu.Lock()
 	defer system.mu.Unlock()
-	
+
 	// Collect IDs of effects to remove
 	var toRemove []string
-	
+
 	for layer, effectMap := range system.effects {
 		for id, effect := range effectMap {
 			// Check if effect depends on source being on battlefield
 			if durationEffect, ok := effect.(EffectWithDuration); ok {
 				if durationEffect.GetSourceID() == sourceID {
 					duration := durationEffect.GetDuration()
-					if duration == DurationWhileOnBattlefield || 
-					   duration == DurationWhileControlled ||
-					   duration == DurationUntilSourceLeaves {
+					if duration == DurationWhileOnBattlefield ||
+						duration == DurationWhileControlled ||
+						duration == DurationUntilSourceLeaves {
 						toRemove = append(toRemove, id)
 					}
 				}
@@ -143,7 +143,7 @@ func CleanupSourceLeftBattlefieldEffects(system *LayerSystem, sourceID string) {
 		}
 		_ = layer // Suppress unused warning
 	}
-	
+
 	// Remove expired effects
 	for _, id := range toRemove {
 		if layer, ok := system.index[id]; ok {

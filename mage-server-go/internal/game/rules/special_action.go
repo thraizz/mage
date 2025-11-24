@@ -53,22 +53,22 @@ const (
 
 // SpecialAction represents a special action that can be taken
 type SpecialAction struct {
-	Type         SpecialActionType
-	PlayerID     string
-	SourceID     string // Card/permanent involved
-	Description  string
-	Execute      func() error
-	CanTake      func() bool // Additional legality check
+	Type        SpecialActionType
+	PlayerID    string
+	SourceID    string // Card/permanent involved
+	Description string
+	Execute     func() error
+	CanTake     func() bool // Additional legality check
 }
 
 // SpecialActionRestriction defines when a special action can be taken
 type SpecialActionRestriction struct {
-	RequiresMainPhase   bool // Must be main phase
-	RequiresEmptyStack  bool // Stack must be empty
-	RequiresOwnTurn     bool // Must be own turn
-	RequiresPriority    bool // Must have priority (all special actions require this)
-	OncePerGame         bool // Can only be taken once per game
-	AdditionalCheck     func() bool // Additional custom checks
+	RequiresMainPhase  bool        // Must be main phase
+	RequiresEmptyStack bool        // Stack must be empty
+	RequiresOwnTurn    bool        // Must be own turn
+	RequiresPriority   bool        // Must have priority (all special actions require this)
+	OncePerGame        bool        // Can only be taken once per game
+	AdditionalCheck    func() bool // Additional custom checks
 }
 
 // GetRestrictions returns the restrictions for a special action type
@@ -154,19 +154,19 @@ func GetRestrictions(actionType SpecialActionType) SpecialActionRestriction {
 
 // SpecialActionManager manages special actions
 type SpecialActionManager struct {
-	mu                  sync.RWMutex
-	takenThisGame       map[string]map[SpecialActionType]bool // playerID -> actionType -> taken
-	takenThisTurn       map[string]map[SpecialActionType]int  // playerID -> actionType -> count
-	availableActions    []SpecialAction
+	mu                   sync.RWMutex
+	takenThisGame        map[string]map[SpecialActionType]bool // playerID -> actionType -> taken
+	takenThisTurn        map[string]map[SpecialActionType]int  // playerID -> actionType -> count
+	availableActions     []SpecialAction
 	canTakeDuringResolve bool
 }
 
 // NewSpecialActionManager creates a new special action manager
 func NewSpecialActionManager() *SpecialActionManager {
 	return &SpecialActionManager{
-		takenThisGame:       make(map[string]map[SpecialActionType]bool),
-		takenThisTurn:       make(map[string]map[SpecialActionType]int),
-		availableActions:    make([]SpecialAction, 0, 8),
+		takenThisGame:        make(map[string]map[SpecialActionType]bool),
+		takenThisTurn:        make(map[string]map[SpecialActionType]int),
+		availableActions:     make([]SpecialAction, 0, 8),
 		canTakeDuringResolve: false, // Generally can't take during resolution
 	}
 }

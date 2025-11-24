@@ -37,7 +37,7 @@ func (co *CounterOperations) AddCounterToCard(cardID string, counter *Counter, c
 		Data:       counter.Name,
 		Timestamp:  timestamp,
 		Metadata: map[string]string{
-			"counter_name": counter.Name,
+			"counter_name":  counter.Name,
 			"counter_count": fmt.Sprintf("%d", counter.Count),
 		},
 		Description: fmt.Sprintf("Added %d %s counter(s) to %s", counter.Count, counter.Name, cardID),
@@ -62,7 +62,7 @@ func (co *CounterOperations) RemoveCounterFromCard(cardID string, counterName st
 		Data:       counterName,
 		Timestamp:  timestamp,
 		Metadata: map[string]string{
-			"counter_name": counterName,
+			"counter_name":  counterName,
 			"counter_count": fmt.Sprintf("%d", amount),
 		},
 		Description: fmt.Sprintf("Removed %d %s counter(s) from %s", amount, counterName, cardID),

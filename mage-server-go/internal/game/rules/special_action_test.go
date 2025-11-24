@@ -9,12 +9,12 @@ import (
 
 func TestSpecialActionRestrictions(t *testing.T) {
 	tests := []struct {
-		name               string
-		actionType         SpecialActionType
-		wantMainPhase      bool
-		wantEmptyStack     bool
-		wantOwnTurn        bool
-		wantOncePerGame    bool
+		name            string
+		actionType      SpecialActionType
+		wantMainPhase   bool
+		wantEmptyStack  bool
+		wantOwnTurn     bool
+		wantOncePerGame bool
 	}{
 		{
 			name:           "play land",

@@ -4,12 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/magefree/mage-server-go/internal/auth"
 	"github.com/magefree/mage-server-go/internal/chat"
 	"github.com/magefree/mage-server-go/internal/config"
@@ -25,6 +26,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/tournament"
 	"github.com/magefree/mage-server-go/internal/user"
 	pb "github.com/magefree/mage-server-go/pkg/proto/mage/v1"
+	"github.com/rs/cors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -98,6 +100,7 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	statsRepo := repository.NewStatsRepository(db)
 	deckRepo := repository.NewDeckRepository(db)
+	cardRepo := repository.NewCardRepository(db)
 	matchHistoryRepo := repository.NewMatchHistoryRepository(db)
 
 	// Initialize user manager
@@ -157,6 +160,7 @@ func main() {
 		userRepo,
 		statsRepo,
 		deckRepo,
+		cardRepo,
 		matchHistoryRepo,
 		roomMgr,
 		chatMgr,
@@ -188,16 +192,54 @@ func main() {
 
 	pb.RegisterMageServerServer(grpcServer, mageServer)
 
-	lis, err := net.Listen("tcp", cfg.Server.GRPC.Address)
-	if err != nil {
-		logger.Fatal("failed to listen", zap.Error(err))
+	// Create HTTP/JSON handler for browser-friendly JSON endpoints
+	jsonHandler := server.NewHTTPJSONHandler(mageServer, logger)
+
+	// Wrap gRPC server with gRPC-Web to support HTTP/JSON requests from browsers
+	wrappedGrpc := grpcweb.WrapServer(grpcServer,
+		grpcweb.WithOriginFunc(func(origin string) bool {
+			// Allow all origins for development
+			// TODO: Configure allowed origins for production
+			return true
+		}),
+	)
+
+	// Create HTTP handler that supports both JSON and gRPC-Web
+	httpHandler := http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
+		contentType := req.Header.Get("Content-Type")
+
+		// Route based on content type
+		if contentType == "application/json" {
+			// Use our custom JSON handler
+			jsonHandler.ServeHTTP(resp, req)
+		} else if wrappedGrpc.IsGrpcWebRequest(req) {
+			// Use gRPC-Web for protobuf requests
+			wrappedGrpc.ServeHTTP(resp, req)
+		} else {
+			// Use native gRPC for gRPC clients
+			grpcServer.ServeHTTP(resp, req)
+		}
+	})
+
+	// Add CORS support for browser requests
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"}, // TODO: Configure for production
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+	}).Handler(httpHandler)
+
+	// Start HTTP server (supports JSON, gRPC-Web, and native gRPC)
+	httpServer := &http.Server{
+		Addr:    cfg.Server.GRPC.Address,
+		Handler: corsHandler,
 	}
 
-	// Start gRPC server
 	go func() {
-		logger.Info("starting gRPC server", zap.String("address", cfg.Server.GRPC.Address))
-		if serveErr := grpcServer.Serve(lis); serveErr != nil {
-			logger.Error("gRPC server error", zap.Error(serveErr))
+		logger.Info("starting multi-protocol server (HTTP/JSON + gRPC-Web + native gRPC)",
+			zap.String("address", cfg.Server.GRPC.Address))
+		if serveErr := httpServer.ListenAndServe(); serveErr != nil && serveErr != http.ErrServerClosed {
+			logger.Error("multi-protocol server error", zap.Error(serveErr))
 		}
 	}()
 
@@ -251,6 +293,14 @@ func main() {
 
 	// Close all active sessions
 	sessionMgr.CloseAll()
+
+	// Shutdown HTTP server with timeout
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownCancel()
+
+	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+		logger.Error("error during HTTP server shutdown", zap.Error(err))
+	}
 
 	grpcServer.GracefulStop()
 

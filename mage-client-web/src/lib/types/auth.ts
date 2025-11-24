@@ -8,7 +8,6 @@
 export interface User {
 	id: string;
 	username: string;
-	email: string;
 }
 
 /**
@@ -26,7 +25,8 @@ export interface AuthState {
 export interface JwtPayload {
 	sub: string; // Subject (user ID)
 	username: string;
-	email: string;
+	email?: string; // Optional email
+	sessionId?: string; // Optional session ID (for session-based tokens)
 	exp: number; // Expiration timestamp
 	iat: number; // Issued at timestamp
 }
@@ -45,6 +45,5 @@ export interface LoginCredentials {
  */
 export interface RegisterData {
 	username: string;
-	email: string;
 	password: string;
 }

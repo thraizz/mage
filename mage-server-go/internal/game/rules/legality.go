@@ -116,7 +116,7 @@ func (lc *LegalityChecker) CheckStackItemLegality(item StackItem) LegalityResult
 					Legal:  false,
 					Reason: "Source card not in valid zone",
 					Details: map[string]string{
-						"source_id": item.SourceID,
+						"source_id":   item.SourceID,
 						"source_zone": fmt.Sprintf("%d", sourceCard.Zone),
 						"kind":        string(item.Kind),
 					},
@@ -146,13 +146,13 @@ func (lc *LegalityChecker) CheckStackItemLegality(item StackItem) LegalityResult
 // Zone constants (matching mage_engine.go)
 // Note: These must match the constants in mage_engine.go exactly
 const (
-	zoneLibrary = 0
-	zoneHand    = 1
+	zoneLibrary     = 0
+	zoneHand        = 1
 	zoneBattlefield = 2
-	zoneGraveyard = 3
-	zoneStack   = 4
-	zoneExile   = 5
-	zoneCommand = 6
+	zoneGraveyard   = 3
+	zoneStack       = 4
+	zoneExile       = 5
+	zoneCommand     = 6
 )
 
 // isSourceInValidZone checks if a source card is in a valid zone for its ability type.

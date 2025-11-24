@@ -39,7 +39,7 @@ func (m *mockDurationEffect) GetSourceID() string {
 // TestCleanupEndOfCombatEffects verifies end of combat cleanup
 func TestCleanupEndOfCombatEffects(t *testing.T) {
 	system := NewLayerSystem()
-	
+
 	// Add an end-of-combat effect
 	combatEffect := &mockDurationEffect{
 		id:       "combat-effect",
@@ -48,7 +48,7 @@ func TestCleanupEndOfCombatEffects(t *testing.T) {
 		sourceID: "source-1",
 	}
 	system.AddEffect(combatEffect)
-	
+
 	// Add an end-of-turn effect (should not be removed)
 	turnEffect := &mockDurationEffect{
 		id:       "turn-effect",
@@ -57,7 +57,7 @@ func TestCleanupEndOfCombatEffects(t *testing.T) {
 		sourceID: "source-2",
 	}
 	system.AddEffect(turnEffect)
-	
+
 	// Add a permanent effect (should not be removed)
 	permEffect := &mockDurationEffect{
 		id:       "perm-effect",
@@ -66,19 +66,19 @@ func TestCleanupEndOfCombatEffects(t *testing.T) {
 		sourceID: "source-3",
 	}
 	system.AddEffect(permEffect)
-	
+
 	// Verify all effects were added
 	system.mu.RLock()
 	initialCount := len(system.effects[LayerAbility])
 	system.mu.RUnlock()
-	
+
 	if initialCount != 3 {
 		t.Fatalf("Expected 3 effects, got %d", initialCount)
 	}
-	
+
 	// Cleanup end of combat effects
 	CleanupEndOfCombatEffects(system)
-	
+
 	// Verify only combat effect was removed
 	system.mu.RLock()
 	finalCount := len(system.effects[LayerAbility])
@@ -86,19 +86,19 @@ func TestCleanupEndOfCombatEffects(t *testing.T) {
 	_, turnExists := system.effects[LayerAbility]["turn-effect"]
 	_, permExists := system.effects[LayerAbility]["perm-effect"]
 	system.mu.RUnlock()
-	
+
 	if finalCount != 2 {
 		t.Errorf("Expected 2 effects after cleanup, got %d", finalCount)
 	}
-	
+
 	if combatExists {
 		t.Error("Combat effect should have been removed")
 	}
-	
+
 	if !turnExists {
 		t.Error("Turn effect should not have been removed")
 	}
-	
+
 	if !permExists {
 		t.Error("Permanent effect should not have been removed")
 	}
@@ -107,7 +107,7 @@ func TestCleanupEndOfCombatEffects(t *testing.T) {
 // TestCleanupEndOfTurnEffects verifies end of turn cleanup
 func TestCleanupEndOfTurnEffects(t *testing.T) {
 	system := NewLayerSystem()
-	
+
 	// Add an end-of-turn effect
 	turnEffect := &mockDurationEffect{
 		id:       "turn-effect",
@@ -116,7 +116,7 @@ func TestCleanupEndOfTurnEffects(t *testing.T) {
 		sourceID: "source-1",
 	}
 	system.AddEffect(turnEffect)
-	
+
 	// Add an end-of-combat effect (should not be removed)
 	combatEffect := &mockDurationEffect{
 		id:       "combat-effect",
@@ -125,34 +125,34 @@ func TestCleanupEndOfTurnEffects(t *testing.T) {
 		sourceID: "source-2",
 	}
 	system.AddEffect(combatEffect)
-	
+
 	// Verify both effects were added
 	system.mu.RLock()
 	initialCount := len(system.effects[LayerAbility])
 	system.mu.RUnlock()
-	
+
 	if initialCount != 2 {
 		t.Fatalf("Expected 2 effects, got %d", initialCount)
 	}
-	
+
 	// Cleanup end of turn effects
 	CleanupEndOfTurnEffects(system)
-	
+
 	// Verify only turn effect was removed
 	system.mu.RLock()
 	finalCount := len(system.effects[LayerAbility])
 	_, turnExists := system.effects[LayerAbility]["turn-effect"]
 	_, combatExists := system.effects[LayerAbility]["combat-effect"]
 	system.mu.RUnlock()
-	
+
 	if finalCount != 1 {
 		t.Errorf("Expected 1 effect after cleanup, got %d", finalCount)
 	}
-	
+
 	if turnExists {
 		t.Error("Turn effect should have been removed")
 	}
-	
+
 	if !combatExists {
 		t.Error("Combat effect should not have been removed")
 	}
@@ -161,9 +161,9 @@ func TestCleanupEndOfTurnEffects(t *testing.T) {
 // TestCleanupSourceLeftBattlefield verifies source-dependent cleanup
 func TestCleanupSourceLeftBattlefield(t *testing.T) {
 	system := NewLayerSystem()
-	
+
 	sourceID := "source-1"
-	
+
 	// Add a WhileOnBattlefield effect
 	whileEffect := &mockDurationEffect{
 		id:       "while-effect",
@@ -172,7 +172,7 @@ func TestCleanupSourceLeftBattlefield(t *testing.T) {
 		sourceID: sourceID,
 	}
 	system.AddEffect(whileEffect)
-	
+
 	// Add a permanent effect from same source (should not be removed)
 	permEffect := &mockDurationEffect{
 		id:       "perm-effect",
@@ -181,7 +181,7 @@ func TestCleanupSourceLeftBattlefield(t *testing.T) {
 		sourceID: sourceID,
 	}
 	system.AddEffect(permEffect)
-	
+
 	// Add an effect from different source (should not be removed)
 	otherEffect := &mockDurationEffect{
 		id:       "other-effect",
@@ -190,19 +190,19 @@ func TestCleanupSourceLeftBattlefield(t *testing.T) {
 		sourceID: "source-2",
 	}
 	system.AddEffect(otherEffect)
-	
+
 	// Verify all effects were added
 	system.mu.RLock()
 	initialCount := len(system.effects[LayerAbility])
 	system.mu.RUnlock()
-	
+
 	if initialCount != 3 {
 		t.Fatalf("Expected 3 effects, got %d", initialCount)
 	}
-	
+
 	// Cleanup effects from source-1 leaving battlefield
 	CleanupSourceLeftBattlefieldEffects(system, sourceID)
-	
+
 	// Verify only while-effect was removed
 	system.mu.RLock()
 	finalCount := len(system.effects[LayerAbility])
@@ -210,19 +210,19 @@ func TestCleanupSourceLeftBattlefield(t *testing.T) {
 	_, permExists := system.effects[LayerAbility]["perm-effect"]
 	_, otherExists := system.effects[LayerAbility]["other-effect"]
 	system.mu.RUnlock()
-	
+
 	if finalCount != 2 {
 		t.Errorf("Expected 2 effects after cleanup, got %d", finalCount)
 	}
-	
+
 	if whileExists {
 		t.Error("While effect should have been removed")
 	}
-	
+
 	if !permExists {
 		t.Error("Permanent effect should not have been removed")
 	}
-	
+
 	if !otherExists {
 		t.Error("Other source effect should not have been removed")
 	}
