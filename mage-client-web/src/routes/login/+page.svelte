@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { auth } from '$lib/stores/auth';
+	import { toast } from '$lib/stores/toast';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
@@ -67,13 +68,18 @@
 			// For now, simulate API call with timeout
 			await simulateLogin(username, password);
 
+			// Show success toast
+			toast.success(`Welcome back, ${username}!`);
+
 			// Redirect to original URL or lobby on successful login
 			goto(returnUrl);
 		} catch (error) {
 			if (error instanceof Error) {
 				errorMessage = error.message;
+				toast.error(error.message);
 			} else {
 				errorMessage = 'Login failed. Please try again.';
+				toast.error('Login failed. Please try again.');
 			}
 		} finally {
 			isLoading = false;
@@ -88,13 +94,18 @@
 			// TODO: Replace with actual guest login API call
 			await simulateLogin('Guest', '', true);
 
+			// Show success toast
+			toast.success('Logged in as Guest');
+
 			// Redirect to original URL or lobby on successful login
 			goto(returnUrl);
 		} catch (error) {
 			if (error instanceof Error) {
 				errorMessage = error.message;
+				toast.error(error.message);
 			} else {
 				errorMessage = 'Guest login failed. Please try again.';
+				toast.error('Guest login failed. Please try again.');
 			}
 		} finally {
 			isLoading = false;

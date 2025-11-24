@@ -239,133 +239,193 @@ Create a route guard that redirects unauthenticated users to login page.
 ---
 
 ## T010: Main App Layout Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T001, T006
 
-**Description:**  
+**Description:**
 Create the main application layout with navigation bar and content area.
 
 **Acceptance Criteria:**
-- [ ] Top navigation bar with logo/title
-- [ ] User menu dropdown (username, logout button)
-- [ ] Navigation links: Lobby, My Decks, Profile
-- [ ] Connection status indicator (online/offline/reconnecting)
-- [ ] Responsive design (hamburger menu on mobile)
-- [ ] Layout wraps all protected routes
-- [ ] Smooth page transitions
+- [x] Top navigation bar with logo/title
+- [x] User menu dropdown (username, logout button)
+- [x] Navigation links: Lobby, My Decks, Profile
+- [x] Connection status indicator (online/offline/reconnecting)
+- [x] Responsive design (hamburger menu on mobile)
+- [x] Layout wraps all protected routes
+- [x] Smooth page transitions
+
+**Files Created:**
+- `src/lib/components/Navbar.svelte` - Main navigation bar with brand, links, connection status, and user menu
+- `src/lib/components/UserMenu.svelte` - Dropdown user menu with profile links and logout
+- `src/lib/components/ConnectionStatus.svelte` - Connection status indicator with tooltip
+
+**Files Modified:**
+- `src/routes/(protected)/+layout.svelte` - Updated to include Navbar and smooth page transitions
 
 ---
 
 ## T011: Toast Notification System
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T001
 
-**Description:**  
+**Description:**
 Create a global toast notification system for user feedback.
 
 **Acceptance Criteria:**
-- [ ] Notification types: success, error, info, warning
-- [ ] Auto-dismiss after configurable duration (default 3s)
-- [ ] Manual dismiss button (X icon)
-- [ ] Stack multiple notifications
-- [ ] Slide-in animation
-- [ ] Positioned top-right or bottom-right
-- [ ] Accessible (ARIA live region)
-- [ ] Global store for managing notifications
+- [x] Notification types: success, error, info, warning
+- [x] Auto-dismiss after configurable duration (default 3s)
+- [x] Manual dismiss button (X icon)
+- [x] Stack multiple notifications
+- [x] Slide-in animation
+- [x] Positioned top-right or bottom-right
+- [x] Accessible (ARIA live region)
+- [x] Global store for managing notifications
+
+**Files Created:**
+- `src/lib/types/toast.ts` - Toast type definitions (Toast, ToastType, ToastOptions)
+- `src/lib/stores/toast.ts` - Global toast store with add/dismiss/success/error/warning/info methods
+- `src/lib/components/Toast.svelte` - Individual toast component with icon, message, and dismiss button
+- `src/lib/components/ToastContainer.svelte` - Container component for stacking toasts
+
+**Files Modified:**
+- `src/routes/+layout.svelte` - Added ToastContainer to root layout for global availability
+- `src/routes/+page.svelte` - Added test buttons to demonstrate toast functionality
 
 
 ---
 
 ## T012: Modal Dialog Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T001
 
-**Description:**  
+**Description:**
 Create a reusable modal dialog component for various use cases.
 
 **Acceptance Criteria:**
-- [ ] Backdrop overlay (semi-transparent dark background)
-- [ ] Modal content area (centered)
-- [ ] Close button (X icon in top-right)
-- [ ] Close on backdrop click (optional prop)
-- [ ] Close on ESC key press
-- [ ] Prevent body scroll when modal open
-- [ ] Fade-in/scale animation
-- [ ] Accessible (focus trap, ARIA dialog role)
-- [ ] Configurable size (small, medium, large)
+- [x] Backdrop overlay (semi-transparent dark background)
+- [x] Modal content area (centered)
+- [x] Close button (X icon in top-right)
+- [x] Close on backdrop click (optional prop)
+- [x] Close on ESC key press
+- [x] Prevent body scroll when modal open
+- [x] Fade-in/scale animation
+- [x] Accessible (focus trap, ARIA dialog role)
+- [x] Configurable size (small, medium, large)
+
+**Files Created:**
+- `src/lib/types/modal.ts` - Modal type definitions (ModalSize, ModalProps)
+- `src/lib/components/Modal.svelte` - Reusable modal component with backdrop, animations, focus trap, and accessibility
+
+**Files Modified:**
+- `src/routes/+page.svelte` - Added modal test section with 5 different modal examples demonstrating all features
 
 
 ---
 
 ## T013: Confirmation Dialog Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T012
 
-**Description:**  
+**Description:**
 Create a confirmation dialog component that wraps the Modal with Yes/No actions.
 
 **Acceptance Criteria:**
-- [ ] Uses Modal component as base
-- [ ] Title and message props
-- [ ] Confirm and cancel button text customizable
-- [ ] Returns promise that resolves to boolean
-- [ ] Destructive action styling (red confirm button) optional
-- [ ] ESC key maps to cancel
-- [ ] Enter key maps to confirm
+- [x] Uses Modal component as base
+- [x] Title and message props
+- [x] Confirm and cancel button text customizable
+- [x] Returns promise that resolves to boolean
+- [x] Destructive action styling (red confirm button) optional
+- [x] ESC key maps to cancel
+- [x] Enter key maps to confirm
+
+**Files Created:**
+- `src/lib/components/ConfirmDialog.svelte` - Reusable confirmation dialog component (callback-based)
+- `src/lib/stores/confirm.ts` - Global confirmation store with promise-based API
+- `src/lib/components/GlobalConfirmDialog.svelte` - Global confirmation dialog instance
+
+**Files Modified:**
+- `src/routes/+layout.svelte` - Added GlobalConfirmDialog to root layout
+- `src/routes/+page.svelte` - Added confirmation dialog test section with 4 different examples (basic, destructive, custom text, component-based)
+
 
 ---
 
 ## T014: Loading Spinner Component
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T001
 
-**Description:**  
+**Description:**
 Create a reusable loading spinner component with different sizes.
 
 **Acceptance Criteria:**
-- [ ] CSS-only spinner animation (no images)
-- [ ] Size variants: small, medium, large
-- [ ] Optional centered overlay mode (fullscreen)
-- [ ] Optional label text below spinner
-- [ ] Accessible (ARIA live region)
-- [ ] Works with light and dark backgrounds
+- [x] CSS-only spinner animation (no images)
+- [x] Size variants: small, medium, large
+- [x] Optional centered overlay mode (fullscreen)
+- [x] Optional label text below spinner
+- [x] Accessible (ARIA live region)
+- [x] Works with light and dark backgrounds
+
+**Files Created:**
+- `src/lib/types/loading.ts` - Loading spinner type definitions (LoadingSize, LoadingSpinnerProps)
+- `src/lib/components/LoadingSpinner.svelte` - Reusable loading spinner with CSS animation, size variants, overlay mode, and accessibility
+
+**Files Modified:**
+- `src/routes/+page.svelte` - Added loading spinner test section with overlay and inline examples
 
 ---
 
 ## T015: gRPC Client Service Factory
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T004, T006
 
-**Description:**  
+**Description:**
 Create a factory for gRPC service clients with authentication and error handling.
 
 **Acceptance Criteria:**
-- [ ] Factory function creates gRPC service clients
-- [ ] Automatically injects JWT token in metadata
-- [ ] Wraps calls with error handling
-- [ ] Converts gRPC errors to user-friendly messages
-- [ ] Logs errors to console (dev mode)
-- [ ] Handles connection errors gracefully
-- [ ] Implements request timeout (30s default)
-- [ ] Typed with TypeScript
+- [x] Factory function creates gRPC service clients
+- [x] Automatically injects JWT token in metadata
+- [x] Wraps calls with error handling
+- [x] Converts gRPC errors to user-friendly messages
+- [x] Logs errors to console (dev mode)
+- [x] Handles connection errors gracefully
+- [x] Implements request timeout (30s default)
+- [x] Typed with TypeScript
+
+**Files Created:**
+- `src/lib/types/grpc.ts` - gRPC type definitions (GrpcStatusCode, GrpcError, UserError, GrpcClientOptions, GrpcMetadata)
+- `src/lib/utils/grpc-errors.ts` - Error handling utilities (toGrpcError, toUserError, isRetryableError, isAuthError, logGrpcError)
+- `src/lib/grpc/service-factory.ts` - Service factory with auth injection, timeout, retry logic, and error handling (grpcCall, grpcCallWithToast, createServiceClient, createGrpcMetadata)
+- `src/lib/grpc/__tests__/service-factory.test.ts` - Comprehensive test suite (18 tests covering metadata, timeouts, auth errors, retries)
+- `vitest.config.ts` - Vitest configuration for testing
+
+**Files Modified:**
+- `package.json` - Added test scripts (test, test:watch, test:ui)
 
 ---
 
 ## T016: Connection Status Store
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T015
 
-**Description:**  
+**Description:**
 Create a store to track WebSocket/gRPC connection status with auto-reconnect.
 
 **Acceptance Criteria:**
-- [ ] States: `connected`, `connecting`, `disconnected`, `reconnecting`
-- [ ] Automatic reconnection with exponential backoff
-- [ ] Max reconnection attempts (10)
-- [ ] Manual reconnect function
-- [ ] Connection health check (ping/pong)
-- [ ] Emit events on status change
-- [ ] Display connection status in UI
+- [x] States: `connected`, `connecting`, `disconnected`, `reconnecting`
+- [x] Automatic reconnection with exponential backoff
+- [x] Max reconnection attempts (10)
+- [x] Manual reconnect function
+- [x] Connection health check (ping/pong)
+- [x] Emit events on status change
+- [x] Display connection status in UI
+
+**Files Created:**
+- `src/lib/types/connection.ts` - Connection type definitions (ConnectionStatus, ConnectionState, ConnectionOptions, ConnectionEvent, ConnectionEventCallback)
+- `src/lib/stores/connection.ts` - Connection store with exponential backoff, health check, event system (connection, connectionStatus, isConnected, connectionLatency)
+- `src/lib/stores/__tests__/connection.test.ts` - Comprehensive test suite (17 tests covering states, reconnection, health check, events)
+
+**Files Modified:**
+- `src/lib/components/ConnectionStatus.svelte` - Updated to use connection store with latency display and manual reconnect button
 
 ---
 
@@ -2089,7 +2149,12 @@ Create custom 404 and error pages.
 
 ---
 
-## T097: Production Build and Deployment
+## T097: UX and UI Rework
+
+With everything set up, we should revisist our styling and make this a professional, modern application.
+Validate major UX flows. Optimize our UI work to be minimal, but delightful. It should be a breeze to play.
+
+## T098: Production Build and Deployment
 **Priority:** P0  
 ****Dependencies:** T001
 

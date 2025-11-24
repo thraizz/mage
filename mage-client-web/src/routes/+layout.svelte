@@ -1,5 +1,7 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
+	import ToastContainer from '$lib/components/ToastContainer.svelte';
+	import GlobalConfirmDialog from '$lib/components/GlobalConfirmDialog.svelte';
 
 	let { children } = $props();
 </script>
@@ -9,3 +11,9 @@
 </svelte:head>
 
 {@render children()}
+
+<!-- Global Toast Notification Container -->
+<ToastContainer />
+
+<!-- Global Confirmation Dialog -->
+<GlobalConfirmDialog />

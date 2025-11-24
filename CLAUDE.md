@@ -205,6 +205,255 @@ Complex cards requiring custom logic go in `internal/game/cards/manual/`:
 cd /Users/aron/dev/opensource/mage/mage-server-go/internal/game/cards/manual
 ```
 
+## Abilities System
+
+The abilities system (`internal/game/abilities/`) implements MTG's comprehensive ability framework following the Comprehensive Rules.
+
+### Ability Types
+
+**Six ability types** (Rule 113):
+- **Spell Abilities**: Instants and sorceries on the stack
+- **Activated Abilities**: Cost: Effect format (`{T}: Draw a card`)
+- **Triggered Abilities**: When/Whenever/At patterns (`When ~ enters, ...`)
+- **Static Abilities**: Continuous effects always active (`~ has flying`)
+- **Mana Abilities**: Special activated abilities that produce mana
+- **Keyword Abilities**: Flying, Trample, Haste, etc.
+
+### Builder Pattern
+
+All abilities use fluent builders for construction:
+
+```go
+// Spell ability (instant/sorcery)
+spell := abilities.NewSpellAbilityBuilder(cardID, "{2}{U}").
+    AddTarget(abilities.NewCreatureTargetFilter()).
+    AddEffect(abilities.NewDamageEffect(3)).
+    AddEffect(abilities.NewDrawCardsEffect(1)).
+    Build()
+
+// Activated ability
+activated := abilities.NewActivatedAbilityBuilder(cardID).
+    AddTapCost().
+    AddManaCost("{1}").
+    AddEffect(abilities.NewDrawCardsEffect(1)).
+    Build()
+
+// Triggered ability
+triggered := abilities.NewTriggeredAbilityBuilder(cardID).
+    SetTrigger(abilities.NewEntersBattlefieldTrigger(cardID)).
+    AddEffect(abilities.NewDamageEffect(2)).
+    AddTarget(abilities.NewAnyTargetFilter()).
+    SetOptional(false).
+    Build()
+
+// Static ability (continuous effects)
+static := abilities.NewSimpleStaticAbility(cardID, abilities.ZoneBattlefield).
+    AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
+    Build()
+```
+
+### Effects System
+
+**40+ effect types** organized by category:
+
+**Basic Effects**:
+- `DamageEffect`: Deal damage to targets
+- `DrawCardsEffect`: Player draws N cards
+- `DestroyEffect`: Destroy target permanent
+- `GainLifeEffect` / `LoseLifeEffect`: Modify life totals
+- `TapEffect` / `UntapEffect`: Tap/untap permanents
+
+**Card Movement**:
+- `ReturnToHandTargetEffect`: Bounce to hand
+- `ExileTargetEffect` / `ExileSourceEffect`: Exile permanents
+- `MillCardsTargetEffect`: Mill from library
+- `SearchLibraryPutInHandEffect`: Tutor effects
+
+**Token & Counters**:
+- `CreateTokenEffect`: Create creature tokens
+- `AddCountersSourceEffect` / `AddCountersTargetEffect`: Add counters
+- 100+ counter types (P1P1, M1M1, Loyalty, Poison, Energy, etc.)
+
+**Ability Modification**:
+- `GrantAbilityEffect`: Grant abilities to targets
+- `GainAbilityAttachedEffect`: Enchanted/equipped creature gains abilities
+
+**Continuous Effects**:
+- `BoostEffect`: Modify power/toughness until end of turn
+- `BoostEnchantedEffect` / `BoostEquippedEffect`: Static P/T modification
+- `DontUntapInControllersUntapStepEnchantedEffect`: Prevention effects
+
+### Cost System
+
+**Comprehensive cost types**:
+- `ManaCost`: Mana payment (`{2}{U}{U}`)
+- `TapCost`: Tap symbol (`{T}`)
+- `SacrificeSourceCost`: Sacrifice this permanent
+- `SacrificeCost`: Sacrifice other permanents
+- `DiscardCost` / `DiscardTargetCost`: Discard cards (with optional filtering)
+- `PayLifeCost`: Pay life
+- `CompositeCost`: Multiple costs combined
+
+### Trigger System
+
+**Common triggers**:
+- `EntersBattlefieldTrigger`: When this enters (ETB)
+- `LeavesBattlefieldTrigger`: When this leaves (LTB)
+- `DiesTrigger`: When creature dies
+- `BecomesTappedTrigger` / `BecomesUntappedTrigger`: Tap state changes
+- `DealsDamageTrigger`: When this deals damage
+
+### Target & Filter System
+
+**Target Filters** (permanents on battlefield):
+- `AnyTargetFilter`: Any legal target (creature, player, planeswalker, or battle)
+- `CreatureTargetFilter`: Target creature (with optional subtype)
+- `PlayerTargetFilter`: Target player or opponent
+- `PermanentTargetFilter`: Any permanent (with optional type filter)
+
+**Card Filters** (cards in hand/graveyard):
+- `ArtifactCardFilter`: Artifact cards
+- `CreatureCardFilter`: Creature cards
+- `LandCardFilter`: Land cards
+- `AnyCardFilter`: Any card
+
+### Zone & Duration System
+
+**Zones** (Rule 400):
+```go
+const (
+    ZoneLibrary
+    ZoneHand
+    ZoneBattlefield
+    ZoneGraveyard
+    ZoneStack
+    ZoneExile
+    ZoneCommand
+    ZoneOutside
+)
+```
+
+**Durations** (Rule 611 - Continuous Effects):
+```go
+const (
+    DurationUntilEndOfTurn      // Most common
+    DurationPermanent           // Lasts forever
+    DurationWhileOnBattlefield  // While source is on battlefield
+    DurationUntilEndOfCombat    // Until end of combat
+    DurationUntilYourNextTurn   // Until your next turn
+    DurationWhileInGraveyard    // While in graveyard
+    DurationWhileInHand         // While in hand
+    DurationWhileInExile        // While in exile
+)
+```
+
+### Layer System (Rule 613)
+
+Continuous effects apply in specific layers to determine interaction order:
+```go
+const (
+    LayerCopyEffects             // Layer 1: Clone effects
+    LayerControlChanging         // Layer 2: Control change
+    LayerTextChanging            // Layer 3: Text modification
+    LayerTypeChanging            // Layer 4: Type changes
+    LayerColorChanging           // Layer 5: Color changes
+    LayerAbilityAddingRemoving   // Layer 6: Ability grants
+    LayerPowerToughnessEffects   // Layer 7: P/T modification
+)
+```
+
+### Attachment System
+
+**Auras & Equipment** (Rules 303.4, 301.5):
+- `EnchantAbility`: "Enchant creature", "Enchant permanent", etc.
+- `EquipAbility`: "Equip {cost}" activated ability
+- `AttachEffect`: Handles attachment resolution
+- `GainAbilityAttachedEffect`: Grants abilities to attached permanent (accepts full Ability objects for complex abilities)
+- `TapEnchantedEffect` / `UntapEnchantedEffect`: Tap/untap attached permanent
+- `BoostEnchantedEffect` / `BoostEquippedEffect`: Modify P/T
+
+### Complex Ability Example
+
+**Psychic Overload** - Demonstrates nested abilities:
+```go
+// Enchant permanent
+enchant := abilities.NewEnchantAbility(
+    cardID,
+    abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter()),
+)
+
+// ETB trigger: tap enchanted permanent
+etb := abilities.NewTriggeredAbilityBuilder(cardID).
+    SetTrigger(abilities.NewEntersBattlefieldTrigger(cardID)).
+    AddEffect(abilities.NewTapEnchantedEffect()).
+    Build()
+
+// Static: Enchanted permanent doesn't untap
+dontUntap := abilities.NewSimpleStaticAbility(cardID, abilities.ZoneBattlefield).
+    AddEffect(abilities.NewDontUntapInControllersUntapStepEnchantedEffect()).
+    Build()
+
+// Static: Grant complex activated ability to enchanted permanent
+grantedAbility := abilities.NewActivatedAbilityBuilder(cardID).
+    AddCost(abilities.NewDiscardTargetCost(2, abilities.NewArtifactCardFilter())).
+    AddEffect(abilities.NewUntapSourceEffect()).
+    Build()
+
+grantAbility := abilities.NewSimpleStaticAbility(cardID, abilities.ZoneBattlefield).
+    AddEffect(abilities.NewGainAbilityAttachedEffect(
+        grantedAbility,
+        abilities.AttachmentTypeAura,
+        abilities.DurationWhileOnBattlefield,
+        "Enchanted permanent has \"Discard two artifact cards: Untap this permanent.\"",
+    )).
+    Build()
+```
+
+### Implementation Status
+
+**✅ Fully Implemented**:
+- Base ability interface & types
+- Spell abilities with targeting
+- Activated abilities with costs
+- Triggered abilities with event system
+- Static abilities with zone awareness
+- 40+ effects (damage, draw, destroy, tokens, counters, mill, bounce, exile, etc.)
+- Cost system (mana, tap, sacrifice, discard, life)
+- Target filters & card filters
+- Attachment system (Auras & Equipment)
+- Duration & layer system
+- Keyword abilities (Flying, Trample, Haste, Vigilance, etc.)
+
+**⚠️ Stub/TODO**:
+- Full layer system application (currently stubs)
+- Integration with turn structure and state-based actions
+- Comprehensive game event system
+- Mana pool management
+- Complete rules engine for resolution
+
+### Key Files
+
+- `internal/game/abilities/ability.go`: Core interfaces
+- `internal/game/abilities/activated.go`: Activated abilities
+- `internal/game/abilities/triggered.go`: Triggered abilities & events
+- `internal/game/abilities/static.go`: Static abilities, zones, durations, layers
+- `internal/game/abilities/spell.go`: Spell abilities
+- `internal/game/abilities/effects.go`: Basic effects & Duration
+- `internal/game/abilities/enchanted_effects.go`: Aura/Equipment effects
+- `internal/game/abilities/attach.go`: Attachment system
+- `internal/game/abilities/costs.go`: Cost system
+- `internal/game/abilities/targets.go`: Target & card filters
+- `internal/game/abilities/keyword.go`: Keyword abilities
+- `internal/game/abilities/counter_effects.go`: Counter manipulation
+- `internal/game/abilities/token_effects.go`: Token creation
+- `internal/game/abilities/grant_ability_effect.go`: Ability granting
+- `internal/game/abilities/bounce.go`: Return to hand effects
+- `internal/game/abilities/exile.go`: Exile effects
+- `internal/game/abilities/mill.go`: Mill effects
+- `internal/game/abilities/search_library.go`: Library search effects
+- `internal/game/abilities/scry_surveil.go`: Scry & surveil
+- `internal/game/abilities/gain_control.go`: Control-changing effects
+
 ## Key Architectural Patterns
 
 ### Manager Interface Pattern

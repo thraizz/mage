@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { auth } from '$lib/stores/auth';
 	import UserMenu from './UserMenu.svelte';
 	import ConnectionStatus from './ConnectionStatus.svelte';
 
@@ -32,9 +31,7 @@
 
 		<!-- Desktop Navigation Links -->
 		<div class="navbar-links desktop-only">
-			<a href="/lobby" class="nav-link" class:active={$page.url.pathname === '/lobby'}>
-				Lobby
-			</a>
+			<a href="/lobby" class="nav-link" class:active={$page.url.pathname === '/lobby'}> Lobby </a>
 			<a href="/decks" class="nav-link" class:active={$page.url.pathname === '/decks'}>
 				My Decks
 			</a>

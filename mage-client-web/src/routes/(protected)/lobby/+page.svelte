@@ -1,15 +1,22 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { auth } from '$lib/stores/auth';
 	import type { Table, GameFormat } from '$lib/types/table';
-	import { fetchTables, getGameFormats } from '$lib/api/lobby';
+	import type { OnlinePlayer } from '$lib/types/player';
+	import { fetchTables, fetchOnlinePlayers, getGameFormats } from '$lib/api/lobby';
 	import TableCard from '$lib/components/TableCard.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import CreateTableModal from '$lib/components/CreateTableModal.svelte';
+	import OnlinePlayersList from '$lib/components/OnlinePlayersList.svelte';
 
 	// State
 	let tables = $state<Table[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+
+	// Online players state
+	let onlinePlayers = $state<OnlinePlayer[]>([]);
+	let playersListOpen = $state(true);
 
 	// Filter state
 	let searchQuery = $state('');
@@ -36,6 +43,18 @@
 			console.error('Failed to load tables:', err);
 		} finally {
 			loading = false;
+		}
+	}
+
+	/**
+	 * Load online players
+	 */
+	async function loadOnlinePlayers(): Promise<void> {
+		try {
+			const currentUsername = $auth.user?.username;
+			onlinePlayers = await fetchOnlinePlayers(currentUsername);
+		} catch (err) {
+			console.error('Failed to load online players:', err);
 		}
 	}
 
@@ -120,9 +139,10 @@
 		window.location.href = `/table/${tableId}`;
 	}
 
-	// Load tables on mount
+	// Load tables and online players on mount
 	onMount(() => {
 		loadTables();
+		loadOnlinePlayers();
 	});
 </script>
 
@@ -263,50 +283,62 @@
 		{/if}
 	</div>
 
-	<!-- Content -->
-	<div class="lobby-content">
-		{#if loading}
-			<!-- Loading State -->
-			<div class="loading-container">
-				<LoadingSpinner size="large" />
-				<p class="loading-text">Loading tables...</p>
-			</div>
-		{:else if error}
-			<!-- Error State -->
-			<div class="error-container">
-				<div class="error-icon">⚠️</div>
-				<h2 class="error-title">Failed to Load Tables</h2>
-				<p class="error-message">{error}</p>
-				<button class="retry-button" onclick={handleRefresh}>Try Again</button>
-			</div>
-		{:else if tables.length === 0}
-			<!-- Empty State - No Tables -->
-			<div class="empty-container">
-				<div class="empty-icon">🎮</div>
-				<h2 class="empty-title">No Active Tables</h2>
-				<p class="empty-message">
-					There are no active games right now. Be the first to create one!
-				</p>
-				<button class="create-table-button" onclick={openCreateModal}>Create a Table</button>
-			</div>
-		{:else if filteredTables().length === 0}
-			<!-- Empty State - No Results -->
-			<div class="empty-container">
-				<div class="empty-icon">🔍</div>
-				<h2 class="empty-title">No Tables Found</h2>
-				<p class="empty-message">
-					No tables match your current filters. Try adjusting your search criteria.
-				</p>
-				<button class="clear-filters-button" onclick={clearFilters}>Clear Filters</button>
-			</div>
-		{:else}
-			<!-- Tables Grid -->
-			<div class="tables-grid">
-				{#each filteredTables() as table (table.id)}
-					<TableCard {table} onClick={handleTableClick} />
-				{/each}
-			</div>
-		{/if}
+	<!-- Main Content with Sidebar -->
+	<div class="lobby-main">
+		<!-- Sidebar: Online Players -->
+		<aside class="sidebar">
+			<OnlinePlayersList
+				bind:players={onlinePlayers}
+				bind:isOpen={playersListOpen}
+				currentUsername={$auth.user?.username || ''}
+			/>
+		</aside>
+
+		<!-- Content -->
+		<div class="lobby-content">
+			{#if loading}
+				<!-- Loading State -->
+				<div class="loading-container">
+					<LoadingSpinner size="large" />
+					<p class="loading-text">Loading tables...</p>
+				</div>
+			{:else if error}
+				<!-- Error State -->
+				<div class="error-container">
+					<div class="error-icon">⚠️</div>
+					<h2 class="error-title">Failed to Load Tables</h2>
+					<p class="error-message">{error}</p>
+					<button class="retry-button" onclick={handleRefresh}>Try Again</button>
+				</div>
+			{:else if tables.length === 0}
+				<!-- Empty State - No Tables -->
+				<div class="empty-container">
+					<div class="empty-icon">🎮</div>
+					<h2 class="empty-title">No Active Tables</h2>
+					<p class="empty-message">
+						There are no active games right now. Be the first to create one!
+					</p>
+					<button class="create-table-button" onclick={openCreateModal}>Create a Table</button>
+				</div>
+			{:else if filteredTables().length === 0}
+				<!-- Empty State - No Results -->
+				<div class="empty-container">
+					<div class="empty-icon">🔍</div>
+					<h2 class="empty-title">No Tables Found</h2>
+					<p class="empty-message">
+						No tables match your current filters. Try adjusting your search criteria.
+					</p>
+					<button class="clear-filters-button" onclick={clearFilters}>Clear Filters</button>
+				</div>
+			{:else}
+				<!-- Tables Grid -->
+				<div class="tables-grid">
+					{#each filteredTables() as table (table.id)}
+						<TableCard {table} onClick={handleTableClick} />
+					{/each}
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -428,6 +460,19 @@
 		to {
 			transform: rotate(360deg);
 		}
+	}
+
+	/* Main Layout */
+	.lobby-main {
+		display: flex;
+		flex: 1;
+		overflow: hidden;
+		gap: 1.5rem;
+	}
+
+	.sidebar {
+		width: 300px;
+		flex-shrink: 0;
 	}
 
 	/* Content */
@@ -741,6 +786,15 @@
 
 		.format-select,
 		.checkbox-label {
+			width: 100%;
+		}
+
+		.lobby-main {
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.sidebar {
 			width: 100%;
 		}
 

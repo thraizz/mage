@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { auth } from '$lib/stores/auth';
+	import { toast } from '$lib/stores/toast';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
@@ -154,8 +155,9 @@
 			// TODO: Replace with actual API call when backend is ready
 			await simulateRegister(registerData);
 
-			// Show success message
+			// Show success message and toast
 			successMessage = 'Account created successfully! Logging you in...';
+			toast.success('Account created successfully!');
 
 			// Auto-login after successful registration
 			await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -165,8 +167,10 @@
 		} catch (error) {
 			if (error instanceof Error) {
 				errorMessage = error.message;
+				toast.error(error.message);
 			} else {
 				errorMessage = 'Registration failed. Please try again.';
+				toast.error('Registration failed. Please try again.');
 			}
 		} finally {
 			isLoading = false;
@@ -252,7 +256,9 @@
 					aria-invalid={usernameError ? 'true' : 'false'}
 					aria-describedby={usernameError ? 'username-error' : 'username-help'}
 				/>
-				<span class="field-help" id="username-help">Alphanumeric characters and underscores only</span>
+				<span class="field-help" id="username-help"
+					>Alphanumeric characters and underscores only</span
+				>
 				{#if usernameError}
 					<span class="field-error" id="username-error" role="alert">{usernameError}</span>
 				{/if}

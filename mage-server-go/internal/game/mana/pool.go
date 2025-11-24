@@ -1,6 +1,7 @@
 package mana
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -296,17 +297,124 @@ func (mp *ManaPool) Copy() *ManaPool {
 	mp.mu.RLock()
 	defer mp.mu.RUnlock()
 	return &ManaPool{
-		White:            mp.White,
-		Blue:             mp.Blue,
-		Black:            mp.Black,
-		Red:              mp.Red,
-		Green:            mp.Green,
-		Colorless:        mp.Colorless,
-		FloatingWhite:    mp.FloatingWhite,
-		FloatingBlue:     mp.FloatingBlue,
-		FloatingBlack:    mp.FloatingBlack,
-		FloatingRed:      mp.FloatingRed,
-		FloatingGreen:    mp.FloatingGreen,
+		White:             mp.White,
+		Blue:              mp.Blue,
+		Black:             mp.Black,
+		Red:               mp.Red,
+		Green:             mp.Green,
+		Colorless:         mp.Colorless,
+		FloatingWhite:     mp.FloatingWhite,
+		FloatingBlue:      mp.FloatingBlue,
+		FloatingBlack:     mp.FloatingBlack,
+		FloatingRed:       mp.FloatingRed,
+		FloatingGreen:     mp.FloatingGreen,
 		FloatingColorless: mp.FloatingColorless,
 	}
+}
+
+// GetAmount returns the total amount of a specific mana type (including floating).
+// This implements the abilities.ManaPoolInterface.
+func (mp *ManaPool) GetAmount(manaType string) int {
+	mp.mu.RLock()
+	defer mp.mu.RUnlock()
+
+	switch manaType {
+	case "WHITE":
+		return mp.White + mp.FloatingWhite
+	case "BLUE":
+		return mp.Blue + mp.FloatingBlue
+	case "BLACK":
+		return mp.Black + mp.FloatingBlack
+	case "RED":
+		return mp.Red + mp.FloatingRed
+	case "GREEN":
+		return mp.Green + mp.FloatingGreen
+	case "COLORLESS":
+		return mp.Colorless + mp.FloatingColorless
+	default:
+		return 0
+	}
+}
+
+// SpendMana attempts to spend mana from the pool.
+// This implements the abilities.ManaPoolInterface.
+// Returns error if insufficient mana.
+func (mp *ManaPool) SpendMana(manaType string, amount int) error {
+	if amount <= 0 {
+		return nil
+	}
+
+	mp.mu.Lock()
+	defer mp.mu.Unlock()
+
+	// Check if we have enough
+	available := 0
+	switch manaType {
+	case "WHITE":
+		available = mp.White + mp.FloatingWhite
+	case "BLUE":
+		available = mp.Blue + mp.FloatingBlue
+	case "BLACK":
+		available = mp.Black + mp.FloatingBlack
+	case "RED":
+		available = mp.Red + mp.FloatingRed
+	case "GREEN":
+		available = mp.Green + mp.FloatingGreen
+	case "COLORLESS":
+		available = mp.Colorless + mp.FloatingColorless
+	default:
+		return fmt.Errorf("unknown mana type: %s", manaType)
+	}
+
+	if available < amount {
+		return fmt.Errorf("insufficient %s mana: need %d, have %d", manaType, amount, available)
+	}
+
+	// Spend from regular pool first, then floating
+	switch manaType {
+	case "WHITE":
+		spendFromRegular := amount
+		if spendFromRegular > mp.White {
+			spendFromRegular = mp.White
+		}
+		mp.White -= spendFromRegular
+		mp.FloatingWhite -= (amount - spendFromRegular)
+	case "BLUE":
+		spendFromRegular := amount
+		if spendFromRegular > mp.Blue {
+			spendFromRegular = mp.Blue
+		}
+		mp.Blue -= spendFromRegular
+		mp.FloatingBlue -= (amount - spendFromRegular)
+	case "BLACK":
+		spendFromRegular := amount
+		if spendFromRegular > mp.Black {
+			spendFromRegular = mp.Black
+		}
+		mp.Black -= spendFromRegular
+		mp.FloatingBlack -= (amount - spendFromRegular)
+	case "RED":
+		spendFromRegular := amount
+		if spendFromRegular > mp.Red {
+			spendFromRegular = mp.Red
+		}
+		mp.Red -= spendFromRegular
+		mp.FloatingRed -= (amount - spendFromRegular)
+	case "GREEN":
+		spendFromRegular := amount
+		if spendFromRegular > mp.Green {
+			spendFromRegular = mp.Green
+		}
+		mp.Green -= spendFromRegular
+		mp.FloatingGreen -= (amount - spendFromRegular)
+	case "COLORLESS":
+		spendFromRegular := amount
+		if spendFromRegular > mp.Colorless {
+			spendFromRegular = mp.Colorless
+		}
+		mp.Colorless -= spendFromRegular
+		mp.FloatingColorless -= (amount - spendFromRegular)
+	}
+
+	return nil
 }

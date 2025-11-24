@@ -1,4 +1,5 @@
 import type { Table, CreateTableRequest, GameFormat } from '$lib/types/table';
+import type { OnlinePlayer } from '$lib/types/player';
 
 /**
  * Mock table data for development
@@ -191,4 +192,48 @@ export function getGameFormats(): GameFormat[] {
 		'Draft',
 		'Sealed'
 	];
+}
+
+/**
+ * Mock online players data for development
+ */
+const MOCK_ONLINE_PLAYERS: OnlinePlayer[] = [
+	{ id: 'u1', username: 'alice', isCurrentUser: false, joinedAt: Date.now() - 300000 },
+	{ id: 'u2', username: 'bob', isCurrentUser: false, joinedAt: Date.now() - 240000 },
+	{ id: 'u3', username: 'charlie', isCurrentUser: false, joinedAt: Date.now() - 120000 },
+	{ id: 'u4', username: 'dave', isCurrentUser: false, joinedAt: Date.now() - 180000 },
+	{ id: 'u5', username: 'eve', isCurrentUser: false, joinedAt: Date.now() - 90000 },
+	{ id: 'u6', username: 'frank', isCurrentUser: false, joinedAt: Date.now() - 600000 },
+	{ id: 'u7', username: 'grace', isCurrentUser: false, joinedAt: Date.now() - 540000 },
+	{ id: 'u8', username: 'henry', isCurrentUser: false, joinedAt: Date.now() - 60000 },
+	{ id: 'u9', username: 'iris', isCurrentUser: false, joinedAt: Date.now() - 420000 },
+	{ id: 'u10', username: 'jack', isCurrentUser: false, joinedAt: Date.now() - 150000 },
+	{ id: 'u11', username: 'kate', isCurrentUser: false, joinedAt: Date.now() - 100000 },
+	{ id: 'u12', username: 'liam', isCurrentUser: false, joinedAt: Date.now() - 50000 },
+	{ id: 'u13', username: 'mia', isCurrentUser: false, joinedAt: Date.now() - 25000 }
+];
+
+/**
+ * Fetch online players in the lobby
+ */
+export async function fetchOnlinePlayers(currentUsername?: string): Promise<OnlinePlayer[]> {
+	// Simulate network delay
+	await new Promise((resolve) => setTimeout(resolve, 400));
+
+	// In production, this would be:
+	// const response = await grpcCall(lobbyService.listOnlinePlayers, {}, 'LobbyService.listOnlinePlayers');
+	// return response.players;
+
+	// Add current user and mark them
+	const players = [...MOCK_ONLINE_PLAYERS];
+	if (currentUsername) {
+		players.unshift({
+			id: 'current',
+			username: currentUsername,
+			isCurrentUser: true,
+			joinedAt: Date.now()
+		});
+	}
+
+	return players;
 }
