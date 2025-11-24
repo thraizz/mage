@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { ChatMessage } from '$lib/types/chat';
-	import { fetchLobbyMessages, sendLobbyMessage } from '$lib/api/chat';
+	import { fetchLobbyMessages, sendLobbyMessage, sendWhisper } from '$lib/api/chat';
 	import { onMount } from 'svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 
@@ -45,6 +45,24 @@
 	}
 
 	/**
+	 * Parse whisper command (/w username message)
+	 */
+	function parseWhisperCommand(content: string): { isWhisper: boolean; username?: string; message?: string } {
+		const whisperRegex = /^\/w\s+(\S+)\s+(.+)$/;
+		const match = content.match(whisperRegex);
+
+		if (match) {
+			return {
+				isWhisper: true,
+				username: match[1],
+				message: match[2]
+			};
+		}
+
+		return { isWhisper: false };
+	}
+
+	/**
 	 * Send a message
 	 */
 	async function handleSendMessage(e: Event): Promise<void> {
@@ -55,11 +73,39 @@
 			return;
 		}
 
+		// Check if it's a whisper command
+		const whisperInfo = parseWhisperCommand(content);
+
+		// Validation for whisper
+		if (whisperInfo.isWhisper) {
+			if (!whisperInfo.username || !whisperInfo.message) {
+				error = 'Invalid whisper format. Use: /w username message';
+				setTimeout(() => (error = null), 3000);
+				return;
+			}
+
+			// Cannot whisper to self
+			if (whisperInfo.username.toLowerCase() === 'currentuser') {
+				error = 'You cannot whisper to yourself';
+				setTimeout(() => (error = null), 3000);
+				return;
+			}
+		}
+
 		sending = true;
 		error = null;
 
 		try {
-			const message = await sendLobbyMessage({ content });
+			let message: ChatMessage;
+
+			if (whisperInfo.isWhisper && whisperInfo.username && whisperInfo.message) {
+				// Send whisper
+				message = await sendWhisper(whisperInfo.username, whisperInfo.message);
+			} else {
+				// Send regular message
+				message = await sendLobbyMessage({ content });
+			}
+
 			messages.push(message);
 			messageInput = '';
 
@@ -68,6 +114,7 @@
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to send message';
 			console.error('Failed to send message:', err);
+			setTimeout(() => (error = null), 5000);
 		} finally {
 			sending = false;
 		}
