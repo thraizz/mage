@@ -75,8 +75,16 @@
 			}
 
 			// Find chat ID for the lobby (main room)
-			const chatResponse = await client.call('ChatFindByRoom', {
-				sessionId: await client.ensureSessionId(),
+			const sessionId = await client.ensureSessionId();
+			if (!sessionId) {
+				throw new Error('No active session - please login first');
+			}
+
+			const chatResponse = await client.call<
+				{ sessionId: string; roomId: string },
+				{ chatId?: string }
+			>('ChatFindByRoom', {
+				sessionId,
 				roomId: roomResponse.roomId
 			});
 
@@ -88,7 +96,7 @@
 			console.log('[LobbyChat] Got chat ID:', chatId);
 
 			// Join the chat room
-			await joinChat(chatId);
+			await joinChat(chatResponse.chatId);
 			console.log('[LobbyChat] Joined chat');
 
 			// Subscribe to WebSocket chat messages

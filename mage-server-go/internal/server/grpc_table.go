@@ -96,19 +96,58 @@ func (s *mageServer) RoomJoinTable(ctx context.Context, req *pb.RoomJoinTableReq
 
 	// Parse and submit deck if provided
 	deckListText := strings.TrimSpace(req.GetDeckList())
+	s.logger.Info("[DECK DEBUG] RoomJoinTable received deck",
+		zap.String("table_id", tbl.ID),
+		zap.String("username", username),
+		zap.Int("deck_text_length", len(deckListText)),
+		zap.Bool("has_deck", deckListText != ""),
+	)
+
 	if deckListText != "" {
+		// Log first 500 chars of deck text for debugging
+		previewLen := len(deckListText)
+		if previewLen > 500 {
+			previewLen = 500
+		}
+		s.logger.Info("[DECK DEBUG] Deck text preview",
+			zap.String("table_id", tbl.ID),
+			zap.String("username", username),
+			zap.String("deck_preview", deckListText[:previewLen]),
+		)
+
 		mainDeck, sideboard, commanders := parseDeckListText(deckListText)
+
+		s.logger.Info("[DECK DEBUG] Parsed deck result",
+			zap.String("table_id", tbl.ID),
+			zap.String("username", username),
+			zap.Int("main_deck_count", len(mainDeck)),
+			zap.Int("sideboard_count", len(sideboard)),
+			zap.Int("commander_count", len(commanders)),
+			zap.Strings("first_5_main", firstN(mainDeck, 5)),
+			zap.Strings("commanders", commanders),
+		)
 
 		if len(mainDeck) > 0 || len(commanders) > 0 {
 			// Validate card names exist in the database
 			allCardNames := append(append(mainDeck, sideboard...), commanders...)
+			s.logger.Debug("[DECK DEBUG] Validating card names",
+				zap.String("table_id", tbl.ID),
+				zap.String("username", username),
+				zap.Int("total_cards_to_validate", len(allCardNames)),
+			)
+
 			if err := s.validateCardNames(ctx, allCardNames); err != nil {
-				s.logger.Warn("deck validation failed, player joined without deck",
+				s.logger.Warn("[DECK DEBUG] Deck validation FAILED, player joined without deck",
 					zap.String("table_id", tbl.ID),
 					zap.String("username", username),
 					zap.Error(err),
 				)
 			} else {
+				s.logger.Debug("[DECK DEBUG] Card validation PASSED",
+					zap.String("table_id", tbl.ID),
+					zap.String("username", username),
+				)
+
 				deckList := table.DeckList{
 					MainDeck:   mainDeck,
 					Sideboard:  sideboard,
@@ -116,13 +155,13 @@ func (s *mageServer) RoomJoinTable(ctx context.Context, req *pb.RoomJoinTableReq
 				}
 
 				if err := tbl.SubmitDeck(username, deckList); err != nil {
-					s.logger.Warn("failed to submit deck for player",
+					s.logger.Warn("[DECK DEBUG] Failed to submit deck to table",
 						zap.String("table_id", tbl.ID),
 						zap.String("username", username),
 						zap.Error(err),
 					)
 				} else {
-					s.logger.Info("deck submitted on join",
+					s.logger.Info("[DECK DEBUG] Deck SUCCESSFULLY submitted on join",
 						zap.String("table_id", tbl.ID),
 						zap.String("username", username),
 						zap.Int("main_count", len(mainDeck)),
@@ -131,7 +170,17 @@ func (s *mageServer) RoomJoinTable(ctx context.Context, req *pb.RoomJoinTableReq
 					)
 				}
 			}
+		} else {
+			s.logger.Warn("[DECK DEBUG] Parsed deck is empty",
+				zap.String("table_id", tbl.ID),
+				zap.String("username", username),
+			)
 		}
+	} else {
+		s.logger.Debug("[DECK DEBUG] No deck text provided in join request",
+			zap.String("table_id", tbl.ID),
+			zap.String("username", username),
+		)
 	}
 
 	s.logger.Info("user joined table",
@@ -293,6 +342,14 @@ func parseQuantity(s string) (int, error) {
 	var qty int
 	_, err := fmt.Sscanf(s, "%d", &qty)
 	return qty, err
+}
+
+// firstN returns the first n elements of a string slice (for logging)
+func firstN(slice []string, n int) []string {
+	if len(slice) <= n {
+		return slice
+	}
+	return slice[:n]
 }
 
 // RoomLeaveTableOrTournament removes a player from a table or tournament.
@@ -926,12 +983,14 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 		}, nil
 	}
 
-	s.logger.Info("deck submitted",
+	s.logger.Info("[DECK DEBUG] DeckSubmit RPC - deck SUCCESSFULLY submitted",
 		zap.String("table_id", tbl.ID),
 		zap.String("username", username),
 		zap.Int("main_count", len(deckList.MainDeck)),
 		zap.Int("sideboard_count", len(deckList.Sideboard)),
 		zap.Int("commander_count", len(deckList.Commanders)),
+		zap.Strings("first_5_main", firstN(deckList.MainDeck, 5)),
+		zap.Strings("commanders", deckList.Commanders),
 	)
 
 	return &pb.DeckSubmitResponse{

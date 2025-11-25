@@ -148,13 +148,77 @@ export async function joinTable(
 		password: password || ''
 	};
 
+	console.log('[joinTable] Sending RoomJoinTable request:', {
+		tableId,
+		hasPassword: !!password,
+		deckListLength: deckList.length,
+		deckListPreview: deckList.substring(0, 300)
+	});
+
 	const response = await client.call<typeof request, { success: boolean; error?: string }>(
 		'RoomJoinTable',
 		request
 	);
 
+	console.log('[joinTable] RoomJoinTable response:', {
+		success: response.success,
+		error: response.error
+	});
+
 	if (!response.success) {
 		throw new Error(response.error || 'Failed to join table');
+	}
+}
+
+/**
+ * Submit a deck to a table
+ * Used by both table creators and joiners
+ */
+export async function submitDeck(
+	tableId: string,
+	deck: {
+		mainDeck: { name: string; quantity: number }[];
+		sideboard: { name: string; quantity: number }[];
+		commanders: { name: string; quantity: number }[];
+	}
+): Promise<void> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	const request = {
+		sessionId,
+		tableId,
+		deck: {
+			mainDeck: deck.mainDeck.map((c) => ({ name: c.name, quantity: c.quantity })),
+			sideboard: deck.sideboard.map((c) => ({ name: c.name, quantity: c.quantity })),
+			commanders: deck.commanders.map((c) => ({ name: c.name, quantity: c.quantity }))
+		}
+	};
+
+	console.log('[submitDeck] Sending DeckSubmit request:', {
+		tableId,
+		mainDeckCount: deck.mainDeck.reduce((sum, c) => sum + c.quantity, 0),
+		sideboardCount: deck.sideboard.reduce((sum, c) => sum + c.quantity, 0),
+		commanderCount: deck.commanders.reduce((sum, c) => sum + c.quantity, 0),
+		firstCards: deck.mainDeck.slice(0, 3).map((c) => `${c.quantity}x ${c.name}`)
+	});
+
+	const response = await client.call<typeof request, { success: boolean; error?: string }>(
+		'DeckSubmit',
+		request
+	);
+
+	console.log('[submitDeck] DeckSubmit response:', {
+		success: response.success,
+		error: response.error
+	});
+
+	if (!response.success) {
+		throw new Error(response.error || 'Failed to submit deck');
 	}
 }
 
@@ -233,50 +297,6 @@ export async function startGame(tableId: string): Promise<string> {
 	} catch (error) {
 		console.error('Failed to start game:', error);
 		throw error;
-	}
-}
-
-/**
- * Submit a deck to a table (for deck validation and game start)
- *
- * This allows players to submit/update their deck after joining a table.
- * The deck is sent in structured format with card names and quantities.
- */
-export async function submitDeck(
-	tableId: string,
-	deck: {
-		mainDeck: { name: string; quantity: number }[];
-		sideboard: { name: string; quantity: number }[];
-		commanders: { name: string; quantity: number }[];
-	}
-): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	// Convert to the proto DeckCardLists format
-	const deckCardLists = {
-		mainDeck: deck.mainDeck.map((c) => ({ name: c.name, quantity: c.quantity })),
-		sideboard: deck.sideboard.map((c) => ({ name: c.name, quantity: c.quantity })),
-		commanders: deck.commanders.map((c) => ({ name: c.name, quantity: c.quantity }))
-	};
-
-	const request = {
-		sessionId,
-		tableId,
-		deck: deckCardLists
-	};
-
-	const response = await client.call<typeof request, { success: boolean; error?: string }>(
-		'DeckSubmit',
-		request
-	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to submit deck');
 	}
 }
 

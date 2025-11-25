@@ -54,8 +54,7 @@ describe('Auth Store', () => {
 
 		const user = {
 			id: 'user123',
-			username: 'testuser',
-			email: 'test@example.com'
+			username: 'testuser'
 		};
 
 		auth.login(token, user);

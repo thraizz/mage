@@ -50,12 +50,28 @@ func (s *mageServer) MatchStart(ctx context.Context, req *pb.MatchStartRequest) 
 		return &pb.MatchStartResponse{Success: false, Error: "table not ready to start"}, nil
 	}
 
+	s.logger.Info("[MATCH START] Beginning match start",
+		zap.String("table_id", tbl.ID),
+		zap.Int("seat_count", len(tbl.Seats)),
+	)
+
 	players := make([]string, 0, len(tbl.Seats))
-	for _, seat := range tbl.Seats {
+	for i, seat := range tbl.Seats {
+		s.logger.Debug("[MATCH START] Checking seat",
+			zap.String("table_id", tbl.ID),
+			zap.Int("seat_index", i),
+			zap.String("player_name", seat.PlayerName),
+			zap.Bool("deck_valid", seat.DeckValid),
+		)
 		if seat.PlayerName != "" {
 			players = append(players, seat.PlayerName)
 			if !seat.DeckValid {
-				s.logger.Debug("player starting without submitted deck",
+				s.logger.Warn("[MATCH START] Player has NO valid deck submitted!",
+					zap.String("table_id", tbl.ID),
+					zap.String("player", seat.PlayerName),
+				)
+			} else {
+				s.logger.Info("[MATCH START] Player has valid deck",
 					zap.String("table_id", tbl.ID),
 					zap.String("player", seat.PlayerName),
 				)
@@ -68,6 +84,11 @@ func (s *mageServer) MatchStart(ctx context.Context, req *pb.MatchStartRequest) 
 	}
 
 	// Collect submitted decks from the table
+	s.logger.Info("[MATCH START] Collecting submitted decks",
+		zap.String("table_id", tbl.ID),
+		zap.Strings("players", players),
+	)
+
 	decks := make(map[string]game.DeckList)
 	for _, playerName := range players {
 		if tableDeck, ok := tbl.GetSubmittedDeck(playerName); ok {
@@ -76,13 +97,25 @@ func (s *mageServer) MatchStart(ctx context.Context, req *pb.MatchStartRequest) 
 				Sideboard:  tableDeck.Sideboard,
 				Commanders: tableDeck.Commanders,
 			}
-			s.logger.Debug("collected deck for player",
+			s.logger.Info("[MATCH START] Got deck for player",
 				zap.String("player", playerName),
 				zap.Int("main_deck_size", len(tableDeck.MainDeck)),
+				zap.Int("sideboard_size", len(tableDeck.Sideboard)),
 				zap.Int("commander_count", len(tableDeck.Commanders)),
+				zap.Strings("first_5_cards", firstN(tableDeck.MainDeck, 5)),
+			)
+		} else {
+			s.logger.Warn("[MATCH START] NO DECK found for player!",
+				zap.String("player", playerName),
 			)
 		}
 	}
+
+	s.logger.Info("[MATCH START] Decks collection complete",
+		zap.String("table_id", tbl.ID),
+		zap.Int("decks_collected", len(decks)),
+		zap.Int("players_count", len(players)),
+	)
 
 	gameInstance := s.gameMgr.CreateGame(tbl.ID, tbl.GameType, players)
 	tbl.RecordMatch(gameInstance.ID)

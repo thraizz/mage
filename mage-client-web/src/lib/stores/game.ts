@@ -148,8 +148,25 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_UPDATE, (data) => {
 				const updateData = data as GameUpdateData;
-				console.log('[GameStore] GAME_UPDATE:', updateData);
+				console.log('[GameStore] GAME_UPDATE received:', {
+					hasGame: !!updateData.game,
+					state: updateData.game?.state,
+					turn: updateData.game?.turn,
+					phase: updateData.game?.phase,
+					playerCount: updateData.game?.players?.length
+				});
 				if (updateData.game) {
+					// Log each player's hand
+					updateData.game.players?.forEach((player) => {
+						console.log('[GameStore] Player hand data:', {
+							playerId: player.playerId,
+							playerName: player.name,
+							handCount: player.handCount,
+							handCards: player.hand?.map((c) => c.name) || [],
+							handCardIds: player.hand?.map((c) => c.id) || []
+						});
+					});
+
 					const normalized = normalizeGameView(updateData.game);
 					update((s) => ({
 						...s,
@@ -427,6 +444,24 @@ function createGameStore() {
 	 * Update game view directly (for initial load via RPC)
 	 */
 	function setGameView(gameView: GameView) {
+		console.log('[GameStore] setGameView called:', {
+			state: gameView.state,
+			turn: gameView.turn,
+			phase: gameView.phase,
+			playerCount: gameView.players?.length
+		});
+
+		// Log each player's hand
+		gameView.players?.forEach((player) => {
+			console.log('[GameStore] setGameView - Player hand:', {
+				playerId: player.playerId,
+				playerName: player.name,
+				handCount: player.handCount,
+				handCards: player.hand?.map((c) => c.name) || [],
+				handCardIds: player.hand?.map((c) => c.id) || []
+			});
+		});
+
 		const normalized = normalizeGameView(gameView);
 		update((s) => ({
 			...s,

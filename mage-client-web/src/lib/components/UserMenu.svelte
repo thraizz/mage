@@ -80,9 +80,6 @@
 		<div bind:this={menuDropdown} class="dropdown-menu" role="menu">
 			<div class="dropdown-header">
 				<div class="dropdown-username">{$auth.user?.username || 'Guest'}</div>
-				{#if $auth.user?.email}
-					<div class="dropdown-email">{$auth.user.email}</div>
-				{/if}
 			</div>
 
 			<div class="dropdown-divider"></div>

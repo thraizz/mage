@@ -638,6 +638,35 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 
 // StartGameWithDecks initializes a new game state with player-submitted decks
 func (e *MageEngine) StartGameWithDecks(gameID string, players []string, gameType string, decks map[string]DeckList) error {
+	if e.logger != nil {
+		e.logger.Info("[ENGINE] StartGameWithDecks called",
+			zap.String("game_id", gameID),
+			zap.Strings("players", players),
+			zap.String("game_type", gameType),
+			zap.Bool("decks_provided", decks != nil),
+			zap.Int("decks_count", len(decks)),
+		)
+		// Log each deck received
+		for playerID, deck := range decks {
+			e.logger.Info("[ENGINE] Deck received for player",
+				zap.String("player", playerID),
+				zap.Int("main_deck_size", len(deck.MainDeck)),
+				zap.Int("sideboard_size", len(deck.Sideboard)),
+				zap.Int("commander_count", len(deck.Commanders)),
+			)
+			if len(deck.MainDeck) > 0 {
+				first5 := deck.MainDeck
+				if len(first5) > 5 {
+					first5 = first5[:5]
+				}
+				e.logger.Info("[ENGINE] First 5 cards in deck",
+					zap.String("player", playerID),
+					zap.Strings("cards", first5),
+				)
+			}
+		}
+	}
+
 	if gameID == "" {
 		return fmt.Errorf("gameID is required")
 	}
@@ -758,12 +787,27 @@ func (e *MageEngine) StartGameWithDecks(gameID string, players []string, gameTyp
 		var deckCardNames []string
 		var commanderNames []string
 
+		if e.logger != nil {
+			e.logger.Info("[ENGINE] Loading deck for player",
+				zap.String("player", playerID),
+				zap.Bool("decks_map_exists", decks != nil),
+			)
+		}
+
 		if decks != nil {
-			if playerDeck, ok := decks[playerID]; ok && len(playerDeck.MainDeck) > 0 {
+			playerDeck, ok := decks[playerID]
+			if e.logger != nil {
+				e.logger.Info("[ENGINE] Checking deck map for player",
+					zap.String("player", playerID),
+					zap.Bool("found_in_map", ok),
+					zap.Int("main_deck_size_if_found", len(playerDeck.MainDeck)),
+				)
+			}
+			if ok && len(playerDeck.MainDeck) > 0 {
 				deckCardNames = playerDeck.MainDeck
 				commanderNames = playerDeck.Commanders
 				if e.logger != nil {
-					e.logger.Info("loading player deck",
+					e.logger.Info("[ENGINE] USING PLAYER'S SUBMITTED DECK",
 						zap.String("player", playerID),
 						zap.Int("main_deck_size", len(deckCardNames)),
 						zap.Int("commander_count", len(commanderNames)),
@@ -774,15 +818,15 @@ func (e *MageEngine) StartGameWithDecks(gameID string, players []string, gameTyp
 
 		// Fall back to test deck if no deck provided
 		if len(deckCardNames) == 0 {
+			if e.logger != nil {
+				e.logger.Warn("[ENGINE] NO DECK FOUND - FALLING BACK TO TEST DECK!",
+					zap.String("player", playerID),
+				)
+			}
 			testDeckNames := []string{"Lightning Bolt", "Lightning Bolt", "Counterspell", "Counterspell", "Shock", "Shock",
 				"Lightning Bolt", "Counterspell", "Shock", "Lightning Bolt"}
 			for j := 0; j < 60; j++ {
 				deckCardNames = append(deckCardNames, testDeckNames[j%len(testDeckNames)])
-			}
-			if e.logger != nil {
-				e.logger.Debug("using test deck for player",
-					zap.String("player", playerID),
-				)
 			}
 		}
 

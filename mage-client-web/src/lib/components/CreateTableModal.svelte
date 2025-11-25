@@ -2,6 +2,7 @@
 	import type { GameFormat } from '$lib/types/table';
 	import type { Deck } from '$lib/types/deck';
 	import { getGameFormats, createTable } from '$lib/api/lobby';
+	import { submitDeck } from '$lib/api/table';
 	import { fetchUserDecks } from '$lib/api/decks';
 	import Modal from './Modal.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
@@ -131,12 +132,52 @@
 		error = null;
 
 		try {
+			// Find the selected deck
+			const deck = availableDecks.find((d) => d.id === selectedDeck);
+			if (!deck) {
+				error = 'Please select a valid deck';
+				loading = false;
+				return;
+			}
+
+			console.log('[CreateTable] Creating table with deck:', {
+				deckId: deck.id,
+				deckName: deck.name,
+				mainDeckCount: deck.mainDeck.length,
+				sideboardCount: deck.sideboard.length,
+				commanderCount: deck.commanders.length
+			});
+
 			const table = await createTable({
 				name: tableName || undefined,
 				format: selectedFormat,
 				maxPlayers,
 				password: password || undefined
 			});
+
+			console.log('[CreateTable] Table created:', table.id, '- Now submitting deck...');
+
+			// Submit the deck for the creator
+			try {
+				await submitDeck(table.id, {
+					mainDeck: deck.mainDeck.map((c) => ({
+						name: c.cardName,
+						quantity: c.quantity
+					})),
+					sideboard: deck.sideboard.map((c) => ({
+						name: c.cardName,
+						quantity: c.quantity
+					})),
+					commanders: deck.commanders.map((c) => ({
+						name: c.cardName,
+						quantity: c.quantity
+					}))
+				});
+				console.log('[CreateTable] Deck submitted successfully!');
+			} catch (deckErr) {
+				console.error('[CreateTable] Failed to submit deck:', deckErr);
+				// Don't fail table creation if deck submit fails - user can resubmit
+			}
 
 			// Success - notify parent and close modal
 			onSuccess(table.id);

@@ -84,6 +84,15 @@
 				throw new Error('Selected deck not found');
 			}
 
+			console.log('[JoinTable] Selected deck:', {
+				id: deck.id,
+				name: deck.name,
+				format: deck.format,
+				mainDeckCount: deck.mainDeck.length,
+				sideboardCount: deck.sideboard.length,
+				commanderCount: deck.commanders.length
+			});
+
 			// Convert deck to text format
 			const deckCards: CardEntry[] = [
 				...deck.commanders.map((c) => ({
@@ -104,9 +113,16 @@
 			];
 			const deckList = structuredCardsToText(deckCards);
 
+			console.log('[JoinTable] Deck text being sent:', {
+				textLength: deckList.length,
+				preview: deckList.substring(0, 500),
+				fullText: deckList
+			});
+
 			// Join table with deck
 			await joinTable(table.id, deckList, table.hasPassword ? password : undefined);
 
+			console.log('[JoinTable] Join successful for table:', table.id);
 			toast.success(`Joined table: ${table.name}`);
 			onSuccess(table.id);
 		} catch (err) {
