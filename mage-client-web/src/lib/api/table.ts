@@ -1,16 +1,29 @@
 /**
  * Table API functions for table lobby operations
- * Real gRPC implementation
+ * Real gRPC implementation using generated protobuf types
  */
 
-import type { Table } from '$lib/types/table';
+import type { Table, GameFormat } from '$lib/types/table';
 import { getMageClient } from '$lib/grpc/client';
 import type { TableView } from '$lib/generated/mage/v1/models';
 import type {
 	RoomGetTableByIdRequest,
 	RoomGetTableByIdResponse
 } from '$lib/generated/mage/v1/room';
-import type { GameFormat } from '$lib/types/table';
+import type {
+	RoomJoinTableRequest,
+	RoomJoinTableResponse,
+	RoomLeaveTableOrTournamentRequest,
+	RoomLeaveTableOrTournamentResponse,
+	DeckSubmitRequest,
+	DeckSubmitResponse,
+	DeckCard,
+	DeckCardLists
+} from '$lib/generated/mage/v1/table';
+import type {
+	MatchStartRequest,
+	MatchStartResponse
+} from '$lib/generated/mage/v1/game';
 
 /**
  * Convert TableView from proto to our Table type
@@ -69,6 +82,23 @@ function convertTableViewToTable(view: TableView): Table {
 }
 
 /**
+ * Helper to create a DeckCard from simple card data
+ * Only name and quantity are required for deck submission
+ */
+function createDeckCard(name: string, quantity: number): DeckCard {
+	return {
+		name,
+		quantity,
+		manaCost: '',
+		cardType: '',
+		types: [],
+		colors: [],
+		power: '',
+		toughness: ''
+	};
+}
+
+/**
  * Fetch table details by ID
  */
 export async function fetchTable(tableId: string): Promise<Table> {
@@ -113,11 +143,13 @@ export async function fetchTable(tableId: string): Promise<Table> {
 export async function toggleReady(_tableId: string, _isReady: boolean): Promise<void> {
 	// TableSetReady RPC doesn't exist - ready status is controlled by deck submission
 	// For now, throw an error to make it clear this functionality isn't implemented
-	throw new Error('Ready status is controlled by deck submission. Please submit your deck to mark yourself as ready.');
+	throw new Error(
+		'Ready status is controlled by deck submission. Please submit your deck to mark yourself as ready.'
+	);
 }
 
 /**
- * Join table with deck
+ * Join table with deck (text format)
  */
 export async function joinTable(
 	tableId: string,
@@ -137,7 +169,7 @@ export async function joinTable(
 		throw new Error('Failed to get main room ID');
 	}
 
-	const request = {
+	const request: RoomJoinTableRequest = {
 		sessionId,
 		roomId: roomResponse.roomId,
 		tableId,
@@ -155,7 +187,7 @@ export async function joinTable(
 		deckListPreview: deckList.substring(0, 300)
 	});
 
-	const response = await client.call<typeof request, { success: boolean; error?: string }>(
+	const response = await client.call<RoomJoinTableRequest, RoomJoinTableResponse>(
 		'RoomJoinTable',
 		request
 	);
@@ -171,7 +203,7 @@ export async function joinTable(
 }
 
 /**
- * Submit a deck to a table
+ * Submit a deck to a table (structured format)
  * Used by both table creators and joiners
  */
 export async function submitDeck(
@@ -189,14 +221,17 @@ export async function submitDeck(
 		throw new Error('No active session - please login first');
 	}
 
-	const request = {
+	// Build structured deck using generated types
+	const deckCardLists: DeckCardLists = {
+		mainDeck: deck.mainDeck.map((c) => createDeckCard(c.name, c.quantity)),
+		sideboard: deck.sideboard.map((c) => createDeckCard(c.name, c.quantity)),
+		commanders: deck.commanders.map((c) => createDeckCard(c.name, c.quantity))
+	};
+
+	const request: DeckSubmitRequest = {
 		sessionId,
 		tableId,
-		deck: {
-			mainDeck: deck.mainDeck.map((c) => ({ name: c.name, quantity: c.quantity })),
-			sideboard: deck.sideboard.map((c) => ({ name: c.name, quantity: c.quantity })),
-			commanders: deck.commanders.map((c) => ({ name: c.name, quantity: c.quantity }))
-		}
+		deck: deckCardLists
 	};
 
 	console.log('[submitDeck] Sending DeckSubmit request:', {
@@ -207,10 +242,7 @@ export async function submitDeck(
 		firstCards: deck.mainDeck.slice(0, 3).map((c) => `${c.quantity}x ${c.name}`)
 	});
 
-	const response = await client.call<typeof request, { success: boolean; error?: string }>(
-		'DeckSubmit',
-		request
-	);
+	const response = await client.call<DeckSubmitRequest, DeckSubmitResponse>('DeckSubmit', request);
 
 	console.log('[submitDeck] DeckSubmit response:', {
 		success: response.success,
@@ -240,16 +272,16 @@ export async function leaveTable(tableId: string): Promise<void> {
 		throw new Error('Failed to get main room ID');
 	}
 
-	const leaveRequest = {
+	const request: RoomLeaveTableOrTournamentRequest = {
 		sessionId,
 		roomId: roomResponse.roomId,
 		tableId
 	};
 
-	const response = await client.call<typeof leaveRequest, { success: boolean; error?: string }>(
-		'RoomLeaveTableOrTournament',
-		leaveRequest
-	);
+	const response = await client.call<
+		RoomLeaveTableOrTournamentRequest,
+		RoomLeaveTableOrTournamentResponse
+	>('RoomLeaveTableOrTournament', request);
 
 	if (!response.success) {
 		throw new Error(response.error || 'Failed to leave table');
@@ -258,9 +290,6 @@ export async function leaveTable(tableId: string): Promise<void> {
 
 /**
  * Start game (host only)
- *
- * Note: The actual method to start a match might be different
- * This assumes MatchStart exists
  */
 export async function startGame(tableId: string): Promise<string> {
 	const client = getMageClient();
@@ -270,34 +299,19 @@ export async function startGame(tableId: string): Promise<string> {
 		throw new Error('No active session - please login first');
 	}
 
-	// Get main room ID
-	const roomResponse = await client.getMainRoomId();
-	if (!roomResponse.roomId) {
-		throw new Error('Failed to get main room ID');
+	const request: MatchStartRequest = {
+		sessionId,
+		tableId
+	};
+
+	const response = await client.call<MatchStartRequest, MatchStartResponse>('MatchStart', request);
+
+	if (!response.success) {
+		throw new Error(response.error || 'Failed to start game');
 	}
 
-	try {
-		const request = {
-			sessionId,
-			roomId: roomResponse.roomId,
-			tableId
-		};
-
-		const response = await client.call<
-			typeof request,
-			{ success: boolean; error?: string; gameId?: string }
-		>('MatchStart', request);
-
-		if (!response.success) {
-			throw new Error(response.error || 'Failed to start game');
-		}
-
-		// Return game ID if provided, otherwise use table ID
-		return response.gameId || tableId;
-	} catch (error) {
-		console.error('Failed to start game:', error);
-		throw error;
-	}
+	// Return game ID if provided, otherwise use table ID
+	return response.gameId || tableId;
 }
 
 /**
