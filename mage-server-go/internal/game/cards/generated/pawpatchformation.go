@@ -30,7 +30,7 @@ func NewPawpatchFormation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewEnchantmentTargetFilter())).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

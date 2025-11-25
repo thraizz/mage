@@ -24,8 +24,8 @@ func NewEnergyBolt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

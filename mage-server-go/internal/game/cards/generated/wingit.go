@@ -25,7 +25,7 @@ func NewWingIt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("flying", 1))).
 		AddEffect(abilities.NewScryEffect(1)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

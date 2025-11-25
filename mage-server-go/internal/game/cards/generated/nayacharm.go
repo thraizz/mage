@@ -24,8 +24,8 @@ func NewNayaCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

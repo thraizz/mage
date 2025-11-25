@@ -24,7 +24,7 @@ func NewDawnToDusk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewEnchantmentTargetFilter())).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

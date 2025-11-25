@@ -23,7 +23,7 @@ func NewWindSail(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
-		AddTarget(abilities.NewTargetRequirement(1, 2, abilities.NewCreatureTargetFilter())).
+		AddTargets(1, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

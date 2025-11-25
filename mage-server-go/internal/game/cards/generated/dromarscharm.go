@@ -27,8 +27,8 @@ func NewDromarsCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddEffect(abilities.NewGainLifeEffect(5)).
 		AddEffect(abilities.NewCounterSpellEffect()).
 		AddEffect(abilities.NewBoostEffect(-2, -2)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewSpellTargetFilter()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

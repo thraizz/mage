@@ -22,8 +22,8 @@ func NewDwarvenLandslide(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(2, 2, abilities.NewLandTargetFilter())).
+		AddTarget(abilities.NewLandTargetFilter()).
+		AddTargets(2, 2, abilities.NewLandTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

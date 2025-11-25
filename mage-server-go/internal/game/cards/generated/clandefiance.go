@@ -26,7 +26,7 @@ func NewClanDefiance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

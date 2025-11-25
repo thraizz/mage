@@ -24,7 +24,7 @@ func NewDreamFracture(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCounterSpellEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

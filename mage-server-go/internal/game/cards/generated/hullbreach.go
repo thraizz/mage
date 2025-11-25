@@ -26,10 +26,10 @@ func NewHullBreach(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewEnchantmentTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewEnchantmentTargetFilter())).
+		AddTarget(abilities.NewArtifactTargetFilter()).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
+		AddTarget(abilities.NewArtifactTargetFilter()).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -23,7 +23,7 @@ func NewSpringCleaning(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
 		// TODO: DestroyAllEffect with complex parameters
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewEnchantmentTargetFilter())).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

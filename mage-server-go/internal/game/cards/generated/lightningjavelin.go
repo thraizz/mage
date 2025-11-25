@@ -23,7 +23,7 @@ func NewLightningJavelin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddEffect(abilities.NewScryEffect(1)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

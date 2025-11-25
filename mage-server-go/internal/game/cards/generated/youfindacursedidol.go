@@ -29,7 +29,7 @@ func NewYouFindACursedIdol(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

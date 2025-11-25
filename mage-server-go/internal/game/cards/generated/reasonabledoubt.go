@@ -23,8 +23,8 @@ func NewReasonableDoubt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCounterSpellEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewSpellTargetFilter()).
+		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

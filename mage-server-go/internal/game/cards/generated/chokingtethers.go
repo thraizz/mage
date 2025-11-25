@@ -23,7 +23,7 @@ func NewChokingTethers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewTapEffect()).
-		AddTarget(abilities.NewTargetRequirement(0, 4, abilities.NewCreatureTargetFilter())).
+		AddTargets(0, 4, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

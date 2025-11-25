@@ -23,8 +23,8 @@ func NewBreakDownTheDoor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewExileTargetEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewEnchantmentTargetFilter())).
+		AddTarget(abilities.NewArtifactTargetFilter()).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

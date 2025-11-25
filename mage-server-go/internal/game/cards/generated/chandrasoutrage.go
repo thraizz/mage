@@ -24,7 +24,7 @@ func NewChandrasOutrage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewDamageEffect(2)).
 		AddEffect(abilities.NewDamageEffect(4)).
 		AddEffect(abilities.NewDamageEffect(2)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

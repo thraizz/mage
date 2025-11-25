@@ -21,7 +21,7 @@ func NewBiomanticMastery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddTarget(abilities.NewTargetRequirement(2, 2, abilities.NewPlayerTargetFilter())).
+		AddTargets(2, 2, abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

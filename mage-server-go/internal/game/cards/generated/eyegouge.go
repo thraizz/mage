@@ -24,7 +24,7 @@ func NewEyeGouge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewBoostEffect(-1, -1)).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

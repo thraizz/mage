@@ -28,7 +28,7 @@ func NewYoureConfrontedByRobbers(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 3)).
-		AddTarget(abilities.NewTargetRequirement(0, 3, abilities.NewCreatureTargetFilter())).
+		AddTargets(0, 3, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

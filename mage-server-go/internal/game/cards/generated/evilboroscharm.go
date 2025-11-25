@@ -30,7 +30,7 @@ func NewEvilBorosCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewDamageEffect(2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

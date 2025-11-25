@@ -26,7 +26,7 @@ func NewGiftOfTheViper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("reach", 1))).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("deathtouch", 1))).
 		AddEffect(abilities.NewUntapEffect("untap it")).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

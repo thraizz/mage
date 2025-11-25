@@ -26,7 +26,7 @@ func NewEbonyCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddEffect(abilities.NewGrantAbilityEffect("FearAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(1)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -508,23 +508,23 @@ class JavaCardParser:
 
     def _extract_class_name(self) -> str:
         """Extract class name"""
-        # Try CardImpl first (most common)
-        match = re.search(r'public final class (\w+) extends CardImpl', self.content)
+        # Try CardImpl first (most common) - handle both "final" and non-final classes
+        match = re.search(r'public (?:final )?class (\w+) extends CardImpl', self.content)
         if match:
             return match.group(1)
 
         # Try SplitCard (e.g., Wear//Tear)
-        match = re.search(r'public final class (\w+) extends SplitCard', self.content)
+        match = re.search(r'public (?:final )?class (\w+) extends SplitCard', self.content)
         if match:
             return match.group(1)
 
         # Try ModalDoubleFacedCard (e.g., Witch Enchanter // Witch-Blessed Meadow)
-        match = re.search(r'public final class (\w+) extends ModalDoubleFacedCard', self.content)
+        match = re.search(r'public (?:final )?class (\w+) extends ModalDoubleFacedCard', self.content)
         if match:
             return match.group(1)
 
         # Try AdventureCard
-        match = re.search(r'public final class (\w+) extends AdventureCard', self.content)
+        match = re.search(r'public (?:final )?class (\w+) extends AdventureCard', self.content)
         if match:
             return match.group(1)
 

@@ -24,7 +24,7 @@ func NewPlungeIntoWinter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewScryEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewCreatureTargetFilter())).
+		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

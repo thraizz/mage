@@ -25,7 +25,7 @@ func NewRushOfAdrenaline(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddEffect(abilities.NewBoostEffect(2, 1)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

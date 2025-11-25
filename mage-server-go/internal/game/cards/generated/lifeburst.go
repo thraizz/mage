@@ -24,7 +24,7 @@ func NewLifeBurst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewGainLifeEffect()).
 		AddEffect(abilities.NewGainLifeEffect(4)).
 		AddEffect(abilities.NewGainLifeEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

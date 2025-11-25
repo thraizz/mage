@@ -30,7 +30,7 @@ func NewFakeYourOwnDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddEffect(abilities.NewBoostEffect(2, 0)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		// TODO: GainAbilityTargetEffect with complex parameters
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

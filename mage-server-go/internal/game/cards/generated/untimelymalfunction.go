@@ -22,8 +22,8 @@ func NewUntimelyMalfunction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 2, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewArtifactTargetFilter()).
+		AddTargets(1, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

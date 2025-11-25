@@ -24,8 +24,8 @@ func NewIntegrityIntervention(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -29,7 +29,7 @@ func NewSunkenField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

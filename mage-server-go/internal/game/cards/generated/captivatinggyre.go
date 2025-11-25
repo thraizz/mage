@@ -22,7 +22,7 @@ func NewCaptivatingGyre(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddTarget(abilities.NewTargetRequirement(0, 3, abilities.NewCreatureTargetFilter())).
+		AddTargets(0, 3, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

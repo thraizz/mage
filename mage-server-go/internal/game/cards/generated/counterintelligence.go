@@ -22,7 +22,7 @@ func NewCounterintelligence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 2, abilities.NewCreatureTargetFilter())).
+		AddTargets(1, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

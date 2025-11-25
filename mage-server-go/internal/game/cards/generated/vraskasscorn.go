@@ -22,7 +22,7 @@ func NewVraskasScorn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(4)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

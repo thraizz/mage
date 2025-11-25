@@ -27,7 +27,7 @@ func NewCorneredByBlackMages(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

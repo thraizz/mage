@@ -25,7 +25,7 @@ func NewMysticConfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewCounterSpellEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

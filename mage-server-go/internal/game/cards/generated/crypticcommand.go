@@ -26,7 +26,7 @@ func NewCrypticCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewCounterSpellEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

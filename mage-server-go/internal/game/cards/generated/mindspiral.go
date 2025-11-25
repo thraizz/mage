@@ -25,7 +25,7 @@ func NewMindSpiral(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 1))).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

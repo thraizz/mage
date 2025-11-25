@@ -24,7 +24,7 @@ func NewReapAndSow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect()).
 		// TODO: SearchLibraryPutInPlayEffect with complex parameters
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

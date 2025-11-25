@@ -24,7 +24,7 @@ func NewErebossIntervention(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddEffect(abilities.NewBoostEffect(x, x)).
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
 		AddEffect(abilities.NewExileTargetEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

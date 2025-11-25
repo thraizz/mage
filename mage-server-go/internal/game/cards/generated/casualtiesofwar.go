@@ -26,7 +26,7 @@ func NewCasualtiesOfWar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

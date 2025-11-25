@@ -24,8 +24,8 @@ func NewVandalize(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())).
+		AddTarget(abilities.NewArtifactTargetFilter()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

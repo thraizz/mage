@@ -24,8 +24,8 @@ func NewIvoryCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewBoostEffect(-2, 0)).
 		AddEffect(abilities.NewTapEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

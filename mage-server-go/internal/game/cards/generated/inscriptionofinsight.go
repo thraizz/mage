@@ -23,7 +23,7 @@ func NewInscriptionOfInsight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewScryEffect(1)).
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddTarget(abilities.NewTargetRequirement(0, 2, abilities.NewCreatureTargetFilter())).
+		AddTargets(0, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

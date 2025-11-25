@@ -28,7 +28,7 @@ func NewReleaseTheGremlins(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -24,7 +24,7 @@ func NewAtrociousExperiment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

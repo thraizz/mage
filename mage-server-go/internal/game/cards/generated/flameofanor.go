@@ -24,9 +24,9 @@ func NewFlameOfAnor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(5)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewArtifactTargetFilter()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

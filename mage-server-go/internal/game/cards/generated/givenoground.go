@@ -25,7 +25,7 @@ func NewGiveNoGround(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		// TODO: GainAbilityTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(2, 6)).
 		// TODO: GainAbilityTargetEffect with complex parameters
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

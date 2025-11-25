@@ -21,10 +21,10 @@ func NewChaoticTransformation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewArtifactTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewCreatureTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewEnchantmentTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewLandTargetFilter())).
+		AddTargets(0, 1, abilities.NewArtifactTargetFilter()).
+		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
+		AddTargets(0, 1, abilities.NewEnchantmentTargetFilter()).
+		AddTargets(0, 1, abilities.NewLandTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

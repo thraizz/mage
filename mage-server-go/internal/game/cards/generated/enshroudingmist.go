@@ -24,7 +24,7 @@ func NewEnshroudingMist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
 		AddEffect(abilities.NewUntapEffect()).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

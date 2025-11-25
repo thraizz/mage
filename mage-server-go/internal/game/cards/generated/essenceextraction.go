@@ -25,7 +25,7 @@ func NewEssenceExtraction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddEffect(abilities.NewGainLifeEffect(3)).
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

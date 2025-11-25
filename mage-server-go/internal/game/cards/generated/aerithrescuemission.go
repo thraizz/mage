@@ -30,7 +30,7 @@ func NewAerithRescueMission(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 1))).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 3)).
 		AddEffect(abilities.NewTapEffect()).
-		AddTarget(abilities.NewTargetRequirement(0, 3, abilities.NewCreatureTargetFilter())).
+		AddTargets(0, 3, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

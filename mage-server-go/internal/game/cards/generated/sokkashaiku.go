@@ -27,8 +27,8 @@ func NewSokkasHaiku(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewMillCardsControllerEffect(1)).
 		AddEffect(abilities.NewUntapEffect("untap target land")).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())).
+		AddTarget(abilities.NewSpellTargetFilter()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

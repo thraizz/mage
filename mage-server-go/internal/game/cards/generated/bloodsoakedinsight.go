@@ -25,7 +25,7 @@ func NewBloodsoakedInsight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "R")
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

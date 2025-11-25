@@ -21,9 +21,9 @@ func NewShiftingGrift(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddTarget(abilities.NewTargetRequirement(2, 2, abilities.NewCreatureTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(2, 2, abilities.NewArtifactTargetFilter())).
-		AddTarget(abilities.NewTargetRequirement(2, 2, abilities.NewEnchantmentTargetFilter())).
+		AddTargets(2, 2, abilities.NewCreatureTargetFilter()).
+		AddTargets(2, 2, abilities.NewArtifactTargetFilter()).
+		AddTargets(2, 2, abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

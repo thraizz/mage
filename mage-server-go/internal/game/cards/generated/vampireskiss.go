@@ -29,7 +29,7 @@ func NewVampiresKiss(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
-		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

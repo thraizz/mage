@@ -23,7 +23,7 @@ func NewJayasImmolatingInferno(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		AddTarget(abilities.NewTargetRequirement(1, 3, abilities.NewAnyTargetFilter())).
+		AddTargets(1, 3, abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -23,7 +23,7 @@ func NewReapWhatIsSown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddTarget(abilities.NewTargetRequirement(0, 3, abilities.NewCreatureTargetFilter())).
+		AddTargets(0, 3, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
