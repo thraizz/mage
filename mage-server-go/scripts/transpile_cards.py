@@ -1507,6 +1507,59 @@ func init() {{
     def _process_effect_params(self, params: str, effect_class: str = '') -> str:
         """Process effect parameters - convert counters, tokens, abilities, and clean up durations"""
 
+        # Special handling for DrawCard effects - just extract numeric amount
+        if effect_class in ('DrawCardSourceControllerEffect', 'DrawCardTargetEffect', 'DrawCardAllEffect'):
+            # Java: new DrawCardSourceControllerEffect(2, true) or new DrawCardSourceControllerEffect(2)
+            # Go: abilities.NewDrawCardsEffect(2)
+            amount_match = re.search(r'\((\d+)', params)
+            if amount_match:
+                return amount_match.group(1)
+            return '1'
+
+        # Special handling for GainAbility effects - extract ability name and duration
+        if effect_class in ('GainAbilityTargetEffect', 'GainAbilitySourceEffect',
+                           'GainAbilityControlledEffect', 'GainAbilityAllEffect'):
+            # Java: new GainAbilityTargetEffect(HasteAbility.getInstance(), Duration.EndOfTurn)
+            # Go: abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)
+
+            # Extract ability name
+            ability_match = re.search(r'(\w+Ability)\.getInstance\(\)|new (\w+Ability)\(\)', params)
+            ability_name = ''
+            if ability_match:
+                ability_name = ability_match.group(1) or ability_match.group(2)
+
+            # Extract duration
+            duration_match = re.search(r'Duration\.(\w+)', params)
+            duration = 'effects.DurationEndOfTurn'  # default
+            if duration_match:
+                duration_name = duration_match.group(1)
+                duration_map = {
+                    'EndOfTurn': 'effects.DurationEndOfTurn',
+                    'WhileOnBattlefield': 'effects.DurationPermanent',
+                    'EndOfCombat': 'effects.DurationEndOfCombat',
+                    'UntilEndOfNextTurn': 'effects.DurationUntilEndOfNextTurn',
+                    'Custom': 'effects.DurationPermanent',
+                }
+                duration = duration_map.get(duration_name, 'effects.DurationEndOfTurn')
+
+            if ability_name:
+                return f'"{ability_name}", {duration}'
+            return '/* TODO: unknown ability */'
+
+        # Special handling for AddCountersAllEffect - extract counter, filter, and description
+        if effect_class == 'AddCountersAllEffect':
+            # Java: new AddCountersAllEffect(CounterType.P1P1.createInstance(), filter)
+            # Go: abilities.NewAddCountersAllEffect(counter, filterFunc, description)
+
+            # Extract counter type
+            counter_match = re.search(r'CounterType\.(\w+)\.createInstance\((\d*)\)', params)
+            if counter_match:
+                counter_type = counter_match.group(1)
+                amount = counter_match.group(2) or '1'
+                counter_const = AbilityMapper.COUNTER_TYPE_MAP.get(counter_type, 'counters.CounterTypeP1P1')
+                return f'{counter_const}.CreateInstance({amount}), nil, ""'
+            return '/* TODO: counter extraction failed */'
+
         # Special handling for SearchLibraryPutInHandEffect
         if effect_class == 'SearchLibraryPutInHandEffect':
             # Extract reveal parameter (boolean)
