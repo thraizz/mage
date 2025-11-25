@@ -24,6 +24,11 @@
 	let guestUsername = '';
 	let guestPassword = '';
 
+	// Available background images
+	const backgroundImages = ['Boros.jpg', 'Golgari.jpg', 'Gruul.jpg', 'Izzet.jpg', 'Rakdos.jpg'];
+	// Randomly select a background image
+	let selectedBackground = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+
 	// Get return URL from query params
 	$: returnUrl = $page.url.searchParams.get('returnUrl') || '/lobby';
 
@@ -116,7 +121,7 @@
 			});
 
 			// Show success toast
-			toast.success(`Welcome back, ${loginUsername}!`);
+			toast.success(`Spell Resolved. Welcome back, ${loginUsername}!`);
 
 			// Small delay to ensure everything is set before navigation
 			await new Promise((resolve) => setTimeout(resolve, 50));
@@ -125,11 +130,11 @@
 			goto(returnUrl);
 		} catch (error) {
 			if (error instanceof Error) {
-				errorMessage = error.message;
-				toast.error(error.message);
+				errorMessage = `Spell Fizzled. ${error.message}`;
+				toast.error(`Spell Fizzled. ${error.message}`);
 			} else {
-				errorMessage = 'Login failed. Please try again.';
-				toast.error('Login failed. Please try again.');
+				errorMessage = 'Spell Fizzled. Valid target not found.';
+				toast.error('Spell Fizzled. Valid target not found.');
 			}
 		} finally {
 			isLoading = false;
@@ -242,7 +247,7 @@
 			});
 
 			// Show success toast
-			toast.success(`Welcome, ${guestUsername}!`);
+			toast.success(`Spell Resolved. Welcome, ${guestUsername}!`);
 
 			// Redirect to original URL or lobby on successful login
 			goto(returnUrl);
@@ -295,10 +300,10 @@
 	<title>Login - MAGE</title>
 </svelte:head>
 
-<div class="container">
-	<div class="card">
-		<h1>Login</h1>
-		<p>Welcome to MAGE - Magic: The Gathering Online</p>
+<div class="container" style="background-image: url('/images/{selectedBackground}')">
+		<div class="card">
+		<h1>Enter the Blind Eternities</h1>
+		<p class="flavor-text">Welcome, Planeswalker. Ignite your spark and draw your destiny.</p>
 
 		{#if errorMessage}
 			<div class="error-message" role="alert" aria-live="polite">
@@ -359,23 +364,23 @@
 			<button type="submit" class="btn-primary" disabled={isLoading}>
 				{#if isLoading}
 					<span class="spinner" aria-hidden="true"></span>
-					Logging in...
+					Gathering Mana...
 				{:else}
-					Login
+					Cast Spell
 				{/if}
 			</button>
 		</form>
 
 		<div class="divider">
-			<span>OR</span>
+			<span>— OR —</span>
 		</div>
 
 		<button type="button" class="btn-secondary" on:click={handleGuestLogin} disabled={isLoading}>
 			{#if isLoading}
 				<span class="spinner" aria-hidden="true"></span>
-				Connecting...
+				Gathering Mana...
 			{:else}
-				Continue as Guest
+				Enter as Wanderer
 			{/if}
 		</button>
 
@@ -387,24 +392,24 @@
 			<button type="button" class="btn-dev" on:click={handleDevLogin} disabled={isLoading}>
 				{#if isLoading}
 					<span class="spinner" aria-hidden="true"></span>
-					Logging in...
+					Gathering Mana...
 				{:else}
-					Log in as thraizz
+					[DEV] thraizz
 				{/if}
 			</button>
 
 			<button type="button" class="btn-dev" on:click={handleDevLogin2} disabled={isLoading}>
 				{#if isLoading}
 					<span class="spinner" aria-hidden="true"></span>
-					Logging in...
+					Gathering Mana...
 				{:else}
-					Log in as thraizz2
+					[DEV] thraizz2
 				{/if}
 			</button>
 		{/if}
 
 		<div class="links">
-			<a href="/register">Don't have an account? Register</a>
+			<a href="/register">No spark yet? <strong>Ignite Your Spark</strong></a>
 		</div>
 	</div>
 </div>
@@ -504,7 +509,6 @@
 		min-height: 100vh;
 		padding: 2rem;
 		position: relative;
-		background-image: url('/images/Boros.jpg');
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -517,39 +521,26 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background-color: rgba(0, 0, 0, 0.4);
+		background-color: rgba(11, 12, 16, 0.7);
 		z-index: 0;
 	}
 
 	.card {
-		background: white;
-		padding: 2rem;
-		border-radius: 8px;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		width: 100%;
-		max-width: 400px;
+		max-width: 420px;
 		position: relative;
 		z-index: 1;
 	}
 
 	h1 {
-		margin: 0 0 0.5rem 0;
-		font-size: 2rem;
-		color: #333;
+		font-size: 2.25rem;
+		text-align: center;
+		margin: 0 0 0.75rem 0;
 	}
 
-	p {
+	.flavor-text {
 		margin: 0 0 2rem 0;
-		color: #666;
-	}
-
-	.error-message {
-		background: #fee;
-		border: 1px solid #fcc;
-		color: #c33;
-		padding: 0.75rem;
-		border-radius: 4px;
-		margin-bottom: 1rem;
+		text-align: center;
 	}
 
 	.login-form {
@@ -567,156 +558,6 @@
 	.checkbox-group {
 		flex-direction: row;
 		align-items: center;
-	}
-
-	.checkbox-group label {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		cursor: pointer;
-	}
-
-	.checkbox-group input[type='checkbox'] {
-		width: auto;
-		cursor: pointer;
-	}
-
-	label {
-		font-weight: 500;
-		color: #333;
-	}
-
-	input[type='text'],
-	input[type='password'] {
-		padding: 0.75rem;
-		border: 1px solid #ddd;
-		border-radius: 4px;
-		font-size: 1rem;
-	}
-
-	input[type='text']:focus,
-	input[type='password']:focus {
-		outline: none;
-		border-color: #667eea;
-		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-	}
-
-	input[aria-invalid='true'] {
-		border-color: #c33;
-	}
-
-	input:disabled {
-		background: #f5f5f5;
-		cursor: not-allowed;
-	}
-
-	.field-error {
-		color: #c33;
-		font-size: 0.875rem;
-	}
-
-	.btn-primary,
-	.btn-secondary,
-	.btn-dev {
-		padding: 0.75rem 1.5rem;
-		border: none;
-		border-radius: 4px;
-		font-size: 1rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-	}
-
-	.btn-primary {
-		background: #667eea;
-		color: white;
-	}
-
-	.btn-primary:hover:not(:disabled) {
-		background: #5568d3;
-	}
-
-	.btn-secondary {
-		background: #f0f0f0;
-		color: #333;
-	}
-
-	.btn-secondary:hover:not(:disabled) {
-		background: #e0e0e0;
-	}
-
-	.btn-dev {
-		background: #ff6b6b;
-		color: white;
-	}
-
-	.btn-dev:hover:not(:disabled) {
-		background: #ee5a5a;
-	}
-
-	.btn-primary:disabled,
-	.btn-secondary:disabled,
-	.btn-dev:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
-
-	.spinner {
-		width: 16px;
-		height: 16px;
-		border: 2px solid currentColor;
-		border-top-color: transparent;
-		border-radius: 50%;
-		animation: spin 0.6s linear infinite;
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	.divider {
-		margin: 1.5rem 0;
-		text-align: center;
-		position: relative;
-	}
-
-	.divider::before {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: 0;
-		right: 0;
-		height: 1px;
-		background: #ddd;
-	}
-
-	.divider span {
-		background: white;
-		padding: 0 1rem;
-		color: #999;
-		font-size: 0.875rem;
-		position: relative;
-		z-index: 1;
-	}
-
-	.links {
-		margin-top: 1rem;
-		text-align: center;
-	}
-
-	.links a {
-		color: #667eea;
-		text-decoration: none;
-	}
-
-	.links a:hover {
-		text-decoration: underline;
 	}
 
 	/* Password Modal Styles */

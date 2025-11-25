@@ -41,7 +41,7 @@
 {#if isChecking}
 	<div class="loading-container" transition:fade={{ duration: 200 }}>
 		<div class="spinner"></div>
-		<p>Loading...</p>
+		<p>Gathering Mana...</p>
 	</div>
 {:else}
 	<div class="app-container" transition:fade={{ duration: 300 }}>
@@ -62,17 +62,17 @@
 		justify-content: center;
 		align-items: center;
 		min-height: 100vh;
-		gap: 1rem;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		gap: var(--space-4);
+		background: var(--ci-blind-eternities);
 	}
 
 	.spinner {
-		width: 40px;
-		height: 40px;
-		border: 4px solid rgba(255, 255, 255, 0.3);
-		border-top: 4px solid white;
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
+		width: 48px;
+		height: 48px;
+		border: 3px solid rgba(59, 130, 246, 0.2);
+		border-top: 3px solid var(--ci-jace-cloak);
+		border-radius: var(--radius-full);
+		animation: spin 0.8s linear infinite;
 	}
 
 	@keyframes spin {
@@ -85,9 +85,10 @@
 	}
 
 	.loading-container p {
-		color: white;
-		font-size: 1rem;
-		font-weight: 500;
+		color: var(--ci-scroll-parchment);
+		font-size: var(--text-base);
+		font-weight: var(--weight-medium);
+		font-style: italic;
 	}
 
 	/* App Container */
@@ -95,6 +96,7 @@
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
+		background: var(--bg-void);
 	}
 
 	/* Main Content */
@@ -106,16 +108,14 @@
 
 	.content-wrapper {
 		flex: 1;
-		max-width: 1280px;
 		width: 100%;
 		margin: 0 auto;
-		padding: 2rem 1rem;
 	}
 
 	/* Responsive */
 	@media (max-width: 640px) {
 		.content-wrapper {
-			padding: 1rem;
+			padding: 0;
 		}
 	}
 </style>

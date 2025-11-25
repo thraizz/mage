@@ -17,6 +17,25 @@
   --bg-steel: #2e3340;          /* Hover state */
 
   /* =========================================
+   * CI.MD STYLE GUIDE COLORS
+   * goMage brand colors from style guide
+   * ========================================= */
+  --ci-blind-eternities: #0B0C10;  /* Primary background (Deep Void) */
+  --ci-jace-cloak: #3B82F6;        /* Primary action buttons (Blue-aligned) */
+  --ci-scroll-parchment: #E2E8F0;  /* Primary text (High readability) */
+  
+  /* Color Pie - Secondary Colors */
+  --ci-plains-pearl: #FDF6E3;      /* White */
+  --ci-island-sapphire: #3AB7FF;   /* Blue */
+  --ci-swamp-obsidian: #A69AA8;    /* Black */
+  --ci-mountain-ember: #FF4D4D;    /* Red */
+  --ci-forest-emerald: #2ECC71;     /* Green */
+  
+  /* Special FX Colors */
+  --ci-mythic-orange: #FF8400;     /* Ultra-premium features */
+  --ci-foil-holo: #E3E3E3;         /* Hover effects with gradient */
+
+  /* =========================================
    * TEXT HIERARCHY
    * From brightest to dimmest
    * ========================================= */

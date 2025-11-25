@@ -283,7 +283,7 @@
 </script>
 
 <svelte:head>
-	<title>Lobby - Mage</title>
+	<title>The Aetherhub - Mage</title>
 </svelte:head>
 
 <div class="lobby-page">
@@ -291,7 +291,7 @@
 	<div class="lobby-header">
 		<div class="header-content">
 			<div class="header-left">
-				<h1 class="page-title">Game Lobby</h1>
+				<h1 class="page-title">The Battlefield</h1>
 				{#if !loading && tables.length > 0}
 					<span class="table-count">
 						{filteredTables().length}
@@ -385,7 +385,7 @@
 					<input
 						type="text"
 						class="search-input"
-						placeholder="Search tables..."
+						placeholder="Scry for tables..."
 						bind:value={searchQuery}
 					/>
 					{#if searchQuery}
@@ -447,13 +447,13 @@
 				<!-- Loading State -->
 				<div class="loading-container">
 					<LoadingSpinner size="large" />
-					<p class="loading-text">Loading tables...</p>
+					<p class="loading-text">Gathering Mana...</p>
 				</div>
 			{:else if error}
 				<!-- Error State -->
 				<div class="error-container">
 					<div class="error-icon">⚠️</div>
-					<h2 class="error-title">Failed to Load Tables</h2>
+					<h2 class="error-title">Spell Fizzled</h2>
 					<p class="error-message">{error}</p>
 					<button class="retry-button" onclick={handleRefresh}>Try Again</button>
 				</div>
@@ -461,19 +461,19 @@
 				<!-- Empty State - No Tables -->
 				<div class="empty-container">
 					<div class="empty-icon">🎮</div>
-					<h2 class="empty-title">No Active Tables</h2>
+					<h2 class="empty-title">The Battlefield Awaits</h2>
 					<p class="empty-message">
-						There are no active games right now. Be the first to create one!
+						No planeswalkers have arrived yet. Be the first to summon a table!
 					</p>
-					<button class="create-table-button" onclick={openCreateModal}>Create a Table</button>
+					<button class="create-table-button" onclick={openCreateModal}>Summon Table</button>
 				</div>
 			{:else if filteredTables().length === 0}
 				<!-- Empty State - No Results -->
 				<div class="empty-container">
 					<div class="empty-icon">🔍</div>
-					<h2 class="empty-title">No Tables Found</h2>
+					<h2 class="empty-title">Tutor Failed</h2>
 					<p class="empty-message">
-						No tables match your current filters. Try adjusting your search criteria.
+						No tables match your scry filters. Adjust your search or clear filters.
 					</p>
 					<button class="clear-filters-button" onclick={clearFilters}>Clear Filters</button>
 				</div>
@@ -536,17 +536,21 @@
 		font-family: var(--font-display);
 		font-size: var(--text-3xl);
 		font-weight: var(--weight-bold);
-		color: var(--text-bright);
+		color: var(--ci-scroll-parchment);
 		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 	}
 
 	.table-count {
-		background: var(--accent-gold);
-		color: var(--bg-void);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		color: var(--ci-scroll-parchment);
 		padding: var(--space-1) var(--space-3);
 		border-radius: var(--radius-full);
 		font-size: var(--text-sm);
 		font-weight: var(--weight-semibold);
+		box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 	}
 
 	.count-divider {
@@ -570,13 +574,13 @@
 	}
 
 	.ws-connected {
-		background: var(--status-success);
-		color: var(--bg-void);
+		background: rgba(46, 204, 113, 0.2);
+		color: var(--ci-forest-emerald);
 	}
 
 	.ws-reconnecting {
-		background: var(--status-warning);
-		color: var(--bg-void);
+		background: rgba(245, 158, 11, 0.2);
+		color: var(--status-warning);
 	}
 
 	.ws-dot {
@@ -650,15 +654,18 @@
 	}
 
 	.create-button {
-		background: var(--accent-gold);
-		color: var(--bg-void);
-		border-color: var(--accent-gold);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		color: var(--ci-scroll-parchment);
+		border-color: transparent;
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 	}
 
 	.create-button:hover {
-		background: var(--accent-gold-bright);
-		border-color: var(--accent-gold-bright);
-		color: var(--bg-void);
+		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		border-color: transparent;
+		color: var(--ci-scroll-parchment);
+		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+		transform: translateY(-1px);
 	}
 
 	.refresh-icon {
@@ -720,9 +727,10 @@
 	}
 
 	.loading-text {
-		color: var(--text-muted);
+		color: var(--ci-swamp-obsidian);
 		font-size: var(--text-lg);
 		font-weight: var(--weight-medium);
+		font-style: italic;
 		margin: 0;
 	}
 
@@ -746,32 +754,40 @@
 		font-family: var(--font-display);
 		font-size: var(--text-2xl);
 		font-weight: var(--weight-bold);
-		color: var(--text-bright);
+		color: var(--ci-scroll-parchment);
 		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.error-message {
-		color: var(--text-muted);
+		color: var(--ci-swamp-obsidian);
 		font-size: var(--text-base);
 		margin: 0;
 		max-width: 28rem;
+		font-style: italic;
 	}
 
 	.retry-button {
 		margin-top: var(--space-4);
 		padding: var(--space-3) var(--space-6);
-		background: var(--accent-gold);
-		color: var(--bg-void);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		color: var(--ci-scroll-parchment);
 		border: none;
 		border-radius: var(--radius-md);
 		font-weight: var(--weight-semibold);
 		font-size: var(--text-base);
 		cursor: pointer;
-		transition: background var(--transition-fast);
+		transition: all var(--transition-base);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 	}
 
 	.retry-button:hover {
-		background: var(--accent-gold-bright);
+		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+		transform: translateY(-1px);
 	}
 
 	/* Empty State */
@@ -795,32 +811,40 @@
 		font-family: var(--font-display);
 		font-size: var(--text-2xl);
 		font-weight: var(--weight-bold);
-		color: var(--text-bright);
+		color: var(--ci-scroll-parchment);
 		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.empty-message {
-		color: var(--text-muted);
+		color: var(--ci-swamp-obsidian);
 		font-size: var(--text-base);
 		margin: 0;
 		max-width: 28rem;
+		font-style: italic;
 	}
 
 	.create-table-button {
 		margin-top: var(--space-4);
 		padding: var(--space-3) var(--space-6);
-		background: var(--accent-gold);
-		color: var(--bg-void);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		color: var(--ci-scroll-parchment);
 		border: none;
 		border-radius: var(--radius-md);
 		font-weight: var(--weight-semibold);
 		font-size: var(--text-base);
 		cursor: pointer;
-		transition: background var(--transition-fast);
+		transition: all var(--transition-base);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 	}
 
 	.create-table-button:hover {
-		background: var(--accent-gold-bright);
+		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+		transform: translateY(-1px);
 	}
 
 	/* Filters Bar */
@@ -866,8 +890,9 @@
 
 	.search-input:focus {
 		outline: none;
-		border-color: var(--accent-gold);
-		box-shadow: 0 0 0 3px var(--accent-gold-glow);
+		border-color: var(--ci-jace-cloak);
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+		background: var(--bg-obsidian);
 	}
 
 	.clear-search {
@@ -912,8 +937,9 @@
 
 	.format-select:focus {
 		outline: none;
-		border-color: var(--accent-gold);
-		box-shadow: 0 0 0 3px var(--accent-gold-glow);
+		border-color: var(--ci-jace-cloak);
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+		background: var(--bg-obsidian);
 	}
 
 	.format-select option {
@@ -946,7 +972,7 @@
 		border-radius: var(--radius-sm);
 		cursor: pointer;
 		transition: all var(--transition-fast);
-		accent-color: var(--accent-gold);
+		accent-color: var(--ci-jace-cloak);
 	}
 
 	.checkbox-text {
@@ -957,18 +983,23 @@
 
 	.clear-filters-button {
 		padding: var(--space-2) var(--space-5);
-		background: var(--status-error);
-		color: var(--text-bright);
+		background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #DC2626 100%);
+		color: var(--ci-scroll-parchment);
 		border: none;
 		border-radius: var(--radius-md);
 		font-weight: var(--weight-semibold);
 		font-size: var(--text-sm);
 		cursor: pointer;
-		transition: background var(--transition-fast);
+		transition: all var(--transition-base);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		box-shadow: 0 2px 8px rgba(255, 77, 77, 0.3);
 	}
 
 	.clear-filters-button:hover {
-		background: #dc2626;
+		background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+		box-shadow: 0 4px 12px rgba(255, 77, 77, 0.4);
+		transform: translateY(-1px);
 	}
 
 	/* Tables Grid */

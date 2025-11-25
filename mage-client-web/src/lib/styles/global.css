@@ -1,0 +1,417 @@
+/**
+ * Global Component Styles
+ * 
+ * Reusable component styles based on CI.md style guide.
+ * These styles can be used across the application.
+ */
+
+/* =========================================
+ * BUTTONS
+ * ========================================= */
+
+.btn-primary,
+.btn-secondary,
+.btn-dev {
+	padding: 0.875rem 1.75rem;
+	border: none;
+	border-radius: var(--radius-lg);
+	font-size: var(--text-base);
+	font-weight: var(--weight-semibold);
+	cursor: pointer;
+	transition: all var(--transition-base);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-2);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-family: var(--font-display);
+	position: relative;
+	overflow: hidden;
+	text-decoration: none;
+}
+
+.btn-primary {
+	background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+	color: var(--ci-scroll-parchment);
+	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(59, 130, 246, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+	background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+	box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.3);
+	transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+	transform: translateY(0) scale(0.98);
+	box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+	background: rgba(166, 154, 168, 0.2);
+	border: 1px solid rgba(166, 154, 168, 0.4);
+	color: var(--ci-scroll-parchment);
+	backdrop-filter: blur(4px);
+}
+
+.btn-secondary:hover:not(:disabled) {
+	background: rgba(166, 154, 168, 0.3);
+	border-color: rgba(166, 154, 168, 0.6);
+	transform: translateY(-1px);
+}
+
+.btn-secondary:active:not(:disabled) {
+	transform: translateY(0) scale(0.98);
+}
+
+.btn-dev {
+	background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #DC2626 100%);
+	color: var(--ci-scroll-parchment);
+	box-shadow: 0 4px 12px rgba(255, 77, 77, 0.3);
+}
+
+.btn-dev:hover:not(:disabled) {
+	background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+	box-shadow: 0 6px 16px rgba(255, 77, 77, 0.4);
+	transform: translateY(-1px);
+}
+
+.btn-dev:active:not(:disabled) {
+	transform: translateY(0) scale(0.98);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-dev:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	position: relative;
+	overflow: hidden;
+}
+
+.btn-primary:disabled::before,
+.btn-secondary:disabled::before,
+.btn-dev:disabled::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: repeating-linear-gradient(
+		45deg,
+		transparent,
+		transparent 10px,
+		rgba(166, 154, 168, 0.1) 10px,
+		rgba(166, 154, 168, 0.1) 20px
+	);
+	opacity: 0.3;
+	animation: summoning-sickness 2s linear infinite;
+}
+
+@keyframes summoning-sickness {
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(100%);
+	}
+}
+
+/* =========================================
+ * INPUTS
+ * ========================================= */
+
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='number'],
+textarea {
+	padding: 0.875rem 1rem;
+	background: rgba(11, 12, 16, 0.8);
+	border: 1px solid rgba(59, 130, 246, 0.3);
+	border-radius: var(--radius-lg);
+	font-size: var(--text-base);
+	color: var(--ci-scroll-parchment);
+	transition: all var(--transition-base);
+	font-family: var(--font-body);
+	width: 100%;
+}
+
+input[type='text']::placeholder,
+input[type='password']::placeholder,
+input[type='email']::placeholder,
+textarea::placeholder {
+	color: var(--ci-swamp-obsidian);
+	opacity: 0.7;
+}
+
+input[type='text']:focus,
+input[type='password']:focus,
+input[type='email']:focus,
+input[type='number']:focus,
+textarea:focus {
+	outline: none;
+	border-color: var(--ci-jace-cloak);
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 0 12px rgba(59, 130, 246, 0.3);
+	background: rgba(11, 12, 16, 0.95);
+}
+
+input[aria-invalid='true'],
+textarea[aria-invalid='true'] {
+	border-color: var(--ci-mountain-ember);
+	box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.2);
+}
+
+input:disabled,
+textarea:disabled {
+	background: rgba(166, 154, 168, 0.1);
+	border-color: rgba(166, 154, 168, 0.2);
+	cursor: not-allowed;
+	opacity: 0.5;
+	position: relative;
+}
+
+input:disabled::after,
+textarea:disabled::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: repeating-linear-gradient(
+		45deg,
+		transparent,
+		transparent 10px,
+		rgba(166, 154, 168, 0.1) 10px,
+		rgba(166, 154, 168, 0.1) 20px
+	);
+}
+
+/* =========================================
+ * LABELS
+ * ========================================= */
+
+label {
+	font-weight: var(--weight-semibold);
+	color: var(--ci-scroll-parchment);
+	font-size: var(--text-sm);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	display: block;
+	margin-bottom: var(--space-2);
+}
+
+/* =========================================
+ * CARDS
+ * ========================================= */
+
+.card {
+	background: rgba(11, 12, 16, 0.95);
+	backdrop-filter: blur(10px);
+	padding: var(--space-10);
+	border-radius: var(--radius-xl);
+	border: 1px solid rgba(59, 130, 246, 0.2);
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.1);
+	position: relative;
+}
+
+/* =========================================
+ * TYPOGRAPHY
+ * ========================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-display);
+	font-weight: var(--weight-bold);
+	color: var(--ci-scroll-parchment);
+	letter-spacing: 0.05em;
+	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+	font-size: var(--text-4xl);
+	margin: 0 0 var(--space-3) 0;
+}
+
+h2 {
+	font-size: var(--text-3xl);
+	margin: 0 0 var(--space-3) 0;
+}
+
+h3 {
+	font-size: var(--text-2xl);
+	margin: 0 0 var(--space-2) 0;
+}
+
+.flavor-text {
+	color: var(--ci-swamp-obsidian);
+	font-style: italic;
+	font-size: var(--text-sm);
+	line-height: var(--leading-relaxed);
+}
+
+/* =========================================
+ * ERROR MESSAGES
+ * ========================================= */
+
+.error-message,
+.field-error {
+	color: var(--ci-mountain-ember);
+	font-size: var(--text-sm);
+	font-weight: var(--weight-medium);
+}
+
+.error-message {
+	background: rgba(255, 77, 77, 0.15);
+	border: 1px solid var(--ci-mountain-ember);
+	padding: var(--space-3) var(--space-4);
+	border-radius: var(--radius-lg);
+	margin-bottom: var(--space-4);
+	text-align: center;
+}
+
+.field-error {
+	display: block;
+	margin-top: var(--space-1);
+}
+
+/* =========================================
+ * DIVIDERS
+ * ========================================= */
+
+.divider {
+	margin: var(--space-6) 0;
+	text-align: center;
+	position: relative;
+}
+
+.divider::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	height: 1px;
+	background: linear-gradient(to right, transparent, rgba(59, 130, 246, 0.4), transparent);
+}
+
+.divider span {
+	background: rgba(11, 12, 16, 0.95);
+	padding: 0 var(--space-4);
+	color: var(--ci-swamp-obsidian);
+	font-size: var(--text-sm);
+	position: relative;
+	z-index: 1;
+	font-style: italic;
+}
+
+/* =========================================
+ * LINKS
+ * ========================================= */
+
+a {
+	color: var(--ci-jace-cloak);
+	text-decoration: none;
+	transition: all var(--transition-base);
+}
+
+a:hover {
+	color: #60A5FA;
+	text-decoration: underline;
+	text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+a strong {
+	font-weight: var(--weight-bold);
+	color: #60A5FA;
+}
+
+/* =========================================
+ * SPINNER / LOADING
+ * ========================================= */
+
+.spinner {
+	width: 16px;
+	height: 16px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* =========================================
+ * CHECKBOXES
+ * ========================================= */
+
+input[type='checkbox'] {
+	accent-color: var(--ci-jace-cloak);
+	cursor: pointer;
+	width: auto;
+}
+
+.checkbox-group label {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	cursor: pointer;
+	text-transform: none;
+	font-weight: var(--weight-normal);
+	font-size: var(--text-base);
+	margin-bottom: 0;
+}
+
+/* =========================================
+ * FORM GROUPS
+ * ========================================= */
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+
+.form-group label {
+	margin-bottom: 0;
+}
+
+/* =========================================
+ * UTILITY CLASSES
+ * ========================================= */
+
+.text-center {
+	text-align: center;
+}
+
+.text-left {
+	text-align: left;
+}
+
+.text-right {
+	text-align: right;
+}
+
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+
