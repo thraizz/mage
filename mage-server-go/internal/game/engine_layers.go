@@ -51,6 +51,11 @@ func (cem *ContinuousEffectsManager) RecalculateAll(
 	// We'll rebuild from scratch each time
 	cem.effectMappings = make(map[string][]string)
 
+	// If no state provided, nothing to process
+	if state == nil {
+		return nil
+	}
+
 	// Get all permanents on the battlefield
 	permanents := state.GetAllPermanents()
 

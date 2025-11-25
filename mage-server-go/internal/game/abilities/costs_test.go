@@ -162,6 +162,22 @@ func (m *mockCostGameContext) GetPermanentsControlledByPlayer(playerID uuid.UUID
 	return result, nil
 }
 
+func (m *mockCostGameContext) GetAllCardsInZone(ctx context.Context, zone int) []CardInfo {
+	return nil
+}
+
+func (m *mockCostGameContext) GetCreaturesControlledBy(ctx context.Context, playerID uuid.UUID) []CardInfo {
+	return nil
+}
+
+func (m *mockCostGameContext) GetPlayerHandForCDA(ctx context.Context, playerID uuid.UUID) []CardInfo {
+	return nil
+}
+
+func (m *mockCostGameContext) GetCountersOnPermanent(ctx context.Context, permanentID uuid.UUID, counterType string) int {
+	return 0
+}
+
 // ========================================
 // SacrificeCost Tests
 // ========================================

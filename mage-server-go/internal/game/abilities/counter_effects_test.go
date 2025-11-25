@@ -156,6 +156,22 @@ func (m *mockCounterGameContext) GetPermanentsControlledByPlayer(playerID uuid.U
 	return result, nil
 }
 
+func (m *mockCounterGameContext) GetAllCardsInZone(ctx context.Context, zone int) []CardInfo {
+	return nil
+}
+
+func (m *mockCounterGameContext) GetCreaturesControlledBy(ctx context.Context, playerID uuid.UUID) []CardInfo {
+	return nil
+}
+
+func (m *mockCounterGameContext) GetPlayerHandForCDA(ctx context.Context, playerID uuid.UUID) []CardInfo {
+	return nil
+}
+
+func (m *mockCounterGameContext) GetCountersOnPermanent(ctx context.Context, permanentID uuid.UUID, counterType string) int {
+	return 0
+}
+
 // ========================================
 // Tests for AddCountersSourceEffect
 // ========================================

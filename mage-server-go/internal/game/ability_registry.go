@@ -157,7 +157,12 @@ func (ar *AbilityRegistry) GetActivatableAbilities(
 			continue
 		}
 
-		// For static abilities, check if they're in the correct zone
+		// Check if ability is in the correct zone (using metadata)
+		if metadata.Zone != zone {
+			continue
+		}
+
+		// For static abilities, also check the ability's own zone property
 		if staticAbility, ok := ability.(*abilities.StaticAbility); ok {
 			if staticAbility.GetZone() != zone {
 				continue

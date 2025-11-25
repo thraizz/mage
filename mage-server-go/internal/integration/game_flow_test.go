@@ -50,18 +50,22 @@ func newGameServerEnv(t testing.TB) *gameServerEnv {
 
 	srv := server.NewMageServer(
 		cfg,
-		nil,
+		nil, // db
 		sessionMgr,
-		nil,
-		nil,
+		nil, // userMgr
+		nil, // userRepo
+		nil, // statsRepo
+		nil, // deckRepo
+		nil, // cardRepo
+		nil, // matchHistoryRepo
 		roomMgr,
 		chatMgr,
 		tableMgr,
 		gameMgr,
 		tournamentMgr,
 		draftMgr,
-		nil,
-		nil,
+		nil, // tokenStore
+		nil, // mailClient
 		"test",
 		logger,
 		adapter,

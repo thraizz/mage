@@ -75,7 +75,7 @@ func TestFaceDownState(t *testing.T) {
 // TestMorphAbility tests the Morph keyword ability
 func TestMorphAbility(t *testing.T) {
 	sourceID := uuid.New()
-	cost := NewManaCost("{2}{U}")
+	cost, _ := ParseManaCost("{2}{U}")
 
 	t.Run("creates morph ability", func(t *testing.T) {
 		morph := NewMorphAbility(sourceID, cost)
@@ -118,7 +118,7 @@ func TestMorphAbility(t *testing.T) {
 // TestMegamorphAbility tests the Megamorph keyword ability
 func TestMegamorphAbility(t *testing.T) {
 	sourceID := uuid.New()
-	cost := NewManaCost("{1}{G}")
+	cost, _ := ParseManaCost("{1}{G}")
 
 	t.Run("creates megamorph ability", func(t *testing.T) {
 		megamorph := NewMegamorphAbility(sourceID, cost)
@@ -186,7 +186,7 @@ func TestManifestEffect(t *testing.T) {
 // TestCloakEffect tests the Cloak effect
 func TestCloakEffect(t *testing.T) {
 	sourceID := uuid.New()
-	cost := NewManaCost("{3}")
+	cost, _ := ParseManaCost("{3}")
 
 	t.Run("creates cloak effect", func(t *testing.T) {
 		effect := NewCloakEffect(sourceID, cost)
@@ -208,7 +208,7 @@ func TestCloakEffect(t *testing.T) {
 func TestTurnFaceUpAction(t *testing.T) {
 	permanentID := uuid.New()
 	playerID := uuid.New()
-	cost := NewManaCost("{2}{U}")
+	cost, _ := ParseManaCost("{2}{U}")
 
 	t.Run("creates turn face up action for morph", func(t *testing.T) {
 		action := NewTurnFaceUpAction(permanentID, playerID, cost, false)
@@ -248,7 +248,7 @@ func TestTurnFaceUpAction(t *testing.T) {
 // TestCastFaceDownOption tests the face-down casting option
 func TestCastFaceDownOption(t *testing.T) {
 	cardID := uuid.New()
-	cost := NewManaCost("{3}")
+	cost, _ := ParseManaCost("{3}")
 
 	t.Run("creates cast face down option for morph", func(t *testing.T) {
 		option := NewCastFaceDownOption(cardID, FaceDownMorph, cost)
@@ -329,7 +329,7 @@ func TestFaceDownStateWithMorphCost(t *testing.T) {
 	actualCard := uuid.New()
 	ownerID := uuid.New()
 	controllerID := uuid.New()
-	morphCost := NewManaCost("{2}{U}")
+	morphCost, _ := ParseManaCost("{2}{U}")
 
 	t.Run("face-down state can store morph cost", func(t *testing.T) {
 		fds := NewFaceDownState(permanentID, actualCard, ownerID, controllerID, FaceDownMorph)
@@ -382,14 +382,14 @@ func TestFaceDownIntegration(t *testing.T) {
 	t.Run("example workflow: casting with morph", func(t *testing.T) {
 		// 1. Card has morph ability
 		cardID := uuid.New()
-		morphCost := NewManaCost("{2}{U}")
+		morphCost, _ := ParseManaCost("{2}{U}")
 		morphAbility := NewMorphAbility(cardID, morphCost)
 
 		assert.NotNil(t, morphAbility)
 		assert.Equal(t, morphCost, morphAbility.GetMorphCost())
 
 		// 2. Player chooses to cast face down
-		faceDownCost := NewManaCost("{3}")
+		faceDownCost, _ := ParseManaCost("{3}")
 		castOption := NewCastFaceDownOption(cardID, FaceDownMorph, faceDownCost)
 
 		assert.Equal(t, cardID, castOption.GetCardID())
@@ -443,7 +443,7 @@ func TestFaceDownIntegration(t *testing.T) {
 	t.Run("example workflow: megamorph", func(t *testing.T) {
 		// 1. Card has megamorph ability
 		cardID := uuid.New()
-		megamorphCost := NewManaCost("{1}{G}")
+		megamorphCost, _ := ParseManaCost("{1}{G}")
 		megamorphAbility := NewMegamorphAbility(cardID, megamorphCost)
 
 		assert.True(t, megamorphAbility.IsMegamorph())

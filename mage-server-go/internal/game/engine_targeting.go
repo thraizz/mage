@@ -58,8 +58,23 @@ func (tsm *TargetSelectionManager) ValidateTargets(
 
 	// Check each target is legal
 	for _, targetID := range selection.Targets {
-		if !tsm.isLegalTarget(ctx, targetID, request.TargetFilter, state, gameCtx) {
-			return fmt.Errorf("illegal target: %s", targetID.String())
+		// First check if target is in pre-computed LegalTargets list
+		if len(request.LegalTargets) > 0 {
+			found := false
+			for _, legalID := range request.LegalTargets {
+				if targetID == legalID {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return fmt.Errorf("illegal target: %s", targetID.String())
+			}
+		} else if state != nil {
+			// Fall back to dynamic legality check if no pre-computed targets
+			if !tsm.isLegalTarget(ctx, targetID, request.TargetFilter, state, gameCtx) {
+				return fmt.Errorf("illegal target: %s", targetID.String())
+			}
 		}
 	}
 

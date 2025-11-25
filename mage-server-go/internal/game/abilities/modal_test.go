@@ -317,6 +317,10 @@ func (e *MockEffect) Apply(ctx context.Context, game GameContext, source uuid.UU
 	return nil
 }
 
+func (e *MockEffect) GetDescription() string {
+	return e.text
+}
+
 func (e *MockEffect) String() string {
 	return e.text
 }
@@ -332,6 +336,10 @@ func (e *MockEffectWithCallback) Apply(ctx context.Context, game GameContext, so
 		e.callback()
 	}
 	return nil
+}
+
+func (e *MockEffectWithCallback) GetDescription() string {
+	return e.text
 }
 
 func (e *MockEffectWithCallback) String() string {
