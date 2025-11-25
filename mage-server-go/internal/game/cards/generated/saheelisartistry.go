@@ -23,9 +23,6 @@ func NewSaheelisArtistry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
-	//   - CreateTokenCopyTargetEffect()
-	//   - CreateTokenCopyTargetEffect()
-	//   - CreateTokenCopyTargetEffect()
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())

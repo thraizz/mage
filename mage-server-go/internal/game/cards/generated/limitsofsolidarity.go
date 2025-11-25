@@ -25,8 +25,6 @@ func NewLimitsOfSolidarity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

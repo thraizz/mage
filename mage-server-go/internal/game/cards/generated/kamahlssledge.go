@@ -22,7 +22,7 @@ func NewKamahlsSledge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(4)).
-		AddEffect(abilities.NewDamageEffect(4)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(4), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

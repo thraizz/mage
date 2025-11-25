@@ -33,6 +33,7 @@ func NewInfernoFist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

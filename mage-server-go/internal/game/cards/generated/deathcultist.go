@@ -27,6 +27,7 @@ func NewDeathCultist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

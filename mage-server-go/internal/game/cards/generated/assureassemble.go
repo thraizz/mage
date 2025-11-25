@@ -6,6 +6,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
 	"github.com/magefree/mage-server-go/internal/game/counters"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
@@ -27,8 +28,9 @@ func NewAssureAssemble(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 3)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

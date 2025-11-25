@@ -23,9 +23,9 @@ func NewForceReflex(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
-		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

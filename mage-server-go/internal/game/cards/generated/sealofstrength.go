@@ -23,6 +23,7 @@ func NewSealOfStrength(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewBoostEffect(3, 3)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

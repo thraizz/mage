@@ -20,12 +20,24 @@ func NewOutpaceOblivion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewDamageEffect(5)).
+		Build()
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(5)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - OutpaceOblivionEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

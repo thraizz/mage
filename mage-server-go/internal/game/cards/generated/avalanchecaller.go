@@ -29,5 +29,11 @@ func NewAvalancheCaller(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesCreatureTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	// card.AddAbility(ability2)
 	return card, nil
 }

@@ -28,5 +28,11 @@ func NewSenateGuildmage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewGainLifeEffect(2)).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DrawDiscardControllerEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

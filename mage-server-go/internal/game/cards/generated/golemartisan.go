@@ -33,7 +33,15 @@ func NewGolemArtisan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddEffect(abilities.NewBoostEffect(1, 1)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability3)
+	// TODO: Implement activated ability with unmapped effects
+	//   - GainsChoiceOfAbilitiesEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	// card.AddAbility(ability4)
 	return card, nil
 }

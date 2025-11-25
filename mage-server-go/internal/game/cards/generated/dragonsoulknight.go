@@ -30,11 +30,13 @@ func NewDragonsoulKnight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(5, 3)).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DragonsoulKnightEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

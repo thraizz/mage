@@ -23,9 +23,7 @@ func NewStirThePride(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(SavedDamageValue.MUCH)).
-		// TODO: GainAbilityControlledEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(2, 2)).
-		AddEffect(abilities.NewGainLifeEffect(SavedDamageValue.MUCH)).
 		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {

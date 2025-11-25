@@ -25,6 +25,7 @@ func NewScaldingCauldron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -22,5 +22,11 @@ func NewDalkovanEncampment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CreateDelayedTriggeredAbilityEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

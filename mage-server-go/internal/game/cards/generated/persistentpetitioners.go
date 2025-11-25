@@ -27,10 +27,13 @@ func NewPersistentPetitioners(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

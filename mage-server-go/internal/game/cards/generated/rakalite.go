@@ -20,10 +20,11 @@ func NewRakalite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{2}").
-		AddEffect(abilities.NewReturnToHandSourceEffect()).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - PreventDamageToTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	// card.AddAbility(ability0)
 	return card, nil
 }

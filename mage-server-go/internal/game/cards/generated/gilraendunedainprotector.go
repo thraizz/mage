@@ -24,5 +24,11 @@ func NewGilraenDunedainProtector(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - GilraenDunedainProtectorEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

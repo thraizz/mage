@@ -22,6 +22,9 @@ func NewSagittarsVolley(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(1, filter)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -21,5 +21,8 @@ func NewGontisAetherHeart(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - AddExtraTurnControllerEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

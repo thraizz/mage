@@ -28,5 +28,11 @@ func NewSaheeliTheSunsBrilliance(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
 	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - SaheeliTheSunsBrillianceEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

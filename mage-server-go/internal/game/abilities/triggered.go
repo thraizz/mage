@@ -20,6 +20,11 @@ type TriggeredAbility struct {
 	effects  []Effect
 	targets  *TargetRequirement
 	optional bool // "you may" triggers
+
+	// values stores runtime data passed from trigger condition to effects
+	// Java: Uses setValue/getValue on Effects to pass data like counters
+	// Example: ResourcefulDefense trigger stores counters, effect retrieves them
+	values map[string]interface{}
 }
 
 // NewTriggeredAbility creates a new triggered ability
@@ -34,6 +39,7 @@ func NewTriggeredAbility(sourceID uuid.UUID, trigger TriggerCondition, effects [
 		trigger:     trigger,
 		effects:     effects,
 		optional:    optional,
+		values:      make(map[string]interface{}),
 	}
 }
 
@@ -88,6 +94,45 @@ func (a *TriggeredAbility) IsOptional() bool {
 	return a.optional
 }
 
+// SetValue stores a value that can be retrieved later by effects
+// Java: this.getEffects().setValue(key, value)
+// This is used to pass data from the trigger condition to the effect
+// Example: A trigger saves the counters from a leaving permanent, then the effect retrieves them
+func (a *TriggeredAbility) SetValue(key string, value interface{}) {
+	if a.values == nil {
+		a.values = make(map[string]interface{})
+	}
+	a.values[key] = value
+}
+
+// GetValue retrieves a value stored by SetValue
+// Java: this.getValue(key)
+// Returns nil if the key doesn't exist
+func (a *TriggeredAbility) GetValue(key string) interface{} {
+	if a.values == nil {
+		return nil
+	}
+	return a.values[key]
+}
+
+// GetValueAsCounters retrieves a value as a counter map (convenience method)
+// Returns nil if the key doesn't exist or isn't a map[string]int
+func (a *TriggeredAbility) GetValueAsCounters(key string) map[string]int {
+	value := a.GetValue(key)
+	if value == nil {
+		return nil
+	}
+	if counters, ok := value.(map[string]int); ok {
+		return counters
+	}
+	return nil
+}
+
+// ClearValues removes all stored values (called after resolution)
+func (a *TriggeredAbility) ClearValues() {
+	a.values = make(map[string]interface{})
+}
+
 // ========================================
 // Trigger Conditions
 // ========================================
@@ -111,6 +156,76 @@ type GameEvent struct {
 	Zone     Zone      // Zone information
 	FromZone Zone      // Previous zone (for zone change events)
 	ToZone   Zone      // New zone (for zone change events)
+
+	// PermanentSnapshot contains the state of a permanent at the moment it left a zone
+	// Java: ZoneChangeEvent.getTarget() returns the Permanent object
+	// This is populated for EventLeavesBattlefield and EventDies events
+	PermanentSnapshot *PermanentSnapshot
+}
+
+// PermanentSnapshot captures the state of a permanent at a specific moment
+// Used for triggered abilities that need to know the state of a permanent
+// after it has left the battlefield (e.g., Resourceful Defense needs counters)
+// Java: Similar to how ZoneChangeEvent stores the Permanent reference
+type PermanentSnapshot struct {
+	ID           uuid.UUID      // Permanent's ID
+	Name         string         // Card name
+	ControllerID uuid.UUID      // Controller at time of snapshot
+	OwnerID      uuid.UUID      // Owner
+	Types        []string       // Card types
+	SubTypes     []string       // Subtypes
+	Power        int            // Power (for creatures)
+	Toughness    int            // Toughness (for creatures)
+	Counters     map[string]int // All counters (name -> count)
+	Tapped       bool           // Was it tapped
+	Abilities    []string       // Ability descriptions
+}
+
+// NewPermanentSnapshot creates a PermanentSnapshot from basic data
+func NewPermanentSnapshot(id, controllerID, ownerID uuid.UUID, name string) *PermanentSnapshot {
+	return &PermanentSnapshot{
+		ID:           id,
+		Name:         name,
+		ControllerID: controllerID,
+		OwnerID:      ownerID,
+		Counters:     make(map[string]int),
+		Types:        make([]string, 0),
+		SubTypes:     make([]string, 0),
+		Abilities:    make([]string, 0),
+	}
+}
+
+// HasCounters returns true if the snapshot has any counters
+func (ps *PermanentSnapshot) HasCounters() bool {
+	if ps == nil || ps.Counters == nil {
+		return false
+	}
+	for _, count := range ps.Counters {
+		if count > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+// GetCounterCount returns the count of a specific counter type
+func (ps *PermanentSnapshot) GetCounterCount(counterName string) int {
+	if ps == nil || ps.Counters == nil {
+		return 0
+	}
+	return ps.Counters[counterName]
+}
+
+// GetAllCounters returns a copy of all counters
+func (ps *PermanentSnapshot) GetAllCounters() map[string]int {
+	if ps == nil || ps.Counters == nil {
+		return make(map[string]int)
+	}
+	result := make(map[string]int)
+	for name, count := range ps.Counters {
+		result[name] = count
+	}
+	return result
 }
 
 // EventType represents the type of game event

@@ -21,8 +21,8 @@ func NewBrushWithDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {

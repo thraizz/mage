@@ -20,5 +20,8 @@ func NewImpendingFlux(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(                 xValue, StaticFilters.FILTER_OPPO...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

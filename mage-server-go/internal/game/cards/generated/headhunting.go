@@ -22,8 +22,8 @@ func NewHeadHunting(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeBounty.CreateInstance(1))).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeBounty.CreateInstance(1))).
 		Build()
 	if err != nil {
 		return nil, err

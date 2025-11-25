@@ -24,8 +24,9 @@ func NewMysticMight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
@@ -35,6 +36,7 @@ func NewMysticMight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(2, 2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

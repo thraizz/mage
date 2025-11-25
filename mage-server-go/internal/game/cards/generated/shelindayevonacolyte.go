@@ -31,6 +31,7 @@ func NewShelindaYevonAcolyte(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

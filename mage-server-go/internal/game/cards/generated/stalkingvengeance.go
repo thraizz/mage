@@ -24,7 +24,13 @@ func NewStalkingVengeance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: DiesCreatureTriggeredAbility
+	//   - Effect: StalkingVengeanceDamageEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	card.AddAbility(ability1)
 	return card, nil
 }

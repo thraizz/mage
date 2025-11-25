@@ -24,26 +24,33 @@ func NewDakkonShadowSlayer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
 		AddEffect(abilities.NewExileTargetEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
-	if err != nil {
-		return nil, err
-	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeLoyalty.CreateInstance(0), LandsYouControlCount.instance, true)).
+		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSurveilEffect(1)).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeLoyalty.CreateInstance(0), LandsYouControlCount.instance, true)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewSurveilEffect(1)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
 	return card, nil
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -23,5 +24,17 @@ func NewCombineGuildmage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - EntersWithCountersControlledEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - MoveCounterTargetsEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -31,5 +31,12 @@ func NewIzzetChemister(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - IzzetChemisterCastFromExileEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

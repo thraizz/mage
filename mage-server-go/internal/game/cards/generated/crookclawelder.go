@@ -29,10 +29,12 @@ func NewCrookclawElder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

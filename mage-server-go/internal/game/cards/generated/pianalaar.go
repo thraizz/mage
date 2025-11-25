@@ -27,18 +27,26 @@ func NewPiaNalaar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("ThopterColorlessToken")
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantBlockTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	// card.AddAbility(ability1)
+	token2_0, err := token.GetToken("ThopterColorlessToken")
 	if err != nil {
 		return nil, err
 	}
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

@@ -24,5 +24,12 @@ func NewGerrardsHourglassPendant(ownerID uuid.UUID, info *cards.CardInfo) (*game
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - GerrardsHourglassPendantReanimateEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{4}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

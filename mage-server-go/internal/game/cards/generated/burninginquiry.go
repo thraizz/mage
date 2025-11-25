@@ -22,7 +22,6 @@ func NewBurningInquiry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardEachPlayerEffect(3, true)
-	//   - DiscardEachPlayerEffect(3, true)
 	// card.AddAbility(ability0)
 	return card, nil
 }

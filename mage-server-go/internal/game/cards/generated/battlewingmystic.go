@@ -24,10 +24,15 @@ func NewBattlewingMystic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: DiscardHandControllerEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	card.AddAbility(ability1)
+	ability2 := abilities.NewKickerAbility(card.ID, "{R}")
+	card.AddAbility(ability2)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardHandControllerEffect()
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability3)
 	return card, nil
 }

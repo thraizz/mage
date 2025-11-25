@@ -27,8 +27,8 @@ func NewIndomitableWill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		AddEffect(abilities.NewBoostEnchantedEffect(1, 2)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		Build()
 	if err != nil {
 		return nil, err

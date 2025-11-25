@@ -25,7 +25,16 @@ func NewQuintoriusLoremaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: BeginningOfEndStepTriggeredAbility
+	//   - Effect: ExileTargetForSourceEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - QuintoriusLoremasterEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

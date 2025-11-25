@@ -20,5 +20,13 @@ func NewSynodSanctum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		Build()
+	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddSacrificeSourceCost().
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

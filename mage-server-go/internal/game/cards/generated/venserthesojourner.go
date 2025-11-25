@@ -23,5 +23,11 @@ func NewVenserTheSojourner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: ExileReturnBattlefieldNextEndStepTargetEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: GetEmblemEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

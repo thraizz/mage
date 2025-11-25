@@ -21,16 +21,19 @@ func NewDecreeOfJustice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("AngelToken")
+	// TODO: Implement triggered ability: CycleTriggeredAbility
+	//   - Effect: DecreeOfJusticeCycleEffect()
+	// card.AddAbility(ability0)
+	token1_0, err := token.GetToken("AngelToken")
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

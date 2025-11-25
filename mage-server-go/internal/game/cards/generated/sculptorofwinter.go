@@ -27,6 +27,7 @@ func NewSculptorOfWinter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -23,5 +23,11 @@ func NewRevenantPatriarch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: SkipCombatStepEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

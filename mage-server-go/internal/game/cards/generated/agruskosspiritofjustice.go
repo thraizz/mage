@@ -25,9 +25,15 @@ func NewAgrusKosSpiritOfJustice(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	// TODO: Implement triggered ability: EntersBattlefieldOrAttacksSourceTriggeredAbility
+	//   - Effect: AgrusKosSpiritOfJusticeEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike)
 	card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	card.AddAbility(ability2)
 	return card, nil
 }

@@ -31,10 +31,12 @@ func NewOliviaVoldaren(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDamageEffect(1)).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationWhileControlled)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

@@ -20,5 +20,11 @@ func NewKnowledgeAndPower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: ScryTriggeredAbility
+	//   - Effect: DoIfCostPaid(new DamageTargetEffect(2), new GenericManaCost(2))
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

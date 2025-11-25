@@ -24,6 +24,7 @@ func NewGraniteShard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddTapCost().
 		AddManaCost("{3}").
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

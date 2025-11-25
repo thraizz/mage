@@ -23,7 +23,6 @@ func NewRoilingWaters(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

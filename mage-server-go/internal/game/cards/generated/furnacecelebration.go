@@ -20,5 +20,11 @@ func NewFurnaceCelebration(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: SacrificePermanentTriggeredAbility
+	//   - Effect: DoIfCostPaid(                 new DamageTargetEffect(2), new Ge...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

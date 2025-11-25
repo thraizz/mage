@@ -31,6 +31,7 @@ func NewSafanaCalimportCutthroat(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 3)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

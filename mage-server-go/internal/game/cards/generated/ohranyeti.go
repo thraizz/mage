@@ -30,6 +30,7 @@ func NewOhranYeti(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

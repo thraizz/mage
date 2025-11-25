@@ -25,8 +25,7 @@ func NewHijack(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

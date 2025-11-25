@@ -21,18 +21,16 @@ func NewBlastFromThePast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("GoblinToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewKickerAbility(card.ID, "{2}{R}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(2)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

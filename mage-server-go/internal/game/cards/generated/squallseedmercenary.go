@@ -25,15 +25,18 @@ func NewSquallSeeDMercenary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DealsCombatDamageToAPlayerTriggeredAbility
+	//   - Effect: ReturnFromGraveyardToBattlefieldTargetEffect()
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
-	// card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	// card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("DoubleStrikeAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

@@ -24,14 +24,20 @@ func NewKayaIntangibleSlayer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHexproof)
-	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: LoseLifeOpponentsEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHexproof)
+	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

@@ -27,6 +27,7 @@ func NewSweettoothWitch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	token1_0, err := token.GetToken("FoodToken")

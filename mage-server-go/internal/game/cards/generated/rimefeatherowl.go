@@ -30,6 +30,7 @@ func NewRimefeatherOwl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeIce.CreateInstance(1))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

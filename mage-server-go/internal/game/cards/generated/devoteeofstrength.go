@@ -25,6 +25,7 @@ func NewDevoteeOfStrength(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

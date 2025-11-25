@@ -25,15 +25,11 @@ func NewUrzasCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	if err != nil {
 		return nil, err
 	}
-	token0_1, err := token.GetToken("KarnConstructToken")
-	if err != nil {
-		return nil, err
-	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectTapped(token0_0, 1, true)).
-		AddEffect(abilities.NewCreateTokenEffectTapped(token0_1, 1, true)).
-		AddEffect(abilities.NewScryEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewBoostEffect(-2, -0, false)).
+		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token0_0, 1, true)).
 		Build()
 	if err != nil {
 		return nil, err

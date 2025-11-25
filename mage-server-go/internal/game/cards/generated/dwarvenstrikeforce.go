@@ -26,7 +26,6 @@ func NewDwarvenStrikeForce(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

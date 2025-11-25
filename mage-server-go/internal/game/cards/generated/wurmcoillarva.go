@@ -25,20 +25,29 @@ func NewWurmcoilLarva(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
-	card.AddAbility(ability1)
-	token2_0, err := token.GetToken("PhyrexianWurm12DeathtouchToken")
+	token0_0, err := token.GetToken("PhyrexianWurm12DeathtouchToken")
 	if err != nil {
 		return nil, err
 	}
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewDiesTrigger(card.ID)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		Build()
+	card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
+	card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
+	card.AddAbility(ability2)
+	token3_0, err := token.GetToken("PhyrexianWurm12DeathtouchToken")
+	if err != nil {
+		return nil, err
+	}
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token3_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

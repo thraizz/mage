@@ -28,6 +28,7 @@ func NewDaringApprentice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

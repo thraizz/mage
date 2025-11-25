@@ -23,5 +23,8 @@ func NewScabClanGiant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: FightTargetSourceEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

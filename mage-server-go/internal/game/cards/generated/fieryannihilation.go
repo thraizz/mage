@@ -21,6 +21,7 @@ func NewFieryAnnihilation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDamageEffect(5, true, true)).
 		AddEffect(abilities.NewExileTargetEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

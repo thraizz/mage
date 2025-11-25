@@ -24,5 +24,11 @@ func NewIcebergCancrix(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

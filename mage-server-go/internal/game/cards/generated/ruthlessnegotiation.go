@@ -21,7 +21,7 @@ func NewRuthlessNegotiation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {

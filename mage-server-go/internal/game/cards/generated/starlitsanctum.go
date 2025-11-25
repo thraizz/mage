@@ -22,5 +22,17 @@ func NewStarlitSanctum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - StarlitSanctumWhiteEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - StarlitSanctumBlackEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

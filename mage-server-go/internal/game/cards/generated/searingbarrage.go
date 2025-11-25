@@ -22,7 +22,7 @@ func NewSearingBarrage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(5)).
-		AddEffect(abilities.NewDamageEffect(3)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(3), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

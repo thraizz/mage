@@ -26,6 +26,7 @@ func NewSaltRoadQuartermasters(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

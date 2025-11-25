@@ -25,8 +25,8 @@ func NewCaesarLegionsEmperor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewDamageEffect(xValue)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

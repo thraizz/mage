@@ -26,10 +26,11 @@ func NewJeskaiRevelation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+		AddEffect(abilities.NewDamageEffect(4, true, true)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(4)).
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

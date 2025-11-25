@@ -22,6 +22,7 @@ func NewClockOfOmens(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

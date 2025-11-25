@@ -24,11 +24,17 @@ func NewSalvationColossus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewBoostEffect(2, 2, true)).
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability2)
+	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
+	card.AddAbility(ability3)
 	return card, nil
 }

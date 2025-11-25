@@ -22,12 +22,13 @@ from datetime import datetime
 @dataclass
 class Ability:
     """Represents a card ability"""
-    ability_type: str  # "spell", "activated", "keyword", "triggered", "static"
+    ability_type: str  # "spell", "activated", "keyword", "triggered", "static", "kicker"
     java_class: str
     go_code: str
     targets: List[str] = field(default_factory=list)
     effects: List[str] = field(default_factory=list)
     costs: List[str] = field(default_factory=list)
+    conditional_targets: List[str] = field(default_factory=list)  # TODOs for conditional targets
 
 
 @dataclass
@@ -302,6 +303,9 @@ class AbilityMapper:
         # DoIfCostPaid
         'DoIfCostPaid': ('TODO', 'nil'),
 
+        # Conditional effects
+        'ConditionalOneShotEffect': ('ConditionalEffect', 'abilities.NewConditionalEffect'),
+
         # Generic/Custom
         'OneShotEffect': ('TODO', 'nil'),  # Custom effect - needs manual implementation
     }
@@ -453,6 +457,8 @@ class AbilityMapper:
         'StaticFilters.FILTER_PERMANENT': 'abilities.NewPermanentTargetFilter()',
         'StaticFilters.FILTER_PERMANENT_CREATURE': 'abilities.NewCreatureTargetFilter()',
         'StaticFilters.FILTER_PERMANENT_ARTIFACT': 'abilities.NewArtifactTargetFilter()',
+        'StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT': 'abilities.NewArtifactOrEnchantmentTargetFilter()',
+        'StaticFilters.FILTER_PERMANENT_ENCHANTMENT': 'abilities.NewEnchantmentTargetFilter()',
     }
 
     @classmethod
@@ -508,25 +514,23 @@ class JavaCardParser:
 
     def _extract_class_name(self) -> str:
         """Extract class name"""
-        # Try CardImpl first (most common) - handle both "final" and non-final classes
-        match = re.search(r'public (?:final )?class (\w+) extends CardImpl', self.content)
-        if match:
-            return match.group(1)
+        # List of base card classes to try (most common first)
+        # Uses \s+ for flexible whitespace to handle files with extra spaces
+        base_classes = [
+            'CardImpl',           # Most common
+            'SplitCard',          # e.g., Wear//Tear
+            'ModalDoubleFacedCard',  # e.g., Witch Enchanter // Witch-Blessed Meadow
+            'AdventureCard',      # Adventure cards
+            'LevelerCard',        # Level Up cards (e.g., Hexdrinker)
+            'MeldCard',           # Meld cards (e.g., BriselaVoiceOfNightmares)
+            'OmenCard',           # Omen cards (e.g., DirgurIslandDragon)
+            'RoomCard',           # Room cards (e.g., BottomlessPoolLockerRoom)
+        ]
 
-        # Try SplitCard (e.g., Wear//Tear)
-        match = re.search(r'public (?:final )?class (\w+) extends SplitCard', self.content)
-        if match:
-            return match.group(1)
-
-        # Try ModalDoubleFacedCard (e.g., Witch Enchanter // Witch-Blessed Meadow)
-        match = re.search(r'public (?:final )?class (\w+) extends ModalDoubleFacedCard', self.content)
-        if match:
-            return match.group(1)
-
-        # Try AdventureCard
-        match = re.search(r'public (?:final )?class (\w+) extends AdventureCard', self.content)
-        if match:
-            return match.group(1)
+        for base_class in base_classes:
+            match = re.search(rf'public (?:final )?class (\w+)\s+extends {base_class}', self.content)
+            if match:
+                return match.group(1)
 
         raise ValueError(f"Could not find class name in {self.file_path}")
 
@@ -586,6 +590,9 @@ class JavaCardParser:
         """Extract abilities"""
         abilities = []
 
+        # Extract custom ability classes (e.g., ResourcefulDefenseTriggeredAbility)
+        abilities.extend(self._extract_custom_ability_classes())
+
         # Extract keyword abilities
         # First, identify lines that are part of GainAbility effect calls (multi-line awareness)
         gain_ability_context = set()
@@ -637,7 +644,7 @@ class JavaCardParser:
                     abilities.append(Ability(
                         ability_type='enchant',
                         java_class='EnchantAbility',
-                        go_code=f'abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))',
+                        go_code='abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))',
                     ))
 
         # Extract EquipAbility (e.g., "new EquipAbility(2, false)")
@@ -652,6 +659,17 @@ class JavaCardParser:
                     ability_type='equip',
                     java_class='EquipAbility',
                     go_code=f'abilities.NewEquipAbility(card.ID, "{{{cost}}}", {str(sorcery_speed_go).lower()})',
+                ))
+
+        # Extract KickerAbility (e.g., "new KickerAbility("{R}")")
+        for line in self.lines:
+            match = re.search(r'new KickerAbility\("([^"]+)"\)', line)
+            if match:
+                kicker_cost = match.group(1)
+                abilities.append(Ability(
+                    ability_type='kicker',
+                    java_class='KickerAbility',
+                    go_code=f'abilities.NewKickerAbility(card.ID, "{kicker_cost}")',
                 ))
 
         # Extract mana abilities
@@ -717,13 +735,51 @@ class JavaCardParser:
             effects = []
             targets = []
 
+            # Join all lines into one string for multi-line effect parsing
+            combined_text = ' '.join(all_lines)
+
+            # First, identify regions inside ConditionalOneShotEffect to avoid double-extraction
+            conditional_effect_regions = []
+            coe_pattern = 'new ConditionalOneShotEffect('
+            coe_start = 0
+            while True:
+                coe_idx = combined_text.find(coe_pattern, coe_start)
+                if coe_idx == -1:
+                    break
+                # Find the matching close paren
+                paren_start = coe_idx + len(coe_pattern) - 1
+                paren_count = 1
+                i = paren_start + 1
+                while i < len(combined_text) and paren_count > 0:
+                    if combined_text[i] == '(':
+                        paren_count += 1
+                    elif combined_text[i] == ')':
+                        paren_count -= 1
+                    i += 1
+                if paren_count == 0:
+                    conditional_effect_regions.append((coe_idx, i))
+                coe_start = i
+
+            def is_inside_conditional_effect(pos: int) -> bool:
+                """Check if position is inside a ConditionalOneShotEffect"""
+                for start, end in conditional_effect_regions:
+                    if start < pos < end:
+                        return True
+                return False
+
+            # Extract effects from combined text for multi-line effects
+            for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
+                # Use balanced parentheses extraction on combined text
+                params = self._extract_effect_params(combined_text, effect_class)
+                if params is not None:
+                    # Find position of this effect in combined text
+                    effect_pos = combined_text.find(f'new {effect_class}(')
+                    # Skip effects that are inside ConditionalOneShotEffect (except ConditionalOneShotEffect itself)
+                    if effect_class != 'ConditionalOneShotEffect' and is_inside_conditional_effect(effect_pos):
+                        continue
+                    effects.append((effect_class, params, go_func))
+
             for line in all_lines:
-                # Extract effects
-                for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
-                    # Use balanced parentheses extraction
-                    params = self._extract_effect_params(line, effect_class)
-                    if params is not None:
-                        effects.append((effect_class, params, go_func))
 
                 # Extract targets (with support for count parameter)
                 for target_class, go_filter in AbilityMapper.TARGET_MAP.items():
@@ -751,6 +807,74 @@ class JavaCardParser:
                         go_target = f'abilities.NewTargetRequirement(1, 1, {go_filter})'
                         targets.append(go_target)
 
+                # Check for TargetPermanent with StaticFilters parameter
+                # Pattern: new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT)
+                target_with_filter_match = re.search(r'new TargetPermanent\((StaticFilters\.\w+)\)', line)
+                if target_with_filter_match:
+                    static_filter = target_with_filter_match.group(1)
+                    # Look up the filter in STATIC_FILTER_MAP
+                    go_filter = AbilityMapper.STATIC_FILTER_MAP.get(static_filter, 'abilities.NewPermanentTargetFilter()')
+                    go_target = f'abilities.NewTargetRequirement(1, 1, {go_filter})'
+                    targets.append(go_target)
+
+            # Check for ConditionalTargetAdjuster (adds conditional targets like kicker targets)
+            # Use combined_text for multi-line matching
+            conditional_targets = []
+            conditional_target_types = set()  # Track which target types are conditional
+            # Pattern: setTargetAdjuster(new ConditionalTargetAdjuster(KickedCondition.ONCE, true, new TargetCreaturePermanent()))
+            # Need to use balanced parentheses for multi-line
+            cta_start = combined_text.find('setTargetAdjuster(new ConditionalTargetAdjuster(')
+            if cta_start != -1:
+                # Find the matching close paren
+                paren_start = cta_start + len('setTargetAdjuster(new ConditionalTargetAdjuster(') - 1
+                paren_count = 1
+                i = paren_start + 1
+                while i < len(combined_text) and paren_count > 0:
+                    if combined_text[i] == '(':
+                        paren_count += 1
+                    elif combined_text[i] == ')':
+                        paren_count -= 1
+                    i += 1
+                if paren_count == 0:
+                    cta_params = combined_text[paren_start + 1:i - 1]
+
+                    # Extract condition and target
+                    is_kicked = 'KickedCondition.ONCE' in cta_params or 'KickedCondition.TWICE' in cta_params
+                    condition_str = 'kicked' if is_kicked else 'conditional'
+
+                    # Try to extract the target from params
+                    target_match = re.search(r'new Target(\w+)', cta_params)
+                    if target_match:
+                        target_type = target_match.group(1)
+                        conditional_targets.append(f'// TODO: Add conditional {condition_str} target: Target{target_type}')
+                        conditional_target_types.add(target_type)
+
+            # Remove conditional targets from regular targets list
+            # Map Java target types to Go filter names
+            target_type_to_filter = {
+                'CreaturePermanent': 'CreatureTargetFilter',
+                'ArtifactPermanent': 'ArtifactTargetFilter',
+                'EnchantmentPermanent': 'EnchantmentTargetFilter',
+                'LandPermanent': 'LandTargetFilter',
+                'Permanent': 'PermanentTargetFilter',
+                'Player': 'PlayerTargetFilter',
+                'AnyTarget': 'AnyTargetFilter',
+                'Spell': 'SpellTargetFilter',
+            }
+            if conditional_target_types:
+                filtered_targets = []
+                for t in targets:
+                    is_conditional = False
+                    for ct_type in conditional_target_types:
+                        # Map Java target type to Go filter name
+                        go_filter_name = target_type_to_filter.get(ct_type, ct_type)
+                        if go_filter_name in t:
+                            is_conditional = True
+                            break
+                    if not is_conditional:
+                        filtered_targets.append(t)
+                targets = filtered_targets
+
             if effects or targets:
                 ability = Ability(
                     ability_type='spell',
@@ -758,6 +882,7 @@ class JavaCardParser:
                     go_code='',  # Will be generated
                     effects=[str(e) for e in effects],
                     targets=targets,
+                    conditional_targets=conditional_targets,
                 )
                 abilities.append(ability)
 
@@ -1011,6 +1136,15 @@ class JavaCardParser:
                 if params is not None:
                     effects.append((effect_class, params, go_func))
 
+            # If no recognized effects found, check for custom effect classes
+            if not effects:
+                # Look for custom effect classes in constructor (e.g., new ResourcefulDefenseMoveCounterEffect())
+                custom_effect_match = re.search(r'new\s+(\w+Effect)\(', full_ability)
+                if custom_effect_match:
+                    custom_effect_class = custom_effect_match.group(1)
+                    # Add TODO for custom effect
+                    effects.append((custom_effect_class, '', 'nil'))
+
             # Extract costs from SimpleActivatedAbility
             costs = []
             costs.extend(self._extract_costs_from_line(full_ability))
@@ -1051,15 +1185,236 @@ class JavaCardParser:
 
                 k += 1
 
-            # Create ability if we found effects
-            if effects:
+            # Extract targets (may be added via ability.addTarget() calls)
+            targets = []
+            for k in range(j, min(j + 50, len(self.lines))):
+                target_line = self.lines[k]
+                # Look for: varName.addTarget(...)
+                if f'{var_name}.addTarget(' in target_line:
+                    # Extract target from this line (may span multiple lines)
+                    target_lines = [target_line]
+                    paren_count = target_line.count('(') - target_line.count(')')
+                    m = k + 1
+                    while m < len(self.lines) and paren_count > 0:
+                        next_target_line = self.lines[m]
+                        target_lines.append(next_target_line)
+                        paren_count += next_target_line.count('(') - next_target_line.count(')')
+                        m += 1
+                    
+                    full_target_line = ' '.join(target_lines)
+                    # Extract target from this line
+                    target_match = re.search(rf'{var_name}\.addTarget\(([^)]+)\)', full_target_line)
+                    if target_match:
+                        target_param = target_match.group(1)
+                        # Try to map to Go target
+                        found_target = False
+                        for target_class, go_filter in AbilityMapper.TARGET_MAP.items():
+                            if f'new {target_class}' in target_param:
+                                # Check for count parameter
+                                count_match = re.search(rf'new {target_class}\((\d+)\)', target_param)
+                                if count_match:
+                                    count = count_match.group(1)
+                                    targets.append(f'abilities.NewTargetRequirement({count}, {count}, {go_filter})')
+                                else:
+                                    targets.append(f'abilities.NewTargetRequirement(1, 1, {go_filter})')
+                                found_target = True
+                                break
+                        
+                        # If no standard target found, check for filter-based targets
+                        if not found_target:
+                            if 'TargetControlledPermanent' in target_param or 'FILTER_CONTROLLED_PERMANENT' in target_param:
+                                targets.append('abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())')
+                            elif 'TargetPermanent' in target_param:
+                                targets.append('abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())')
+
+            # Create ability if we found effects or costs (some activated abilities might only have costs)
+            if effects or costs:
                 abilities.append(Ability(
                     ability_type='activated',
                     java_class='SimpleActivatedAbility',
                     go_code='',  # Will be generated
                     effects=[str(e) for e in effects],
-                    targets=[],
+                    targets=targets,
                     costs=costs,  # Add costs to ability
+                ))
+
+        return abilities
+
+    def _extract_custom_ability_classes(self) -> List[Ability]:
+        """
+        Extract custom ability classes that are instantiated and then added.
+        Pattern:
+            Ability ltbAbility = new ResourcefulDefenseTriggeredAbility();
+            ltbAbility.addTarget(...);
+            this.addAbility(ltbAbility);
+        """
+        abilities = []
+
+        for i, line in enumerate(self.lines):
+            # Look for: Ability varName = new CustomAbilityClass(...)
+            # Match patterns like:
+            #   Ability ltbAbility = new ResourcefulDefenseTriggeredAbility();
+            #   Ability ability = new SimpleActivatedAbility(...);
+            match = re.search(r'Ability\s+(\w+)\s*=\s*new\s+(\w+)(?:\(|;)', line)
+            if not match:
+                continue
+
+            var_name = match.group(1)
+            ability_class = match.group(2)
+
+            # Skip if it's SimpleActivatedAbility (handled elsewhere)
+            if ability_class == 'SimpleActivatedAbility':
+                continue
+
+            # Skip if it's SimpleStaticAbility (handled elsewhere)
+            if ability_class == 'SimpleStaticAbility':
+                continue
+
+            # Check if this ability is actually added to the card
+            is_added = False
+            for j in range(i, min(i + 50, len(self.lines))):  # Look ahead up to 50 lines
+                if f'this.addAbility({var_name})' in self.lines[j] or f'addAbility({var_name})' in self.lines[j]:
+                    is_added = True
+                    break
+
+            if not is_added:
+                continue
+
+            # Determine ability type based on class name or superclass
+            ability_type = 'triggered'  # Default
+            is_triggered = False
+            is_activated = False
+
+            # Check if it extends a known triggered ability class
+            for j in range(i, min(i + 100, len(self.lines))):
+                if f'class {ability_class}' in self.lines[j] or f'class {ability_class} extends' in self.lines[j]:
+                    # Look for extends clause
+                    extends_line = self.lines[j]
+                    if 'extends LeavesBattlefieldAllTriggeredAbility' in extends_line or 'extends LeavesBattlefieldTriggeredAbility' in extends_line:
+                        is_triggered = True
+                        ability_type = 'triggered'
+                    elif 'extends EntersBattlefieldTriggeredAbility' in extends_line or 'extends EntersBattlefieldAllTriggeredAbility' in extends_line:
+                        is_triggered = True
+                        ability_type = 'triggered'
+                    elif 'extends DiesTriggeredAbility' in extends_line:
+                        is_triggered = True
+                        ability_type = 'triggered'
+                    elif 'extends SimpleActivatedAbility' in extends_line:
+                        is_activated = True
+                        ability_type = 'activated'
+                    break
+
+            # Extract constructor parameters (may span multiple lines)
+            constructor_lines = [line]
+            paren_count = line.count('(') - line.count(')')
+            j = i + 1
+            while j < len(self.lines) and paren_count > 0:
+                next_line = self.lines[j]
+                constructor_lines.append(next_line)
+                paren_count += next_line.count('(') - next_line.count(')')
+                j += 1
+
+            full_constructor = ' '.join(constructor_lines)
+
+            # Extract effects from constructor
+            effects = []
+            for effect_class, (effect_type, go_func) in AbilityMapper.EFFECT_MAP.items():
+                params = self._extract_effect_params(full_constructor, effect_class)
+                if params is not None:
+                    effects.append((effect_class, params, go_func))
+
+            # If no recognized effects found, check for custom effect classes
+            if not effects:
+                # Look for custom effect classes in constructor (e.g., new ResourcefulDefenseLeaveEffect())
+                custom_effect_match = re.search(r'new\s+(\w+Effect)\(', full_constructor)
+                if custom_effect_match:
+                    custom_effect_class = custom_effect_match.group(1)
+                    # Add TODO for custom effect
+                    effects.append((custom_effect_class, '', 'nil'))
+                else:
+                    # Also check in the class definition's super() call
+                    # Look for the class definition and its constructor
+                    for j in range(i, min(i + 200, len(self.lines))):
+                        if f'class {ability_class}' in self.lines[j]:
+                            # Find the constructor
+                            for k in range(j, min(j + 50, len(self.lines))):
+                                if f'{ability_class}()' in self.lines[k] or f'{ability_class}(' in self.lines[k]:
+                                    # Look for super() call in constructor
+                                    for m in range(k, min(k + 20, len(self.lines))):
+                                        if 'super(' in self.lines[m]:
+                                            # Extract effect from super call
+                                            super_line = self.lines[m]
+                                            super_effect_match = re.search(r'super\(new\s+(\w+Effect)\(', super_line)
+                                            if super_effect_match:
+                                                custom_effect_class = super_effect_match.group(1)
+                                                effects.append((custom_effect_class, '', 'nil'))
+                                                break
+                                    break
+                            break
+
+            # Extract targets added to this ability
+            targets = []
+            for k in range(i, min(i + 50, len(self.lines))):
+                target_line = self.lines[k]
+                # Look for: varName.addTarget(...)
+                if f'{var_name}.addTarget(' in target_line:
+                    # Extract target from this line (may span multiple lines)
+                    target_lines = [target_line]
+                    paren_count = target_line.count('(') - target_line.count(')')
+                    m = k + 1
+                    while m < len(self.lines) and paren_count > 0:
+                        next_target_line = self.lines[m]
+                        target_lines.append(next_target_line)
+                        paren_count += next_target_line.count('(') - next_target_line.count(')')
+                        m += 1
+                    
+                    full_target_line = ' '.join(target_lines)
+                    # Extract target from this line
+                    target_match = re.search(rf'{var_name}\.addTarget\(([^)]+)\)', full_target_line)
+                    if target_match:
+                        target_param = target_match.group(1)
+                        # Try to map to Go target
+                        found_target = False
+                        for target_class, go_filter in AbilityMapper.TARGET_MAP.items():
+                            if f'new {target_class}' in target_param:
+                                # Check for count parameter
+                                count_match = re.search(rf'new {target_class}\((\d+)\)', target_param)
+                                if count_match:
+                                    count = count_match.group(1)
+                                    targets.append(f'abilities.NewTargetRequirement({count}, {count}, {go_filter})')
+                                else:
+                                    targets.append(f'abilities.NewTargetRequirement(1, 1, {go_filter})')
+                                found_target = True
+                                break
+                        
+                        # If no standard target found, check for filter-based targets
+                        if not found_target:
+                            # Check for TargetControlledPermanent with filter
+                            if 'TargetControlledPermanent' in target_param:
+                                # Default to controlled permanent filter (another permanent)
+                                targets.append('abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())')
+                            elif 'TargetPermanent' in target_param:
+                                # Default to permanent filter
+                                targets.append('abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())')
+
+            # Extract costs (for activated abilities)
+            costs = []
+            if is_activated:
+                costs.extend(self._extract_costs_from_line(full_constructor))
+                # Look for additional addCost calls
+                for k in range(i, min(i + 50, len(self.lines))):
+                    if f'{var_name}.addCost(' in self.lines[k]:
+                        costs.extend(self._extract_costs_from_line(self.lines[k]))
+
+            # Create ability object
+            if effects or is_triggered or is_activated:
+                abilities.append(Ability(
+                    ability_type=ability_type,
+                    java_class=ability_class,
+                    go_code='',  # Will be generated
+                    effects=[str(e) for e in effects] if effects else [],
+                    targets=targets,
+                    costs=costs,
                 ))
 
         return abilities
@@ -1244,11 +1599,17 @@ func init() {{
         elif ability.ability_type == 'equip':
             return f'\tability{index}, err := {ability.go_code}\n\tif err != nil {{\n\t\treturn nil, err\n\t}}\n\tcard.AddAbility(ability{index})'
 
+        elif ability.ability_type == 'kicker':
+            return f'\tability{index} := {ability.go_code}\n\tcard.AddAbility(ability{index})'
+
         elif ability.ability_type == 'spell':
             return self._generate_spell_ability(ability, index)
 
         elif ability.ability_type == 'activated':
             return self._generate_activated_ability(ability, index)
+
+        elif ability.ability_type == 'triggered':
+            return self._generate_triggered_ability(ability, index)
 
         return ''
 
@@ -1268,7 +1629,7 @@ func init() {{
 
         if has_todo:
             # Generate TODO comment for unmapped effects
-            lines.append(f'\t// TODO: Implement spell ability with unmapped effects')
+            lines.append('\t// TODO: Implement spell ability with unmapped effects')
 
             for effect_str in ability.effects:
                 java_effect_class, params, go_func = eval(effect_str)
@@ -1279,8 +1640,8 @@ func init() {{
                     lines.append(f'\t//   - {java_effect_class}({param_str})')
 
             if ability.targets:
-                lines.append(f'\t//')
-                lines.append(f'\t// Targets:')
+                lines.append('\t//')
+                lines.append('\t// Targets:')
                 for target in ability.targets:
                     lines.append(f'\t//   - {target}')
 
@@ -1299,9 +1660,9 @@ func init() {{
                 if token_name not in token_vars:
                     var_name = f'token{index}_{len(token_vars)}'
                     lines.append(f'\t{var_name}, err := token.GetToken("{token_name}")')
-                    lines.append(f'\tif err != nil {{')
-                    lines.append(f'\t\treturn nil, err')
-                    lines.append(f'\t}}')
+                    lines.append('\tif err != nil {')
+                    lines.append('\t\treturn nil, err')
+                    lines.append('\t}')
                     token_vars[token_name] = var_name
 
         lines.append(f'\tability{index}, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).')
@@ -1352,13 +1713,37 @@ func init() {{
 
         # Add targets
         for target in ability.targets:
-            lines.append(f'\t\tAddTarget({target}).')
+            # Parse target string to extract min, max, and filter
+            # Format: abilities.NewTargetRequirement(min, max, filter)
+            # The filter is always a simple function call like abilities.NewPlayerTargetFilter()
+            # Match: abilities.NewTargetRequirement(min, max, abilities.NewXxxFilter())
+            target_match = re.search(r'abilities\.NewTargetRequirement\((\d+),\s*(\d+),\s*(abilities\.New\w+Filter\(\))\)', target)
+            if target_match:
+                min_count = int(target_match.group(1))
+                max_count = int(target_match.group(2))
+                filter_expr = target_match.group(3)
+                
+                if min_count == 1 and max_count == 1:
+                    # Use AddTarget for single target
+                    lines.append(f'\t\tAddTarget({filter_expr}).')
+                else:
+                    # Use AddTargets for custom min/max
+                    lines.append(f'\t\tAddTargets({min_count}, {max_count}, {filter_expr}).')
+            else:
+                # Fallback: assume it's already a filter (shouldn't happen, but handle gracefully)
+                lines.append(f'\t\tAddTarget({target}).')
 
         lines.append('\t\tBuild()')
         lines.append('\tif err != nil {')
         lines.append('\t\treturn nil, err')
         lines.append('\t}')
         lines.append(f'\tcard.AddAbility(ability{index})')
+
+        # Add conditional target TODOs
+        if ability.conditional_targets:
+            lines.append('')
+            for cond_target in ability.conditional_targets:
+                lines.append(f'\t{cond_target}')
 
         return '\n'.join(lines)
 
@@ -1378,7 +1763,7 @@ func init() {{
 
         if has_todo:
             # Generate TODO comment for unmapped effects
-            lines.append(f'\t// TODO: Implement activated ability with unmapped effects')
+            lines.append('\t// TODO: Implement activated ability with unmapped effects')
 
             for effect_str in ability.effects:
                 java_effect_class, params, go_func = eval(effect_str)
@@ -1389,8 +1774,8 @@ func init() {{
                     lines.append(f'\t//   - {java_effect_class}({param_str})')
 
             if ability.costs:
-                lines.append(f'\t//')
-                lines.append(f'\t// Costs:')
+                lines.append('\t//')
+                lines.append('\t// Costs:')
                 for cost in ability.costs:
                     lines.append(f'\t//   - {cost}')
 
@@ -1409,9 +1794,9 @@ func init() {{
                 if token_name not in token_vars:
                     var_name = f'token{index}_{len(token_vars)}'
                     lines.append(f'\t{var_name}, err := token.GetToken("{token_name}")')
-                    lines.append(f'\tif err != nil {{')
-                    lines.append(f'\t\treturn nil, err')
-                    lines.append(f'\t}}')
+                    lines.append('\tif err != nil {')
+                    lines.append('\t\treturn nil, err')
+                    lines.append('\t}')
                     token_vars[token_name] = var_name
 
         lines.append(f'\tability{index} := abilities.NewActivatedAbilityBuilder(card.ID).')
@@ -1466,7 +1851,166 @@ func init() {{
 
         # Add targets
         for target in ability.targets:
-            lines.append(f'\t\tAddTarget({target}).')
+            # Parse target string to extract min, max, and filter
+            # Format: abilities.NewTargetRequirement(min, max, filter)
+            # The filter is always a simple function call like abilities.NewPlayerTargetFilter()
+            # Match: abilities.NewTargetRequirement(min, max, abilities.NewXxxFilter())
+            target_match = re.search(r'abilities\.NewTargetRequirement\((\d+),\s*(\d+),\s*(abilities\.New\w+Filter\(\))\)', target)
+            if target_match:
+                min_count = int(target_match.group(1))
+                max_count = int(target_match.group(2))
+                filter_expr = target_match.group(3)
+                
+                if min_count == 1 and max_count == 1:
+                    # Use AddTarget for single target
+                    lines.append(f'\t\tAddTarget({filter_expr}).')
+                else:
+                    # Use AddTargets for custom min/max
+                    lines.append(f'\t\tAddTargets({min_count}, {max_count}, {filter_expr}).')
+            else:
+                # Fallback: assume it's already a filter (shouldn't happen, but handle gracefully)
+                lines.append(f'\t\tAddTarget({target}).')
+
+        lines.append('\t\tBuild()')
+        lines.append(f'\tcard.AddAbility(ability{index})')
+
+        return '\n'.join(lines)
+
+    def _generate_triggered_ability(self, ability: Ability, index: int) -> str:
+        """Generate triggered ability with builder pattern"""
+        lines = []
+
+        # Check if any effects are unmapped (TODO)
+        has_todo = False
+        for effect_str in ability.effects:
+            if not effect_str:
+                continue
+            java_effect_class, params, go_func = eval(effect_str)
+
+            # Check for TODO/unmapped effects
+            if go_func == 'nil' or 'TODO' in go_func:
+                has_todo = True
+                break
+
+        # Determine trigger type based on Java class name
+        trigger_type = 'LeavesBattlefieldAll'  # Default
+        if 'LeavesBattlefield' in ability.java_class or 'LeavesBattlefieldAll' in ability.java_class:
+            trigger_type = 'LeavesBattlefieldAll'
+        elif 'EntersBattlefield' in ability.java_class:
+            trigger_type = 'EntersBattlefield'
+        elif 'Dies' in ability.java_class:
+            trigger_type = 'Dies'
+
+        if has_todo or not ability.effects:
+            # Generate TODO comment for unmapped effects or custom triggers
+            lines.append(f'\t// TODO: Implement triggered ability: {ability.java_class}')
+            
+            if ability.effects:
+                for effect_str in ability.effects:
+                    if not effect_str:
+                        continue
+                    java_effect_class, params, go_func = eval(effect_str)
+                    is_todo = go_func == 'nil' or 'TODO' in go_func
+                    if is_todo:
+                        param_str = params[:50] + '...' if len(params) > 50 else params
+                        lines.append(f'\t//   - Effect: {java_effect_class}({param_str})')
+
+            if ability.targets:
+                lines.append('\t//')
+                lines.append('\t// Targets:')
+                for target in ability.targets:
+                    lines.append(f'\t//   - {target}')
+
+            lines.append(f'\t// card.AddAbility(ability{index})')
+            return '\n'.join(lines)
+
+        # Pre-process to find tokens that need variables
+        token_vars = {}
+        for effect_str in ability.effects:
+            if not effect_str:
+                continue
+            java_effect_class, params, go_func = eval(effect_str)
+            # Process params to see what tokens are referenced
+            params_clean = self._process_effect_params(params, java_effect_class)
+            # Check if this effect uses tokens
+            token_matches = re.findall(r'token\.GetToken\("(\w+)"\)', params_clean)
+            for token_name in token_matches:
+                if token_name not in token_vars:
+                    var_name = f'token{index}_{len(token_vars)}'
+                    lines.append(f'\t{var_name}, err := token.GetToken("{token_name}")')
+                    lines.append('\tif err != nil {')
+                    lines.append('\t\treturn nil, err')
+                    lines.append('\t}')
+                    token_vars[token_name] = var_name
+
+        # Build triggered ability
+        lines.append(f'\tability{index} := abilities.NewTriggeredAbilityBuilder(card.ID).')
+
+        # Set trigger based on type
+        if trigger_type == 'LeavesBattlefieldAll':
+            # For LeavesBattlefieldAll, we need a trigger that fires when any permanent you control leaves
+            # TODO: Implement LeavesBattlefieldAllTrigger with filter support
+            lines.append('\t\t// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)')
+            lines.append('\t\t// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).')
+        elif trigger_type == 'EntersBattlefield':
+            lines.append('\t\tSetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).')
+        elif trigger_type == 'Dies':
+            lines.append('\t\tSetTrigger(abilities.NewDiesTrigger(card.ID)).')
+        else:
+            # Default: use a generic trigger (will need TODO)
+            lines.append(f'\t\t// TODO: Set trigger for {trigger_type}')
+
+        # Add effects
+        for effect_str in ability.effects:
+            if not effect_str:
+                continue
+            java_effect_class, params, go_func = eval(effect_str)
+            # Clean up params - process counter, token, and ability expressions
+            params_clean = self._process_effect_params(params, java_effect_class)
+
+            # Replace token.GetToken calls with token variables
+            for token_name, var_name in token_vars.items():
+                params_clean = params_clean.replace(f'token.GetToken("{token_name}")', var_name)
+
+            # Special handling for CreateTokenEffect
+            if java_effect_class == 'CreateTokenEffect':
+                comma_count = params_clean.count(',')
+                if comma_count == 0:
+                    effect_call = f'abilities.NewCreateTokenEffect({params_clean})'
+                elif comma_count == 1:
+                    effect_call = f'abilities.NewCreateTokenEffectAmount({params_clean})'
+                elif comma_count == 2:
+                    effect_call = f'abilities.NewCreateTokenEffectTapped({params_clean})'
+                else:
+                    effect_call = f'abilities.NewCreateTokenEffectAttacking({params_clean})'
+                lines.append(f'\t\tAddEffect({effect_call}).')
+                continue
+
+            # Check if params are malformed
+            if (re.search(r'\(\s*\)', params_clean) or
+                re.search(r'\{[^}]*\}', params_clean) or
+                re.search(r'/\*.*?\*/', params_clean) or
+                re.search(r'\bnew\s+[A-Z]', params_clean) or
+                re.search(r'filter\b', params_clean) or
+                re.search(r'CounterType\.', params_clean)):
+                lines.append(f'\t\t// TODO: {java_effect_class} with complex parameters')
+            else:
+                lines.append(f'\t\tAddEffect({go_func}({params_clean})).')
+
+        # Add targets
+        for target in ability.targets:
+            target_match = re.search(r'abilities\.NewTargetRequirement\((\d+),\s*(\d+),\s*(abilities\.New\w+Filter\(\))\)', target)
+            if target_match:
+                min_count = int(target_match.group(1))
+                max_count = int(target_match.group(2))
+                filter_expr = target_match.group(3)
+                
+                if min_count == 1 and max_count == 1:
+                    lines.append(f'\t\tAddTarget({filter_expr}).')
+                else:
+                    lines.append(f'\t\tAddTargets({min_count}, {max_count}, {filter_expr}).')
+            else:
+                lines.append(f'\t\tAddTarget({target}).')
 
         lines.append('\t\tBuild()')
         lines.append(f'\tcard.AddAbility(ability{index})')
@@ -1545,6 +2089,33 @@ func init() {{
             if ability_name:
                 return f'"{ability_name}", {duration}'
             return '/* TODO: unknown ability */'
+
+        # Special handling for ConditionalOneShotEffect - extract wrapped effect and condition
+        if effect_class == 'ConditionalOneShotEffect':
+            # Java: new ConditionalOneShotEffect(new DamageTargetEffect(2), KickedCondition.ONCE, "...")
+            # Go: abilities.NewConditionalEffect(wrapped_effect, "kicked")
+
+            # Check if KickedCondition is used
+            is_kicked = 'KickedCondition.ONCE' in params or 'KickedCondition.TWICE' in params
+            condition = '"kicked"' if is_kicked else '"unknown"'
+
+            # Try to extract the wrapped effect
+            # Look for: new XEffect(params)
+            wrapped_match = re.search(r'new (\w+Effect)\(([^)]*)\)', params)
+            if wrapped_match:
+                wrapped_effect_class = wrapped_match.group(1)
+                wrapped_params = wrapped_match.group(2)
+
+                # Check if wrapped effect is a known effect
+                effect_info = AbilityMapper.EFFECT_MAP.get(wrapped_effect_class)
+                if effect_info and effect_info[1] != 'nil' and 'TODO' not in effect_info[1]:
+                    go_func = effect_info[1]
+                    # Process the wrapped params
+                    processed_params = self._process_effect_params(wrapped_params, wrapped_effect_class)
+                    return f'{go_func}({processed_params}), {condition}'
+
+            # If we can't parse the wrapped effect, return TODO
+            return '/* TODO: ConditionalOneShotEffect with complex wrapped effect */'
 
         # Special handling for AddCountersAllEffect - extract counter, filter, and description
         if effect_class == 'AddCountersAllEffect':
@@ -1927,8 +2498,10 @@ func init() {{
             ('StaticFilters.FILTER_CARD_A', 'abilities.NewAnyTargetFilter()'),
             ('StaticFilters.FILTER_CARD', 'abilities.NewAnyTargetFilter()'),
             # Permanent filters
+            ('StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT', 'abilities.NewArtifactOrEnchantmentTargetFilter()'),
             ('StaticFilters.FILTER_PERMANENT_CREATURE', 'abilities.NewCreatureTargetFilter()'),
             ('StaticFilters.FILTER_PERMANENT_ARTIFACT', 'abilities.NewArtifactTargetFilter()'),
+            ('StaticFilters.FILTER_PERMANENT_ENCHANTMENT', 'abilities.NewEnchantmentTargetFilter()'),
             ('StaticFilters.FILTER_PERMANENT', 'abilities.NewPermanentTargetFilter()'),
         ]
 
@@ -2123,7 +2696,7 @@ def save_stats(results: List[TranspileResult], stats_file: str = "transpile_stat
     print(f"\n📊 Statistics saved to {stats_file}")
 
     # Print summary
-    print(f"\n=== Transpilation Summary ===")
+    print("\n=== Transpilation Summary ===")
     print(f"Total cards:          {stats['summary']['total']}")
     print(f"✓ Successful:         {stats['summary']['successful']} ({stats['summary']['success_rate']})")
     print(f"✗ Failed:             {stats['summary']['failed']}")
@@ -2131,15 +2704,15 @@ def save_stats(results: List[TranspileResult], stats_file: str = "transpile_stat
     print(f"✅ Fully implemented: {stats['summary']['fully_implemented']} ({stats['summary']['complete_rate']})")
 
     if error_categories:
-        print(f"\n=== Error Breakdown ===")
+        print("\n=== Error Breakdown ===")
         for error_type, cards in sorted(error_categories.items(), key=lambda x: -len(x[1])):
             print(f"{error_type}: {len(cards)} cards")
 
     if todo_analysis["total"] > 0:
-        print(f"\n=== TODO Analysis ===")
+        print("\n=== TODO Analysis ===")
         print(f"Cards with TODOs: {todo_analysis['total']}")
         if todo_analysis["details"]:
-            print(f"\nSample cards with TODOs:")
+            print("\nSample cards with TODOs:")
             for card_name, details in list(todo_analysis["details"].items())[:5]:
                 print(f"  {card_name}: {details['count']} TODO(s)")
                 if details["messages"]:

@@ -27,6 +27,7 @@ func NewWitchsClinic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

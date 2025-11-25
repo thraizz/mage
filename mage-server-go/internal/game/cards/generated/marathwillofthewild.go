@@ -26,9 +26,9 @@ func NewMarathWillOfTheWild(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(0), ManaSpentToCastCount.instance, true)).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(0), GetXValue.instance)).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
 		Build()
 	if err != nil {
 		return nil, err

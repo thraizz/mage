@@ -23,8 +23,8 @@ func NewMomentOfValor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
+		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

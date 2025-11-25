@@ -33,6 +33,7 @@ func NewEntropicEidolon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewLoseLifeEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

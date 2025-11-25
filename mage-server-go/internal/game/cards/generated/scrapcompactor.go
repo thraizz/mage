@@ -25,6 +25,8 @@ func NewScrapCompactor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
@@ -32,6 +34,7 @@ func NewScrapCompactor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

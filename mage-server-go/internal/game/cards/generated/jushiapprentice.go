@@ -27,11 +27,14 @@ func NewJushiApprentice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

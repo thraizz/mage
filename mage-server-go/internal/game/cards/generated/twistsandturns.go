@@ -20,8 +20,11 @@ func NewTwistsAndTurns(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: ExploreTargetEffect()
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - TransformSourceEffect()
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

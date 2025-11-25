@@ -20,12 +20,14 @@ func NewStrongholdArena(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewKickerAbility(card.ID, "{G}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(xValue)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

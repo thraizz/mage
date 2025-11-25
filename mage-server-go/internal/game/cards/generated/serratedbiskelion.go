@@ -28,6 +28,7 @@ func NewSerratedBiskelion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeM1M1.CreateInstance(1), true)).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

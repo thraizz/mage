@@ -22,6 +22,7 @@ func NewRootOut(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewArtifactOrEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -21,8 +21,8 @@ func NewExplodingBorders(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		AddEffect(abilities.NewDamageEffect(DomainValue.REGULAR)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

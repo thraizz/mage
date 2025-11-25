@@ -20,11 +20,18 @@ func NewIllGottenInheritance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// TODO: Implement triggered ability: BeginningOfUpkeepTriggeredAbility
+	//   - Effect: DamagePlayersEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(4)).
 		AddEffect(abilities.NewGainLifeEffect(4)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

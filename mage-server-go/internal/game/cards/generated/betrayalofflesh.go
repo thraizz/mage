@@ -22,7 +22,6 @@ func NewBetrayalOfFlesh(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
-	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())

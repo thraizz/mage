@@ -25,12 +25,21 @@ func NewWallCrawl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		Build()
+	card.AddAbility(ability0)
+	token1_0, err := token.GetToken("Spider21Token")
+	if err != nil {
+		return nil, err
+	}
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

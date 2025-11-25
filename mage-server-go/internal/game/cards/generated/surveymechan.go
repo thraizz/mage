@@ -34,6 +34,8 @@ func NewSurveyMechan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

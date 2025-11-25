@@ -24,5 +24,12 @@ func NewSecretPassage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability0)
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - InvestigateEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{4}")
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

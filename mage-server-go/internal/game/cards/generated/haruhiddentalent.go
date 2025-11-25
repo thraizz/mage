@@ -24,5 +24,8 @@ func NewHaruHiddenTalent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldAllTriggeredAbility
+	//   - Effect: EarthbendTargetEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

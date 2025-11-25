@@ -21,9 +21,9 @@ func NewIntegrityIntervention(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
+		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()

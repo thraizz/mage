@@ -28,6 +28,7 @@ func NewWosePathfinder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(3, 3)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

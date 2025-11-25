@@ -27,6 +27,7 @@ func NewUndergroundForum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeBounty.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

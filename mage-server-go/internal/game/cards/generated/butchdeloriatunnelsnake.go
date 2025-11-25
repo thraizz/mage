@@ -30,6 +30,7 @@ func NewButchDeLoriaTunnelSnake(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("menace", 1))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

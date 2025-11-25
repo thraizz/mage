@@ -20,11 +20,15 @@ func NewHypnoticCloud(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - DiscardTargetEffect(3)
-	//
-	// Targets:
-	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
-	// card.AddAbility(ability0)
+	ability0 := abilities.NewKickerAbility(card.ID, "{4}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
 	return card, nil
 }

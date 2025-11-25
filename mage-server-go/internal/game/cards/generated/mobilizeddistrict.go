@@ -27,5 +27,11 @@ func NewMobilizedDistrict(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability0)
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesCreatureSourceEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{4}")
+	// card.AddAbility(ability2)
 	return card, nil
 }

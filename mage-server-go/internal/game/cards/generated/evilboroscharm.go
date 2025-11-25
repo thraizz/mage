@@ -26,10 +26,10 @@ func NewEvilBorosCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: BoostAllEffect with complex parameters
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewDamageEffect(2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		// TODO: BoostAllEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

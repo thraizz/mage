@@ -24,10 +24,9 @@ func NewYavimayasEmbrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
 		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -22,8 +22,8 @@ func NewOrder66(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeBounty.CreateInstance(1), nil, "")).
 		// TODO: DestroyAllEffect with complex parameters
+		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeBounty.CreateInstance(1), nil, "")).
 		Build()
 	if err != nil {
 		return nil, err

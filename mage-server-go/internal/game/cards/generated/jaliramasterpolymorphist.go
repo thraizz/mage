@@ -24,5 +24,11 @@ func NewJaliraMasterPolymorphist(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - RevealCardsFromLibraryUntilEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

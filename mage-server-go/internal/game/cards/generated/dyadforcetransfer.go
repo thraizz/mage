@@ -21,9 +21,9 @@ func NewDyadForceTransfer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

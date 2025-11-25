@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -25,9 +26,15 @@ func NewKyodaiSoulOfKamigawa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	card.AddAbility(ability2)
 	return card, nil
 }

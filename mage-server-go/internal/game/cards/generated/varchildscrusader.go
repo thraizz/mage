@@ -24,6 +24,7 @@ func NewVarchildsCrusader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	// TODO: Implement activated ability with unmapped effects
+	//   - CantBeBlockedByCreaturesSourceEffect()
 	//   - SacrificeSourceEffect()
 	//
 	// Costs:

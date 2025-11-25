@@ -21,10 +21,17 @@ func NewDelifsCube(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	// TODO: Implement activated ability with unmapped effects
+	//   - CreateDelayedTriggeredAbilityEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
 	//   - RegenerateTargetEffect()
 	//
 	// Costs:
 	//   - AddManaCost("{2}")
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

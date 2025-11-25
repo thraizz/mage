@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -22,5 +23,12 @@ func NewConversionApparatus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - GetEnergyCountersControllerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

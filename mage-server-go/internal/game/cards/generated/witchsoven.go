@@ -27,11 +27,16 @@ func NewWitchsOven(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - WitchsOvenEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

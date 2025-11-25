@@ -21,15 +21,17 @@ func NewStallForTime(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 1))).
+	ability0 := abilities.NewKickerAbility(card.ID, "{1}{U}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewTapEffect()).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTargets(0, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

@@ -23,8 +23,14 @@ func NewSmolderInitiate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: SpellCastAllTriggeredAbility
+	//   - Effect: DoIfCostPaid(new LoseLifeTargetEffect(1), new ManaCostsImpl<>("...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new LoseLifeTargetEffect(1), new ManaCostsImpl<>("...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

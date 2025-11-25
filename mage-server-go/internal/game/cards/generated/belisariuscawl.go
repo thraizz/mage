@@ -35,11 +35,15 @@ func NewBelisariusCawl(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		Build()
+	card.AddAbility(ability1)
 	// TODO: Implement activated ability with unmapped effects
 	//   - LookLibraryAndPickControllerEffect(GetXValue.instance, 1, StaticFilters.FILTER_CARD_A...)
 	//
 	// Costs:
 	//   - AddTapCost()
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
 	return card, nil
 }

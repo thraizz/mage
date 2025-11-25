@@ -27,8 +27,7 @@ func NewDragTheCanal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewGainLifeEffect(2)).
-		AddEffect(abilities.NewSurveilEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(2), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

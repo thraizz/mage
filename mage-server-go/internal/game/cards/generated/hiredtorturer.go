@@ -29,6 +29,7 @@ func NewHiredTorturer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

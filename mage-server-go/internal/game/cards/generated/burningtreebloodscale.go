@@ -22,5 +22,11 @@ func NewBurningTreeBloodscale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantBeBlockedByTargetSourceEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - MustBeBlockedByTargetSourceEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,7 +22,6 @@ func NewConsultTheNecrosages(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(2)
-	//   - DiscardTargetEffect(2)
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())

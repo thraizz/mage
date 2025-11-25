@@ -25,6 +25,7 @@ func NewMoxiteRefinery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeCharge.CreateInstance(1), GetXValue.instance)).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

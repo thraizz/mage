@@ -24,7 +24,16 @@ func NewAdmonitionAngel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: LandfallAbility
+	//   - Effect: ExileTargetForSourceEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	// TODO: Implement triggered ability: LeavesBattlefieldTriggeredAbility
+	//   - Effect: ReturnFromExileForSourceEffect()
+	// card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	card.AddAbility(ability2)
 	return card, nil
 }

@@ -25,8 +25,8 @@ func NewManticoreOfTheGauntlet(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1))).
 		AddEffect(abilities.NewDamageEffect(StaticValue.get(3), true, true)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1))).
 		Build()
 	if err != nil {
 		return nil, err

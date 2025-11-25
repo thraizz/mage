@@ -25,11 +25,17 @@ func NewSigurdJarlOfRavensthorpe(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
+	// TODO: Implement triggered ability: BoastAbility
+	//   - Effect: SigurdJarlOfRavensthorpeEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability2)
+	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
+	card.AddAbility(ability3)
 	return card, nil
 }

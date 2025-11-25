@@ -24,5 +24,8 @@ func NewSyggRiverGuide(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - GainProtectionFromColorTargetEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

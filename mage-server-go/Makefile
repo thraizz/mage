@@ -91,6 +91,13 @@ migrate-create: ## Create new migration (usage: make migrate-create NAME=create_
 	@echo "Creating migration: $(NAME)"
 	migrate create -ext sql -dir migrations -seq $(NAME)
 
+
+transpile-cards: ## Transpile cards
+	@echo "Transpiling cards..."
+	python3 ./scripts/transpile_cards.py --batch
+	go fmt ./internal/game/cards/generated/...
+	@echo "Cards transpiled"
+
 tools: ## Install development tools
 	@echo "Installing development tools..."
 	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest

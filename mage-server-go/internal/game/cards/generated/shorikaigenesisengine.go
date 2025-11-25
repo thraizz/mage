@@ -25,15 +25,12 @@ func NewShorikaiGenesisEngine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("PilotCrewToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{1}").
-		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DrawDiscardControllerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

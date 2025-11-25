@@ -21,12 +21,8 @@ func NewIncreasingDevotion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("HumanToken")
-	if err != nil {
-		return nil, err
-	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 10)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

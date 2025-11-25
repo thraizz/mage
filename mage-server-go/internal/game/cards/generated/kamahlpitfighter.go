@@ -30,6 +30,7 @@ func NewKamahlPitFighter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

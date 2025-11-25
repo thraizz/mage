@@ -30,12 +30,18 @@ func NewSamiteBlessing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	// TODO: Implement activated ability with unmapped effects
+	//   - PreventNextDamageFromChosenSourceToTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(ability2, AttachmentType.AURA, rule)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

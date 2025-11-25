@@ -20,5 +20,12 @@ func NewCurrencyConverter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - DrawDiscardControllerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

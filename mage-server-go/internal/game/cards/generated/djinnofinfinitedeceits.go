@@ -24,7 +24,13 @@ func NewDjinnOfInfiniteDeceits(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateIfConditionActivatedAbility
+	//   - Effect: ExchangeControlTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	card.AddAbility(ability1)
 	return card, nil
 }

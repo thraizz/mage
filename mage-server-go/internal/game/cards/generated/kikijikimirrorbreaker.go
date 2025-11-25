@@ -31,5 +31,11 @@ func NewKikiJikiMirrorBreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(source.getControllerId(), null, true)
 	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - KikiJikiMirrorBreakerEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

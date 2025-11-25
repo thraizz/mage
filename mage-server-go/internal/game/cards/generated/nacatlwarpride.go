@@ -24,8 +24,11 @@ func NewNacatlWarPride(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: NacatlWarPrideEffect()
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(controller.getId(), null, false, count, true, true)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

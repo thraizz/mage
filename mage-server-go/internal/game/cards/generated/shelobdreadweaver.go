@@ -29,5 +29,8 @@ func NewShelobDreadWeaver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ReturnToBattlefieldUnderYourControlTargetEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

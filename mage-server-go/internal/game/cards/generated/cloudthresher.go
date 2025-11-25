@@ -24,12 +24,15 @@ func NewCloudthresher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: DamageAllEffect(2, "it", StaticFilters.FILTER_CREATURE_FLYING)
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
+	card.AddAbility(ability2)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(2, "it", StaticFilters.FILTER_CREATURE_FLYING)
-	// card.AddAbility(ability2)
+	// card.AddAbility(ability3)
 	return card, nil
 }

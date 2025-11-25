@@ -26,6 +26,7 @@ func NewTarPitcher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

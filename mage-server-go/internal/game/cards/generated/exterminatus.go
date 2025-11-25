@@ -23,5 +23,12 @@ func NewExterminatus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible)
 	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: DestroyAllEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
 	return card, nil
 }

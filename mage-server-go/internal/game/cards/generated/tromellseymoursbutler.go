@@ -24,5 +24,12 @@ func NewTromellSeymoursButler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - TromellSeymoursButlerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

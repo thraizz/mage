@@ -26,16 +26,22 @@ func NewQuestingPhelddagrif(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		// TODO: GainAbilitySourceEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

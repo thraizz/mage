@@ -33,6 +33,7 @@ func NewCausticTar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewLoseLifeEffect(3)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

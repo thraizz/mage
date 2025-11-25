@@ -28,19 +28,30 @@ func NewRollingHamsphere(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 3)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
+	card.AddAbility(ability0)
+	token1_0, err := token.GetToken("HamsterToken")
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 3)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability2)
 	return card, nil
 }

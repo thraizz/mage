@@ -26,5 +26,11 @@ func NewWillingTestSubject(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - RollDiceEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{6}")
+	// card.AddAbility(ability1)
 	return card, nil
 }

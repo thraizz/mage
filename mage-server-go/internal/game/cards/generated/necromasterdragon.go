@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -24,7 +25,10 @@ func NewNecromasterDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: DealsCombatDamageToAPlayerTriggeredAbility
+	//   - Effect: DoIfCostPaid(new CreateTokenEffect(new ZombieToken(), 1), new M...)
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	card.AddAbility(ability1)
 	return card, nil
 }

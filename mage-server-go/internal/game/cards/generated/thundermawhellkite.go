@@ -24,12 +24,15 @@ func NewThundermawHellkite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: DamageAllEffect(1, "it", filter)
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	card.AddAbility(ability2)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(1, "it", filter)
-	// card.AddAbility(ability2)
+	// card.AddAbility(ability3)
 	return card, nil
 }

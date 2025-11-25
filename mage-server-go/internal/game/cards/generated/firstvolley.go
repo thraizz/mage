@@ -24,7 +24,6 @@ func NewFirstVolley(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(1)).
 		AddEffect(abilities.NewDamageEffect(1)).
-		AddEffect(abilities.NewDamageEffect(1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

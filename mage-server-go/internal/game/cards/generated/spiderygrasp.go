@@ -23,8 +23,8 @@ func NewSpideryGrasp(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 4)).
-		AddEffect(abilities.NewGrantAbilityEffect("ReachAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewUntapEffect()).
+		AddEffect(abilities.NewGrantAbilityEffect("ReachAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

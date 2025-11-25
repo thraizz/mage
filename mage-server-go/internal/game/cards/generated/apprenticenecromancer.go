@@ -27,5 +27,12 @@ func NewApprenticeNecromancer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	// TODO: Implement spell ability with unmapped effects
 	//   - SacrificeTargetEffect("sacrifice the creature", source.getControllerId())
 	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ApprenticeNecromancerEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -29,6 +29,7 @@ func NewFloodbringer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

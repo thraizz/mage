@@ -21,11 +21,12 @@ func NewOraclesVault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{2}").
-		AddTapCost().
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeBrick.CreateInstance(1))).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExileTopXMayPlayUntilEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

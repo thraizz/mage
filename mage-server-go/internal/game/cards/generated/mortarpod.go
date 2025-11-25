@@ -38,6 +38,7 @@ func NewMortarpod(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

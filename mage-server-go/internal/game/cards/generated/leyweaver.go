@@ -26,6 +26,7 @@ func NewLeyWeaver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

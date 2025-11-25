@@ -21,14 +21,10 @@ func NewTurnIntoAPumpkin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("FoodToken")
-	if err != nil {
-		return nil, err
-	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

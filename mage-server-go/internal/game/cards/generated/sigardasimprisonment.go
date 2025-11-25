@@ -31,13 +31,8 @@ func NewSigardasImprisonment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		return nil, err
 	}
 	card.AddAbility(ability1)
-	token2_0, err := token.GetToken("BloodToken")
-	if err != nil {
-		return nil, err
-	}
-	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
-		Build()
-	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExileAttachedEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

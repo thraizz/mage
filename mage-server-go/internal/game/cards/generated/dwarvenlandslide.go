@@ -22,12 +22,12 @@ func NewDwarvenLandslide(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewLandTargetFilter()).
-		AddTargets(2, 2, abilities.NewLandTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+
+	// TODO: Add conditional kicked target: TargetLandPermanent
 	return card, nil
 }

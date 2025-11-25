@@ -29,6 +29,7 @@ func NewShinewend(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

@@ -28,5 +28,8 @@ func NewDimensionalInfiltrator(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DimensionalInfiltratorEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

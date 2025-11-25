@@ -22,7 +22,6 @@ func NewKaerveksHex(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(1, StaticFilters.FILTER_PERMANENT_CREATURE_NON_BLA...)
-	//   - DamageAllEffect(1, filter)
 	// card.AddAbility(ability0)
 	return card, nil
 }

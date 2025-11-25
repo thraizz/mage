@@ -23,12 +23,19 @@ func NewTheSkullsporeNexus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect( /* TODO: token extraction failed */ )).
 		// TODO: BoostTargetEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffect( /* TODO: token extraction failed */ )).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - TheSkullsporeNexusDoubleEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

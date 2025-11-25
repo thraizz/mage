@@ -22,7 +22,7 @@ func NewSlickSequence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(2)).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

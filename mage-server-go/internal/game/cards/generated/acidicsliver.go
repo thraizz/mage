@@ -28,6 +28,7 @@ func NewAcidicSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddSacrificeSourceCost().
 		AddManaCost("{2}").
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

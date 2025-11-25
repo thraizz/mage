@@ -22,7 +22,6 @@ func NewFieryJustice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(5)).
-		AddEffect(abilities.NewGainLifeEffect(5)).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {

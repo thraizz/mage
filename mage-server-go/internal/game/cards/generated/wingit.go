@@ -23,8 +23,8 @@ func NewWingIt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("flying", 1))).
 		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("flying", 1))).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

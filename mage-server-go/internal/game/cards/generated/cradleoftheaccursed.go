@@ -22,18 +22,28 @@ func NewCradleOfTheAccursed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
-	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("ZombieToken")
+	token0_0, err := token.GetToken("ZombieToken")
 	if err != nil {
 		return nil, err
 	}
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		Build()
+	card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "C")
+	card.AddAbility(ability1)
+	token2_0, err := token.GetToken("ZombieToken")
+	if err != nil {
+		return nil, err
+	}
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

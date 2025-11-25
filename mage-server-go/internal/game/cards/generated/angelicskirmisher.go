@@ -25,20 +25,23 @@ func NewAngelicSkirmisher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
+	// TODO: Implement triggered ability: BeginningOfCombatTriggeredAbility
+	//   - Effect: AngelicSkirmisherEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
 	card.AddAbility(ability2)
-	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
+	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability3)
-	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability4 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
+	card.AddAbility(ability4)
+	ability5, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability4)
+	card.AddAbility(ability5)
 	return card, nil
 }

@@ -22,6 +22,7 @@ func NewRhysticDeluge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

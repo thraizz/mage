@@ -30,5 +30,11 @@ func NewTheSoulStone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	// TODO: Implement spell ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
 	// card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - HarnessSourceEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability3)
 	return card, nil
 }

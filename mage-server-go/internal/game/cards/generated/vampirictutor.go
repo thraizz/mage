@@ -21,8 +21,8 @@ func NewVampiricTutor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: SearchLibraryPutOnLibraryEffect with complex parameters
 		AddEffect(abilities.NewLoseLifeEffect(2)).
+		// TODO: SearchLibraryPutOnLibraryEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

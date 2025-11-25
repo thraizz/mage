@@ -21,17 +21,14 @@ func NewConquerorsPledge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("KorSoldierToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 12)).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 6)).
+	ability0 := abilities.NewKickerAbility(card.ID, "{6}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

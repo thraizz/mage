@@ -125,7 +125,66 @@ type GameContext interface {
 
 	// GetCountersOnPermanent returns the number of a specific counter type on a permanent
 	GetCountersOnPermanent(ctx context.Context, permanentID uuid.UUID, counterType string) int
+
+	// GetAllCountersOnPermanent returns all counters on a permanent as a map (name -> count)
+	// Java: permanent.getCounters(game).values()
+	// Used by effects like Resourceful Defense that need to move all counter types
+	GetAllCountersOnPermanent(ctx context.Context, permanentID uuid.UUID) map[string]int
+
+	// RemoveCountersFromPermanent removes counters from a permanent
+	// Java: permanent.removeCounters(counterName, amount, source, game)
+	// Returns error if the permanent doesn't exist
+	RemoveCountersFromPermanent(ctx context.Context, permanentID uuid.UUID, counterName string, amount int) error
+
+	// GetMultiAmountChoice asks the player to distribute amounts among multiple options
+	// Java: player.getMultiAmountWithIndividualConstraints()
+	// Used for effects like "move any number of counters" where player chooses distribution
+	// choices: list of options with constraints (name, min, max, current value)
+	// totalMin: minimum total that must be distributed
+	// totalMax: maximum total that can be distributed
+	// Returns: list of chosen amounts (one per choice), or nil if player cancelled
+	GetMultiAmountChoice(
+		ctx context.Context,
+		playerID uuid.UUID,
+		choices []MultiAmountChoice,
+		totalMin, totalMax int,
+		choiceType MultiAmountType,
+	) ([]int, error)
 }
+
+// MultiAmountChoice represents a single option in a multi-amount choice
+// Java: MultiAmountMessage
+type MultiAmountChoice struct {
+	Name    string // Display name (e.g., "+1/+1 (3)")
+	Min     int    // Minimum value for this option
+	Max     int    // Maximum value for this option
+	Current int    // Current value on the permanent (for display)
+}
+
+// NewMultiAmountChoice creates a new choice option
+func NewMultiAmountChoice(name string, min, max, current int) MultiAmountChoice {
+	return MultiAmountChoice{
+		Name:    name,
+		Min:     min,
+		Max:     max,
+		Current: current,
+	}
+}
+
+// MultiAmountType indicates what type of multi-amount choice this is
+// Java: MultiAmountType enum
+type MultiAmountType int
+
+const (
+	// MultiAmountTypeCounters is for choosing counter amounts
+	MultiAmountTypeCounters MultiAmountType = iota
+	// MultiAmountTypeDamage is for distributing damage
+	MultiAmountTypeDamage
+	// MultiAmountTypeMana is for choosing mana distribution
+	MultiAmountTypeMana
+	// MultiAmountTypeGeneric is for other distributions
+	MultiAmountTypeGeneric
+)
 
 // CardInfo provides minimal card information for CDA calculations
 type CardInfo interface {

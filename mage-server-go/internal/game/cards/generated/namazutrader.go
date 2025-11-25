@@ -23,15 +23,20 @@ func NewNamazuTrader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewLoseLifeEffect(1)).
+		Build()
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(                 new SurveilEffect(2),            ...)
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
 	return card, nil
 }

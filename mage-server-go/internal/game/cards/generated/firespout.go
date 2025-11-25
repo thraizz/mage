@@ -20,9 +20,12 @@ func NewFirespout(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - DamageAllEffect(3, filter1)
-	//   - DamageAllEffect(3, StaticFilters.FILTER_CREATURE_FLYING)
-	// card.AddAbility(ability0)
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

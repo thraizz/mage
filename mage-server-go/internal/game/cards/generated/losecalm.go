@@ -25,9 +25,6 @@ func NewLoseCalm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewGrantAbilityEffect("MenaceAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("MenaceAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

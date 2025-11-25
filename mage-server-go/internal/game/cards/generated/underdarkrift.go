@@ -20,7 +20,13 @@ func NewUnderdarkRift(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: UnderdarkRiftEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "C")
+	card.AddAbility(ability1)
 	return card, nil
 }

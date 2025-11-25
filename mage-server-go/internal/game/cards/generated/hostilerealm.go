@@ -31,5 +31,11 @@ func NewHostileRealm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantBlockTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

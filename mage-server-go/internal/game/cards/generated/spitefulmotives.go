@@ -30,8 +30,6 @@ func NewSpitefulMotives(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewBoostEnchantedEffect(3, 0)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		AddEffect(abilities.NewBoostEnchantedEffect(3, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
 		Build()
 	if err != nil {
 		return nil, err

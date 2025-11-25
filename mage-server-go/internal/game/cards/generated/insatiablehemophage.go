@@ -24,7 +24,10 @@ func NewInsatiableHemophage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: MutatesSourceTriggeredAbility
+	//   - Effect: LoseLifeOpponentsEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
+	card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,5 +22,10 @@ func NewWindbriskHeights(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

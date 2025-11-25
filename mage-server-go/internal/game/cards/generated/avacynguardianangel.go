@@ -29,5 +29,11 @@ func NewAvacynGuardianAngel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - AvacynGuardianAngelPreventToCreatureEffect()
+	// card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - AvacynGuardianAngelPreventToPlayerEffect()
+	// card.AddAbility(ability3)
 	return card, nil
 }

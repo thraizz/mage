@@ -24,19 +24,28 @@ func NewHuatliDinosaurKnight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(2))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(2))).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(4, 4, filter2)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

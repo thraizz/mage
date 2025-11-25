@@ -24,19 +24,14 @@ func NewNikoAris(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(xValue)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("ShardToken")
-	if err != nil {
-		return nil, err
-	}
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: CantBeBlockedTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+		AddEffect(abilities.NewDamageEffect(xValue)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -53,5 +48,16 @@ func NewNikoAris(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	token3_0, err := token.GetToken("ShardToken")
+	if err != nil {
+		return nil, err
+	}
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token3_0)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
 	return card, nil
 }

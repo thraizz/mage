@@ -22,5 +22,11 @@ func NewBoggartForager(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - ShuffleLibraryTargetEffect()
+	//
+	// Costs:
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

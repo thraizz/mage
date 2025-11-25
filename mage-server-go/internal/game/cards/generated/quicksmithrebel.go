@@ -24,17 +24,24 @@ func NewQuicksmithRebel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		// TODO: GainAbilityTargetEffect with complex parameters
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+	card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

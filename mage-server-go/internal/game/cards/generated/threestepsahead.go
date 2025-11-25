@@ -27,6 +27,7 @@ func NewThreeStepsAhead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

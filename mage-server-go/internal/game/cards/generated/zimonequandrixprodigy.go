@@ -24,11 +24,19 @@ func NewZimoneQuandrixProdigy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// TODO: Implement activated ability with unmapped effects
+	//   - PutCardFromHandOntoBattlefieldEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{4}").
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		Build()
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

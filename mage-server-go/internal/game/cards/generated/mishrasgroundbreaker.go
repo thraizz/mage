@@ -22,5 +22,12 @@ func NewMishrasGroundbreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesCreatureTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

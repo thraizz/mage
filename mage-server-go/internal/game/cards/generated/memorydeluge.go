@@ -20,5 +20,8 @@ func NewMemoryDeluge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - LookLibraryAndPickControllerEffect(                 ManaSpentToCastCount.instance, 2,...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

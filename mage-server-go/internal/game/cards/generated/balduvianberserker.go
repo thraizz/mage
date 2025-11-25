@@ -23,5 +23,11 @@ func NewBalduvianBerserker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewDiesTrigger(card.ID)).
+		AddEffect(abilities.NewDamageEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

@@ -30,6 +30,7 @@ func NewHexavus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("flying", 1))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).

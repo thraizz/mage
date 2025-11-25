@@ -20,8 +20,14 @@ func NewAbidingGrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewGainLifeEffect(1)).
+		Build()
+	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

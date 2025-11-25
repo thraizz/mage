@@ -21,6 +21,7 @@ func NewChimericCoils(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	// TODO: Implement activated ability with unmapped effects
+	//   - ChimericCoilsEffect()
 	//   - SacrificeSourceEffect()
 	// card.AddAbility(ability0)
 	return card, nil

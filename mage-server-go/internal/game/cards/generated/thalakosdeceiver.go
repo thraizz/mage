@@ -23,8 +23,14 @@ func NewThalakosDeceiver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksAndIsNotBlockedTriggeredAbility
+	//   - Effect: DoIfCostPaid(new GainControlTargetEffect(Duration.EndOfGame), n...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new GainControlTargetEffect(Duration.EndOfGame), n...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

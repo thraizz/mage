@@ -22,7 +22,6 @@ func NewSliceAndDice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(4, new FilterCreaturePermanent())
-	//   - DamageAllEffect(1, StaticFilters.FILTER_PERMANENT_CREATURE)
 	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(1, StaticFilters.FILTER_PERMANENT_CREATURE)

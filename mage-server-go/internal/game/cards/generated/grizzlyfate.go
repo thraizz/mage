@@ -21,12 +21,8 @@ func NewGrizzlyFate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("BearToken")
-	if err != nil {
-		return nil, err
-	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 4)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

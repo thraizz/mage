@@ -22,8 +22,8 @@ func NewBondOfPassion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

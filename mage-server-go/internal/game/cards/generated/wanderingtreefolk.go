@@ -26,5 +26,8 @@ func NewWanderingTreefolk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - SeekCardEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

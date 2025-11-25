@@ -20,5 +20,12 @@ func NewBucknardsEverfullPurse(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - BucknardsEverfullPurseEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

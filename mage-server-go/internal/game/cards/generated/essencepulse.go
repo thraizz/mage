@@ -22,6 +22,7 @@ func NewEssencePulse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
 		Build()
 	if err != nil {
 		return nil, err

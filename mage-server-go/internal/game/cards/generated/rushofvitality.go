@@ -24,8 +24,6 @@ func NewRushOfVitality(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewBoostEffect(1, 0)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

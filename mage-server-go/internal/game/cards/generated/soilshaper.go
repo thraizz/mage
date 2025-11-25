@@ -23,5 +23,11 @@ func NewSoilshaper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: SpellCastControllerTriggeredAbility
+	//   - Effect: BecomesCreatureTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

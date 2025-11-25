@@ -33,6 +33,7 @@ func NewGyomeMasterChef(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{1}").
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewTapEffect("tap it")).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	token2_0, err := token.GetToken("FoodToken")

@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -24,6 +25,9 @@ func NewMishrasCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).

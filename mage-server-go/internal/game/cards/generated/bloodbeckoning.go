@@ -20,12 +20,16 @@ func NewBloodBeckoning(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewKickerAbility(card.ID, "{3}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
+
+	// TODO: Add conditional kicked target: TargetCardInYourGraveyard
 	return card, nil
 }

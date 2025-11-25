@@ -28,9 +28,9 @@ func NewKaylasCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(2)).
-		AddEffect(abilities.NewGrantAbilityEffect("DoubleStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		// TODO: SearchLibraryPutInHandEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		AddEffect(abilities.NewGrantAbilityEffect("DoubleStrikeAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

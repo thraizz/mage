@@ -22,6 +22,7 @@ func NewSustenance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -21,8 +21,8 @@ func NewSyphonFuel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(-6, -6)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddEffect(abilities.NewBoostEffect(-6, -6)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

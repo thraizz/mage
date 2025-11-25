@@ -20,13 +20,19 @@ func NewSunfireBalm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	// TODO: Implement triggered ability: CycleTriggeredAbility
+	//   - Effect: PreventDamageToTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
+	// card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

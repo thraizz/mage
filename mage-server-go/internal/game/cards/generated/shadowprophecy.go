@@ -20,12 +20,8 @@ func NewShadowProphecy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(2)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - LookLibraryAndPickControllerEffect(                 DomainValue.REGULAR, 2, PutCards....)
+	// card.AddAbility(ability0)
 	return card, nil
 }

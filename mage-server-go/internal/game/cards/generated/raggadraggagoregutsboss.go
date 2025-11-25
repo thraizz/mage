@@ -24,26 +24,33 @@ func NewRaggadraggaGoregutsBoss(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
-	if err != nil {
-		return nil, err
-	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: BoostAllEffect with complex parameters
+		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect("untap it")).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewUntapEffect("untap it")).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
 	return card, nil
 }

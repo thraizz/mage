@@ -20,5 +20,14 @@ func NewSorrowsPath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BecomesTappedSourceTriggeredAbility
+	//   - Effect: DamageControllerEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - SorrowsPathSwitchBlockersEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

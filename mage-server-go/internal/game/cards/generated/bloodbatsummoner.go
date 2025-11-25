@@ -25,11 +25,17 @@ func NewBloodbatSummoner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: BeginningOfCombatTriggeredAbility
+	//   - Effect: BecomesCreatureTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability2)
+	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	card.AddAbility(ability3)
 	return card, nil
 }

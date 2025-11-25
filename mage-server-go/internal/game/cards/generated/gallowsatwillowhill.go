@@ -24,6 +24,7 @@ func NewGallowsAtWillowHill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddManaCost("{3}").
 		AddTapCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

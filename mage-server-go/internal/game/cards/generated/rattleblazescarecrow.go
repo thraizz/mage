@@ -26,7 +26,6 @@ func NewRattleblazeScarecrow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("PersistAbility", effects.DurationPermanent)).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

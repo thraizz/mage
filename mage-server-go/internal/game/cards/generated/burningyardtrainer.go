@@ -24,9 +24,15 @@ func NewBurningYardTrainer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewBoostEffect(2, 2)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	card.AddAbility(ability2)
 	return card, nil
 }

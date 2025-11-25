@@ -25,23 +25,29 @@ func NewSurlyBadgersaur(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	// TODO: Implement triggered ability: DiscardCardControllerTriggeredAbility
+	//   - Effect: FightTargetSourceEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("TreasureToken")
+	card.AddAbility(ability1)
+	token2_0, err := token.GetToken("TreasureToken")
 	if err != nil {
 		return nil, err
 	}
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

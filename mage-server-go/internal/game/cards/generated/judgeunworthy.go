@@ -22,7 +22,6 @@ func NewJudgeUnworthy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewScryEffect(1)).
-		AddEffect(abilities.NewScryEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -28,6 +28,7 @@ func NewMyojinOfInfiniteRage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeDivinity.CreateInstance(1))).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

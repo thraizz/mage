@@ -22,7 +22,6 @@ func NewBorrowedGrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(0, 2)).
-		AddEffect(abilities.NewBoostEffect(2, 0)).
 		Build()
 	if err != nil {
 		return nil, err

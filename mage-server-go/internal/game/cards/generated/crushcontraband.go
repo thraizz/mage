@@ -22,7 +22,6 @@ func NewCrushContraband(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewExileTargetEffect()).
-		AddEffect(abilities.NewExileTargetEffect()).
 		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	if err != nil {

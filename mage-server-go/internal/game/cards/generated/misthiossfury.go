@@ -22,7 +22,7 @@ func NewMisthiossFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(3)).
-		AddEffect(abilities.NewDamageEffect(2)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(2), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

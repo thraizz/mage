@@ -24,11 +24,10 @@ func NewFoulPresence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewBoostEffect(-1, -1)).
+		AddEffect(abilities.NewBoostEnchantedEffect(-1, -1)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.AURA)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
-		AddEffect(abilities.NewBoostEnchantedEffect(-1, -1)).
-		AddEffect(abilities.NewBoostEffect(-1, -1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.AURA)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
@@ -45,6 +44,7 @@ func NewFoulPresence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(-1, -1)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability3)
 	return card, nil

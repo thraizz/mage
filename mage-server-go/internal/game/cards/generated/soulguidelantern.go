@@ -20,19 +20,31 @@ func NewSoulGuideLantern(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewExileTargetEffect()).
+		Build()
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - SoulGuideLanternEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability2)
+	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
-	card.AddAbility(ability1)
+	card.AddAbility(ability3)
 	return card, nil
 }

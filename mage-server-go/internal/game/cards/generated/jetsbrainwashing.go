@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/effects"
 	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
@@ -22,20 +21,21 @@ func NewJetsBrainwashing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("ClueArtifactToken")
+	ability0 := abilities.NewKickerAbility(card.ID, "{3}")
+	card.AddAbility(ability0)
+	token1_0, err := token.GetToken("ClueArtifactToken")
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn), "kicked")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

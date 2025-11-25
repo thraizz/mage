@@ -27,5 +27,11 @@ func NewArcaneArtisan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(player.getId())
 	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ArcaneArtisanCreateTokenEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

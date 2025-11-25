@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -23,5 +24,10 @@ func NewBrokersVeteran(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewDiesTrigger(card.ID)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("shield", 1))).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

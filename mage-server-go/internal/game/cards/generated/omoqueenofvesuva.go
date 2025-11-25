@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -24,15 +25,22 @@ func NewOmoQueenOfVesuva(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("everything", 1))).
+		AddTarget(abilities.NewLandTargetFilter()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.BuildSimpleManaAbility(card.ID, "U")
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability1)
-	ability2 := abilities.BuildSimpleManaAbility(card.ID, "B")
+	ability2 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability2)
-	ability3 := abilities.BuildSimpleManaAbility(card.ID, "R")
+	ability3 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability3)
-	ability4 := abilities.BuildSimpleManaAbility(card.ID, "G")
+	ability4 := abilities.BuildSimpleManaAbility(card.ID, "R")
 	card.AddAbility(ability4)
+	ability5 := abilities.BuildSimpleManaAbility(card.ID, "G")
+	card.AddAbility(ability5)
 	return card, nil
 }

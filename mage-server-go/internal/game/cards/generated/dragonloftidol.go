@@ -27,7 +27,6 @@ func NewDragonloftIdol(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

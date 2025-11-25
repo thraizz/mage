@@ -20,5 +20,8 @@ func NewResentfulRevelation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - LookLibraryAndPickControllerEffect(                 3, 1, PutCards.HAND, PutCards.GRA...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -20,5 +20,7 @@ func NewBoldDefense(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{3}{W}")
+	card.AddAbility(ability0)
 	return card, nil
 }

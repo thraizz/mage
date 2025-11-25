@@ -24,8 +24,6 @@ func NewVirulentSwipe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewBoostEffect(2, 0)).
-		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

@@ -24,14 +24,19 @@ func NewRuinRat(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewDiesTrigger(card.ID)).
+		AddEffect(abilities.NewExileTargetEffect()).
+		Build()
 	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
+	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

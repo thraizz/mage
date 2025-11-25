@@ -23,7 +23,6 @@ func NewSynchronizedStrike(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddTargets(0, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

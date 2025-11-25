@@ -22,8 +22,6 @@ func NewHurlyBurly(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(1, filterWithoutFlying)
-	//   - DamageAllEffect(1, StaticFilters.FILTER_CREATURE_FLYING)
-	//   - DamageAllEffect(1, filterWithoutFlying)
 	// card.AddAbility(ability0)
 	return card, nil
 }

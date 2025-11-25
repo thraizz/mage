@@ -21,20 +21,23 @@ func NewDawnOfTheDead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewExileTargetEffect()).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: BeginningOfUpkeepTriggeredAbility
+	//   - Effect: DawnOfTheDeadEffect()
+	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(1)).
+		AddEffect(abilities.NewExileTargetEffect()).
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewLoseLifeEffect(1)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability2)
 	return card, nil
 }

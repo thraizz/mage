@@ -22,7 +22,7 @@ func NewFoundryHelix(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(4)).
-		AddEffect(abilities.NewGainLifeEffect(4)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(4), "unknown")).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

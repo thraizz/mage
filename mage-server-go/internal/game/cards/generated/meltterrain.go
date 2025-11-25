@@ -21,8 +21,8 @@ func NewMeltTerrain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	if err != nil {

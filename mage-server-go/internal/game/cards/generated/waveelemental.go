@@ -27,6 +27,7 @@ func NewWaveElemental(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -25,6 +25,7 @@ func NewSandalsOfAbdallah(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewGrantAbilityEffect("IslandwalkAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

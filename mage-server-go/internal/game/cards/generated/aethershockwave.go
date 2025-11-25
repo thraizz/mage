@@ -22,7 +22,6 @@ func NewAetherShockwave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewTapEffect(filterNonSpirit)).
-		AddEffect(abilities.NewTapEffect(filterSpirit)).
 		Build()
 	if err != nil {
 		return nil, err

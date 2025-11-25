@@ -21,13 +21,9 @@ func NewFungalRebirth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("SaprolingToken")
-	if err != nil {
-		return nil, err
-	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

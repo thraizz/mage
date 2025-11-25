@@ -20,5 +20,14 @@ func NewTawnossCoffin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: TawnossCoffinTriggeredAbility
+	//   - Effect: TawnossCoffinReturnEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - TawnossCoffinEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

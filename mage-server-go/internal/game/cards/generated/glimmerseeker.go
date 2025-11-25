@@ -31,6 +31,7 @@ func NewGlimmerSeeker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

@@ -27,5 +27,11 @@ func NewEssenceBottle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeElixir.CreateInstance(1))).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - EssenceBottleEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

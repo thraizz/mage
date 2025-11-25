@@ -25,6 +25,8 @@ func NewDragonsparkReactor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddManaCost("{4}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(xValue)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

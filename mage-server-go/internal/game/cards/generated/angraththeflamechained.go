@@ -23,9 +23,15 @@ func NewAngrathTheFlameChained(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - DiscardEachPlayerEffect(TargetController.OPPONENT)
-	//   - SacrificeTargetEffect("sacrifice this", source.getControllerId())
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: DiscardEachPlayerEffect(TargetController.OPPONENT)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - SacrificeTargetEffect("sacrifice this", source.getControllerId())
+	//   - DiscardEachPlayerEffect(TargetController.OPPONENT)
+	// card.AddAbility(ability1)
 	return card, nil
 }

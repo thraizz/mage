@@ -22,10 +22,9 @@ func NewTouchOfVitae(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
-		// TODO: GainAbilityTargetEffect with complex parameters
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

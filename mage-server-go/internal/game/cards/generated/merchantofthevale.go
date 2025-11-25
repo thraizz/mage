@@ -23,13 +23,9 @@ func NewMerchantOfTheVale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DoIfCostPaid(                 new DrawCardSourceControllerEffec...)
+	// card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()

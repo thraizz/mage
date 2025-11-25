@@ -29,6 +29,7 @@ func NewUktabiFaerie(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

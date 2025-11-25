@@ -24,9 +24,9 @@ func NewCracklingClub(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		AddEffect(abilities.NewBoostEnchantedEffect(1, 0)).
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddEffect(abilities.NewBoostEnchantedEffect(1, 0)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
@@ -36,6 +36,7 @@ func NewCracklingClub(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

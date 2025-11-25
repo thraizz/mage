@@ -21,9 +21,8 @@ func NewTorchTheTower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(3)).
-		AddEffect(abilities.NewDamageEffect(2)).
 		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(3), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

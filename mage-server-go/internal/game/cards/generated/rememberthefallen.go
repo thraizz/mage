@@ -22,7 +22,6 @@ func NewRememberTheFallen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -27,7 +27,14 @@ func NewScarwoodHag(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		// TODO: GainAbilityTargetEffect with complex parameters
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

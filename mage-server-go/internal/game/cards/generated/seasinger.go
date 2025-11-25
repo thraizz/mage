@@ -26,6 +26,7 @@ func NewSeasinger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationWhileControlled)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects

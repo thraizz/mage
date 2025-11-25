@@ -25,23 +25,28 @@ func NewBoneDevourer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewDiesTrigger(card.ID)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
-	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	card.AddAbility(ability3)
+	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), CreaturesDiedThisTurnCount.instance, false)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability3)
+	card.AddAbility(ability4)
 	return card, nil
 }

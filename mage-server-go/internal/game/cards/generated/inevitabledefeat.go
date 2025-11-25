@@ -21,8 +21,8 @@ func NewInevitableDefeat(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewGainLifeEffect(3)).
+		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

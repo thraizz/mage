@@ -30,5 +30,8 @@ func NewFlowstoneSculpture(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability1)
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - FlowstoneSculptureEffect()
+	// card.AddAbility(ability3)
 	return card, nil
 }

@@ -24,6 +24,7 @@ func NewSkullCatapult(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

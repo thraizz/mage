@@ -27,5 +27,12 @@ func NewReflectionOfKikiJiki(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(null, null, true)
 	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ReflectionOfKikiJikiEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

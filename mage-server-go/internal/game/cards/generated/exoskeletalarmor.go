@@ -26,7 +26,6 @@ func NewExoskeletalArmor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(count, count)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		AddEffect(abilities.NewBoostEnchantedEffect(count, count)).
 		Build()
 	if err != nil {
 		return nil, err

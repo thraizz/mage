@@ -24,12 +24,18 @@ func NewGuardianOfFaith(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: PhaseOutTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	card.AddAbility(ability2)
 	// TODO: Implement spell ability with unmapped effects
 	//   - PhaseOutTargetEffect()
-	// card.AddAbility(ability2)
+	// card.AddAbility(ability3)
 	return card, nil
 }

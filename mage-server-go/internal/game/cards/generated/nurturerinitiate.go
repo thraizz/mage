@@ -23,8 +23,14 @@ func NewNurturerInitiate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: SpellCastAllTriggeredAbility
+	//   - Effect: DoIfCostPaid(new BoostTargetEffect(1, 1, Duration.EndOfTurn), n...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new BoostTargetEffect(1, 1, Duration.EndOfTurn), n...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

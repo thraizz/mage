@@ -36,10 +36,6 @@ func NewChromanticore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability4)
 	ability5, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
 		Build()
 	if err != nil {
 		return nil, err

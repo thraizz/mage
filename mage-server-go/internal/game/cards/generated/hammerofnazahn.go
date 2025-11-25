@@ -22,20 +22,23 @@ func NewHammerOfNazahn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: EntersBattlefieldThisOrAnotherTriggeredAbility
+	//   - Effect: HammerOfNazahnEffect()
+	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(2, 0)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewBoostEquippedEffect(2, 0)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability2)
 	return card, nil
 }

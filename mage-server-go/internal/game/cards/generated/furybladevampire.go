@@ -24,7 +24,10 @@ func NewFurybladeVampire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: BeginningOfCombatTriggeredAbility
+	//   - Effect: DoIfCostPaid(new BoostSourceEffect(3, 0, Duration.EndOfTurn), n...)
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
+	card.AddAbility(ability1)
 	return card, nil
 }

@@ -24,7 +24,15 @@ func NewEscapeTunnel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddTapCost().
 		AddSacrificeSourceCost().
 		// TODO: SearchLibraryPutInPlayEffect with complex parameters
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantBeBlockedTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

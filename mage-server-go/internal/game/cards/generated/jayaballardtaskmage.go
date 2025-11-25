@@ -27,13 +27,22 @@ func NewJayaBallardTaskMage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageEverythingEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

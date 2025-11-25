@@ -29,15 +29,17 @@ func NewCauterySliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddSacrificeSourceCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: GainAbilityAllEffect with complex parameters
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - PreventDamageToTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
@@ -45,5 +47,12 @@ func NewCauterySliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: GainAbilityAllEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
 	return card, nil
 }

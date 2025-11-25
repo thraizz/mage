@@ -22,16 +22,19 @@ func NewWindZendikon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
+	// TODO: Implement triggered ability: DiesAttachedTriggeredAbility
+	//   - Effect: ReturnToHandAttachedEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability2 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
+	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

@@ -22,8 +22,8 @@ func NewFancyFootwork(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
+		AddEffect(abilities.NewUntapEffect()).
 		AddTargets(1, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

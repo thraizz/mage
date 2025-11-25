@@ -26,6 +26,7 @@ func NewMemorialToWar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

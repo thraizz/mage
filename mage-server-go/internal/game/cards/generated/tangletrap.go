@@ -21,8 +21,9 @@ func NewTangletrap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(5)).
+		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

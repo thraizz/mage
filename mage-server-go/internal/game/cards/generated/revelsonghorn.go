@@ -24,6 +24,7 @@ func NewRevelsongHorn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(1, 1)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

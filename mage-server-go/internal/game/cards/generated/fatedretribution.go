@@ -22,7 +22,7 @@ func NewFatedRetribution(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: DestroyAllEffect with complex parameters
-		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewScryEffect(1), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

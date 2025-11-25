@@ -23,5 +23,11 @@ func NewBlightBreathCatoblepas(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

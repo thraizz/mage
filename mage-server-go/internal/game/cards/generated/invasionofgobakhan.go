@@ -21,5 +21,11 @@ func NewInvasionOfGobakhan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: InvasionOfGobakhanEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

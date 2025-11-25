@@ -34,6 +34,7 @@ func NewVolatileFault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

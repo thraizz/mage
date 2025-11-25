@@ -20,14 +20,17 @@ func NewFightWithFire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(5)).
+	ability0 := abilities.NewKickerAbility(card.ID, "{5}{R}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
-		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
+
+	// TODO: Add conditional kicked target: TargetCreaturePermanent
 	return card, nil
 }

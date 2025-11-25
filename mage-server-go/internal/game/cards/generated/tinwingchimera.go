@@ -32,6 +32,7 @@ func NewTinWingChimera(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP2P2.CreateInstance(1))).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationPermanent)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

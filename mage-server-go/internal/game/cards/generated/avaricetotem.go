@@ -20,5 +20,8 @@ func NewAvariceTotem(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExchangeControlTargetEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

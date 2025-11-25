@@ -23,8 +23,11 @@ func NewDreamFighter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BlocksOrBlockedByCreatureSourceTriggeredAbility
+	//   - Effect: PhaseOutSourceEffect()
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - PhaseOutSourceEffect()
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -24,9 +24,9 @@ func NewEvanescentIntellect(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
@@ -36,6 +36,7 @@ func NewEvanescentIntellect(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

@@ -22,7 +22,6 @@ func NewHailStorm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(2, new FilterAttackingCreature())
-	//   - DamageAllEffect(1, StaticFilters.FILTER_PERMANENT_CREATURE_CONTROL...)
 	// card.AddAbility(ability0)
 	return card, nil
 }

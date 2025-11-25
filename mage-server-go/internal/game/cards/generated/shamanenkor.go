@@ -23,5 +23,14 @@ func NewShamanEnKor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - RedirectDamageFromSourceToTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{0}")
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ShamanEnKorRedirectFromTargetEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

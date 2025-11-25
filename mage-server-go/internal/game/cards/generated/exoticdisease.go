@@ -21,8 +21,8 @@ func NewExoticDisease(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(DomainValue.REGULAR)).
 		AddEffect(abilities.NewGainLifeEffect(DomainValue.REGULAR)).
+		AddEffect(abilities.NewLoseLifeEffect(DomainValue.REGULAR)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

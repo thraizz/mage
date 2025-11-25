@@ -25,6 +25,7 @@ func NewJacobHaukenInspector(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	// TODO: Implement activated ability with unmapped effects
+	//   - JacobHaukenInspectorExileEffect()
 	//   - TransformSourceEffect()
 	//   - DoIfCostPaid(new TransformSourceEffect(), new ManaCostsImpl<>("...)
 	//

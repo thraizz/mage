@@ -23,5 +23,8 @@ func NewLukkaCoppercoatOutcast(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: LukkaCoppercoatOutcastPolymorphEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -350,31 +350,102 @@ type internalCard struct {
 	IsCommander       bool // Is this a commander card
 }
 
+// LastKnownInfo stores the state of a permanent at the moment it left a zone
+// Java: GameImpl.getLastKnownInformation(), lki/lkiExtended maps
+// MTG Rules: 113.7a, 400.7 (Objects that change zones are tracked)
+type LastKnownInfo struct {
+	ID           string              // Permanent ID
+	Name         string              // Card name
+	ControllerID string              // Controller at time of leaving
+	OwnerID      string              // Owner
+	Types        string              // Type line
+	SubTypes     []string            // Subtypes
+	Power        string              // Power (for creatures)
+	Toughness    string              // Toughness (for creatures)
+	Counters     map[string]int      // All counters at time of leaving (name -> count)
+	Tapped       bool                // Was it tapped
+	Zone         int                 // Zone it was in
+	ZoneCounter  int                 // Zone change counter (increments each zone change)
+	Timestamp    time.Time           // When it left
+	Abilities    []EngineAbilityView // Abilities it had
+}
+
+// copyCountersToMap converts a Counters object to a simple map for LKI storage
+func copyCountersToMap(c *counters.Counters) map[string]int {
+	if c == nil {
+		return make(map[string]int)
+	}
+	result := make(map[string]int)
+	for name, counter := range c.GetAll() {
+		result[name] = counter.Count
+	}
+	return result
+}
+
+// createLKIFromCard creates a LastKnownInfo snapshot from an internalCard
+func createLKIFromCard(card *internalCard, zoneCounter int) *LastKnownInfo {
+	return &LastKnownInfo{
+		ID:           card.ID,
+		Name:         card.Name,
+		ControllerID: card.ControllerID,
+		OwnerID:      card.OwnerID,
+		Types:        card.Type,
+		SubTypes:     append([]string{}, card.SubTypes...),
+		Power:        card.Power,
+		Toughness:    card.Toughness,
+		Counters:     copyCountersToMap(card.Counters),
+		Tapped:       card.Tapped,
+		Zone:         card.Zone,
+		ZoneCounter:  zoneCounter,
+		Timestamp:    time.Now(),
+		Abilities:    append([]EngineAbilityView{}, card.Abilities...),
+	}
+}
+
+// storeLKI stores Last Known Information for a permanent leaving the battlefield
+// This must be called BEFORE the permanent is removed from the battlefield
+func (gs *engineGameState) storeLKI(card *internalCard) {
+	// Increment zone counter for this permanent
+	gs.lkiZoneCounter[card.ID]++
+	zoneCounter := gs.lkiZoneCounter[card.ID]
+
+	// Create and store the LKI snapshot
+	gs.lki[card.ID] = createLKIFromCard(card, zoneCounter)
+}
+
+// getLKI retrieves the Last Known Information for a permanent
+// Returns nil if no LKI exists for the given ID
+func (gs *engineGameState) getLKI(permanentID string) *LastKnownInfo {
+	return gs.lki[permanentID]
+}
+
 // internalPlayer represents a player in the game state
 type internalPlayer struct {
-	PlayerID        string
-	Name            string
-	Life            int
-	Poison          int
-	Energy          int
-	Library         []*internalCard
-	Hand            []*internalCard
-	Graveyard       []*internalCard
-	ManaPool        *mana.ManaPool
-	HasPriority     bool
-	Passed          bool
-	StateOrdinal    int
-	Lost            bool
-	Left            bool
-	Wins            int
-	Quit            bool           // Player quit the match
-	TimerTimeout    bool           // Player lost due to timer timeout
-	IdleTimeout     bool           // Player lost due to idle timeout
-	Conceded        bool           // Player conceded
-	StoredBookmark  int            // Bookmark ID for player undo (-1 = no undo available)
-	MulliganCount   int            // Number of times player has mulliganed
-	KeptHand        bool           // Whether player has kept their hand
-	CommanderDamage map[string]int // Tracks combat damage from each commander (commander ID -> damage)
+	PlayerID            string
+	Name                string
+	Life                int
+	Poison              int
+	Energy              int
+	Library             []*internalCard
+	Hand                []*internalCard
+	Graveyard           []*internalCard
+	ManaPool            *mana.ManaPool
+	HasPriority         bool
+	Passed              bool
+	StateOrdinal        int
+	Lost                bool
+	Left                bool
+	Wins                int
+	Quit                bool           // Player quit the match
+	TimerTimeout        bool           // Player lost due to timer timeout
+	IdleTimeout         bool           // Player lost due to idle timeout
+	Conceded            bool           // Player conceded
+	StoredBookmark      int            // Bookmark ID for player undo (-1 = no undo available)
+	MulliganCount       int            // Number of times player has mulliganed
+	KeptHand            bool           // Whether player has kept their hand
+	CommanderDamage     map[string]int // Tracks combat damage from each commander (commander ID -> damage)
+	LandsPlayedThisTurn int            // Number of lands played this turn
+	LandsPerTurn        int            // Maximum lands allowed per turn (default 1)
 }
 
 // triggeredAbilityQueueItem represents a triggered ability waiting to be put on the stack
@@ -444,7 +515,12 @@ type engineGameState struct {
 	startedAt          time.Time
 	startingPlayerID   string // Player who won the coin flip and goes first (skips first draw)
 	firstTurnDrawDone  bool   // Whether the first turn draw skip has been applied
-	mu                 sync.RWMutex
+	// Last Known Information (LKI) system
+	// Java: GameImpl.lki (Map<Zone, Map<UUID, MageObject>>)
+	// Stores permanent state when it leaves the battlefield for triggered abilities
+	lki            map[string]*LastKnownInfo // permanentID -> LKI snapshot
+	lkiZoneCounter map[string]int            // permanentID -> zone change counter
+	mu             sync.RWMutex
 }
 
 // GameNotification represents a notification that can be sent to UI/websocket clients
@@ -752,6 +828,8 @@ func (e *MageEngine) StartGameWithDecks(gameID string, players []string, gameTyp
 		lookedAt:         make([]EngineLookedAtView, 0),
 		combat:           newCombatState(),
 		startingPlayerID: startingPlayerID,
+		lki:              make(map[string]*LastKnownInfo),
+		lkiZoneCounter:   make(map[string]int),
 		analytics: &gameAnalytics{
 			actionsPerTurn: make(map[int]int),
 			turnStartTimes: make(map[int]time.Time),
@@ -776,25 +854,27 @@ func (e *MageEngine) StartGameWithDecks(gameID string, players []string, gameTyp
 	for i, playerID := range players {
 		gameState.playerOrder[i] = playerID
 		gameState.players[playerID] = &internalPlayer{
-			PlayerID:        playerID,
-			Name:            playerID,
-			Life:            gameRules.StartingLife, // Use game type starting life
-			Poison:          0,
-			Energy:          0,
-			Library:         make([]*internalCard, 0),
-			Hand:            make([]*internalCard, 0),
-			Graveyard:       make([]*internalCard, 0),
-			ManaPool:        mana.NewManaPool(),
-			HasPriority:     false,
-			Passed:          false,
-			StateOrdinal:    0,
-			Lost:            false,
-			Left:            false,
-			Wins:            0,
-			StoredBookmark:  -1,                   // No undo available initially
-			MulliganCount:   0,                    // No mulligans yet
-			KeptHand:        false,                // Haven't kept hand yet
-			CommanderDamage: make(map[string]int), // Track commander damage from each commander
+			PlayerID:            playerID,
+			Name:                playerID,
+			Life:                gameRules.StartingLife, // Use game type starting life
+			Poison:              0,
+			Energy:              0,
+			Library:             make([]*internalCard, 0),
+			Hand:                make([]*internalCard, 0),
+			Graveyard:           make([]*internalCard, 0),
+			ManaPool:            mana.NewManaPool(),
+			HasPriority:         false,
+			Passed:              false,
+			StateOrdinal:        0,
+			Lost:                false,
+			Left:                false,
+			Wins:                0,
+			StoredBookmark:      -1,                   // No undo available initially
+			MulliganCount:       0,                    // No mulligans yet
+			KeptHand:            false,                // Haven't kept hand yet
+			CommanderDamage:     make(map[string]int), // Track commander damage from each commander
+			LandsPlayedThisTurn: 0,                    // No lands played yet
+			LandsPerTurn:        1,                    // Default: 1 land per turn
 		}
 
 		// Load player's deck if provided, otherwise use test deck
@@ -1189,6 +1269,8 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 		return e.handleIntegerAction(gameState, action)
 	case "SEND_UUID":
 		return e.handleUUIDAction(gameState, action)
+	case "SPECIAL_ACTION":
+		return e.handleSpecialAction(gameState, action)
 	default:
 		return fmt.Errorf("unknown action type: %s", action.ActionType)
 	}
@@ -1977,6 +2059,115 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 	gameState.turnManager.SetPriority(activePlayerID)
 	gameState.players[activePlayerID].HasPriority = true
 	gameState.addPrompt(activePlayerID, "You have priority. Pass?", []string{"PASS", "CAST"})
+
+	return nil
+}
+
+// handleSpecialAction handles SPECIAL_ACTION type actions (play land, foretell, etc.)
+// Per MTG Rule 116: Special actions don't use the stack
+func (e *MageEngine) handleSpecialAction(gameState *engineGameState, action PlayerAction) error {
+	payload, ok := action.Data.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("SPECIAL_ACTION data must be a map")
+	}
+
+	actionType, ok := payload["action_type"].(string)
+	if !ok {
+		return fmt.Errorf("action_type is required")
+	}
+
+	sourceID, ok := payload["source_id"].(string)
+	if !ok {
+		return fmt.Errorf("source_id is required")
+	}
+
+	playerID := action.PlayerID
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	switch actionType {
+	case "PLAY_LAND":
+		return e.handlePlayLand(gameState, player, sourceID)
+	default:
+		return fmt.Errorf("unknown special action: %s", actionType)
+	}
+}
+
+// handlePlayLand handles playing a land from hand
+// Per MTG Rule 116.2a: Playing a land is a special action (doesn't use stack)
+// Per MTG Rule 305.1: Can only play during main phase, with empty stack, once per turn
+func (e *MageEngine) handlePlayLand(gameState *engineGameState, player *internalPlayer, cardID string) error {
+	// Check if player has priority
+	if gameState.turnManager.PriorityPlayer() != player.PlayerID {
+		return fmt.Errorf("player %s does not have priority", player.PlayerID)
+	}
+
+	// Check if it's a main phase (precombat or postcombat)
+	currentPhase := gameState.turnManager.CurrentPhase()
+	if currentPhase != rules.PhasePrecombatMain && currentPhase != rules.PhasePostcombatMain {
+		return fmt.Errorf("can only play lands during main phase")
+	}
+
+	// Check if stack is empty
+	if !gameState.stack.IsEmpty() {
+		return fmt.Errorf("cannot play land with spells on stack")
+	}
+
+	// Check if player has already played their land for the turn
+	if player.LandsPlayedThisTurn >= player.LandsPerTurn {
+		return fmt.Errorf("already played %d land(s) this turn", player.LandsPlayedThisTurn)
+	}
+
+	// Find card in hand by ID
+	var card *internalCard
+	var idx int = -1
+	for i, c := range player.Hand {
+		if c.ID == cardID {
+			card = c
+			idx = i
+			break
+		}
+	}
+
+	if card == nil {
+		return fmt.Errorf("card %s not found in hand", cardID)
+	}
+
+	// Verify it's a land
+	if !strings.Contains(strings.ToLower(card.Type), "land") {
+		return fmt.Errorf("card %s is not a land", card.Name)
+	}
+
+	// Remove from hand
+	player.Hand = append(player.Hand[:idx], player.Hand[idx+1:]...)
+
+	// Move to battlefield
+	card.Zone = zoneBattlefield
+	card.ControllerID = player.PlayerID
+	card.Tapped = false
+	gameState.battlefield = append(gameState.battlefield, card)
+
+	// Increment lands played this turn
+	player.LandsPlayedThisTurn++
+
+	// Add message
+	gameState.addMessage(fmt.Sprintf("%s plays %s", player.Name, card.Name), "action")
+
+	// Publish land played event
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventCardPlayed, card.ID, "", player.PlayerID))
+
+	// Broadcast update
+	e.broadcastUpdate(gameState)
+
+	if e.logger != nil {
+		e.logger.Debug("land played",
+			zap.String("player", player.PlayerID),
+			zap.String("card", card.Name),
+			zap.Int("lands_played_this_turn", player.LandsPlayedThisTurn),
+		)
+	}
 
 	return nil
 }
@@ -3826,28 +4017,30 @@ func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapsh
 	// Deep copy players
 	for id, player := range gameState.players {
 		playerCopy := &internalPlayer{
-			PlayerID:       player.PlayerID,
-			Name:           player.Name,
-			Life:           player.Life,
-			Poison:         player.Poison,
-			Energy:         player.Energy,
-			Library:        make([]*internalCard, len(player.Library)),
-			Hand:           make([]*internalCard, len(player.Hand)),
-			Graveyard:      make([]*internalCard, len(player.Graveyard)),
-			ManaPool:       player.ManaPool.Copy(),
-			HasPriority:    player.HasPriority,
-			Passed:         player.Passed,
-			StateOrdinal:   player.StateOrdinal,
-			Lost:           player.Lost,
-			Left:           player.Left,
-			Wins:           player.Wins,
-			Quit:           player.Quit,
-			TimerTimeout:   player.TimerTimeout,
-			IdleTimeout:    player.IdleTimeout,
-			Conceded:       player.Conceded,
-			StoredBookmark: player.StoredBookmark,
-			MulliganCount:  player.MulliganCount,
-			KeptHand:       player.KeptHand,
+			PlayerID:            player.PlayerID,
+			Name:                player.Name,
+			Life:                player.Life,
+			Poison:              player.Poison,
+			Energy:              player.Energy,
+			Library:             make([]*internalCard, len(player.Library)),
+			Hand:                make([]*internalCard, len(player.Hand)),
+			Graveyard:           make([]*internalCard, len(player.Graveyard)),
+			ManaPool:            player.ManaPool.Copy(),
+			HasPriority:         player.HasPriority,
+			Passed:              player.Passed,
+			StateOrdinal:        player.StateOrdinal,
+			Lost:                player.Lost,
+			Left:                player.Left,
+			Wins:                player.Wins,
+			Quit:                player.Quit,
+			TimerTimeout:        player.TimerTimeout,
+			IdleTimeout:         player.IdleTimeout,
+			Conceded:            player.Conceded,
+			StoredBookmark:      player.StoredBookmark,
+			MulliganCount:       player.MulliganCount,
+			KeptHand:            player.KeptHand,
+			LandsPlayedThisTurn: player.LandsPlayedThisTurn,
+			LandsPerTurn:        player.LandsPerTurn,
 		}
 		snapshot.Players[id] = playerCopy
 	}
@@ -4803,6 +4996,11 @@ func (e *MageEngine) handleStepBegin(gameState *engineGameState, step rules.Step
 // performUntapStep untaps all permanents controlled by the active player
 // Per MTG Rule 502.2
 func (e *MageEngine) performUntapStep(gameState *engineGameState, activePlayerID string) {
+	// Reset lands played this turn for active player (beginning of turn)
+	if player, exists := gameState.players[activePlayerID]; exists {
+		player.LandsPlayedThisTurn = 0
+	}
+
 	untappedCount := 0
 	for _, card := range gameState.battlefield {
 		if card.ControllerID == activePlayerID && card.Tapped {

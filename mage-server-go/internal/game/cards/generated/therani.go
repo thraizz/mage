@@ -24,5 +24,14 @@ func NewTheRani(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldOrAttacksSourceTriggeredAbility
+	//   - Effect: TheRaniEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	// TODO: Implement triggered ability: DealsDamageToAPlayerAllTriggeredAbility
+	//   - Effect: InvestigateEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

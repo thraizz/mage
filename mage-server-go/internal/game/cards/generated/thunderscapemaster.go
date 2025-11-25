@@ -27,6 +27,7 @@ func NewThunderscapeMaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddTapCost().
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).

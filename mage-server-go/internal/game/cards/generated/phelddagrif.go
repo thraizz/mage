@@ -27,16 +27,22 @@ func NewPhelddagrif(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

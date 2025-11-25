@@ -21,8 +21,8 @@ func NewGlyphOfDestruction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(10, 0)).
 		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewBoostEffect(10, 0)).
 		Build()
 	if err != nil {
 		return nil, err

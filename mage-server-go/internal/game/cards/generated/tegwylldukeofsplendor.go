@@ -25,16 +25,21 @@ func NewTegwyllDukeOfSplendor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewDiesTrigger(card.ID)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
+	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

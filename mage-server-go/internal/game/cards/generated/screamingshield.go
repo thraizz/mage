@@ -38,6 +38,7 @@ func NewScreamingShield(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

@@ -22,16 +22,23 @@ func NewIfnirDeadlands(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(2))).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.BuildSimpleManaAbility(card.ID, "B")
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability2 := abilities.BuildSimpleManaAbility(card.ID, "B")
+	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(2))).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

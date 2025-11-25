@@ -26,6 +26,7 @@ func NewBlinkmothWell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

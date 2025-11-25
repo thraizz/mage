@@ -25,19 +25,35 @@ func NewLootThePathfinder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
-	card.AddAbility(ability1)
-	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
-	card.AddAbility(ability2)
-	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	// TODO: Implement triggered ability: ExhaustAbility
+	//   - Effect: AddManaOfAnyColorEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		Build()
+	card.AddAbility(ability1)
+	ability2 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	card.AddAbility(ability2)
+	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike)
+	card.AddAbility(ability3)
+	ability4 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	card.AddAbility(ability4)
+	ability5 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	card.AddAbility(ability5)
+	ability6, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDamageEffect(3)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability3)
+	card.AddAbility(ability6)
 	return card, nil
 }

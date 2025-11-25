@@ -30,5 +30,8 @@ func NewMatsuTribeDecoy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - MustBeBlockedByTargetSourceEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

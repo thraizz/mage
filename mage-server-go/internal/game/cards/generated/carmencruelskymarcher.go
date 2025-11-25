@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -25,10 +26,19 @@ func NewCarmenCruelSkymarcher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: ReturnFromGraveyardToBattlefieldTargetEffect()
+	// card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	card.AddAbility(ability2)
 	// TODO: Implement spell ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability3)
 	return card, nil
 }

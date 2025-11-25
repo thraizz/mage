@@ -20,5 +20,11 @@ func NewGeneralsRegalia(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - GeneralsRegaliaEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	// card.AddAbility(ability0)
 	return card, nil
 }

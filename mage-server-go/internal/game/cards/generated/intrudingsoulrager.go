@@ -26,10 +26,11 @@ func NewIntrudingSoulrager(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamagePlayersEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

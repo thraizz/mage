@@ -27,6 +27,7 @@ func NewTerisiaresDevastation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(GetXValue.instance)).
+		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
 		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, false)).
 		Build()
 	if err != nil {

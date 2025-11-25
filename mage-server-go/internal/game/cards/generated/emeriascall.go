@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
@@ -29,6 +30,7 @@ func NewEmeriasCall(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
+		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

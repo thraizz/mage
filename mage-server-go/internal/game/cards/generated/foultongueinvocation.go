@@ -21,7 +21,7 @@ func NewFoulTongueInvocation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(4)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(4), "unknown")).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

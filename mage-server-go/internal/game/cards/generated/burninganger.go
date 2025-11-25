@@ -31,12 +31,17 @@ func NewBurningAnger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		return nil, err
 	}
 	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

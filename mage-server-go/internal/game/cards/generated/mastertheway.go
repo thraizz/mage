@@ -23,7 +23,6 @@ func NewMasterTheWay(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(CardsInControllerHandCount.ANY)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewDamageEffect(CardsInControllerHandCount.ANY)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

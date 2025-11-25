@@ -24,5 +24,11 @@ func NewBohnBeguilingBalladeer(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: CastSecondSpellTriggeredAbility
+	//   - Effect: GoadTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

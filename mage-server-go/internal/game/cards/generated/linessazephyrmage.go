@@ -27,6 +27,8 @@ func NewLinessaZephyrMage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -25,6 +25,7 @@ func NewBloodtallowCandle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewBoostEffect(-5, -5)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

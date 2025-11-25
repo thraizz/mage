@@ -24,6 +24,7 @@ func NewIcyManipulator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -23,5 +23,8 @@ func NewWellgabberApothecary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - PreventDamageToTargetEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

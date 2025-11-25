@@ -23,6 +23,9 @@ func NewDevastatingOnslaught(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(null, null, true, xValue)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

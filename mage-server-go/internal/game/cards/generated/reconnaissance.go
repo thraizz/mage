@@ -20,10 +20,11 @@ func NewReconnaissance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{0}").
-		AddEffect(abilities.NewUntapEffect("and untap it")).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - RemoveFromCombatTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{0}")
+	// card.AddAbility(ability0)
 	return card, nil
 }

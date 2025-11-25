@@ -24,5 +24,11 @@ func NewLivingBrainMechanicalMarvel(ownerID uuid.UUID, info *cards.CardInfo) (*g
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BeginningOfCombatTriggeredAbility
+	//   - Effect: BecomesCreatureTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

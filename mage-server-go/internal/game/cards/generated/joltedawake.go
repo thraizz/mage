@@ -22,6 +22,7 @@ func NewJoltedAwake(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
+	//   - DoIfCostPaid(                 new ReturnFromGraveyardToBattlefi...)
 	// card.AddAbility(ability0)
 	return card, nil
 }

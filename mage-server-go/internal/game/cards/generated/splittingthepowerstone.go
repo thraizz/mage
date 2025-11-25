@@ -27,7 +27,7 @@ func NewSplittingThePowerstone(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffectTapped(token0_0, 2, true)).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

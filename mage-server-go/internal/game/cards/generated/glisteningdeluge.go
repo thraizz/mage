@@ -20,5 +20,12 @@ func NewGlisteningDeluge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewBoostEffect(-1, -1)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

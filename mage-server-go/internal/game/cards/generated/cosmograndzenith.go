@@ -28,12 +28,22 @@ func NewCosmograndZenith(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+		Build()
+	card.AddAbility(ability0)
+	token1_0, err := token.GetToken("HumanSoldierToken")
+	if err != nil {
+		return nil, err
+	}
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

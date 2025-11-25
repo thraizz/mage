@@ -27,9 +27,9 @@ func NewMarduCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDamageEffect(4)).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewDamageEffect(4)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

@@ -23,5 +23,11 @@ func NewFrontlineSage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - DrawDiscardControllerEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

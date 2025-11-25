@@ -22,6 +22,7 @@ func NewWailOfTheForgotten(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(1)
+	//   - LookLibraryAndPickControllerEffect(                 3, 1, PutCards.HAND, PutCards.GRA...)
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())

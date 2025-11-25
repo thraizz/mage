@@ -30,6 +30,7 @@ func NewWallOfLimbs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewLoseLifeEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

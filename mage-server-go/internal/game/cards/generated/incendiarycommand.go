@@ -22,7 +22,6 @@ func NewIncendiaryCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(2, new FilterCreaturePermanent())
-	//   - DamageAllEffect(2, new FilterCreaturePermanent())
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())

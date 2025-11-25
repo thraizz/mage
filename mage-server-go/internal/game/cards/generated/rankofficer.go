@@ -24,8 +24,14 @@ func NewRankOfficer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseLifeOpponentsEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new CreateTokenEffect(new ZombieToken()), new Disc...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

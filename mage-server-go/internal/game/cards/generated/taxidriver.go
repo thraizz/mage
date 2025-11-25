@@ -28,6 +28,7 @@ func NewTaxiDriver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

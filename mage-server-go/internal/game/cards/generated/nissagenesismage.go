@@ -24,8 +24,8 @@ func NewNissaGenesisMage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewUntapEffect("untap up to two target creatures and up to two target lands")).
 		AddEffect(abilities.NewBoostEffect(5, 5)).
+		AddEffect(abilities.NewUntapEffect("untap up to two target creatures and up to two target lands")).
 		Build()
 	if err != nil {
 		return nil, err

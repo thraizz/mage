@@ -22,8 +22,8 @@ func NewBoonOfSafety(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("shield", 1))).
 		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("shield", 1))).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

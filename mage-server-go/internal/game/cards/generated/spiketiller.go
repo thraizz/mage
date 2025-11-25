@@ -27,13 +27,15 @@ func NewSpikeTiller(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{2}").
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesCreatureTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	// card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(3))).
 		Build()

@@ -33,6 +33,7 @@ func NewScouringSwarm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffectTapped(token1_0, 1, true)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

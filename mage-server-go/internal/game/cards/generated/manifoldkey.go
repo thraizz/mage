@@ -24,7 +24,16 @@ func NewManifoldKey(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantBeBlockedTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

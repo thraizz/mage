@@ -27,5 +27,17 @@ func NewSubiraTulzidiCaravanner(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantBeBlockedTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CreateDelayedTriggeredAbilityEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

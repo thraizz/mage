@@ -24,6 +24,7 @@ func NewBasilicaSkullbomb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

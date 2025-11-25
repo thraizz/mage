@@ -26,10 +26,9 @@ func NewMyojinOfToweringMight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DistributeCountersEffect()
+	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("indestructible", 1))).
 		Build()

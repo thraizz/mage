@@ -34,6 +34,7 @@ func NewSkeletalSwarming(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffectAttacking(token1_0, 2, true, false)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -22,10 +22,13 @@ func NewIntoTheFloodMaw(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+
+	// TODO: Add conditional conditional target: TargetOpponentsCreaturePermanent
 	return card, nil
 }

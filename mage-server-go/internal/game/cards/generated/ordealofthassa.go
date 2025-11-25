@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -23,9 +24,15 @@ func NewOrdealOfThassa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
-	// TODO: Implement spell ability with unmapped effects
-	//   - SacrificeSourceEffect()
-	// card.AddAbility(ability1)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()

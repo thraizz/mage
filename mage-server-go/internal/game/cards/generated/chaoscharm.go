@@ -23,9 +23,7 @@ func NewChaosCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(1)).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewDamageEffect(1)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).

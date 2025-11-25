@@ -22,8 +22,6 @@ func NewFireMagic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(1, StaticFilters.FILTER_PERMANENT_CREATURE)
-	//   - DamageAllEffect(2, StaticFilters.FILTER_PERMANENT_CREATURE)
-	//   - DamageAllEffect(3, StaticFilters.FILTER_PERMANENT_CREATURE)
 	// card.AddAbility(ability0)
 	return card, nil
 }

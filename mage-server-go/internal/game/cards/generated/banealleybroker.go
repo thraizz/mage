@@ -22,5 +22,11 @@ func NewBaneAlleyBroker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - BaneAlleyBrokerReturnToHandEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

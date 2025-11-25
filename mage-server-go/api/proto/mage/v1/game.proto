@@ -127,6 +127,27 @@ message SendPlayerActionResponse {
   string error = 2;
 }
 
+// Special action types (lands, foretell, etc.)
+enum SpecialActionType {
+  SPECIAL_ACTION_UNSPECIFIED = 0;
+  PLAY_LAND = 1;
+  FORETELL = 2;
+  SUSPEND = 3;
+  COMPANION = 4;
+}
+
+message SendSpecialActionRequest {
+  string session_id = 1;
+  string game_id = 2;
+  SpecialActionType action_type = 3;
+  string source_id = 4;  // Card UUID
+}
+
+message SendSpecialActionResponse {
+  bool success = 1;
+  string error = 2;
+}
+
 message MatchStartRequest {
   string session_id = 1;
   string table_id = 2;

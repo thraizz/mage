@@ -22,15 +22,21 @@ func NewConquerorsFoothold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// TODO: Implement activated ability with unmapped effects
+	//   - DrawDiscardControllerEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
-	card.AddAbility(ability1)
-	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
+	card.AddAbility(ability2)
+	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

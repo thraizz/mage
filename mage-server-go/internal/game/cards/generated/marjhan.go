@@ -23,13 +23,21 @@ func NewMarjhan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(-1, 0)).
-		AddEffect(abilities.NewDamageEffect(1)).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddEffect(abilities.NewBoostEffect(-1, 0)).
+		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - SacrificeSourceEffect()
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
 	return card, nil
 }

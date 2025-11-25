@@ -25,18 +25,24 @@ func NewTheMasterTranscendent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("rad", 2))).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("rad", 2))).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	// TODO: Implement activated ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
 	//
 	// Costs:
 	//   - AddTapCost()
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
 	return card, nil
 }

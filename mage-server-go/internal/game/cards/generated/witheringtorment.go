@@ -23,6 +23,7 @@ func NewWitheringTorment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

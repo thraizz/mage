@@ -38,6 +38,7 @@ func NewFrondlandFelidar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

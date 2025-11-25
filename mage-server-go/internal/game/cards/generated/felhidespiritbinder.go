@@ -24,9 +24,15 @@ func NewFelhideSpiritbinder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - DoIfCostPaid(new FelhideSpiritbinderEffect(), new ManaCostsImpl...)
-	//   - CreateTokenCopyTargetEffect(null, CardType.ENCHANTMENT, true)
+	// TODO: Implement triggered ability: InspiredAbility
+	//   - Effect: DoIfCostPaid(new FelhideSpiritbinderEffect(), new ManaCostsImpl...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - CreateTokenCopyTargetEffect(null, CardType.ENCHANTMENT, true)
+	//   - DoIfCostPaid(new FelhideSpiritbinderEffect(), new ManaCostsImpl...)
+	// card.AddAbility(ability1)
 	return card, nil
 }

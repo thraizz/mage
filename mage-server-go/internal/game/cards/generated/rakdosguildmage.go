@@ -37,7 +37,11 @@ func NewRakdosGuildmage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(-2, -2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - RakdosGuildmageEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

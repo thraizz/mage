@@ -25,6 +25,7 @@ func NewRealmbreakerTheInvasionTree(ownerID uuid.UUID, info *cards.CardInfo) (*g
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).

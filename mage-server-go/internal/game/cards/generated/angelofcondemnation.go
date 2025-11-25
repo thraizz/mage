@@ -28,5 +28,17 @@ func NewAngelOfCondemnation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExileReturnBattlefieldNextEndStepTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExileUntilSourceLeavesEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability3)
 	return card, nil
 }

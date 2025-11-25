@@ -148,6 +148,9 @@ service MageServer {
   // Send player action (pass, undo, concede, etc.)
   rpc SendPlayerAction(SendPlayerActionRequest) returns (SendPlayerActionResponse);
 
+  // Send special action (play land, foretell, etc.)
+  rpc SendSpecialAction(SendSpecialActionRequest) returns (SendSpecialActionResponse);
+
   // Start a match
   rpc MatchStart(MatchStartRequest) returns (MatchStartResponse);
 

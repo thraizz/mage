@@ -24,6 +24,7 @@ func NewIngenuityEngine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

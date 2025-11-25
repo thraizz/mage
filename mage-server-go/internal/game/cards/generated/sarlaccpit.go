@@ -33,7 +33,6 @@ func NewSarlaccPit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

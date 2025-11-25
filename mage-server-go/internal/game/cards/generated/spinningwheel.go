@@ -24,6 +24,7 @@ func NewSpinningWheel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{5}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

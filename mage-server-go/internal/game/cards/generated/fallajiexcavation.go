@@ -26,8 +26,8 @@ func NewFallajiExcavation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectTapped(token0_0, 3, true)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token0_0, 3, true)).
 		Build()
 	if err != nil {
 		return nil, err

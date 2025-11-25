@@ -21,10 +21,13 @@ func NewStrengthTestingHammer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewEquipAbility(card.ID, "{3}", false)
+	// TODO: Implement triggered ability: AttacksAttachedTriggeredAbility
+	//   - Effect: StrengthTestingHammerEffect()
+	// card.AddAbility(ability0)
+	ability1, err := abilities.NewEquipAbility(card.ID, "{3}", false)
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

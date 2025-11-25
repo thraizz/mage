@@ -24,16 +24,22 @@ func NewGrimHireling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("TreasureToken")
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: GrimHirelingEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
+	token1_0, err := token.GetToken("TreasureToken")
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

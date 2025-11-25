@@ -37,5 +37,12 @@ func NewAggression(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
 	return card, nil
 }

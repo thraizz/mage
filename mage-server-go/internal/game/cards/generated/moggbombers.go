@@ -23,5 +23,11 @@ func NewMoggBombers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldAllTriggeredAbility
+	//   - Effect: SacrificeSourceEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

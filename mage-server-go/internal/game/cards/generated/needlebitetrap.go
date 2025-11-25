@@ -22,8 +22,8 @@ func NewNeedlebiteTrap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(5)).
 		AddEffect(abilities.NewGainLifeEffect(5)).
+		AddEffect(abilities.NewLoseLifeEffect(5)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

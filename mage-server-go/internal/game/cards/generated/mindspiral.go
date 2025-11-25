@@ -23,13 +23,15 @@ func NewMindSpiral(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 1))).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+
+	// TODO: Add conditional conditional target: TargetOpponentsCreaturePermanent
 	return card, nil
 }

@@ -24,11 +24,14 @@ func NewAgelessSentinels(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	// TODO: Implement triggered ability: BlocksSourceTriggeredAbility
+	//   - Effect: AgelessSentinelsEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability2)
+	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
+	card.AddAbility(ability3)
 	return card, nil
 }

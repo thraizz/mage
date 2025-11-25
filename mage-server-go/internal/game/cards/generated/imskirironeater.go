@@ -24,9 +24,16 @@ func NewImskirIronEater(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(SacrificeCostManaValue.ARTIFACT)).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddEffect(abilities.NewDamageEffect(SacrificeCostManaValue.ARTIFACT)).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

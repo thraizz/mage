@@ -24,7 +24,6 @@ func NewDragonscaleBoon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(2))).
-		AddEffect(abilities.NewUntapEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

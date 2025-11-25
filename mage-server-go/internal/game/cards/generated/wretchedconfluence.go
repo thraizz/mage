@@ -21,10 +21,10 @@ func NewWretchedConfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		AddEffect(abilities.NewBoostEffect(-2, -2)).
 		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

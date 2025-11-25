@@ -27,6 +27,7 @@ func NewGoblinDiggingTeam(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

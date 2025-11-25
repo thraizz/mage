@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -30,5 +31,8 @@ func NewKrasisIncubation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - AddPlusOneCountersAttachedEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

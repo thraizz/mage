@@ -26,5 +26,12 @@ func NewCampfire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewGainLifeEffect(2)).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CampfireEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

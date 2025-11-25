@@ -24,9 +24,15 @@ func NewManifoldMouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
+	// TODO: Implement triggered ability: BeginningOfCombatTriggeredAbility
+	//   - Effect: GainsChoiceOfAbilitiesEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike)
 	card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
+	card.AddAbility(ability2)
 	return card, nil
 }

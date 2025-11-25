@@ -30,5 +30,11 @@ func NewTsabosAssassin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - TsabosAssasinEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

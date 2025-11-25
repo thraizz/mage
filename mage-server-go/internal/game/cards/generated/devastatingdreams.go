@@ -21,8 +21,8 @@ func NewDevastatingDreams(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
-	//   - SacrificeAllEffect(GetXValue.instance, new FilterControlledLandPerman...)
 	//   - DamageAllEffect(GetXValue.instance, new FilterCreaturePermanent())
+	//   - SacrificeAllEffect(GetXValue.instance, new FilterControlledLandPerman...)
 	// card.AddAbility(ability0)
 	return card, nil
 }

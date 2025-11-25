@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
@@ -27,6 +28,7 @@ func NewTheCrystalsChosen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 4)).
+		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), nil, "")).
 		Build()
 	if err != nil {
 		return nil, err

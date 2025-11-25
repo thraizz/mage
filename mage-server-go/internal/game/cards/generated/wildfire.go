@@ -21,8 +21,8 @@ func NewWildfire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
-	//   - SacrificeAllEffect(4, filter)
 	//   - DamageAllEffect(4, StaticFilters.FILTER_PERMANENT_CREATURE)
+	//   - SacrificeAllEffect(4, filter)
 	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -27,5 +27,10 @@ func NewLowlandOaf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	// TODO: Implement spell ability with unmapped effects
 	//   - SacrificeTargetEffect("sacrifice this", source.getControllerId())
 	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

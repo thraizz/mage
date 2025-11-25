@@ -23,5 +23,8 @@ func NewNadiersNightblade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: LeavesBattlefieldAllTriggeredAbility
+	//   - Effect: LoseLifeOpponentsEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

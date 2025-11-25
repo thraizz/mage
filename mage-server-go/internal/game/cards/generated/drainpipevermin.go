@@ -23,9 +23,16 @@ func NewDrainpipeVermin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DiesSourceTriggeredAbility
+	//   - Effect: DiscardTargetEffect(1)
+	//   - Effect: DoIfCostPaid(new DiscardTargetEffect(1), new ColoredManaCost(Co...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(1)
 	//   - DoIfCostPaid(new DiscardTargetEffect(1), new ColoredManaCost(Co...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

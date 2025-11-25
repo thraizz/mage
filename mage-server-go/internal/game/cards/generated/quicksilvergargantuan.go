@@ -23,8 +23,11 @@ func NewQuicksilverGargantuan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldAbility
+	//   - Effect: CopyPermanentEffect(new QuicksilverGargantuanCopyApplier())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CopyPermanentEffect(new QuicksilverGargantuanCopyApplier())
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

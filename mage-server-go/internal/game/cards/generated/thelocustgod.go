@@ -35,16 +35,19 @@ func NewTheLocustGod(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		return nil, err
 	}
 	card.AddAbility(ability1)
-	token2_0, err := token.GetToken("TheLocustGodInsectToken")
+	// TODO: Implement activated ability with unmapped effects
+	//   - DrawDiscardControllerEffect()
+	// card.AddAbility(ability2)
+	token3_0, err := token.GetToken("TheLocustGodInsectToken")
 	if err != nil {
 		return nil, err
 	}
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectTapped(token2_0, 1, false)).
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token3_0, 1, false)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

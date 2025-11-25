@@ -25,11 +25,16 @@ func NewVizierOfTumblingSands(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,5 +22,10 @@ func NewShelldockIsle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

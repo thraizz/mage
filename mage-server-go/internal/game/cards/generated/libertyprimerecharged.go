@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -31,11 +32,12 @@ func NewLibertyPrimeRecharged(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.AddAbility(ability1)
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability2)
-	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{2}").
-		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		Build()
-	card.AddAbility(ability3)
+	// TODO: Implement activated ability with unmapped effects
+	//   - GetEnergyCountersControllerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability3)
 	return card, nil
 }

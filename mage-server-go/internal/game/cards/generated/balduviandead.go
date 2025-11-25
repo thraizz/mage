@@ -27,5 +27,8 @@ func NewBalduvianDead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	// TODO: Implement spell ability with unmapped effects
 	//   - SacrificeTargetEffect("Sacrifice the token at the beginning of the next ...)
 	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BalduvianDeadEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

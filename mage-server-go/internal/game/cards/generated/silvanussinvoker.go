@@ -31,6 +31,7 @@ func NewSilvanussInvoker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{8}").
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

@@ -28,16 +28,23 @@ func NewUrzaPowerstoneProdigy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("PowerstoneToken")
+	// TODO: Implement activated ability with unmapped effects
+	//   - DrawDiscardControllerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
+	token2_0, err := token.GetToken("PowerstoneToken")
 	if err != nil {
 		return nil, err
 	}
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectTapped(token1_0, 1, true)).
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token2_0, 1, true)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

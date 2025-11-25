@@ -23,7 +23,6 @@ func NewVirulentWound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1))).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypePoison.CreateInstance(1))).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

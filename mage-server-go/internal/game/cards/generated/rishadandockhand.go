@@ -27,6 +27,7 @@ func NewRishadanDockhand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

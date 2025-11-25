@@ -24,5 +24,8 @@ func NewTophTheFirstMetalbender(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BeginningOfEndStepTriggeredAbility
+	//   - Effect: EarthbendTargetEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -20,5 +20,14 @@ func NewMizziumTransreliquat(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - MizziumTransreliquatCopyEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - MizziumTransreliquatCopyAndGainAbilityEffect()
+	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - MizziumTransreliquatCopyAndGainAbilityEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

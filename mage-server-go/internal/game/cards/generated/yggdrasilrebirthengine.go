@@ -21,5 +21,8 @@ func NewYggdrasilRebirthEngine(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: YggdrasilRebirthEngineReturnCreatureEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

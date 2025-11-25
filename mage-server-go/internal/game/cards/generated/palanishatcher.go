@@ -25,23 +25,26 @@ func NewPalanisHatcher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	// TODO: Implement triggered ability: BeginningOfCombatTriggeredAbility
+	//   - Effect: SacrificeControllerEffect(filterEgg, 1, "")
+	// card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("DinosaurEggToken")
+	card.AddAbility(ability1)
+	token2_0, err := token.GetToken("DinosaurEggToken")
 	if err != nil {
 		return nil, err
 	}
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token2_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

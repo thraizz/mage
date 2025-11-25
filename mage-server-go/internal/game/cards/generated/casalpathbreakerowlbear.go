@@ -26,12 +26,18 @@ func NewCasalPathbreakerOwlbear(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		// TODO: BoostControlledEffect with complex parameters
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability1)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
+	card.AddAbility(ability2)
 	// TODO: Implement spell ability with unmapped effects
 	//   - TransformSourceEffect()
-	// card.AddAbility(ability2)
+	// card.AddAbility(ability3)
 	return card, nil
 }

@@ -24,7 +24,13 @@ func NewPhantomSteed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: ExileUntilSourceLeavesEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
+	card.AddAbility(ability1)
 	return card, nil
 }

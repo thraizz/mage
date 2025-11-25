@@ -23,8 +23,8 @@ func NewSuddenSpinnerets(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 3)).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("reach", 1))).
 		AddEffect(abilities.NewUntapEffect()).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("reach", 1))).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

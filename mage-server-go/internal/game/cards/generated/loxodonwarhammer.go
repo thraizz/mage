@@ -24,7 +24,6 @@ func NewLoxodonWarhammer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(3, 0)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
 		Build()
 	if err != nil {
 		return nil, err

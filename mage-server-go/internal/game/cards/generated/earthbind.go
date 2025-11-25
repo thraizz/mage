@@ -22,18 +22,21 @@ func NewEarthbind(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: EarthbindEffect()
+	// card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability2)
-	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability3 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
+	card.AddAbility(ability3)
+	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability3)
+	card.AddAbility(ability4)
 	return card, nil
 }

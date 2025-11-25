@@ -30,9 +30,8 @@ func NewCommandersAuthority(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		Build()
 	if err != nil {
 		return nil, err

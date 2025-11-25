@@ -23,5 +23,10 @@ func NewCallousOppressor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

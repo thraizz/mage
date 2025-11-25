@@ -24,5 +24,8 @@ func NewSauronTheNecromancer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: SauronTheNecromancerEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

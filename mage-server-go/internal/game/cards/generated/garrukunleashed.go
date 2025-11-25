@@ -31,8 +31,8 @@ func NewGarrukUnleashed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(3, 3)).
-		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

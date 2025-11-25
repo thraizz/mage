@@ -28,5 +28,11 @@ func NewGrimoireOfTheDead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("study", 1))).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - GrimoireOfTheDeadEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

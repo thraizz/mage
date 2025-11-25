@@ -22,8 +22,8 @@ func NewUrzasRebuff(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
 		AddEffect(abilities.NewTapEffect()).
+		AddEffect(abilities.NewCounterSpellEffect()).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		AddTargets(0, 2, abilities.NewCreatureTargetFilter()).
 		Build()

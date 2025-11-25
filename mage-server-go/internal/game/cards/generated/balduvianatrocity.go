@@ -23,5 +23,10 @@ func NewBalduvianAtrocity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: BalduvianAtrocityEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKickerAbility(card.ID, "{R}")
+	card.AddAbility(ability1)
 	return card, nil
 }

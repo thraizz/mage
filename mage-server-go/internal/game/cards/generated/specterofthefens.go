@@ -29,6 +29,7 @@ func NewSpecterOfTheFens(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -24,5 +24,10 @@ func NewLadyEvangela(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

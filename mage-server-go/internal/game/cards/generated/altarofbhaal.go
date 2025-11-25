@@ -21,16 +21,19 @@ func NewAltarOfBhaal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("SkeletonMenaceToken")
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: ReturnFromGraveyardToBattlefieldTargetEffect()
+	// card.AddAbility(ability0)
+	token1_0, err := token.GetToken("SkeletonMenaceToken")
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, false)).
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token1_0, 1, true, false)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

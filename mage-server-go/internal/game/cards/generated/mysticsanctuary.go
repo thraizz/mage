@@ -21,7 +21,10 @@ func NewMysticSanctuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: EntersBattlefieldUntappedTriggeredAbility
+	//   - Effect: PutOnLibraryTargetEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "U")
+	card.AddAbility(ability1)
 	return card, nil
 }

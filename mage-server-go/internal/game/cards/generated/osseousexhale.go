@@ -22,7 +22,7 @@ func NewOsseousExhale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(5)).
-		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(2), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

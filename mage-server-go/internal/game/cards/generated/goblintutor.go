@@ -22,10 +22,6 @@ func NewGoblinTutor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: SearchLibraryPutInHandEffect with complex parameters
-		// TODO: SearchLibraryPutInHandEffect with complex parameters
-		// TODO: SearchLibraryPutInHandEffect with complex parameters
-		// TODO: SearchLibraryPutInHandEffect with complex parameters
-		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

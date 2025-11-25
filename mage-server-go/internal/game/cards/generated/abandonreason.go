@@ -24,7 +24,6 @@ func NewAbandonReason(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		AddTargets(0, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

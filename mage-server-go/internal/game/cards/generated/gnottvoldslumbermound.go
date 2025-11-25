@@ -32,6 +32,7 @@ func NewGnottvoldSlumbermound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

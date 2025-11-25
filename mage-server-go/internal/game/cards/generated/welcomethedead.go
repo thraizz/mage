@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -20,8 +21,13 @@ func NewWelcomeTheDead(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	token0_0, err := token.GetToken("ZombieDruidToken")
+	if err != nil {
+		return nil, err
+	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, false)).
 		Build()
 	if err != nil {
 		return nil, err

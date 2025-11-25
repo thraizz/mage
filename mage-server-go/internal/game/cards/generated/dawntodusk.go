@@ -23,7 +23,6 @@ func NewDawnToDusk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {

@@ -26,7 +26,6 @@ func NewParasiticBond(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(2)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
-		AddEffect(abilities.NewDamageEffect(2)).
 		Build()
 	if err != nil {
 		return nil, err

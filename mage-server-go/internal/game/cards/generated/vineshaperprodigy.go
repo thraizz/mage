@@ -22,8 +22,10 @@ func NewVineshaperProdigy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{1}{U}")
+	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - LookLibraryAndPickControllerEffect(                 3, 1, PutCards.HAND, PutCards.BOT...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

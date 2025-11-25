@@ -28,5 +28,11 @@ func NewMagosiTheWaterveil(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("eon", 1))).
 		Build()
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - AddExtraTurnControllerEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

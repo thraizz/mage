@@ -23,5 +23,8 @@ func NewMildManneredLibrarian(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: ActivateOncePerGameActivatedAbility
+	//   - Effect: AddCardSubTypeSourceEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

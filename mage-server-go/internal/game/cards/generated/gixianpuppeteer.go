@@ -23,8 +23,11 @@ func NewGixianPuppeteer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DrawNthCardTriggeredAbility
+	//   - Effect: LoseLifeOpponentsEffect()
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

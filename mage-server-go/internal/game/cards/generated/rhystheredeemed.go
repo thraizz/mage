@@ -37,5 +37,11 @@ func NewRhysTheRedeemed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - RhysTheRedeemedEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

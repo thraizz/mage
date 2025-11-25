@@ -24,6 +24,7 @@ func NewMillstone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -24,17 +24,25 @@ func NewGhostLitWarder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		// TODO: CounterUnlessPaysEffect with complex parameters
+		AddTarget(abilities.NewSpellTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: CounterUnlessPaysEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+	card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		// TODO: CounterUnlessPaysEffect with complex parameters
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

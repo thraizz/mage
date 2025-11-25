@@ -26,5 +26,11 @@ func NewNullhideFerox(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHexproof)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - NullhideFeroxLoseAbilitiesEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	// card.AddAbility(ability1)
 	return card, nil
 }

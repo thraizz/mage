@@ -23,8 +23,8 @@ func NewMinionReflector(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
-	//   - CreateTokenCopyTargetEffect(source.getControllerId(), null, true)
 	//   - SacrificeSourceEffect()
+	//   - CreateTokenCopyTargetEffect(source.getControllerId(), null, true)
 	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(                         new MinionReflectorEffect...)

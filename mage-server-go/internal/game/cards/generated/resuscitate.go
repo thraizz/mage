@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -20,11 +21,18 @@ func NewResuscitate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: GainAbilityAllEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	// TODO: Implement activated ability with unmapped effects
 	//   - RegenerateSourceEffect()
 	//
 	// Costs:
 	//   - AddManaCost("{1}")
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

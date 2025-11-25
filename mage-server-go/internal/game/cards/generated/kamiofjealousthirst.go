@@ -26,9 +26,8 @@ func NewKamiOfJealousThirst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewGainLifeEffect(2)).
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseLifeOpponentsEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

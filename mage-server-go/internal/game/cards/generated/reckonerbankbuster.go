@@ -34,6 +34,7 @@ func NewReckonerBankbuster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

@@ -25,9 +25,6 @@ func NewJeskaiCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddEffect(abilities.NewDamageEffect(4)).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
 		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewDamageEffect(4)).
-		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

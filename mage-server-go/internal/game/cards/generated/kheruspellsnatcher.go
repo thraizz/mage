@@ -23,5 +23,11 @@ func NewKheruSpellsnatcher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: TurnedFaceUpSourceTriggeredAbility
+	//   - Effect: KheruSpellsnatcherEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

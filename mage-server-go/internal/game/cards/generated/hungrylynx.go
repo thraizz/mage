@@ -7,6 +7,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game/cards"
 	"github.com/magefree/mage-server-go/internal/game/counters"
 	"github.com/magefree/mage-server-go/internal/game/effects"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -25,13 +26,19 @@ func NewHungryLynx(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: GainAbilityAllEffect with complex parameters
+	// TODO: Implement triggered ability: BeginningOfEndStepTriggeredAbility
+	//   - Effect: CreateTokenTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), nil, "")).
+		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -23,6 +24,7 @@ func NewYourTempleIsUnderAttack(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {

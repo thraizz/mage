@@ -24,5 +24,8 @@ func NewTinybonesBaubleBurglar(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: DiscardEachPlayerEffect(                         StaticValue.get(1), false...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

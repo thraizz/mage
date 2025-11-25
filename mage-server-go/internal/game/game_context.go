@@ -226,6 +226,10 @@ func (gc *GameContext) DestroyPermanent(permanentID uuid.UUID) error {
 	// Find and remove the permanent from the battlefield
 	for i, permanent := range gameState.battlefield {
 		if permanent.ID == permanentID.String() {
+			// Store LKI BEFORE removing from battlefield
+			// This captures the permanent's state (including counters) at the moment of leaving
+			gameState.storeLKI(permanent)
+
 			// Remove from battlefield
 			gameState.battlefield = append(gameState.battlefield[:i], gameState.battlefield[i+1:]...)
 
@@ -395,6 +399,10 @@ func (gc *GameContext) SacrificePermanent(permanentID uuid.UUID) error {
 	// Find and remove the permanent from the battlefield
 	for i, permanent := range gameState.battlefield {
 		if permanent.ID == permanentID.String() {
+			// Store LKI BEFORE removing from battlefield
+			// This captures the permanent's state (including counters) at the moment of leaving
+			gameState.storeLKI(permanent)
+
 			// Remove from battlefield
 			gameState.battlefield = append(gameState.battlefield[:i], gameState.battlefield[i+1:]...)
 
@@ -534,6 +542,43 @@ func (gc *GameContext) GetPermanent(id uuid.UUID) (interface{}, error) {
 	}
 
 	return nil, fmt.Errorf("permanent %s not found", id)
+}
+
+// GetPermanentOrLKI retrieves a permanent by ID, falling back to Last Known Information
+// if the permanent is no longer on the battlefield.
+// Java: Game.getPermanentOrLKIBattlefield()
+// MTG Rules: 113.7a (Objects track their last known information when they leave zones)
+//
+// This is critical for triggered abilities like Resourceful Defense that need to
+// know the state of a permanent (especially its counters) at the moment it left
+// the battlefield.
+func (gc *GameContext) GetPermanentOrLKI(id uuid.UUID) (*LastKnownInfo, error) {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return nil, fmt.Errorf("game %s not found", gc.gameID)
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	// First try to find the permanent on the battlefield
+	for _, permanent := range gameState.battlefield {
+		if permanent.ID == id.String() {
+			// Permanent still exists - create LKI from current state
+			zoneCounter := gameState.lkiZoneCounter[permanent.ID]
+			return createLKIFromCard(permanent, zoneCounter), nil
+		}
+	}
+
+	// Permanent not on battlefield - check LKI
+	if lki := gameState.getLKI(id.String()); lki != nil {
+		return lki, nil
+	}
+
+	return nil, fmt.Errorf("permanent %s not found (no LKI available)", id)
 }
 
 // AddCountersToPermanent adds counters to a permanent.
@@ -1118,6 +1163,124 @@ func (gc *GameContext) GetCountersOnPermanent(ctx context.Context, permanentID u
 	}
 
 	return 0
+}
+
+// GetAllCountersOnPermanent returns all counters on a permanent as a map (name -> count)
+// Java: permanent.getCounters(game).values()
+// Used by effects like Resourceful Defense that need to access all counter types
+func (gc *GameContext) GetAllCountersOnPermanent(ctx context.Context, permanentID uuid.UUID) map[string]int {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return make(map[string]int)
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	permanentIDStr := permanentID.String()
+
+	// Search battlefield for the permanent
+	for _, card := range gameState.battlefield {
+		if card.ID == permanentIDStr {
+			if card.Counters == nil {
+				return make(map[string]int)
+			}
+			// Convert counters to simple map
+			result := make(map[string]int)
+			for name, counter := range card.Counters.GetAll() {
+				result[name] = counter.Count
+			}
+			return result
+		}
+	}
+
+	return make(map[string]int)
+}
+
+// RemoveCountersFromPermanent removes counters from a permanent
+// Java: permanent.removeCounters(counterName, amount, source, game)
+// Returns error if the permanent doesn't exist
+func (gc *GameContext) RemoveCountersFromPermanent(ctx context.Context, permanentID uuid.UUID, counterName string, amount int) error {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return fmt.Errorf("game %s not found", gc.gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	permanentIDStr := permanentID.String()
+
+	// Search battlefield for the permanent
+	for _, card := range gameState.battlefield {
+		if card.ID == permanentIDStr {
+			if card.Counters == nil {
+				return nil // No counters to remove
+			}
+			removed := card.Counters.RemoveCounter(counterName, amount)
+			if removed {
+				gc.logger.Info("removed counters from permanent",
+					zap.String("permanent", card.Name),
+					zap.String("counter", counterName),
+					zap.Int("amount", amount),
+					zap.Int("remaining", card.Counters.GetCount(counterName)))
+			}
+			return nil
+		}
+	}
+
+	return fmt.Errorf("permanent %s not found", permanentID)
+}
+
+// GetMultiAmountChoice asks the player to distribute amounts among multiple options
+// Java: player.getMultiAmountWithIndividualConstraints()
+// This is a stub implementation that returns default values for testing/AI
+// A real implementation would prompt the player through the UI
+func (gc *GameContext) GetMultiAmountChoice(
+	ctx context.Context,
+	playerID uuid.UUID,
+	choices []abilities.MultiAmountChoice,
+	totalMin, totalMax int,
+	choiceType abilities.MultiAmountType,
+) ([]int, error) {
+	if len(choices) == 0 {
+		return []int{}, nil
+	}
+
+	// Simple default strategy: distribute maximum amounts
+	// In a real implementation, this would prompt the player
+	result := make([]int, len(choices))
+	remaining := totalMax
+
+	for i := range choices {
+		// Take as much as possible from each choice, up to its max
+		take := choices[i].Max
+		if take > remaining {
+			take = remaining
+		}
+		if take < choices[i].Min {
+			take = choices[i].Min
+		}
+		result[i] = take
+		remaining -= take
+
+		if remaining <= 0 {
+			break
+		}
+	}
+
+	gc.logger.Info("multi-amount choice made (default strategy)",
+		zap.String("player", playerID.String()),
+		zap.Int("total", totalMax-remaining),
+		zap.Int("choiceType", int(choiceType)))
+
+	return result, nil
 }
 
 // isCreature checks if a card is a creature

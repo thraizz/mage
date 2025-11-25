@@ -22,9 +22,9 @@ func NewMomentOfDefiance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewBoostEffect(2, 1)).
 		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

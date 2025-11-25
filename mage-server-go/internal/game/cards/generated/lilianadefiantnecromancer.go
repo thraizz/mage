@@ -23,11 +23,14 @@ func NewLilianaDefiantNecromancer(ownerID uuid.UUID, info *cards.CardInfo) (*gam
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: ReturnFromGraveyardToBattlefieldTargetEffect()
 	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
-	//   - DiscardEachPlayerEffect(1, false)
+	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
 	// card.AddAbility(ability1)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DiscardEachPlayerEffect(1, false)
+	// card.AddAbility(ability2)
 	return card, nil
 }

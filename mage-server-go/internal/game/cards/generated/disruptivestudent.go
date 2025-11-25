@@ -28,6 +28,7 @@ func NewDisruptiveStudent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddTapCost().
 		AddManaCost("{1}").
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

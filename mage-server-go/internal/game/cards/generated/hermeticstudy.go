@@ -24,8 +24,9 @@ func NewHermeticStudy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddEffect(abilities.NewDamageEffect(1)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
@@ -35,6 +36,7 @@ func NewHermeticStudy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

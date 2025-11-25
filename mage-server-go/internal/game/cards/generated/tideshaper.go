@@ -23,12 +23,20 @@ func NewTideShaper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: TideShaperEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKickerAbility(card.ID, "{1}")
+	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability2)
 	return card, nil
 }

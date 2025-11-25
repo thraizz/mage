@@ -26,6 +26,7 @@ func NewFalkenrathExterminator(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDamageEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

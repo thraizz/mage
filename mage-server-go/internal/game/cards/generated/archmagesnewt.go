@@ -23,5 +23,8 @@ func NewArchmagesNewt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DealsCombatDamageToAPlayerTriggeredAbility
+	//   - Effect: ArchmagesNewtEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

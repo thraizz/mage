@@ -24,7 +24,16 @@ func NewGremlinMine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(4)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - GremlinMineEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

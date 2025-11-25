@@ -26,6 +26,7 @@ func NewBloodriteInvoker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{8}").
 		AddEffect(abilities.NewLoseLifeEffect(3)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

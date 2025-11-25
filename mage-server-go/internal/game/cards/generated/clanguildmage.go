@@ -26,5 +26,17 @@ func NewClanGuildmage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantBlockTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesCreatureTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

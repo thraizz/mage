@@ -32,6 +32,7 @@ func NewKjeldoranPride(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

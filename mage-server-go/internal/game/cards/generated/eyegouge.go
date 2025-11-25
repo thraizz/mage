@@ -23,7 +23,6 @@ func NewEyeGouge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewBoostEffect(-1, -1)).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

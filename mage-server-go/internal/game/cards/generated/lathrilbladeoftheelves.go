@@ -25,11 +25,12 @@ func NewLathrilBladeOfTheElves(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddTapCost().
-		AddEffect(abilities.NewGainLifeEffect(10)).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseLifeOpponentsEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
 	token1_0, err := token.GetToken("ElfWarriorToken")
 	if err != nil {
 		return nil, err

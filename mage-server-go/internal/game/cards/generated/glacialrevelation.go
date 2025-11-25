@@ -20,5 +20,8 @@ func NewGlacialRevelation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - RevealLibraryPickControllerEffect(                 6, Integer.MAX_VALUE, filter, Put...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

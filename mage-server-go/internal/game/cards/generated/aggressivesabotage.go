@@ -20,11 +20,13 @@ func NewAggressiveSabotage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{R}")
+	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(2)
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

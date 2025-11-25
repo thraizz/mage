@@ -24,16 +24,19 @@ func NewWrennAndSeven(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("WrennAndSevenTreefolkToken")
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: WrennAndSevenReturnEffect()
+	// card.AddAbility(ability0)
+	token1_0, err := token.GetToken("WrennAndSevenTreefolkToken")
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

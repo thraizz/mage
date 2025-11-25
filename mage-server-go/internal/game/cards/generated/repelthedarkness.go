@@ -21,8 +21,8 @@ func NewRepelTheDarkness(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewTapEffect()).
 		AddTargets(0, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

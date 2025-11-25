@@ -22,8 +22,8 @@ func NewGruesomeEncore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
 		AddEffect(abilities.NewExileTargetEffect()).
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

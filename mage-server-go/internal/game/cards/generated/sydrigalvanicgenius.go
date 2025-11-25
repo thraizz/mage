@@ -32,9 +32,13 @@ func NewSydriGalvanicGenius(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		return nil, err
 	}
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// TODO: Implement activated ability with unmapped effects
+	//   - SydriGalvanicGeniusEffect()
+	// card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

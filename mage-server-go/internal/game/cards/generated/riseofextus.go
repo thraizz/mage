@@ -22,7 +22,6 @@ func NewRiseOfExtus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewExileTargetEffect()).
-		AddEffect(abilities.NewExileTargetEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

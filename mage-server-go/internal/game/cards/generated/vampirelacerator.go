@@ -25,6 +25,7 @@ func NewVampireLacerator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewLoseLifeEffect(1), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

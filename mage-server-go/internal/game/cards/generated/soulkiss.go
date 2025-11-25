@@ -26,7 +26,6 @@ func NewSoulKiss(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
 		Build()
 	if err != nil {
 		return nil, err

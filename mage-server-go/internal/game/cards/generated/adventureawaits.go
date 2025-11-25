@@ -20,12 +20,8 @@ func NewAdventureAwaits(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - LookLibraryAndPickControllerEffect(                 5, 1, StaticFilters.FILTER_CARD_C...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

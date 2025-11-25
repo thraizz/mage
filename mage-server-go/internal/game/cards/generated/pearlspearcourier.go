@@ -28,6 +28,7 @@ func NewPearlspearCourier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationPermanent)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

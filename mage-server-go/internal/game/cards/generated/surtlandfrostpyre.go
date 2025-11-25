@@ -20,7 +20,13 @@ func NewSurtlandFrostpyre(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "R")
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewScryEffect(1)).
+		Build()
 	card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "R")
+	card.AddAbility(ability1)
 	return card, nil
 }

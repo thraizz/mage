@@ -28,6 +28,7 @@ func NewQuillmaneBaku(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

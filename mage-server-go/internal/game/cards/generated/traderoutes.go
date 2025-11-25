@@ -29,8 +29,12 @@ func NewTradeRoutes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{1}").
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		Build()
+	card.AddAbility(ability2)
 	return card, nil
 }

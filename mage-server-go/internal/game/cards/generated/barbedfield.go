@@ -24,10 +24,9 @@ func NewBarbedField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddEffect(abilities.NewDamageEffect(1)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
@@ -37,6 +36,7 @@ func NewBarbedField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

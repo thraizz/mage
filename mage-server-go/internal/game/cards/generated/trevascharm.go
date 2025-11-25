@@ -21,8 +21,8 @@ func NewTrevasCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewExileTargetEffect()).
 		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {

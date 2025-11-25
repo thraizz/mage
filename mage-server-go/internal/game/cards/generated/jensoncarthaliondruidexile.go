@@ -24,5 +24,11 @@ func NewJensonCarthalionDruidExile(ownerID uuid.UUID, info *cards.CardInfo) (*ga
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewScryEffect(1)).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

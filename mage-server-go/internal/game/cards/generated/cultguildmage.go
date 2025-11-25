@@ -23,13 +23,21 @@ func NewCultGuildmage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: DiscardTargetEffect(1)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(1)
-	// card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

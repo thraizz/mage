@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
@@ -26,7 +27,9 @@ func NewTitaniasCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(2), nil, "")).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

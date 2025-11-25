@@ -24,6 +24,7 @@ func NewZealotOfTheGodPharaoh(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

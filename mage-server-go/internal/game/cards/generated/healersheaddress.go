@@ -29,9 +29,15 @@ func NewHealersHeaddress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// TODO: Implement activated ability with unmapped effects
+	//   - PreventDamageToTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		Build()
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

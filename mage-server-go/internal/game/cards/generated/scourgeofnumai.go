@@ -24,6 +24,7 @@ func NewScourgeOfNumai(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewLoseLifeEffect(2), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

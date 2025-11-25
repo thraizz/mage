@@ -25,10 +25,13 @@ func NewKamahlFistOfKrosa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesCreatureTargetEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(3, 3)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		Build()
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

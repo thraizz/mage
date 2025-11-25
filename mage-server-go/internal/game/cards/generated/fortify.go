@@ -22,8 +22,6 @@ func NewFortify(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(0, 2)).
-		AddEffect(abilities.NewBoostEffect(2, 0)).
-		AddEffect(abilities.NewBoostEffect(0, 2)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -23,9 +23,16 @@ func NewRuneBrandJuggler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: SuspectTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(-5, -5)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

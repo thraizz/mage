@@ -24,6 +24,7 @@ func NewVoltaicKey(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddTapCost().
 		AddManaCost("{1}").
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

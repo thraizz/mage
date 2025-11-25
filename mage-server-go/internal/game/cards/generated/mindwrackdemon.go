@@ -37,6 +37,7 @@ func NewMindwrackDemon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(4)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewLoseLifeEffect(4), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

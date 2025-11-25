@@ -23,7 +23,6 @@ func NewHuntToExtinction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(GetXValue.instance, filter)
-	//   - DamageAllEffect(GetXValue.instance, new FilterCreaturePermanent())
 	// card.AddAbility(ability0)
 	return card, nil
 }

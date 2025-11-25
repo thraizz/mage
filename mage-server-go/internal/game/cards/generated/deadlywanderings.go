@@ -24,7 +24,6 @@ func NewDeadlyWanderings(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationPermanent)).
-		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

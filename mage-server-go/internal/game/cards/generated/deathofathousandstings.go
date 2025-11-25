@@ -22,8 +22,8 @@ func NewDeathOfAThousandStings(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(1)).
+		AddEffect(abilities.NewLoseLifeEffect(1)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

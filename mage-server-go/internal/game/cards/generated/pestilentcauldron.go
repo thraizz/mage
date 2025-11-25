@@ -40,13 +40,14 @@ func NewPestilentCauldron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability1)
-	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{1}").
-		AddTapCost().
-		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		Build()
-	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - MillCardsEachPlayerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddTapCost()
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{4}").
 		AddTapCost().

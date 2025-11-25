@@ -21,16 +21,12 @@ func NewMarinaVendrellsGrimoire(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: LoseLifeTriggeredAbility
+	//   - Effect: DiscardControllerEffect(SavedLifeLossValue.MANY)
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardControllerEffect(SavedLifeLossValue.MANY)
-	// card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
+	// card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
@@ -38,5 +34,12 @@ func NewMarinaVendrellsGrimoire(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
 	return card, nil
 }

@@ -28,6 +28,7 @@ func NewMalevolentHermit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{3}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

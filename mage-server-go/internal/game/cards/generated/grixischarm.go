@@ -24,8 +24,6 @@ func NewGrixisCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddEffect(abilities.NewBoostEffect(-4, -4)).
 		AddEffect(abilities.NewBoostEffect(2, 0, false)).
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddEffect(abilities.NewBoostEffect(-4, -4)).
-		AddEffect(abilities.NewBoostEffect(2, 0, false)).
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

@@ -31,6 +31,7 @@ func NewDiversionUnit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{3}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

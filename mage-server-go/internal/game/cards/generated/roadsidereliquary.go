@@ -27,7 +27,9 @@ func NewRoadsideReliquary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

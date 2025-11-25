@@ -24,6 +24,7 @@ func NewSpiritMirror(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{0}").
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	token1_0, err := token.GetToken("ReflectionToken")

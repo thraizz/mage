@@ -28,6 +28,7 @@ func NewNecromancersStockpile(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, false)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

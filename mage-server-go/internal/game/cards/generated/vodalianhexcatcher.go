@@ -30,6 +30,7 @@ func NewVodalianHexcatcher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

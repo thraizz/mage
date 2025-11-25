@@ -23,8 +23,21 @@ func NewChandraHeartOfFire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: DiscardHandControllerEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: ChandraHeartOfFireUltimateEffect()
+	// card.AddAbility(ability2)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardHandControllerEffect()
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability3)
 	return card, nil
 }

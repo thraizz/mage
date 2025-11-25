@@ -21,5 +21,8 @@ func NewSeismicSense(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - LookLibraryAndPickControllerEffect(                 LandsYouControlCount.instance, 1,...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

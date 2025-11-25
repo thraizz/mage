@@ -20,9 +20,12 @@ func NewRestlessFortress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
-	card.AddAbility(ability0)
-	ability1 := abilities.BuildSimpleManaAbility(card.ID, "B")
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: LoseLifeDefendingPlayerEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability1)
+	ability2 := abilities.BuildSimpleManaAbility(card.ID, "B")
+	card.AddAbility(ability2)
 	return card, nil
 }

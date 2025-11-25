@@ -31,5 +31,11 @@ func NewErrantStreetArtist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability1)
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CopyTargetStackObjectEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability3)
 	return card, nil
 }

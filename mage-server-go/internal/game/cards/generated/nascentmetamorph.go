@@ -23,5 +23,11 @@ func NewNascentMetamorph(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksOrBlocksTriggeredAbility
+	//   - Effect: NascentMetamorphEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

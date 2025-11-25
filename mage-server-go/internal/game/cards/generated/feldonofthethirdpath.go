@@ -26,8 +26,14 @@ func NewFeldonOfTheThirdPath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
-	//   - CreateTokenCopyTargetEffect(source.getControllerId(), CardType.ARTIFACT, true)
 	//   - SacrificeTargetEffect("Sacrifice the token at the beginning of the next ...)
+	//   - CreateTokenCopyTargetEffect(source.getControllerId(), CardType.ARTIFACT, true)
 	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - FeldonOfTheThirdPathEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,7 +22,6 @@ func NewBloodLust(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(4, -4)).
-		AddEffect(abilities.NewBoostEffect(StaticValue.get(4))).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

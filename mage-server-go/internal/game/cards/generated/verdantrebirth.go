@@ -22,9 +22,9 @@ func NewVerdantRebirth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		// TODO: GainAbilityTargetEffect with complex parameters
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

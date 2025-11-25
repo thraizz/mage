@@ -30,6 +30,7 @@ func NewBattleRampart(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

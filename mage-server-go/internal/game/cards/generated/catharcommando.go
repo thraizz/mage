@@ -29,6 +29,7 @@ func NewCatharCommando(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

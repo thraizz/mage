@@ -23,11 +23,8 @@ func NewWingsOfTheCosmos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 3)).
-		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewBoostEffect(1, 3)).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewUntapEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

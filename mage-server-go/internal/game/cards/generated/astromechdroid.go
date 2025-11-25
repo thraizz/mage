@@ -28,6 +28,7 @@ func NewAstromechDroid(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(1, 1)).
 		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

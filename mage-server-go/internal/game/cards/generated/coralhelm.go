@@ -23,6 +23,7 @@ func NewCoralHelm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddEffect(abilities.NewBoostEffect(2, 2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

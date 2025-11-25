@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -20,15 +21,11 @@ func NewVengefulPossession(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
-		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DoIfCostPaid(                 new DrawCardSourceControllerEffec...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

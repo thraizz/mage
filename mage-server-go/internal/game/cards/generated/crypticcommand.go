@@ -22,10 +22,10 @@ func NewCrypticCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

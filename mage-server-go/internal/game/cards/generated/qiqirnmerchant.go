@@ -23,12 +23,19 @@ func NewQiqirnMerchant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// TODO: Implement activated ability with unmapped effects
+	//   - DrawDiscardControllerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{7}").
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

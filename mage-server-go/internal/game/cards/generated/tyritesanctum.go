@@ -23,17 +23,19 @@ func NewTyriteSanctum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{2}").
-		AddTapCost().
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - AddCardSubTypeTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{4}").
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("indestructible", 1))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

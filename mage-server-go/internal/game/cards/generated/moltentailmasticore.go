@@ -26,6 +26,7 @@ func NewMoltenTailMasticore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{4}").
 		AddEffect(abilities.NewDamageEffect(4)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

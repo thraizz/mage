@@ -21,9 +21,9 @@ func NewMiseryCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
-		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -29,8 +29,8 @@ func NewTilonallisSummoner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, true)).
 		AddEffect(abilities.NewExileTargetEffect()).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, true)).
 		Build()
 	if err != nil {
 		return nil, err

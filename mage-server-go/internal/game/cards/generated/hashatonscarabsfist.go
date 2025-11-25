@@ -24,5 +24,8 @@ func NewHashatonScarabsFist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DiscardCardControllerTriggeredAbility
+	//   - Effect: DoIfCostPaid(new HashatonScarabsFistEffect(), new ManaCostsImpl...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -27,6 +27,7 @@ func NewGalvanicKey(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddManaCost("{3}").
 		AddTapCost().
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -30,5 +30,11 @@ func NewCuombajjWitches(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

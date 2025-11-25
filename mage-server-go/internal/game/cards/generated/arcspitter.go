@@ -29,6 +29,7 @@ func NewArcSpitter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

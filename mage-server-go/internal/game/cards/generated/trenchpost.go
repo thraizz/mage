@@ -27,6 +27,7 @@ func NewTrenchpost(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddManaCost("{3}").
 		AddTapCost().
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

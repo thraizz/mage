@@ -24,9 +24,21 @@ func NewNahiriTheUnforgiving(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: AttacksIfAbleTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: DiscardControllerEffect(1)
+	// card.AddAbility(ability1)
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: NahiriTheUnforgivingTokenEffect()
+	// card.AddAbility(ability2)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardControllerEffect(1)
 	//   - CreateTokenCopyTargetEffect(controller.getId(), null, true)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability3)
 	return card, nil
 }

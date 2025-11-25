@@ -22,8 +22,8 @@ func NewNullElementalBlast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
 		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	if err != nil {
 		return nil, err

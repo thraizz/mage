@@ -30,6 +30,7 @@ func NewInallaArchmageRitualist(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	// card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewLoseLifeEffect(7)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects

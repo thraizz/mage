@@ -21,12 +21,8 @@ func NewSmallpox(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
-	//   - DiscardEachPlayerEffect()
 	//   - SacrificeAllEffect(1, StaticFilters.FILTER_CONTROLLED_CREATURE)
-	//   - SacrificeAllEffect(1, StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND)
 	//   - DiscardEachPlayerEffect()
-	//   - SacrificeAllEffect(1, StaticFilters.FILTER_CONTROLLED_CREATURE)
-	//   - SacrificeAllEffect(1, StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND)
 	// card.AddAbility(ability0)
 	return card, nil
 }

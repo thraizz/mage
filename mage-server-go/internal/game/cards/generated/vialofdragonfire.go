@@ -24,6 +24,7 @@ func NewVialOfDragonfire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

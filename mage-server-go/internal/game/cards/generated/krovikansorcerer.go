@@ -28,5 +28,11 @@ func NewKrovikanSorcerer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DrawDiscardOneOfThemEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

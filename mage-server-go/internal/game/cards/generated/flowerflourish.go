@@ -22,6 +22,7 @@ func NewFlowerFlourish(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

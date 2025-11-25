@@ -27,5 +27,11 @@ func NewCogworkAssembler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(null, CardType.ARTIFACT, true)
 	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CogworkAssemblerCreateTokenEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{7}")
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -27,6 +27,7 @@ func NewFanBearer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

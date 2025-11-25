@@ -22,5 +22,13 @@ func NewHauntedFengraf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ReturnFromGraveyardAtRandomEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

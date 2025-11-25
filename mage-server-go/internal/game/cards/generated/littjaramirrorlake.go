@@ -21,10 +21,13 @@ func NewLittjaraMirrorlake(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: LittjaraMirrorlakeEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "U")
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
 	return card, nil
 }

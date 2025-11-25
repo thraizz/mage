@@ -21,7 +21,7 @@ func NewGalvanicBlast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(4)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(4), "unknown")).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

@@ -29,5 +29,8 @@ func NewAdarkarWindform(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseAbilityTargetEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

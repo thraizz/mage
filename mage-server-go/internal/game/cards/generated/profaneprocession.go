@@ -22,6 +22,7 @@ func NewProfaneProcession(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	// TODO: Implement activated ability with unmapped effects
+	//   - ExileTargetForSourceEffect()
 	//   - TransformSourceEffect()
 	// card.AddAbility(ability0)
 	return card, nil

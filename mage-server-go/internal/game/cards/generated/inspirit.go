@@ -23,7 +23,6 @@ func NewInspirit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 4)).
 		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewBoostEffect(2, 4)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

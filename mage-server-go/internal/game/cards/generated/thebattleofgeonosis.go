@@ -22,7 +22,6 @@ func NewTheBattleOfGeonosis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(new IntPlusDynamicValue(1, GetXValue.instance), ne...)
-	//   - DamageAllEffect(new IntPlusDynamicValue(1, GetXValue.instance), ne...)
 	// card.AddAbility(ability0)
 	return card, nil
 }

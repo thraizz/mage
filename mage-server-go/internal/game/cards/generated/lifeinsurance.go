@@ -20,5 +20,10 @@ func NewLifeInsurance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewDiesTrigger(card.ID)).
+		AddEffect(abilities.NewLoseLifeEffect(1)).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

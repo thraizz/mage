@@ -21,7 +21,7 @@ func NewFieryImpulse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(3)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(3), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

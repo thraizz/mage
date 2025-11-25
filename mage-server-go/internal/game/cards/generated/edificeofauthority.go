@@ -21,10 +21,17 @@ func NewEdificeOfAuthority(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddTapCost().
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeBrick.CreateInstance(1))).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateIfConditionActivatedAbility
+	//   - Effect: EdificeOfAuthorityEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantAttackTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

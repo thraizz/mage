@@ -20,5 +20,8 @@ func NewHarnessTheStorm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: SpellCastControllerTriggeredAbility
+	//   - Effect: MayCastTargetCardEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

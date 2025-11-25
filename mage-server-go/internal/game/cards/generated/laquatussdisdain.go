@@ -22,8 +22,8 @@ func NewLaquatussDisdain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	if err != nil {
 		return nil, err

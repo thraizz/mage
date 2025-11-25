@@ -25,13 +25,9 @@ func NewReturnFromTheWilds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	if err != nil {
 		return nil, err
 	}
-	token0_1, err := token.GetToken("FoodToken")
-	if err != nil {
-		return nil, err
-	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_1)).
 		Build()
 	if err != nil {
 		return nil, err

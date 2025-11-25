@@ -23,10 +23,7 @@ func NewBuccaneersBravado(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewBoostEffect(1, 1)).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewGrantAbilityEffect("DoubleStrikeAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

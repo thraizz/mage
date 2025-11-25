@@ -24,5 +24,11 @@ func NewCaptainAmericaFirstAvenger(ownerID uuid.UUID, info *cards.CardInfo) (*ga
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageMultiEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	// card.AddAbility(ability0)
 	return card, nil
 }

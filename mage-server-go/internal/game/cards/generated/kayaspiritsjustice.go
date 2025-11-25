@@ -32,9 +32,9 @@ func NewKayaSpiritsJustice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewSurveilEffect(1)).
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
-		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

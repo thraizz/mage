@@ -25,6 +25,7 @@ func NewBroodButcher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(-2, -2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	token1_0, err := token.GetToken("EldraziScionToken")

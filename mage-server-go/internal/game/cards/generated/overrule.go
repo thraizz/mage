@@ -22,8 +22,8 @@ func NewOverrule(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect(GetXValue.instance)).
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
+		AddEffect(abilities.NewCounterSpellEffect(GetXValue.instance)).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

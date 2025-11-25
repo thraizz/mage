@@ -33,6 +33,7 @@ func NewMatsuTribeSniper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -26,6 +26,7 @@ func NewChatterfangSquirrelGeneral(ownerID uuid.UUID, info *cards.CardInfo) (*ga
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(GetXValue.instance)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -22,9 +22,8 @@ func NewThornbiteStaff(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.EQUIPMENT)).
 		AddEffect(abilities.NewUntapEffect()).
-		// TODO: GainAbilityAttachedEffect with complex parameters
+		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.EQUIPMENT)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -34,6 +33,7 @@ func NewThornbiteStaff(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

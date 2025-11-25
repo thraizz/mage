@@ -26,7 +26,6 @@ func NewDisruptionAura(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err

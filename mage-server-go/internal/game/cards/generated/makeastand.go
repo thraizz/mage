@@ -24,7 +24,6 @@ func NewMakeAStand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

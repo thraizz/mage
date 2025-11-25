@@ -24,16 +24,25 @@ func NewJaredCarthalion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("KavuAllColorToken")
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: JaredCarthalionBoostEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: JaredCarthalionUltimateEffect()
+	// card.AddAbility(ability1)
+	token2_0, err := token.GetToken("KavuAllColorToken")
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability2)
 	return card, nil
 }

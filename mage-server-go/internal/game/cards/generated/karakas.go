@@ -26,6 +26,7 @@ func NewKarakas(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

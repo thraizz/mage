@@ -31,6 +31,7 @@ func NewMoriaScavenger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

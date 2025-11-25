@@ -30,6 +30,7 @@ func NewDrMadisonLi(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddEffect(abilities.NewBoostEffect(1, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).

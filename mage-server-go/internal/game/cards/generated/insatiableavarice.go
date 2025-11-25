@@ -21,9 +21,9 @@ func NewInsatiableAvarice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: SearchLibraryPutOnLibraryEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(3)).
+		// TODO: SearchLibraryPutOnLibraryEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

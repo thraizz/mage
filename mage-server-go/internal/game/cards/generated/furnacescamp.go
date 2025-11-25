@@ -23,5 +23,8 @@ func NewFurnaceScamp(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DealsCombatDamageToAPlayerTriggeredAbility
+	//   - Effect: DoIfCostPaid(                 new DamageTargetEffect(3, true, "...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -23,5 +23,8 @@ func NewBrotherhoodPatriarch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DiesSourceTriggeredAbility
+	//   - Effect: LoseLifeOpponentsEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

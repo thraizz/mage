@@ -22,7 +22,7 @@ func NewRavagingBlaze(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(GetXValue.instance), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

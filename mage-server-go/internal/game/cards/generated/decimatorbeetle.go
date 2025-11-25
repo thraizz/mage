@@ -27,7 +27,6 @@ func NewDecimatorBeetle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1))).
 		AddEffect(abilities.NewRemoveCounterTargetEffect(counters.CounterTypeM1M1.CreateInstance(1))).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1))).
 		Build()
 	if err != nil {
 		return nil, err

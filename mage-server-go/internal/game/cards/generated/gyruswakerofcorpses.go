@@ -26,8 +26,11 @@ func NewGyrusWakerOfCorpses(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: GyrusWakerOfCorpsesEffect()
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(source.getControllerId(), null, true, 1, true, tru...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

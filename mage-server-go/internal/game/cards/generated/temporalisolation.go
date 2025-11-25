@@ -27,8 +27,8 @@ func NewTemporalIsolation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability1 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordShadow), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
 		Build()
 	if err != nil {
 		return nil, err

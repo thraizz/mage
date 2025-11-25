@@ -22,7 +22,6 @@ func NewRiddleOfLightning(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewScryEffect(1)).
-		AddEffect(abilities.NewScryEffect(1)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

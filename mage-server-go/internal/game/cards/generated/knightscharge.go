@@ -20,5 +20,14 @@ func NewKnightsCharge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksCreatureYouControlTriggeredAbility
+	//   - Effect: LoseLifeOpponentsEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ReturnFromYourGraveyardToBattlefieldAllEffect()
+	//
+	// Costs:
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,8 +22,6 @@ func NewRainOfRust(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewArtifactTargetFilter()).
 		AddTarget(abilities.NewLandTargetFilter()).
 		Build()

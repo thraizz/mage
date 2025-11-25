@@ -33,5 +33,11 @@ func NewEzrimAgencyChief(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability2)
 	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHexproof)
 	card.AddAbility(ability3)
+	// TODO: Implement activated ability with unmapped effects
+	//   - GainsChoiceOfAbilitiesEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	// card.AddAbility(ability4)
 	return card, nil
 }

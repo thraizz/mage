@@ -24,10 +24,9 @@ func NewLightningProwess(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
 		AddEffect(abilities.NewDamageEffect(1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
@@ -37,6 +36,7 @@ func NewLightningProwess(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

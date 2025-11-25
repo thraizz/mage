@@ -23,6 +23,7 @@ func NewGruesomeRealization(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddEffect(abilities.NewBoostEffect(-1, -1, false)).
 		Build()
 	if err != nil {
 		return nil, err

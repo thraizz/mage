@@ -32,6 +32,7 @@ func NewXathridGorgon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("petrification", 1))).
 		AddEffect(abilities.NewGrantAbilityEffect("DefenderAbility", effects.DurationPermanent)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

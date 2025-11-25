@@ -24,13 +24,16 @@ func NewSteelSeraph(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: BeginningOfCombatTriggeredAbility
+	//   - Effect: GainsChoiceOfAbilitiesEffect()
+	// card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability2)
-	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
+	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability3)
+	ability4 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
+	card.AddAbility(ability4)
 	return card, nil
 }

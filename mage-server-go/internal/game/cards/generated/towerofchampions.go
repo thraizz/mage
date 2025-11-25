@@ -24,6 +24,7 @@ func NewTowerOfChampions(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{8}").
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(6, 6)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

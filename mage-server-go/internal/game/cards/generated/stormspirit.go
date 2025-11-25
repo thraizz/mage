@@ -29,6 +29,7 @@ func NewStormSpirit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

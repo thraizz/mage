@@ -30,5 +30,11 @@ func NewAuraOfDominion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - UntapAttachedEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	// card.AddAbility(ability2)
 	return card, nil
 }

@@ -24,7 +24,13 @@ func NewRakdosAugermage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: RakdosAugermageEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
+	card.AddAbility(ability1)
 	return card, nil
 }

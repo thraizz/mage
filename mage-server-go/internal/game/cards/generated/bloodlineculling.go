@@ -22,6 +22,7 @@ func NewBloodlineCulling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(-5, -5)).
+		AddEffect(abilities.NewBoostEffect(-2, -2, false)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

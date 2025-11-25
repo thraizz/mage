@@ -30,5 +30,11 @@ func NewWalkingSponge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability1)
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - WalkingSpongeEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability3)
 	return card, nil
 }

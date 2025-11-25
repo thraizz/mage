@@ -29,9 +29,8 @@ func NewLlanowarGreenwidow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: GainAbilitySourceEffect with complex parameters
-		Build()
-	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ReturnSourceFromGraveyardToBattlefieldEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

@@ -23,7 +23,6 @@ func NewSupplantForm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
-	//   - CreateTokenCopyTargetEffect()
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())

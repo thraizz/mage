@@ -21,18 +21,16 @@ func NewMegaFlare(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("UtvaraHellkiteDragonToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+	ability0 := abilities.NewKickerAbility(card.ID, "{3}{R}{R}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

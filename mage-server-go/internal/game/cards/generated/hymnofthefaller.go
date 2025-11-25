@@ -21,10 +21,10 @@ func NewHymnOfTheFaller(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSurveilEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewSurveilEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

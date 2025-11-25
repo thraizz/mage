@@ -24,12 +24,15 @@ func NewZedruuTheGreathearted(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(PermanentsYouOwnThatOpponentsControlCount.instance)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewGainLifeEffect(PermanentsYouOwnThatOpponentsControlCount.instance)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - TargetPlayerGainControlTargetPermanentEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

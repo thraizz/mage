@@ -30,6 +30,7 @@ func NewSoulswornJury(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

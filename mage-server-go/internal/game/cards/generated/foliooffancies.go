@@ -25,5 +25,11 @@ func NewFolioOfFancies(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - FolioOfFanciesEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

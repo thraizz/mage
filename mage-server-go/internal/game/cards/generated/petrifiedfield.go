@@ -29,5 +29,10 @@ func NewPetrifiedField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddSacrificeSourceCost().
+		Build()
+	card.AddAbility(ability2)
 	return card, nil
 }

@@ -21,13 +21,10 @@ func NewSeedshipImpact(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("LanderToken")
-	if err != nil {
-		return nil, err
-	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		AddTarget(abilities.NewArtifactOrEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

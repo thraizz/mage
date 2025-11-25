@@ -20,14 +20,18 @@ func NewResoundingScream(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: CycleTriggeredAbility
+	//   - Effect: DiscardTargetEffect(2, true)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
-	//   - DiscardTargetEffect(2, true)
-	//   - DiscardTargetEffect(1, true)
 	//   - DiscardTargetEffect(2, true)
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

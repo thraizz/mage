@@ -22,7 +22,7 @@ func NewRabbitResponse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 1)).
-		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewScryEffect(1), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

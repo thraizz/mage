@@ -26,7 +26,6 @@ func NewBlazethornScarecrow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
-		AddEffect(abilities.NewGrantAbilityEffect("WitherAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

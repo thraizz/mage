@@ -23,5 +23,11 @@ func NewCyclopeanGiant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DiesSourceTriggeredAbility
+	//   - Effect: BecomesBasicLandTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

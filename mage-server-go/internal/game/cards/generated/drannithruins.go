@@ -27,6 +27,7 @@ func NewDrannithRuins(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(2))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

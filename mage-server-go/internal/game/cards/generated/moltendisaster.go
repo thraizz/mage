@@ -20,5 +20,7 @@ func NewMoltenDisaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{R}")
+	card.AddAbility(ability0)
 	return card, nil
 }

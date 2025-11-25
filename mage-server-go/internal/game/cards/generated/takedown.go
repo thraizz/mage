@@ -22,6 +22,9 @@ func NewTakeDown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(1, StaticFilters.FILTER_CREATURE_FLYING)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

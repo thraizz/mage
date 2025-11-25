@@ -23,5 +23,7 @@ func NewThicketElemental(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{1}{G}")
+	card.AddAbility(ability0)
 	return card, nil
 }

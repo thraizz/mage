@@ -23,8 +23,26 @@ func NewVronosMaskedInquisitor(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: PhaseOutTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		Build()
+	card.AddAbility(ability1)
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: BecomesCreatureTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability2)
 	// TODO: Implement spell ability with unmapped effects
 	//   - PhaseOutTargetEffect()
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability3)
 	return card, nil
 }

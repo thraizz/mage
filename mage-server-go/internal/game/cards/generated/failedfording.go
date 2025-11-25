@@ -22,7 +22,7 @@ func NewFailedFording(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
-		AddEffect(abilities.NewSurveilEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewSurveilEffect(1), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

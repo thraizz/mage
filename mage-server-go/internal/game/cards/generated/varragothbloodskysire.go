@@ -25,7 +25,13 @@ func NewVarragothBloodskySire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: BoastAbility
+	//   - Effect: VarragothBloodskySireEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
+	card.AddAbility(ability1)
 	return card, nil
 }

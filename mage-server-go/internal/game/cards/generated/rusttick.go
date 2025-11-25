@@ -27,6 +27,7 @@ func NewRustTick(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

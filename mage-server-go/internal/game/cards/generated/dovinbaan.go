@@ -24,9 +24,9 @@ func NewDovinBaan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(-3, 0)).
-		AddEffect(abilities.NewGainLifeEffect(2)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddEffect(abilities.NewBoostEffect(-3, 0)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -24,6 +24,7 @@ func NewDoomCannon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddManaCost("{3}").
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

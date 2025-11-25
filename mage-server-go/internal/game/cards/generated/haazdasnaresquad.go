@@ -23,5 +23,8 @@ func NewHaazdaSnareSquad(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: DoIfCostPaid(new TapTargetEffect(), new ManaCostsImpl<>("{W}"))
+	// card.AddAbility(ability0)
 	return card, nil
 }

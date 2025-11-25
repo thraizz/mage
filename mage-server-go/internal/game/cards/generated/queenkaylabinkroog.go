@@ -24,5 +24,8 @@ func NewQueenKaylaBinKroog(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: QueenKaylaBinKroogEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

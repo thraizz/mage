@@ -25,6 +25,7 @@ func NewWhaleboneGlider(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

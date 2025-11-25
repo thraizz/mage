@@ -32,6 +32,7 @@ func NewToweringViewpoint(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

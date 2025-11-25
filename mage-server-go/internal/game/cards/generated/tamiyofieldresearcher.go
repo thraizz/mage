@@ -24,8 +24,8 @@ func NewTamiyoFieldResearcher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewTapEffect()).
 		Build()
 	if err != nil {
 		return nil, err

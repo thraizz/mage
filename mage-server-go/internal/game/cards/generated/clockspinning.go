@@ -22,10 +22,8 @@ func NewClockspinning(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewAddCountersTargetEffect(counter)).
 		AddEffect(abilities.NewRemoveCounterTargetEffect()).
-		AddEffect(abilities.NewAddCountersTargetEffect(counter)).
-		AddEffect(abilities.NewRemoveCounterTargetEffect(counter)).
-		AddEffect(abilities.NewAddCountersTargetEffect(counter)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -21,13 +21,11 @@ func NewConfoundingRiddle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
-		AddTarget(abilities.NewSpellTargetFilter()).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - LookLibraryAndPickControllerEffect(                 4, 1, PutCards.HAND, PutCards.GRA...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

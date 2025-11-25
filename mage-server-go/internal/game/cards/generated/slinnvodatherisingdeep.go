@@ -24,5 +24,7 @@ func NewSlinnVodaTheRisingDeep(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{1}{U}")
+	card.AddAbility(ability0)
 	return card, nil
 }

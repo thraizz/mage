@@ -36,5 +36,11 @@ func NewShadowspear(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseAbilityAllEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	// card.AddAbility(ability3)
 	return card, nil
 }

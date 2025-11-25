@@ -29,6 +29,7 @@ func NewSarythTheVipersFang(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

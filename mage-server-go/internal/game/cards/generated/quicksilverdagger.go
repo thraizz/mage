@@ -34,6 +34,7 @@ func NewQuicksilverDagger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

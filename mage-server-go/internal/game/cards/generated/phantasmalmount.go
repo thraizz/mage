@@ -29,7 +29,12 @@ func NewPhantasmalMount(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - SacrificeTargetEffect()
-	//   - SacrificeTargetEffect()
 	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - PhantasmalMountEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

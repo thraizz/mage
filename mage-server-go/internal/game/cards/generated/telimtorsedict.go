@@ -21,8 +21,8 @@ func NewTelimTorsEdict(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

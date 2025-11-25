@@ -20,5 +20,8 @@ func NewRoilingRegrowth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - SacrificeControllerEffect(                 StaticFilters.FILTER_LAND, 1, nul...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

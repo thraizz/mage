@@ -32,6 +32,7 @@ func NewLightningSpear(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

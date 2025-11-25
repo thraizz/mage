@@ -22,12 +22,12 @@ func NewMagmaBurst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(3)).
-		AddTarget(abilities.NewAnyTargetFilter()).
-		AddTargets(2, 2, abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+
+	// TODO: Add conditional kicked target: TargetAnyTarget
 	return card, nil
 }

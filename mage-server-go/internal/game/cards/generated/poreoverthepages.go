@@ -22,7 +22,6 @@ func NewPoreOverThePages(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardControllerEffect(1)
-	//   - DiscardControllerEffect(1)
 	// card.AddAbility(ability0)
 	return card, nil
 }

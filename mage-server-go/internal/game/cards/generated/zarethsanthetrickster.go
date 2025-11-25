@@ -25,10 +25,16 @@ func NewZarethSanTheTrickster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: DealsCombatDamageToAPlayerTriggeredAbility
+	//   - Effect: ReturnFromGraveyardToBattlefieldTargetEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ZarethSanTheTricksterEffect()
+	// card.AddAbility(ability3)
 	return card, nil
 }

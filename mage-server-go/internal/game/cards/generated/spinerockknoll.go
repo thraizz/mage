@@ -22,5 +22,10 @@ func NewSpinerockKnoll(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "R")
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

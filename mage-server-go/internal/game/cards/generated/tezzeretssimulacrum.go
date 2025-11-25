@@ -26,6 +26,8 @@ func NewTezzeretsSimulacrum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewLoseLifeEffect(3)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewLoseLifeEffect(3), "unknown")).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

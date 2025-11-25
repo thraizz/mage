@@ -44,6 +44,36 @@ Uses the Python transpiler in batch mode with statistics tracking.
 - Statistics: `transpile_stats.json` (includes error breakdown and TODO analysis)
 - Log: `transpile_results.log`
 
+**`test_transpile_coverage.py`** - Test that transpiler finds all Java cards
+
+Verifies that the transpiler processes all Java card files (either successfully or with errors).
+
+```bash
+# Test all cards (takes a long time - 30,000+ cards)
+python3 scripts/test_transpile_coverage.py
+
+# Test first 100 cards (quick check)
+python3 scripts/test_transpile_coverage.py --limit=100
+
+# Test random sample of 50 cards
+python3 scripts/test_transpile_coverage.py --sample=50
+
+# Save results to JSON file
+python3 scripts/test_transpile_coverage.py --limit=1000 --json=test_results.json
+```
+
+**What it tests:**
+- Scans Java directory for all `.java` card files
+- Runs transpiler on each file
+- Verifies all cards were processed (successfully or with errors)
+- Reports any cards that were completely missed
+
+**Output:**
+- Reports total cards found vs processed
+- Lists missing cards (if any)
+- Shows failure breakdown by error type
+- Exit code: 0 if all cards processed, 1 if any missing
+
 **`analyze_transpile_stats.py`** - Analyze transpilation statistics
 
 View and query statistics from `transpile_stats.json`:

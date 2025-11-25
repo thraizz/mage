@@ -28,6 +28,7 @@ func NewGhosthelmCourier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewGrantAbilityEffect("ShroudAbility", effects.DurationPermanent)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

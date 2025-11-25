@@ -27,5 +27,11 @@ func NewUrborg(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability0)
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - UrborgEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

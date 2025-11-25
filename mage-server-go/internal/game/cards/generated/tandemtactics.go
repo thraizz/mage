@@ -21,8 +21,8 @@ func NewTandemTactics(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddEffect(abilities.NewBoostEffect(1, 2)).
 		AddTargets(0, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

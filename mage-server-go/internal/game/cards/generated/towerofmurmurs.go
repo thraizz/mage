@@ -24,6 +24,7 @@ func NewTowerOfMurmurs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{8}").
 		AddTapCost().
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -20,12 +20,8 @@ func NewLetsPlayAGame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(3)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DiscardEachPlayerEffect(                 StaticValue.get(2), false, Target...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

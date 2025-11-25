@@ -26,6 +26,8 @@ func NewDroolingGroodion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewBoostEffect(-2, -2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

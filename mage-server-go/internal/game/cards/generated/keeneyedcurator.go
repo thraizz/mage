@@ -31,5 +31,11 @@ func NewKeenEyedCurator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExileTargetForSourceEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	// card.AddAbility(ability1)
 	return card, nil
 }

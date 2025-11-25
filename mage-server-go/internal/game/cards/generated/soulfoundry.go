@@ -24,5 +24,11 @@ func NewSoulFoundry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
 	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - SoulFoundryEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

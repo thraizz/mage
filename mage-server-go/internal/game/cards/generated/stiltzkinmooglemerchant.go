@@ -27,5 +27,12 @@ func NewStiltzkinMoogleMerchant(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - StiltzkinMoogleMerchantEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -21,8 +21,8 @@ func NewConsumingSinkhole(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewDamageEffect(4)).
+		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

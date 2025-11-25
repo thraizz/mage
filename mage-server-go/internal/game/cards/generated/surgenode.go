@@ -25,6 +25,7 @@ func NewSurgeNode(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeCharge.CreateInstance(1))).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

@@ -24,6 +24,7 @@ func NewOverwhelmingSurge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -25,6 +25,7 @@ func NewScrollOfAvacyn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(5)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(5), "unknown")).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -30,12 +30,12 @@ func NewGenjuOfTheFields(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	card.AddAbility(ability1)
-	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{2}").
-		AddEffect(abilities.NewGainLifeEffect(SavedDamageValue.MUCH)).
-		// TODO: GainAbilityAttachedEffect with complex parameters
-		Build()
-	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesCreatureAttachedWithActivatedAbilityOrSpellEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	// card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		Build()

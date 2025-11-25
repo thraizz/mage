@@ -22,8 +22,8 @@ func NewStartFromScratch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

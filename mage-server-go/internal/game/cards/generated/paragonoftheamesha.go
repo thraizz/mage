@@ -30,11 +30,13 @@ func NewParagonOfTheAmesha(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(3, 3)).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ParagonOfTheAmeshaEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

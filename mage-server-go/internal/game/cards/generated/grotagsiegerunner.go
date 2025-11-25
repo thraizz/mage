@@ -27,6 +27,7 @@ func NewGrotagSiegeRunner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -24,6 +24,7 @@ func NewHelmOfPossession(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationWhileControlled)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -25,6 +25,7 @@ func NewSandmanShiftingScoundrel(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.Rarity = "common"
 
 	// TODO: Implement activated ability with unmapped effects
+	//   - ReturnSourceFromGraveyardToBattlefieldEffect()
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect(true)
 	// card.AddAbility(ability0)
 	return card, nil

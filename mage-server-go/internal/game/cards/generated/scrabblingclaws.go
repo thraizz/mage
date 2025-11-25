@@ -20,12 +20,15 @@ func NewScrabblingClaws(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// TODO: Implement activated ability with unmapped effects
+	//   - ScrabblingClawsEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

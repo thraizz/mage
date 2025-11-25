@@ -23,8 +23,14 @@ func NewSurgespanner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BecomesTappedSourceTriggeredAbility
+	//   - Effect: DoIfCostPaid(new ReturnToHandTargetEffect(), new ManaCostsImpl<...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new ReturnToHandTargetEffect(), new ManaCostsImpl<...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

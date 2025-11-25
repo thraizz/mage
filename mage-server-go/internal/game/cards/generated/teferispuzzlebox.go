@@ -20,5 +20,8 @@ func NewTeferisPuzzleBox(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BeginningOfDrawTriggeredAbility
+	//   - Effect: TeferisPuzzleBoxEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

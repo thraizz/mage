@@ -21,7 +21,7 @@ func NewHorrificAssault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(3)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(3), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

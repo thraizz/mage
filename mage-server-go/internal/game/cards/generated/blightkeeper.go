@@ -31,6 +31,7 @@ func NewBlightKeeper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewLoseLifeEffect(4)).
 		AddEffect(abilities.NewGainLifeEffect(4)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

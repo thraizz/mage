@@ -34,6 +34,7 @@ func NewGoblinCratermaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

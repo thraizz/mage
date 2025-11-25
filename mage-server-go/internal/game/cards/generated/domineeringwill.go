@@ -21,8 +21,8 @@ func NewDomineeringWill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		AddEffect(abilities.NewUntapEffect()).
+		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

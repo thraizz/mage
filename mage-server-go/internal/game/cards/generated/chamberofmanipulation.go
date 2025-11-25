@@ -33,6 +33,7 @@ func NewChamberOfManipulation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

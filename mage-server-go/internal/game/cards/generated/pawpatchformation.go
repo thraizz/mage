@@ -26,10 +26,10 @@ func NewPawpatchFormation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {

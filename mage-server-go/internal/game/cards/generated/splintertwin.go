@@ -27,12 +27,18 @@ func NewSplinterTwin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(source.getControllerId(), null, true)
 	// card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	// TODO: Implement activated ability with unmapped effects
+	//   - SplinterTwinEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

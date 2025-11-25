@@ -20,5 +20,8 @@ func NewDeafeningClarion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(                 3, StaticFilters.FILTER_PERMANENT...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

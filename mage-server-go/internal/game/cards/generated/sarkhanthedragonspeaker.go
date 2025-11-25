@@ -24,18 +24,25 @@ func NewSarkhanTheDragonspeaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewDamageEffect(4)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible)
 	card.AddAbility(ability2)
-	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
+	card.AddAbility(ability3)
+	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(4)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability3)
+	card.AddAbility(ability4)
 	return card, nil
 }

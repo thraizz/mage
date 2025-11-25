@@ -24,7 +24,7 @@ func NewSagesDousing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCounterSpellEffect()).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

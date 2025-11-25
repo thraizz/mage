@@ -21,10 +21,16 @@ func NewTalonGatesOfMadara(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: PhaseOutTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "C")
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - PhaseOutTargetEffect()
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
 	return card, nil
 }

@@ -28,6 +28,7 @@ func NewLightningCoreExcavator(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

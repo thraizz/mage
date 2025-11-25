@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -22,6 +23,7 @@ func NewCrypsis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewUntapEffect("untap it")).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

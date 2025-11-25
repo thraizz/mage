@@ -27,6 +27,7 @@ func NewKozilekTheGreatDistortion(ownerID uuid.UUID, info *cards.CardInfo) (*gam
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

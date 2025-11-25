@@ -20,5 +20,14 @@ func NewMuseVessel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: MuseVesselExileEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - OneShotNonTargetEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

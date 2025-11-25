@@ -20,5 +20,13 @@ func NewSilverBolt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - SilverBoltEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

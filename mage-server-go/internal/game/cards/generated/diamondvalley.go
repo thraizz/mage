@@ -27,5 +27,9 @@ func NewDiamondValley(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

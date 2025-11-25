@@ -1425,7 +1425,7 @@ func (s *mageServer) DeckGet(ctx context.Context, req *pb.DeckGetRequest) (*pb.D
 }
 
 // normalizeCardName normalizes a card name to match database format
-// Removes punctuation (commas, apostrophes, hyphens) and normalizes spacing
+// Removes punctuation (commas, apostrophes, hyphens, colons) and normalizes spacing
 func normalizeCardName(name string) string {
 	// Trim whitespace
 	name = strings.TrimSpace(name)
@@ -1440,6 +1440,7 @@ func normalizeCardName(name string) string {
 	name = strings.ReplaceAll(name, "-", " ")
 	name = strings.ReplaceAll(name, "/", " ")
 	name = strings.ReplaceAll(name, "//", " ")
+	name = strings.ReplaceAll(name, ":", " ")
 
 	// Normalize multiple spaces to single space
 	spaceRegex := regexp.MustCompile(`\s+`)

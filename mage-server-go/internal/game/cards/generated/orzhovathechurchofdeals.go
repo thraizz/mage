@@ -26,6 +26,7 @@ func NewOrzhovaTheChurchOfDeals(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 		AddTapCost().
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

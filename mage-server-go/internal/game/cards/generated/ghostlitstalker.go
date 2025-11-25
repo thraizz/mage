@@ -23,9 +23,20 @@ func NewGhostLitStalker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: DiscardTargetEffect(2)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ChannelAbility
+	//   - Effect: DiscardTargetEffect(4)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(2)
-	//   - DiscardTargetEffect(4)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability2)
 	return card, nil
 }

@@ -30,6 +30,7 @@ func NewVoraciousVarmint(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

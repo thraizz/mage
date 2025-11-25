@@ -23,8 +23,6 @@ func NewPainfulTruths(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		// TODO: LoseLifeSourceControllerEffect with complex parameters
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

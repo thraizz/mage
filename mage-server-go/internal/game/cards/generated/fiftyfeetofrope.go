@@ -20,5 +20,20 @@ func NewFiftyFeetOfRope(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantBlockTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddTapCost()
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DontUntapInControllersNextUntapStepTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,20 +22,23 @@ func NewWhipOfErebos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
-		AddEffect(abilities.NewExileTargetEffect()).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: WhipOfErebosEffect()
+	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationPermanent)).
+		AddEffect(abilities.NewExileTargetEffect()).
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationPermanent)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability2)
 	return card, nil
 }

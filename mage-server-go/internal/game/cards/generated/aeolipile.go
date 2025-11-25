@@ -24,6 +24,7 @@ func NewAeolipile(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

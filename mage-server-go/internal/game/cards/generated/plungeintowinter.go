@@ -21,9 +21,9 @@ func NewPlungeIntoWinter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewScryEffect(1)).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

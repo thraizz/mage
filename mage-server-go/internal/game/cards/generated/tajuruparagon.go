@@ -23,5 +23,7 @@ func NewTajuruParagon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{3}")
+	card.AddAbility(ability0)
 	return card, nil
 }

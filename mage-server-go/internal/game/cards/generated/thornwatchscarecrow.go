@@ -26,7 +26,6 @@ func NewThornwatchScarecrow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("WitherAbility", effects.DurationPermanent)).
-		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

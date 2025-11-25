@@ -22,7 +22,6 @@ func NewGamble(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardControllerEffect(1, true)
-	//   - DiscardControllerEffect(1, true)
 	// card.AddAbility(ability0)
 	return card, nil
 }

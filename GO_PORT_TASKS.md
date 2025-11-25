@@ -454,6 +454,50 @@ Status legend:
 - [x] Ensure deterministic serialization for saved games and tournaments
 - [x] Add checksum/validation to guard against divergent game state
 
+## mage_engine.go TODOs (Code-Level Tasks)
+
+### Effect System
+- [ ] Prevention effects (Rule 615) - Damage prevention, protection (line 518)
+
+### Mulligan
+- [ ] Implement London Mulligan bottom selection (line 1312)
+
+### Untap/Cleanup
+- [ ] Check for "doesn't untap" effects (line 4809)
+- [ ] Let player choose which cards to discard (line 4898)
+
+### Combat - Attack Declaration
+- [ ] Add battles that can be attacked (line 5276)
+- [ ] Implement AsThoughEffectType.ATTACK_AS_HASTE for haste effects (lines 5314, 5374)
+- [ ] Implement AsThoughEffectType.ATTACK for effects allowing defender to attack (lines 5320, 5380, 5441)
+- [ ] Implement restriction effects (Java canAttackCheckRestrictionEffects) (line 5390)
+- [ ] Check summoning sickness when we track turn entered (line 5445)
+- [ ] Check for "can't attack" restrictions (line 5446)
+- [ ] Check for "must attack" requirements (line 5447)
+- [ ] Validate can attack specific defender (protection, etc.) (line 5459)
+- [ ] Check if creature CAN attack (not tapped, summoning sickness, etc.) (line 6539)
+
+### Combat - Blocking
+- [ ] Check for "can block while tapped" abilities (line 5626)
+- [ ] Check for battle type when implemented (line 5636)
+- [ ] Check for suspected status when implemented (line 5639)
+- [ ] Check for AsThoughEffectType.BLOCK_DRAGON (lines 5695, 5884)
+- [ ] Check other restriction effects (shadow, intimidate, etc.) (line 5703)
+- [ ] Check protection (line 5704)
+- [ ] Check for restrictions on multiple blocks (line 5775)
+- [ ] Check if blocker CAN block (not tapped, etc.) (line 6424)
+- [ ] Check other restrictions from continuous effects (line 6496)
+- [ ] Support effects that modify minBlockedBy (line 7540)
+
+### Damage Calculation
+- [ ] For battles, lethal = min(lethal, defense counters) (line 7803)
+
+### Ability System
+- [ ] Check for abilities granted by continuous effects (line 7324)
+- [ ] Implement full keyword ability checking once ability system is fully integrated (line 8258)
+- [ ] Implement full protection quality checking once ability system is fully integrated (line 8265)
+- [ ] Enhance to include color-changing effects from layer system (line 8272)
+
 ## Testing & Parity Validation
 - [x] Add unit tests for `TurnManager` sequencing and wraparound behavior
 - [x] Add unit tests for `StackManager` LIFO behavior and resolution callbacks

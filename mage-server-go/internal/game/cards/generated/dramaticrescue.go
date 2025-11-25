@@ -21,8 +21,8 @@ func NewDramaticRescue(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

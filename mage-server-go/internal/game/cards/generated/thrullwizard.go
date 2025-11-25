@@ -26,6 +26,7 @@ func NewThrullWizard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewCounterSpellEffect(cost)).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

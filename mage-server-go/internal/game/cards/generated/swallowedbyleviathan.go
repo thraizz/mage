@@ -22,8 +22,8 @@ func NewSwallowedByLeviathan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewSurveilEffect(1)).
 		AddEffect(abilities.NewCounterSpellEffect(xValue)).
+		AddEffect(abilities.NewSurveilEffect(1)).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

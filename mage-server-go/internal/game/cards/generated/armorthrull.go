@@ -28,6 +28,7 @@ func NewArmorThrull(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("p1p2", 1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

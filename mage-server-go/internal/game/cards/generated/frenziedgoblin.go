@@ -23,8 +23,11 @@ func NewFrenziedGoblin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: DoIfCostPaid(new CantBlockTargetEffect(Duration.EndOfTurn), new...)
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new CantBlockTargetEffect(Duration.EndOfTurn), new...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

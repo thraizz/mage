@@ -23,7 +23,6 @@ func NewPsychicDrain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
-		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

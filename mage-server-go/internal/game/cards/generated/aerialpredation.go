@@ -23,6 +23,7 @@ func NewAerialPredation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -21,17 +21,14 @@ func NewSaprolingMigration(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("SaprolingToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 4)).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+	ability0 := abilities.NewKickerAbility(card.ID, "{4}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

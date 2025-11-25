@@ -21,8 +21,8 @@ func NewNiveousWisps(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect("tap that creature")).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewTapEffect("tap that creature")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

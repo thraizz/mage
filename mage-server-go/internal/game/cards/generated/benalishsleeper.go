@@ -23,8 +23,10 @@ func NewBenalishSleeper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{B}")
+	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - SacrificeAllEffect(StaticFilters.FILTER_PERMANENT_CREATURE)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
@@ -25,14 +26,19 @@ func NewRasputinTheOneiromancer(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("RasputinKnightToken")
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeDream.CreateInstance(1), OpponentsCount.instance, false)).
+		Build()
+	card.AddAbility(ability0)
+	token1_0, err := token.GetToken("RasputinKnightToken")
 	if err != nil {
 		return nil, err
 	}
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

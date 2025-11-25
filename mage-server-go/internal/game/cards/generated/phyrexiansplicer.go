@@ -35,5 +35,11 @@ func NewPhyrexianSplicer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	card.AddAbility(ability3)
+	// TODO: Implement activated ability with unmapped effects
+	//   - PhyrexianSplicerEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability4)
 	return card, nil
 }

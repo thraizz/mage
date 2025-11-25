@@ -23,7 +23,6 @@ func NewGlyphOfDelusion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: GainAbilityTargetEffect with complex parameters
-		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

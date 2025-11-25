@@ -36,5 +36,9 @@ func NewGargoyleSentinel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{3}").
+		Build()
+	card.AddAbility(ability3)
 	return card, nil
 }

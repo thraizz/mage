@@ -26,7 +26,6 @@ func NewWingrattleScarecrow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationPermanent)).
-		AddEffect(abilities.NewGrantAbilityEffect("PersistAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -20,11 +20,14 @@ func NewRancidEarth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - DamageAllEffect(1, StaticFilters.FILTER_PERMANENT_CREATURE)
-	//
-	// Targets:
-	//   - abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())
-	// card.AddAbility(ability0)
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDestroyEffect()).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		AddTarget(abilities.NewLandTargetFilter()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

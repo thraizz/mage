@@ -23,7 +23,6 @@ func NewCoralReef(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("polyp", 4))).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("polyp", 2), true)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -31,6 +30,7 @@ func NewCoralReef(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP0P1.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

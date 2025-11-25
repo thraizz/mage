@@ -21,8 +21,8 @@ func NewBloodFrenzy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(4, 0)).
 		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewBoostEffect(4, 0)).
 		Build()
 	if err != nil {
 		return nil, err

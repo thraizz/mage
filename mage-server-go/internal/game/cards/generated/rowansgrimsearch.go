@@ -20,8 +20,14 @@ func NewRowansGrimSearch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - LookLibraryAndPickControllerEffect(4, 2, PutCards.TOP_ANY, PutCards.GRAVEYARD, true)
-	// card.AddAbility(ability0)
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewLoseLifeEffect(2)).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

@@ -23,5 +23,11 @@ func NewPierceStrider(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewLoseLifeEffect(3)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

@@ -26,11 +26,16 @@ func NewNoxiousField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageEverythingEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -20,8 +21,13 @@ func NewTheBattleOfBywater(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	token0_0, err := token.GetToken("FoodToken")
+	if err != nil {
+		return nil, err
+	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: DestroyAllEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	if err != nil {
 		return nil, err

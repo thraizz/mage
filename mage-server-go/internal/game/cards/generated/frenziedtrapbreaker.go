@@ -34,6 +34,8 @@ func NewFrenziedTrapbreaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

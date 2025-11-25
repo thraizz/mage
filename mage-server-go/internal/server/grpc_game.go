@@ -534,6 +534,35 @@ func (s *mageServer) SendPlayerAction(ctx context.Context, req *pb.SendPlayerAct
 	return &pb.SendPlayerActionResponse{Success: true}, nil
 }
 
+// SendSpecialAction handles special actions (play land, foretell, etc.)
+func (s *mageServer) SendSpecialAction(ctx context.Context, req *pb.SendSpecialActionRequest) (*pb.SendSpecialActionResponse, error) {
+	player, gameInstance, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
+	if errMsg != "" {
+		return &pb.SendSpecialActionResponse{Success: false, Error: errMsg}, nil
+	}
+
+	actionType := req.GetActionType()
+	if actionType == pb.SpecialActionType_SPECIAL_ACTION_UNSPECIFIED {
+		return &pb.SendSpecialActionResponse{Success: false, Error: "action_type is required"}, nil
+	}
+
+	sourceID := req.GetSourceId()
+	if sourceID == "" {
+		return &pb.SendSpecialActionResponse{Success: false, Error: "source_id is required"}, nil
+	}
+
+	payload := map[string]interface{}{
+		"action_type": actionType.String(),
+		"source_id":   sourceID,
+	}
+
+	if err := s.gameMgr.SendPlayerAction(gameInstance.ID, player, "SPECIAL_ACTION", payload); err != nil {
+		return &pb.SendSpecialActionResponse{Success: false, Error: err.Error()}, nil
+	}
+
+	return &pb.SendSpecialActionResponse{Success: true}, nil
+}
+
 // helper to resolve session/game/player for action RPCs
 func (s *mageServer) resolveGamePlayer(sessionID, gameID string) (string, *game.Game, string) {
 	sess, gameInstance, err := s.resolveGameAccess(sessionID, gameID, false)

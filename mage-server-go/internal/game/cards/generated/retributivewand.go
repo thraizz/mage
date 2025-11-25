@@ -24,6 +24,8 @@ func NewRetributiveWand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{3}").
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

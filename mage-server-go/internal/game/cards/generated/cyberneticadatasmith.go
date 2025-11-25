@@ -26,6 +26,8 @@ func NewCyberneticaDatasmith(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

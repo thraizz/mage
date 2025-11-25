@@ -24,6 +24,7 @@ func NewBrittleEffigy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{4}").
 		AddTapCost().
 		AddEffect(abilities.NewExileTargetEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

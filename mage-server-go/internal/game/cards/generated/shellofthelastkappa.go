@@ -21,5 +21,20 @@ func NewShellOfTheLastKappa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - ShellOfTheLastKappaEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ShellOfTheLastKappaCastEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

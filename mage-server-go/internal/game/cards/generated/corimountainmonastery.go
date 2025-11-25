@@ -22,5 +22,11 @@ func NewCoriMountainMonastery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "R")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExileTopXMayPlayUntilEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

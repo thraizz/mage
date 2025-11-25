@@ -30,6 +30,7 @@ func NewSoratamiSavant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

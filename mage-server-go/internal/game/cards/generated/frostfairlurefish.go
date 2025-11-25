@@ -29,19 +29,28 @@ func NewFrostFairLureFish(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	if err != nil {
 		return nil, err
 	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		Build()
+	card.AddAbility(ability0)
+	token1_0, err := token.GetToken("FishNoAbilityToken")
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: GainAbilityControlledEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: GainAbilityControlledEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability2)
 	return card, nil
 }

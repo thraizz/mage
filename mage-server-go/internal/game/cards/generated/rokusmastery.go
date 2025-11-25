@@ -22,7 +22,7 @@ func NewRokusMastery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewScryEffect(1), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

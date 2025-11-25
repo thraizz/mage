@@ -43,6 +43,8 @@ func NewJabbaTheHutt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeBounty.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

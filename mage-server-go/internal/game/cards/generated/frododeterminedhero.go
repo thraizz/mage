@@ -24,5 +24,11 @@ func NewFrodoDeterminedHero(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldOrAttacksSourceTriggeredAbility
+	//   - Effect: FrodoDeterminedHeroEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

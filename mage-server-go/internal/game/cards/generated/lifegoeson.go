@@ -21,7 +21,7 @@ func NewLifeGoesOn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(8)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(8), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

@@ -21,8 +21,8 @@ func NewMaestrosConfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		AddEffect(abilities.NewBoostEffect(-3, -3)).
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

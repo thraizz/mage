@@ -31,6 +31,7 @@ func NewSokratesAthenianTeacher(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		// TODO: GainAbilityTargetEffect with complex parameters
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

@@ -26,7 +26,6 @@ func NewStrengthOfUnity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(DomainValue.REGULAR, DomainValue.REGULAR)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		AddEffect(abilities.NewBoostEnchantedEffect(DomainValue.REGULAR, DomainValue.REGULAR)).
 		Build()
 	if err != nil {
 		return nil, err

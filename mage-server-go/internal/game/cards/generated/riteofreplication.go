@@ -21,12 +21,15 @@ func NewRiteOfReplication(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - CreateTokenCopyTargetEffect(null, null, false, 5)
-	//   - CreateTokenCopyTargetEffect()
-	//
-	// Targets:
-	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
-	// card.AddAbility(ability0)
+	ability0 := abilities.NewKickerAbility(card.ID, "{5}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
 	return card, nil
 }

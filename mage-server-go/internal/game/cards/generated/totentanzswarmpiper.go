@@ -28,6 +28,7 @@ func NewTotentanzSwarmPiper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	token1_0, err := token.GetToken("RatCantBlockToken")

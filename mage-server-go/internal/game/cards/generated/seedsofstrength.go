@@ -22,8 +22,6 @@ func NewSeedsOfStrength(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewBoostEffect(1, 1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).

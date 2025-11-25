@@ -29,19 +29,31 @@ func NewKenrithTheReturnedKing(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGainLifeEffect(5)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability3)
+	// TODO: Implement activated ability with unmapped effects
+	//   - KenrithTheReturnedKingEffect()
+	// card.AddAbility(ability4)
 	return card, nil
 }

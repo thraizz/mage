@@ -28,6 +28,7 @@ func NewNecroticSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddSacrificeSourceCost().
 		AddManaCost("{3}").
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

@@ -39,6 +39,7 @@ func NewInquisitorGreyfax(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

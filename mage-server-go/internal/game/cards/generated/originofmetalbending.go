@@ -27,6 +27,7 @@ func NewOriginOfMetalbending(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewArtifactOrEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

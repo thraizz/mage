@@ -24,8 +24,13 @@ func NewElvishHydromancer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: CreateTokenCopyTargetEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKickerAbility(card.ID, "{3}{U}")
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability2)
 	return card, nil
 }

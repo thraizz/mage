@@ -20,5 +20,12 @@ func NewMarchOfOtherworldlyLight(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewExileTargetEffect()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

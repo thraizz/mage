@@ -20,15 +20,17 @@ func NewTolarianGeyser(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+	ability0 := abilities.NewKickerAbility(card.ID, "{W}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGainLifeEffect(3)).
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(3), "kicked")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,8 +22,8 @@ func NewMassMutiny(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

@@ -20,5 +20,8 @@ func NewRakshasasBargain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - LookLibraryAndPickControllerEffect(                 4, 2, PutCards.HAND, PutCards.GRA...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

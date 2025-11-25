@@ -21,10 +21,9 @@ func NewHeritageReclamation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewExileTargetEffect()).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewArtifactTargetFilter()).
 		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()

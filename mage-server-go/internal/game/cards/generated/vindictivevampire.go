@@ -23,5 +23,8 @@ func NewVindictiveVampire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: VindictiveVampireTriggeredAbility
+	//   - Effect: DamagePlayersEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

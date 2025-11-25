@@ -30,6 +30,7 @@ func NewTrigonOfMending(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewGainLifeEffect(3)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

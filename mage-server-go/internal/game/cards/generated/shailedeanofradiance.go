@@ -31,6 +31,7 @@ func NewShaileDeanOfRadiance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

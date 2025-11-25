@@ -22,7 +22,6 @@ func NewHeavenEarth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(GetXValue.instance, StaticFilters.FILTER_CREATURE_...)
-	//   - DamageAllEffect(GetXValue.instance, filterWithouFlying)
 	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -27,6 +27,7 @@ func NewCinderElemental(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

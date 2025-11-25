@@ -29,5 +29,11 @@ func NewSkirkAlarmist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	// TODO: Implement spell ability with unmapped effects
 	//   - SacrificeTargetEffect("sacrifice this", source.getControllerId())
 	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - TurnFaceUpTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

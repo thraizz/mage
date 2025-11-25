@@ -21,9 +21,15 @@ func NewShefetDunes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewBoostEffect(1, 1)).
+		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.BuildSimpleManaAbility(card.ID, "W")
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability1)
+	ability2 := abilities.BuildSimpleManaAbility(card.ID, "W")
+	card.AddAbility(ability2)
 	return card, nil
 }

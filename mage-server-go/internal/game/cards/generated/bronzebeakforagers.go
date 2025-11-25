@@ -23,9 +23,11 @@ func NewBronzebeakForagers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: ExileUntilSourceLeavesEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BronzebeakForagerDissolveEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

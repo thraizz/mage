@@ -20,5 +20,8 @@ func NewArcaneInfusion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - LookLibraryAndPickControllerEffect(                 4, 1, StaticFilters.FILTER_CARD_I...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -26,8 +26,8 @@ func NewRighteousConfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewGainLifeEffect(5)).
+		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	if err != nil {

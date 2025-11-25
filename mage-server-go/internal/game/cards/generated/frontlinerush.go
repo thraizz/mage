@@ -26,6 +26,7 @@ func NewFrontlineRush(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewBoostEffect(CreaturesYouControlCount.PLURAL, CreaturesYouControlCount.PLURAL)).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

@@ -20,5 +20,7 @@ func NewShellShield(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{1}")
+	card.AddAbility(ability0)
 	return card, nil
 }

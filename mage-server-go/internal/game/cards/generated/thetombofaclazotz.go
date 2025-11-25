@@ -24,5 +24,11 @@ func NewTheTombOfAclazotz(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - TheTombOfAclazotzEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

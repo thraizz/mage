@@ -25,6 +25,7 @@ func NewMajesticMetamorphosis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

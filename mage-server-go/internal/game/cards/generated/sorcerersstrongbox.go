@@ -23,5 +23,10 @@ func NewSorcerersStrongbox(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	// TODO: Implement spell ability with unmapped effects
 	//   - SacrificeSourceEffect()
 	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddManaCost("{2}").
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

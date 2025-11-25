@@ -21,10 +21,16 @@ func NewRelicOfProgenitus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	// TODO: Implement activated ability with unmapped effects
+	//   - RelicOfProgenitusEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
 	//   - ExileGraveyardAllPlayersEffect()
 	//
 	// Costs:
 	//   - AddManaCost("{1}")
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

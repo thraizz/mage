@@ -24,19 +24,25 @@ func NewAshiokWickedManipulator(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: ExileCardsFromTopOfLibraryTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - LookLibraryAndPickControllerEffect(2, 1, PutCards.EXILED, PutCards.HAND)
-	// card.AddAbility(ability0)
-	token1_0, err := token.GetToken("AshiokWickedManipulatorNightmareToken")
+	// card.AddAbility(ability1)
+	token2_0, err := token.GetToken("AshiokWickedManipulatorNightmareToken")
 	if err != nil {
 		return nil, err
 	}
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token2_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

@@ -20,13 +20,18 @@ func NewOrimsThunder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewKickerAbility(card.ID, "{R}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		AddTarget(abilities.NewArtifactOrEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
+
+	// TODO: Add conditional kicked target: TargetCreaturePermanent
 	return card, nil
 }

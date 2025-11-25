@@ -31,6 +31,7 @@ func NewOllenbockEscort(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

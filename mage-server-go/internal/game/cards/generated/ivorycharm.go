@@ -21,7 +21,6 @@ func NewIvoryCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewBoostEffect(-2, 0)).
 		AddEffect(abilities.NewTapEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).

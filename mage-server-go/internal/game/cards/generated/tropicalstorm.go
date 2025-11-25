@@ -22,7 +22,6 @@ func NewTropicalStorm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(GetXValue.instance, StaticFilters.FILTER_CREATURE_...)
-	//   - DamageAllEffect(1, filter2)
 	// card.AddAbility(ability0)
 	return card, nil
 }

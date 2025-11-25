@@ -20,5 +20,12 @@ func NewNecraSanctuary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewLoseLifeEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

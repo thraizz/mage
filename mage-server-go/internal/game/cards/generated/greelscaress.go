@@ -27,8 +27,8 @@ func NewGreelsCaress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		AddEffect(abilities.NewBoostEnchantedEffect(-3, 0)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		Build()
 	if err != nil {
 		return nil, err

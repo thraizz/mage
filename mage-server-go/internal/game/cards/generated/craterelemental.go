@@ -27,6 +27,7 @@ func NewCraterElemental(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(4)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

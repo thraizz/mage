@@ -22,7 +22,6 @@ func NewExplosiveWelcome(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(StaticValue.get(5), true, true)).
-		AddEffect(abilities.NewDamageEffect(StaticValue.get(3), true, true)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

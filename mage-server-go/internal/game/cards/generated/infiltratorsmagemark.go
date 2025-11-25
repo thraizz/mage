@@ -27,8 +27,8 @@ func NewInfiltratorsMagemark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability1 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		// TODO: BoostAllEffect with complex parameters
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		Build()
 	if err != nil {
 		return nil, err

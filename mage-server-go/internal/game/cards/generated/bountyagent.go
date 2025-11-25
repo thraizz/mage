@@ -30,6 +30,7 @@ func NewBountyAgent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

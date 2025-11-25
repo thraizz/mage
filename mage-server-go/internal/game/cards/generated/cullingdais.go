@@ -26,5 +26,12 @@ func NewCullingDais(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeCharge.CreateInstance(1))).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CullingDaisEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

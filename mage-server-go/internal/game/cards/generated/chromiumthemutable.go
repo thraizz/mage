@@ -31,5 +31,8 @@ func NewChromiumTheMutable(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability1)
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHexproof)
 	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesCreatureSourceEffect()
+	// card.AddAbility(ability3)
 	return card, nil
 }

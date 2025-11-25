@@ -28,6 +28,7 @@ func NewBearTrap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

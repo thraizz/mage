@@ -22,9 +22,8 @@ func NewThunderbolt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(4)).
-		AddEffect(abilities.NewDamageEffect(3)).
-		AddEffect(abilities.NewDamageEffect(4)).
 		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

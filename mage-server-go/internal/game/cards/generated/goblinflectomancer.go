@@ -23,5 +23,11 @@ func NewGoblinFlectomancer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - ChooseNewTargetsTargetEffect()
+	//
+	// Costs:
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -21,9 +21,8 @@ func NewUmezawasCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(-1, -1)).
-		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddEffect(abilities.NewBoostEffect(-1, -1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

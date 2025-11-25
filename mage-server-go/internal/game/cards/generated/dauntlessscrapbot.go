@@ -23,5 +23,8 @@ func NewDauntlessScrapbot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: ExileGraveyardAllPlayersEffect(StaticFilters.FILTER_CARD, TargetController.OPPONE...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

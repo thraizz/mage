@@ -25,6 +25,7 @@ func NewCollectorsCage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

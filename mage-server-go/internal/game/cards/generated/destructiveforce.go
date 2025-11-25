@@ -21,8 +21,8 @@ func NewDestructiveForce(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
-	//   - SacrificeAllEffect(5, filterLand)
 	//   - DamageAllEffect(5, filterCreature)
+	//   - SacrificeAllEffect(5, filterLand)
 	// card.AddAbility(ability0)
 	return card, nil
 }

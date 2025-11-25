@@ -40,6 +40,7 @@ func NewArcaneTeachings(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability3)
 	return card, nil

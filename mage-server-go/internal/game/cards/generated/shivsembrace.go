@@ -24,11 +24,9 @@ func NewShivsEmbrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewBoostEnchantedEffect(1, 0)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -31,6 +31,7 @@ func NewStirringBard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddTapCost().
 		// TODO: GainAbilityTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

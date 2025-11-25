@@ -21,11 +21,15 @@ func NewTorrentOfSouls(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
-	//
-	// Targets:
-	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
-	// card.AddAbility(ability0)
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: BoostAllEffect with complex parameters
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		AddTarget(abilities.NewPlayerTargetFilter()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

@@ -31,6 +31,7 @@ func NewTidewaterMinion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

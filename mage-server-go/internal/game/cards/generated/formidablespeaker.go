@@ -27,6 +27,7 @@ func NewFormidableSpeaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects

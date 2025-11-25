@@ -23,8 +23,6 @@ func NewTemptWithReflections(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
-	//   - CreateTokenCopyTargetEffect(playerId)
-	//   - CreateTokenCopyTargetEffect()
 	// card.AddAbility(ability0)
 	return card, nil
 }

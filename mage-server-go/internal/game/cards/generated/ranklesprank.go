@@ -21,8 +21,8 @@ func NewRanklesPrank(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
-	//   - DiscardEachPlayerEffect(2, false)
 	//   - SacrificeAllEffect(2, filter)
+	//   - DiscardEachPlayerEffect(2, false)
 	// card.AddAbility(ability0)
 	return card, nil
 }

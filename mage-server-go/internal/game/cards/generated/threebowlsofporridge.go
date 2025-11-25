@@ -28,6 +28,7 @@ func NewThreeBowlsOfPorridge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

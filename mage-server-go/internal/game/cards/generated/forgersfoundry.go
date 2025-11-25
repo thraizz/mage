@@ -22,5 +22,11 @@ func NewForgersFoundry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ForgersFoundryCastEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

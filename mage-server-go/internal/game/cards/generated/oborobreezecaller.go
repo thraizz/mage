@@ -29,6 +29,7 @@ func NewOboroBreezecaller(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

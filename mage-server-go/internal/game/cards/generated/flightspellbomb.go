@@ -25,6 +25,7 @@ func NewFlightSpellbomb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects

@@ -24,7 +24,7 @@ func NewOrcishHealer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	// TODO: Implement activated ability with unmapped effects
-	//   - RegenerateTargetEffect()
+	//   - CantBeRegeneratedTargetEffect()
 	//
 	// Costs:
 	//   - AddTapCost()
@@ -35,5 +35,11 @@ func NewOrcishHealer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	// Costs:
 	//   - AddTapCost()
 	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - RegenerateTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

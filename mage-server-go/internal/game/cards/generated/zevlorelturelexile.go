@@ -27,5 +27,12 @@ func NewZevlorElturelExile(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CreateDelayedTriggeredAbilityEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

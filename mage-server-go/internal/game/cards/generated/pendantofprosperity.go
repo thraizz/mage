@@ -27,5 +27,12 @@ func NewPendantOfProsperity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - PendantOfProsperityEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,17 +22,20 @@ func NewElbrusTheBindingBlade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewEquipAbility(card.ID, "{1}", false)
+	// TODO: Implement triggered ability: DealsDamageToAPlayerAttachedTriggeredAbility
+	//   - Effect: ElbrusTheBindingBladeEffect()
+	// card.AddAbility(ability0)
+	ability1, err := abilities.NewEquipAbility(card.ID, "{1}", false)
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(1, 0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

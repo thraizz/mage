@@ -23,7 +23,6 @@ func NewAlarum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 3)).
 		AddEffect(abilities.NewUntapEffect()).
-		AddEffect(abilities.NewBoostEffect(1, 3)).
 		Build()
 	if err != nil {
 		return nil, err

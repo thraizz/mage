@@ -20,14 +20,11 @@ func NewPippinsBravery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(4, 4)).
-		AddEffect(abilities.NewBoostEffect(2, 2)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DoIfCostPaid(                 new BoostTargetEffect(4, 4),     ...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

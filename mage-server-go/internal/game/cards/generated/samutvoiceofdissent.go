@@ -37,6 +37,7 @@ func NewSamutVoiceOfDissent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability4 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability4)
 	ability5, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

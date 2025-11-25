@@ -20,11 +20,12 @@ func NewConjurersBauble(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddTapCost().
-		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - PutOnLibraryTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

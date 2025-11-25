@@ -24,8 +24,6 @@ func NewWoodcuttersGrit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(3, 3)).
 		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewBoostEffect(3, 3)).
-		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

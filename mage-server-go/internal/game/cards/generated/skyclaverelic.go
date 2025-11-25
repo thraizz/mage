@@ -23,5 +23,7 @@ func NewSkyclaveRelic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible)
 	card.AddAbility(ability0)
+	ability1 := abilities.NewKickerAbility(card.ID, "{3}")
+	card.AddAbility(ability1)
 	return card, nil
 }

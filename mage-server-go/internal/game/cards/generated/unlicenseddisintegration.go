@@ -22,7 +22,7 @@ func NewUnlicensedDisintegration(ownerID uuid.UUID, info *cards.CardInfo) (*game
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewDamageEffect(3)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(3), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

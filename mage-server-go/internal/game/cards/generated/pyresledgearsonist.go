@@ -27,6 +27,7 @@ func NewPyreSledgeArsonist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(PyreSledgeArsonistValue.instance)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

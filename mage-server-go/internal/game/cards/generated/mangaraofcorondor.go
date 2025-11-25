@@ -28,6 +28,7 @@ func NewMangaraOfCorondor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddTapCost().
 		AddEffect(abilities.NewExileSourceEffect()).
 		AddEffect(abilities.NewExileTargetEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

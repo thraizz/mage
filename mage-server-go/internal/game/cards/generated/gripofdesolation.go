@@ -22,8 +22,6 @@ func NewGripOfDesolation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewExileTargetEffect()).
-		AddEffect(abilities.NewExileTargetEffect()).
-		AddEffect(abilities.NewExileTargetEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewLandTargetFilter()).
 		Build()

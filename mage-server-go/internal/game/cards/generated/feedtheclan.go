@@ -21,8 +21,7 @@ func NewFeedTheClan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(10)).
-		AddEffect(abilities.NewGainLifeEffect(5)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(10), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

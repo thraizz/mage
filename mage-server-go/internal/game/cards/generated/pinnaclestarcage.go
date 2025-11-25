@@ -21,6 +21,7 @@ func NewPinnacleStarcage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	// TODO: Implement activated ability with unmapped effects
+	//   - PinnacleStarcageTokenEffect()
 	//   - SacrificeSourceEffect()
 	// card.AddAbility(ability0)
 	return card, nil

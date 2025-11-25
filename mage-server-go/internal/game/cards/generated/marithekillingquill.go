@@ -30,10 +30,9 @@ func NewMariTheKillingQuill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationPermanent)).
-		// TODO: GainAbilityControlledEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

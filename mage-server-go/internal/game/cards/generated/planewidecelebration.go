@@ -26,9 +26,9 @@ func NewPlanewideCelebration(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewGainLifeEffect(4)).
 		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewGainLifeEffect(4)).
 		Build()
 	if err != nil {
 		return nil, err

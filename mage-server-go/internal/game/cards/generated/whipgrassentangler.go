@@ -26,6 +26,7 @@ func NewWhipgrassEntangler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		// TODO: GainAbilityTargetEffect with complex parameters
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

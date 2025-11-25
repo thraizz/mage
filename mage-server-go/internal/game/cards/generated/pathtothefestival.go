@@ -21,7 +21,8 @@ func NewPathToTheFestival(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewScryEffect(1)).
+		// TODO: SearchLibraryPutInPlayEffect with complex parameters
+		AddEffect(abilities.NewConditionalEffect(abilities.NewScryEffect(1), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

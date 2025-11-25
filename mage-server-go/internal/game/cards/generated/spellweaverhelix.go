@@ -20,5 +20,8 @@ func NewSpellweaverHelix(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: SpellweaverHelixImprintEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

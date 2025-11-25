@@ -32,6 +32,7 @@ func NewShaukuEndbringer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddTapCost().
 		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

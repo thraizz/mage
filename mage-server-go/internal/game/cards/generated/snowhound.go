@@ -28,6 +28,7 @@ func NewSnowHound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddTapCost().
 		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -23,11 +23,16 @@ func NewStoryweave(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeLore.CreateInstance(2))).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(2))).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - StoryweaveReplacementEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{0}")
+	// card.AddAbility(ability1)
 	return card, nil
 }

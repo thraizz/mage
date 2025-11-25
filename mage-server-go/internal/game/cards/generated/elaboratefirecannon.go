@@ -23,6 +23,7 @@ func NewElaborateFirecannon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects

@@ -26,5 +26,11 @@ func NewBomatCourier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ReturnFromExileForSourceEffect()
+	//
+	// Costs:
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

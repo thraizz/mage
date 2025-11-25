@@ -27,5 +27,7 @@ func NewPeerlessRecycling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	card.AddAbility(ability0)
+
+	// TODO: Add conditional conditional target: TargetCardInYourGraveyard
 	return card, nil
 }

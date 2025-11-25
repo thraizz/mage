@@ -27,6 +27,7 @@ func NewMinasMorgulDarkFortress(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("shadow", 1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -20,8 +20,11 @@ func NewTemporalFirestorm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{1}{W}")
+	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(                 5, StaticFilters.FILTER_PERMANENT...)
 	//   - PhaseOutTargetEffect()
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -21,8 +21,8 @@ func NewFastFurious(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
-	//   - DiscardControllerEffect(1)
 	//   - DamageAllEffect(3, filter)
+	//   - DiscardControllerEffect(1)
 	// card.AddAbility(ability0)
 	return card, nil
 }

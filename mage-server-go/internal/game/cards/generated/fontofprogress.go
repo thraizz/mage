@@ -25,6 +25,7 @@ func NewFontOfProgress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{3}").
 		AddTapCost().
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

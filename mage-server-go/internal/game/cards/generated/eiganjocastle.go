@@ -23,5 +23,11 @@ func NewEiganjoCastle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - PreventDamageToTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -24,5 +24,16 @@ func NewPapalymoTotolymo(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: SpellCastControllerTriggeredAbility
+	//   - Effect: DamagePlayersEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - PapalymoTotolymoEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{4}")
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -26,6 +26,7 @@ func NewBlightedGorge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

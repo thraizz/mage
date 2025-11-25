@@ -20,5 +20,16 @@ func NewBloodchiefsThirst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{2}{B}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDestroyEffect()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
+
+	// TODO: Add conditional kicked target: TargetPermanent
 	return card, nil
 }

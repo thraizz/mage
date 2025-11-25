@@ -33,6 +33,7 @@ func NewArwenMortalQueen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("lifelink", 1))).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("lifelink", 1))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

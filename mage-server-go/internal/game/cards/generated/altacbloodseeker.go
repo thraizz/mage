@@ -27,7 +27,6 @@ func NewAltacBloodseeker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

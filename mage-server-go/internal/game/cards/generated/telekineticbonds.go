@@ -20,8 +20,14 @@ func NewTelekineticBonds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DiscardCardPlayerTriggeredAbility
+	//   - Effect: DoIfCostPaid(new MayTapOrUntapTargetEffect(), new ManaCostsImpl...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new MayTapOrUntapTargetEffect(), new ManaCostsImpl...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -24,6 +24,7 @@ func NewArkOfBlight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

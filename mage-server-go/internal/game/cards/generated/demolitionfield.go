@@ -28,6 +28,7 @@ func NewDemolitionField(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
 		// TODO: SearchLibraryPutInPlayEffect with complex parameters
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

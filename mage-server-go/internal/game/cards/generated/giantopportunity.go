@@ -21,21 +21,8 @@ func NewGiantOpportunity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("GiantOpportunityToken")
-	if err != nil {
-		return nil, err
-	}
-	token0_1, err := token.GetToken("FoodToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_1, 3)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DoIfCostPaid(                 new CreateTokenEffect(new GiantOp...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

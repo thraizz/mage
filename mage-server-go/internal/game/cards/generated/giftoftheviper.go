@@ -22,10 +22,8 @@ func NewGiftOfTheViper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("reach", 1))).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("deathtouch", 1))).
 		AddEffect(abilities.NewUntapEffect("untap it")).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

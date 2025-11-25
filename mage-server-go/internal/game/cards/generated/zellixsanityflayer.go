@@ -28,6 +28,7 @@ func NewZellixSanityFlayer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

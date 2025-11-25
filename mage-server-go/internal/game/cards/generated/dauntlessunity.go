@@ -20,5 +20,7 @@ func NewDauntlessUnity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{1}{W}")
+	card.AddAbility(ability0)
 	return card, nil
 }

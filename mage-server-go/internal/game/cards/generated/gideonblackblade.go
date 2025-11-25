@@ -24,20 +24,26 @@ func NewGideonBlackblade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
-	card.AddAbility(ability0)
-	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: GainsChoiceOfAbilitiesEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible)
+	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability2)
 	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible)
 	card.AddAbility(ability3)
-	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability4 := abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible)
+	card.AddAbility(ability4)
+	ability5, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability4)
+	card.AddAbility(ability5)
 	return card, nil
 }

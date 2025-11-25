@@ -22,7 +22,6 @@ func NewRenewedFaith(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(6)).
-		AddEffect(abilities.NewGainLifeEffect(2)).
 		Build()
 	if err != nil {
 		return nil, err

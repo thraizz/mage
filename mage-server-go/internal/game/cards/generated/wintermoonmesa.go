@@ -26,6 +26,7 @@ func NewWintermoonMesa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

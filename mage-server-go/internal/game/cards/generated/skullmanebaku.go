@@ -28,6 +28,7 @@ func NewSkullmaneBaku(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

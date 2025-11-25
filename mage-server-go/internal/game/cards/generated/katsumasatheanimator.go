@@ -27,5 +27,8 @@ func NewKatsumasaTheAnimator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - KatsumasaTheAnimatorEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

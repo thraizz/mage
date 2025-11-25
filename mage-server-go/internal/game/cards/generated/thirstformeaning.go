@@ -22,6 +22,7 @@ func NewThirstForMeaning(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardControllerEffect(2)
+	//   - DoIfCostPaid(                 null, new DiscardControllerEffect...)
 	// card.AddAbility(ability0)
 	return card, nil
 }

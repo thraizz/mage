@@ -23,8 +23,17 @@ func NewThunderscapeBattlemage(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: DiscardTargetEffect(2)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewEnchantmentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKickerAbility(card.ID, "{1}{B}")
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(2)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability2)
 	return card, nil
 }

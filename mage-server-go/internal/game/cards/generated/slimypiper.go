@@ -27,6 +27,7 @@ func NewSlimyPiper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewBoostEffect(2, 2), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

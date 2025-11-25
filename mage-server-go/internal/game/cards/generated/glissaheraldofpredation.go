@@ -24,5 +24,8 @@ func NewGlissaHeraldOfPredation(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BeginningOfCombatTriggeredAbility
+	//   - Effect: GlissaHeraldOfPredationIncubateEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

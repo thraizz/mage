@@ -28,6 +28,7 @@ func NewCrackOpen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
+		AddTarget(abilities.NewArtifactOrEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

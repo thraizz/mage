@@ -24,6 +24,7 @@ func NewElvenLyre(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewBoostEffect(2, 2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

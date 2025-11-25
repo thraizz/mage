@@ -88,6 +88,62 @@ func (PlayerAction) EnumDescriptor() ([]byte, []int) {
 	return file_mage_v1_game_proto_rawDescGZIP(), []int{0}
 }
 
+// Special action types (lands, foretell, etc.)
+type SpecialActionType int32
+
+const (
+	SpecialActionType_SPECIAL_ACTION_UNSPECIFIED SpecialActionType = 0
+	SpecialActionType_PLAY_LAND                  SpecialActionType = 1
+	SpecialActionType_FORETELL                   SpecialActionType = 2
+	SpecialActionType_SUSPEND                    SpecialActionType = 3
+	SpecialActionType_COMPANION                  SpecialActionType = 4
+)
+
+// Enum value maps for SpecialActionType.
+var (
+	SpecialActionType_name = map[int32]string{
+		0: "SPECIAL_ACTION_UNSPECIFIED",
+		1: "PLAY_LAND",
+		2: "FORETELL",
+		3: "SUSPEND",
+		4: "COMPANION",
+	}
+	SpecialActionType_value = map[string]int32{
+		"SPECIAL_ACTION_UNSPECIFIED": 0,
+		"PLAY_LAND":                  1,
+		"FORETELL":                   2,
+		"SUSPEND":                    3,
+		"COMPANION":                  4,
+	}
+)
+
+func (x SpecialActionType) Enum() *SpecialActionType {
+	p := new(SpecialActionType)
+	*p = x
+	return p
+}
+
+func (x SpecialActionType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SpecialActionType) Descriptor() protoreflect.EnumDescriptor {
+	return file_mage_v1_game_proto_enumTypes[1].Descriptor()
+}
+
+func (SpecialActionType) Type() protoreflect.EnumType {
+	return &file_mage_v1_game_proto_enumTypes[1]
+}
+
+func (x SpecialActionType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SpecialActionType.Descriptor instead.
+func (SpecialActionType) EnumDescriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{1}
+}
+
 type GameJoinRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
@@ -1184,6 +1240,126 @@ func (x *SendPlayerActionResponse) GetError() string {
 	return ""
 }
 
+type SendSpecialActionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	GameId        string                 `protobuf:"bytes,2,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	ActionType    SpecialActionType      `protobuf:"varint,3,opt,name=action_type,json=actionType,proto3,enum=mage.v1.SpecialActionType" json:"action_type,omitempty"`
+	SourceId      string                 `protobuf:"bytes,4,opt,name=source_id,json=sourceId,proto3" json:"source_id,omitempty"` // Card UUID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendSpecialActionRequest) Reset() {
+	*x = SendSpecialActionRequest{}
+	mi := &file_mage_v1_game_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendSpecialActionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendSpecialActionRequest) ProtoMessage() {}
+
+func (x *SendSpecialActionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendSpecialActionRequest.ProtoReflect.Descriptor instead.
+func (*SendSpecialActionRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *SendSpecialActionRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *SendSpecialActionRequest) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *SendSpecialActionRequest) GetActionType() SpecialActionType {
+	if x != nil {
+		return x.ActionType
+	}
+	return SpecialActionType_SPECIAL_ACTION_UNSPECIFIED
+}
+
+func (x *SendSpecialActionRequest) GetSourceId() string {
+	if x != nil {
+		return x.SourceId
+	}
+	return ""
+}
+
+type SendSpecialActionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendSpecialActionResponse) Reset() {
+	*x = SendSpecialActionResponse{}
+	mi := &file_mage_v1_game_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendSpecialActionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendSpecialActionResponse) ProtoMessage() {}
+
+func (x *SendSpecialActionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendSpecialActionResponse.ProtoReflect.Descriptor instead.
+func (*SendSpecialActionResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *SendSpecialActionResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *SendSpecialActionResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
 type MatchStartRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
@@ -1194,7 +1370,7 @@ type MatchStartRequest struct {
 
 func (x *MatchStartRequest) Reset() {
 	*x = MatchStartRequest{}
-	mi := &file_mage_v1_game_proto_msgTypes[20]
+	mi := &file_mage_v1_game_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1206,7 +1382,7 @@ func (x *MatchStartRequest) String() string {
 func (*MatchStartRequest) ProtoMessage() {}
 
 func (x *MatchStartRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[20]
+	mi := &file_mage_v1_game_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1219,7 +1395,7 @@ func (x *MatchStartRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MatchStartRequest.ProtoReflect.Descriptor instead.
 func (*MatchStartRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{20}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *MatchStartRequest) GetSessionId() string {
@@ -1247,7 +1423,7 @@ type MatchStartResponse struct {
 
 func (x *MatchStartResponse) Reset() {
 	*x = MatchStartResponse{}
-	mi := &file_mage_v1_game_proto_msgTypes[21]
+	mi := &file_mage_v1_game_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1259,7 +1435,7 @@ func (x *MatchStartResponse) String() string {
 func (*MatchStartResponse) ProtoMessage() {}
 
 func (x *MatchStartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[21]
+	mi := &file_mage_v1_game_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1272,7 +1448,7 @@ func (x *MatchStartResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MatchStartResponse.ProtoReflect.Descriptor instead.
 func (*MatchStartResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{21}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *MatchStartResponse) GetSuccess() bool {
@@ -1306,7 +1482,7 @@ type MatchQuitRequest struct {
 
 func (x *MatchQuitRequest) Reset() {
 	*x = MatchQuitRequest{}
-	mi := &file_mage_v1_game_proto_msgTypes[22]
+	mi := &file_mage_v1_game_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1318,7 +1494,7 @@ func (x *MatchQuitRequest) String() string {
 func (*MatchQuitRequest) ProtoMessage() {}
 
 func (x *MatchQuitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[22]
+	mi := &file_mage_v1_game_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1331,7 +1507,7 @@ func (x *MatchQuitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MatchQuitRequest.ProtoReflect.Descriptor instead.
 func (*MatchQuitRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{22}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *MatchQuitRequest) GetSessionId() string {
@@ -1358,7 +1534,7 @@ type MatchQuitResponse struct {
 
 func (x *MatchQuitResponse) Reset() {
 	*x = MatchQuitResponse{}
-	mi := &file_mage_v1_game_proto_msgTypes[23]
+	mi := &file_mage_v1_game_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1370,7 +1546,7 @@ func (x *MatchQuitResponse) String() string {
 func (*MatchQuitResponse) ProtoMessage() {}
 
 func (x *MatchQuitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[23]
+	mi := &file_mage_v1_game_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1383,7 +1559,7 @@ func (x *MatchQuitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MatchQuitResponse.ProtoReflect.Descriptor instead.
 func (*MatchQuitResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{23}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *MatchQuitResponse) GetSuccess() bool {
@@ -1410,7 +1586,7 @@ type ReplayInitRequest struct {
 
 func (x *ReplayInitRequest) Reset() {
 	*x = ReplayInitRequest{}
-	mi := &file_mage_v1_game_proto_msgTypes[24]
+	mi := &file_mage_v1_game_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1422,7 +1598,7 @@ func (x *ReplayInitRequest) String() string {
 func (*ReplayInitRequest) ProtoMessage() {}
 
 func (x *ReplayInitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[24]
+	mi := &file_mage_v1_game_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1435,7 +1611,7 @@ func (x *ReplayInitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayInitRequest.ProtoReflect.Descriptor instead.
 func (*ReplayInitRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{24}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ReplayInitRequest) GetSessionId() string {
@@ -1462,7 +1638,7 @@ type ReplayInitResponse struct {
 
 func (x *ReplayInitResponse) Reset() {
 	*x = ReplayInitResponse{}
-	mi := &file_mage_v1_game_proto_msgTypes[25]
+	mi := &file_mage_v1_game_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1474,7 +1650,7 @@ func (x *ReplayInitResponse) String() string {
 func (*ReplayInitResponse) ProtoMessage() {}
 
 func (x *ReplayInitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[25]
+	mi := &file_mage_v1_game_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1487,7 +1663,7 @@ func (x *ReplayInitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayInitResponse.ProtoReflect.Descriptor instead.
 func (*ReplayInitResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{25}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ReplayInitResponse) GetSuccess() bool {
@@ -1514,7 +1690,7 @@ type ReplayStartRequest struct {
 
 func (x *ReplayStartRequest) Reset() {
 	*x = ReplayStartRequest{}
-	mi := &file_mage_v1_game_proto_msgTypes[26]
+	mi := &file_mage_v1_game_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1526,7 +1702,7 @@ func (x *ReplayStartRequest) String() string {
 func (*ReplayStartRequest) ProtoMessage() {}
 
 func (x *ReplayStartRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[26]
+	mi := &file_mage_v1_game_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1539,7 +1715,7 @@ func (x *ReplayStartRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayStartRequest.ProtoReflect.Descriptor instead.
 func (*ReplayStartRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{26}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ReplayStartRequest) GetSessionId() string {
@@ -1566,7 +1742,7 @@ type ReplayStartResponse struct {
 
 func (x *ReplayStartResponse) Reset() {
 	*x = ReplayStartResponse{}
-	mi := &file_mage_v1_game_proto_msgTypes[27]
+	mi := &file_mage_v1_game_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1578,7 +1754,7 @@ func (x *ReplayStartResponse) String() string {
 func (*ReplayStartResponse) ProtoMessage() {}
 
 func (x *ReplayStartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[27]
+	mi := &file_mage_v1_game_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1591,7 +1767,7 @@ func (x *ReplayStartResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayStartResponse.ProtoReflect.Descriptor instead.
 func (*ReplayStartResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{27}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ReplayStartResponse) GetSuccess() bool {
@@ -1618,7 +1794,7 @@ type ReplayStopRequest struct {
 
 func (x *ReplayStopRequest) Reset() {
 	*x = ReplayStopRequest{}
-	mi := &file_mage_v1_game_proto_msgTypes[28]
+	mi := &file_mage_v1_game_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1630,7 +1806,7 @@ func (x *ReplayStopRequest) String() string {
 func (*ReplayStopRequest) ProtoMessage() {}
 
 func (x *ReplayStopRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[28]
+	mi := &file_mage_v1_game_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1643,7 +1819,7 @@ func (x *ReplayStopRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayStopRequest.ProtoReflect.Descriptor instead.
 func (*ReplayStopRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{28}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *ReplayStopRequest) GetSessionId() string {
@@ -1670,7 +1846,7 @@ type ReplayStopResponse struct {
 
 func (x *ReplayStopResponse) Reset() {
 	*x = ReplayStopResponse{}
-	mi := &file_mage_v1_game_proto_msgTypes[29]
+	mi := &file_mage_v1_game_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1682,7 +1858,7 @@ func (x *ReplayStopResponse) String() string {
 func (*ReplayStopResponse) ProtoMessage() {}
 
 func (x *ReplayStopResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[29]
+	mi := &file_mage_v1_game_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1695,7 +1871,7 @@ func (x *ReplayStopResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayStopResponse.ProtoReflect.Descriptor instead.
 func (*ReplayStopResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{29}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ReplayStopResponse) GetSuccess() bool {
@@ -1722,7 +1898,7 @@ type ReplayNextRequest struct {
 
 func (x *ReplayNextRequest) Reset() {
 	*x = ReplayNextRequest{}
-	mi := &file_mage_v1_game_proto_msgTypes[30]
+	mi := &file_mage_v1_game_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1734,7 +1910,7 @@ func (x *ReplayNextRequest) String() string {
 func (*ReplayNextRequest) ProtoMessage() {}
 
 func (x *ReplayNextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[30]
+	mi := &file_mage_v1_game_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1747,7 +1923,7 @@ func (x *ReplayNextRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayNextRequest.ProtoReflect.Descriptor instead.
 func (*ReplayNextRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{30}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *ReplayNextRequest) GetSessionId() string {
@@ -1774,7 +1950,7 @@ type ReplayNextResponse struct {
 
 func (x *ReplayNextResponse) Reset() {
 	*x = ReplayNextResponse{}
-	mi := &file_mage_v1_game_proto_msgTypes[31]
+	mi := &file_mage_v1_game_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1786,7 +1962,7 @@ func (x *ReplayNextResponse) String() string {
 func (*ReplayNextResponse) ProtoMessage() {}
 
 func (x *ReplayNextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[31]
+	mi := &file_mage_v1_game_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1799,7 +1975,7 @@ func (x *ReplayNextResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayNextResponse.ProtoReflect.Descriptor instead.
 func (*ReplayNextResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{31}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ReplayNextResponse) GetSuccess() bool {
@@ -1826,7 +2002,7 @@ type ReplayPreviousRequest struct {
 
 func (x *ReplayPreviousRequest) Reset() {
 	*x = ReplayPreviousRequest{}
-	mi := &file_mage_v1_game_proto_msgTypes[32]
+	mi := &file_mage_v1_game_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1838,7 +2014,7 @@ func (x *ReplayPreviousRequest) String() string {
 func (*ReplayPreviousRequest) ProtoMessage() {}
 
 func (x *ReplayPreviousRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[32]
+	mi := &file_mage_v1_game_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1851,7 +2027,7 @@ func (x *ReplayPreviousRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayPreviousRequest.ProtoReflect.Descriptor instead.
 func (*ReplayPreviousRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{32}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *ReplayPreviousRequest) GetSessionId() string {
@@ -1878,7 +2054,7 @@ type ReplayPreviousResponse struct {
 
 func (x *ReplayPreviousResponse) Reset() {
 	*x = ReplayPreviousResponse{}
-	mi := &file_mage_v1_game_proto_msgTypes[33]
+	mi := &file_mage_v1_game_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1890,7 +2066,7 @@ func (x *ReplayPreviousResponse) String() string {
 func (*ReplayPreviousResponse) ProtoMessage() {}
 
 func (x *ReplayPreviousResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[33]
+	mi := &file_mage_v1_game_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1903,7 +2079,7 @@ func (x *ReplayPreviousResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayPreviousResponse.ProtoReflect.Descriptor instead.
 func (*ReplayPreviousResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{33}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *ReplayPreviousResponse) GetSuccess() bool {
@@ -1931,7 +2107,7 @@ type ReplaySkipForwardRequest struct {
 
 func (x *ReplaySkipForwardRequest) Reset() {
 	*x = ReplaySkipForwardRequest{}
-	mi := &file_mage_v1_game_proto_msgTypes[34]
+	mi := &file_mage_v1_game_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1943,7 +2119,7 @@ func (x *ReplaySkipForwardRequest) String() string {
 func (*ReplaySkipForwardRequest) ProtoMessage() {}
 
 func (x *ReplaySkipForwardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[34]
+	mi := &file_mage_v1_game_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1956,7 +2132,7 @@ func (x *ReplaySkipForwardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplaySkipForwardRequest.ProtoReflect.Descriptor instead.
 func (*ReplaySkipForwardRequest) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{34}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ReplaySkipForwardRequest) GetSessionId() string {
@@ -1990,7 +2166,7 @@ type ReplaySkipForwardResponse struct {
 
 func (x *ReplaySkipForwardResponse) Reset() {
 	*x = ReplaySkipForwardResponse{}
-	mi := &file_mage_v1_game_proto_msgTypes[35]
+	mi := &file_mage_v1_game_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2002,7 +2178,7 @@ func (x *ReplaySkipForwardResponse) String() string {
 func (*ReplaySkipForwardResponse) ProtoMessage() {}
 
 func (x *ReplaySkipForwardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_game_proto_msgTypes[35]
+	mi := &file_mage_v1_game_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2015,7 +2191,7 @@ func (x *ReplaySkipForwardResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplaySkipForwardResponse.ProtoReflect.Descriptor instead.
 func (*ReplaySkipForwardResponse) Descriptor() ([]byte, []int) {
-	return file_mage_v1_game_proto_rawDescGZIP(), []int{35}
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ReplaySkipForwardResponse) GetSuccess() bool {
@@ -2113,6 +2289,16 @@ const file_mage_v1_game_proto_rawDesc = "" +
 	"\x06action\x18\x03 \x01(\x0e2\x15.mage.v1.PlayerActionR\x06action\"J\n" +
 	"\x18SendPlayerActionResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"\xac\x01\n" +
+	"\x18SendSpecialActionRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
+	"\agame_id\x18\x02 \x01(\tR\x06gameId\x12;\n" +
+	"\vaction_type\x18\x03 \x01(\x0e2\x1a.mage.v1.SpecialActionTypeR\n" +
+	"actionType\x12\x1b\n" +
+	"\tsource_id\x18\x04 \x01(\tR\bsourceId\"K\n" +
+	"\x19SendSpecialActionResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\"M\n" +
 	"\x11MatchStartRequest\x12\x1d\n" +
 	"\n" +
@@ -2181,7 +2367,13 @@ const file_mage_v1_game_proto_rawDesc = "" +
 	"\x16PASS_UNTIL_END_OF_TURN\x10\x05\x12\x18\n" +
 	"\x14PASS_UNTIL_NEXT_TURN\x10\x06\x12\x1d\n" +
 	"\x19PASS_UNTIL_STACK_RESOLVED\x10\a\x12\x1b\n" +
-	"\x17PASS_UNTIL_MY_NEXT_TURN\x10\bB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
+	"\x17PASS_UNTIL_MY_NEXT_TURN\x10\b*l\n" +
+	"\x11SpecialActionType\x12\x1e\n" +
+	"\x1aSPECIAL_ACTION_UNSPECIFIED\x10\x00\x12\r\n" +
+	"\tPLAY_LAND\x10\x01\x12\f\n" +
+	"\bFORETELL\x10\x02\x12\v\n" +
+	"\aSUSPEND\x10\x03\x12\r\n" +
+	"\tCOMPANION\x10\x04B6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
 
 var (
 	file_mage_v1_game_proto_rawDescOnce sync.Once
@@ -2195,56 +2387,60 @@ func file_mage_v1_game_proto_rawDescGZIP() []byte {
 	return file_mage_v1_game_proto_rawDescData
 }
 
-var file_mage_v1_game_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_mage_v1_game_proto_msgTypes = make([]protoimpl.MessageInfo, 36)
+var file_mage_v1_game_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_mage_v1_game_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_mage_v1_game_proto_goTypes = []any{
 	(PlayerAction)(0),                  // 0: mage.v1.PlayerAction
-	(*GameJoinRequest)(nil),            // 1: mage.v1.GameJoinRequest
-	(*GameJoinResponse)(nil),           // 2: mage.v1.GameJoinResponse
-	(*GameWatchStartRequest)(nil),      // 3: mage.v1.GameWatchStartRequest
-	(*GameWatchStartResponse)(nil),     // 4: mage.v1.GameWatchStartResponse
-	(*GameWatchStopRequest)(nil),       // 5: mage.v1.GameWatchStopRequest
-	(*GameWatchStopResponse)(nil),      // 6: mage.v1.GameWatchStopResponse
-	(*GameGetViewRequest)(nil),         // 7: mage.v1.GameGetViewRequest
-	(*GameGetViewResponse)(nil),        // 8: mage.v1.GameGetViewResponse
-	(*SendPlayerUUIDRequest)(nil),      // 9: mage.v1.SendPlayerUUIDRequest
-	(*SendPlayerUUIDResponse)(nil),     // 10: mage.v1.SendPlayerUUIDResponse
-	(*SendPlayerStringRequest)(nil),    // 11: mage.v1.SendPlayerStringRequest
-	(*SendPlayerStringResponse)(nil),   // 12: mage.v1.SendPlayerStringResponse
-	(*SendPlayerBooleanRequest)(nil),   // 13: mage.v1.SendPlayerBooleanRequest
-	(*SendPlayerBooleanResponse)(nil),  // 14: mage.v1.SendPlayerBooleanResponse
-	(*SendPlayerIntegerRequest)(nil),   // 15: mage.v1.SendPlayerIntegerRequest
-	(*SendPlayerIntegerResponse)(nil),  // 16: mage.v1.SendPlayerIntegerResponse
-	(*SendPlayerManaTypeRequest)(nil),  // 17: mage.v1.SendPlayerManaTypeRequest
-	(*SendPlayerManaTypeResponse)(nil), // 18: mage.v1.SendPlayerManaTypeResponse
-	(*SendPlayerActionRequest)(nil),    // 19: mage.v1.SendPlayerActionRequest
-	(*SendPlayerActionResponse)(nil),   // 20: mage.v1.SendPlayerActionResponse
-	(*MatchStartRequest)(nil),          // 21: mage.v1.MatchStartRequest
-	(*MatchStartResponse)(nil),         // 22: mage.v1.MatchStartResponse
-	(*MatchQuitRequest)(nil),           // 23: mage.v1.MatchQuitRequest
-	(*MatchQuitResponse)(nil),          // 24: mage.v1.MatchQuitResponse
-	(*ReplayInitRequest)(nil),          // 25: mage.v1.ReplayInitRequest
-	(*ReplayInitResponse)(nil),         // 26: mage.v1.ReplayInitResponse
-	(*ReplayStartRequest)(nil),         // 27: mage.v1.ReplayStartRequest
-	(*ReplayStartResponse)(nil),        // 28: mage.v1.ReplayStartResponse
-	(*ReplayStopRequest)(nil),          // 29: mage.v1.ReplayStopRequest
-	(*ReplayStopResponse)(nil),         // 30: mage.v1.ReplayStopResponse
-	(*ReplayNextRequest)(nil),          // 31: mage.v1.ReplayNextRequest
-	(*ReplayNextResponse)(nil),         // 32: mage.v1.ReplayNextResponse
-	(*ReplayPreviousRequest)(nil),      // 33: mage.v1.ReplayPreviousRequest
-	(*ReplayPreviousResponse)(nil),     // 34: mage.v1.ReplayPreviousResponse
-	(*ReplaySkipForwardRequest)(nil),   // 35: mage.v1.ReplaySkipForwardRequest
-	(*ReplaySkipForwardResponse)(nil),  // 36: mage.v1.ReplaySkipForwardResponse
-	(*GameView)(nil),                   // 37: mage.v1.GameView
+	(SpecialActionType)(0),             // 1: mage.v1.SpecialActionType
+	(*GameJoinRequest)(nil),            // 2: mage.v1.GameJoinRequest
+	(*GameJoinResponse)(nil),           // 3: mage.v1.GameJoinResponse
+	(*GameWatchStartRequest)(nil),      // 4: mage.v1.GameWatchStartRequest
+	(*GameWatchStartResponse)(nil),     // 5: mage.v1.GameWatchStartResponse
+	(*GameWatchStopRequest)(nil),       // 6: mage.v1.GameWatchStopRequest
+	(*GameWatchStopResponse)(nil),      // 7: mage.v1.GameWatchStopResponse
+	(*GameGetViewRequest)(nil),         // 8: mage.v1.GameGetViewRequest
+	(*GameGetViewResponse)(nil),        // 9: mage.v1.GameGetViewResponse
+	(*SendPlayerUUIDRequest)(nil),      // 10: mage.v1.SendPlayerUUIDRequest
+	(*SendPlayerUUIDResponse)(nil),     // 11: mage.v1.SendPlayerUUIDResponse
+	(*SendPlayerStringRequest)(nil),    // 12: mage.v1.SendPlayerStringRequest
+	(*SendPlayerStringResponse)(nil),   // 13: mage.v1.SendPlayerStringResponse
+	(*SendPlayerBooleanRequest)(nil),   // 14: mage.v1.SendPlayerBooleanRequest
+	(*SendPlayerBooleanResponse)(nil),  // 15: mage.v1.SendPlayerBooleanResponse
+	(*SendPlayerIntegerRequest)(nil),   // 16: mage.v1.SendPlayerIntegerRequest
+	(*SendPlayerIntegerResponse)(nil),  // 17: mage.v1.SendPlayerIntegerResponse
+	(*SendPlayerManaTypeRequest)(nil),  // 18: mage.v1.SendPlayerManaTypeRequest
+	(*SendPlayerManaTypeResponse)(nil), // 19: mage.v1.SendPlayerManaTypeResponse
+	(*SendPlayerActionRequest)(nil),    // 20: mage.v1.SendPlayerActionRequest
+	(*SendPlayerActionResponse)(nil),   // 21: mage.v1.SendPlayerActionResponse
+	(*SendSpecialActionRequest)(nil),   // 22: mage.v1.SendSpecialActionRequest
+	(*SendSpecialActionResponse)(nil),  // 23: mage.v1.SendSpecialActionResponse
+	(*MatchStartRequest)(nil),          // 24: mage.v1.MatchStartRequest
+	(*MatchStartResponse)(nil),         // 25: mage.v1.MatchStartResponse
+	(*MatchQuitRequest)(nil),           // 26: mage.v1.MatchQuitRequest
+	(*MatchQuitResponse)(nil),          // 27: mage.v1.MatchQuitResponse
+	(*ReplayInitRequest)(nil),          // 28: mage.v1.ReplayInitRequest
+	(*ReplayInitResponse)(nil),         // 29: mage.v1.ReplayInitResponse
+	(*ReplayStartRequest)(nil),         // 30: mage.v1.ReplayStartRequest
+	(*ReplayStartResponse)(nil),        // 31: mage.v1.ReplayStartResponse
+	(*ReplayStopRequest)(nil),          // 32: mage.v1.ReplayStopRequest
+	(*ReplayStopResponse)(nil),         // 33: mage.v1.ReplayStopResponse
+	(*ReplayNextRequest)(nil),          // 34: mage.v1.ReplayNextRequest
+	(*ReplayNextResponse)(nil),         // 35: mage.v1.ReplayNextResponse
+	(*ReplayPreviousRequest)(nil),      // 36: mage.v1.ReplayPreviousRequest
+	(*ReplayPreviousResponse)(nil),     // 37: mage.v1.ReplayPreviousResponse
+	(*ReplaySkipForwardRequest)(nil),   // 38: mage.v1.ReplaySkipForwardRequest
+	(*ReplaySkipForwardResponse)(nil),  // 39: mage.v1.ReplaySkipForwardResponse
+	(*GameView)(nil),                   // 40: mage.v1.GameView
 }
 var file_mage_v1_game_proto_depIdxs = []int32{
-	37, // 0: mage.v1.GameGetViewResponse.game:type_name -> mage.v1.GameView
+	40, // 0: mage.v1.GameGetViewResponse.game:type_name -> mage.v1.GameView
 	0,  // 1: mage.v1.SendPlayerActionRequest.action:type_name -> mage.v1.PlayerAction
-	2,  // [2:2] is the sub-list for method output_type
-	2,  // [2:2] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	1,  // 2: mage.v1.SendSpecialActionRequest.action_type:type_name -> mage.v1.SpecialActionType
+	3,  // [3:3] is the sub-list for method output_type
+	3,  // [3:3] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_game_proto_init() }
@@ -2258,8 +2454,8 @@ func file_mage_v1_game_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_game_proto_rawDesc), len(file_mage_v1_game_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   36,
+			NumEnums:      2,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

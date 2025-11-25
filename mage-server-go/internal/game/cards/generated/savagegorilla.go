@@ -28,6 +28,7 @@ func NewSavageGorilla(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewBoostEffect(-3, -3)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

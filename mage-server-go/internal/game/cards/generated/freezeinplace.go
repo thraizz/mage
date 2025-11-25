@@ -23,8 +23,8 @@ func NewFreezeInPlace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewTapEffect()).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 3))).
 		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 3))).
 		Build()
 	if err != nil {
 		return nil, err

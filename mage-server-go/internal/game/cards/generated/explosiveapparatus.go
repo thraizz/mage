@@ -25,6 +25,7 @@ func NewExplosiveApparatus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

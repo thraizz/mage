@@ -29,6 +29,7 @@ func NewThoughtcutterAgent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewLoseLifeEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

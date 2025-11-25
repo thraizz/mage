@@ -20,9 +20,12 @@ func NewAdviceFromTheFae(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - LookLibraryAndPickControllerEffect(5, 2, PutCards.HAND, PutCards.BOTTOM_ANY)
-	//   - LookLibraryAndPickControllerEffect(5, 1, PutCards.HAND, PutCards.BOTTOM_ANY)
-	// card.AddAbility(ability0)
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

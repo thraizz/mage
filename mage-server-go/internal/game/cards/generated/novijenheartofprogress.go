@@ -22,5 +22,11 @@ func NewNovijenHeartOfProgress(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - NovijenHeartOfProgressEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

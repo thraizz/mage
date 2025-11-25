@@ -23,7 +23,6 @@ func NewConsumingBonfire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(7)).
-		AddEffect(abilities.NewDamageEffect(4)).
 		Build()
 	if err != nil {
 		return nil, err

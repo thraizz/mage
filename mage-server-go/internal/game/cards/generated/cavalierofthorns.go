@@ -24,10 +24,13 @@ func NewCavalierOfThorns(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: DiesSourceTriggeredAbility
+	//   - Effect: DoIfCostPaid(                 new PutOnLibraryTargetEffect(true...)
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - RevealLibraryPickControllerEffect(                 5, 1, StaticFilters.FILTER_CARD_L...)
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
 	return card, nil
 }

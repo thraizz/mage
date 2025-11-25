@@ -21,7 +21,7 @@ func NewSunderingStroke(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(7)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(7), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

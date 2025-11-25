@@ -36,6 +36,7 @@ func NewFrontlineMedic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddSacrificeSourceCost().
 		AddManaCost("{3}").
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -21,8 +21,8 @@ func NewSphinxsRevelation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(manaX)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewGainLifeEffect(manaX)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -25,7 +25,6 @@ func NewDyingWail(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(2)
-	//   - DiscardTargetEffect(2)
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())

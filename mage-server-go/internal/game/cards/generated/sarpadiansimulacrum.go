@@ -29,6 +29,7 @@ func NewSarpadianSimulacrum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(4)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

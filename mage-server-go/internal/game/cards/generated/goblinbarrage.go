@@ -29,5 +29,7 @@ func NewGoblinBarrage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	card.AddAbility(ability0)
+
+	// TODO: Add conditional kicked target: TargetPlayerOrPlaneswalker
 	return card, nil
 }

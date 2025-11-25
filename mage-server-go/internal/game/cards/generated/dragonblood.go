@@ -25,6 +25,7 @@ func NewDragonBlood(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddManaCost("{3}").
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

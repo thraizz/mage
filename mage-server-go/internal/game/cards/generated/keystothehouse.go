@@ -25,6 +25,7 @@ func NewKeysToTheHouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddTapCost().
 		AddSacrificeSourceCost().
 		// TODO: SearchLibraryPutInHandEffect with complex parameters
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

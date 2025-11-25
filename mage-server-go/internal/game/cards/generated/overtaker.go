@@ -29,6 +29,7 @@ func NewOvertaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -30,6 +30,7 @@ func NewBlinkmothNexus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(1, 1)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

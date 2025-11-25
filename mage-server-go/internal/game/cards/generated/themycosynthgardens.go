@@ -23,5 +23,11 @@ func NewTheMycosynthGardens(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - TheMycosynthGardensCopyEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

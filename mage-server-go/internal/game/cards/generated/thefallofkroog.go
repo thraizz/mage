@@ -21,6 +21,7 @@ func NewTheFallOfKroog(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDamageEffect(3, true)).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()

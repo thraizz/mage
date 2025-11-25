@@ -22,8 +22,8 @@ func NewTouchOfDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(1)).
-		AddEffect(abilities.NewGainLifeEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewGainLifeEffect(1)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

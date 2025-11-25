@@ -21,6 +21,7 @@ func NewBlackSunsTwilight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
 		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

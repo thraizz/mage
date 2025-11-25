@@ -23,5 +23,12 @@ func NewDAvenantTrapper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewTapEffect("tap target creature an opponent controls. <i>(Artifacts, legendaries, and Sagas are historic.)</i>")).
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

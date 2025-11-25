@@ -23,5 +23,11 @@ func NewGracefulAntelope(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DealsCombatDamageToAPlayerTriggeredAbility
+	//   - Effect: BecomesBasicLandTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

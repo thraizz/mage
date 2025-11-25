@@ -21,7 +21,6 @@ func NewEnergyBolt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
 		AddTarget(abilities.NewAnyTargetFilter()).

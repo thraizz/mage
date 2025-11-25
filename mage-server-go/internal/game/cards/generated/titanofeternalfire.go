@@ -34,6 +34,7 @@ func NewTitanOfEternalFire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -20,5 +20,19 @@ func NewRavenousAmulet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		Build()
+	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseLifeOpponentsEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{4}")
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -21,8 +21,8 @@ func NewCollapsingBorders(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(DomainValue.TARGET)).
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddEffect(abilities.NewGainLifeEffect(DomainValue.TARGET)).
 		Build()
 	if err != nil {
 		return nil, err

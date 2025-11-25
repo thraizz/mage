@@ -21,7 +21,7 @@ func NewRestForTheWeary(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(8)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(8), "unknown")).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

@@ -30,7 +30,6 @@ func NewSoulOfTheros(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

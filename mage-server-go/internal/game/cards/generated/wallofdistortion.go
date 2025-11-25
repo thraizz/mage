@@ -24,10 +24,16 @@ func NewWallOfDistortion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: DiscardTargetEffect(1)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(1)
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
 	return card, nil
 }

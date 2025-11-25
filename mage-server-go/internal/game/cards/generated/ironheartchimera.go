@@ -32,6 +32,7 @@ func NewIronHeartChimera(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP2P2.CreateInstance(1))).
 		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationPermanent)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

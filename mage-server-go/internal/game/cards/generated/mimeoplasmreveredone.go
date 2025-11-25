@@ -24,5 +24,11 @@ func NewMimeoplasmReveredOne(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - MimeoplasmReveredOneEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - MimeoplasmReveredOneEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

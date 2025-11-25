@@ -23,5 +23,7 @@ func NewScourgeOfTheSkyclaves(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{4}{B}")
+	card.AddAbility(ability0)
 	return card, nil
 }

@@ -30,11 +30,12 @@ func NewGlassCastHeart(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddTapCost().
-		AddEffect(abilities.NewGainLifeEffect(13)).
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseLifeOpponentsEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	token2_0, err := token.GetToken("BloodToken")
 	if err != nil {
 		return nil, err

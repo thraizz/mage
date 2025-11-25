@@ -21,17 +21,20 @@ func NewPipBoy3000(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewEquipAbility(card.ID, "{2}", false)
+	// TODO: Implement triggered ability: AttacksAttachedTriggeredAbility
+	//   - Effect: DrawDiscardControllerEffect()
+	// card.AddAbility(ability0)
+	ability1, err := abilities.NewEquipAbility(card.ID, "{2}", false)
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	card.AddAbility(ability1)
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
+	card.AddAbility(ability2)
 	return card, nil
 }

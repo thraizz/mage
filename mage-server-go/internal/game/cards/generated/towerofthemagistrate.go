@@ -22,5 +22,12 @@ func NewTowerOfTheMagistrate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - GainProtectionFromTypeTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

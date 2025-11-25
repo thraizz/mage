@@ -22,6 +22,7 @@ func NewLilianasSpoils(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(1)
+	//   - LookLibraryAndPickControllerEffect(                 5, 1, filter, PutCards.HAND, PutC...)
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())

@@ -31,5 +31,9 @@ func NewRaziaBorosArchangel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.AddAbility(ability1)
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability2)
+	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		Build()
+	card.AddAbility(ability3)
 	return card, nil
 }

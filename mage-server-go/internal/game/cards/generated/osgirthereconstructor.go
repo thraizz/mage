@@ -26,14 +26,17 @@ func NewOsgirTheReconstructor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: OsgirTheReconstructorCreateArtifactTokensEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(player.getId(), null, false, 2)
-	// card.AddAbility(ability1)
-	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
+	// card.AddAbility(ability2)
+	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
 		Build()
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

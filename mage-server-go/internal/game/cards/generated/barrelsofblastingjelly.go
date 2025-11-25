@@ -25,6 +25,7 @@ func NewBarrelsOfBlastingJelly(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(5)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

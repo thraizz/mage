@@ -33,6 +33,7 @@ func NewTheDestinedWarrior(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(3, 0)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewBoostEffect(3, 0), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

@@ -26,6 +26,7 @@ func NewMishrasFoundry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(2, 2)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

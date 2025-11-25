@@ -29,5 +29,11 @@ func NewVenomDeadlyDevourer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordMenace)
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - VenomDeadlyDevourerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	// card.AddAbility(ability2)
 	return card, nil
 }

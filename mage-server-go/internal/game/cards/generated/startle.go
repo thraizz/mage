@@ -26,9 +26,9 @@ func NewStartle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewBoostEffect(-2, 0)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

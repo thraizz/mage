@@ -21,7 +21,10 @@ func NewTrenzaloreClocktower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateIfConditionActivatedAbility
+	//   - Effect: TrenzaloreClocktowerEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "U")
+	card.AddAbility(ability1)
 	return card, nil
 }

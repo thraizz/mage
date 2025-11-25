@@ -24,8 +24,8 @@ func NewArmamentOfNyx(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
 		Build()
 	if err != nil {
 		return nil, err

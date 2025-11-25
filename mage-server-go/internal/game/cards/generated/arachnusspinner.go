@@ -26,5 +26,8 @@ func NewArachnusSpinner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ArachnusSpinnerEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

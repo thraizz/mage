@@ -26,6 +26,7 @@ func NewKamiOfAncientLaw(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

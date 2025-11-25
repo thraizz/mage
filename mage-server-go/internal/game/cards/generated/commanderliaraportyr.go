@@ -24,5 +24,8 @@ func NewCommanderLiaraPortyr(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksWithCreaturesTriggeredAbility
+	//   - Effect: CommanderLiaraPortyrCostEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

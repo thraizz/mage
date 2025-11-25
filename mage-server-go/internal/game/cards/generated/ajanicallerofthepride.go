@@ -29,7 +29,6 @@ func NewAjaniCallerOfThePride(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGrantAbilityEffect("DoubleStrikeAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

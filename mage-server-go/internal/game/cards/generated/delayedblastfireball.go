@@ -20,5 +20,8 @@ func NewDelayedBlastFireball(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(                 DelayedBlastFireballValue.instanc...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

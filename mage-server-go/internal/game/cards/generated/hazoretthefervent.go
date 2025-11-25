@@ -29,5 +29,8 @@ func NewHazoretTheFervent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamagePlayersEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

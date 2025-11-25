@@ -31,9 +31,8 @@ func NewSurgeEngine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.AddAbility(ability1)
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
 	card.AddAbility(ability2)
-	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewGrantAbilityEffect("CantBeBlockedSourceAbility", effects.DurationPermanent)).
-		Build()
-	card.AddAbility(ability3)
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseAbilitySourceEffect()
+	// card.AddAbility(ability3)
 	return card, nil
 }

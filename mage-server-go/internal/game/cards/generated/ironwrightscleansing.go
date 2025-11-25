@@ -22,6 +22,7 @@ func NewIronwrightsCleansing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewExileTargetEffect()).
+		AddTarget(abilities.NewArtifactOrEnchantmentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

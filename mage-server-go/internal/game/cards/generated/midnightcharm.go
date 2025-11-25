@@ -22,12 +22,10 @@ func NewMidnightCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewDamageEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(1)).
-		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewTapEffect()).
+		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).

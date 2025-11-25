@@ -21,7 +21,7 @@ func NewRiversGrasp(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

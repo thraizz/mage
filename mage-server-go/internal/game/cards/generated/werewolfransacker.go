@@ -23,5 +23,11 @@ func NewWerewolfRansacker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: TransformIntoSourceTriggeredAbility
+	//   - Effect: WerewolfRansackerEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

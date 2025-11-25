@@ -22,6 +22,7 @@ func NewAntagonism(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(2), "unknown")).
 		Build()
 	if err != nil {
 		return nil, err

@@ -27,5 +27,11 @@ func NewHopeOfGhirapur(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - HopeOfGhirapurCantCastEffect()
+	//
+	// Costs:
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

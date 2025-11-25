@@ -30,5 +30,11 @@ func NewWingedTempleOfOrazca(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - WingedTempleOfOrazcaEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -23,6 +24,7 @@ func NewImpedeMomentum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 3))).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

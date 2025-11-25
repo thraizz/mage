@@ -27,6 +27,7 @@ func NewMyojinOfRoaringBlades(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDamageEffect(7)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

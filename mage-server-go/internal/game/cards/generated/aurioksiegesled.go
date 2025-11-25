@@ -23,5 +23,16 @@ func NewAuriokSiegeSled(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{1}").
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CantBeBlockedByTargetSourceEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{1}")
+	// card.AddAbility(ability1)
 	return card, nil
 }

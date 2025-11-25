@@ -25,8 +25,14 @@ func NewTheScarabGod(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BeginningOfUpkeepTriggeredAbility
+	//   - Effect: LoseLifeOpponentsEffect()
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(source.getControllerId(), null, false, 1, false, f...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - TheScarabGodExileEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

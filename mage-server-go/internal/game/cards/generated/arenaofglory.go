@@ -20,7 +20,10 @@ func NewArenaOfGlory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "R")
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: SimpleManaAbility
+	//   - Effect: BasicManaEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "R")
+	card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,31 +22,37 @@ func NewChainsaw(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewEquipAbility(card.ID, "{3}", false)
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewEquipAbility(card.ID, "{3}", false)
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("rev", 1))).
+		AddEffect(abilities.NewDamageEffect(3)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(xValue, StaticValue.get(0))).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("rev", 1))).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability3)
+	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewBoostEquippedEffect(xValue, StaticValue.get(0))).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability4)
 	return card, nil
 }

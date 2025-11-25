@@ -20,9 +20,14 @@ func NewConsultTheStarCharts(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - LookLibraryAndPickControllerEffect(LandsYouControlCount.instance, 2, PutCards.HAND, P...)
-	//   - LookLibraryAndPickControllerEffect(LandsYouControlCount.instance, 1, PutCards.HAND, P...)
-	// card.AddAbility(ability0)
+	ability0 := abilities.NewKickerAbility(card.ID, "{1}{U}")
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
 	return card, nil
 }

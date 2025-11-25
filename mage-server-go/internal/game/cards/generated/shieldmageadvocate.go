@@ -30,5 +30,10 @@ func NewShieldmageAdvocate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

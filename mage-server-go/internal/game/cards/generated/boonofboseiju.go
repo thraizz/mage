@@ -21,6 +21,7 @@ func NewBoonOfBoseiju(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewBoostEffect(GreatestAmongPermanentsValue.MANAVALUE_CONTROLLED_PERMANENTS, GreatestAmongPermanentsValue.MANAVALUE_CONTROLLED_PERMANENTS)).
 		AddEffect(abilities.NewUntapEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

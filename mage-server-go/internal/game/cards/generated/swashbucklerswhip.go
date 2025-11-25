@@ -30,7 +30,15 @@ func NewSwashbucklersWhip(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DiscoverEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{8}")
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

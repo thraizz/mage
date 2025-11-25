@@ -22,5 +22,8 @@ func NewBloodSpeaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BeginningOfUpkeepTriggeredAbility
+	//   - Effect: DoIfCostPaid(                         new SearchLibraryPutInHan...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

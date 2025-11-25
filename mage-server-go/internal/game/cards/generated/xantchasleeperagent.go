@@ -24,10 +24,11 @@ func NewXantchaSleeperAgent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{3}").
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseLifePermanentControllerEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	// card.AddAbility(ability0)
 	return card, nil
 }

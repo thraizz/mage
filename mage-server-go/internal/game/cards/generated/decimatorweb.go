@@ -26,6 +26,7 @@ func NewDecimatorWeb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypePoison.CreateInstance(1))).
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

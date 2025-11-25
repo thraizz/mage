@@ -23,7 +23,6 @@ func NewCovenantOfBlood(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(4)).
 		AddEffect(abilities.NewGainLifeEffect(4)).
-		AddEffect(abilities.NewGainLifeEffect(4)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

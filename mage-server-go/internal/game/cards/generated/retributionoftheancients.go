@@ -22,6 +22,7 @@ func NewRetributionOfTheAncients(ownerID uuid.UUID, info *cards.CardInfo) (*game
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -22,5 +23,8 @@ func NewStrongTheBrutishThespian(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DealtDamageToSourceTriggeredAbility
+	//   - Effect: AddCountersPlayersEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -33,6 +33,7 @@ func NewWrench(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddManaCost("{3}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

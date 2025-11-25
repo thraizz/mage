@@ -22,8 +22,7 @@ func NewBranchingBolt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(3)).
-		AddEffect(abilities.NewDamageEffect(3)).
-		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

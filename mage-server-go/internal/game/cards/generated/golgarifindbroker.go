@@ -23,5 +23,10 @@ func NewGolgariFindbroker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

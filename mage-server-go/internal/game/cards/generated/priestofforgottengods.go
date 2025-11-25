@@ -27,6 +27,7 @@ func NewPriestOfForgottenGods(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		AddTapCost().
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -24,6 +24,7 @@ func NewAwakenTheMaelstrom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

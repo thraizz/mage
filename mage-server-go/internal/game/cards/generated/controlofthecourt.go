@@ -22,7 +22,6 @@ func NewControlOfTheCourt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardControllerEffect(3, true)
-	//   - DiscardControllerEffect(3, true)
 	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -26,8 +26,8 @@ func NewBreyaEtheriumShaper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(-4, -4)).
 		AddEffect(abilities.NewGainLifeEffect(5)).
+		AddEffect(abilities.NewBoostEffect(-4, -4)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -36,6 +36,7 @@ func NewBreyaEtheriumShaper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	token2_0, err := token.GetToken("ThopterToken")

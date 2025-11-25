@@ -22,8 +22,6 @@ func NewLifeBurst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect()).
-		AddEffect(abilities.NewGainLifeEffect(4)).
-		AddEffect(abilities.NewGainLifeEffect()).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

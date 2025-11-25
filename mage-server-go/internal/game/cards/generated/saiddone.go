@@ -21,8 +21,8 @@ func NewSaidDone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		AddEffect(abilities.NewTapEffect()).
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		AddTargets(0, 2, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

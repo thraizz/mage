@@ -22,8 +22,6 @@ func NewFlay(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(1, true)
-	//   - DiscardTargetEffect(1, true)
-	//   - DiscardTargetEffect(1, true)
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())

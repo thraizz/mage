@@ -21,7 +21,8 @@ func NewJoust(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewBoostEffect(2, 1), "unknown")).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err

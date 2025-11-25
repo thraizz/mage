@@ -21,13 +21,9 @@ func NewKirtarsWrath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("SpiritWhiteToken")
-	if err != nil {
-		return nil, err
-	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: DestroyAllEffect with complex parameters
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

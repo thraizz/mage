@@ -27,5 +27,7 @@ func NewRushingRiver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		return nil, err
 	}
 	card.AddAbility(ability0)
+
+	// TODO: Add conditional kicked target: TargetNonlandPermanent
 	return card, nil
 }

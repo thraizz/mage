@@ -28,7 +28,15 @@ func NewStreambedAquitects(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(1, 1)).
 		// TODO: GainAbilityTargetEffect with complex parameters
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewLandTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesBasicLandTargetEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,28 +22,37 @@ func NewFieldTestedFryingPan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewEquipAbility(card.ID, "{2}", false)
+	token0_0, err := token.GetToken("FoodToken")
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("FoodToken")
-	if err != nil {
-		return nil, err
-	}
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewEquipAbility(card.ID, "{2}", false)
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	token2_0, err := token.GetToken("FoodToken")
+	if err != nil {
+		return nil, err
+	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(equippedTrigger, AttachmentType.EQUIPMENT)).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(equippedTrigger, AttachmentType.EQUIPMENT)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
 	return card, nil
 }

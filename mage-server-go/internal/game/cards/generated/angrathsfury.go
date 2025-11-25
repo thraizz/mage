@@ -21,8 +21,8 @@ func NewAngrathsFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()

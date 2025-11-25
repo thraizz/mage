@@ -20,9 +20,13 @@ func NewGreedsGambit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		Build()
+	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardControllerEffect(1)
-	//   - DiscardControllerEffect(3)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

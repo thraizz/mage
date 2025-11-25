@@ -26,8 +26,9 @@ func NewHauntTheNetwork(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+		AddEffect(abilities.NewGainLifeEffect(ArtifactYouControlCount.instance + "where X is the number of artifacts you control")).
 		AddEffect(abilities.NewLoseLifeEffect(ArtifactYouControlCount.instance)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {

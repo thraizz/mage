@@ -29,11 +29,10 @@ func NewCaribouRange(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
+		AddEffect(abilities.NewGainLifeEffect(1)).
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
-		AddEffect(abilities.NewGainLifeEffect(1)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		Build()
 	if err != nil {
 		return nil, err

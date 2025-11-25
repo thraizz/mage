@@ -23,5 +23,12 @@ func NewSpikedPitTrap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{5}").
+		AddTapCost().
+		AddSacrificeSourceCost().
+		AddTarget(abilities.NewCreatureTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

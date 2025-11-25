@@ -21,12 +21,13 @@ func NewStoneOfErech(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddTapCost().
-		AddManaCost("{2}").
-		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDrawCardsEffect(1)).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExileGraveyardAllTargetPlayerEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddManaCost("{2}")
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability0)
 	return card, nil
 }

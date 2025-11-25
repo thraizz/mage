@@ -27,6 +27,7 @@ func NewElvishHexhunter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

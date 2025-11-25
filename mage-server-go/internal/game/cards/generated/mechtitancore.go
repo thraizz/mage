@@ -23,5 +23,11 @@ func NewMechtitanCore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - MechtitanCoreTokenEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{5}")
+	// card.AddAbility(ability0)
 	return card, nil
 }

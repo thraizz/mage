@@ -21,8 +21,7 @@ func NewDemonfire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance, false)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(GetXValue.instance), "unknown")).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

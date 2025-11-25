@@ -22,7 +22,6 @@ func NewRoughTumble(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(2, filterWithoutFlying)
-	//   - DamageAllEffect(6, StaticFilters.FILTER_CREATURE_FLYING)
 	// card.AddAbility(ability0)
 	return card, nil
 }

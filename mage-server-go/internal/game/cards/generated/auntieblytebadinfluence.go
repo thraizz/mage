@@ -30,6 +30,7 @@ func NewAuntieBlyteBadInfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

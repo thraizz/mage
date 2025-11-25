@@ -21,8 +21,8 @@ func NewPrismariCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

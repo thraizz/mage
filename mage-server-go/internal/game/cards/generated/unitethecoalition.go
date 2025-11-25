@@ -28,6 +28,7 @@ func NewUniteTheCoalition(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewArtifactOrEnchantmentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

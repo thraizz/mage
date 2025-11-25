@@ -23,5 +23,10 @@ func NewKruinStriker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
+		AddEffect(abilities.NewBoostEffect(1, 0)).
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

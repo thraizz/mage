@@ -21,10 +21,10 @@ func NewCeaseDesist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewExileTargetEffect()).
-		AddEffect(abilities.NewGainLifeEffect(2)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		// TODO: DestroyAllEffect with complex parameters
+		AddEffect(abilities.NewGainLifeEffect(2)).
+		AddEffect(abilities.NewExileTargetEffect()).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

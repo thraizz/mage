@@ -27,6 +27,7 @@ func NewCapashenUnicorn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

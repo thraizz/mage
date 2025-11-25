@@ -21,12 +21,14 @@ func NewConsumedByGreed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+
+	// TODO: Add conditional conditional target: TargetCardInYourGraveyard
 	return card, nil
 }

@@ -20,5 +20,10 @@ func NewTreasureChest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{4}").
+		AddSacrificeSourceCost().
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

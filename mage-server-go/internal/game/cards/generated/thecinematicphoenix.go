@@ -36,5 +36,8 @@ func NewTheCinematicPhoenix(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	//   - AddManaCost("{1}")
 	//   - AddTapCost()
 	// card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ReturnSourceFromGraveyardToBattlefieldEffect()
+	// card.AddAbility(ability3)
 	return card, nil
 }

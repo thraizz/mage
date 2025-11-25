@@ -21,8 +21,8 @@ func NewSovereignsBite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(3)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
+		AddEffect(abilities.NewLoseLifeEffect(3)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

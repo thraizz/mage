@@ -27,7 +27,12 @@ func NewEightAndAHalfTails(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		// TODO: GainAbilityTargetEffect with complex parameters
+		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesColorTargetEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

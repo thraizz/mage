@@ -24,5 +24,8 @@ func NewToshiroUmezawa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DiesCreatureTriggeredAbility
+	//   - Effect: MayCastTargetCardEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

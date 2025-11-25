@@ -23,5 +23,8 @@ func NewSorinImperiousBloodlord(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: LoyaltyAbility
+	//   - Effect: SorinImperiousBloodlordEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -23,5 +23,11 @@ func NewAcklayOfTheArena(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BecomesMonstrousTriggeredAbility
+	//   - Effect: FightTargetsEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -22,7 +22,7 @@ func NewNocturnalHunger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewLoseLifeEffect(2), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

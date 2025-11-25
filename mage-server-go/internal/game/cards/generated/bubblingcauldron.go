@@ -25,5 +25,11 @@ func NewBubblingCauldron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddEffect(abilities.NewGainLifeEffect(4)).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - LoseLifeOpponentsYouGainLifeLostEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -34,5 +34,11 @@ func NewScourgeOfSkolaVale(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ScourgeOfSkolaValeEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

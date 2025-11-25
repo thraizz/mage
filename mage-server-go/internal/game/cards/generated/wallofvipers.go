@@ -26,9 +26,8 @@ func NewWallOfVipers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDestroyEffect()).
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DestroySourceEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

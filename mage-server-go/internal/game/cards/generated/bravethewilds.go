@@ -23,5 +23,15 @@ func NewBraveTheWilds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: SearchLibraryPutInHandEffect with complex parameters
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
+
+	// TODO: Add conditional conditional target: TargetControlledPermanent
 	return card, nil
 }

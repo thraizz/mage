@@ -20,15 +20,18 @@ func NewThranPortal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
-	card.AddAbility(ability0)
-	ability1 := abilities.BuildSimpleManaAbility(card.ID, "U")
+	// TODO: Implement triggered ability: AsEntersBattlefieldAbility
+	//   - Effect: ChooseBasicLandTypeEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability1)
-	ability2 := abilities.BuildSimpleManaAbility(card.ID, "B")
+	ability2 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability2)
-	ability3 := abilities.BuildSimpleManaAbility(card.ID, "R")
+	ability3 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability3)
-	ability4 := abilities.BuildSimpleManaAbility(card.ID, "G")
+	ability4 := abilities.BuildSimpleManaAbility(card.ID, "R")
 	card.AddAbility(ability4)
+	ability5 := abilities.BuildSimpleManaAbility(card.ID, "G")
+	card.AddAbility(ability5)
 	return card, nil
 }

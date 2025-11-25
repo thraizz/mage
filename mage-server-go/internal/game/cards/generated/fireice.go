@@ -21,8 +21,8 @@ func NewFireIce(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewTapEffect()).
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {

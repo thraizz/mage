@@ -31,6 +31,7 @@ func NewSkyCrier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

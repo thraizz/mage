@@ -33,5 +33,9 @@ func NewAyliEternalPilgrim(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{1}").
+		Build()
+	card.AddAbility(ability2)
 	return card, nil
 }

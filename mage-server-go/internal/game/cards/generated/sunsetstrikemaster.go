@@ -29,6 +29,7 @@ func NewSunsetStrikemaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(6)).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

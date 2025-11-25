@@ -23,6 +23,7 @@ func NewRepulsiveMutation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCounterSpellEffect(GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1), GetXValue.instance)).
 		Build()
 	if err != nil {
 		return nil, err

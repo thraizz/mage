@@ -25,13 +25,19 @@ func NewPashalikMons(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("GoblinToken")
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		SetTrigger(abilities.NewDiesTrigger(card.ID)).
+		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	card.AddAbility(ability0)
+	token1_0, err := token.GetToken("GoblinToken")
 	if err != nil {
 		return nil, err
 	}
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
 		Build()
-	card.AddAbility(ability0)
+	card.AddAbility(ability1)
 	return card, nil
 }

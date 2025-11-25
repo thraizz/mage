@@ -23,7 +23,6 @@ func NewPiracyCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(1)
-	//   - DiscardTargetEffect(1)
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())

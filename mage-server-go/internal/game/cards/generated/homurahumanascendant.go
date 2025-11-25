@@ -27,7 +27,6 @@ func NewHomuraHumanAscendant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationPermanent)).
-		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -25,6 +25,7 @@ func NewCyclopeanSnare(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

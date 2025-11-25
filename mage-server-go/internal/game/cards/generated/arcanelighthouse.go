@@ -26,5 +26,10 @@ func NewArcaneLighthouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability0)
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{1}").
+		AddTapCost().
+		Build()
+	card.AddAbility(ability2)
 	return card, nil
 }

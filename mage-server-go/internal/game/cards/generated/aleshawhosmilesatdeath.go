@@ -25,7 +25,11 @@ func NewAleshaWhoSmilesAtDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: ReturnFromGraveyardToBattlefieldTargetEffect(true, true)
+	//   - Effect: DoIfCostPaid(                 new ReturnFromGraveyardToBattlefi...)
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
+	card.AddAbility(ability1)
 	return card, nil
 }

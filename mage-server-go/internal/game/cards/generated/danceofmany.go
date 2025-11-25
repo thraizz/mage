@@ -22,9 +22,18 @@ func NewDanceOfMany(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - CreateTokenCopyTargetEffect()
-	//   - SacrificeTargetEffect("sacrifice Dance of Many")
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: DanceOfManyCreateTokenCopyEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
+	// TODO: Implement triggered ability: LeavesBattlefieldTriggeredAbility
+	//   - Effect: DanceOfManyExileTokenEffect()
+	// card.AddAbility(ability1)
+	// TODO: Implement spell ability with unmapped effects
+	//   - SacrificeTargetEffect("sacrifice Dance of Many")
+	//   - CreateTokenCopyTargetEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

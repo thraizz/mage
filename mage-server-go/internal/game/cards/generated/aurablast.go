@@ -21,8 +21,8 @@ func NewAuraBlast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	if err != nil {

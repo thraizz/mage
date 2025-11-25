@@ -26,5 +26,12 @@ func NewVegetationAbomination(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - VegetationAbominationEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

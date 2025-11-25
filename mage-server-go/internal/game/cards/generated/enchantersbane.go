@@ -20,5 +20,11 @@ func NewEnchantersBane(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: BeginningOfEndStepTriggeredAbility
+	//   - Effect: EnchantersBaneEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewEnchantmentTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

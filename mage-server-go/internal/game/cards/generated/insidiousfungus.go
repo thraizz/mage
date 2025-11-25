@@ -27,6 +27,7 @@ func NewInsidiousFungus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{2}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

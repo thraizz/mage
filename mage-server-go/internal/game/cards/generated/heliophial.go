@@ -28,5 +28,10 @@ func NewHeliophial(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddSacrificeSourceCost().
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

@@ -27,5 +27,11 @@ func NewAbyssalHarvester(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(source.getControllerId(), null, false, 1, false, f...)
 	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - AbyssalHarvesterEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

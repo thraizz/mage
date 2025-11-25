@@ -26,7 +26,6 @@ func NewCursedLand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(1)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
-		AddEffect(abilities.NewDamageEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

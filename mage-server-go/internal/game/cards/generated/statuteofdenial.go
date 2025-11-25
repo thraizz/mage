@@ -23,6 +23,7 @@ func NewStatuteOfDenial(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCounterSpellEffect()).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

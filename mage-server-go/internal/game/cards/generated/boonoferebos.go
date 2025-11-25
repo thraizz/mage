@@ -22,7 +22,6 @@ func NewBoonOfErebos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - RegenerateTargetEffect()
-	//   - RegenerateTargetEffect()
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())

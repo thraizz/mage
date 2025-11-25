@@ -21,7 +21,7 @@ func NewCacklingFlames(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(5)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(5), "unknown")).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

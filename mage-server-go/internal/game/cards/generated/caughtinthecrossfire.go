@@ -22,7 +22,6 @@ func NewCaughtInTheCrossfire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(2, filter)
-	//   - DamageAllEffect(2, filter2)
 	// card.AddAbility(ability0)
 	return card, nil
 }

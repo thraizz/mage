@@ -27,6 +27,7 @@ func NewPhyrexianDenouncer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewBoostEffect(-1, -1)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

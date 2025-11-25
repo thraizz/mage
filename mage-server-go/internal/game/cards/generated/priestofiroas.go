@@ -26,6 +26,7 @@ func NewPriestOfIroas(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

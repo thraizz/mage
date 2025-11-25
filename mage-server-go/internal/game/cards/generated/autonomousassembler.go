@@ -31,6 +31,7 @@ func NewAutonomousAssembler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddManaCost("{1}").
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

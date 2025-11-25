@@ -21,12 +21,8 @@ func NewDeathCloud(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
-	//   - DiscardEachPlayerEffect(xValue, false)
 	//   - SacrificeAllEffect(xValue, new FilterControlledCreaturePermanent("cre...)
-	//   - SacrificeAllEffect(xValue, new FilterControlledLandPermanent("lands"))
 	//   - DiscardEachPlayerEffect(xValue, false)
-	//   - SacrificeAllEffect(xValue, new FilterControlledCreaturePermanent("cre...)
-	//   - SacrificeAllEffect(xValue, new FilterControlledLandPermanent("lands"))
 	// card.AddAbility(ability0)
 	return card, nil
 }

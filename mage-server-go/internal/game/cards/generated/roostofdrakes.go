@@ -21,16 +21,7 @@ func NewRoostOfDrakes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("DrakeToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
+	ability0 := abilities.NewKickerAbility(card.ID, "{2}{U}")
 	card.AddAbility(ability0)
 	token1_0, err := token.GetToken("DrakeToken")
 	if err != nil {
@@ -43,5 +34,16 @@ func NewRoostOfDrakes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	token2_0, err := token.GetToken("DrakeToken")
+	if err != nil {
+		return nil, err
+	}
+	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability2)
 	return card, nil
 }

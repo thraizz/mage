@@ -26,7 +26,6 @@ func NewPendrellFlux(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
 		Build()
 	if err != nil {
 		return nil, err

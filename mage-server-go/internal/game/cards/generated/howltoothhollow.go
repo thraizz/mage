@@ -22,5 +22,10 @@ func NewHowltoothHollow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		// TODO: ConditionalOneShotEffect with complex parameters
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

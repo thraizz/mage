@@ -23,7 +23,10 @@ func NewWhispererOfTheWilds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "G")
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateIfConditionManaAbility
+	//   - Effect: BasicManaEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "G")
+	card.AddAbility(ability1)
 	return card, nil
 }

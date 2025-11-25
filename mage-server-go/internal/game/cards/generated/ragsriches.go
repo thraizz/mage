@@ -21,8 +21,8 @@ func NewRagsRiches(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfGame)).
 		AddEffect(abilities.NewBoostEffect(-2, -2)).
+		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfGame)).
 		Build()
 	if err != nil {
 		return nil, err

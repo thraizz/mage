@@ -21,8 +21,7 @@ func NewTragicTrajectory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(-10, -10)).
-		AddEffect(abilities.NewBoostEffect(-2, -2)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewBoostEffect(-10, -10), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

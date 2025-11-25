@@ -26,5 +26,11 @@ func NewGoldenGuardian(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - FightTargetSourceEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	// card.AddAbility(ability1)
 	return card, nil
 }

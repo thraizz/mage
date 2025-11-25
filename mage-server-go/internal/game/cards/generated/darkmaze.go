@@ -26,10 +26,11 @@ func NewDarkMaze(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{0}").
-		AddEffect(abilities.NewExileSourceEffect()).
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CanAttackAsThoughItDidntHaveDefenderSourceEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{0}")
+	// card.AddAbility(ability1)
 	return card, nil
 }

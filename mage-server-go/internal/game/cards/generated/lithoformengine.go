@@ -21,5 +21,26 @@ func NewLithoformEngine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - CopyTargetStackObjectEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddTapCost()
+	// card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CopyTargetStackObjectEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - CopyTargetStackObjectEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{4}")
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

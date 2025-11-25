@@ -25,13 +25,7 @@ func NewOneDozenEyes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	if err != nil {
 		return nil, err
 	}
-	token0_1, err := token.GetToken("OneDozenEyesBeastToken")
-	if err != nil {
-		return nil, err
-	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 5)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_1)).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 5)).
 		Build()
 	if err != nil {

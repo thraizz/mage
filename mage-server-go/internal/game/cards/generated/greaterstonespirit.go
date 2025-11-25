@@ -37,6 +37,7 @@ func NewGreaterStoneSpirit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(0, 2)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

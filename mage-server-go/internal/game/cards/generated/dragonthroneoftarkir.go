@@ -24,8 +24,8 @@ func NewDragonThroneOfTarkir(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewBoostEffect(SourcePermanentPowerValue.NOT_NEGATIVE, SourcePermanentPowerValue.NOT_NEGATIVE, true)).
+		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.EQUIPMENT)).
 		Build()
 	if err != nil {
@@ -39,5 +39,10 @@ func NewDragonThroneOfTarkir(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{2}").
+		AddTapCost().
+		Build()
+	card.AddAbility(ability2)
 	return card, nil
 }

@@ -24,5 +24,11 @@ func NewXavierSalInfestedCaptain(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: PopulateEffect()
+	// card.AddAbility(ability0)
+	// TODO: Implement triggered ability: ActivateAsSorceryActivatedAbility
+	//   - Effect: ProliferateEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

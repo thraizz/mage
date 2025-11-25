@@ -28,5 +28,11 @@ func NewHidetsuguDevouringChaos(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 		AddEffect(abilities.NewScryEffect(1)).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - HidetsuguDevouringChaosEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

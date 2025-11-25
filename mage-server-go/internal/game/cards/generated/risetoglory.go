@@ -22,7 +22,6 @@ func NewRiseToGlory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
-	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
 	// card.AddAbility(ability0)
 	return card, nil
 }

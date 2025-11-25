@@ -22,9 +22,8 @@ func NewForceDenial(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
-		AddEffect(abilities.NewCounterSpellEffect()).
 		AddEffect(abilities.NewScryEffect(1)).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

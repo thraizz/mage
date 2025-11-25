@@ -22,12 +22,14 @@ func NewSazacapsBrew(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewBoostEffect(2, 0)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewBoostEffect(2, 0), "unknown")).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
+
+	// TODO: Add conditional conditional target: TargetControlledCreaturePermanent
 	return card, nil
 }

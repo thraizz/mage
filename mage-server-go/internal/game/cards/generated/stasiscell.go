@@ -32,6 +32,7 @@ func NewStasisCell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

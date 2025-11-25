@@ -21,7 +21,7 @@ func NewDiplomacyOfTheWastes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewLoseLifeEffect(2), "unknown")).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {

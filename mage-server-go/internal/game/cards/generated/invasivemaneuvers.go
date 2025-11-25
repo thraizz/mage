@@ -21,7 +21,7 @@ func NewInvasiveManeuvers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(5)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(5), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

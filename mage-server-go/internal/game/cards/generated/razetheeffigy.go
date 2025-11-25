@@ -21,8 +21,8 @@ func NewRazeTheEffigy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	if err != nil {

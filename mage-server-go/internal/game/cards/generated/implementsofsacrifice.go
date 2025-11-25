@@ -20,5 +20,8 @@ func NewImplementsOfSacrifice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: SimpleManaAbility
+	//   - Effect: AddManaOfAnyColorEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

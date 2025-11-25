@@ -27,6 +27,7 @@ func NewYavimayaSteelcrusher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

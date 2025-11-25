@@ -25,7 +25,6 @@ func NewShadowbornApostle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: SearchLibraryPutInPlayEffect with complex parameters
-		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

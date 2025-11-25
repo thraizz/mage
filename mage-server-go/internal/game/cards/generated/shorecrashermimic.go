@@ -23,5 +23,8 @@ func NewShorecrasherMimic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: SpellCastControllerTriggeredAbility
+	//   - Effect: SetBasePowerToughnessSourceEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

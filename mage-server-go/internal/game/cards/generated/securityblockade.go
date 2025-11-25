@@ -31,23 +31,29 @@ func NewSecurityBlockade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	card.AddAbility(ability1)
-	token2_0, err := token.GetToken("KnightToken")
+	// TODO: Implement activated ability with unmapped effects
+	//   - PreventDamageToControllerEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
+	token3_0, err := token.GetToken("KnightToken")
 	if err != nil {
 		return nil, err
 	}
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA, rule)).
+		AddEffect(abilities.NewCreateTokenEffect(token3_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability3)
+	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA, rule)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability4)
 	return card, nil
 }

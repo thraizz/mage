@@ -20,5 +20,8 @@ func NewDescendantsFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: OneOrMoreCombatDamagePlayerTriggeredAbility
+	//   - Effect: DoIfCostPaid(                         new DescendantsFuryEffect...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

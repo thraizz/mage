@@ -21,9 +21,12 @@ func NewMisleadingSignpost(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
-	card.AddAbility(ability0)
-	ability1 := abilities.BuildSimpleManaAbility(card.ID, "U")
+	// TODO: Implement triggered ability: EntersBattlefieldTriggeredAbility
+	//   - Effect: ReselectDefenderAttackedByTargetEffect()
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability1)
+	ability2 := abilities.BuildSimpleManaAbility(card.ID, "U")
+	card.AddAbility(ability2)
 	return card, nil
 }

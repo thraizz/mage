@@ -20,5 +20,7 @@ func NewMaddeningCacophony(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewKickerAbility(card.ID, "{3}{U}")
+	card.AddAbility(ability0)
 	return card, nil
 }

@@ -23,6 +23,9 @@ func NewStolenIdentity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

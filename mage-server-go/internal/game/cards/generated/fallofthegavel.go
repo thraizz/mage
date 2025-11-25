@@ -22,8 +22,8 @@ func NewFallOfTheGavel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect()).
 		AddEffect(abilities.NewGainLifeEffect(5)).
+		AddEffect(abilities.NewCounterSpellEffect()).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

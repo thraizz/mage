@@ -24,5 +24,8 @@ func NewTophEarthbendingMaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksWithCreaturesTriggeredAbility
+	//   - Effect: EarthbendTargetEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -25,6 +25,7 @@ func NewRelicAmulet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewDamageEffect(RelicAmuletValue.instance)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

@@ -27,6 +27,7 @@ func NewScarwoodBandits(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationCustom)).
+		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -23,7 +23,6 @@ func NewTrickeryCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - LookLibraryControllerEffect(4)
-	//   - LookLibraryControllerEffect(4)
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())

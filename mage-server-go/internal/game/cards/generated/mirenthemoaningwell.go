@@ -23,5 +23,12 @@ func NewMirenTheMoaningWell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "C")
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - MirenTheMoaningWellEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

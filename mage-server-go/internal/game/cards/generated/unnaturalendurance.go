@@ -22,7 +22,6 @@ func NewUnnaturalEndurance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - RegenerateTargetEffect()
-	//   - RegenerateTargetEffect()
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())

@@ -20,8 +20,14 @@ func NewLightningCloud(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: SpellCastAllTriggeredAbility
+	//   - Effect: DoIfCostPaid(new DamageTargetEffect(1), new ManaCostsImpl<>("{R...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new DamageTargetEffect(1), new ManaCostsImpl<>("{R...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -21,5 +21,10 @@ func NewSkyshipWeatherlight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{4}").
+		AddTapCost().
+		Build()
+	card.AddAbility(ability0)
 	return card, nil
 }

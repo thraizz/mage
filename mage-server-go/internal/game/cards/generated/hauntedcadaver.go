@@ -23,5 +23,9 @@ func NewHauntedCadaver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DealsCombatDamageToAPlayerTriggeredAbility
+	//   - Effect: DiscardTargetEffect(3)
+	//   - Effect: DoIfCostPaid(                 new DiscardTargetEffect(3), new S...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

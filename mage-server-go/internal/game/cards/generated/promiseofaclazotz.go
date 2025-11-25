@@ -21,16 +21,11 @@ func NewPromiseOfAclazotz(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("VampireDemonToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: BeginningOfEndStepTriggeredAbility
+	//   - Effect: DoIfCostPaid(                 new PopulateEffect(),            ...)
+	// card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DoIfCostPaid(                 new CreateTokenEffect(new Vampire...)
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -22,7 +22,6 @@ func NewCulturalExchange(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationCustom)).
-		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationCustom)).
 		AddTargets(2, 2, abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

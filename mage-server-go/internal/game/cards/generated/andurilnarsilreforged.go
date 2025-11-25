@@ -30,6 +30,7 @@ func NewAndurilNarsilReforged(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(2), nil, "")).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

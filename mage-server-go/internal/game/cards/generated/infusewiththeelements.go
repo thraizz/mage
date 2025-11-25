@@ -25,8 +25,6 @@ func NewInfuseWithTheElements(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: AddCountersTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
-		// TODO: AddCountersTargetEffect with complex parameters
-		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

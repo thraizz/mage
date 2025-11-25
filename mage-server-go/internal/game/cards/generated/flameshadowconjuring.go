@@ -21,8 +21,11 @@ func NewFlameshadowConjuring(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldControlledTriggeredAbility
+	//   - Effect: DoIfCostPaid(new FlameshadowConjuringEffect(), new ManaCostsImp...)
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(null, null, true)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

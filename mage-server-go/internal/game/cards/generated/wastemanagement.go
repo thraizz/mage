@@ -20,12 +20,7 @@ func NewWasteManagement(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddTarget(abilities.NewPlayerTargetFilter()).
-		Build()
-	if err != nil {
-		return nil, err
-	}
+	ability0 := abilities.NewKickerAbility(card.ID, "{3}{B}")
 	card.AddAbility(ability0)
 	return card, nil
 }

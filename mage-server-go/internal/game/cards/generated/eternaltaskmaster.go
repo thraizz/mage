@@ -23,5 +23,8 @@ func NewEternalTaskmaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: DoIfCostPaid(                 new ReturnFromGraveyardToHandTarg...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -26,5 +26,10 @@ func NewMartyrOfAshes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(RevealTargetFromHandCostCount.instance, filterCrea...)
 	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{2}").
+		AddSacrificeSourceCost().
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

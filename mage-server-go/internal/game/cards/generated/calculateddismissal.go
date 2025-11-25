@@ -23,7 +23,7 @@ func NewCalculatedDismissal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCounterSpellEffect()).
-		AddEffect(abilities.NewScryEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewScryEffect(1), "unknown")).
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

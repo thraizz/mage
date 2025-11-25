@@ -21,7 +21,7 @@ func NewTheSpotsPortal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(2)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewLoseLifeEffect(2), "unknown")).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

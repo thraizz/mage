@@ -30,6 +30,7 @@ func NewTrigonOfCorruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1))).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

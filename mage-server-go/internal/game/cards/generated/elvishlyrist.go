@@ -27,6 +27,7 @@ func NewElvishLyrist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

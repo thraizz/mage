@@ -23,8 +23,11 @@ func NewRiptideSurvivor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: TurnedFaceUpSourceTriggeredAbility
+	//   - Effect: DiscardControllerEffect(2)
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardControllerEffect(2)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

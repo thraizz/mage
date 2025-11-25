@@ -23,7 +23,6 @@ func NewJundCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DamageAllEffect(2, new FilterCreaturePermanent())
-	//   - DamageAllEffect(2, new FilterCreaturePermanent())
 	//
 	// Targets:
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())

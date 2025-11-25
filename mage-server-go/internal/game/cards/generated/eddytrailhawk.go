@@ -25,10 +25,16 @@ func NewEddytrailHawk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
-	card.AddAbility(ability0)
+	// TODO: Implement triggered ability: AttacksTriggeredAbility
+	//   - Effect: DoIfCostPaid(new GainAbilityTargetEffect(FlyingAbility.getInsta...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	// card.AddAbility(ability0)
+	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
+	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new GainAbilityTargetEffect(FlyingAbility.getInsta...)
-	// card.AddAbility(ability1)
+	// card.AddAbility(ability2)
 	return card, nil
 }

@@ -33,18 +33,12 @@ func NewRinAndSeriInseparable(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		return nil, err
 	}
 	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("GreenCatToken")
-	if err != nil {
-		return nil, err
-	}
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
-	if err != nil {
-		return nil, err
-	}
 	card.AddAbility(ability1)
-	token2_0, err := token.GetToken("WhiteDogToken")
+	token2_0, err := token.GetToken("GreenCatToken")
 	if err != nil {
 		return nil, err
 	}
@@ -55,5 +49,16 @@ func NewRinAndSeriInseparable(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	token3_0, err := token.GetToken("WhiteDogToken")
+	if err != nil {
+		return nil, err
+	}
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token3_0)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
 	return card, nil
 }

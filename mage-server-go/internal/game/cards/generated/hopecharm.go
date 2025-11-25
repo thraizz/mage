@@ -22,11 +22,9 @@ func NewHopeCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(2)).
 		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewGainLifeEffect(2)).
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewGainLifeEffect(2)).
-		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

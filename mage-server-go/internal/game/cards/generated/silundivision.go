@@ -22,5 +22,8 @@ func NewSilundiVision(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - LookLibraryAndPickControllerEffect(                 6, 1, StaticFilters.FILTER_CARD_I...)
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -28,7 +28,11 @@ func NewYawgmothThranPhysician(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1))).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ProliferateEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

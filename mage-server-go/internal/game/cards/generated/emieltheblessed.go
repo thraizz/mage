@@ -24,8 +24,14 @@ func NewEmielTheBlessed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExileThenReturnTargetEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{3}")
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DoIfCostPaid(new EmielTheBlessedEffect(), new ManaCostsImpl<>("...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

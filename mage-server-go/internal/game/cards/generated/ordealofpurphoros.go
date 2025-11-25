@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -23,11 +24,15 @@ func NewOrdealOfPurphoros(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
-	// TODO: Implement spell ability with unmapped effects
-	//   - SacrificeSourceEffect()
-	//
-	// Targets:
-	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
-	// card.AddAbility(ability1)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewDamageEffect(3)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		AddTarget(abilities.NewAnyTargetFilter()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
 	return card, nil
 }

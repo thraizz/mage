@@ -23,7 +23,6 @@ func NewInvokeTheFiremind(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

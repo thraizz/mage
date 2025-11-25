@@ -21,9 +21,8 @@ func NewDrownInFilth(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewMillCardsControllerEffect(1)).
-		AddEffect(abilities.NewMillCardsControllerEffect(1)).
 		AddEffect(abilities.NewBoostEffect(landCards, landCards)).
+		AddEffect(abilities.NewMillCardsControllerEffect(1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

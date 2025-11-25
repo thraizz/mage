@@ -31,6 +31,7 @@ func NewVishKalBloodArbiter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(VishKalBloodArbiterDynamicValue.instance, VishKalBloodArbiterDynamicValue.instance)).
+		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

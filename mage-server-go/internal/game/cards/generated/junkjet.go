@@ -34,16 +34,20 @@ func NewJunkJet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		return nil, err
 	}
 	card.AddAbility(ability1)
-	token2_0, err := token.GetToken("JunkToken")
+	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddManaCost("{3}").
+		Build()
+	card.AddAbility(ability2)
+	token3_0, err := token.GetToken("JunkToken")
 	if err != nil {
 		return nil, err
 	}
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewCreateTokenEffect(token3_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability2)
+	card.AddAbility(ability3)
 	return card, nil
 }

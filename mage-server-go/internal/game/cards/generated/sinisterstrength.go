@@ -26,7 +26,6 @@ func NewSinisterStrength(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(3, 1)).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		AddEffect(abilities.NewBoostEnchantedEffect(3, 1)).
 		Build()
 	if err != nil {
 		return nil, err

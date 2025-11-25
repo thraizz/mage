@@ -26,7 +26,11 @@ func NewTymaretTheMurderKing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewDamageEffect(2)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ReturnSourceFromGraveyardToHandEffect()
+	// card.AddAbility(ability1)
 	return card, nil
 }

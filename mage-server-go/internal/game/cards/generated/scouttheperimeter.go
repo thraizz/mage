@@ -22,8 +22,8 @@ func NewScoutThePerimeter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeBounty.CreateInstance(1))).
 		// TODO: SearchLibraryPutInPlayEffect with complex parameters
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeBounty.CreateInstance(1))).
 		Build()
 	if err != nil {
 		return nil, err

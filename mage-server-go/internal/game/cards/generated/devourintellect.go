@@ -20,11 +20,13 @@ func NewDevourIntellect(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Implement spell ability with unmapped effects
-	//   - DiscardTargetEffect(1)
-	//
-	// Targets:
-	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
-	// card.AddAbility(ability0)
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: ConditionalOneShotEffect with complex parameters
+		AddTarget(abilities.NewOpponentTargetFilter()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

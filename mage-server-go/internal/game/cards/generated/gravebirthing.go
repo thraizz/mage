@@ -26,9 +26,8 @@ func NewGraveBirthing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	if err != nil {

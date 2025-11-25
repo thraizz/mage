@@ -31,6 +31,7 @@ func NewSpiketailHatchling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		AddSacrificeSourceCost().
 		AddManaCost("{1}").
 		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

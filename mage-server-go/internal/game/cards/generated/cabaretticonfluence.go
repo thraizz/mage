@@ -5,6 +5,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
+	"github.com/magefree/mage-server-go/internal/game/effects"
 	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
@@ -28,6 +29,9 @@ func NewCabarettiConfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewArtifactOrEnchantmentTargetFilter())
 	// card.AddAbility(ability2)
 	return card, nil
 }

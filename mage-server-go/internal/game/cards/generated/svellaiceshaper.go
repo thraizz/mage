@@ -35,5 +35,11 @@ func NewSvellaIceShaper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - SvellaIceShaperEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

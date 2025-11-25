@@ -20,5 +20,11 @@ func NewSphinxsTutelage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DrawCardControllerTriggeredAbility
+	//   - Effect: SphinxsTutelageEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

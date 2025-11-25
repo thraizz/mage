@@ -25,6 +25,7 @@ func NewAshnodsTransmogrant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddTapCost().
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

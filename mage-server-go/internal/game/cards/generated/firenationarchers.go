@@ -27,14 +27,11 @@ func NewFireNationArchers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
 	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("SoldierRedToken")
-	if err != nil {
-		return nil, err
-	}
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{5}").
-		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamagePlayersEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{5}")
+	// card.AddAbility(ability1)
 	return card, nil
 }

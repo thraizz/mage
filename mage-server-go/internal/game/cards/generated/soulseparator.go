@@ -24,5 +24,10 @@ func NewSoulSeparator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect(null, null, false, 1, false, false, null, 1, 1, tr...)
 	// card.AddAbility(ability0)
+	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
+		AddTapCost().
+		AddSacrificeSourceCost().
+		Build()
+	card.AddAbility(ability1)
 	return card, nil
 }

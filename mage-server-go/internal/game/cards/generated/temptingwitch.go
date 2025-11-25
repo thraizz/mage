@@ -28,6 +28,7 @@ func NewTemptingWitch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewLoseLifeEffect(3)).
+		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	token1_0, err := token.GetToken("FoodToken")

@@ -21,7 +21,6 @@ func NewHearthCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 0, false)).
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewBoostEffect(1, 0, false)).
 		Build()

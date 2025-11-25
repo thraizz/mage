@@ -35,5 +35,11 @@ func NewGenjuOfTheRealm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - BecomesCreatureAttachedWithActivatedAbilityOrSpellEffect()
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	// card.AddAbility(ability3)
 	return card, nil
 }

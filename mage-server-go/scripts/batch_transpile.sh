@@ -44,9 +44,9 @@ fi
 
 # Skip compilation for now (too slow for large batches)
 # Uncomment to test compilation:
-# echo "Testing Go compilation..."
-# if go build ./internal/game/cards/generated/... 2>&1 | tee -a "$LOG_FILE"; then
-#     echo "✓ All generated cards compile successfully!"
-# else
-#     echo "✗ Some generated cards have compilation errors (see log)"
-# fi
+echo "Testing Go compilation..."
+if go build ./internal/game/cards/generated/... 2>&1 | tee -a "$LOG_FILE"; then
+    echo "✓ All generated cards compile successfully!"
+else
+    echo "✗ Some generated cards have compilation errors (see log)"
+fi

@@ -24,5 +24,8 @@ func NewTymaretChosenFromDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement activated ability with unmapped effects
+	//   - TymaretChosenFromDeathEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

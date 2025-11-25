@@ -23,9 +23,16 @@ func NewInsidiousBookworms(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DiesSourceTriggeredAbility
+	//   - Effect: DiscardTargetEffect(1, true)
+	//   - Effect: DoIfCostPaid(new DiscardTargetEffect(1, true), new ManaCostsImp...)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	// card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(1, true)
 	//   - DoIfCostPaid(new DiscardTargetEffect(1, true), new ManaCostsImp...)
-	// card.AddAbility(ability0)
+	// card.AddAbility(ability1)
 	return card, nil
 }

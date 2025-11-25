@@ -23,5 +23,8 @@ func NewGolgariThug(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: DiesSourceTriggeredAbility
+	//   - Effect: PutOnLibraryTargetEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

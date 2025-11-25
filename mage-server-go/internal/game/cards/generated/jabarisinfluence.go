@@ -22,8 +22,8 @@ func NewJabarisInfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationCustom)).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M0.CreateInstance(1))).
+		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationCustom)).
 		Build()
 	if err != nil {
 		return nil, err

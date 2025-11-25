@@ -22,10 +22,6 @@ func NewMercilessEviction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: ExileAllEffect with complex parameters
-		// TODO: ExileAllEffect with complex parameters
-		// TODO: ExileAllEffect with complex parameters
-		// TODO: ExileAllEffect with complex parameters
-		// TODO: ExileAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

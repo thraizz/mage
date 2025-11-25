@@ -26,5 +26,11 @@ func NewRemorsefulCleric(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - ExileGraveyardAllTargetPlayerEffect()
+	//
+	// Costs:
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

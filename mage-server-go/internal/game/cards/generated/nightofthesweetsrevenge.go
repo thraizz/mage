@@ -22,25 +22,31 @@ func NewNightOfTheSweetsRevenge(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.BuildSimpleManaAbility(card.ID, "G")
-	card.AddAbility(ability0)
-	token1_0, err := token.GetToken("FoodToken")
-	if err != nil {
-		return nil, err
-	}
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
+	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
+		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
+		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
+		AddEffect(abilities.NewBoostEffect(xValue, xValue, false)).
 		Build()
+	card.AddAbility(ability0)
+	ability1 := abilities.BuildSimpleManaAbility(card.ID, "G")
+	card.AddAbility(ability1)
+	token2_0, err := token.GetToken("FoodToken")
 	if err != nil {
 		return nil, err
 	}
-	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("GreenManaAbility", effects.DurationPermanent)).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewGrantAbilityEffect("GreenManaAbility", effects.DurationPermanent)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability3)
 	return card, nil
 }

@@ -23,5 +23,8 @@ func NewGraveyardGlutton(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	// TODO: Implement triggered ability: EntersBattlefieldOrAttacksSourceTriggeredAbility
+	//   - Effect: GraveyardGluttonEffect()
+	// card.AddAbility(ability0)
 	return card, nil
 }

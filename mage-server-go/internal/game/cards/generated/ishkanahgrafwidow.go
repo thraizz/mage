@@ -30,6 +30,7 @@ func NewIshkanahGrafwidow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewLoseLifeEffect(xValue)).
+		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)
 	token2_0, err := token.GetToken("SpiderToken")

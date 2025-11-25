@@ -28,9 +28,8 @@ func NewRadiantSolar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability1)
-	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewGainLifeEffect(3)).
-		Build()
-	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - VentureIntoTheDungeonEffect()
+	// card.AddAbility(ability2)
 	return card, nil
 }

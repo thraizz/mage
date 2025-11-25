@@ -24,6 +24,7 @@ func NewScrollOfOrigins(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "unknown")).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -27,6 +27,7 @@ func NewSterlingKeykeeper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil
