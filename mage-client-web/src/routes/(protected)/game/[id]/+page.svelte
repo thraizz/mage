@@ -33,7 +33,9 @@
 		concedeGame,
 		sendPlayerUUID,
 		sendPlayerBoolean,
-		sendPlayerString
+		sendPlayerString,
+		keepHand,
+		mulligan
 	} from '$lib/api/game';
 	import type { CardView } from '$lib/generated/mage/v1/models';
 	import type { GameCard, GamePhase } from '$lib/types/game';
@@ -49,6 +51,7 @@
 	import GameActionsPanel from '$lib/components/game/GameActionsPanel.svelte';
 	import GameChat from '$lib/components/game/GameChat.svelte';
 	import ActionLog from '$lib/components/game/ActionLog.svelte';
+	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 
 	// Game ID from route params
 	const gameId = $derived($page.params.id);
@@ -61,6 +64,10 @@
 	let isActionLoading = $state(false);
 	let showStackOverlay = $state(false);
 	let initialized = $state(false);
+
+	// Mulligan state
+	let mulliganCount = $state(0);
+	let isMulliganLoading = $state(false);
 
 	// Get local player ID from auth (server uses usernames as player IDs)
 	const localPlayerId = $derived($auth.user?.username || '');
@@ -88,6 +95,11 @@
 	// Player name map for display
 	const playerNames = $derived(
 		new Map(allPlayers.map((p) => [p.playerId, p.name]))
+	);
+
+	// Mulligan phase detection
+	const isMulliganPhase = $derived(
+		gameState.gameView?.state?.toLowerCase() === 'mulligan'
 	);
 
 	// Get active player name
@@ -310,6 +322,43 @@
 	}
 
 	/**
+	 * Handle keeping hand during mulligan
+	 */
+	async function handleKeepHand() {
+		if (!gameId || isMulliganLoading) return;
+
+		isMulliganLoading = true;
+		try {
+			await keepHand(gameId);
+			addLogEntry('You kept your hand');
+		} catch (err) {
+			console.error('Failed to keep hand:', err);
+			gameStore.setError(err instanceof Error ? err.message : 'Failed to keep hand');
+		} finally {
+			isMulliganLoading = false;
+		}
+	}
+
+	/**
+	 * Handle mulligan during mulligan phase
+	 */
+	async function handleMulligan() {
+		if (!gameId || isMulliganLoading) return;
+
+		isMulliganLoading = true;
+		try {
+			await mulligan(gameId);
+			mulliganCount++;
+			addLogEntry(`You took mulligan #${mulliganCount}`);
+		} catch (err) {
+			console.error('Failed to mulligan:', err);
+			gameStore.setError(err instanceof Error ? err.message : 'Failed to mulligan');
+		} finally {
+			isMulliganLoading = false;
+		}
+	}
+
+	/**
 	 * Add message to action log
 	 */
 	function addLogEntry(message: string) {
@@ -392,6 +441,15 @@
 				<button class="btn-primary" onclick={() => goto('/lobby')}>Return to Lobby</button>
 			</div>
 		</div>
+	{:else if isMulliganPhase}
+		<!-- Mulligan Phase -->
+		<MulliganDialog
+			cards={myCards}
+			mulliganCount={mulliganCount}
+			onKeep={handleKeepHand}
+			onMulligan={handleMulligan}
+			isLoading={isMulliganLoading}
+		/>
 	{:else}
 		<!-- Game Header -->
 		<div class="game-header">

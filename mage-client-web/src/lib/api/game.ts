@@ -294,6 +294,20 @@ export async function passUntilMyNextTurn(gameId: string): Promise<void> {
 }
 
 /**
+ * Keep current hand during mulligan phase
+ */
+export async function keepHand(gameId: string): Promise<void> {
+	return sendPlayerString(gameId, 'KEEP');
+}
+
+/**
+ * Mulligan (redraw hand with one fewer card)
+ */
+export async function mulligan(gameId: string): Promise<void> {
+	return sendPlayerString(gameId, 'MULLIGAN');
+}
+
+/**
  * Quit the match entirely
  */
 export async function quitMatch(gameId: string): Promise<void> {

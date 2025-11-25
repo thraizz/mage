@@ -228,6 +228,47 @@ export async function startGame(tableId: string): Promise<string> {
 }
 
 /**
+ * Submit a deck to a table (for deck validation and game start)
+ *
+ * This allows players to submit/update their deck after joining a table.
+ * The deck is sent in structured format with card names and quantities.
+ */
+export async function submitDeck(
+	tableId: string,
+	deck: {
+		mainDeck: { name: string; quantity: number }[];
+		sideboard: { name: string; quantity: number }[];
+		commanders: { name: string; quantity: number }[];
+	}
+): Promise<void> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	// Convert to the proto DeckCardLists format
+	const deckCardLists = {
+		mainDeck: deck.mainDeck.map((c) => ({ name: c.name, quantity: c.quantity })),
+		sideboard: deck.sideboard.map((c) => ({ name: c.name, quantity: c.quantity })),
+		commanders: deck.commanders.map((c) => ({ name: c.name, quantity: c.quantity }))
+	};
+
+	const request = {
+		sessionId,
+		tableId,
+		deck: deckCardLists
+	};
+
+	const response = await client.call('DeckSubmit', request);
+
+	if (!response.success) {
+		throw new Error(response.error || 'Failed to submit deck');
+	}
+}
+
+/**
  * Kick player from table (host only)
  *
  * Note: This functionality might not be available via RPC

@@ -884,30 +884,19 @@ func (e *MageEngine) StartGameWithDecks(gameID string, players []string, gameTyp
 		)
 	}
 
-	// Auto-complete mulligan phase for now (TODO: implement mulligan UI in client)
-	// All players automatically keep their hands
-	for _, player := range gameState.players {
-		player.KeptHand = true
-	}
-
-	// Transition to main game
-	gameState.state = GameStateInProgress
-
-	// Give priority to the starting player
-	gameState.turnManager.SetPriority(startingPlayerID)
-
-	// Notify game start
+	// Notify game start - players need to make mulligan decisions
+	// Game stays in GameStateMulligan until all players have kept their hands
 	e.notifyGameStateChange(gameID, map[string]interface{}{
-		"state":           "in_progress",
+		"state":           "mulligan",
 		"game_type":       gameType,
 		"players":         players,
 		"starting_player": startingPlayerID,
 	})
 
 	if e.logger != nil {
-		e.logger.Info("mulligan auto-completed, game in progress",
+		e.logger.Info("game in mulligan phase, waiting for player decisions",
 			zap.String("game_id", gameID),
-			zap.String("priority_player", startingPlayerID),
+			zap.String("starting_player", startingPlayerID),
 		)
 	}
 
@@ -1077,11 +1066,188 @@ func (e *MageEngine) handlePlayerAction(gameState *engineGameState, action Playe
 
 	dataStr = strings.ToUpper(strings.TrimSpace(dataStr))
 
-	if dataStr == "PASS" {
+	switch dataStr {
+	case "PASS":
 		return e.handlePass(gameState, action.PlayerID)
+	case "KEEP":
+		return e.handleKeepHand(gameState, action.PlayerID)
+	case "MULLIGAN":
+		return e.handleMulligan(gameState, action.PlayerID)
+	default:
+		return fmt.Errorf("unknown player action: %s", dataStr)
+	}
+}
+
+// handleKeepHand handles a player choosing to keep their hand during mulligan
+func (e *MageEngine) handleKeepHand(gameState *engineGameState, playerID string) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
 	}
 
-	return fmt.Errorf("unknown player action: %s", dataStr)
+	if gameState.state != GameStateMulligan {
+		return fmt.Errorf("not in mulligan phase")
+	}
+
+	if player.KeptHand {
+		return fmt.Errorf("player %s has already kept hand", playerID)
+	}
+
+	player.KeptHand = true
+	gameState.addMessage(fmt.Sprintf("%s keeps their hand (%d cards)", playerID, len(player.Hand)), "action")
+
+	// Check if all players have kept their hands
+	allKept := true
+	for _, p := range gameState.players {
+		if !p.KeptHand {
+			allKept = false
+			break
+		}
+	}
+
+	if allKept {
+		// All players have kept - transition to main game
+		e.completeMulliganPhase(gameState)
+	}
+
+	// Notify state change
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+		"player":    playerID,
+		"action":    "keep",
+		"hand_size": len(player.Hand),
+	})
+
+	return nil
+}
+
+// handleMulligan handles a player choosing to mulligan
+func (e *MageEngine) handleMulligan(gameState *engineGameState, playerID string) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	if gameState.state != GameStateMulligan {
+		return fmt.Errorf("not in mulligan phase")
+	}
+
+	if player.KeptHand {
+		return fmt.Errorf("player %s has already kept hand", playerID)
+	}
+
+	// Increment mulligan count
+	player.MulliganCount++
+
+	// Calculate new hand size (London Mulligan: draw 7, then put X on bottom)
+	// For simplicity, we'll draw 7 and then they'll discard to (7 - mulliganCount)
+	newHandSize := 7 - player.MulliganCount
+	if newHandSize < 0 {
+		newHandSize = 0
+	}
+
+	// Return current hand to library
+	for _, card := range player.Hand {
+		card.Zone = zoneLibrary
+		player.Library = append(player.Library, card)
+	}
+	player.Hand = make([]*internalCard, 0)
+
+	// Shuffle library
+	e.shuffleLibrary(player)
+
+	// Draw new hand of 7 cards
+	for i := 0; i < 7 && len(player.Library) > 0; i++ {
+		card := player.Library[len(player.Library)-1]
+		player.Library = player.Library[:len(player.Library)-1]
+		card.Zone = zoneHand
+		player.Hand = append(player.Hand, card)
+	}
+
+	gameState.addMessage(fmt.Sprintf("%s takes mulligan #%d (drew 7 cards, must put %d on bottom)",
+		playerID, player.MulliganCount, player.MulliganCount), "action")
+
+	// If mulligan count reached hand size, auto-keep (they'd have 0 cards)
+	if newHandSize == 0 {
+		player.KeptHand = true
+		gameState.addMessage(fmt.Sprintf("%s forced to keep (no cards left to draw)", playerID), "action")
+	} else {
+		// Prompt for cards to put on bottom (simplified: just keep immediately for now)
+		// TODO: Implement London Mulligan bottom selection
+		// For now, auto-put the last N cards on bottom
+		cardsToBottom := player.MulliganCount
+		if cardsToBottom > 0 && len(player.Hand) >= cardsToBottom {
+			for i := 0; i < cardsToBottom; i++ {
+				card := player.Hand[len(player.Hand)-1]
+				player.Hand = player.Hand[:len(player.Hand)-1]
+				card.Zone = zoneLibrary
+				// Put on bottom of library (beginning of slice)
+				player.Library = append([]*internalCard{card}, player.Library...)
+			}
+			gameState.addMessage(fmt.Sprintf("%s puts %d cards on bottom of library (hand now %d cards)",
+				playerID, cardsToBottom, len(player.Hand)), "action")
+		}
+
+		// Add prompt for next mulligan decision
+		gameState.addPrompt(playerID, fmt.Sprintf("Keep hand (%d cards) or mulligan again?", len(player.Hand)), []string{"KEEP", "MULLIGAN"})
+	}
+
+	// Check if all players have kept their hands
+	allKept := true
+	for _, p := range gameState.players {
+		if !p.KeptHand {
+			allKept = false
+			break
+		}
+	}
+
+	if allKept {
+		// All players have kept - transition to main game
+		e.completeMulliganPhase(gameState)
+	}
+
+	// Notify state change
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+		"player":         playerID,
+		"action":         "mulligan",
+		"mulligan_count": player.MulliganCount,
+		"hand_size":      len(player.Hand),
+		"kept":           player.KeptHand,
+	})
+
+	return nil
+}
+
+// completeMulliganPhase transitions from mulligan to main game
+func (e *MageEngine) completeMulliganPhase(gameState *engineGameState) {
+	gameState.state = GameStateInProgress
+
+	// Give priority to the starting player
+	startingPlayerID := gameState.playerOrder[0]
+	for _, playerID := range gameState.playerOrder {
+		if player, exists := gameState.players[playerID]; exists && player.HasPriority {
+			startingPlayerID = playerID
+			break
+		}
+	}
+
+	// Set active player based on starting player determination
+	gameState.turnManager.SetPriority(startingPlayerID)
+
+	gameState.addMessage("Mulligan phase complete, game begins", "system")
+	gameState.addMessage(fmt.Sprintf("Turn 1 - %s's turn", startingPlayerID), "phase")
+
+	// Notify all players that game is now in progress
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+		"state":           "in_progress",
+		"starting_player": startingPlayerID,
+	})
+
+	if e.logger != nil {
+		e.logger.Info("mulligan phase completed, game in progress",
+			zap.String("game_id", gameState.gameID),
+			zap.String("priority_player", startingPlayerID),
+		)
+	}
 }
 
 // handlePass handles a pass action
@@ -1277,8 +1443,18 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 		return fmt.Errorf("SEND_STRING data must be string")
 	}
 
-	// Check if this is a pass action (some tests use "Pass" as SEND_STRING)
+	// Check for special action strings first
 	spellNameUpper := strings.ToUpper(strings.TrimSpace(spellName))
+
+	// Handle mulligan phase actions
+	if spellNameUpper == "KEEP" {
+		return e.handleKeepHand(gameState, action.PlayerID)
+	}
+	if spellNameUpper == "MULLIGAN" {
+		return e.handleMulligan(gameState, action.PlayerID)
+	}
+
+	// Check if this is a pass action (some tests use "Pass" as SEND_STRING)
 	if spellNameUpper == "PASS" {
 		return e.handlePass(gameState, action.PlayerID)
 	}

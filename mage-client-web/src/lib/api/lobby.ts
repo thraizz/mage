@@ -178,11 +178,10 @@ export async function joinTable(tableId: string, password?: string): Promise<voi
 		sessionId,
 		roomId: roomResponse.roomId,
 		tableId,
-		name: 'Player', // Player name - could be from auth store
+		playerName: '', // Server derives from session
 		playerType: 'Human',
-		skill: 1,
-		deckType: 'Constructed',
-		deck: '', // Deck will be selected later
+		skillLevel: 1,
+		deckList: '', // Deck will be selected later
 		password: password || ''
 	};
 

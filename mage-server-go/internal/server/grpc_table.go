@@ -94,6 +94,46 @@ func (s *mageServer) RoomJoinTable(ctx context.Context, req *pb.RoomJoinTableReq
 		)
 	}
 
+	// Parse and submit deck if provided
+	deckListText := strings.TrimSpace(req.GetDeckList())
+	if deckListText != "" {
+		mainDeck, sideboard, commanders := parseDeckListText(deckListText)
+
+		if len(mainDeck) > 0 || len(commanders) > 0 {
+			// Validate card names exist in the database
+			allCardNames := append(append(mainDeck, sideboard...), commanders...)
+			if err := s.validateCardNames(ctx, allCardNames); err != nil {
+				s.logger.Warn("deck validation failed, player joined without deck",
+					zap.String("table_id", tbl.ID),
+					zap.String("username", username),
+					zap.Error(err),
+				)
+			} else {
+				deckList := table.DeckList{
+					MainDeck:   mainDeck,
+					Sideboard:  sideboard,
+					Commanders: commanders,
+				}
+
+				if err := tbl.SubmitDeck(username, deckList); err != nil {
+					s.logger.Warn("failed to submit deck for player",
+						zap.String("table_id", tbl.ID),
+						zap.String("username", username),
+						zap.Error(err),
+					)
+				} else {
+					s.logger.Info("deck submitted on join",
+						zap.String("table_id", tbl.ID),
+						zap.String("username", username),
+						zap.Int("main_count", len(mainDeck)),
+						zap.Int("sideboard_count", len(sideboard)),
+						zap.Int("commander_count", len(commanders)),
+					)
+				}
+			}
+		}
+	}
+
 	s.logger.Info("user joined table",
 		zap.String("table_id", tbl.ID),
 		zap.String("room_id", tbl.RoomID),
@@ -104,6 +144,155 @@ func (s *mageServer) RoomJoinTable(ctx context.Context, req *pb.RoomJoinTableReq
 	return &pb.RoomJoinTableResponse{
 		Success: true,
 	}, nil
+}
+
+// parseDeckListText parses a deck list text format into card name slices.
+// Supports formats like:
+// Commander:
+// 1 CardName
+//
+// 4 Lightning Bolt
+// 4 Counterspell
+//
+// Sideboard:
+// 2 Disenchant
+func parseDeckListText(text string) (mainDeck, sideboard, commanders []string) {
+	lines := strings.Split(text, "\n")
+	inSideboard := false
+	inCommander := false
+	hadCommanderCards := false
+	commanderCardsProcessed := 0
+
+	for _, rawLine := range lines {
+		line := strings.TrimSpace(rawLine)
+
+		// Empty line: if we were in commander section and had cards, switch back to main
+		if line == "" {
+			if inCommander && hadCommanderCards {
+				inCommander = false
+				commanderCardsProcessed = 0
+			}
+			continue
+		}
+
+		// Skip comments
+		if strings.HasPrefix(line, "#") || strings.HasPrefix(line, "//") {
+			continue
+		}
+
+		lowerLine := strings.ToLower(line)
+
+		// Skip Arena metadata lines
+		if lowerLine == "about" || strings.HasPrefix(lowerLine, "name ") {
+			continue
+		}
+
+		// Section markers
+		if lowerLine == "commander" || lowerLine == "command zone" {
+			inCommander = true
+			inSideboard = false
+			hadCommanderCards = false
+			commanderCardsProcessed = 0
+			continue
+		}
+
+		if lowerLine == "deck" || lowerLine == "main" || lowerLine == "main deck" {
+			inSideboard = false
+			inCommander = false
+			commanderCardsProcessed = 0
+			continue
+		}
+
+		if lowerLine == "sideboard" {
+			inSideboard = true
+			inCommander = false
+			commanderCardsProcessed = 0
+			continue
+		}
+
+		// Traditional format with colons
+		if (strings.Contains(lowerLine, "commander") || strings.Contains(lowerLine, "command zone")) && strings.Contains(lowerLine, ":") {
+			inCommander = true
+			inSideboard = false
+			hadCommanderCards = false
+			commanderCardsProcessed = 0
+			continue
+		}
+		if strings.Contains(lowerLine, "sideboard") && strings.Contains(lowerLine, ":") {
+			inSideboard = true
+			inCommander = false
+			commanderCardsProcessed = 0
+			continue
+		}
+		if (strings.Contains(lowerLine, "main") || strings.Contains(lowerLine, "deck")) && strings.Contains(lowerLine, ":") && !strings.Contains(lowerLine, "commander") && !strings.Contains(lowerLine, "sideboard") {
+			inSideboard = false
+			inCommander = false
+			commanderCardsProcessed = 0
+			continue
+		}
+
+		// Parse card line: "4 Lightning Bolt" or "4x Lightning Bolt" or "Lightning Bolt"
+		quantity, cardName := parseCardLine(line)
+		if cardName == "" || quantity <= 0 {
+			continue
+		}
+
+		// Commander section: allow up to 2 cards (for partner commanders)
+		if inCommander && commanderCardsProcessed >= 2 {
+			inCommander = false
+		} else if inCommander && commanderCardsProcessed >= 1 {
+			if commanderCardsProcessed+quantity != 2 {
+				inCommander = false
+			}
+		}
+
+		// Add cards to appropriate slice
+		for i := 0; i < quantity; i++ {
+			if inCommander {
+				commanders = append(commanders, cardName)
+				hadCommanderCards = true
+				commanderCardsProcessed++
+				if commanderCardsProcessed >= 2 {
+					inCommander = false
+				}
+			} else if inSideboard {
+				sideboard = append(sideboard, cardName)
+			} else {
+				mainDeck = append(mainDeck, cardName)
+			}
+		}
+	}
+
+	return mainDeck, sideboard, commanders
+}
+
+// parseCardLine parses a single card line like "4 Lightning Bolt" or "4x Lightning Bolt" or "Lightning Bolt"
+func parseCardLine(line string) (quantity int, cardName string) {
+	line = strings.TrimSpace(line)
+	if line == "" {
+		return 0, ""
+	}
+
+	// Try to match "4 CardName" or "4x CardName"
+	// Regex: ^(\d+)x?\s+(.+)$
+	parts := strings.SplitN(line, " ", 2)
+	if len(parts) == 2 {
+		qtyStr := strings.TrimSuffix(parts[0], "x")
+		qtyStr = strings.TrimSuffix(qtyStr, "X")
+		if qty, err := parseQuantity(qtyStr); err == nil && qty > 0 {
+			return qty, strings.TrimSpace(parts[1])
+		}
+	}
+
+	// Single card without quantity
+	return 1, line
+}
+
+// parseQuantity parses a quantity string, returns error if not a valid number
+func parseQuantity(s string) (int, error) {
+	var qty int
+	_, err := fmt.Sscanf(s, "%d", &qty)
+	return qty, err
 }
 
 // RoomLeaveTableOrTournament removes a player from a table or tournament.
