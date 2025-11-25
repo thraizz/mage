@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { authStore } from '$lib/stores/auth';
-	import { toastStore } from '$lib/stores/toast';
+	import { auth } from '$lib/stores/auth';
+	import { toast } from '$lib/stores/toast';
 	import {
 		fetchUserProfile,
 		fetchUserStats,
@@ -50,8 +50,8 @@
 
 			// If session expired, redirect to login
 			if (error.toLowerCase().includes('session')) {
-				toastStore.error('Session expired - please login again');
-				authStore.logout();
+				toast.error('Session expired - please login again');
+				auth.logout();
 				goto('/login');
 			}
 		} finally {
@@ -89,7 +89,7 @@
 
 		try {
 			await changePassword({ currentPassword, newPassword });
-			toastStore.success('Password changed successfully');
+			toast.success('Password changed successfully');
 
 			// Reset form
 			currentPassword = '';
@@ -162,7 +162,7 @@
 	});
 
 	// Derived username for display
-	const username = $derived($authStore.user?.username || 'Unknown');
+	const username = $derived($auth.user?.username || 'Unknown');
 </script>
 
 <svelte:head>

@@ -81,8 +81,8 @@
 	function getPhaseClass(phase: (typeof phases)[number]): string {
 		const classes = ['phase-item'];
 		if (isCurrentPhase(phase.key)) classes.push('active');
-		if (phase.isMain) classes.push('main-phase');
-		if (phase.isCombat) classes.push('combat-phase');
+		if ('isMain' in phase && phase.isMain) classes.push('main-phase');
+		if ('isCombat' in phase && phase.isCombat) classes.push('combat-phase');
 		return classes.join(' ');
 	}
 

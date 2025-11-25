@@ -148,7 +148,10 @@ export async function joinTable(
 		password: password || ''
 	};
 
-	const response = await client.call('RoomJoinTable', request);
+	const response = await client.call<typeof request, { success: boolean; error?: string }>(
+		'RoomJoinTable',
+		request
+	);
 
 	if (!response.success) {
 		throw new Error(response.error || 'Failed to join table');
@@ -179,7 +182,10 @@ export async function leaveTable(tableId: string): Promise<void> {
 		tableId
 	};
 
-	const response = await client.call('RoomLeaveTableOrTournament', leaveRequest);
+	const response = await client.call<typeof leaveRequest, { success: boolean; error?: string }>(
+		'RoomLeaveTableOrTournament',
+		leaveRequest
+	);
 
 	if (!response.success) {
 		throw new Error(response.error || 'Failed to leave table');
@@ -213,7 +219,10 @@ export async function startGame(tableId: string): Promise<string> {
 			tableId
 		};
 
-		const response = await client.call('MatchStart', request);
+		const response = await client.call<
+			typeof request,
+			{ success: boolean; error?: string; gameId?: string }
+		>('MatchStart', request);
 
 		if (!response.success) {
 			throw new Error(response.error || 'Failed to start game');
@@ -261,7 +270,10 @@ export async function submitDeck(
 		deck: deckCardLists
 	};
 
-	const response = await client.call('DeckSubmit', request);
+	const response = await client.call<typeof request, { success: boolean; error?: string }>(
+		'DeckSubmit',
+		request
+	);
 
 	if (!response.success) {
 		throw new Error(response.error || 'Failed to submit deck');

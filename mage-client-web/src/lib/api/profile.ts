@@ -5,16 +5,70 @@ import type {
 	ChangePasswordRequest
 } from '$lib/types/profile';
 import { getMageClient } from '$lib/grpc/client';
-import type {
-	UserGetProfileRequest,
-	UserGetProfileResponse,
-	UserGetStatsRequest,
-	UserGetStatsResponse,
-	UserGetMatchHistoryRequest,
-	UserGetMatchHistoryResponse,
-	UserChangePasswordRequest,
-	UserChangePasswordResponse
-} from '$lib/generated/mage/v1/user';
+
+// Define request/response types locally since they're not generated yet
+interface UserGetProfileRequest {
+	sessionId: string;
+}
+
+interface UserGetProfileResponse {
+	success: boolean;
+	error?: string;
+	profile?: {
+		userId: string;
+		username: string;
+		email?: string;
+		createdAt: number;
+		lastLogin?: number;
+	};
+}
+
+interface UserGetStatsRequest {
+	sessionId: string;
+}
+
+interface UserGetStatsResponse {
+	success: boolean;
+	error?: string;
+	stats?: {
+		wins: number;
+		losses: number;
+		draws: number;
+		quits: number;
+		totalPlayTime?: number;
+	};
+}
+
+interface UserGetMatchHistoryRequest {
+	sessionId: string;
+	limit: number;
+}
+
+interface MatchRecord {
+	matchId: string;
+	opponentName?: string;
+	format?: string;
+	result: string;
+	timestamp: number;
+	duration?: number;
+}
+
+interface UserGetMatchHistoryResponse {
+	success: boolean;
+	error?: string;
+	matches?: MatchRecord[];
+}
+
+interface UserChangePasswordRequest {
+	sessionId: string;
+	currentPassword: string;
+	newPassword: string;
+}
+
+interface UserChangePasswordResponse {
+	success: boolean;
+	error?: string;
+}
 
 /**
  * Fetch user profile information

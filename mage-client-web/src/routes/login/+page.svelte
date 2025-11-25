@@ -112,8 +112,7 @@
 			// Store in auth store (this will also ensure sessionId is set)
 			auth.login(token, {
 				id: response.userId,
-				username: loginUsername,
-				email: `${loginUsername}@example.com`
+				username: loginUsername
 			});
 
 			// Show success toast
@@ -239,8 +238,7 @@
 			// Store in auth store
 			auth.login(token, {
 				id: response.userId,
-				username: guestUsername,
-				email: 'guest@example.com'
+				username: guestUsername
 			});
 
 			// Show success toast
