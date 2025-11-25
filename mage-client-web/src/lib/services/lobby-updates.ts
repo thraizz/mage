@@ -53,7 +53,6 @@ function convertTableViewToTable(view: TableView): Table {
 			id: `${view.tableId}-${seat.seatNumber}`,
 			username: seat.playerName,
 			isHost: index === 0,
-			isReady: status !== 'waiting',
 			joinedAt: createTime
 		}));
 

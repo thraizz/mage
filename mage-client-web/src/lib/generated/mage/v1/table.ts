@@ -5,3845 +5,3771 @@
 // source: mage/v1/table.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
-import { MatchOptions } from './models';
+import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { MatchOptions } from "./models";
 
 export interface RoomCreateTableRequest {
-	sessionId: string;
-	roomId: string;
-	matchOptions?: MatchOptions | undefined;
+  sessionId: string;
+  roomId: string;
+  matchOptions?: MatchOptions | undefined;
 }
 
 export interface RoomCreateTableResponse {
-	success: boolean;
-	error: string;
-	tableId: string;
+  success: boolean;
+  error: string;
+  tableId: string;
 }
 
 export interface RoomCreateTournamentRequest {
-	sessionId: string;
-	roomId: string;
-	tournamentOptions?: TournamentOptions | undefined;
+  sessionId: string;
+  roomId: string;
+  tournamentOptions?: TournamentOptions | undefined;
 }
 
 export interface TournamentOptions {
-	name: string;
-	tournamentType: string;
-	numWins: number;
-	constructedDeckSize: number;
-	draftCubeId: number;
-	limitedPacks: number;
-	numRounds: number;
-	freeMulligans: number;
-	draftTiming: string;
-	rated: boolean;
-	quitRatio: number;
-	minimumRating: number;
-	sets: string[];
+  name: string;
+  tournamentType: string;
+  numWins: number;
+  constructedDeckSize: number;
+  draftCubeId: number;
+  limitedPacks: number;
+  numRounds: number;
+  freeMulligans: number;
+  draftTiming: string;
+  rated: boolean;
+  quitRatio: number;
+  minimumRating: number;
+  sets: string[];
 }
 
 export interface RoomCreateTournamentResponse {
-	success: boolean;
-	error: string;
-	tournamentId: string;
+  success: boolean;
+  error: string;
+  tournamentId: string;
 }
 
 export interface RoomJoinTableRequest {
-	sessionId: string;
-	roomId: string;
-	tableId: string;
-	playerName: string;
-	playerType: string;
-	skillLevel: number;
-	deckList: string;
-	password: string;
+  sessionId: string;
+  roomId: string;
+  tableId: string;
+  playerName: string;
+  playerType: string;
+  skillLevel: number;
+  deckList: string;
+  password: string;
 }
 
 export interface RoomJoinTableResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface RoomJoinTournamentRequest {
-	sessionId: string;
-	roomId: string;
-	tournamentId: string;
-	playerName: string;
-	playerType: string;
-	skillLevel: number;
-	deckList: string;
+  sessionId: string;
+  roomId: string;
+  tournamentId: string;
+  playerName: string;
+  playerType: string;
+  skillLevel: number;
+  deckList: string;
 }
 
 export interface RoomJoinTournamentResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface RoomLeaveTableOrTournamentRequest {
-	sessionId: string;
-	roomId: string;
-	tableId: string;
+  sessionId: string;
+  roomId: string;
+  tableId: string;
 }
 
 export interface RoomLeaveTableOrTournamentResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface RoomWatchTableRequest {
-	sessionId: string;
-	roomId: string;
-	tableId: string;
+  sessionId: string;
+  roomId: string;
+  tableId: string;
 }
 
 export interface RoomWatchTableResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface RoomWatchTournamentRequest {
-	sessionId: string;
-	roomId: string;
-	tournamentId: string;
+  sessionId: string;
+  roomId: string;
+  tournamentId: string;
 }
 
 export interface RoomWatchTournamentResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface TableSwapSeatsRequest {
-	sessionId: string;
-	roomId: string;
-	tableId: string;
-	seatNum1: number;
-	seatNum2: number;
+  sessionId: string;
+  roomId: string;
+  tableId: string;
+  seatNum1: number;
+  seatNum2: number;
 }
 
 export interface TableSwapSeatsResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface TableRemoveRequest {
-	sessionId: string;
-	roomId: string;
-	tableId: string;
+  sessionId: string;
+  roomId: string;
+  tableId: string;
 }
 
 export interface TableRemoveResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface TableIsOwnerRequest {
-	sessionId: string;
-	roomId: string;
-	tableId: string;
+  sessionId: string;
+  roomId: string;
+  tableId: string;
 }
 
 export interface TableIsOwnerResponse {
-	isOwner: boolean;
+  isOwner: boolean;
 }
 
 export interface DeckSubmitRequest {
-	sessionId: string;
-	tableId: string;
-	deck?: DeckCardLists | undefined;
+  sessionId: string;
+  tableId: string;
+  deck?: DeckCardLists | undefined;
 }
 
 /** DeckCard contains a card name and its full metadata */
 export interface DeckCard {
-	name: string;
-	/** e.g., "{2}{U}{U}" */
-	manaCost: string;
-	/** e.g., "Creature - Human Wizard" */
-	cardType: string;
-	/** e.g., ["CREATURE", "INSTANT"] */
-	types: string[];
-	/** e.g., ["U", "W"] (W=White, U=Blue, B=Black, R=Red, G=Green) */
-	colors: string[];
-	/** For creatures, e.g., "2" */
-	power: string;
-	/** For creatures, e.g., "3" */
-	toughness: string;
-	/** Number of copies in the deck */
-	quantity: number;
+  name: string;
+  /** e.g., "{2}{U}{U}" */
+  manaCost: string;
+  /** e.g., "Creature - Human Wizard" */
+  cardType: string;
+  /** e.g., ["CREATURE", "INSTANT"] */
+  types: string[];
+  /** e.g., ["U", "W"] (W=White, U=Blue, B=Black, R=Red, G=Green) */
+  colors: string[];
+  /** For creatures, e.g., "2" */
+  power: string;
+  /** For creatures, e.g., "3" */
+  toughness: string;
+  /** Number of copies in the deck */
+  quantity: number;
 }
 
 export interface DeckCardLists {
-	mainDeck: DeckCard[];
-	sideboard: DeckCard[];
-	/** For Commander format (usually 1-2 cards) */
-	commanders: DeckCard[];
+  mainDeck: DeckCard[];
+  sideboard: DeckCard[];
+  /** For Commander format (usually 1-2 cards) */
+  commanders: DeckCard[];
 }
 
 export interface DeckSubmitResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface DeckSaveRequest {
-	sessionId: string;
-	deckName: string;
-	deck?: DeckCardLists | undefined;
-	/** e.g., "Standard", "Modern", "Commander" */
-	format: string;
-	/** Optional deck description */
-	description: string;
+  sessionId: string;
+  deckName: string;
+  deck?:
+    | DeckCardLists
+    | undefined;
+  /** e.g., "Standard", "Modern", "Commander" */
+  format: string;
+  /** Optional deck description */
+  description: string;
 }
 
 export interface DeckSaveResponse {
-	success: boolean;
-	error: string;
-	deckId: number;
+  success: boolean;
+  error: string;
+  deckId: number;
 }
 
 export interface DeckListRequest {
-	sessionId: string;
-	/** Optional: filter by format (e.g., "Standard", "Modern", "Commander") */
-	format: string;
+  sessionId: string;
+  /** Optional: filter by format (e.g., "Standard", "Modern", "Commander") */
+  format: string;
 }
 
 export interface DeckInfo {
-	id: number;
-	name: string;
-	format: string;
-	description: string;
-	mainDeckCount: number;
-	sideboardCount: number;
-	/** Unix timestamp */
-	createdAt: number;
-	/** Unix timestamp */
-	updatedAt: number;
+  id: number;
+  name: string;
+  format: string;
+  description: string;
+  mainDeckCount: number;
+  sideboardCount: number;
+  /** Unix timestamp */
+  createdAt: number;
+  /** Unix timestamp */
+  updatedAt: number;
 }
 
 export interface DeckListResponse {
-	success: boolean;
-	error: string;
-	decks: DeckInfo[];
+  success: boolean;
+  error: string;
+  decks: DeckInfo[];
 }
 
 export interface DeckDeleteRequest {
-	sessionId: string;
-	deckId: number;
+  sessionId: string;
+  deckId: number;
 }
 
 export interface DeckDeleteResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface DeckGetRequest {
-	sessionId: string;
-	deckId: number;
+  sessionId: string;
+  deckId: number;
 }
 
 export interface DeckGetResponse {
-	success: boolean;
-	error: string;
-	info?: DeckInfo | undefined;
-	deck?: DeckCardLists | undefined;
+  success: boolean;
+  error: string;
+  info?: DeckInfo | undefined;
+  deck?: DeckCardLists | undefined;
 }
 
 function createBaseRoomCreateTableRequest(): RoomCreateTableRequest {
-	return { sessionId: '', roomId: '', matchOptions: undefined };
+  return { sessionId: "", roomId: "", matchOptions: undefined };
 }
 
 export const RoomCreateTableRequest: MessageFns<RoomCreateTableRequest> = {
-	encode(message: RoomCreateTableRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.matchOptions !== undefined) {
-			MatchOptions.encode(message.matchOptions, writer.uint32(26).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: RoomCreateTableRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.matchOptions !== undefined) {
+      MatchOptions.encode(message.matchOptions, writer.uint32(26).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomCreateTableRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomCreateTableRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomCreateTableRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomCreateTableRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.matchOptions = MatchOptions.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.matchOptions = MatchOptions.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomCreateTableRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			matchOptions: isSet(object.matchOptions)
-				? MatchOptions.fromJSON(object.matchOptions)
-				: undefined
-		};
-	},
+  fromJSON(object: any): RoomCreateTableRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      matchOptions: isSet(object.matchOptions) ? MatchOptions.fromJSON(object.matchOptions) : undefined,
+    };
+  },
 
-	toJSON(message: RoomCreateTableRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.matchOptions !== undefined) {
-			obj.matchOptions = MatchOptions.toJSON(message.matchOptions);
-		}
-		return obj;
-	},
+  toJSON(message: RoomCreateTableRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.matchOptions !== undefined) {
+      obj.matchOptions = MatchOptions.toJSON(message.matchOptions);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomCreateTableRequest>): RoomCreateTableRequest {
-		return RoomCreateTableRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomCreateTableRequest>): RoomCreateTableRequest {
-		const message = createBaseRoomCreateTableRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.matchOptions =
-			object.matchOptions !== undefined && object.matchOptions !== null
-				? MatchOptions.fromPartial(object.matchOptions)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<RoomCreateTableRequest>): RoomCreateTableRequest {
+    return RoomCreateTableRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomCreateTableRequest>): RoomCreateTableRequest {
+    const message = createBaseRoomCreateTableRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.matchOptions = (object.matchOptions !== undefined && object.matchOptions !== null)
+      ? MatchOptions.fromPartial(object.matchOptions)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseRoomCreateTableResponse(): RoomCreateTableResponse {
-	return { success: false, error: '', tableId: '' };
+  return { success: false, error: "", tableId: "" };
 }
 
 export const RoomCreateTableResponse: MessageFns<RoomCreateTableResponse> = {
-	encode(
-		message: RoomCreateTableResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(26).string(message.tableId);
-		}
-		return writer;
-	},
+  encode(message: RoomCreateTableResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(26).string(message.tableId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomCreateTableResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomCreateTableResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomCreateTableResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomCreateTableResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tableId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomCreateTableResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
-		};
-	},
+  fromJSON(object: any): RoomCreateTableResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+    };
+  },
 
-	toJSON(message: RoomCreateTableResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		return obj;
-	},
+  toJSON(message: RoomCreateTableResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomCreateTableResponse>): RoomCreateTableResponse {
-		return RoomCreateTableResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomCreateTableResponse>): RoomCreateTableResponse {
-		const message = createBaseRoomCreateTableResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.tableId = object.tableId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomCreateTableResponse>): RoomCreateTableResponse {
+    return RoomCreateTableResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomCreateTableResponse>): RoomCreateTableResponse {
+    const message = createBaseRoomCreateTableResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    message.tableId = object.tableId ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomCreateTournamentRequest(): RoomCreateTournamentRequest {
-	return { sessionId: '', roomId: '', tournamentOptions: undefined };
+  return { sessionId: "", roomId: "", tournamentOptions: undefined };
 }
 
 export const RoomCreateTournamentRequest: MessageFns<RoomCreateTournamentRequest> = {
-	encode(
-		message: RoomCreateTournamentRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.tournamentOptions !== undefined) {
-			TournamentOptions.encode(message.tournamentOptions, writer.uint32(26).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: RoomCreateTournamentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.tournamentOptions !== undefined) {
+      TournamentOptions.encode(message.tournamentOptions, writer.uint32(26).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomCreateTournamentRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomCreateTournamentRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomCreateTournamentRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomCreateTournamentRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tournamentOptions = TournamentOptions.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tournamentOptions = TournamentOptions.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomCreateTournamentRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			tournamentOptions: isSet(object.tournamentOptions)
-				? TournamentOptions.fromJSON(object.tournamentOptions)
-				: undefined
-		};
-	},
+  fromJSON(object: any): RoomCreateTournamentRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      tournamentOptions: isSet(object.tournamentOptions)
+        ? TournamentOptions.fromJSON(object.tournamentOptions)
+        : undefined,
+    };
+  },
 
-	toJSON(message: RoomCreateTournamentRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.tournamentOptions !== undefined) {
-			obj.tournamentOptions = TournamentOptions.toJSON(message.tournamentOptions);
-		}
-		return obj;
-	},
+  toJSON(message: RoomCreateTournamentRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.tournamentOptions !== undefined) {
+      obj.tournamentOptions = TournamentOptions.toJSON(message.tournamentOptions);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomCreateTournamentRequest>): RoomCreateTournamentRequest {
-		return RoomCreateTournamentRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomCreateTournamentRequest>): RoomCreateTournamentRequest {
-		const message = createBaseRoomCreateTournamentRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.tournamentOptions =
-			object.tournamentOptions !== undefined && object.tournamentOptions !== null
-				? TournamentOptions.fromPartial(object.tournamentOptions)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<RoomCreateTournamentRequest>): RoomCreateTournamentRequest {
+    return RoomCreateTournamentRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomCreateTournamentRequest>): RoomCreateTournamentRequest {
+    const message = createBaseRoomCreateTournamentRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.tournamentOptions = (object.tournamentOptions !== undefined && object.tournamentOptions !== null)
+      ? TournamentOptions.fromPartial(object.tournamentOptions)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseTournamentOptions(): TournamentOptions {
-	return {
-		name: '',
-		tournamentType: '',
-		numWins: 0,
-		constructedDeckSize: 0,
-		draftCubeId: 0,
-		limitedPacks: 0,
-		numRounds: 0,
-		freeMulligans: 0,
-		draftTiming: '',
-		rated: false,
-		quitRatio: 0,
-		minimumRating: 0,
-		sets: []
-	};
+  return {
+    name: "",
+    tournamentType: "",
+    numWins: 0,
+    constructedDeckSize: 0,
+    draftCubeId: 0,
+    limitedPacks: 0,
+    numRounds: 0,
+    freeMulligans: 0,
+    draftTiming: "",
+    rated: false,
+    quitRatio: 0,
+    minimumRating: 0,
+    sets: [],
+  };
 }
 
 export const TournamentOptions: MessageFns<TournamentOptions> = {
-	encode(message: TournamentOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.name !== '') {
-			writer.uint32(10).string(message.name);
-		}
-		if (message.tournamentType !== '') {
-			writer.uint32(18).string(message.tournamentType);
-		}
-		if (message.numWins !== 0) {
-			writer.uint32(24).int32(message.numWins);
-		}
-		if (message.constructedDeckSize !== 0) {
-			writer.uint32(32).int32(message.constructedDeckSize);
-		}
-		if (message.draftCubeId !== 0) {
-			writer.uint32(40).int32(message.draftCubeId);
-		}
-		if (message.limitedPacks !== 0) {
-			writer.uint32(48).int32(message.limitedPacks);
-		}
-		if (message.numRounds !== 0) {
-			writer.uint32(56).int32(message.numRounds);
-		}
-		if (message.freeMulligans !== 0) {
-			writer.uint32(64).int32(message.freeMulligans);
-		}
-		if (message.draftTiming !== '') {
-			writer.uint32(74).string(message.draftTiming);
-		}
-		if (message.rated !== false) {
-			writer.uint32(80).bool(message.rated);
-		}
-		if (message.quitRatio !== 0) {
-			writer.uint32(88).int32(message.quitRatio);
-		}
-		if (message.minimumRating !== 0) {
-			writer.uint32(96).int32(message.minimumRating);
-		}
-		for (const v of message.sets) {
-			writer.uint32(106).string(v!);
-		}
-		return writer;
-	},
+  encode(message: TournamentOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.tournamentType !== "") {
+      writer.uint32(18).string(message.tournamentType);
+    }
+    if (message.numWins !== 0) {
+      writer.uint32(24).int32(message.numWins);
+    }
+    if (message.constructedDeckSize !== 0) {
+      writer.uint32(32).int32(message.constructedDeckSize);
+    }
+    if (message.draftCubeId !== 0) {
+      writer.uint32(40).int32(message.draftCubeId);
+    }
+    if (message.limitedPacks !== 0) {
+      writer.uint32(48).int32(message.limitedPacks);
+    }
+    if (message.numRounds !== 0) {
+      writer.uint32(56).int32(message.numRounds);
+    }
+    if (message.freeMulligans !== 0) {
+      writer.uint32(64).int32(message.freeMulligans);
+    }
+    if (message.draftTiming !== "") {
+      writer.uint32(74).string(message.draftTiming);
+    }
+    if (message.rated !== false) {
+      writer.uint32(80).bool(message.rated);
+    }
+    if (message.quitRatio !== 0) {
+      writer.uint32(88).int32(message.quitRatio);
+    }
+    if (message.minimumRating !== 0) {
+      writer.uint32(96).int32(message.minimumRating);
+    }
+    for (const v of message.sets) {
+      writer.uint32(106).string(v!);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TournamentOptions {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTournamentOptions();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TournamentOptions {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTournamentOptions();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.name = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.name = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.tournamentType = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.tournamentType = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.numWins = reader.int32();
-					continue;
-				}
-				case 4: {
-					if (tag !== 32) {
-						break;
-					}
+          message.numWins = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
 
-					message.constructedDeckSize = reader.int32();
-					continue;
-				}
-				case 5: {
-					if (tag !== 40) {
-						break;
-					}
+          message.constructedDeckSize = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
 
-					message.draftCubeId = reader.int32();
-					continue;
-				}
-				case 6: {
-					if (tag !== 48) {
-						break;
-					}
+          message.draftCubeId = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
 
-					message.limitedPacks = reader.int32();
-					continue;
-				}
-				case 7: {
-					if (tag !== 56) {
-						break;
-					}
+          message.limitedPacks = reader.int32();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
 
-					message.numRounds = reader.int32();
-					continue;
-				}
-				case 8: {
-					if (tag !== 64) {
-						break;
-					}
+          message.numRounds = reader.int32();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
 
-					message.freeMulligans = reader.int32();
-					continue;
-				}
-				case 9: {
-					if (tag !== 74) {
-						break;
-					}
+          message.freeMulligans = reader.int32();
+          continue;
+        }
+        case 9: {
+          if (tag !== 74) {
+            break;
+          }
 
-					message.draftTiming = reader.string();
-					continue;
-				}
-				case 10: {
-					if (tag !== 80) {
-						break;
-					}
+          message.draftTiming = reader.string();
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
 
-					message.rated = reader.bool();
-					continue;
-				}
-				case 11: {
-					if (tag !== 88) {
-						break;
-					}
+          message.rated = reader.bool();
+          continue;
+        }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
 
-					message.quitRatio = reader.int32();
-					continue;
-				}
-				case 12: {
-					if (tag !== 96) {
-						break;
-					}
+          message.quitRatio = reader.int32();
+          continue;
+        }
+        case 12: {
+          if (tag !== 96) {
+            break;
+          }
 
-					message.minimumRating = reader.int32();
-					continue;
-				}
-				case 13: {
-					if (tag !== 106) {
-						break;
-					}
+          message.minimumRating = reader.int32();
+          continue;
+        }
+        case 13: {
+          if (tag !== 106) {
+            break;
+          }
 
-					message.sets.push(reader.string());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.sets.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TournamentOptions {
-		return {
-			name: isSet(object.name) ? globalThis.String(object.name) : '',
-			tournamentType: isSet(object.tournamentType) ? globalThis.String(object.tournamentType) : '',
-			numWins: isSet(object.numWins) ? globalThis.Number(object.numWins) : 0,
-			constructedDeckSize: isSet(object.constructedDeckSize)
-				? globalThis.Number(object.constructedDeckSize)
-				: 0,
-			draftCubeId: isSet(object.draftCubeId) ? globalThis.Number(object.draftCubeId) : 0,
-			limitedPacks: isSet(object.limitedPacks) ? globalThis.Number(object.limitedPacks) : 0,
-			numRounds: isSet(object.numRounds) ? globalThis.Number(object.numRounds) : 0,
-			freeMulligans: isSet(object.freeMulligans) ? globalThis.Number(object.freeMulligans) : 0,
-			draftTiming: isSet(object.draftTiming) ? globalThis.String(object.draftTiming) : '',
-			rated: isSet(object.rated) ? globalThis.Boolean(object.rated) : false,
-			quitRatio: isSet(object.quitRatio) ? globalThis.Number(object.quitRatio) : 0,
-			minimumRating: isSet(object.minimumRating) ? globalThis.Number(object.minimumRating) : 0,
-			sets: globalThis.Array.isArray(object?.sets)
-				? object.sets.map((e: any) => globalThis.String(e))
-				: []
-		};
-	},
+  fromJSON(object: any): TournamentOptions {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      tournamentType: isSet(object.tournamentType) ? globalThis.String(object.tournamentType) : "",
+      numWins: isSet(object.numWins) ? globalThis.Number(object.numWins) : 0,
+      constructedDeckSize: isSet(object.constructedDeckSize) ? globalThis.Number(object.constructedDeckSize) : 0,
+      draftCubeId: isSet(object.draftCubeId) ? globalThis.Number(object.draftCubeId) : 0,
+      limitedPacks: isSet(object.limitedPacks) ? globalThis.Number(object.limitedPacks) : 0,
+      numRounds: isSet(object.numRounds) ? globalThis.Number(object.numRounds) : 0,
+      freeMulligans: isSet(object.freeMulligans) ? globalThis.Number(object.freeMulligans) : 0,
+      draftTiming: isSet(object.draftTiming) ? globalThis.String(object.draftTiming) : "",
+      rated: isSet(object.rated) ? globalThis.Boolean(object.rated) : false,
+      quitRatio: isSet(object.quitRatio) ? globalThis.Number(object.quitRatio) : 0,
+      minimumRating: isSet(object.minimumRating) ? globalThis.Number(object.minimumRating) : 0,
+      sets: globalThis.Array.isArray(object?.sets) ? object.sets.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
 
-	toJSON(message: TournamentOptions): unknown {
-		const obj: any = {};
-		if (message.name !== '') {
-			obj.name = message.name;
-		}
-		if (message.tournamentType !== '') {
-			obj.tournamentType = message.tournamentType;
-		}
-		if (message.numWins !== 0) {
-			obj.numWins = Math.round(message.numWins);
-		}
-		if (message.constructedDeckSize !== 0) {
-			obj.constructedDeckSize = Math.round(message.constructedDeckSize);
-		}
-		if (message.draftCubeId !== 0) {
-			obj.draftCubeId = Math.round(message.draftCubeId);
-		}
-		if (message.limitedPacks !== 0) {
-			obj.limitedPacks = Math.round(message.limitedPacks);
-		}
-		if (message.numRounds !== 0) {
-			obj.numRounds = Math.round(message.numRounds);
-		}
-		if (message.freeMulligans !== 0) {
-			obj.freeMulligans = Math.round(message.freeMulligans);
-		}
-		if (message.draftTiming !== '') {
-			obj.draftTiming = message.draftTiming;
-		}
-		if (message.rated !== false) {
-			obj.rated = message.rated;
-		}
-		if (message.quitRatio !== 0) {
-			obj.quitRatio = Math.round(message.quitRatio);
-		}
-		if (message.minimumRating !== 0) {
-			obj.minimumRating = Math.round(message.minimumRating);
-		}
-		if (message.sets?.length) {
-			obj.sets = message.sets;
-		}
-		return obj;
-	},
+  toJSON(message: TournamentOptions): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.tournamentType !== "") {
+      obj.tournamentType = message.tournamentType;
+    }
+    if (message.numWins !== 0) {
+      obj.numWins = Math.round(message.numWins);
+    }
+    if (message.constructedDeckSize !== 0) {
+      obj.constructedDeckSize = Math.round(message.constructedDeckSize);
+    }
+    if (message.draftCubeId !== 0) {
+      obj.draftCubeId = Math.round(message.draftCubeId);
+    }
+    if (message.limitedPacks !== 0) {
+      obj.limitedPacks = Math.round(message.limitedPacks);
+    }
+    if (message.numRounds !== 0) {
+      obj.numRounds = Math.round(message.numRounds);
+    }
+    if (message.freeMulligans !== 0) {
+      obj.freeMulligans = Math.round(message.freeMulligans);
+    }
+    if (message.draftTiming !== "") {
+      obj.draftTiming = message.draftTiming;
+    }
+    if (message.rated !== false) {
+      obj.rated = message.rated;
+    }
+    if (message.quitRatio !== 0) {
+      obj.quitRatio = Math.round(message.quitRatio);
+    }
+    if (message.minimumRating !== 0) {
+      obj.minimumRating = Math.round(message.minimumRating);
+    }
+    if (message.sets?.length) {
+      obj.sets = message.sets;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TournamentOptions>): TournamentOptions {
-		return TournamentOptions.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TournamentOptions>): TournamentOptions {
-		const message = createBaseTournamentOptions();
-		message.name = object.name ?? '';
-		message.tournamentType = object.tournamentType ?? '';
-		message.numWins = object.numWins ?? 0;
-		message.constructedDeckSize = object.constructedDeckSize ?? 0;
-		message.draftCubeId = object.draftCubeId ?? 0;
-		message.limitedPacks = object.limitedPacks ?? 0;
-		message.numRounds = object.numRounds ?? 0;
-		message.freeMulligans = object.freeMulligans ?? 0;
-		message.draftTiming = object.draftTiming ?? '';
-		message.rated = object.rated ?? false;
-		message.quitRatio = object.quitRatio ?? 0;
-		message.minimumRating = object.minimumRating ?? 0;
-		message.sets = object.sets?.map((e) => e) || [];
-		return message;
-	}
+  create(base?: DeepPartial<TournamentOptions>): TournamentOptions {
+    return TournamentOptions.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TournamentOptions>): TournamentOptions {
+    const message = createBaseTournamentOptions();
+    message.name = object.name ?? "";
+    message.tournamentType = object.tournamentType ?? "";
+    message.numWins = object.numWins ?? 0;
+    message.constructedDeckSize = object.constructedDeckSize ?? 0;
+    message.draftCubeId = object.draftCubeId ?? 0;
+    message.limitedPacks = object.limitedPacks ?? 0;
+    message.numRounds = object.numRounds ?? 0;
+    message.freeMulligans = object.freeMulligans ?? 0;
+    message.draftTiming = object.draftTiming ?? "";
+    message.rated = object.rated ?? false;
+    message.quitRatio = object.quitRatio ?? 0;
+    message.minimumRating = object.minimumRating ?? 0;
+    message.sets = object.sets?.map((e) => e) || [];
+    return message;
+  },
 };
 
 function createBaseRoomCreateTournamentResponse(): RoomCreateTournamentResponse {
-	return { success: false, error: '', tournamentId: '' };
+  return { success: false, error: "", tournamentId: "" };
 }
 
 export const RoomCreateTournamentResponse: MessageFns<RoomCreateTournamentResponse> = {
-	encode(
-		message: RoomCreateTournamentResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		if (message.tournamentId !== '') {
-			writer.uint32(26).string(message.tournamentId);
-		}
-		return writer;
-	},
+  encode(message: RoomCreateTournamentResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    if (message.tournamentId !== "") {
+      writer.uint32(26).string(message.tournamentId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomCreateTournamentResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomCreateTournamentResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomCreateTournamentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomCreateTournamentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tournamentId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tournamentId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomCreateTournamentResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : ''
-		};
-	},
+  fromJSON(object: any): RoomCreateTournamentResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : "",
+    };
+  },
 
-	toJSON(message: RoomCreateTournamentResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.tournamentId !== '') {
-			obj.tournamentId = message.tournamentId;
-		}
-		return obj;
-	},
+  toJSON(message: RoomCreateTournamentResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.tournamentId !== "") {
+      obj.tournamentId = message.tournamentId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomCreateTournamentResponse>): RoomCreateTournamentResponse {
-		return RoomCreateTournamentResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomCreateTournamentResponse>): RoomCreateTournamentResponse {
-		const message = createBaseRoomCreateTournamentResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.tournamentId = object.tournamentId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomCreateTournamentResponse>): RoomCreateTournamentResponse {
+    return RoomCreateTournamentResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomCreateTournamentResponse>): RoomCreateTournamentResponse {
+    const message = createBaseRoomCreateTournamentResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    message.tournamentId = object.tournamentId ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomJoinTableRequest(): RoomJoinTableRequest {
-	return {
-		sessionId: '',
-		roomId: '',
-		tableId: '',
-		playerName: '',
-		playerType: '',
-		skillLevel: 0,
-		deckList: '',
-		password: ''
-	};
+  return {
+    sessionId: "",
+    roomId: "",
+    tableId: "",
+    playerName: "",
+    playerType: "",
+    skillLevel: 0,
+    deckList: "",
+    password: "",
+  };
 }
 
 export const RoomJoinTableRequest: MessageFns<RoomJoinTableRequest> = {
-	encode(message: RoomJoinTableRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(26).string(message.tableId);
-		}
-		if (message.playerName !== '') {
-			writer.uint32(34).string(message.playerName);
-		}
-		if (message.playerType !== '') {
-			writer.uint32(42).string(message.playerType);
-		}
-		if (message.skillLevel !== 0) {
-			writer.uint32(48).int32(message.skillLevel);
-		}
-		if (message.deckList !== '') {
-			writer.uint32(58).string(message.deckList);
-		}
-		if (message.password !== '') {
-			writer.uint32(66).string(message.password);
-		}
-		return writer;
-	},
+  encode(message: RoomJoinTableRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(26).string(message.tableId);
+    }
+    if (message.playerName !== "") {
+      writer.uint32(34).string(message.playerName);
+    }
+    if (message.playerType !== "") {
+      writer.uint32(42).string(message.playerType);
+    }
+    if (message.skillLevel !== 0) {
+      writer.uint32(48).int32(message.skillLevel);
+    }
+    if (message.deckList !== "") {
+      writer.uint32(58).string(message.deckList);
+    }
+    if (message.password !== "") {
+      writer.uint32(66).string(message.password);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomJoinTableRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomJoinTableRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomJoinTableRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomJoinTableRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.tableId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.playerName = reader.string();
-					continue;
-				}
-				case 5: {
-					if (tag !== 42) {
-						break;
-					}
+          message.playerName = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
 
-					message.playerType = reader.string();
-					continue;
-				}
-				case 6: {
-					if (tag !== 48) {
-						break;
-					}
+          message.playerType = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
 
-					message.skillLevel = reader.int32();
-					continue;
-				}
-				case 7: {
-					if (tag !== 58) {
-						break;
-					}
+          message.skillLevel = reader.int32();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
 
-					message.deckList = reader.string();
-					continue;
-				}
-				case 8: {
-					if (tag !== 66) {
-						break;
-					}
+          message.deckList = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
 
-					message.password = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.password = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomJoinTableRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : '',
-			playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : '',
-			playerType: isSet(object.playerType) ? globalThis.String(object.playerType) : '',
-			skillLevel: isSet(object.skillLevel) ? globalThis.Number(object.skillLevel) : 0,
-			deckList: isSet(object.deckList) ? globalThis.String(object.deckList) : '',
-			password: isSet(object.password) ? globalThis.String(object.password) : ''
-		};
-	},
+  fromJSON(object: any): RoomJoinTableRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+      playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : "",
+      playerType: isSet(object.playerType) ? globalThis.String(object.playerType) : "",
+      skillLevel: isSet(object.skillLevel) ? globalThis.Number(object.skillLevel) : 0,
+      deckList: isSet(object.deckList) ? globalThis.String(object.deckList) : "",
+      password: isSet(object.password) ? globalThis.String(object.password) : "",
+    };
+  },
 
-	toJSON(message: RoomJoinTableRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		if (message.playerName !== '') {
-			obj.playerName = message.playerName;
-		}
-		if (message.playerType !== '') {
-			obj.playerType = message.playerType;
-		}
-		if (message.skillLevel !== 0) {
-			obj.skillLevel = Math.round(message.skillLevel);
-		}
-		if (message.deckList !== '') {
-			obj.deckList = message.deckList;
-		}
-		if (message.password !== '') {
-			obj.password = message.password;
-		}
-		return obj;
-	},
+  toJSON(message: RoomJoinTableRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    if (message.playerName !== "") {
+      obj.playerName = message.playerName;
+    }
+    if (message.playerType !== "") {
+      obj.playerType = message.playerType;
+    }
+    if (message.skillLevel !== 0) {
+      obj.skillLevel = Math.round(message.skillLevel);
+    }
+    if (message.deckList !== "") {
+      obj.deckList = message.deckList;
+    }
+    if (message.password !== "") {
+      obj.password = message.password;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomJoinTableRequest>): RoomJoinTableRequest {
-		return RoomJoinTableRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomJoinTableRequest>): RoomJoinTableRequest {
-		const message = createBaseRoomJoinTableRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.tableId = object.tableId ?? '';
-		message.playerName = object.playerName ?? '';
-		message.playerType = object.playerType ?? '';
-		message.skillLevel = object.skillLevel ?? 0;
-		message.deckList = object.deckList ?? '';
-		message.password = object.password ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomJoinTableRequest>): RoomJoinTableRequest {
+    return RoomJoinTableRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomJoinTableRequest>): RoomJoinTableRequest {
+    const message = createBaseRoomJoinTableRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.tableId = object.tableId ?? "";
+    message.playerName = object.playerName ?? "";
+    message.playerType = object.playerType ?? "";
+    message.skillLevel = object.skillLevel ?? 0;
+    message.deckList = object.deckList ?? "";
+    message.password = object.password ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomJoinTableResponse(): RoomJoinTableResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const RoomJoinTableResponse: MessageFns<RoomJoinTableResponse> = {
-	encode(message: RoomJoinTableResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: RoomJoinTableResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomJoinTableResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomJoinTableResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomJoinTableResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomJoinTableResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomJoinTableResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): RoomJoinTableResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: RoomJoinTableResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: RoomJoinTableResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomJoinTableResponse>): RoomJoinTableResponse {
-		return RoomJoinTableResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomJoinTableResponse>): RoomJoinTableResponse {
-		const message = createBaseRoomJoinTableResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomJoinTableResponse>): RoomJoinTableResponse {
+    return RoomJoinTableResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomJoinTableResponse>): RoomJoinTableResponse {
+    const message = createBaseRoomJoinTableResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomJoinTournamentRequest(): RoomJoinTournamentRequest {
-	return {
-		sessionId: '',
-		roomId: '',
-		tournamentId: '',
-		playerName: '',
-		playerType: '',
-		skillLevel: 0,
-		deckList: ''
-	};
+  return { sessionId: "", roomId: "", tournamentId: "", playerName: "", playerType: "", skillLevel: 0, deckList: "" };
 }
 
 export const RoomJoinTournamentRequest: MessageFns<RoomJoinTournamentRequest> = {
-	encode(
-		message: RoomJoinTournamentRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.tournamentId !== '') {
-			writer.uint32(26).string(message.tournamentId);
-		}
-		if (message.playerName !== '') {
-			writer.uint32(34).string(message.playerName);
-		}
-		if (message.playerType !== '') {
-			writer.uint32(42).string(message.playerType);
-		}
-		if (message.skillLevel !== 0) {
-			writer.uint32(48).int32(message.skillLevel);
-		}
-		if (message.deckList !== '') {
-			writer.uint32(58).string(message.deckList);
-		}
-		return writer;
-	},
+  encode(message: RoomJoinTournamentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.tournamentId !== "") {
+      writer.uint32(26).string(message.tournamentId);
+    }
+    if (message.playerName !== "") {
+      writer.uint32(34).string(message.playerName);
+    }
+    if (message.playerType !== "") {
+      writer.uint32(42).string(message.playerType);
+    }
+    if (message.skillLevel !== 0) {
+      writer.uint32(48).int32(message.skillLevel);
+    }
+    if (message.deckList !== "") {
+      writer.uint32(58).string(message.deckList);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomJoinTournamentRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomJoinTournamentRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomJoinTournamentRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomJoinTournamentRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tournamentId = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.tournamentId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.playerName = reader.string();
-					continue;
-				}
-				case 5: {
-					if (tag !== 42) {
-						break;
-					}
+          message.playerName = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
 
-					message.playerType = reader.string();
-					continue;
-				}
-				case 6: {
-					if (tag !== 48) {
-						break;
-					}
+          message.playerType = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
 
-					message.skillLevel = reader.int32();
-					continue;
-				}
-				case 7: {
-					if (tag !== 58) {
-						break;
-					}
+          message.skillLevel = reader.int32();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
 
-					message.deckList = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.deckList = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomJoinTournamentRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : '',
-			playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : '',
-			playerType: isSet(object.playerType) ? globalThis.String(object.playerType) : '',
-			skillLevel: isSet(object.skillLevel) ? globalThis.Number(object.skillLevel) : 0,
-			deckList: isSet(object.deckList) ? globalThis.String(object.deckList) : ''
-		};
-	},
+  fromJSON(object: any): RoomJoinTournamentRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : "",
+      playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : "",
+      playerType: isSet(object.playerType) ? globalThis.String(object.playerType) : "",
+      skillLevel: isSet(object.skillLevel) ? globalThis.Number(object.skillLevel) : 0,
+      deckList: isSet(object.deckList) ? globalThis.String(object.deckList) : "",
+    };
+  },
 
-	toJSON(message: RoomJoinTournamentRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.tournamentId !== '') {
-			obj.tournamentId = message.tournamentId;
-		}
-		if (message.playerName !== '') {
-			obj.playerName = message.playerName;
-		}
-		if (message.playerType !== '') {
-			obj.playerType = message.playerType;
-		}
-		if (message.skillLevel !== 0) {
-			obj.skillLevel = Math.round(message.skillLevel);
-		}
-		if (message.deckList !== '') {
-			obj.deckList = message.deckList;
-		}
-		return obj;
-	},
+  toJSON(message: RoomJoinTournamentRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.tournamentId !== "") {
+      obj.tournamentId = message.tournamentId;
+    }
+    if (message.playerName !== "") {
+      obj.playerName = message.playerName;
+    }
+    if (message.playerType !== "") {
+      obj.playerType = message.playerType;
+    }
+    if (message.skillLevel !== 0) {
+      obj.skillLevel = Math.round(message.skillLevel);
+    }
+    if (message.deckList !== "") {
+      obj.deckList = message.deckList;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomJoinTournamentRequest>): RoomJoinTournamentRequest {
-		return RoomJoinTournamentRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomJoinTournamentRequest>): RoomJoinTournamentRequest {
-		const message = createBaseRoomJoinTournamentRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.tournamentId = object.tournamentId ?? '';
-		message.playerName = object.playerName ?? '';
-		message.playerType = object.playerType ?? '';
-		message.skillLevel = object.skillLevel ?? 0;
-		message.deckList = object.deckList ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomJoinTournamentRequest>): RoomJoinTournamentRequest {
+    return RoomJoinTournamentRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomJoinTournamentRequest>): RoomJoinTournamentRequest {
+    const message = createBaseRoomJoinTournamentRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.tournamentId = object.tournamentId ?? "";
+    message.playerName = object.playerName ?? "";
+    message.playerType = object.playerType ?? "";
+    message.skillLevel = object.skillLevel ?? 0;
+    message.deckList = object.deckList ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomJoinTournamentResponse(): RoomJoinTournamentResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const RoomJoinTournamentResponse: MessageFns<RoomJoinTournamentResponse> = {
-	encode(
-		message: RoomJoinTournamentResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: RoomJoinTournamentResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomJoinTournamentResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomJoinTournamentResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomJoinTournamentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomJoinTournamentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomJoinTournamentResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): RoomJoinTournamentResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: RoomJoinTournamentResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: RoomJoinTournamentResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomJoinTournamentResponse>): RoomJoinTournamentResponse {
-		return RoomJoinTournamentResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomJoinTournamentResponse>): RoomJoinTournamentResponse {
-		const message = createBaseRoomJoinTournamentResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomJoinTournamentResponse>): RoomJoinTournamentResponse {
+    return RoomJoinTournamentResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomJoinTournamentResponse>): RoomJoinTournamentResponse {
+    const message = createBaseRoomJoinTournamentResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomLeaveTableOrTournamentRequest(): RoomLeaveTableOrTournamentRequest {
-	return { sessionId: '', roomId: '', tableId: '' };
+  return { sessionId: "", roomId: "", tableId: "" };
 }
 
 export const RoomLeaveTableOrTournamentRequest: MessageFns<RoomLeaveTableOrTournamentRequest> = {
-	encode(
-		message: RoomLeaveTableOrTournamentRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(26).string(message.tableId);
-		}
-		return writer;
-	},
+  encode(message: RoomLeaveTableOrTournamentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(26).string(message.tableId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomLeaveTableOrTournamentRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomLeaveTableOrTournamentRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomLeaveTableOrTournamentRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomLeaveTableOrTournamentRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tableId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomLeaveTableOrTournamentRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
-		};
-	},
+  fromJSON(object: any): RoomLeaveTableOrTournamentRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+    };
+  },
 
-	toJSON(message: RoomLeaveTableOrTournamentRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		return obj;
-	},
+  toJSON(message: RoomLeaveTableOrTournamentRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomLeaveTableOrTournamentRequest>): RoomLeaveTableOrTournamentRequest {
-		return RoomLeaveTableOrTournamentRequest.fromPartial(base ?? {});
-	},
-	fromPartial(
-		object: DeepPartial<RoomLeaveTableOrTournamentRequest>
-	): RoomLeaveTableOrTournamentRequest {
-		const message = createBaseRoomLeaveTableOrTournamentRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.tableId = object.tableId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomLeaveTableOrTournamentRequest>): RoomLeaveTableOrTournamentRequest {
+    return RoomLeaveTableOrTournamentRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomLeaveTableOrTournamentRequest>): RoomLeaveTableOrTournamentRequest {
+    const message = createBaseRoomLeaveTableOrTournamentRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.tableId = object.tableId ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomLeaveTableOrTournamentResponse(): RoomLeaveTableOrTournamentResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const RoomLeaveTableOrTournamentResponse: MessageFns<RoomLeaveTableOrTournamentResponse> = {
-	encode(
-		message: RoomLeaveTableOrTournamentResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: RoomLeaveTableOrTournamentResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomLeaveTableOrTournamentResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomLeaveTableOrTournamentResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomLeaveTableOrTournamentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomLeaveTableOrTournamentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomLeaveTableOrTournamentResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): RoomLeaveTableOrTournamentResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: RoomLeaveTableOrTournamentResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: RoomLeaveTableOrTournamentResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(
-		base?: DeepPartial<RoomLeaveTableOrTournamentResponse>
-	): RoomLeaveTableOrTournamentResponse {
-		return RoomLeaveTableOrTournamentResponse.fromPartial(base ?? {});
-	},
-	fromPartial(
-		object: DeepPartial<RoomLeaveTableOrTournamentResponse>
-	): RoomLeaveTableOrTournamentResponse {
-		const message = createBaseRoomLeaveTableOrTournamentResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomLeaveTableOrTournamentResponse>): RoomLeaveTableOrTournamentResponse {
+    return RoomLeaveTableOrTournamentResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomLeaveTableOrTournamentResponse>): RoomLeaveTableOrTournamentResponse {
+    const message = createBaseRoomLeaveTableOrTournamentResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomWatchTableRequest(): RoomWatchTableRequest {
-	return { sessionId: '', roomId: '', tableId: '' };
+  return { sessionId: "", roomId: "", tableId: "" };
 }
 
 export const RoomWatchTableRequest: MessageFns<RoomWatchTableRequest> = {
-	encode(message: RoomWatchTableRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(26).string(message.tableId);
-		}
-		return writer;
-	},
+  encode(message: RoomWatchTableRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(26).string(message.tableId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomWatchTableRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomWatchTableRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomWatchTableRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomWatchTableRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tableId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomWatchTableRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
-		};
-	},
+  fromJSON(object: any): RoomWatchTableRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+    };
+  },
 
-	toJSON(message: RoomWatchTableRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		return obj;
-	},
+  toJSON(message: RoomWatchTableRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomWatchTableRequest>): RoomWatchTableRequest {
-		return RoomWatchTableRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomWatchTableRequest>): RoomWatchTableRequest {
-		const message = createBaseRoomWatchTableRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.tableId = object.tableId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomWatchTableRequest>): RoomWatchTableRequest {
+    return RoomWatchTableRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomWatchTableRequest>): RoomWatchTableRequest {
+    const message = createBaseRoomWatchTableRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.tableId = object.tableId ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomWatchTableResponse(): RoomWatchTableResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const RoomWatchTableResponse: MessageFns<RoomWatchTableResponse> = {
-	encode(message: RoomWatchTableResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: RoomWatchTableResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomWatchTableResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomWatchTableResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomWatchTableResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomWatchTableResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomWatchTableResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): RoomWatchTableResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: RoomWatchTableResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: RoomWatchTableResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomWatchTableResponse>): RoomWatchTableResponse {
-		return RoomWatchTableResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomWatchTableResponse>): RoomWatchTableResponse {
-		const message = createBaseRoomWatchTableResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomWatchTableResponse>): RoomWatchTableResponse {
+    return RoomWatchTableResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomWatchTableResponse>): RoomWatchTableResponse {
+    const message = createBaseRoomWatchTableResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomWatchTournamentRequest(): RoomWatchTournamentRequest {
-	return { sessionId: '', roomId: '', tournamentId: '' };
+  return { sessionId: "", roomId: "", tournamentId: "" };
 }
 
 export const RoomWatchTournamentRequest: MessageFns<RoomWatchTournamentRequest> = {
-	encode(
-		message: RoomWatchTournamentRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.tournamentId !== '') {
-			writer.uint32(26).string(message.tournamentId);
-		}
-		return writer;
-	},
+  encode(message: RoomWatchTournamentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.tournamentId !== "") {
+      writer.uint32(26).string(message.tournamentId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomWatchTournamentRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomWatchTournamentRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomWatchTournamentRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomWatchTournamentRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tournamentId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tournamentId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomWatchTournamentRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : ''
-		};
-	},
+  fromJSON(object: any): RoomWatchTournamentRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : "",
+    };
+  },
 
-	toJSON(message: RoomWatchTournamentRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.tournamentId !== '') {
-			obj.tournamentId = message.tournamentId;
-		}
-		return obj;
-	},
+  toJSON(message: RoomWatchTournamentRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.tournamentId !== "") {
+      obj.tournamentId = message.tournamentId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomWatchTournamentRequest>): RoomWatchTournamentRequest {
-		return RoomWatchTournamentRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomWatchTournamentRequest>): RoomWatchTournamentRequest {
-		const message = createBaseRoomWatchTournamentRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.tournamentId = object.tournamentId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomWatchTournamentRequest>): RoomWatchTournamentRequest {
+    return RoomWatchTournamentRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomWatchTournamentRequest>): RoomWatchTournamentRequest {
+    const message = createBaseRoomWatchTournamentRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.tournamentId = object.tournamentId ?? "";
+    return message;
+  },
 };
 
 function createBaseRoomWatchTournamentResponse(): RoomWatchTournamentResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const RoomWatchTournamentResponse: MessageFns<RoomWatchTournamentResponse> = {
-	encode(
-		message: RoomWatchTournamentResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: RoomWatchTournamentResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RoomWatchTournamentResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRoomWatchTournamentResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomWatchTournamentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomWatchTournamentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RoomWatchTournamentResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): RoomWatchTournamentResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: RoomWatchTournamentResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: RoomWatchTournamentResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RoomWatchTournamentResponse>): RoomWatchTournamentResponse {
-		return RoomWatchTournamentResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RoomWatchTournamentResponse>): RoomWatchTournamentResponse {
-		const message = createBaseRoomWatchTournamentResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RoomWatchTournamentResponse>): RoomWatchTournamentResponse {
+    return RoomWatchTournamentResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomWatchTournamentResponse>): RoomWatchTournamentResponse {
+    const message = createBaseRoomWatchTournamentResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseTableSwapSeatsRequest(): TableSwapSeatsRequest {
-	return { sessionId: '', roomId: '', tableId: '', seatNum1: 0, seatNum2: 0 };
+  return { sessionId: "", roomId: "", tableId: "", seatNum1: 0, seatNum2: 0 };
 }
 
 export const TableSwapSeatsRequest: MessageFns<TableSwapSeatsRequest> = {
-	encode(message: TableSwapSeatsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(26).string(message.tableId);
-		}
-		if (message.seatNum1 !== 0) {
-			writer.uint32(32).int32(message.seatNum1);
-		}
-		if (message.seatNum2 !== 0) {
-			writer.uint32(40).int32(message.seatNum2);
-		}
-		return writer;
-	},
+  encode(message: TableSwapSeatsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(26).string(message.tableId);
+    }
+    if (message.seatNum1 !== 0) {
+      writer.uint32(32).int32(message.seatNum1);
+    }
+    if (message.seatNum2 !== 0) {
+      writer.uint32(40).int32(message.seatNum2);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TableSwapSeatsRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTableSwapSeatsRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TableSwapSeatsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTableSwapSeatsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 32) {
-						break;
-					}
+          message.tableId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
 
-					message.seatNum1 = reader.int32();
-					continue;
-				}
-				case 5: {
-					if (tag !== 40) {
-						break;
-					}
+          message.seatNum1 = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
 
-					message.seatNum2 = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.seatNum2 = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TableSwapSeatsRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : '',
-			seatNum1: isSet(object.seatNum1) ? globalThis.Number(object.seatNum1) : 0,
-			seatNum2: isSet(object.seatNum2) ? globalThis.Number(object.seatNum2) : 0
-		};
-	},
+  fromJSON(object: any): TableSwapSeatsRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+      seatNum1: isSet(object.seatNum1) ? globalThis.Number(object.seatNum1) : 0,
+      seatNum2: isSet(object.seatNum2) ? globalThis.Number(object.seatNum2) : 0,
+    };
+  },
 
-	toJSON(message: TableSwapSeatsRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		if (message.seatNum1 !== 0) {
-			obj.seatNum1 = Math.round(message.seatNum1);
-		}
-		if (message.seatNum2 !== 0) {
-			obj.seatNum2 = Math.round(message.seatNum2);
-		}
-		return obj;
-	},
+  toJSON(message: TableSwapSeatsRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    if (message.seatNum1 !== 0) {
+      obj.seatNum1 = Math.round(message.seatNum1);
+    }
+    if (message.seatNum2 !== 0) {
+      obj.seatNum2 = Math.round(message.seatNum2);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TableSwapSeatsRequest>): TableSwapSeatsRequest {
-		return TableSwapSeatsRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TableSwapSeatsRequest>): TableSwapSeatsRequest {
-		const message = createBaseTableSwapSeatsRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.tableId = object.tableId ?? '';
-		message.seatNum1 = object.seatNum1 ?? 0;
-		message.seatNum2 = object.seatNum2 ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<TableSwapSeatsRequest>): TableSwapSeatsRequest {
+    return TableSwapSeatsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TableSwapSeatsRequest>): TableSwapSeatsRequest {
+    const message = createBaseTableSwapSeatsRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.tableId = object.tableId ?? "";
+    message.seatNum1 = object.seatNum1 ?? 0;
+    message.seatNum2 = object.seatNum2 ?? 0;
+    return message;
+  },
 };
 
 function createBaseTableSwapSeatsResponse(): TableSwapSeatsResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const TableSwapSeatsResponse: MessageFns<TableSwapSeatsResponse> = {
-	encode(message: TableSwapSeatsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: TableSwapSeatsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TableSwapSeatsResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTableSwapSeatsResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TableSwapSeatsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTableSwapSeatsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TableSwapSeatsResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): TableSwapSeatsResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: TableSwapSeatsResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: TableSwapSeatsResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TableSwapSeatsResponse>): TableSwapSeatsResponse {
-		return TableSwapSeatsResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TableSwapSeatsResponse>): TableSwapSeatsResponse {
-		const message = createBaseTableSwapSeatsResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<TableSwapSeatsResponse>): TableSwapSeatsResponse {
+    return TableSwapSeatsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TableSwapSeatsResponse>): TableSwapSeatsResponse {
+    const message = createBaseTableSwapSeatsResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseTableRemoveRequest(): TableRemoveRequest {
-	return { sessionId: '', roomId: '', tableId: '' };
+  return { sessionId: "", roomId: "", tableId: "" };
 }
 
 export const TableRemoveRequest: MessageFns<TableRemoveRequest> = {
-	encode(message: TableRemoveRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(26).string(message.tableId);
-		}
-		return writer;
-	},
+  encode(message: TableRemoveRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(26).string(message.tableId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TableRemoveRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTableRemoveRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TableRemoveRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTableRemoveRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tableId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TableRemoveRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
-		};
-	},
+  fromJSON(object: any): TableRemoveRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+    };
+  },
 
-	toJSON(message: TableRemoveRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		return obj;
-	},
+  toJSON(message: TableRemoveRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TableRemoveRequest>): TableRemoveRequest {
-		return TableRemoveRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TableRemoveRequest>): TableRemoveRequest {
-		const message = createBaseTableRemoveRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.tableId = object.tableId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<TableRemoveRequest>): TableRemoveRequest {
+    return TableRemoveRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TableRemoveRequest>): TableRemoveRequest {
+    const message = createBaseTableRemoveRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.tableId = object.tableId ?? "";
+    return message;
+  },
 };
 
 function createBaseTableRemoveResponse(): TableRemoveResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const TableRemoveResponse: MessageFns<TableRemoveResponse> = {
-	encode(message: TableRemoveResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: TableRemoveResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TableRemoveResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTableRemoveResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TableRemoveResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTableRemoveResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TableRemoveResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): TableRemoveResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: TableRemoveResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: TableRemoveResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TableRemoveResponse>): TableRemoveResponse {
-		return TableRemoveResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TableRemoveResponse>): TableRemoveResponse {
-		const message = createBaseTableRemoveResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<TableRemoveResponse>): TableRemoveResponse {
+    return TableRemoveResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TableRemoveResponse>): TableRemoveResponse {
+    const message = createBaseTableRemoveResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseTableIsOwnerRequest(): TableIsOwnerRequest {
-	return { sessionId: '', roomId: '', tableId: '' };
+  return { sessionId: "", roomId: "", tableId: "" };
 }
 
 export const TableIsOwnerRequest: MessageFns<TableIsOwnerRequest> = {
-	encode(message: TableIsOwnerRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(26).string(message.tableId);
-		}
-		return writer;
-	},
+  encode(message: TableIsOwnerRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== "") {
+      writer.uint32(18).string(message.roomId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(26).string(message.tableId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TableIsOwnerRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTableIsOwnerRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TableIsOwnerRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTableIsOwnerRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.roomId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tableId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TableIsOwnerRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
-		};
-	},
+  fromJSON(object: any): TableIsOwnerRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+    };
+  },
 
-	toJSON(message: TableIsOwnerRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		return obj;
-	},
+  toJSON(message: TableIsOwnerRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TableIsOwnerRequest>): TableIsOwnerRequest {
-		return TableIsOwnerRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TableIsOwnerRequest>): TableIsOwnerRequest {
-		const message = createBaseTableIsOwnerRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		message.tableId = object.tableId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<TableIsOwnerRequest>): TableIsOwnerRequest {
+    return TableIsOwnerRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TableIsOwnerRequest>): TableIsOwnerRequest {
+    const message = createBaseTableIsOwnerRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.roomId = object.roomId ?? "";
+    message.tableId = object.tableId ?? "";
+    return message;
+  },
 };
 
 function createBaseTableIsOwnerResponse(): TableIsOwnerResponse {
-	return { isOwner: false };
+  return { isOwner: false };
 }
 
 export const TableIsOwnerResponse: MessageFns<TableIsOwnerResponse> = {
-	encode(message: TableIsOwnerResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.isOwner !== false) {
-			writer.uint32(8).bool(message.isOwner);
-		}
-		return writer;
-	},
+  encode(message: TableIsOwnerResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.isOwner !== false) {
+      writer.uint32(8).bool(message.isOwner);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): TableIsOwnerResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseTableIsOwnerResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): TableIsOwnerResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTableIsOwnerResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.isOwner = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.isOwner = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): TableIsOwnerResponse {
-		return { isOwner: isSet(object.isOwner) ? globalThis.Boolean(object.isOwner) : false };
-	},
+  fromJSON(object: any): TableIsOwnerResponse {
+    return { isOwner: isSet(object.isOwner) ? globalThis.Boolean(object.isOwner) : false };
+  },
 
-	toJSON(message: TableIsOwnerResponse): unknown {
-		const obj: any = {};
-		if (message.isOwner !== false) {
-			obj.isOwner = message.isOwner;
-		}
-		return obj;
-	},
+  toJSON(message: TableIsOwnerResponse): unknown {
+    const obj: any = {};
+    if (message.isOwner !== false) {
+      obj.isOwner = message.isOwner;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<TableIsOwnerResponse>): TableIsOwnerResponse {
-		return TableIsOwnerResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<TableIsOwnerResponse>): TableIsOwnerResponse {
-		const message = createBaseTableIsOwnerResponse();
-		message.isOwner = object.isOwner ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<TableIsOwnerResponse>): TableIsOwnerResponse {
+    return TableIsOwnerResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TableIsOwnerResponse>): TableIsOwnerResponse {
+    const message = createBaseTableIsOwnerResponse();
+    message.isOwner = object.isOwner ?? false;
+    return message;
+  },
 };
 
 function createBaseDeckSubmitRequest(): DeckSubmitRequest {
-	return { sessionId: '', tableId: '', deck: undefined };
+  return { sessionId: "", tableId: "", deck: undefined };
 }
 
 export const DeckSubmitRequest: MessageFns<DeckSubmitRequest> = {
-	encode(message: DeckSubmitRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(18).string(message.tableId);
-		}
-		if (message.deck !== undefined) {
-			DeckCardLists.encode(message.deck, writer.uint32(26).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: DeckSubmitRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(18).string(message.tableId);
+    }
+    if (message.deck !== undefined) {
+      DeckCardLists.encode(message.deck, writer.uint32(26).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckSubmitRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckSubmitRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckSubmitRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckSubmitRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.tableId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.deck = DeckCardLists.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.deck = DeckCardLists.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckSubmitRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : '',
-			deck: isSet(object.deck) ? DeckCardLists.fromJSON(object.deck) : undefined
-		};
-	},
+  fromJSON(object: any): DeckSubmitRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+      deck: isSet(object.deck) ? DeckCardLists.fromJSON(object.deck) : undefined,
+    };
+  },
 
-	toJSON(message: DeckSubmitRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		if (message.deck !== undefined) {
-			obj.deck = DeckCardLists.toJSON(message.deck);
-		}
-		return obj;
-	},
+  toJSON(message: DeckSubmitRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    if (message.deck !== undefined) {
+      obj.deck = DeckCardLists.toJSON(message.deck);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckSubmitRequest>): DeckSubmitRequest {
-		return DeckSubmitRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckSubmitRequest>): DeckSubmitRequest {
-		const message = createBaseDeckSubmitRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.tableId = object.tableId ?? '';
-		message.deck =
-			object.deck !== undefined && object.deck !== null
-				? DeckCardLists.fromPartial(object.deck)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<DeckSubmitRequest>): DeckSubmitRequest {
+    return DeckSubmitRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckSubmitRequest>): DeckSubmitRequest {
+    const message = createBaseDeckSubmitRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.tableId = object.tableId ?? "";
+    message.deck = (object.deck !== undefined && object.deck !== null)
+      ? DeckCardLists.fromPartial(object.deck)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseDeckCard(): DeckCard {
-	return {
-		name: '',
-		manaCost: '',
-		cardType: '',
-		types: [],
-		colors: [],
-		power: '',
-		toughness: '',
-		quantity: 0
-	};
+  return { name: "", manaCost: "", cardType: "", types: [], colors: [], power: "", toughness: "", quantity: 0 };
 }
 
 export const DeckCard: MessageFns<DeckCard> = {
-	encode(message: DeckCard, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.name !== '') {
-			writer.uint32(10).string(message.name);
-		}
-		if (message.manaCost !== '') {
-			writer.uint32(18).string(message.manaCost);
-		}
-		if (message.cardType !== '') {
-			writer.uint32(26).string(message.cardType);
-		}
-		for (const v of message.types) {
-			writer.uint32(34).string(v!);
-		}
-		for (const v of message.colors) {
-			writer.uint32(42).string(v!);
-		}
-		if (message.power !== '') {
-			writer.uint32(50).string(message.power);
-		}
-		if (message.toughness !== '') {
-			writer.uint32(58).string(message.toughness);
-		}
-		if (message.quantity !== 0) {
-			writer.uint32(64).int32(message.quantity);
-		}
-		return writer;
-	},
+  encode(message: DeckCard, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.manaCost !== "") {
+      writer.uint32(18).string(message.manaCost);
+    }
+    if (message.cardType !== "") {
+      writer.uint32(26).string(message.cardType);
+    }
+    for (const v of message.types) {
+      writer.uint32(34).string(v!);
+    }
+    for (const v of message.colors) {
+      writer.uint32(42).string(v!);
+    }
+    if (message.power !== "") {
+      writer.uint32(50).string(message.power);
+    }
+    if (message.toughness !== "") {
+      writer.uint32(58).string(message.toughness);
+    }
+    if (message.quantity !== 0) {
+      writer.uint32(64).int32(message.quantity);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckCard {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckCard();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckCard {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckCard();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.name = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.name = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.manaCost = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.manaCost = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.cardType = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.cardType = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.types.push(reader.string());
-					continue;
-				}
-				case 5: {
-					if (tag !== 42) {
-						break;
-					}
+          message.types.push(reader.string());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
 
-					message.colors.push(reader.string());
-					continue;
-				}
-				case 6: {
-					if (tag !== 50) {
-						break;
-					}
+          message.colors.push(reader.string());
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
 
-					message.power = reader.string();
-					continue;
-				}
-				case 7: {
-					if (tag !== 58) {
-						break;
-					}
+          message.power = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
 
-					message.toughness = reader.string();
-					continue;
-				}
-				case 8: {
-					if (tag !== 64) {
-						break;
-					}
+          message.toughness = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
 
-					message.quantity = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.quantity = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckCard {
-		return {
-			name: isSet(object.name) ? globalThis.String(object.name) : '',
-			manaCost: isSet(object.manaCost) ? globalThis.String(object.manaCost) : '',
-			cardType: isSet(object.cardType) ? globalThis.String(object.cardType) : '',
-			types: globalThis.Array.isArray(object?.types)
-				? object.types.map((e: any) => globalThis.String(e))
-				: [],
-			colors: globalThis.Array.isArray(object?.colors)
-				? object.colors.map((e: any) => globalThis.String(e))
-				: [],
-			power: isSet(object.power) ? globalThis.String(object.power) : '',
-			toughness: isSet(object.toughness) ? globalThis.String(object.toughness) : '',
-			quantity: isSet(object.quantity) ? globalThis.Number(object.quantity) : 0
-		};
-	},
+  fromJSON(object: any): DeckCard {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      manaCost: isSet(object.manaCost) ? globalThis.String(object.manaCost) : "",
+      cardType: isSet(object.cardType) ? globalThis.String(object.cardType) : "",
+      types: globalThis.Array.isArray(object?.types) ? object.types.map((e: any) => globalThis.String(e)) : [],
+      colors: globalThis.Array.isArray(object?.colors) ? object.colors.map((e: any) => globalThis.String(e)) : [],
+      power: isSet(object.power) ? globalThis.String(object.power) : "",
+      toughness: isSet(object.toughness) ? globalThis.String(object.toughness) : "",
+      quantity: isSet(object.quantity) ? globalThis.Number(object.quantity) : 0,
+    };
+  },
 
-	toJSON(message: DeckCard): unknown {
-		const obj: any = {};
-		if (message.name !== '') {
-			obj.name = message.name;
-		}
-		if (message.manaCost !== '') {
-			obj.manaCost = message.manaCost;
-		}
-		if (message.cardType !== '') {
-			obj.cardType = message.cardType;
-		}
-		if (message.types?.length) {
-			obj.types = message.types;
-		}
-		if (message.colors?.length) {
-			obj.colors = message.colors;
-		}
-		if (message.power !== '') {
-			obj.power = message.power;
-		}
-		if (message.toughness !== '') {
-			obj.toughness = message.toughness;
-		}
-		if (message.quantity !== 0) {
-			obj.quantity = Math.round(message.quantity);
-		}
-		return obj;
-	},
+  toJSON(message: DeckCard): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.manaCost !== "") {
+      obj.manaCost = message.manaCost;
+    }
+    if (message.cardType !== "") {
+      obj.cardType = message.cardType;
+    }
+    if (message.types?.length) {
+      obj.types = message.types;
+    }
+    if (message.colors?.length) {
+      obj.colors = message.colors;
+    }
+    if (message.power !== "") {
+      obj.power = message.power;
+    }
+    if (message.toughness !== "") {
+      obj.toughness = message.toughness;
+    }
+    if (message.quantity !== 0) {
+      obj.quantity = Math.round(message.quantity);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckCard>): DeckCard {
-		return DeckCard.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckCard>): DeckCard {
-		const message = createBaseDeckCard();
-		message.name = object.name ?? '';
-		message.manaCost = object.manaCost ?? '';
-		message.cardType = object.cardType ?? '';
-		message.types = object.types?.map((e) => e) || [];
-		message.colors = object.colors?.map((e) => e) || [];
-		message.power = object.power ?? '';
-		message.toughness = object.toughness ?? '';
-		message.quantity = object.quantity ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<DeckCard>): DeckCard {
+    return DeckCard.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckCard>): DeckCard {
+    const message = createBaseDeckCard();
+    message.name = object.name ?? "";
+    message.manaCost = object.manaCost ?? "";
+    message.cardType = object.cardType ?? "";
+    message.types = object.types?.map((e) => e) || [];
+    message.colors = object.colors?.map((e) => e) || [];
+    message.power = object.power ?? "";
+    message.toughness = object.toughness ?? "";
+    message.quantity = object.quantity ?? 0;
+    return message;
+  },
 };
 
 function createBaseDeckCardLists(): DeckCardLists {
-	return { mainDeck: [], sideboard: [], commanders: [] };
+  return { mainDeck: [], sideboard: [], commanders: [] };
 }
 
 export const DeckCardLists: MessageFns<DeckCardLists> = {
-	encode(message: DeckCardLists, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		for (const v of message.mainDeck) {
-			DeckCard.encode(v!, writer.uint32(10).fork()).join();
-		}
-		for (const v of message.sideboard) {
-			DeckCard.encode(v!, writer.uint32(18).fork()).join();
-		}
-		for (const v of message.commanders) {
-			DeckCard.encode(v!, writer.uint32(26).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: DeckCardLists, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.mainDeck) {
+      DeckCard.encode(v!, writer.uint32(10).fork()).join();
+    }
+    for (const v of message.sideboard) {
+      DeckCard.encode(v!, writer.uint32(18).fork()).join();
+    }
+    for (const v of message.commanders) {
+      DeckCard.encode(v!, writer.uint32(26).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckCardLists {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckCardLists();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckCardLists {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckCardLists();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.mainDeck.push(DeckCard.decode(reader, reader.uint32()));
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.mainDeck.push(DeckCard.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.sideboard.push(DeckCard.decode(reader, reader.uint32()));
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.sideboard.push(DeckCard.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.commanders.push(DeckCard.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.commanders.push(DeckCard.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckCardLists {
-		return {
-			mainDeck: globalThis.Array.isArray(object?.mainDeck)
-				? object.mainDeck.map((e: any) => DeckCard.fromJSON(e))
-				: [],
-			sideboard: globalThis.Array.isArray(object?.sideboard)
-				? object.sideboard.map((e: any) => DeckCard.fromJSON(e))
-				: [],
-			commanders: globalThis.Array.isArray(object?.commanders)
-				? object.commanders.map((e: any) => DeckCard.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): DeckCardLists {
+    return {
+      mainDeck: globalThis.Array.isArray(object?.mainDeck) ? object.mainDeck.map((e: any) => DeckCard.fromJSON(e)) : [],
+      sideboard: globalThis.Array.isArray(object?.sideboard)
+        ? object.sideboard.map((e: any) => DeckCard.fromJSON(e))
+        : [],
+      commanders: globalThis.Array.isArray(object?.commanders)
+        ? object.commanders.map((e: any) => DeckCard.fromJSON(e))
+        : [],
+    };
+  },
 
-	toJSON(message: DeckCardLists): unknown {
-		const obj: any = {};
-		if (message.mainDeck?.length) {
-			obj.mainDeck = message.mainDeck.map((e) => DeckCard.toJSON(e));
-		}
-		if (message.sideboard?.length) {
-			obj.sideboard = message.sideboard.map((e) => DeckCard.toJSON(e));
-		}
-		if (message.commanders?.length) {
-			obj.commanders = message.commanders.map((e) => DeckCard.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: DeckCardLists): unknown {
+    const obj: any = {};
+    if (message.mainDeck?.length) {
+      obj.mainDeck = message.mainDeck.map((e) => DeckCard.toJSON(e));
+    }
+    if (message.sideboard?.length) {
+      obj.sideboard = message.sideboard.map((e) => DeckCard.toJSON(e));
+    }
+    if (message.commanders?.length) {
+      obj.commanders = message.commanders.map((e) => DeckCard.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckCardLists>): DeckCardLists {
-		return DeckCardLists.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckCardLists>): DeckCardLists {
-		const message = createBaseDeckCardLists();
-		message.mainDeck = object.mainDeck?.map((e) => DeckCard.fromPartial(e)) || [];
-		message.sideboard = object.sideboard?.map((e) => DeckCard.fromPartial(e)) || [];
-		message.commanders = object.commanders?.map((e) => DeckCard.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<DeckCardLists>): DeckCardLists {
+    return DeckCardLists.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckCardLists>): DeckCardLists {
+    const message = createBaseDeckCardLists();
+    message.mainDeck = object.mainDeck?.map((e) => DeckCard.fromPartial(e)) || [];
+    message.sideboard = object.sideboard?.map((e) => DeckCard.fromPartial(e)) || [];
+    message.commanders = object.commanders?.map((e) => DeckCard.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBaseDeckSubmitResponse(): DeckSubmitResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const DeckSubmitResponse: MessageFns<DeckSubmitResponse> = {
-	encode(message: DeckSubmitResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: DeckSubmitResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckSubmitResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckSubmitResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckSubmitResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckSubmitResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckSubmitResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): DeckSubmitResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: DeckSubmitResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: DeckSubmitResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckSubmitResponse>): DeckSubmitResponse {
-		return DeckSubmitResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckSubmitResponse>): DeckSubmitResponse {
-		const message = createBaseDeckSubmitResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DeckSubmitResponse>): DeckSubmitResponse {
+    return DeckSubmitResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckSubmitResponse>): DeckSubmitResponse {
+    const message = createBaseDeckSubmitResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseDeckSaveRequest(): DeckSaveRequest {
-	return { sessionId: '', deckName: '', deck: undefined, format: '', description: '' };
+  return { sessionId: "", deckName: "", deck: undefined, format: "", description: "" };
 }
 
 export const DeckSaveRequest: MessageFns<DeckSaveRequest> = {
-	encode(message: DeckSaveRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.deckName !== '') {
-			writer.uint32(18).string(message.deckName);
-		}
-		if (message.deck !== undefined) {
-			DeckCardLists.encode(message.deck, writer.uint32(26).fork()).join();
-		}
-		if (message.format !== '') {
-			writer.uint32(34).string(message.format);
-		}
-		if (message.description !== '') {
-			writer.uint32(42).string(message.description);
-		}
-		return writer;
-	},
+  encode(message: DeckSaveRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.deckName !== "") {
+      writer.uint32(18).string(message.deckName);
+    }
+    if (message.deck !== undefined) {
+      DeckCardLists.encode(message.deck, writer.uint32(26).fork()).join();
+    }
+    if (message.format !== "") {
+      writer.uint32(34).string(message.format);
+    }
+    if (message.description !== "") {
+      writer.uint32(42).string(message.description);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckSaveRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckSaveRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckSaveRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckSaveRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.deckName = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.deckName = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.deck = DeckCardLists.decode(reader, reader.uint32());
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.deck = DeckCardLists.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.format = reader.string();
-					continue;
-				}
-				case 5: {
-					if (tag !== 42) {
-						break;
-					}
+          message.format = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
 
-					message.description = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.description = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckSaveRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			deckName: isSet(object.deckName) ? globalThis.String(object.deckName) : '',
-			deck: isSet(object.deck) ? DeckCardLists.fromJSON(object.deck) : undefined,
-			format: isSet(object.format) ? globalThis.String(object.format) : '',
-			description: isSet(object.description) ? globalThis.String(object.description) : ''
-		};
-	},
+  fromJSON(object: any): DeckSaveRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      deckName: isSet(object.deckName) ? globalThis.String(object.deckName) : "",
+      deck: isSet(object.deck) ? DeckCardLists.fromJSON(object.deck) : undefined,
+      format: isSet(object.format) ? globalThis.String(object.format) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
+    };
+  },
 
-	toJSON(message: DeckSaveRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.deckName !== '') {
-			obj.deckName = message.deckName;
-		}
-		if (message.deck !== undefined) {
-			obj.deck = DeckCardLists.toJSON(message.deck);
-		}
-		if (message.format !== '') {
-			obj.format = message.format;
-		}
-		if (message.description !== '') {
-			obj.description = message.description;
-		}
-		return obj;
-	},
+  toJSON(message: DeckSaveRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.deckName !== "") {
+      obj.deckName = message.deckName;
+    }
+    if (message.deck !== undefined) {
+      obj.deck = DeckCardLists.toJSON(message.deck);
+    }
+    if (message.format !== "") {
+      obj.format = message.format;
+    }
+    if (message.description !== "") {
+      obj.description = message.description;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckSaveRequest>): DeckSaveRequest {
-		return DeckSaveRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckSaveRequest>): DeckSaveRequest {
-		const message = createBaseDeckSaveRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.deckName = object.deckName ?? '';
-		message.deck =
-			object.deck !== undefined && object.deck !== null
-				? DeckCardLists.fromPartial(object.deck)
-				: undefined;
-		message.format = object.format ?? '';
-		message.description = object.description ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DeckSaveRequest>): DeckSaveRequest {
+    return DeckSaveRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckSaveRequest>): DeckSaveRequest {
+    const message = createBaseDeckSaveRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.deckName = object.deckName ?? "";
+    message.deck = (object.deck !== undefined && object.deck !== null)
+      ? DeckCardLists.fromPartial(object.deck)
+      : undefined;
+    message.format = object.format ?? "";
+    message.description = object.description ?? "";
+    return message;
+  },
 };
 
 function createBaseDeckSaveResponse(): DeckSaveResponse {
-	return { success: false, error: '', deckId: 0 };
+  return { success: false, error: "", deckId: 0 };
 }
 
 export const DeckSaveResponse: MessageFns<DeckSaveResponse> = {
-	encode(message: DeckSaveResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		if (message.deckId !== 0) {
-			writer.uint32(24).int64(message.deckId);
-		}
-		return writer;
-	},
+  encode(message: DeckSaveResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    if (message.deckId !== 0) {
+      writer.uint32(24).int64(message.deckId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckSaveResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckSaveResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckSaveResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckSaveResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.deckId = longToNumber(reader.int64());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.deckId = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckSaveResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			deckId: isSet(object.deckId) ? globalThis.Number(object.deckId) : 0
-		};
-	},
+  fromJSON(object: any): DeckSaveResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      deckId: isSet(object.deckId) ? globalThis.Number(object.deckId) : 0,
+    };
+  },
 
-	toJSON(message: DeckSaveResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.deckId !== 0) {
-			obj.deckId = Math.round(message.deckId);
-		}
-		return obj;
-	},
+  toJSON(message: DeckSaveResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.deckId !== 0) {
+      obj.deckId = Math.round(message.deckId);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckSaveResponse>): DeckSaveResponse {
-		return DeckSaveResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckSaveResponse>): DeckSaveResponse {
-		const message = createBaseDeckSaveResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.deckId = object.deckId ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<DeckSaveResponse>): DeckSaveResponse {
+    return DeckSaveResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckSaveResponse>): DeckSaveResponse {
+    const message = createBaseDeckSaveResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    message.deckId = object.deckId ?? 0;
+    return message;
+  },
 };
 
 function createBaseDeckListRequest(): DeckListRequest {
-	return { sessionId: '', format: '' };
+  return { sessionId: "", format: "" };
 }
 
 export const DeckListRequest: MessageFns<DeckListRequest> = {
-	encode(message: DeckListRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.format !== '') {
-			writer.uint32(18).string(message.format);
-		}
-		return writer;
-	},
+  encode(message: DeckListRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.format !== "") {
+      writer.uint32(18).string(message.format);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckListRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckListRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckListRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckListRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.format = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.format = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckListRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			format: isSet(object.format) ? globalThis.String(object.format) : ''
-		};
-	},
+  fromJSON(object: any): DeckListRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      format: isSet(object.format) ? globalThis.String(object.format) : "",
+    };
+  },
 
-	toJSON(message: DeckListRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.format !== '') {
-			obj.format = message.format;
-		}
-		return obj;
-	},
+  toJSON(message: DeckListRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.format !== "") {
+      obj.format = message.format;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckListRequest>): DeckListRequest {
-		return DeckListRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckListRequest>): DeckListRequest {
-		const message = createBaseDeckListRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.format = object.format ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DeckListRequest>): DeckListRequest {
+    return DeckListRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckListRequest>): DeckListRequest {
+    const message = createBaseDeckListRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.format = object.format ?? "";
+    return message;
+  },
 };
 
 function createBaseDeckInfo(): DeckInfo {
-	return {
-		id: 0,
-		name: '',
-		format: '',
-		description: '',
-		mainDeckCount: 0,
-		sideboardCount: 0,
-		createdAt: 0,
-		updatedAt: 0
-	};
+  return {
+    id: 0,
+    name: "",
+    format: "",
+    description: "",
+    mainDeckCount: 0,
+    sideboardCount: 0,
+    createdAt: 0,
+    updatedAt: 0,
+  };
 }
 
 export const DeckInfo: MessageFns<DeckInfo> = {
-	encode(message: DeckInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.id !== 0) {
-			writer.uint32(8).int64(message.id);
-		}
-		if (message.name !== '') {
-			writer.uint32(18).string(message.name);
-		}
-		if (message.format !== '') {
-			writer.uint32(26).string(message.format);
-		}
-		if (message.description !== '') {
-			writer.uint32(34).string(message.description);
-		}
-		if (message.mainDeckCount !== 0) {
-			writer.uint32(40).int32(message.mainDeckCount);
-		}
-		if (message.sideboardCount !== 0) {
-			writer.uint32(48).int32(message.sideboardCount);
-		}
-		if (message.createdAt !== 0) {
-			writer.uint32(56).int64(message.createdAt);
-		}
-		if (message.updatedAt !== 0) {
-			writer.uint32(64).int64(message.updatedAt);
-		}
-		return writer;
-	},
+  encode(message: DeckInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int64(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.format !== "") {
+      writer.uint32(26).string(message.format);
+    }
+    if (message.description !== "") {
+      writer.uint32(34).string(message.description);
+    }
+    if (message.mainDeckCount !== 0) {
+      writer.uint32(40).int32(message.mainDeckCount);
+    }
+    if (message.sideboardCount !== 0) {
+      writer.uint32(48).int32(message.sideboardCount);
+    }
+    if (message.createdAt !== 0) {
+      writer.uint32(56).int64(message.createdAt);
+    }
+    if (message.updatedAt !== 0) {
+      writer.uint32(64).int64(message.updatedAt);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckInfo {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckInfo();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.id = longToNumber(reader.int64());
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.id = longToNumber(reader.int64());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.name = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.format = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.format = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.description = reader.string();
-					continue;
-				}
-				case 5: {
-					if (tag !== 40) {
-						break;
-					}
+          message.description = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
 
-					message.mainDeckCount = reader.int32();
-					continue;
-				}
-				case 6: {
-					if (tag !== 48) {
-						break;
-					}
+          message.mainDeckCount = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
 
-					message.sideboardCount = reader.int32();
-					continue;
-				}
-				case 7: {
-					if (tag !== 56) {
-						break;
-					}
+          message.sideboardCount = reader.int32();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
 
-					message.createdAt = longToNumber(reader.int64());
-					continue;
-				}
-				case 8: {
-					if (tag !== 64) {
-						break;
-					}
+          message.createdAt = longToNumber(reader.int64());
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
 
-					message.updatedAt = longToNumber(reader.int64());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.updatedAt = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckInfo {
-		return {
-			id: isSet(object.id) ? globalThis.Number(object.id) : 0,
-			name: isSet(object.name) ? globalThis.String(object.name) : '',
-			format: isSet(object.format) ? globalThis.String(object.format) : '',
-			description: isSet(object.description) ? globalThis.String(object.description) : '',
-			mainDeckCount: isSet(object.mainDeckCount) ? globalThis.Number(object.mainDeckCount) : 0,
-			sideboardCount: isSet(object.sideboardCount) ? globalThis.Number(object.sideboardCount) : 0,
-			createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
-			updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0
-		};
-	},
+  fromJSON(object: any): DeckInfo {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      format: isSet(object.format) ? globalThis.String(object.format) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
+      mainDeckCount: isSet(object.mainDeckCount) ? globalThis.Number(object.mainDeckCount) : 0,
+      sideboardCount: isSet(object.sideboardCount) ? globalThis.Number(object.sideboardCount) : 0,
+      createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
+      updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
+    };
+  },
 
-	toJSON(message: DeckInfo): unknown {
-		const obj: any = {};
-		if (message.id !== 0) {
-			obj.id = Math.round(message.id);
-		}
-		if (message.name !== '') {
-			obj.name = message.name;
-		}
-		if (message.format !== '') {
-			obj.format = message.format;
-		}
-		if (message.description !== '') {
-			obj.description = message.description;
-		}
-		if (message.mainDeckCount !== 0) {
-			obj.mainDeckCount = Math.round(message.mainDeckCount);
-		}
-		if (message.sideboardCount !== 0) {
-			obj.sideboardCount = Math.round(message.sideboardCount);
-		}
-		if (message.createdAt !== 0) {
-			obj.createdAt = Math.round(message.createdAt);
-		}
-		if (message.updatedAt !== 0) {
-			obj.updatedAt = Math.round(message.updatedAt);
-		}
-		return obj;
-	},
+  toJSON(message: DeckInfo): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.format !== "") {
+      obj.format = message.format;
+    }
+    if (message.description !== "") {
+      obj.description = message.description;
+    }
+    if (message.mainDeckCount !== 0) {
+      obj.mainDeckCount = Math.round(message.mainDeckCount);
+    }
+    if (message.sideboardCount !== 0) {
+      obj.sideboardCount = Math.round(message.sideboardCount);
+    }
+    if (message.createdAt !== 0) {
+      obj.createdAt = Math.round(message.createdAt);
+    }
+    if (message.updatedAt !== 0) {
+      obj.updatedAt = Math.round(message.updatedAt);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckInfo>): DeckInfo {
-		return DeckInfo.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckInfo>): DeckInfo {
-		const message = createBaseDeckInfo();
-		message.id = object.id ?? 0;
-		message.name = object.name ?? '';
-		message.format = object.format ?? '';
-		message.description = object.description ?? '';
-		message.mainDeckCount = object.mainDeckCount ?? 0;
-		message.sideboardCount = object.sideboardCount ?? 0;
-		message.createdAt = object.createdAt ?? 0;
-		message.updatedAt = object.updatedAt ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<DeckInfo>): DeckInfo {
+    return DeckInfo.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckInfo>): DeckInfo {
+    const message = createBaseDeckInfo();
+    message.id = object.id ?? 0;
+    message.name = object.name ?? "";
+    message.format = object.format ?? "";
+    message.description = object.description ?? "";
+    message.mainDeckCount = object.mainDeckCount ?? 0;
+    message.sideboardCount = object.sideboardCount ?? 0;
+    message.createdAt = object.createdAt ?? 0;
+    message.updatedAt = object.updatedAt ?? 0;
+    return message;
+  },
 };
 
 function createBaseDeckListResponse(): DeckListResponse {
-	return { success: false, error: '', decks: [] };
+  return { success: false, error: "", decks: [] };
 }
 
 export const DeckListResponse: MessageFns<DeckListResponse> = {
-	encode(message: DeckListResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		for (const v of message.decks) {
-			DeckInfo.encode(v!, writer.uint32(26).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: DeckListResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    for (const v of message.decks) {
+      DeckInfo.encode(v!, writer.uint32(26).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckListResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckListResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckListResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckListResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.decks.push(DeckInfo.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.decks.push(DeckInfo.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckListResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			decks: globalThis.Array.isArray(object?.decks)
-				? object.decks.map((e: any) => DeckInfo.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): DeckListResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      decks: globalThis.Array.isArray(object?.decks) ? object.decks.map((e: any) => DeckInfo.fromJSON(e)) : [],
+    };
+  },
 
-	toJSON(message: DeckListResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.decks?.length) {
-			obj.decks = message.decks.map((e) => DeckInfo.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: DeckListResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.decks?.length) {
+      obj.decks = message.decks.map((e) => DeckInfo.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckListResponse>): DeckListResponse {
-		return DeckListResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckListResponse>): DeckListResponse {
-		const message = createBaseDeckListResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.decks = object.decks?.map((e) => DeckInfo.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<DeckListResponse>): DeckListResponse {
+    return DeckListResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckListResponse>): DeckListResponse {
+    const message = createBaseDeckListResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    message.decks = object.decks?.map((e) => DeckInfo.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBaseDeckDeleteRequest(): DeckDeleteRequest {
-	return { sessionId: '', deckId: 0 };
+  return { sessionId: "", deckId: 0 };
 }
 
 export const DeckDeleteRequest: MessageFns<DeckDeleteRequest> = {
-	encode(message: DeckDeleteRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.deckId !== 0) {
-			writer.uint32(16).int64(message.deckId);
-		}
-		return writer;
-	},
+  encode(message: DeckDeleteRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.deckId !== 0) {
+      writer.uint32(16).int64(message.deckId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckDeleteRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckDeleteRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckDeleteRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckDeleteRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.deckId = longToNumber(reader.int64());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.deckId = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckDeleteRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			deckId: isSet(object.deckId) ? globalThis.Number(object.deckId) : 0
-		};
-	},
+  fromJSON(object: any): DeckDeleteRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      deckId: isSet(object.deckId) ? globalThis.Number(object.deckId) : 0,
+    };
+  },
 
-	toJSON(message: DeckDeleteRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.deckId !== 0) {
-			obj.deckId = Math.round(message.deckId);
-		}
-		return obj;
-	},
+  toJSON(message: DeckDeleteRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.deckId !== 0) {
+      obj.deckId = Math.round(message.deckId);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckDeleteRequest>): DeckDeleteRequest {
-		return DeckDeleteRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckDeleteRequest>): DeckDeleteRequest {
-		const message = createBaseDeckDeleteRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.deckId = object.deckId ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<DeckDeleteRequest>): DeckDeleteRequest {
+    return DeckDeleteRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckDeleteRequest>): DeckDeleteRequest {
+    const message = createBaseDeckDeleteRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.deckId = object.deckId ?? 0;
+    return message;
+  },
 };
 
 function createBaseDeckDeleteResponse(): DeckDeleteResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const DeckDeleteResponse: MessageFns<DeckDeleteResponse> = {
-	encode(message: DeckDeleteResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: DeckDeleteResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckDeleteResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckDeleteResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckDeleteResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckDeleteResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckDeleteResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): DeckDeleteResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: DeckDeleteResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: DeckDeleteResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckDeleteResponse>): DeckDeleteResponse {
-		return DeckDeleteResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckDeleteResponse>): DeckDeleteResponse {
-		const message = createBaseDeckDeleteResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DeckDeleteResponse>): DeckDeleteResponse {
+    return DeckDeleteResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckDeleteResponse>): DeckDeleteResponse {
+    const message = createBaseDeckDeleteResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseDeckGetRequest(): DeckGetRequest {
-	return { sessionId: '', deckId: 0 };
+  return { sessionId: "", deckId: 0 };
 }
 
 export const DeckGetRequest: MessageFns<DeckGetRequest> = {
-	encode(message: DeckGetRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.deckId !== 0) {
-			writer.uint32(16).int64(message.deckId);
-		}
-		return writer;
-	},
+  encode(message: DeckGetRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.deckId !== 0) {
+      writer.uint32(16).int64(message.deckId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckGetRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckGetRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckGetRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckGetRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.deckId = longToNumber(reader.int64());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.deckId = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckGetRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			deckId: isSet(object.deckId) ? globalThis.Number(object.deckId) : 0
-		};
-	},
+  fromJSON(object: any): DeckGetRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      deckId: isSet(object.deckId) ? globalThis.Number(object.deckId) : 0,
+    };
+  },
 
-	toJSON(message: DeckGetRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.deckId !== 0) {
-			obj.deckId = Math.round(message.deckId);
-		}
-		return obj;
-	},
+  toJSON(message: DeckGetRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.deckId !== 0) {
+      obj.deckId = Math.round(message.deckId);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckGetRequest>): DeckGetRequest {
-		return DeckGetRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckGetRequest>): DeckGetRequest {
-		const message = createBaseDeckGetRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.deckId = object.deckId ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<DeckGetRequest>): DeckGetRequest {
+    return DeckGetRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckGetRequest>): DeckGetRequest {
+    const message = createBaseDeckGetRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.deckId = object.deckId ?? 0;
+    return message;
+  },
 };
 
 function createBaseDeckGetResponse(): DeckGetResponse {
-	return { success: false, error: '', info: undefined, deck: undefined };
+  return { success: false, error: "", info: undefined, deck: undefined };
 }
 
 export const DeckGetResponse: MessageFns<DeckGetResponse> = {
-	encode(message: DeckGetResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		if (message.info !== undefined) {
-			DeckInfo.encode(message.info, writer.uint32(26).fork()).join();
-		}
-		if (message.deck !== undefined) {
-			DeckCardLists.encode(message.deck, writer.uint32(34).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: DeckGetResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    if (message.info !== undefined) {
+      DeckInfo.encode(message.info, writer.uint32(26).fork()).join();
+    }
+    if (message.deck !== undefined) {
+      DeckCardLists.encode(message.deck, writer.uint32(34).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DeckGetResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDeckGetResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DeckGetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeckGetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.info = DeckInfo.decode(reader, reader.uint32());
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.info = DeckInfo.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.deck = DeckCardLists.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.deck = DeckCardLists.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DeckGetResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			info: isSet(object.info) ? DeckInfo.fromJSON(object.info) : undefined,
-			deck: isSet(object.deck) ? DeckCardLists.fromJSON(object.deck) : undefined
-		};
-	},
+  fromJSON(object: any): DeckGetResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      info: isSet(object.info) ? DeckInfo.fromJSON(object.info) : undefined,
+      deck: isSet(object.deck) ? DeckCardLists.fromJSON(object.deck) : undefined,
+    };
+  },
 
-	toJSON(message: DeckGetResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.info !== undefined) {
-			obj.info = DeckInfo.toJSON(message.info);
-		}
-		if (message.deck !== undefined) {
-			obj.deck = DeckCardLists.toJSON(message.deck);
-		}
-		return obj;
-	},
+  toJSON(message: DeckGetResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.info !== undefined) {
+      obj.info = DeckInfo.toJSON(message.info);
+    }
+    if (message.deck !== undefined) {
+      obj.deck = DeckCardLists.toJSON(message.deck);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DeckGetResponse>): DeckGetResponse {
-		return DeckGetResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DeckGetResponse>): DeckGetResponse {
-		const message = createBaseDeckGetResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.info =
-			object.info !== undefined && object.info !== null
-				? DeckInfo.fromPartial(object.info)
-				: undefined;
-		message.deck =
-			object.deck !== undefined && object.deck !== null
-				? DeckCardLists.fromPartial(object.deck)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<DeckGetResponse>): DeckGetResponse {
+    return DeckGetResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeckGetResponse>): DeckGetResponse {
+    const message = createBaseDeckGetResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    message.info = (object.info !== undefined && object.info !== null) ? DeckInfo.fromPartial(object.info) : undefined;
+    message.deck = (object.deck !== undefined && object.deck !== null)
+      ? DeckCardLists.fromPartial(object.deck)
+      : undefined;
+    return message;
+  },
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-	? T
-	: T extends globalThis.Array<infer U>
-		? globalThis.Array<DeepPartial<U>>
-		: T extends ReadonlyArray<infer U>
-			? ReadonlyArray<DeepPartial<U>>
-			: T extends {}
-				? { [K in keyof T]?: DeepPartial<T[K]> }
-				: Partial<T>;
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
 
 function longToNumber(int64: { toString(): string }): number {
-	const num = globalThis.Number(int64.toString());
-	if (num > globalThis.Number.MAX_SAFE_INTEGER) {
-		throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
-	}
-	if (num < globalThis.Number.MIN_SAFE_INTEGER) {
-		throw new globalThis.Error('Value is smaller than Number.MIN_SAFE_INTEGER');
-	}
-	return num;
+  const num = globalThis.Number(int64.toString());
+  if (num > globalThis.Number.MAX_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  if (num < globalThis.Number.MIN_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+  }
+  return num;
 }
 
 function isSet(value: any): boolean {
-	return value !== null && value !== undefined;
+  return value !== null && value !== undefined;
 }
 
 interface MessageFns<T> {
-	encode(message: T, writer?: BinaryWriter): BinaryWriter;
-	decode(input: BinaryReader | Uint8Array, length?: number): T;
-	fromJSON(object: any): T;
-	toJSON(message: T): unknown;
-	create(base?: DeepPartial<T>): T;
-	fromPartial(object: DeepPartial<T>): T;
+  encode(message: T, writer?: BinaryWriter): BinaryWriter;
+  decode(input: BinaryReader | Uint8Array, length?: number): T;
+  fromJSON(object: any): T;
+  toJSON(message: T): unknown;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }

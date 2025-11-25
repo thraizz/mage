@@ -4,7 +4,6 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import type { RegisterData } from '$lib/types/auth';
 	import { getMageClient } from '$lib/grpc/client';
 	import { createSessionToken } from '$lib/utils/jwt';
 

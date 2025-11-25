@@ -278,8 +278,11 @@ func (m *Manager) SendPlayerAction(gameID, playerID, actionType string, data int
 // GameEngine interface defines the contract for game engine implementations
 // This allows the Go server to integrate with different game engines
 type GameEngine interface {
-	// StartGame initializes and starts a game
+	// StartGame initializes and starts a game (without decks - for backwards compatibility)
 	StartGame(gameID string, players []string, gameType string) error
+
+	// StartGameWithDecks initializes and starts a game with player-submitted decks
+	StartGameWithDecks(gameID string, players []string, gameType string, decks map[string]DeckList) error
 
 	// ProcessAction processes a player action
 	ProcessAction(gameID string, action PlayerAction) error
@@ -297,6 +300,17 @@ type GameEngine interface {
 	ResumeGame(gameID string) error
 }
 
+// DeckList represents a player's deck submission for the game engine
+type DeckList struct {
+	MainDeck   []string
+	Sideboard  []string
+	Commanders []string
+}
+
+// GameNotificationCallback is called when the engine emits a notification
+// This is an alias for NotificationHandler to enable type compatibility
+type GameNotificationCallback = NotificationHandler
+
 // EngineAdapter adapts the game engine to the server
 type EngineAdapter struct {
 	engine GameEngine
@@ -308,6 +322,15 @@ func NewEngineAdapter(engine GameEngine, logger *zap.Logger) *EngineAdapter {
 	return &EngineAdapter{
 		engine: engine,
 		logger: logger,
+	}
+}
+
+// SetNotificationCallback sets a callback for game notifications
+// This should be called after creating the adapter to wire up WebSocket notifications
+func (ea *EngineAdapter) SetNotificationCallback(callback GameNotificationCallback) {
+	if mageEngine, ok := ea.engine.(*MageEngine); ok {
+		mageEngine.SetNotificationHandler(callback)
+		ea.logger.Info("game notification handler configured")
 	}
 }
 
@@ -330,12 +353,20 @@ func (ea *EngineAdapter) ProcessGameActions(game *Game) {
 	}
 }
 
-// StartGame notifies the engine a game has started.
+// StartGame notifies the engine a game has started (without decks - for backwards compatibility).
 func (ea *EngineAdapter) StartGame(game *Game) error {
 	if ea == nil || ea.engine == nil || game == nil {
 		return nil
 	}
 	return ea.engine.StartGame(game.ID, game.Players, game.GameType)
+}
+
+// StartGameWithDecks notifies the engine a game has started with player-submitted decks.
+func (ea *EngineAdapter) StartGameWithDecks(game *Game, decks map[string]DeckList) error {
+	if ea == nil || ea.engine == nil || game == nil {
+		return nil
+	}
+	return ea.engine.StartGameWithDecks(game.ID, game.Players, game.GameType, decks)
 }
 
 // EndGame notifies the engine a game has ended.

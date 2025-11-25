@@ -148,3 +148,44 @@ export type GameEventType =
 	| 'CARD_MOVED'
 	| 'PRIORITY_PASSED'
 	| 'GAME_END';
+
+export interface ActionLogEntry {
+	id: string;
+	timestamp: number;
+	type: 'player' | 'system';
+	playerName?: string;
+	playerId?: string;
+	actionType: ActionType;
+	text: string;
+	cardName?: string;
+	cardId?: string;
+}
+
+export type ActionType =
+	| 'play'
+	| 'cast'
+	| 'tap'
+	| 'untap'
+	| 'attack'
+	| 'block'
+	| 'damage'
+	| 'destroy'
+	| 'exile'
+	| 'draw'
+	| 'discard'
+	| 'shuffle'
+	| 'search'
+	| 'counter'
+	| 'trigger'
+	| 'ability'
+	| 'enchant'
+	| 'equip'
+	| 'sacrifice'
+	| 'mill'
+	| 'scry'
+	| 'surveil'
+	| 'phase'
+	| 'priority'
+	| 'mana'
+	| 'life'
+	| 'system';

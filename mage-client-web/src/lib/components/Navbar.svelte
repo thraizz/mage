@@ -91,21 +91,21 @@
 
 <style>
 	.navbar {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		background: var(--bg-obsidian);
+		border-bottom: 1px solid var(--border-subtle);
 		position: sticky;
 		top: 0;
-		z-index: 100;
+		z-index: var(--z-sticky);
 	}
 
 	.navbar-container {
 		max-width: 1280px;
 		margin: 0 auto;
-		padding: 0 1rem;
+		padding: 0 var(--space-4);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		height: 64px;
+		height: var(--navbar-height);
 	}
 
 	/* Brand */
@@ -117,20 +117,21 @@
 	.brand-link {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: var(--space-2);
 		text-decoration: none;
-		color: white;
-		font-weight: 700;
-		font-size: 1.5rem;
-		transition: opacity 0.2s;
+		color: var(--accent-gold);
+		font-family: var(--font-display);
+		font-weight: var(--weight-bold);
+		font-size: var(--text-xl);
+		transition: color var(--transition-fast);
 	}
 
 	.brand-link:hover {
-		opacity: 0.9;
+		color: var(--accent-gold-bright);
 	}
 
 	.brand-icon {
-		font-size: 2rem;
+		font-size: 1.75rem;
 	}
 
 	.brand-text {
@@ -141,46 +142,48 @@
 	.navbar-links {
 		display: flex;
 		align-items: center;
-		gap: 2rem;
+		gap: var(--space-1);
 		flex: 1;
 		justify-content: center;
 	}
 
 	.nav-link {
-		color: white;
+		color: var(--text-muted);
 		text-decoration: none;
-		font-weight: 500;
-		font-size: 1rem;
-		padding: 0.5rem 1rem;
-		border-radius: 0.375rem;
-		transition: background-color 0.2s;
+		font-weight: var(--weight-medium);
+		font-size: var(--text-sm);
+		padding: var(--space-2) var(--space-4);
+		border-radius: var(--radius-md);
+		transition: all var(--transition-fast);
 		position: relative;
 	}
 
 	.nav-link:hover {
-		background-color: rgba(255, 255, 255, 0.1);
+		color: var(--text-bright);
+		background: var(--bg-iron);
 	}
 
 	.nav-link.active {
-		background-color: rgba(255, 255, 255, 0.2);
+		color: var(--accent-gold);
+		background: var(--bg-iron);
 	}
 
 	.nav-link.active::after {
 		content: '';
 		position: absolute;
-		bottom: -8px;
-		left: 0;
-		right: 0;
-		height: 3px;
-		background-color: white;
-		border-radius: 2px;
+		bottom: -1px;
+		left: var(--space-4);
+		right: var(--space-4);
+		height: 2px;
+		background: var(--accent-gold);
+		border-radius: var(--radius-full);
 	}
 
 	/* Right Side */
 	.navbar-right {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--space-3);
 	}
 
 	/* Mobile Menu Button */
@@ -188,8 +191,8 @@
 		display: none;
 		flex-direction: column;
 		justify-content: space-around;
-		width: 30px;
-		height: 30px;
+		width: 28px;
+		height: 28px;
 		background: transparent;
 		border: none;
 		cursor: pointer;
@@ -198,38 +201,44 @@
 
 	.hamburger-line {
 		width: 100%;
-		height: 3px;
-		background-color: white;
-		border-radius: 2px;
-		transition: all 0.3s;
+		height: 2px;
+		background: var(--text-muted);
+		border-radius: var(--radius-full);
+		transition: all var(--transition-base);
+	}
+
+	.mobile-menu-button:hover .hamburger-line {
+		background: var(--accent-gold);
 	}
 
 	/* Mobile Menu */
 	.mobile-menu {
 		display: none;
-		background-color: rgba(102, 126, 234, 0.98);
-		padding: 1rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		background: var(--bg-slate);
+		padding: var(--space-3);
+		border-top: 1px solid var(--border-subtle);
 	}
 
 	.mobile-nav-link {
 		display: block;
-		color: white;
+		color: var(--text-muted);
 		text-decoration: none;
-		font-weight: 500;
-		font-size: 1rem;
-		padding: 0.75rem 1rem;
-		border-radius: 0.375rem;
-		margin-bottom: 0.5rem;
-		transition: background-color 0.2s;
+		font-weight: var(--weight-medium);
+		font-size: var(--text-base);
+		padding: var(--space-3) var(--space-4);
+		border-radius: var(--radius-md);
+		margin-bottom: var(--space-1);
+		transition: all var(--transition-fast);
 	}
 
 	.mobile-nav-link:hover {
-		background-color: rgba(255, 255, 255, 0.1);
+		color: var(--text-bright);
+		background: var(--bg-iron);
 	}
 
 	.mobile-nav-link.active {
-		background-color: rgba(255, 255, 255, 0.2);
+		color: var(--accent-gold);
+		background: var(--bg-iron);
 	}
 
 	/* Responsive */

@@ -2,7 +2,9 @@ package game
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
+	"math/big"
 	"strconv"
 	"strings"
 	"sync"
@@ -15,6 +17,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game/mana"
 	"github.com/magefree/mage-server-go/internal/game/rules"
 	"github.com/magefree/mage-server-go/internal/game/targeting"
+	"github.com/magefree/mage-server-go/internal/plugin"
 	"go.uber.org/zap"
 )
 
@@ -343,32 +346,34 @@ type internalCard struct {
 	// Status fields
 	SummoningSickness bool // Does this creature have summoning sickness
 	IsToken           bool // Is this a token (doesn't go to graveyard when destroyed)
+	IsCommander       bool // Is this a commander card
 }
 
 // internalPlayer represents a player in the game state
 type internalPlayer struct {
-	PlayerID       string
-	Name           string
-	Life           int
-	Poison         int
-	Energy         int
-	Library        []*internalCard
-	Hand           []*internalCard
-	Graveyard      []*internalCard
-	ManaPool       *mana.ManaPool
-	HasPriority    bool
-	Passed         bool
-	StateOrdinal   int
-	Lost           bool
-	Left           bool
-	Wins           int
-	Quit           bool // Player quit the match
-	TimerTimeout   bool // Player lost due to timer timeout
-	IdleTimeout    bool // Player lost due to idle timeout
-	Conceded       bool // Player conceded
-	StoredBookmark int  // Bookmark ID for player undo (-1 = no undo available)
-	MulliganCount  int  // Number of times player has mulliganed
-	KeptHand       bool // Whether player has kept their hand
+	PlayerID        string
+	Name            string
+	Life            int
+	Poison          int
+	Energy          int
+	Library         []*internalCard
+	Hand            []*internalCard
+	Graveyard       []*internalCard
+	ManaPool        *mana.ManaPool
+	HasPriority     bool
+	Passed          bool
+	StateOrdinal    int
+	Lost            bool
+	Left            bool
+	Wins            int
+	Quit            bool           // Player quit the match
+	TimerTimeout    bool           // Player lost due to timer timeout
+	IdleTimeout     bool           // Player lost due to idle timeout
+	Conceded        bool           // Player conceded
+	StoredBookmark  int            // Bookmark ID for player undo (-1 = no undo available)
+	MulliganCount   int            // Number of times player has mulliganed
+	KeptHand        bool           // Whether player has kept their hand
+	CommanderDamage map[string]int // Tracks combat damage from each commander (commander ID -> damage)
 }
 
 // triggeredAbilityQueueItem represents a triggered ability waiting to be put on the stack
@@ -407,6 +412,9 @@ type gameAnalytics struct {
 type engineGameState struct {
 	gameID             string
 	gameType           string
+	gameTypeConfig     plugin.GameType       // Configured rules for this game type
+	gameRules          plugin.GameRules      // Game rules (starting life, deck size, etc.)
+	behaviors          []plugin.GameBehavior // Format-specific behaviors (commander, etc.)
 	state              GameState
 	players            map[string]*internalPlayer
 	playerOrder        []string
@@ -433,6 +441,8 @@ type engineGameState struct {
 	messages           []EngineMessage
 	prompts            []EnginePrompt
 	startedAt          time.Time
+	startingPlayerID   string // Player who won the coin flip and goes first (skips first draw)
+	firstTurnDrawDone  bool   // Whether the first turn draw skip has been applied
 	mu                 sync.RWMutex
 }
 
@@ -621,7 +631,13 @@ func (e *MageEngine) notifyTrigger(gameID string, data map[string]interface{}) {
 }
 
 // StartGame initializes a new game state
+// Deprecated: Use StartGameWithDecks instead for proper deck loading
 func (e *MageEngine) StartGame(gameID string, players []string, gameType string) error {
+	return e.StartGameWithDecks(gameID, players, gameType, nil)
+}
+
+// StartGameWithDecks initializes a new game state with player-submitted decks
+func (e *MageEngine) StartGameWithDecks(gameID string, players []string, gameType string, decks map[string]DeckList) error {
 	if gameID == "" {
 		return fmt.Errorf("gameID is required")
 	}
@@ -638,20 +654,61 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 		return fmt.Errorf("game %s already exists", gameID)
 	}
 
-	// Create game state
+	// Look up game type configuration from registry
+	var gameTypeConfig plugin.GameType
+	gameRules := plugin.DefaultGameRules()
+	var behaviors []plugin.GameBehavior
+
+	if gt, err := plugin.GetGameType(gameType); err == nil {
+		gameTypeConfig = gt
+		gameRules = plugin.GetRulesForGameType(gt)
+		behaviors = plugin.GetBehaviorsForGameType(gt)
+		if e.logger != nil {
+			e.logger.Info("using game type configuration",
+				zap.String("game_type", gameType),
+				zap.Int("starting_life", gameRules.StartingLife),
+				zap.Int("minimum_deck_size", gameRules.MinimumDeckSize),
+				zap.Int("starting_hand_size", gameRules.StartingHandSize),
+				zap.Int("behavior_count", len(behaviors)),
+			)
+		}
+	} else {
+		if e.logger != nil {
+			e.logger.Warn("game type not found in registry, using defaults",
+				zap.String("game_type", gameType),
+				zap.Error(err),
+			)
+		}
+	}
+
+	// Coin flip to determine starting player (MTG Rule 103.2)
+	// The winner of the flip chooses to play first or draw first
+	coinFlipResult, err := rand.Int(rand.Reader, big.NewInt(int64(len(players))))
+	if err != nil {
+		e.mu.Unlock()
+		return fmt.Errorf("failed to perform coin flip: %w", err)
+	}
+	startingPlayerIndex := int(coinFlipResult.Int64())
+	startingPlayerID := players[startingPlayerIndex]
+
+	// Create game state - start in MULLIGAN state
 	gameState := &engineGameState{
-		gameID:      gameID,
-		gameType:    gameType,
-		state:       GameStateInProgress,
-		players:     make(map[string]*internalPlayer),
-		playerOrder: make([]string, len(players)),
-		cards:       make(map[string]*internalCard),
-		battlefield: make([]*internalCard, 0),
-		exile:       make([]*internalCard, 0),
-		command:     make([]*internalCard, 0),
-		revealed:    make([]EngineRevealedView, 0),
-		lookedAt:    make([]EngineLookedAtView, 0),
-		combat:      newCombatState(),
+		gameID:           gameID,
+		gameType:         gameType,
+		gameTypeConfig:   gameTypeConfig,
+		gameRules:        gameRules,
+		behaviors:        behaviors,
+		state:            GameStateMulligan, // Start in mulligan phase
+		players:          make(map[string]*internalPlayer),
+		playerOrder:      make([]string, len(players)),
+		cards:            make(map[string]*internalCard),
+		battlefield:      make([]*internalCard, 0),
+		exile:            make([]*internalCard, 0),
+		command:          make([]*internalCard, 0),
+		revealed:         make([]EngineRevealedView, 0),
+		lookedAt:         make([]EngineLookedAtView, 0),
+		combat:           newCombatState(),
+		startingPlayerID: startingPlayerID,
 		analytics: &gameAnalytics{
 			actionsPerTurn: make(map[int]int),
 			turnStartTimes: make(map[int]time.Time),
@@ -676,52 +733,94 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 	for i, playerID := range players {
 		gameState.playerOrder[i] = playerID
 		gameState.players[playerID] = &internalPlayer{
-			PlayerID:       playerID,
-			Name:           playerID,
-			Life:           20,
-			Poison:         0,
-			Energy:         0,
-			Library:        make([]*internalCard, 0),
-			Hand:           make([]*internalCard, 0),
-			Graveyard:      make([]*internalCard, 0),
-			ManaPool:       mana.NewManaPool(),
-			HasPriority:    false,
-			Passed:         false,
-			StateOrdinal:   0,
-			Lost:           false,
-			Left:           false,
-			Wins:           0,
-			StoredBookmark: -1,    // No undo available initially
-			MulliganCount:  0,     // No mulligans yet
-			KeptHand:       false, // Haven't kept hand yet
+			PlayerID:        playerID,
+			Name:            playerID,
+			Life:            gameRules.StartingLife, // Use game type starting life
+			Poison:          0,
+			Energy:          0,
+			Library:         make([]*internalCard, 0),
+			Hand:            make([]*internalCard, 0),
+			Graveyard:       make([]*internalCard, 0),
+			ManaPool:        mana.NewManaPool(),
+			HasPriority:     false,
+			Passed:          false,
+			StateOrdinal:    0,
+			Lost:            false,
+			Left:            false,
+			Wins:            0,
+			StoredBookmark:  -1,                   // No undo available initially
+			MulliganCount:   0,                    // No mulligans yet
+			KeptHand:        false,                // Haven't kept hand yet
+			CommanderDamage: make(map[string]int), // Track commander damage from each commander
 		}
 
-		// Create starting hand (7 cards)
-		// Mix of different card types for testing
-		cardNames := []string{"Lightning Bolt", "Lightning Bolt", "Lightning Bolt", "Counterspell", "Shock", "Lightning Bolt", "Lightning Bolt"}
-		for j := 0; j < 7; j++ {
-			cardName := cardNames[j%len(cardNames)]
+		// Load player's deck if provided, otherwise use test deck
+		var deckCardNames []string
+		var commanderNames []string
+
+		if decks != nil {
+			if playerDeck, ok := decks[playerID]; ok && len(playerDeck.MainDeck) > 0 {
+				deckCardNames = playerDeck.MainDeck
+				commanderNames = playerDeck.Commanders
+				if e.logger != nil {
+					e.logger.Info("loading player deck",
+						zap.String("player", playerID),
+						zap.Int("main_deck_size", len(deckCardNames)),
+						zap.Int("commander_count", len(commanderNames)),
+					)
+				}
+			}
+		}
+
+		// Fall back to test deck if no deck provided
+		if len(deckCardNames) == 0 {
+			testDeckNames := []string{"Lightning Bolt", "Lightning Bolt", "Counterspell", "Counterspell", "Shock", "Shock",
+				"Lightning Bolt", "Counterspell", "Shock", "Lightning Bolt"}
+			for j := 0; j < 60; j++ {
+				deckCardNames = append(deckCardNames, testDeckNames[j%len(testDeckNames)])
+			}
+			if e.logger != nil {
+				e.logger.Debug("using test deck for player",
+					zap.String("player", playerID),
+				)
+			}
+		}
+
+		// Create cards in library from deck
+		for j, cardName := range deckCardNames {
 			card := e.createStarterCard(fmt.Sprintf("%s-card-%d", playerID, j), playerID, cardName)
-			gameState.cards[card.ID] = card
-			gameState.players[playerID].Hand = append(gameState.players[playerID].Hand, card)
-			card.Zone = zoneHand
-		}
-
-		// Create library (53 cards for a 60-card deck)
-		// Mix card types
-		libraryCardNames := []string{"Lightning Bolt", "Counterspell", "Shock", "Lightning Bolt", "Counterspell"}
-		for j := 0; j < 53; j++ {
-			cardName := libraryCardNames[j%len(libraryCardNames)]
-			card := e.createStarterCard(fmt.Sprintf("%s-library-%d", playerID, j), playerID, cardName)
 			gameState.cards[card.ID] = card
 			gameState.players[playerID].Library = append(gameState.players[playerID].Library, card)
 			card.Zone = zoneLibrary
 		}
+
+		// Create commander cards and move to command zone if applicable
+		// Check if this game type has commander behavior
+		hasCommanderBehavior := gameState.hasCommanderBehavior()
+		if hasCommanderBehavior && len(commanderNames) > 0 {
+			for j, commanderName := range commanderNames {
+				card := e.createStarterCard(fmt.Sprintf("%s-commander-%d", playerID, j), playerID, commanderName)
+				card.IsCommander = true
+				gameState.cards[card.ID] = card
+				gameState.command = append(gameState.command, card)
+				card.Zone = zoneCommand
+				if e.logger != nil {
+					e.logger.Info("commander moved to command zone",
+						zap.String("player", playerID),
+						zap.String("commander", commanderName),
+						zap.String("card_id", card.ID),
+					)
+				}
+			}
+		}
+
+		// Shuffle library using Fisher-Yates with crypto/rand
+		e.shuffleLibrary(gameState.players[playerID])
 	}
 
-	// Initialize turn manager with first player
-	gameState.turnManager = rules.NewTurnManager(players[0])
-	gameState.players[players[0]].HasPriority = true
+	// Initialize turn manager with starting player (determined by coin flip)
+	gameState.turnManager = rules.NewTurnManager(startingPlayerID)
+	gameState.players[startingPlayerID].HasPriority = true
 
 	// Initialize legality checker and target validator
 	gameState.legality = rules.NewLegalityChecker(gameState)
@@ -732,8 +831,26 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 		gameState.watchers.NotifyWatchers(event)
 	})
 
-	// Add initial log message
-	gameState.addMessage("Game started", "action")
+	// Add coin flip message
+	gameState.addMessage(fmt.Sprintf("%s wins the coin flip and will play first", startingPlayerID), "action")
+
+	// Draw initial hands (7 cards each)
+	for _, playerID := range players {
+		player := gameState.players[playerID]
+		for j := 0; j < 7 && len(player.Library) > 0; j++ {
+			// Draw from top of library
+			card := player.Library[len(player.Library)-1]
+			player.Library = player.Library[:len(player.Library)-1]
+			card.Zone = zoneHand
+			player.Hand = append(player.Hand, card)
+		}
+		gameState.addMessage(fmt.Sprintf("%s draws opening hand of %d cards", playerID, len(player.Hand)), "action")
+	}
+
+	// Prompt each player for mulligan decision
+	for _, playerID := range players {
+		gameState.addPrompt(playerID, "Keep hand or mulligan?", []string{"KEEP", "MULLIGAN"})
+	}
 
 	e.games[gameID] = gameState
 
@@ -758,22 +875,57 @@ func (e *MageEngine) StartGame(gameID string, players []string, gameType string)
 		}
 	}
 
-	// Notify game start (safe to call after releasing lock)
-	e.notifyGameStateChange(gameID, map[string]interface{}{
-		"state":     "started",
-		"game_type": gameType,
-		"players":   players,
-	})
-
 	if e.logger != nil {
 		e.logger.Info("mage engine started game",
 			zap.String("game_id", gameID),
 			zap.Strings("players", players),
 			zap.String("game_type", gameType),
+			zap.String("starting_player", startingPlayerID),
+		)
+	}
+
+	// Auto-complete mulligan phase for now (TODO: implement mulligan UI in client)
+	// All players automatically keep their hands
+	for _, player := range gameState.players {
+		player.KeptHand = true
+	}
+
+	// Transition to main game
+	gameState.state = GameStateInProgress
+
+	// Give priority to the starting player
+	gameState.turnManager.SetPriority(startingPlayerID)
+
+	// Notify game start
+	e.notifyGameStateChange(gameID, map[string]interface{}{
+		"state":           "in_progress",
+		"game_type":       gameType,
+		"players":         players,
+		"starting_player": startingPlayerID,
+	})
+
+	if e.logger != nil {
+		e.logger.Info("mulligan auto-completed, game in progress",
+			zap.String("game_id", gameID),
+			zap.String("priority_player", startingPlayerID),
 		)
 	}
 
 	return nil
+}
+
+// shuffleLibrary performs a Fisher-Yates shuffle using crypto/rand
+func (e *MageEngine) shuffleLibrary(player *internalPlayer) {
+	n := len(player.Library)
+	for i := n - 1; i > 0; i-- {
+		jBig, err := rand.Int(rand.Reader, big.NewInt(int64(i+1)))
+		if err != nil {
+			// Fallback to deterministic swap on error (shouldn't happen)
+			continue
+		}
+		j := int(jBig.Int64())
+		player.Library[i], player.Library[j] = player.Library[j], player.Library[i]
+	}
 }
 
 // createStarterCard creates a simple starter card for testing
@@ -1000,6 +1152,10 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		// Get active player
 		activePlayerID := gameState.turnManager.ActivePlayer()
 
+		// Handle step-specific actions (untap, draw, cleanup, etc.)
+		// Per MTG Rules 502-514 for turn-based actions
+		e.handleStepBegin(gameState, step, activePlayerID)
+
 		// Handle combat step initialization
 		// Per Java BeginCombatStep.beginStep() and DeclareAttackersStep.beginStep()
 		e.handleCombatStepBegin(gameState, step, activePlayerID)
@@ -1060,6 +1216,10 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 			// Set priority to active player
 			activePlayerID := gameState.turnManager.ActivePlayer()
 
+			// Handle step-specific actions (untap, draw, cleanup, etc.)
+			// Per MTG Rules 502-514 for turn-based actions
+			e.handleStepBegin(gameState, step, activePlayerID)
+
 			// Handle combat step initialization
 			// Per Java BeginCombatStep.beginStep() and DeclareAttackersStep.beginStep()
 			e.handleCombatStepBegin(gameState, step, activePlayerID)
@@ -1072,6 +1232,19 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 
 			gameState.turnManager.SetPriority(activePlayerID)
 			gameState.players[activePlayerID].HasPriority = true
+
+			// Notify phase change and priority
+			e.notifyPhaseChange(gameState.gameID, map[string]interface{}{
+				"phase":         phase.String(),
+				"step":          step.String(),
+				"active_player": activePlayerID,
+				"turn":          gameState.turnManager.TurnNumber(),
+			})
+			e.notifyPriorityChange(gameState.gameID, activePlayerID, map[string]interface{}{
+				"active_player": activePlayerID,
+				"phase":         phase.String(),
+				"step":          step.String(),
+			})
 			return nil
 		}
 		// Per rule 117.5: Check state-based actions before priority
@@ -1085,6 +1258,13 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		gameState.players[nextPlayerID].HasPriority = true
 		gameState.players[nextPlayerID].Passed = false
 		gameState.addPrompt(nextPlayerID, "You have priority. Pass?", []string{"PASS", "CAST"})
+
+		// Notify priority change to update clients
+		e.notifyPriorityChange(gameState.gameID, nextPlayerID, map[string]interface{}{
+			"active_player": gameState.turnManager.ActivePlayer(),
+			"phase":         gameState.turnManager.CurrentPhase().String(),
+			"step":          gameState.turnManager.CurrentStep().String(),
+		})
 	}
 
 	return nil
@@ -2708,6 +2888,36 @@ func (e *MageEngine) checkStateBasedActions(gameState *engineGameState) bool {
 			continue
 		}
 
+		// Commander rule 903.10a: Check via CommanderBehavior if attached
+		// A player that's been dealt 21 or more combat damage by the same commander loses
+		if cb := gameState.getCommanderBehavior(); cb != nil && cb.IsCommanderDamageEnabled() && player.CommanderDamage != nil {
+			threshold := cb.GetDamageThreshold()
+			for commanderID, damage := range player.CommanderDamage {
+				if damage >= threshold {
+					player.Lost = true
+					commanderName := commanderID
+					if commander, exists := gameState.cards[commanderID]; exists {
+						commanderName = commander.Name
+					}
+					gameState.addMessage(fmt.Sprintf("%s loses the game (commander damage from %s >= %d)",
+						player.PlayerID, commanderName, threshold), "action")
+					somethingHappened = true
+					if e.logger != nil {
+						e.logger.Info("player lost due to commander damage",
+							zap.String("player_id", player.PlayerID),
+							zap.String("commander_id", commanderID),
+							zap.Int("damage", damage),
+							zap.Int("threshold", threshold),
+						)
+					}
+					break
+				}
+			}
+			if player.Lost {
+				continue
+			}
+		}
+
 		// 704.5c: If a player would draw a card from an empty library, they lose the game
 		// Note: This is typically handled when the draw would occur, but we check here too
 		if len(player.Library) == 0 {
@@ -2988,6 +3198,27 @@ func (s *engineGameState) addPrompt(playerID, text string, options []string) {
 		Options:   options,
 		Timestamp: time.Now(),
 	})
+}
+
+// hasCommanderBehavior returns true if this game has a CommanderBehavior attached.
+// This determines whether commander cards should be moved to the command zone.
+func (s *engineGameState) hasCommanderBehavior() bool {
+	for _, behavior := range s.behaviors {
+		if _, ok := behavior.(*plugin.CommanderBehavior); ok {
+			return true
+		}
+	}
+	return false
+}
+
+// getCommanderBehavior returns the CommanderBehavior if one is attached, nil otherwise.
+func (s *engineGameState) getCommanderBehavior() *plugin.CommanderBehavior {
+	for _, behavior := range s.behaviors {
+		if cb, ok := behavior.(*plugin.CommanderBehavior); ok {
+			return cb
+		}
+	}
+	return nil
 }
 
 // buildAttackerPromptOptions builds prompt options for declaring attackers
@@ -3950,11 +4181,8 @@ func (e *MageEngine) PlayerMulligan(gameID, playerID string) error {
 	player.Library = append(player.Library, player.Hand...)
 	player.Hand = make([]*internalCard, 0)
 
-	// Shuffle library (simple random shuffle)
-	for i := len(player.Library) - 1; i > 0; i-- {
-		j := i // In production, use crypto/rand for true randomness
-		player.Library[i], player.Library[j] = player.Library[j], player.Library[i]
-	}
+	// Shuffle library using proper crypto/rand shuffle
+	e.shuffleLibrary(player)
 
 	// Increment mulligan count
 	player.MulliganCount++
@@ -4233,6 +4461,157 @@ func (e *MageEngine) processMustBeBlockedRequirements(gameState *engineGameState
 	}
 
 	return nil
+}
+
+// handleStepBegin handles step-specific actions when entering a new step
+// Per MTG Rules 502-514 for turn-based actions
+func (e *MageEngine) handleStepBegin(gameState *engineGameState, step rules.Step, activePlayerID string) {
+	switch step {
+	case rules.StepUntap:
+		// Per MTG Rule 502.2: Untap all tapped permanents controlled by active player
+		// Skip this on turn 1 (first player's first turn)
+		e.performUntapStep(gameState, activePlayerID)
+
+	case rules.StepUpkeep:
+		// Per MTG Rule 503: No turn-based actions, but triggers happen here
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventUpkeepStep, "", "", activePlayerID))
+
+	case rules.StepDraw:
+		// Per MTG Rule 504.1: Active player draws a card
+		// Per MTG Rule 103.7a: The starting player skips their draw step on turn 1
+		e.performDrawStep(gameState, activePlayerID)
+
+	case rules.StepCleanup:
+		// Per MTG Rule 514.1-514.3: Discard to hand size, remove damage, end "until end of turn" effects
+		e.performCleanupStep(gameState, activePlayerID)
+	}
+}
+
+// performUntapStep untaps all permanents controlled by the active player
+// Per MTG Rule 502.2
+func (e *MageEngine) performUntapStep(gameState *engineGameState, activePlayerID string) {
+	untappedCount := 0
+	for _, card := range gameState.battlefield {
+		if card.ControllerID == activePlayerID && card.Tapped {
+			// TODO: Check for "doesn't untap" effects
+			card.Tapped = false
+			untappedCount++
+		}
+	}
+
+	if untappedCount > 0 {
+		gameState.addMessage(fmt.Sprintf("%s untaps %d permanents", activePlayerID, untappedCount), "action")
+	}
+
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventUntapStep, "", "", activePlayerID))
+
+	if e.logger != nil {
+		e.logger.Debug("untap step performed",
+			zap.String("player", activePlayerID),
+			zap.Int("untapped", untappedCount),
+		)
+	}
+}
+
+// performDrawStep has the active player draw a card
+// Per MTG Rule 504.1 and 103.7a (starting player skips first draw)
+func (e *MageEngine) performDrawStep(gameState *engineGameState, activePlayerID string) {
+	// Per MTG Rule 103.7a: The starting player skips their draw step on the first turn
+	turnNumber := gameState.turnManager.TurnNumber()
+	if turnNumber == 1 && activePlayerID == gameState.startingPlayerID && !gameState.firstTurnDrawDone {
+		gameState.firstTurnDrawDone = true
+		gameState.addMessage(fmt.Sprintf("%s skips their first turn draw", activePlayerID), "action")
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventDrawStep, "", "", activePlayerID))
+
+		if e.logger != nil {
+			e.logger.Debug("first turn draw skipped",
+				zap.String("player", activePlayerID),
+			)
+		}
+		return
+	}
+
+	player, exists := gameState.players[activePlayerID]
+	if !exists {
+		if e.logger != nil {
+			e.logger.Error("player not found for draw step", zap.String("player", activePlayerID))
+		}
+		return
+	}
+
+	if len(player.Library) == 0 {
+		// Player loses if they can't draw from empty library
+		// Per MTG Rule 704.5b
+		player.Lost = true
+		gameState.addMessage(fmt.Sprintf("%s cannot draw from empty library and loses the game", activePlayerID), "action")
+		if e.logger != nil {
+			e.logger.Info("player loses by drawing from empty library",
+				zap.String("player", activePlayerID),
+			)
+		}
+		return
+	}
+
+	// Draw from top of library
+	card := player.Library[len(player.Library)-1]
+	player.Library = player.Library[:len(player.Library)-1]
+	card.Zone = zoneHand
+	player.Hand = append(player.Hand, card)
+
+	gameState.addMessage(fmt.Sprintf("%s draws a card", activePlayerID), "action")
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventDrawStep, "", "", activePlayerID))
+
+	if e.logger != nil {
+		e.logger.Debug("draw step performed",
+			zap.String("player", activePlayerID),
+			zap.String("card", card.Name),
+			zap.Int("hand_size", len(player.Hand)),
+		)
+	}
+}
+
+// performCleanupStep handles end of turn cleanup
+// Per MTG Rule 514.1-514.3
+func (e *MageEngine) performCleanupStep(gameState *engineGameState, activePlayerID string) {
+	player, exists := gameState.players[activePlayerID]
+	if !exists {
+		return
+	}
+
+	// 514.1: Discard to maximum hand size (7 by default)
+	maxHandSize := 7
+	if len(player.Hand) > maxHandSize {
+		discardCount := len(player.Hand) - maxHandSize
+		// TODO: Let player choose which cards to discard
+		// For now, discard from the end of hand
+		for i := 0; i < discardCount && len(player.Hand) > maxHandSize; i++ {
+			card := player.Hand[len(player.Hand)-1]
+			player.Hand = player.Hand[:len(player.Hand)-1]
+			card.Zone = zoneGraveyard
+			player.Graveyard = append(player.Graveyard, card)
+		}
+		if discardCount > 0 {
+			gameState.addMessage(fmt.Sprintf("%s discards %d cards to hand size", activePlayerID, discardCount), "action")
+		}
+	}
+
+	// 514.2: Remove all damage from creatures
+	for _, card := range gameState.battlefield {
+		if strings.Contains(card.Type, "Creature") && card.Damage > 0 {
+			card.Damage = 0
+		}
+	}
+
+	// 514.3: "Until end of turn" and "this turn" effects end
+	// This is handled by effects.CleanupEndOfTurnEffects called in handlePass
+
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventCleanupStep, "", "", activePlayerID))
+
+	if e.logger != nil {
+		e.logger.Debug("cleanup step performed",
+			zap.String("player", activePlayerID),
+		)
+	}
 }
 
 // handleCombatStepBegin handles combat initialization when entering combat steps
@@ -7339,6 +7718,27 @@ func (e *MageEngine) dealDamageToDefender(gameState *engineGameState, attacker *
 
 	// Deal damage to player
 	player.Life -= amount
+
+	// Track commander damage if this is combat damage from a commander (Rule 903.10a)
+	// "A player that's been dealt 21 or more combat damage by the same commander over the
+	// course of the game loses the game."
+	if cb := gameState.getCommanderBehavior(); cb != nil && cb.IsCommanderDamageEnabled() && attacker.IsCommander {
+		if player.CommanderDamage == nil {
+			player.CommanderDamage = make(map[string]int)
+		}
+		player.CommanderDamage[attacker.ID] += amount
+
+		if e.logger != nil {
+			e.logger.Info("commander damage dealt",
+				zap.String("commander_id", attacker.ID),
+				zap.String("commander_name", attacker.Name),
+				zap.String("player", defenderID),
+				zap.Int("damage", amount),
+				zap.Int("total_from_commander", player.CommanderDamage[attacker.ID]),
+				zap.Int("threshold", cb.GetDamageThreshold()),
+			)
+		}
+	}
 
 	// Handle lifelink
 	if e.hasAbility(attacker, abilityLifelink) {

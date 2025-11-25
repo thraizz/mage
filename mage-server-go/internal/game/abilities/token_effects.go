@@ -164,6 +164,104 @@ func (e *CreateTokenEffect) GetLastAddedTokenIDs() []uuid.UUID {
 }
 
 // ========================================
+// Create Token Effect with Dynamic Amount
+// ========================================
+
+// CreateTokenEffectDynamic creates token(s) with a dynamically calculated amount.
+// Mirrors Java CreateTokenEffect with DynamicValue parameter.
+type CreateTokenEffectDynamic struct {
+	token        *token.Token
+	amountValue  DynamicValue
+	tapped       bool
+	attacking    bool
+	lastAddedIDs []uuid.UUID
+}
+
+// NewCreateTokenEffectDynamic creates an effect that creates tokens based on a dynamic value.
+func NewCreateTokenEffectDynamic(tok *token.Token, amount DynamicValue) *CreateTokenEffectDynamic {
+	return &CreateTokenEffectDynamic{
+		token:        tok.Copy(),
+		amountValue:  amount,
+		tapped:       false,
+		attacking:    false,
+		lastAddedIDs: make([]uuid.UUID, 0),
+	}
+}
+
+// NewCreateTokenEffectDynamicTapped creates an effect that creates tokens tapped based on a dynamic value.
+func NewCreateTokenEffectDynamicTapped(tok *token.Token, amount DynamicValue, tapped bool) *CreateTokenEffectDynamic {
+	return &CreateTokenEffectDynamic{
+		token:        tok.Copy(),
+		amountValue:  amount,
+		tapped:       tapped,
+		attacking:    false,
+		lastAddedIDs: make([]uuid.UUID, 0),
+	}
+}
+
+func (e *CreateTokenEffectDynamic) Apply(ctx context.Context, game GameContext, source uuid.UUID, targets []uuid.UUID) error {
+	if e.token == nil {
+		return nil
+	}
+
+	// Calculate the dynamic amount
+	amount := e.amountValue.Calculate(ctx, game, source)
+	if amount <= 0 {
+		return nil
+	}
+
+	// Cast to TokenGameContext for token operations
+	tokenGame, ok := game.(TokenGameContext)
+	if !ok {
+		return fmt.Errorf("game context does not support token operations")
+	}
+
+	// Create the tokens
+	createdIDs, err := tokenGame.CreateTokens(e.token, amount, source, e.tapped, e.attacking)
+	if err != nil {
+		return fmt.Errorf("failed to create tokens: %w", err)
+	}
+
+	e.lastAddedIDs = createdIDs
+
+	// Inform players
+	if len(createdIDs) > 0 {
+		if amount == 1 {
+			tokenGame.InformPlayers(fmt.Sprintf("Created %s", e.token.Description))
+		} else {
+			tokenGame.InformPlayers(fmt.Sprintf("Created %d %s", amount, e.token.Description))
+		}
+	}
+
+	return nil
+}
+
+func (e *CreateTokenEffectDynamic) GetDescription() string {
+	if e.token == nil {
+		return ""
+	}
+
+	desc := fmt.Sprintf("create X %s where X is %s", e.token.Description, e.amountValue.GetMessage())
+
+	if e.tapped {
+		desc += " tapped"
+	}
+
+	if e.attacking {
+		desc += " and attacking"
+	}
+
+	return desc
+}
+
+// GetLastAddedTokenIDs returns the IDs of tokens created by this effect.
+func (e *CreateTokenEffectDynamic) GetLastAddedTokenIDs() []uuid.UUID {
+	result := make([]uuid.UUID, len(e.lastAddedIDs))
+	copy(result, e.lastAddedIDs)
+	return result
+}
+
+// ========================================
 // Extended GameContext Interface for Tokens
 // ========================================
 

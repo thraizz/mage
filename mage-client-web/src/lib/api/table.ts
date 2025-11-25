@@ -10,7 +10,6 @@ import type {
 	RoomGetTableByIdRequest,
 	RoomGetTableByIdResponse
 } from '$lib/generated/mage/v1/room';
-import type { TableSetReadyRequest, TableSetReadyResponse } from '$lib/generated/mage/v1/table';
 import type { GameFormat } from '$lib/types/table';
 
 /**
@@ -52,7 +51,6 @@ function convertTableViewToTable(view: TableView): Table {
 			id: `${view.tableId}-${seat.seatNumber}`,
 			username: seat.playerName,
 			isHost: index === 0, // First player is typically the host
-			isReady: status !== 'waiting', // Assume ready if game is not waiting
 			joinedAt: createTime
 		}));
 
@@ -108,44 +106,14 @@ export async function fetchTable(tableId: string): Promise<Table> {
 /**
  * Toggle ready status for current player
  *
- * Note: The actual RPC method name might be different
- * This assumes TableSetReady exists in the proto
+ * NOTE: The TableSetReady RPC does not exist in the current server implementation.
+ * In XMage, ready status is controlled by deck submission via DeckSubmit.
+ * This function is a placeholder for future implementation.
  */
-export async function toggleReady(tableId: string, isReady: boolean): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	// Get main room ID
-	const roomResponse = await client.getMainRoomId();
-	if (!roomResponse.roomId) {
-		throw new Error('Failed to get main room ID');
-	}
-
-	try {
-		const request: TableSetReadyRequest = {
-			sessionId,
-			roomId: roomResponse.roomId,
-			tableId,
-			ready: isReady
-		};
-
-		const response = await client.call<TableSetReadyRequest, TableSetReadyResponse>(
-			'TableSetReady',
-			request
-		);
-
-		if (!response.success) {
-			throw new Error(response.error || 'Failed to set ready status');
-		}
-	} catch (error) {
-		// If TableSetReady doesn't exist, this might be handled differently
-		console.warn('TableSetReady not available:', error);
-		// The server might handle ready status differently (e.g., through deck submission)
-	}
+export async function toggleReady(_tableId: string, _isReady: boolean): Promise<void> {
+	// TableSetReady RPC doesn't exist - ready status is controlled by deck submission
+	// For now, throw an error to make it clear this functionality isn't implemented
+	throw new Error('Ready status is controlled by deck submission. Please submit your deck to mark yourself as ready.');
 }
 
 /**
@@ -265,7 +233,7 @@ export async function startGame(tableId: string): Promise<string> {
  * Note: This functionality might not be available via RPC
  * It might require admin privileges or be handled differently
  */
-export async function kickPlayer(tableId: string, playerId: string): Promise<void> {
+export async function kickPlayer(_tableId: string, _playerId: string): Promise<void> {
 	const client = getMageClient();
 	const sessionId = await client.ensureSessionId();
 

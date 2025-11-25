@@ -708,8 +708,15 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 		}
 	}
 
+	commanderNames := make([]string, 0)
+	for _, card := range deck.GetCommanders() {
+		for i := int32(0); i < card.GetQuantity(); i++ {
+			commanderNames = append(commanderNames, card.GetName())
+		}
+	}
+
 	// Validate all card names exist in the database
-	allCardNames := append(mainDeckNames, sideboardNames...)
+	allCardNames := append(append(mainDeckNames, sideboardNames...), commanderNames...)
 	if err := s.validateCardNames(ctx, allCardNames); err != nil {
 		return &pb.DeckSubmitResponse{
 			Success: false,
@@ -718,8 +725,9 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 	}
 
 	deckList := table.DeckList{
-		MainDeck:  mainDeckNames,
-		Sideboard: sideboardNames,
+		MainDeck:   mainDeckNames,
+		Sideboard:  sideboardNames,
+		Commanders: commanderNames,
 	}
 
 	if err := tbl.SubmitDeck(username, deckList); err != nil {
@@ -734,6 +742,7 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 		zap.String("username", username),
 		zap.Int("main_count", len(deckList.MainDeck)),
 		zap.Int("sideboard_count", len(deckList.Sideboard)),
+		zap.Int("commander_count", len(deckList.Commanders)),
 	)
 
 	return &pb.DeckSubmitResponse{

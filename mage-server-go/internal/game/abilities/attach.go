@@ -27,6 +27,7 @@ const (
 	OutcomeProtect       Outcome = "Protect"
 	OutcomeDetriment     Outcome = "Detriment"
 	OutcomeNeutral       Outcome = "Neutral"
+	OutcomeGainControl   Outcome = "GainControl"
 )
 
 // NewAttachEffect creates a new attach effect

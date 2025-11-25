@@ -88,9 +88,7 @@
 
 	// Derived values
 	const isYourTurn = $derived(activePlayerId === localPlayerId);
-	const currentPhaseInfo = $derived(
-		phases.find((p) => p.key === currentPhase) || phases[0]
-	);
+	const currentPhaseInfo = $derived(phases.find((p) => p.key === currentPhase) || phases[0]);
 </script>
 
 <div class="phase-indicator" class:animated>

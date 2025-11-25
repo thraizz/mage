@@ -37,8 +37,13 @@ func NewNullEngine(logger *zap.Logger) *NullEngine {
 	}
 }
 
-// StartGame initializes a new game state.
+// StartGame initializes a new game state (without decks).
 func (n *NullEngine) StartGame(gameID string, players []string, gameType string) error {
+	return n.StartGameWithDecks(gameID, players, gameType, nil)
+}
+
+// StartGameWithDecks initializes a new game state with player-submitted decks.
+func (n *NullEngine) StartGameWithDecks(gameID string, players []string, gameType string, decks map[string]DeckList) error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
 
@@ -49,10 +54,15 @@ func (n *NullEngine) StartGame(gameID string, players []string, gameType string)
 	}
 
 	if n.logger != nil {
+		deckCount := 0
+		if decks != nil {
+			deckCount = len(decks)
+		}
 		n.logger.Info("null engine started game",
 			zap.String("game_id", gameID),
 			zap.Strings("players", players),
 			zap.String("game_type", gameType),
+			zap.Int("deck_count", deckCount),
 		)
 	}
 

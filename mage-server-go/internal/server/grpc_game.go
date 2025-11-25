@@ -12,6 +12,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -66,27 +67,92 @@ func (s *mageServer) MatchStart(ctx context.Context, req *pb.MatchStartRequest) 
 		return &pb.MatchStartResponse{Success: false, Error: "not enough players to start match"}, nil
 	}
 
-	game := s.gameMgr.CreateGame(tbl.ID, tbl.GameType, players)
-	tbl.RecordMatch(game.ID)
+	// Collect submitted decks from the table
+	decks := make(map[string]game.DeckList)
+	for _, playerName := range players {
+		if tableDeck, ok := tbl.GetSubmittedDeck(playerName); ok {
+			decks[playerName] = game.DeckList{
+				MainDeck:   tableDeck.MainDeck,
+				Sideboard:  tableDeck.Sideboard,
+				Commanders: tableDeck.Commanders,
+			}
+			s.logger.Debug("collected deck for player",
+				zap.String("player", playerName),
+				zap.Int("main_deck_size", len(tableDeck.MainDeck)),
+				zap.Int("commander_count", len(tableDeck.Commanders)),
+			)
+		}
+	}
+
+	gameInstance := s.gameMgr.CreateGame(tbl.ID, tbl.GameType, players)
+	tbl.RecordMatch(gameInstance.ID)
 	tbl.SetState(table.TableStateDueling)
 
 	if s.gameAdapter != nil {
-		if err := s.gameAdapter.StartGame(game); err != nil {
+		// Use StartGameWithDecks to pass player decks to the engine
+		if err := s.gameAdapter.StartGameWithDecks(gameInstance, decks); err != nil {
 			s.logger.Warn("failed to start game engine",
-				zap.String("game_id", game.ID),
+				zap.String("game_id", gameInstance.ID),
 				zap.Error(err),
 			)
 		}
-		go s.gameAdapter.ProcessGameActions(game)
+		go s.gameAdapter.ProcessGameActions(gameInstance)
 	}
 
 	s.logger.Info("match started",
 		zap.String("table_id", tbl.ID),
-		zap.String("game_id", game.ID),
+		zap.String("game_id", gameInstance.ID),
 		zap.Strings("players", players),
 	)
 
-	return &pb.MatchStartResponse{Success: true}, nil
+	// Send START_GAME WebSocket event to all players in the table
+	s.notifyGameStart(gameInstance.ID, players)
+
+	return &pb.MatchStartResponse{Success: true, GameId: gameInstance.ID}, nil
+}
+
+// notifyGameStart sends START_GAME WebSocket events to all players
+func (s *mageServer) notifyGameStart(gameID string, playerNames []string) {
+	// Create the START_GAME event data
+	startGameData := &pb.StartGameData{
+		GameId:      gameID,
+		PlayerNames: playerNames,
+	}
+
+	// Create the ServerEvent
+	event := &pb.ServerEvent{
+		ObjectId: gameID,
+		Method:   pb.CallbackMethod_START_GAME,
+	}
+
+	// Marshal the data into Any
+	anyData, err := anypb.New(startGameData)
+	if err != nil {
+		s.logger.Error("failed to marshal StartGameData",
+			zap.String("game_id", gameID),
+			zap.Error(err),
+		)
+		return
+	}
+	event.Data = anyData
+
+	// Send to all players
+	for _, playerName := range playerNames {
+		sessions := s.sessionMgr.GetSessionsByUser(playerName)
+		for _, sess := range sessions {
+			if !sess.SendCallback(event) {
+				s.logger.Warn("failed to send START_GAME event to player",
+					zap.String("game_id", gameID),
+					zap.String("player", playerName),
+				)
+			} else {
+				s.logger.Debug("sent START_GAME event to player",
+					zap.String("game_id", gameID),
+					zap.String("player", playerName),
+				)
+			}
+		}
+	}
 }
 
 // GameJoin registers a player to an active game session.

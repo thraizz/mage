@@ -5,1919 +5,1859 @@
 // source: mage/v1/auth.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
-import { ServerState } from './models';
+import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { ServerState } from "./models";
 
 export interface ConnectUserRequest {
-	userName: string;
-	password: string;
-	sessionId: string;
-	clientVersion: string;
-	userIdStr: string;
-	restoreSessionId: string;
+  userName: string;
+  password: string;
+  sessionId: string;
+  clientVersion: string;
+  userIdStr: string;
+  restoreSessionId: string;
 }
 
 export interface ConnectUserResponse {
-	success: boolean;
-	error: string;
-	sessionId: string;
-	userId: string;
+  success: boolean;
+  error: string;
+  sessionId: string;
+  userId: string;
 }
 
 export interface ConnectAdminRequest {
-	password: string;
-	sessionId: string;
+  password: string;
+  sessionId: string;
 }
 
 export interface ConnectAdminResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ConnectSetUserDataRequest {
-	sessionId: string;
-	avatarId: number;
-	showAbsoluteAbilities: boolean;
-	allowRequestsFromFriends: boolean;
-	confirmEmptyManaPool: boolean;
-	userGroup: string;
-	userSkipPrioritySteps: string[];
-	flagsName: string;
-	askMoveToGraveOrder: number;
+  sessionId: string;
+  avatarId: number;
+  showAbsoluteAbilities: boolean;
+  allowRequestsFromFriends: boolean;
+  confirmEmptyManaPool: boolean;
+  userGroup: string;
+  userSkipPrioritySteps: string[];
+  flagsName: string;
+  askMoveToGraveOrder: number;
 }
 
 export interface ConnectSetUserDataResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface AuthRegisterRequest {
-	userName: string;
-	password: string;
-	/** Optional - not currently used */
-	email: string;
+  userName: string;
+  password: string;
+  /** Optional - not currently used */
+  email: string;
 }
 
 export interface AuthRegisterResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface AuthSendTokenToEmailRequest {
-	email: string;
+  email: string;
 }
 
 export interface AuthSendTokenToEmailResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface AuthResetPasswordRequest {
-	email: string;
-	token: string;
-	newPassword: string;
+  email: string;
+  token: string;
+  newPassword: string;
 }
 
 export interface AuthResetPasswordResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface PingRequest {
-	sessionId: string;
+  sessionId: string;
 }
 
 export interface PingResponse {
-	success: boolean;
+  success: boolean;
 }
 
 export interface GetServerStateRequest {
-	sessionId: string;
+  sessionId: string;
 }
 
 export interface GetServerStateResponse {
-	serverState?: ServerState | undefined;
+  serverState?: ServerState | undefined;
 }
 
 export interface ServerGetPromotionMessagesRequest {
-	sessionId: string;
+  sessionId: string;
 }
 
 export interface ServerGetPromotionMessagesResponse {
-	messages: string[];
+  messages: string[];
 }
 
 export interface ServerAddFeedbackMessageRequest {
-	sessionId: string;
-	userName: string;
-	title: string;
-	message: string;
-	feedbackType: string;
-	email: string;
+  sessionId: string;
+  userName: string;
+  title: string;
+  message: string;
+  feedbackType: string;
+  email: string;
 }
 
 export interface ServerAddFeedbackMessageResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 function createBaseConnectUserRequest(): ConnectUserRequest {
-	return {
-		userName: '',
-		password: '',
-		sessionId: '',
-		clientVersion: '',
-		userIdStr: '',
-		restoreSessionId: ''
-	};
+  return { userName: "", password: "", sessionId: "", clientVersion: "", userIdStr: "", restoreSessionId: "" };
 }
 
 export const ConnectUserRequest: MessageFns<ConnectUserRequest> = {
-	encode(message: ConnectUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.userName !== '') {
-			writer.uint32(10).string(message.userName);
-		}
-		if (message.password !== '') {
-			writer.uint32(18).string(message.password);
-		}
-		if (message.sessionId !== '') {
-			writer.uint32(26).string(message.sessionId);
-		}
-		if (message.clientVersion !== '') {
-			writer.uint32(34).string(message.clientVersion);
-		}
-		if (message.userIdStr !== '') {
-			writer.uint32(42).string(message.userIdStr);
-		}
-		if (message.restoreSessionId !== '') {
-			writer.uint32(50).string(message.restoreSessionId);
-		}
-		return writer;
-	},
+  encode(message: ConnectUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userName !== "") {
+      writer.uint32(10).string(message.userName);
+    }
+    if (message.password !== "") {
+      writer.uint32(18).string(message.password);
+    }
+    if (message.sessionId !== "") {
+      writer.uint32(26).string(message.sessionId);
+    }
+    if (message.clientVersion !== "") {
+      writer.uint32(34).string(message.clientVersion);
+    }
+    if (message.userIdStr !== "") {
+      writer.uint32(42).string(message.userIdStr);
+    }
+    if (message.restoreSessionId !== "") {
+      writer.uint32(50).string(message.restoreSessionId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ConnectUserRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseConnectUserRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ConnectUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConnectUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.userName = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.userName = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.password = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.password = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.clientVersion = reader.string();
-					continue;
-				}
-				case 5: {
-					if (tag !== 42) {
-						break;
-					}
+          message.clientVersion = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
 
-					message.userIdStr = reader.string();
-					continue;
-				}
-				case 6: {
-					if (tag !== 50) {
-						break;
-					}
+          message.userIdStr = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
 
-					message.restoreSessionId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.restoreSessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ConnectUserRequest {
-		return {
-			userName: isSet(object.userName) ? globalThis.String(object.userName) : '',
-			password: isSet(object.password) ? globalThis.String(object.password) : '',
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			clientVersion: isSet(object.clientVersion) ? globalThis.String(object.clientVersion) : '',
-			userIdStr: isSet(object.userIdStr) ? globalThis.String(object.userIdStr) : '',
-			restoreSessionId: isSet(object.restoreSessionId)
-				? globalThis.String(object.restoreSessionId)
-				: ''
-		};
-	},
+  fromJSON(object: any): ConnectUserRequest {
+    return {
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+      password: isSet(object.password) ? globalThis.String(object.password) : "",
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      clientVersion: isSet(object.clientVersion) ? globalThis.String(object.clientVersion) : "",
+      userIdStr: isSet(object.userIdStr) ? globalThis.String(object.userIdStr) : "",
+      restoreSessionId: isSet(object.restoreSessionId) ? globalThis.String(object.restoreSessionId) : "",
+    };
+  },
 
-	toJSON(message: ConnectUserRequest): unknown {
-		const obj: any = {};
-		if (message.userName !== '') {
-			obj.userName = message.userName;
-		}
-		if (message.password !== '') {
-			obj.password = message.password;
-		}
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.clientVersion !== '') {
-			obj.clientVersion = message.clientVersion;
-		}
-		if (message.userIdStr !== '') {
-			obj.userIdStr = message.userIdStr;
-		}
-		if (message.restoreSessionId !== '') {
-			obj.restoreSessionId = message.restoreSessionId;
-		}
-		return obj;
-	},
+  toJSON(message: ConnectUserRequest): unknown {
+    const obj: any = {};
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    if (message.password !== "") {
+      obj.password = message.password;
+    }
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.clientVersion !== "") {
+      obj.clientVersion = message.clientVersion;
+    }
+    if (message.userIdStr !== "") {
+      obj.userIdStr = message.userIdStr;
+    }
+    if (message.restoreSessionId !== "") {
+      obj.restoreSessionId = message.restoreSessionId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ConnectUserRequest>): ConnectUserRequest {
-		return ConnectUserRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ConnectUserRequest>): ConnectUserRequest {
-		const message = createBaseConnectUserRequest();
-		message.userName = object.userName ?? '';
-		message.password = object.password ?? '';
-		message.sessionId = object.sessionId ?? '';
-		message.clientVersion = object.clientVersion ?? '';
-		message.userIdStr = object.userIdStr ?? '';
-		message.restoreSessionId = object.restoreSessionId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ConnectUserRequest>): ConnectUserRequest {
+    return ConnectUserRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConnectUserRequest>): ConnectUserRequest {
+    const message = createBaseConnectUserRequest();
+    message.userName = object.userName ?? "";
+    message.password = object.password ?? "";
+    message.sessionId = object.sessionId ?? "";
+    message.clientVersion = object.clientVersion ?? "";
+    message.userIdStr = object.userIdStr ?? "";
+    message.restoreSessionId = object.restoreSessionId ?? "";
+    return message;
+  },
 };
 
 function createBaseConnectUserResponse(): ConnectUserResponse {
-	return { success: false, error: '', sessionId: '', userId: '' };
+  return { success: false, error: "", sessionId: "", userId: "" };
 }
 
 export const ConnectUserResponse: MessageFns<ConnectUserResponse> = {
-	encode(message: ConnectUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		if (message.sessionId !== '') {
-			writer.uint32(26).string(message.sessionId);
-		}
-		if (message.userId !== '') {
-			writer.uint32(34).string(message.userId);
-		}
-		return writer;
-	},
+  encode(message: ConnectUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    if (message.sessionId !== "") {
+      writer.uint32(26).string(message.sessionId);
+    }
+    if (message.userId !== "") {
+      writer.uint32(34).string(message.userId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ConnectUserResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseConnectUserResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ConnectUserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConnectUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.userId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.userId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ConnectUserResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			userId: isSet(object.userId) ? globalThis.String(object.userId) : ''
-		};
-	},
+  fromJSON(object: any): ConnectUserResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      userId: isSet(object.userId) ? globalThis.String(object.userId) : "",
+    };
+  },
 
-	toJSON(message: ConnectUserResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.userId !== '') {
-			obj.userId = message.userId;
-		}
-		return obj;
-	},
+  toJSON(message: ConnectUserResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ConnectUserResponse>): ConnectUserResponse {
-		return ConnectUserResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ConnectUserResponse>): ConnectUserResponse {
-		const message = createBaseConnectUserResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.sessionId = object.sessionId ?? '';
-		message.userId = object.userId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ConnectUserResponse>): ConnectUserResponse {
+    return ConnectUserResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConnectUserResponse>): ConnectUserResponse {
+    const message = createBaseConnectUserResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    message.sessionId = object.sessionId ?? "";
+    message.userId = object.userId ?? "";
+    return message;
+  },
 };
 
 function createBaseConnectAdminRequest(): ConnectAdminRequest {
-	return { password: '', sessionId: '' };
+  return { password: "", sessionId: "" };
 }
 
 export const ConnectAdminRequest: MessageFns<ConnectAdminRequest> = {
-	encode(message: ConnectAdminRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.password !== '') {
-			writer.uint32(10).string(message.password);
-		}
-		if (message.sessionId !== '') {
-			writer.uint32(18).string(message.sessionId);
-		}
-		return writer;
-	},
+  encode(message: ConnectAdminRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.password !== "") {
+      writer.uint32(10).string(message.password);
+    }
+    if (message.sessionId !== "") {
+      writer.uint32(18).string(message.sessionId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ConnectAdminRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseConnectAdminRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ConnectAdminRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConnectAdminRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.password = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.password = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.sessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ConnectAdminRequest {
-		return {
-			password: isSet(object.password) ? globalThis.String(object.password) : '',
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : ''
-		};
-	},
+  fromJSON(object: any): ConnectAdminRequest {
+    return {
+      password: isSet(object.password) ? globalThis.String(object.password) : "",
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+    };
+  },
 
-	toJSON(message: ConnectAdminRequest): unknown {
-		const obj: any = {};
-		if (message.password !== '') {
-			obj.password = message.password;
-		}
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		return obj;
-	},
+  toJSON(message: ConnectAdminRequest): unknown {
+    const obj: any = {};
+    if (message.password !== "") {
+      obj.password = message.password;
+    }
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ConnectAdminRequest>): ConnectAdminRequest {
-		return ConnectAdminRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ConnectAdminRequest>): ConnectAdminRequest {
-		const message = createBaseConnectAdminRequest();
-		message.password = object.password ?? '';
-		message.sessionId = object.sessionId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ConnectAdminRequest>): ConnectAdminRequest {
+    return ConnectAdminRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConnectAdminRequest>): ConnectAdminRequest {
+    const message = createBaseConnectAdminRequest();
+    message.password = object.password ?? "";
+    message.sessionId = object.sessionId ?? "";
+    return message;
+  },
 };
 
 function createBaseConnectAdminResponse(): ConnectAdminResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const ConnectAdminResponse: MessageFns<ConnectAdminResponse> = {
-	encode(message: ConnectAdminResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ConnectAdminResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ConnectAdminResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseConnectAdminResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ConnectAdminResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConnectAdminResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ConnectAdminResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ConnectAdminResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: ConnectAdminResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ConnectAdminResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ConnectAdminResponse>): ConnectAdminResponse {
-		return ConnectAdminResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ConnectAdminResponse>): ConnectAdminResponse {
-		const message = createBaseConnectAdminResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ConnectAdminResponse>): ConnectAdminResponse {
+    return ConnectAdminResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConnectAdminResponse>): ConnectAdminResponse {
+    const message = createBaseConnectAdminResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseConnectSetUserDataRequest(): ConnectSetUserDataRequest {
-	return {
-		sessionId: '',
-		avatarId: 0,
-		showAbsoluteAbilities: false,
-		allowRequestsFromFriends: false,
-		confirmEmptyManaPool: false,
-		userGroup: '',
-		userSkipPrioritySteps: [],
-		flagsName: '',
-		askMoveToGraveOrder: 0
-	};
+  return {
+    sessionId: "",
+    avatarId: 0,
+    showAbsoluteAbilities: false,
+    allowRequestsFromFriends: false,
+    confirmEmptyManaPool: false,
+    userGroup: "",
+    userSkipPrioritySteps: [],
+    flagsName: "",
+    askMoveToGraveOrder: 0,
+  };
 }
 
 export const ConnectSetUserDataRequest: MessageFns<ConnectSetUserDataRequest> = {
-	encode(
-		message: ConnectSetUserDataRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.avatarId !== 0) {
-			writer.uint32(16).int32(message.avatarId);
-		}
-		if (message.showAbsoluteAbilities !== false) {
-			writer.uint32(24).bool(message.showAbsoluteAbilities);
-		}
-		if (message.allowRequestsFromFriends !== false) {
-			writer.uint32(32).bool(message.allowRequestsFromFriends);
-		}
-		if (message.confirmEmptyManaPool !== false) {
-			writer.uint32(40).bool(message.confirmEmptyManaPool);
-		}
-		if (message.userGroup !== '') {
-			writer.uint32(50).string(message.userGroup);
-		}
-		for (const v of message.userSkipPrioritySteps) {
-			writer.uint32(58).string(v!);
-		}
-		if (message.flagsName !== '') {
-			writer.uint32(66).string(message.flagsName);
-		}
-		if (message.askMoveToGraveOrder !== 0) {
-			writer.uint32(72).int32(message.askMoveToGraveOrder);
-		}
-		return writer;
-	},
+  encode(message: ConnectSetUserDataRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.avatarId !== 0) {
+      writer.uint32(16).int32(message.avatarId);
+    }
+    if (message.showAbsoluteAbilities !== false) {
+      writer.uint32(24).bool(message.showAbsoluteAbilities);
+    }
+    if (message.allowRequestsFromFriends !== false) {
+      writer.uint32(32).bool(message.allowRequestsFromFriends);
+    }
+    if (message.confirmEmptyManaPool !== false) {
+      writer.uint32(40).bool(message.confirmEmptyManaPool);
+    }
+    if (message.userGroup !== "") {
+      writer.uint32(50).string(message.userGroup);
+    }
+    for (const v of message.userSkipPrioritySteps) {
+      writer.uint32(58).string(v!);
+    }
+    if (message.flagsName !== "") {
+      writer.uint32(66).string(message.flagsName);
+    }
+    if (message.askMoveToGraveOrder !== 0) {
+      writer.uint32(72).int32(message.askMoveToGraveOrder);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ConnectSetUserDataRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseConnectSetUserDataRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ConnectSetUserDataRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConnectSetUserDataRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.avatarId = reader.int32();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.avatarId = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.showAbsoluteAbilities = reader.bool();
-					continue;
-				}
-				case 4: {
-					if (tag !== 32) {
-						break;
-					}
+          message.showAbsoluteAbilities = reader.bool();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
 
-					message.allowRequestsFromFriends = reader.bool();
-					continue;
-				}
-				case 5: {
-					if (tag !== 40) {
-						break;
-					}
+          message.allowRequestsFromFriends = reader.bool();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
 
-					message.confirmEmptyManaPool = reader.bool();
-					continue;
-				}
-				case 6: {
-					if (tag !== 50) {
-						break;
-					}
+          message.confirmEmptyManaPool = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
 
-					message.userGroup = reader.string();
-					continue;
-				}
-				case 7: {
-					if (tag !== 58) {
-						break;
-					}
+          message.userGroup = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
 
-					message.userSkipPrioritySteps.push(reader.string());
-					continue;
-				}
-				case 8: {
-					if (tag !== 66) {
-						break;
-					}
+          message.userSkipPrioritySteps.push(reader.string());
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
 
-					message.flagsName = reader.string();
-					continue;
-				}
-				case 9: {
-					if (tag !== 72) {
-						break;
-					}
+          message.flagsName = reader.string();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
 
-					message.askMoveToGraveOrder = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.askMoveToGraveOrder = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ConnectSetUserDataRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			avatarId: isSet(object.avatarId) ? globalThis.Number(object.avatarId) : 0,
-			showAbsoluteAbilities: isSet(object.showAbsoluteAbilities)
-				? globalThis.Boolean(object.showAbsoluteAbilities)
-				: false,
-			allowRequestsFromFriends: isSet(object.allowRequestsFromFriends)
-				? globalThis.Boolean(object.allowRequestsFromFriends)
-				: false,
-			confirmEmptyManaPool: isSet(object.confirmEmptyManaPool)
-				? globalThis.Boolean(object.confirmEmptyManaPool)
-				: false,
-			userGroup: isSet(object.userGroup) ? globalThis.String(object.userGroup) : '',
-			userSkipPrioritySteps: globalThis.Array.isArray(object?.userSkipPrioritySteps)
-				? object.userSkipPrioritySteps.map((e: any) => globalThis.String(e))
-				: [],
-			flagsName: isSet(object.flagsName) ? globalThis.String(object.flagsName) : '',
-			askMoveToGraveOrder: isSet(object.askMoveToGraveOrder)
-				? globalThis.Number(object.askMoveToGraveOrder)
-				: 0
-		};
-	},
+  fromJSON(object: any): ConnectSetUserDataRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      avatarId: isSet(object.avatarId) ? globalThis.Number(object.avatarId) : 0,
+      showAbsoluteAbilities: isSet(object.showAbsoluteAbilities)
+        ? globalThis.Boolean(object.showAbsoluteAbilities)
+        : false,
+      allowRequestsFromFriends: isSet(object.allowRequestsFromFriends)
+        ? globalThis.Boolean(object.allowRequestsFromFriends)
+        : false,
+      confirmEmptyManaPool: isSet(object.confirmEmptyManaPool)
+        ? globalThis.Boolean(object.confirmEmptyManaPool)
+        : false,
+      userGroup: isSet(object.userGroup) ? globalThis.String(object.userGroup) : "",
+      userSkipPrioritySteps: globalThis.Array.isArray(object?.userSkipPrioritySteps)
+        ? object.userSkipPrioritySteps.map((e: any) => globalThis.String(e))
+        : [],
+      flagsName: isSet(object.flagsName) ? globalThis.String(object.flagsName) : "",
+      askMoveToGraveOrder: isSet(object.askMoveToGraveOrder) ? globalThis.Number(object.askMoveToGraveOrder) : 0,
+    };
+  },
 
-	toJSON(message: ConnectSetUserDataRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.avatarId !== 0) {
-			obj.avatarId = Math.round(message.avatarId);
-		}
-		if (message.showAbsoluteAbilities !== false) {
-			obj.showAbsoluteAbilities = message.showAbsoluteAbilities;
-		}
-		if (message.allowRequestsFromFriends !== false) {
-			obj.allowRequestsFromFriends = message.allowRequestsFromFriends;
-		}
-		if (message.confirmEmptyManaPool !== false) {
-			obj.confirmEmptyManaPool = message.confirmEmptyManaPool;
-		}
-		if (message.userGroup !== '') {
-			obj.userGroup = message.userGroup;
-		}
-		if (message.userSkipPrioritySteps?.length) {
-			obj.userSkipPrioritySteps = message.userSkipPrioritySteps;
-		}
-		if (message.flagsName !== '') {
-			obj.flagsName = message.flagsName;
-		}
-		if (message.askMoveToGraveOrder !== 0) {
-			obj.askMoveToGraveOrder = Math.round(message.askMoveToGraveOrder);
-		}
-		return obj;
-	},
+  toJSON(message: ConnectSetUserDataRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.avatarId !== 0) {
+      obj.avatarId = Math.round(message.avatarId);
+    }
+    if (message.showAbsoluteAbilities !== false) {
+      obj.showAbsoluteAbilities = message.showAbsoluteAbilities;
+    }
+    if (message.allowRequestsFromFriends !== false) {
+      obj.allowRequestsFromFriends = message.allowRequestsFromFriends;
+    }
+    if (message.confirmEmptyManaPool !== false) {
+      obj.confirmEmptyManaPool = message.confirmEmptyManaPool;
+    }
+    if (message.userGroup !== "") {
+      obj.userGroup = message.userGroup;
+    }
+    if (message.userSkipPrioritySteps?.length) {
+      obj.userSkipPrioritySteps = message.userSkipPrioritySteps;
+    }
+    if (message.flagsName !== "") {
+      obj.flagsName = message.flagsName;
+    }
+    if (message.askMoveToGraveOrder !== 0) {
+      obj.askMoveToGraveOrder = Math.round(message.askMoveToGraveOrder);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ConnectSetUserDataRequest>): ConnectSetUserDataRequest {
-		return ConnectSetUserDataRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ConnectSetUserDataRequest>): ConnectSetUserDataRequest {
-		const message = createBaseConnectSetUserDataRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.avatarId = object.avatarId ?? 0;
-		message.showAbsoluteAbilities = object.showAbsoluteAbilities ?? false;
-		message.allowRequestsFromFriends = object.allowRequestsFromFriends ?? false;
-		message.confirmEmptyManaPool = object.confirmEmptyManaPool ?? false;
-		message.userGroup = object.userGroup ?? '';
-		message.userSkipPrioritySteps = object.userSkipPrioritySteps?.map((e) => e) || [];
-		message.flagsName = object.flagsName ?? '';
-		message.askMoveToGraveOrder = object.askMoveToGraveOrder ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<ConnectSetUserDataRequest>): ConnectSetUserDataRequest {
+    return ConnectSetUserDataRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConnectSetUserDataRequest>): ConnectSetUserDataRequest {
+    const message = createBaseConnectSetUserDataRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.avatarId = object.avatarId ?? 0;
+    message.showAbsoluteAbilities = object.showAbsoluteAbilities ?? false;
+    message.allowRequestsFromFriends = object.allowRequestsFromFriends ?? false;
+    message.confirmEmptyManaPool = object.confirmEmptyManaPool ?? false;
+    message.userGroup = object.userGroup ?? "";
+    message.userSkipPrioritySteps = object.userSkipPrioritySteps?.map((e) => e) || [];
+    message.flagsName = object.flagsName ?? "";
+    message.askMoveToGraveOrder = object.askMoveToGraveOrder ?? 0;
+    return message;
+  },
 };
 
 function createBaseConnectSetUserDataResponse(): ConnectSetUserDataResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const ConnectSetUserDataResponse: MessageFns<ConnectSetUserDataResponse> = {
-	encode(
-		message: ConnectSetUserDataResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ConnectSetUserDataResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ConnectSetUserDataResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseConnectSetUserDataResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ConnectSetUserDataResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConnectSetUserDataResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ConnectSetUserDataResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ConnectSetUserDataResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: ConnectSetUserDataResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ConnectSetUserDataResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ConnectSetUserDataResponse>): ConnectSetUserDataResponse {
-		return ConnectSetUserDataResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ConnectSetUserDataResponse>): ConnectSetUserDataResponse {
-		const message = createBaseConnectSetUserDataResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ConnectSetUserDataResponse>): ConnectSetUserDataResponse {
+    return ConnectSetUserDataResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConnectSetUserDataResponse>): ConnectSetUserDataResponse {
+    const message = createBaseConnectSetUserDataResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseAuthRegisterRequest(): AuthRegisterRequest {
-	return { userName: '', password: '', email: '' };
+  return { userName: "", password: "", email: "" };
 }
 
 export const AuthRegisterRequest: MessageFns<AuthRegisterRequest> = {
-	encode(message: AuthRegisterRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.userName !== '') {
-			writer.uint32(10).string(message.userName);
-		}
-		if (message.password !== '') {
-			writer.uint32(18).string(message.password);
-		}
-		if (message.email !== '') {
-			writer.uint32(26).string(message.email);
-		}
-		return writer;
-	},
+  encode(message: AuthRegisterRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userName !== "") {
+      writer.uint32(10).string(message.userName);
+    }
+    if (message.password !== "") {
+      writer.uint32(18).string(message.password);
+    }
+    if (message.email !== "") {
+      writer.uint32(26).string(message.email);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AuthRegisterRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAuthRegisterRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AuthRegisterRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuthRegisterRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.userName = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.userName = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.password = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.password = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.email = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.email = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AuthRegisterRequest {
-		return {
-			userName: isSet(object.userName) ? globalThis.String(object.userName) : '',
-			password: isSet(object.password) ? globalThis.String(object.password) : '',
-			email: isSet(object.email) ? globalThis.String(object.email) : ''
-		};
-	},
+  fromJSON(object: any): AuthRegisterRequest {
+    return {
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+      password: isSet(object.password) ? globalThis.String(object.password) : "",
+      email: isSet(object.email) ? globalThis.String(object.email) : "",
+    };
+  },
 
-	toJSON(message: AuthRegisterRequest): unknown {
-		const obj: any = {};
-		if (message.userName !== '') {
-			obj.userName = message.userName;
-		}
-		if (message.password !== '') {
-			obj.password = message.password;
-		}
-		if (message.email !== '') {
-			obj.email = message.email;
-		}
-		return obj;
-	},
+  toJSON(message: AuthRegisterRequest): unknown {
+    const obj: any = {};
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    if (message.password !== "") {
+      obj.password = message.password;
+    }
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AuthRegisterRequest>): AuthRegisterRequest {
-		return AuthRegisterRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AuthRegisterRequest>): AuthRegisterRequest {
-		const message = createBaseAuthRegisterRequest();
-		message.userName = object.userName ?? '';
-		message.password = object.password ?? '';
-		message.email = object.email ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AuthRegisterRequest>): AuthRegisterRequest {
+    return AuthRegisterRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AuthRegisterRequest>): AuthRegisterRequest {
+    const message = createBaseAuthRegisterRequest();
+    message.userName = object.userName ?? "";
+    message.password = object.password ?? "";
+    message.email = object.email ?? "";
+    return message;
+  },
 };
 
 function createBaseAuthRegisterResponse(): AuthRegisterResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const AuthRegisterResponse: MessageFns<AuthRegisterResponse> = {
-	encode(message: AuthRegisterResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: AuthRegisterResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AuthRegisterResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAuthRegisterResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AuthRegisterResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuthRegisterResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AuthRegisterResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): AuthRegisterResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: AuthRegisterResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: AuthRegisterResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AuthRegisterResponse>): AuthRegisterResponse {
-		return AuthRegisterResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AuthRegisterResponse>): AuthRegisterResponse {
-		const message = createBaseAuthRegisterResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AuthRegisterResponse>): AuthRegisterResponse {
+    return AuthRegisterResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AuthRegisterResponse>): AuthRegisterResponse {
+    const message = createBaseAuthRegisterResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseAuthSendTokenToEmailRequest(): AuthSendTokenToEmailRequest {
-	return { email: '' };
+  return { email: "" };
 }
 
 export const AuthSendTokenToEmailRequest: MessageFns<AuthSendTokenToEmailRequest> = {
-	encode(
-		message: AuthSendTokenToEmailRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.email !== '') {
-			writer.uint32(10).string(message.email);
-		}
-		return writer;
-	},
+  encode(message: AuthSendTokenToEmailRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.email !== "") {
+      writer.uint32(10).string(message.email);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AuthSendTokenToEmailRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAuthSendTokenToEmailRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AuthSendTokenToEmailRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuthSendTokenToEmailRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.email = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.email = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AuthSendTokenToEmailRequest {
-		return { email: isSet(object.email) ? globalThis.String(object.email) : '' };
-	},
+  fromJSON(object: any): AuthSendTokenToEmailRequest {
+    return { email: isSet(object.email) ? globalThis.String(object.email) : "" };
+  },
 
-	toJSON(message: AuthSendTokenToEmailRequest): unknown {
-		const obj: any = {};
-		if (message.email !== '') {
-			obj.email = message.email;
-		}
-		return obj;
-	},
+  toJSON(message: AuthSendTokenToEmailRequest): unknown {
+    const obj: any = {};
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AuthSendTokenToEmailRequest>): AuthSendTokenToEmailRequest {
-		return AuthSendTokenToEmailRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AuthSendTokenToEmailRequest>): AuthSendTokenToEmailRequest {
-		const message = createBaseAuthSendTokenToEmailRequest();
-		message.email = object.email ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AuthSendTokenToEmailRequest>): AuthSendTokenToEmailRequest {
+    return AuthSendTokenToEmailRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AuthSendTokenToEmailRequest>): AuthSendTokenToEmailRequest {
+    const message = createBaseAuthSendTokenToEmailRequest();
+    message.email = object.email ?? "";
+    return message;
+  },
 };
 
 function createBaseAuthSendTokenToEmailResponse(): AuthSendTokenToEmailResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const AuthSendTokenToEmailResponse: MessageFns<AuthSendTokenToEmailResponse> = {
-	encode(
-		message: AuthSendTokenToEmailResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: AuthSendTokenToEmailResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AuthSendTokenToEmailResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAuthSendTokenToEmailResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AuthSendTokenToEmailResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuthSendTokenToEmailResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AuthSendTokenToEmailResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): AuthSendTokenToEmailResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: AuthSendTokenToEmailResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: AuthSendTokenToEmailResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AuthSendTokenToEmailResponse>): AuthSendTokenToEmailResponse {
-		return AuthSendTokenToEmailResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AuthSendTokenToEmailResponse>): AuthSendTokenToEmailResponse {
-		const message = createBaseAuthSendTokenToEmailResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AuthSendTokenToEmailResponse>): AuthSendTokenToEmailResponse {
+    return AuthSendTokenToEmailResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AuthSendTokenToEmailResponse>): AuthSendTokenToEmailResponse {
+    const message = createBaseAuthSendTokenToEmailResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseAuthResetPasswordRequest(): AuthResetPasswordRequest {
-	return { email: '', token: '', newPassword: '' };
+  return { email: "", token: "", newPassword: "" };
 }
 
 export const AuthResetPasswordRequest: MessageFns<AuthResetPasswordRequest> = {
-	encode(
-		message: AuthResetPasswordRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.email !== '') {
-			writer.uint32(10).string(message.email);
-		}
-		if (message.token !== '') {
-			writer.uint32(18).string(message.token);
-		}
-		if (message.newPassword !== '') {
-			writer.uint32(26).string(message.newPassword);
-		}
-		return writer;
-	},
+  encode(message: AuthResetPasswordRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.email !== "") {
+      writer.uint32(10).string(message.email);
+    }
+    if (message.token !== "") {
+      writer.uint32(18).string(message.token);
+    }
+    if (message.newPassword !== "") {
+      writer.uint32(26).string(message.newPassword);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AuthResetPasswordRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAuthResetPasswordRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AuthResetPasswordRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuthResetPasswordRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.email = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.email = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.token = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.token = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.newPassword = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.newPassword = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AuthResetPasswordRequest {
-		return {
-			email: isSet(object.email) ? globalThis.String(object.email) : '',
-			token: isSet(object.token) ? globalThis.String(object.token) : '',
-			newPassword: isSet(object.newPassword) ? globalThis.String(object.newPassword) : ''
-		};
-	},
+  fromJSON(object: any): AuthResetPasswordRequest {
+    return {
+      email: isSet(object.email) ? globalThis.String(object.email) : "",
+      token: isSet(object.token) ? globalThis.String(object.token) : "",
+      newPassword: isSet(object.newPassword) ? globalThis.String(object.newPassword) : "",
+    };
+  },
 
-	toJSON(message: AuthResetPasswordRequest): unknown {
-		const obj: any = {};
-		if (message.email !== '') {
-			obj.email = message.email;
-		}
-		if (message.token !== '') {
-			obj.token = message.token;
-		}
-		if (message.newPassword !== '') {
-			obj.newPassword = message.newPassword;
-		}
-		return obj;
-	},
+  toJSON(message: AuthResetPasswordRequest): unknown {
+    const obj: any = {};
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    if (message.token !== "") {
+      obj.token = message.token;
+    }
+    if (message.newPassword !== "") {
+      obj.newPassword = message.newPassword;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AuthResetPasswordRequest>): AuthResetPasswordRequest {
-		return AuthResetPasswordRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AuthResetPasswordRequest>): AuthResetPasswordRequest {
-		const message = createBaseAuthResetPasswordRequest();
-		message.email = object.email ?? '';
-		message.token = object.token ?? '';
-		message.newPassword = object.newPassword ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AuthResetPasswordRequest>): AuthResetPasswordRequest {
+    return AuthResetPasswordRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AuthResetPasswordRequest>): AuthResetPasswordRequest {
+    const message = createBaseAuthResetPasswordRequest();
+    message.email = object.email ?? "";
+    message.token = object.token ?? "";
+    message.newPassword = object.newPassword ?? "";
+    return message;
+  },
 };
 
 function createBaseAuthResetPasswordResponse(): AuthResetPasswordResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const AuthResetPasswordResponse: MessageFns<AuthResetPasswordResponse> = {
-	encode(
-		message: AuthResetPasswordResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: AuthResetPasswordResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AuthResetPasswordResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAuthResetPasswordResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AuthResetPasswordResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuthResetPasswordResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AuthResetPasswordResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): AuthResetPasswordResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: AuthResetPasswordResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: AuthResetPasswordResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AuthResetPasswordResponse>): AuthResetPasswordResponse {
-		return AuthResetPasswordResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AuthResetPasswordResponse>): AuthResetPasswordResponse {
-		const message = createBaseAuthResetPasswordResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AuthResetPasswordResponse>): AuthResetPasswordResponse {
+    return AuthResetPasswordResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AuthResetPasswordResponse>): AuthResetPasswordResponse {
+    const message = createBaseAuthResetPasswordResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBasePingRequest(): PingRequest {
-	return { sessionId: '' };
+  return { sessionId: "" };
 }
 
 export const PingRequest: MessageFns<PingRequest> = {
-	encode(message: PingRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		return writer;
-	},
+  encode(message: PingRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): PingRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBasePingRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): PingRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePingRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.sessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): PingRequest {
-		return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '' };
-	},
+  fromJSON(object: any): PingRequest {
+    return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "" };
+  },
 
-	toJSON(message: PingRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		return obj;
-	},
+  toJSON(message: PingRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<PingRequest>): PingRequest {
-		return PingRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<PingRequest>): PingRequest {
-		const message = createBasePingRequest();
-		message.sessionId = object.sessionId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<PingRequest>): PingRequest {
+    return PingRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PingRequest>): PingRequest {
+    const message = createBasePingRequest();
+    message.sessionId = object.sessionId ?? "";
+    return message;
+  },
 };
 
 function createBasePingResponse(): PingResponse {
-	return { success: false };
+  return { success: false };
 }
 
 export const PingResponse: MessageFns<PingResponse> = {
-	encode(message: PingResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		return writer;
-	},
+  encode(message: PingResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): PingResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBasePingResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): PingResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePingResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.success = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): PingResponse {
-		return { success: isSet(object.success) ? globalThis.Boolean(object.success) : false };
-	},
+  fromJSON(object: any): PingResponse {
+    return { success: isSet(object.success) ? globalThis.Boolean(object.success) : false };
+  },
 
-	toJSON(message: PingResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		return obj;
-	},
+  toJSON(message: PingResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<PingResponse>): PingResponse {
-		return PingResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<PingResponse>): PingResponse {
-		const message = createBasePingResponse();
-		message.success = object.success ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<PingResponse>): PingResponse {
+    return PingResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PingResponse>): PingResponse {
+    const message = createBasePingResponse();
+    message.success = object.success ?? false;
+    return message;
+  },
 };
 
 function createBaseGetServerStateRequest(): GetServerStateRequest {
-	return { sessionId: '' };
+  return { sessionId: "" };
 }
 
 export const GetServerStateRequest: MessageFns<GetServerStateRequest> = {
-	encode(message: GetServerStateRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		return writer;
-	},
+  encode(message: GetServerStateRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GetServerStateRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGetServerStateRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GetServerStateRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetServerStateRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.sessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GetServerStateRequest {
-		return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '' };
-	},
+  fromJSON(object: any): GetServerStateRequest {
+    return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "" };
+  },
 
-	toJSON(message: GetServerStateRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		return obj;
-	},
+  toJSON(message: GetServerStateRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GetServerStateRequest>): GetServerStateRequest {
-		return GetServerStateRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GetServerStateRequest>): GetServerStateRequest {
-		const message = createBaseGetServerStateRequest();
-		message.sessionId = object.sessionId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GetServerStateRequest>): GetServerStateRequest {
+    return GetServerStateRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetServerStateRequest>): GetServerStateRequest {
+    const message = createBaseGetServerStateRequest();
+    message.sessionId = object.sessionId ?? "";
+    return message;
+  },
 };
 
 function createBaseGetServerStateResponse(): GetServerStateResponse {
-	return { serverState: undefined };
+  return { serverState: undefined };
 }
 
 export const GetServerStateResponse: MessageFns<GetServerStateResponse> = {
-	encode(message: GetServerStateResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.serverState !== undefined) {
-			ServerState.encode(message.serverState, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: GetServerStateResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.serverState !== undefined) {
+      ServerState.encode(message.serverState, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GetServerStateResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGetServerStateResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GetServerStateResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetServerStateResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.serverState = ServerState.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.serverState = ServerState.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GetServerStateResponse {
-		return {
-			serverState: isSet(object.serverState) ? ServerState.fromJSON(object.serverState) : undefined
-		};
-	},
+  fromJSON(object: any): GetServerStateResponse {
+    return { serverState: isSet(object.serverState) ? ServerState.fromJSON(object.serverState) : undefined };
+  },
 
-	toJSON(message: GetServerStateResponse): unknown {
-		const obj: any = {};
-		if (message.serverState !== undefined) {
-			obj.serverState = ServerState.toJSON(message.serverState);
-		}
-		return obj;
-	},
+  toJSON(message: GetServerStateResponse): unknown {
+    const obj: any = {};
+    if (message.serverState !== undefined) {
+      obj.serverState = ServerState.toJSON(message.serverState);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GetServerStateResponse>): GetServerStateResponse {
-		return GetServerStateResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GetServerStateResponse>): GetServerStateResponse {
-		const message = createBaseGetServerStateResponse();
-		message.serverState =
-			object.serverState !== undefined && object.serverState !== null
-				? ServerState.fromPartial(object.serverState)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<GetServerStateResponse>): GetServerStateResponse {
+    return GetServerStateResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetServerStateResponse>): GetServerStateResponse {
+    const message = createBaseGetServerStateResponse();
+    message.serverState = (object.serverState !== undefined && object.serverState !== null)
+      ? ServerState.fromPartial(object.serverState)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseServerGetPromotionMessagesRequest(): ServerGetPromotionMessagesRequest {
-	return { sessionId: '' };
+  return { sessionId: "" };
 }
 
 export const ServerGetPromotionMessagesRequest: MessageFns<ServerGetPromotionMessagesRequest> = {
-	encode(
-		message: ServerGetPromotionMessagesRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		return writer;
-	},
+  encode(message: ServerGetPromotionMessagesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ServerGetPromotionMessagesRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseServerGetPromotionMessagesRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ServerGetPromotionMessagesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerGetPromotionMessagesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.sessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ServerGetPromotionMessagesRequest {
-		return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '' };
-	},
+  fromJSON(object: any): ServerGetPromotionMessagesRequest {
+    return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "" };
+  },
 
-	toJSON(message: ServerGetPromotionMessagesRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		return obj;
-	},
+  toJSON(message: ServerGetPromotionMessagesRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ServerGetPromotionMessagesRequest>): ServerGetPromotionMessagesRequest {
-		return ServerGetPromotionMessagesRequest.fromPartial(base ?? {});
-	},
-	fromPartial(
-		object: DeepPartial<ServerGetPromotionMessagesRequest>
-	): ServerGetPromotionMessagesRequest {
-		const message = createBaseServerGetPromotionMessagesRequest();
-		message.sessionId = object.sessionId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ServerGetPromotionMessagesRequest>): ServerGetPromotionMessagesRequest {
+    return ServerGetPromotionMessagesRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ServerGetPromotionMessagesRequest>): ServerGetPromotionMessagesRequest {
+    const message = createBaseServerGetPromotionMessagesRequest();
+    message.sessionId = object.sessionId ?? "";
+    return message;
+  },
 };
 
 function createBaseServerGetPromotionMessagesResponse(): ServerGetPromotionMessagesResponse {
-	return { messages: [] };
+  return { messages: [] };
 }
 
 export const ServerGetPromotionMessagesResponse: MessageFns<ServerGetPromotionMessagesResponse> = {
-	encode(
-		message: ServerGetPromotionMessagesResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		for (const v of message.messages) {
-			writer.uint32(10).string(v!);
-		}
-		return writer;
-	},
+  encode(message: ServerGetPromotionMessagesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.messages) {
+      writer.uint32(10).string(v!);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ServerGetPromotionMessagesResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseServerGetPromotionMessagesResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ServerGetPromotionMessagesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerGetPromotionMessagesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.messages.push(reader.string());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.messages.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ServerGetPromotionMessagesResponse {
-		return {
-			messages: globalThis.Array.isArray(object?.messages)
-				? object.messages.map((e: any) => globalThis.String(e))
-				: []
-		};
-	},
+  fromJSON(object: any): ServerGetPromotionMessagesResponse {
+    return {
+      messages: globalThis.Array.isArray(object?.messages) ? object.messages.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
 
-	toJSON(message: ServerGetPromotionMessagesResponse): unknown {
-		const obj: any = {};
-		if (message.messages?.length) {
-			obj.messages = message.messages;
-		}
-		return obj;
-	},
+  toJSON(message: ServerGetPromotionMessagesResponse): unknown {
+    const obj: any = {};
+    if (message.messages?.length) {
+      obj.messages = message.messages;
+    }
+    return obj;
+  },
 
-	create(
-		base?: DeepPartial<ServerGetPromotionMessagesResponse>
-	): ServerGetPromotionMessagesResponse {
-		return ServerGetPromotionMessagesResponse.fromPartial(base ?? {});
-	},
-	fromPartial(
-		object: DeepPartial<ServerGetPromotionMessagesResponse>
-	): ServerGetPromotionMessagesResponse {
-		const message = createBaseServerGetPromotionMessagesResponse();
-		message.messages = object.messages?.map((e) => e) || [];
-		return message;
-	}
+  create(base?: DeepPartial<ServerGetPromotionMessagesResponse>): ServerGetPromotionMessagesResponse {
+    return ServerGetPromotionMessagesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ServerGetPromotionMessagesResponse>): ServerGetPromotionMessagesResponse {
+    const message = createBaseServerGetPromotionMessagesResponse();
+    message.messages = object.messages?.map((e) => e) || [];
+    return message;
+  },
 };
 
 function createBaseServerAddFeedbackMessageRequest(): ServerAddFeedbackMessageRequest {
-	return { sessionId: '', userName: '', title: '', message: '', feedbackType: '', email: '' };
+  return { sessionId: "", userName: "", title: "", message: "", feedbackType: "", email: "" };
 }
 
 export const ServerAddFeedbackMessageRequest: MessageFns<ServerAddFeedbackMessageRequest> = {
-	encode(
-		message: ServerAddFeedbackMessageRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.userName !== '') {
-			writer.uint32(18).string(message.userName);
-		}
-		if (message.title !== '') {
-			writer.uint32(26).string(message.title);
-		}
-		if (message.message !== '') {
-			writer.uint32(34).string(message.message);
-		}
-		if (message.feedbackType !== '') {
-			writer.uint32(42).string(message.feedbackType);
-		}
-		if (message.email !== '') {
-			writer.uint32(50).string(message.email);
-		}
-		return writer;
-	},
+  encode(message: ServerAddFeedbackMessageRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(18).string(message.userName);
+    }
+    if (message.title !== "") {
+      writer.uint32(26).string(message.title);
+    }
+    if (message.message !== "") {
+      writer.uint32(34).string(message.message);
+    }
+    if (message.feedbackType !== "") {
+      writer.uint32(42).string(message.feedbackType);
+    }
+    if (message.email !== "") {
+      writer.uint32(50).string(message.email);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ServerAddFeedbackMessageRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseServerAddFeedbackMessageRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ServerAddFeedbackMessageRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerAddFeedbackMessageRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.userName = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.userName = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.title = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.title = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-				case 5: {
-					if (tag !== 42) {
-						break;
-					}
+          message.message = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
 
-					message.feedbackType = reader.string();
-					continue;
-				}
-				case 6: {
-					if (tag !== 50) {
-						break;
-					}
+          message.feedbackType = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
 
-					message.email = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.email = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ServerAddFeedbackMessageRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			userName: isSet(object.userName) ? globalThis.String(object.userName) : '',
-			title: isSet(object.title) ? globalThis.String(object.title) : '',
-			message: isSet(object.message) ? globalThis.String(object.message) : '',
-			feedbackType: isSet(object.feedbackType) ? globalThis.String(object.feedbackType) : '',
-			email: isSet(object.email) ? globalThis.String(object.email) : ''
-		};
-	},
+  fromJSON(object: any): ServerAddFeedbackMessageRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+      title: isSet(object.title) ? globalThis.String(object.title) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      feedbackType: isSet(object.feedbackType) ? globalThis.String(object.feedbackType) : "",
+      email: isSet(object.email) ? globalThis.String(object.email) : "",
+    };
+  },
 
-	toJSON(message: ServerAddFeedbackMessageRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.userName !== '') {
-			obj.userName = message.userName;
-		}
-		if (message.title !== '') {
-			obj.title = message.title;
-		}
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		if (message.feedbackType !== '') {
-			obj.feedbackType = message.feedbackType;
-		}
-		if (message.email !== '') {
-			obj.email = message.email;
-		}
-		return obj;
-	},
+  toJSON(message: ServerAddFeedbackMessageRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    if (message.title !== "") {
+      obj.title = message.title;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.feedbackType !== "") {
+      obj.feedbackType = message.feedbackType;
+    }
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ServerAddFeedbackMessageRequest>): ServerAddFeedbackMessageRequest {
-		return ServerAddFeedbackMessageRequest.fromPartial(base ?? {});
-	},
-	fromPartial(
-		object: DeepPartial<ServerAddFeedbackMessageRequest>
-	): ServerAddFeedbackMessageRequest {
-		const message = createBaseServerAddFeedbackMessageRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.userName = object.userName ?? '';
-		message.title = object.title ?? '';
-		message.message = object.message ?? '';
-		message.feedbackType = object.feedbackType ?? '';
-		message.email = object.email ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ServerAddFeedbackMessageRequest>): ServerAddFeedbackMessageRequest {
+    return ServerAddFeedbackMessageRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ServerAddFeedbackMessageRequest>): ServerAddFeedbackMessageRequest {
+    const message = createBaseServerAddFeedbackMessageRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.userName = object.userName ?? "";
+    message.title = object.title ?? "";
+    message.message = object.message ?? "";
+    message.feedbackType = object.feedbackType ?? "";
+    message.email = object.email ?? "";
+    return message;
+  },
 };
 
 function createBaseServerAddFeedbackMessageResponse(): ServerAddFeedbackMessageResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const ServerAddFeedbackMessageResponse: MessageFns<ServerAddFeedbackMessageResponse> = {
-	encode(
-		message: ServerAddFeedbackMessageResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ServerAddFeedbackMessageResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ServerAddFeedbackMessageResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseServerAddFeedbackMessageResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ServerAddFeedbackMessageResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerAddFeedbackMessageResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ServerAddFeedbackMessageResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ServerAddFeedbackMessageResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: ServerAddFeedbackMessageResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ServerAddFeedbackMessageResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ServerAddFeedbackMessageResponse>): ServerAddFeedbackMessageResponse {
-		return ServerAddFeedbackMessageResponse.fromPartial(base ?? {});
-	},
-	fromPartial(
-		object: DeepPartial<ServerAddFeedbackMessageResponse>
-	): ServerAddFeedbackMessageResponse {
-		const message = createBaseServerAddFeedbackMessageResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ServerAddFeedbackMessageResponse>): ServerAddFeedbackMessageResponse {
+    return ServerAddFeedbackMessageResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ServerAddFeedbackMessageResponse>): ServerAddFeedbackMessageResponse {
+    const message = createBaseServerAddFeedbackMessageResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-	? T
-	: T extends globalThis.Array<infer U>
-		? globalThis.Array<DeepPartial<U>>
-		: T extends ReadonlyArray<infer U>
-			? ReadonlyArray<DeepPartial<U>>
-			: T extends {}
-				? { [K in keyof T]?: DeepPartial<T[K]> }
-				: Partial<T>;
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
 
 function isSet(value: any): boolean {
-	return value !== null && value !== undefined;
+  return value !== null && value !== undefined;
 }
 
 interface MessageFns<T> {
-	encode(message: T, writer?: BinaryWriter): BinaryWriter;
-	decode(input: BinaryReader | Uint8Array, length?: number): T;
-	fromJSON(object: any): T;
-	toJSON(message: T): unknown;
-	create(base?: DeepPartial<T>): T;
-	fromPartial(object: DeepPartial<T>): T;
+  encode(message: T, writer?: BinaryWriter): BinaryWriter;
+  decode(input: BinaryReader | Uint8Array, length?: number): T;
+  fromJSON(object: any): T;
+  toJSON(message: T): unknown;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }

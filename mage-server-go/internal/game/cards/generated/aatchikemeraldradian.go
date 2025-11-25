@@ -37,8 +37,10 @@ func NewAatchikEmeraldRadian(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	if err != nil {
 		return nil, err
 	}
+	// Create tokens equal to the number of artifact and/or creature cards in your graveyard
+	count := abilities.NewCardsInControllerGraveyardCountArtifactOrCreature()
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, count)).
+		AddEffect(abilities.NewCreateTokenEffectDynamic(token1_0, count)).
 		Build()
 	if err != nil {
 		return nil, err

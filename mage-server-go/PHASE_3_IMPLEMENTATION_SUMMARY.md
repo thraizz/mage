@@ -1,4 +1,4 @@
-# Phase 3 Implementation Summary
+./PHASE_4_IMPLEMENTATION_SUMMARY.md# Phase 3 Implementation Summary
 
 **Date**: 2025-01-24
 **Status**: ✅ COMPLETE (6 of 6 complete - 100%)
@@ -17,11 +17,13 @@ Phase 3 focuses on advanced mechanics and special card types from the Engine Gap
 #### Implemented Features
 
 **Face-Down State Tracking**:
+
 - `FaceDownState` struct tracks all face-down permanent characteristics
 - Rule 708.2 compliance: 2/2 creatures with no text, name, subtypes, mana cost, or color
 - Tracks how card became face down (Morph, Manifest, Megamorph, Cloak, Disguise)
 
 **Morph Mechanic (Rule 702.37)**:
+
 ```go
 type MorphAbility struct {
     baseAbility
@@ -29,11 +31,13 @@ type MorphAbility struct {
     isMegamorph bool
 }
 ```
+
 - Cast face down for {3} as 2/2 creature
 - Turn face up any time with priority by paying morph cost
 - Megamorph variant adds +1/+1 counter when turned face up
 
 **Manifest Mechanic (Rule 701.34)**:
+
 ```go
 type ManifestEffect struct {
     description string
@@ -42,11 +46,13 @@ type ManifestEffect struct {
     count       int
 }
 ```
+
 - Put cards onto battlefield face down as 2/2 creatures
 - Creature cards can be turned face up by paying mana cost
 - Cards with morph can use morph cost instead
 
 **Turn Face Up Special Action (Rule 708.8)**:
+
 ```go
 type TurnFaceUpAction struct {
     permanentID uuid.UUID
@@ -55,11 +61,13 @@ type TurnFaceUpAction struct {
     isMegamorph bool
 }
 ```
+
 - Special action (doesn't use stack)
 - Can be performed any time player has priority
 - Megamorph adds +1/+1 counter
 
 **Additional Variants**:
+
 - **Cloak** (Rule 702.162): Thunder Junction variant of manifest
 - **Disguise**: Alternative face-down casting
 
@@ -88,6 +96,7 @@ type TurnFaceUpAction struct {
 #### Implemented Features
 
 **Double-Faced Card Types**:
+
 ```go
 type CardFaceType int
 
@@ -105,6 +114,7 @@ const (
 ```
 
 **DFC State Tracking**:
+
 ```go
 type DFCState struct {
     cardID          uuid.UUID
@@ -125,6 +135,7 @@ type DFCState struct {
 ```
 
 **Transform Mechanic (Rule 701.28)**:
+
 ```go
 type TransformAbility struct {
     baseAbility
@@ -138,11 +149,13 @@ type TransformEffect struct {
     targetCount int
 }
 ```
+
 - Flip between front and back faces
 - Tracks transform count and timing
 - Supports conditional transforms
 
 **Day/Night Cycle (Rule 702.145)**:
+
 ```go
 type DayNightState struct {
     isDay          bool
@@ -154,12 +167,14 @@ type DayNightState struct {
 type DayboundAbility struct { baseAbility }
 type NightboundAbility struct { baseAbility }
 ```
+
 - Global day/night tracking per game
 - Daybound permanents transform when it becomes night
 - Nightbound permanents transform when it becomes day
 - First Daybound/Nightbound permanent establishes day/night
 
 **Meld Mechanic (Rule 713)**:
+
 ```go
 type MeldAbility struct {
     baseAbility
@@ -176,11 +191,13 @@ type MeldEffect struct {
     result      uuid.UUID
 }
 ```
+
 - Two cards meld into one combined permanent
 - Both halves exiled, result enters battlefield
 - Combined card has characteristics from result
 
 **Modal DFC Support**:
+
 ```go
 type ModalDFCChoice struct {
     cardID      uuid.UUID
@@ -188,6 +205,7 @@ type ModalDFCChoice struct {
     alternativeCost *ManaCost
 }
 ```
+
 - Choose which face to cast during casting
 - Both faces available from certain zones
 - Can't transform once on battlefield
@@ -195,23 +213,27 @@ type ModalDFCChoice struct {
 #### Example Cards Supported
 
 **Transforming DFCs**:
+
 - Delver of Secrets / Insectile Aberration
 - Huntmaster of the Fells / Ravager of the Fells
 - Garruk Relentless / Garruk, the Veil-Cursed (planeswalker)
 - Arlinn Kord / Arlinn, Embraced by the Moon (planeswalker)
 
 **Modal DFCs**:
+
 - Tangled Florahedron / Tangled Vale
 - Valki, God of Lies / Tibalt, Cosmic Impostor
 - Agadeem's Awakening / Agadeem, the Undercrypt
 - Sea Gate Restoration / Sea Gate, Reborn
 
 **Meld Pairs**:
+
 - Bruna + Gisela → Brisela, Voice of Nightmares
 - Graf Rats + Midnight Scavengers → Chittering Host
 - Hanweir Battlements + Hanweir Garrison → Hanweir, the Writhing Township
 
 **Day/Night Cards**:
+
 - Celestus Sanctifier (Daybound)
 - Gavony Dawnguard (Daybound)
 - Firmament Sage (Nightbound)
@@ -234,6 +256,7 @@ type ModalDFCChoice struct {
 #### Implemented Features
 
 **Text Change Types**:
+
 ```go
 type TextChangeType int
 
@@ -248,6 +271,7 @@ const (
 ```
 
 **Text-Changing Effect (Layer 3)**:
+
 ```go
 type TextChangingEffect struct {
     baseContinuousEffect
@@ -260,6 +284,7 @@ type TextChangingEffect struct {
     appliedTo   map[uuid.UUID]bool
 }
 ```
+
 - Applied in Layer 3 (after copy, control; before type, color, abilities)
 - Can target specific cards or apply globally
 - Supports duration-based effects
@@ -267,28 +292,33 @@ type TextChangingEffect struct {
 **Specific Card Implementations**:
 
 **Magical Hack**:
+
 ```go
 type MagicalHackEffect struct {
     *TextChangingEffect
     targetID uuid.UUID
 }
 ```
+
 - Change one basic land type to another
 - Permanent duration
 - Example: "Swampwalk" becomes "Plainswalk"
 
 **Mind Bend**:
+
 ```go
 type MindBendEffect struct {
     *TextChangingEffect
     targetID uuid.UUID
 }
 ```
+
 - Change color word or basic land type
 - Until end of turn duration
 - Flexible targeting
 
 **Artificial Evolution**:
+
 ```go
 type ArtificialEvolutionEffect struct {
     *TextChangingEffect
@@ -296,6 +326,7 @@ type ArtificialEvolutionEffect struct {
     excludedSubtypes []string
 }
 ```
+
 - Change creature types
 - Permanent duration
 - Can't choose types from card name
@@ -303,6 +334,7 @@ type ArtificialEvolutionEffect struct {
 **Helper Systems**:
 
 **Color Word Handling**:
+
 ```go
 type ColorWord string
 
@@ -315,6 +347,7 @@ func IsValidColorWord(word string) bool
 ```
 
 **Basic Land Type Handling**:
+
 ```go
 type BasicLandType string
 
@@ -327,6 +360,7 @@ func GetLandwalkFromLandType(landType BasicLandType) string
 ```
 
 **Text Replacement Helper**:
+
 ```go
 type TextReplacementHelper struct {
     caseSensitive bool
@@ -336,6 +370,7 @@ func (h *TextReplacementHelper) ReplaceInText(text, from, to string) string
 func (h *TextReplacementHelper) FindAllOccurrences(text, search string) []int
 func (h *TextReplacementHelper) matchCase(original, replacement string) string
 ```
+
 - Case-sensitive and case-insensitive replacement
 - Preserves original capitalization
 - Handles multiple occurrences
@@ -372,17 +407,20 @@ func (h *TextReplacementHelper) matchCase(original, replacement string) string
 **12 High-Priority Keyword Actions**:
 
 1. **Explore** (Rule 701.46):
+
 ```go
 type ExploreEffect struct {
     description      string
     exploringCreature uuid.UUID
 }
 ```
+
 - Reveal top card of library
 - If land, put into hand
 - If nonland, +1/+1 counter and choice of destination
 
 2. **Connive** (Rule 701.47):
+
 ```go
 type ConniveEffect struct {
     description       string
@@ -390,16 +428,19 @@ type ConniveEffect struct {
     conniveCount      int
 }
 ```
+
 - Draw card, then discard card
 - If nonland discarded, +1/+1 counter on creature
 - Can connive multiple times
 
 3. **Surveil** (Rule 701.42):
+
 - Already existed in `scry_surveil.go`
 - Like Scry but cards go to graveyard
 - Look at top N, put any in graveyard, rest on top
 
 4. **Amass** (Rule 701.44):
+
 ```go
 type AmassEffect struct {
     description string
@@ -407,10 +448,12 @@ type AmassEffect struct {
     armySubtype string // "Zombies" or "Orcs"
 }
 ```
+
 - Create 0/0 Army if don't control one
 - Put +1/+1 counters on Army
 
 5. **Adapt** (Rule 702.142):
+
 ```go
 type AdaptEffect struct {
     description string
@@ -418,10 +461,12 @@ type AdaptEffect struct {
     permanent   uuid.UUID
 }
 ```
+
 - If no +1/+1 counters, add N counters
 - One-time activation
 
 6. **Monstrosity** (Rule 701.31):
+
 ```go
 type MonstrosityEffect struct {
     description string
@@ -429,28 +474,34 @@ type MonstrosityEffect struct {
     permanent   uuid.UUID
 }
 ```
+
 - If not monstrous, add counters and become monstrous
 - Permanent status change
 
 7. **Bolster** (Rule 701.33):
+
 ```go
 type BolsterEffect struct {
     description string
     count       int
 }
 ```
+
 - Put counters on creature with least toughness
 
 8. **Support** (Rule 701.34):
+
 ```go
 type SupportEffect struct {
     description string
     count       int
 }
 ```
+
 - Put +1/+1 counter on each of up to N targets
 
 9. **Goad** (Rule 701.38):
+
 ```go
 type GoadEffect struct {
     description    string
@@ -458,18 +509,22 @@ type GoadEffect struct {
     goadedCreature uuid.UUID
 }
 ```
+
 - Must attack each combat if able
 - Must attack player other than goading player
 
 10. **Learn** (Rule 701.45):
+
 ```go
 type LearnEffect struct {
     description string
 }
 ```
+
 - Discard then draw, OR get Lesson from sideboard
 
 11. **Fateseal**:
+
 ```go
 type FatesealEffect struct {
     description string
@@ -477,15 +532,18 @@ type FatesealEffect struct {
     opponent    uuid.UUID
 }
 ```
+
 - Like Scry but for opponent's library
 
 12. **Clash** (Rule 702.63):
+
 ```go
 type ClashEffect struct {
     description string
     player      uuid.UUID
 }
 ```
+
 - Reveal top cards, compare mana values
 - Higher mana value wins
 
@@ -529,93 +587,119 @@ type ClashEffect struct {
 **13 Combat Keyword Abilities**:
 
 1. **Flying** (Rule 702.9):
+
 ```go
 type FlyingAbility struct { baseAbility }
 ```
+
 - Evasion ability
 - Can only be blocked by flying/reach
 
 2. **First Strike** (Rule 702.7):
+
 ```go
 type FirstStrikeAbility struct { baseAbility }
 ```
+
 - Deals combat damage before creatures without
 - Creates separate damage step
 
 3. **Double Strike** (Rule 702.4):
+
 ```go
 type DoubleStrikeAbility struct { baseAbility }
 ```
+
 - Deals damage in both first strike and regular steps
 
 4. **Deathtouch** (Rule 702.2):
+
 ```go
 type DeathtouchAbility struct { baseAbility }
 ```
+
 - Any amount of damage is lethal
 - Creates state-based action
 
 5. **Lifelink** (Rule 702.15):
+
 ```go
 type LifelinkAbility struct { baseAbility }
 ```
+
 - Damage dealt causes life gain
 - Simultaneous with damage
 
 6. **Vigilance** (Rule 702.20):
+
 ```go
 type VigilanceAbility struct { baseAbility }
 ```
+
 - Doesn't tap when attacking
 
 7. **Trample** (Rule 702.19):
+
 ```go
 type TrampleAbility struct { baseAbility }
 ```
+
 - Excess damage to defending player
 - Requires lethal assignment to blockers first
 
 8. **Reach** (Rule 702.17):
+
 ```go
 type ReachAbility struct { baseAbility }
 ```
+
 - Can block flying creatures
 
 9. **Menace** (Rule 702.111):
+
 ```go
 type MenaceAbility struct { baseAbility }
 ```
+
 - Must be blocked by 2+ creatures
 - Evasion ability
 
 10. **Defender** (Rule 702.3):
+
 ```go
 type DefenderAbility struct { baseAbility }
 ```
+
 - Can't attack
 - Only blocks
 
 11. **Hexproof** (Rule 702.11):
+
 ```go
 type HexproofAbility struct { baseAbility }
 ```
+
 - Can't be targeted by opponents
 - Targeting restriction
 
 12. **Shroud** (Rule 702.18):
+
 ```go
 type ShroudAbility struct { baseAbility }
 ```
+
 - Can't be targeted by anyone
 - Stronger than Hexproof
 
 13. **Protection** (Rule 702.16):
+
 ```go
 type ProtectionAbility struct {
     baseAbility
     fromQuality string
 }
 ```
+
 - DEBT: Damage prevented, can't be Enchanted/Equipped, can't Block, can't be Targeted
 - Quality-based (color, type, etc.)
 
@@ -684,6 +768,7 @@ func CanBeBlocked(attackerID uuid.UUID, blockers []uuid.UUID, game GameContext) 
 **6 Special Card Type Systems**:
 
 1. **Split Cards** (Rule 709):
+
 ```go
 type SplitCardState struct {
     cardID      uuid.UUID
@@ -703,12 +788,14 @@ const (
 
 type FuseAbility struct { baseAbility }
 ```
+
 - Two spells on one card (left/right halves)
 - Can cast either half independently
 - **Fuse** keyword allows casting both halves together
 - CMC: Sum of both halves when not on stack, chosen half when on stack
 
 2. **Adventure Cards** (Rule 715):
+
 ```go
 type AdventureCardState struct {
     cardID          uuid.UUID
@@ -726,12 +813,14 @@ type AdventureAbility struct {
     adventureCost *ManaCost
 }
 ```
+
 - Creature with additional instant/sorcery (Adventure)
 - Cast Adventure spell, exiles instead of going to graveyard
 - Can cast creature from exile after adventure resolves
 - "You may cast [card name] from exile"
 
 3. **Saga Cards** (Rule 714):
+
 ```go
 type SagaState struct {
     permanentID    uuid.UUID
@@ -751,6 +840,7 @@ type SagaChapterTrigger struct {
     chapters []int // Chapters this triggers on (e.g., [1, 3])
 }
 ```
+
 - Enchantment with chapter-based abilities
 - Adds lore counter at beginning of precombat main phase
 - Triggers abilities for each chapter reached
@@ -758,6 +848,7 @@ type SagaChapterTrigger struct {
 - Chapter ranges: "I", "I, III", "III", etc.
 
 4. **Class Cards** (Rule 716):
+
 ```go
 type ClassState struct {
     permanentID  uuid.UUID
@@ -779,6 +870,7 @@ type ClassLevelUpAbility struct {
     cost        *ManaCost
 }
 ```
+
 - Enchantment with three levels (1, 2, 3)
 - Starts at level 1
 - Activated abilities to advance levels
@@ -787,6 +879,7 @@ type ClassLevelUpAbility struct {
 - Sorcery-speed activation
 
 5. **Flip Cards** (Rule 710):
+
 ```go
 type FlipCardState struct {
     cardID          uuid.UUID
@@ -799,6 +892,7 @@ type FlipCardState struct {
     flippedFaceID   uuid.UUID
 }
 ```
+
 - Old-style Kamigawa mechanic
 - Card physically rotates 180°
 - Bottom half becomes new characteristics
@@ -806,6 +900,7 @@ type FlipCardState struct {
 - Examples: Nezumi Graverobber, Akki Lavarunner
 
 6. **Leveler Cards** (Rule 711):
+
 ```go
 type LevelerState struct {
     permanentID   uuid.UUID
@@ -830,6 +925,7 @@ type AddLevelCounterEffect struct {
     description string
 }
 ```
+
 - Creature with level-up activated ability
 - Pay cost to add level counter (sorcery speed)
 - Different P/T and abilities at level ranges
@@ -839,6 +935,7 @@ type AddLevelCounterEffect struct {
 #### Helper Functions
 
 **For Split Cards**:
+
 ```go
 func NewSplitCardState(cardID, leftHalf, rightHalf uuid.UUID, leftName, rightName string) *SplitCardState
 func (scs *SplitCardState) CanFuse() bool
@@ -846,6 +943,7 @@ func (scs *SplitCardState) GetCMCOnStack(choice SplitCardCastChoice) int
 ```
 
 **For Adventure Cards**:
+
 ```go
 func NewAdventureCardState(cardID, creatureFace, adventureFace uuid.UUID, creatureName, adventureName string) *AdventureCardState
 func (acs *AdventureCardState) CanCastCreature() bool
@@ -853,6 +951,7 @@ func (acs *AdventureCardState) CanCastAdventure() bool
 ```
 
 **For Saga Cards**:
+
 ```go
 func NewSagaState(permanentID uuid.UUID, finalChapter int) *SagaState
 func (ss *SagaState) AddLoreCounter() int
@@ -861,6 +960,7 @@ func (ss *SagaState) HasTriggeredChapter(chapter int) bool
 ```
 
 **For Class Cards**:
+
 ```go
 func NewClassState(permanentID uuid.UUID) *ClassState
 func (cs *ClassState) CanLevelUp(targetLevel int) bool
@@ -869,6 +969,7 @@ func (a *ClassAbility) GetAbilitiesForLevel(level int) []Ability
 ```
 
 **For Flip Cards**:
+
 ```go
 func NewFlipCardState(cardID, permanentID uuid.UUID, normalName, flippedName string) *FlipCardState
 func (fcs *FlipCardState) Flip()
@@ -876,6 +977,7 @@ func (fcs *FlipCardState) IsFlipped() bool
 ```
 
 **For Leveler Cards**:
+
 ```go
 func NewLevelerState(permanentID uuid.UUID, ranges []LevelRange) *LevelerState
 func (ls *LevelerState) AddLevelCounter()
@@ -886,6 +988,7 @@ func (ls *LevelerState) GetLevelCounters() int
 #### Example Cards Supported
 
 **Split Cards**:
+
 - Fire // Ice (from Apocalypse)
 - Breaking // Entering (Fuse)
 - Wear // Tear
@@ -893,6 +996,7 @@ func (ls *LevelerState) GetLevelCounters() int
 - Beck // Call (Fuse)
 
 **Adventure Cards**:
+
 - Bonecrusher Giant // Stomp
 - Brazen Borrower // Petty Theft
 - Lovestruck Beast // Heart's Desire
@@ -900,6 +1004,7 @@ func (ls *LevelerState) GetLevelCounters() int
 - Realm-Cloaked Giant // Cast Off
 
 **Saga Cards**:
+
 - The Eldest Reborn (I, II, III chapters)
 - History of Benalia (I, II, III)
 - The Mirari Conjecture (I, II, III)
@@ -907,6 +1012,7 @@ func (ls *LevelerState) GetLevelCounters() int
 - Elspeth Conquers Death (I, II, III)
 
 **Class Cards**:
+
 - Cleric Class (Level 1/2/3 with different abilities)
 - Monk Class
 - Ranger Class
@@ -914,6 +1020,7 @@ func (ls *LevelerState) GetLevelCounters() int
 - Warlock Class
 
 **Flip Cards**:
+
 - Nezumi Graverobber // Nighteyes the Desecrator
 - Akki Lavarunner // Tok-Tok, Volcano Born
 - Hired Muscle // Scarmaker
@@ -921,6 +1028,7 @@ func (ls *LevelerState) GetLevelCounters() int
 - Bushi Tenderfoot // Kenzo the Hardhearted
 
 **Leveler Cards**:
+
 - Student of Warfare (Level 2, Level 7)
 - Kargan Dragonlord (Level 4, Level 8)
 - Knight of Cliffhaven (Level 3, Level 6)
@@ -946,20 +1054,22 @@ func (ls *LevelerState) GetLevelCounters() int
 ## Code Statistics
 
 ### New Files Created
-| File | Lines | Purpose |
-|------|-------|---------|
-| `face_down.go` | 530 | Morph, Manifest, face-down mechanics |
-| `face_down_test.go` | 390 | Comprehensive face-down tests |
-| `transform.go` | 570 | Transform, DFC, Day/Night, Meld |
-| `text_changing.go` | 490 | Text-changing effects (Layer 3) |
-| `keyword_actions_extended.go` | 430 | 12 keyword actions |
-| `keyword_abilities_combat.go` | 650 | 13 combat keyword abilities |
-| `special_card_types.go` | 665 | 6 special card type systems |
-| **Total** | **3,725** | **Phase 3 implementation** |
+
+| File                          | Lines     | Purpose                              |
+| ----------------------------- | --------- | ------------------------------------ |
+| `face_down.go`                | 530       | Morph, Manifest, face-down mechanics |
+| `face_down_test.go`           | 390       | Comprehensive face-down tests        |
+| `transform.go`                | 570       | Transform, DFC, Day/Night, Meld      |
+| `text_changing.go`            | 490       | Text-changing effects (Layer 3)      |
+| `keyword_actions_extended.go` | 430       | 12 keyword actions                   |
+| `keyword_abilities_combat.go` | 650       | 13 combat keyword abilities          |
+| `special_card_types.go`       | 665       | 6 special card type systems          |
+| **Total**                     | **3,725** | **Phase 3 implementation**           |
 
 ### Integration Points
 
 **With Existing Systems**:
+
 - **Layer System**: Text-changing effects integrate with Layer 3
 - **Continuous Effects**: All new effects extend baseContinuousEffect
 - **Casting System**: Modal DFCs choose face during casting, Morph offers face-down casting
@@ -969,6 +1079,7 @@ func (ls *LevelerState) GetLevelCounters() int
 - **Triggered Abilities**: "When transformed", "When turned face up", "When day/night changes"
 
 **New Interfaces**:
+
 ```go
 // Face-down tracking
 type FaceDownState struct { ... }
@@ -989,6 +1100,7 @@ type TextReplacementHelper struct { ... }
 ### Test Coverage
 
 **Face-Down Permanents**: 16 tests
+
 - FaceDownState creation and characteristics
 - Morph and Megamorph abilities
 - Manifest effects
@@ -1003,52 +1115,52 @@ type TextReplacementHelper struct { ... }
 
 ### Comprehensive Rules Implemented
 
-| Rule | Description | Status |
-|------|-------------|--------|
-| 708 | Face-Down Spells and Permanents | ✅ Complete |
-| 702.37 | Morph | ✅ Complete |
-| 702.37c | Megamorph | ✅ Complete |
-| 701.34 | Manifest | ✅ Complete |
-| 702.162 | Cloak | ✅ Complete |
-| 712 | Double-Faced Cards | ✅ Complete |
-| 701.28 | Transform | ✅ Complete |
-| 702.145 | Daybound/Nightbound | ✅ Complete |
-| 713 | Meld | ✅ Complete |
-| 613.1d | Text-Changing Effects (Layer 3) | ✅ Complete |
-| 612 | Text-Changing Rules | ✅ Complete |
-| 701.46 | Explore | ✅ Complete |
-| 701.47 | Connive | ✅ Complete |
-| 701.42 | Surveil | ✅ Complete |
-| 701.44 | Amass | ✅ Complete |
-| 702.142 | Adapt | ✅ Complete |
-| 701.31 | Monstrosity | ✅ Complete |
-| 701.33 | Bolster | ✅ Complete |
-| 701.34 | Support | ✅ Complete |
-| 701.38 | Goad | ✅ Complete |
-| 701.45 | Learn | ✅ Complete |
-| 702.63 | Clash | ✅ Complete |
-| 702.9 | Flying | ✅ Complete |
-| 702.7 | First Strike | ✅ Complete |
-| 702.4 | Double Strike | ✅ Complete |
-| 702.2 | Deathtouch | ✅ Complete |
-| 702.15 | Lifelink | ✅ Complete |
-| 702.20 | Vigilance | ✅ Complete |
-| 702.19 | Trample | ✅ Complete |
-| 702.17 | Reach | ✅ Complete |
-| 702.111 | Menace | ✅ Complete |
-| 702.3 | Defender | ✅ Complete |
-| 702.11 | Hexproof | ✅ Complete |
-| 702.18 | Shroud | ✅ Complete |
-| 702.16 | Protection | ✅ Complete |
-| 709 | Split Cards | ✅ Complete |
-| 702.101 | Fuse | ✅ Complete |
-| 715 | Adventure Cards | ✅ Complete |
-| 714 | Saga Cards | ✅ Complete |
-| 716 | Class Cards | ✅ Complete |
-| 710 | Flip Cards | ✅ Complete |
-| 711 | Leveler Cards | ✅ Complete |
-| 702.87 | Level Up | ✅ Complete |
-| 704.5u | Saga Sacrifice (SBA) | ✅ Complete |
+| Rule    | Description                     | Status      |
+| ------- | ------------------------------- | ----------- |
+| 708     | Face-Down Spells and Permanents | ✅ Complete |
+| 702.37  | Morph                           | ✅ Complete |
+| 702.37c | Megamorph                       | ✅ Complete |
+| 701.34  | Manifest                        | ✅ Complete |
+| 702.162 | Cloak                           | ✅ Complete |
+| 712     | Double-Faced Cards              | ✅ Complete |
+| 701.28  | Transform                       | ✅ Complete |
+| 702.145 | Daybound/Nightbound             | ✅ Complete |
+| 713     | Meld                            | ✅ Complete |
+| 613.1d  | Text-Changing Effects (Layer 3) | ✅ Complete |
+| 612     | Text-Changing Rules             | ✅ Complete |
+| 701.46  | Explore                         | ✅ Complete |
+| 701.47  | Connive                         | ✅ Complete |
+| 701.42  | Surveil                         | ✅ Complete |
+| 701.44  | Amass                           | ✅ Complete |
+| 702.142 | Adapt                           | ✅ Complete |
+| 701.31  | Monstrosity                     | ✅ Complete |
+| 701.33  | Bolster                         | ✅ Complete |
+| 701.34  | Support                         | ✅ Complete |
+| 701.38  | Goad                            | ✅ Complete |
+| 701.45  | Learn                           | ✅ Complete |
+| 702.63  | Clash                           | ✅ Complete |
+| 702.9   | Flying                          | ✅ Complete |
+| 702.7   | First Strike                    | ✅ Complete |
+| 702.4   | Double Strike                   | ✅ Complete |
+| 702.2   | Deathtouch                      | ✅ Complete |
+| 702.15  | Lifelink                        | ✅ Complete |
+| 702.20  | Vigilance                       | ✅ Complete |
+| 702.19  | Trample                         | ✅ Complete |
+| 702.17  | Reach                           | ✅ Complete |
+| 702.111 | Menace                          | ✅ Complete |
+| 702.3   | Defender                        | ✅ Complete |
+| 702.11  | Hexproof                        | ✅ Complete |
+| 702.18  | Shroud                          | ✅ Complete |
+| 702.16  | Protection                      | ✅ Complete |
+| 709     | Split Cards                     | ✅ Complete |
+| 702.101 | Fuse                            | ✅ Complete |
+| 715     | Adventure Cards                 | ✅ Complete |
+| 714     | Saga Cards                      | ✅ Complete |
+| 716     | Class Cards                     | ✅ Complete |
+| 710     | Flip Cards                      | ✅ Complete |
+| 711     | Leveler Cards                   | ✅ Complete |
+| 702.87  | Level Up                        | ✅ Complete |
+| 704.5u  | Saga Sacrifice (SBA)            | ✅ Complete |
 
 **Total Rules Covered**: 50+ comprehensive rule sections
 
@@ -1059,11 +1171,13 @@ type TextReplacementHelper struct { ... }
 ### Immediate (Current Sprint)
 
 1. **Expand Keyword Actions** (In Progress):
+
    - Implement Explore, Connive, Amass
    - Implement Surveil, Adapt, Monstrosity
    - Add tests for each action
 
 2. **Expand Keyword Abilities**:
+
    - Implement Flying, First Strike, Double Strike
    - Implement Deathtouch, Lifelink, Vigilance, Trample
    - Implement Hexproof, Menace, Reach
@@ -1078,12 +1192,14 @@ type TextReplacementHelper struct { ... }
 ### Future Phases
 
 **Phase 4: Combat System** (from ENGINE_GAP_ANALYSIS.md):
+
 - Combat damage assignment
 - Attacker/blocker ordering
 - Multiple blockers handling
 - Combat tricks timing
 
 **Phase 5: Advanced Interactions** (from ENGINE_GAP_ANALYSIS.md):
+
 - Linked abilities
 - Characteristic-defining abilities
 - "At beginning of" triggers
@@ -1097,6 +1213,7 @@ type TextReplacementHelper struct { ... }
 ### For Card Implementers
 
 **Using Face-Down Mechanics**:
+
 ```go
 // Morph card
 morphAbility := abilities.NewMorphAbility(cardID, abilities.NewManaCost("{2}{U}"))
@@ -1111,6 +1228,7 @@ manifestEffect := abilities.NewManifestEffect(sourceID, abilities.ManifestFromLi
 ```
 
 **Using Transform Mechanics**:
+
 ```go
 // Transforming card
 transformAbility := abilities.NewTransformAbility(cardID, abilities.TransformTriggered)
@@ -1130,6 +1248,7 @@ backFace.AddAbility(nightboundAbility)
 ```
 
 **Using Text-Changing Effects**:
+
 ```go
 // Magical Hack - change land type
 effect := abilities.NewMagicalHackEffect(
@@ -1163,6 +1282,7 @@ effect := abilities.NewArtificialEvolutionEffect(
 ## Summary
 
 Phase 3 has successfully implemented all 6 major systems **(100% complete)**:
+
 - ✅ Face-down permanents (Morph, Manifest, Megamorph, Cloak)
 - ✅ Transform and DFC support (Transform, Modal, Meld, Day/Night)
 - ✅ Text-changing effects (Layer 3)
@@ -1175,14 +1295,17 @@ Phase 3 has successfully implemented all 6 major systems **(100% complete)**:
 **Cards Enabled**: Thousands of cards across all sets
 
 ### Keyword Actions (15 total)
+
 - **Existing**: Scry, Mill, Proliferate
 - **New**: Explore, Connive, Surveil, Amass, Adapt, Monstrosity, Bolster, Support, Goad, Learn, Fateseal, Clash
 
 ### Keyword Abilities (17 total)
+
 - **Existing**: Flash, Haste, Indestructible, Ward
 - **New**: Flying, First Strike, Double Strike, Deathtouch, Lifelink, Vigilance, Trample, Reach, Menace, Defender, Hexproof, Shroud, Protection
 
 ### Special Card Types (6 systems)
+
 - **Split Cards**: Fire//Ice, Beck//Call (with Fuse)
 - **Adventure Cards**: Bonecrusher Giant, Brazen Borrower
 - **Saga Cards**: The Eldest Reborn, History of Benalia

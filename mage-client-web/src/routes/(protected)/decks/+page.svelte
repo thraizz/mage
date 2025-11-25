@@ -189,19 +189,19 @@
 <style>
 	.decks-page {
 		min-height: 100vh;
-		background-color: #f9fafb;
-		padding: 2rem 0;
+		background: var(--bg-void);
+		padding: var(--space-8) 0;
 	}
 
 	.decks-container {
 		max-width: 1280px;
 		margin: 0 auto;
-		padding: 0 1rem;
+		padding: 0 var(--space-4);
 	}
 
 	/* Header */
 	.header {
-		margin-bottom: 2rem;
+		margin-bottom: var(--space-8);
 	}
 
 	.header-content {
@@ -211,103 +211,111 @@
 	}
 
 	.header-text h1 {
-		font-size: 1.875rem;
-		font-weight: 700;
-		color: #111827;
+		font-family: var(--font-display);
+		font-size: var(--text-3xl);
+		font-weight: var(--weight-bold);
+		color: var(--text-bright);
 		margin: 0;
 	}
 
 	.header-text p {
-		margin: 0.5rem 0 0 0;
-		font-size: 0.875rem;
-		color: #4b5563;
+		margin: var(--space-2) 0 0 0;
+		font-size: var(--text-sm);
+		color: var(--text-muted);
 	}
 
 	.btn-upload {
 		display: inline-flex;
 		align-items: center;
-		padding: 0.5rem 1rem;
+		padding: var(--space-2) var(--space-4);
 		border: none;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: white;
-		background-color: #3b82f6;
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
+		color: var(--bg-void);
+		background: var(--accent-gold);
 		cursor: pointer;
-		transition: background-color 0.2s;
-		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		transition: background var(--transition-fast);
 	}
 
 	.btn-upload:hover {
-		background-color: #2563eb;
+		background: var(--accent-gold-bright);
 	}
 
 	.btn-upload:focus {
 		outline: none;
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+		box-shadow: 0 0 0 3px var(--accent-gold-glow);
 	}
 
 	.btn-upload .icon {
 		width: 1.25rem;
 		height: 1.25rem;
-		margin-right: 0.5rem;
+		margin-right: var(--space-2);
 	}
 
 	/* Filters */
 	.filters {
-		margin-bottom: 1.5rem;
+		margin-bottom: var(--space-6);
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--space-4);
 	}
 
 	.filter-label {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #374151;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--text-muted);
 	}
 
 	.format-select {
 		display: block;
 		width: 12rem;
-		padding: 0.5rem 0.75rem;
-		padding-right: 2.5rem;
-		font-size: 0.875rem;
-		border: 1px solid #d1d5db;
-		border-radius: 0.375rem;
-		background-color: white;
-		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		padding: var(--space-2) var(--space-3);
+		padding-right: var(--space-10);
+		font-size: var(--text-sm);
+		font-family: var(--font-body);
+		color: var(--text-bright);
+		background: var(--bg-iron);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
 		cursor: pointer;
+		transition: all var(--transition-fast);
 	}
 
 	.format-select:focus {
 		outline: none;
-		border-color: #3b82f6;
-		box-shadow: 0 0 0 1px #3b82f6;
+		border-color: var(--accent-gold);
+		box-shadow: 0 0 0 3px var(--accent-gold-glow);
+	}
+
+	.format-select option {
+		background: var(--bg-slate);
+		color: var(--text-bright);
 	}
 
 	.btn-refresh {
 		display: inline-flex;
 		align-items: center;
-		padding: 0.5rem 0.75rem;
-		border: 1px solid #d1d5db;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #374151;
-		background-color: white;
+		padding: var(--space-2) var(--space-3);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--text-muted);
+		background: var(--bg-iron);
 		cursor: pointer;
-		transition: background-color 0.2s;
-		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		transition: all var(--transition-fast);
 	}
 
 	.btn-refresh:hover {
-		background-color: #f9fafb;
+		background: var(--bg-steel);
+		border-color: var(--border-strong);
+		color: var(--text-bright);
 	}
 
 	.btn-refresh:focus {
 		outline: none;
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+		box-shadow: 0 0 0 3px var(--accent-gold-glow);
 	}
 
 	.refresh-icon {
@@ -321,20 +329,20 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 3rem 0;
+		padding: var(--space-12) 0;
 	}
 
 	.loading-state p {
-		margin-top: 1rem;
-		color: #4b5563;
+		margin-top: var(--space-4);
+		color: var(--text-muted);
 	}
 
 	/* Error State */
 	.error-state {
-		background-color: #fef2f2;
-		border-left: 4px solid #f87171;
-		padding: 1rem;
-		border-radius: 0.375rem;
+		background: var(--status-error-dim);
+		border-left: 4px solid var(--status-error);
+		padding: var(--space-4);
+		border-radius: var(--radius-md);
 	}
 
 	.error-content {
@@ -348,125 +356,126 @@
 	.error-icon {
 		width: 1.25rem;
 		height: 1.25rem;
-		color: #f87171;
+		color: var(--status-error);
 	}
 
 	.error-text {
-		margin-left: 0.75rem;
+		margin-left: var(--space-3);
 	}
 
 	.error-text h3 {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #991b1b;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--status-error);
 		margin: 0;
 	}
 
 	.error-text p {
-		margin: 0.25rem 0 0 0;
-		font-size: 0.875rem;
-		color: #b91c1c;
+		margin: var(--space-1) 0 0 0;
+		font-size: var(--text-sm);
+		color: var(--text-muted);
 	}
 
 	.btn-retry {
-		margin-top: 0.75rem;
+		margin-top: var(--space-3);
 		display: inline-flex;
 		align-items: center;
-		padding: 0.5rem 0.75rem;
-		border: none;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #b91c1c;
-		background-color: #fee2e2;
+		padding: var(--space-2) var(--space-3);
+		border: 1px solid var(--status-error);
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--status-error);
+		background: transparent;
 		cursor: pointer;
-		transition: background-color 0.2s;
+		transition: all var(--transition-fast);
 	}
 
 	.btn-retry:hover {
-		background-color: #fecaca;
+		background: var(--status-error);
+		color: var(--text-bright);
 	}
 
 	.btn-retry:focus {
 		outline: none;
-		box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5);
+		box-shadow: 0 0 0 3px var(--status-error-dim);
 	}
 
 	/* Empty State */
 	.empty-state {
 		text-align: center;
-		padding: 3rem;
-		background-color: white;
-		border-radius: 0.5rem;
-		border: 2px dashed #d1d5db;
+		padding: var(--space-12);
+		background: var(--bg-obsidian);
+		border-radius: var(--radius-lg);
+		border: 2px dashed var(--border-default);
 	}
 
 	.empty-icon {
 		margin: 0 auto;
 		width: 3rem;
 		height: 3rem;
-		color: #9ca3af;
+		color: var(--text-ghost);
 	}
 
 	.empty-state h3 {
-		margin: 0.5rem 0 0 0;
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #111827;
+		margin: var(--space-2) 0 0 0;
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
 	}
 
 	.empty-state p {
-		margin: 0.25rem 0 0 0;
-		font-size: 0.875rem;
-		color: #6b7280;
+		margin: var(--space-1) 0 0 0;
+		font-size: var(--text-sm);
+		color: var(--text-muted);
 	}
 
 	.empty-actions {
-		margin-top: 1.5rem;
+		margin-top: var(--space-6);
 	}
 
 	.btn-upload-empty {
 		display: inline-flex;
 		align-items: center;
-		padding: 0.5rem 1rem;
+		padding: var(--space-2) var(--space-4);
 		border: none;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: white;
-		background-color: #3b82f6;
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
+		color: var(--bg-void);
+		background: var(--accent-gold);
 		cursor: pointer;
-		transition: background-color 0.2s;
-		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+		transition: background var(--transition-fast);
 	}
 
 	.btn-upload-empty:hover {
-		background-color: #2563eb;
+		background: var(--accent-gold-bright);
 	}
 
 	.btn-upload-empty:focus {
 		outline: none;
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+		box-shadow: 0 0 0 3px var(--accent-gold-glow);
 	}
 
 	.btn-upload-empty .icon {
 		width: 1.25rem;
 		height: 1.25rem;
-		margin-right: 0.5rem;
+		margin-right: var(--space-2);
 	}
 
 	/* Deck Grid */
 	.deck-grid {
 		display: grid;
 		grid-template-columns: repeat(1, 1fr);
-		gap: 1.5rem;
+		gap: var(--space-6);
 	}
 
 	.deck-count {
-		margin-top: 1.5rem;
+		margin-top: var(--space-6);
 		text-align: center;
-		font-size: 0.875rem;
-		color: #4b5563;
+		font-size: var(--text-sm);
+		color: var(--text-muted);
 	}
 
 	/* Responsive */
@@ -492,7 +501,7 @@
 		.header-content {
 			flex-direction: column;
 			align-items: flex-start;
-			gap: 1rem;
+			gap: var(--space-4);
 		}
 
 		.filters {

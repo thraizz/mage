@@ -24,6 +24,7 @@ const (
 	KeywordVigilance      KeywordType = "VIGILANCE"
 	KeywordDefender       KeywordType = "DEFENDER"
 	KeywordFlash          KeywordType = "FLASH"
+	KeywordShroud         KeywordType = "SHROUD"
 )
 
 // KeywordAbility represents a keyword ability (flying, vigilance, etc.)

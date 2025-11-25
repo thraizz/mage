@@ -4,8 +4,15 @@
  */
 
 import { writable, get } from 'svelte/store';
-import type { CallbackMethod } from '$lib/generated/mage/v1/websocket';
-import { callbackMethodFromJSON } from '$lib/generated/mage/v1/websocket';
+import type { CallbackMethod, ChatMessageData, StartGameData, GameUpdateData, GameInitData } from '$lib/generated/mage/v1/websocket';
+import {
+	callbackMethodFromJSON,
+	ChatMessageData as ChatMessageDataCodec,
+	StartGameData as StartGameDataCodec,
+	GameUpdateData as GameUpdateDataCodec,
+	GameInitData as GameInitDataCodec
+} from '$lib/generated/mage/v1/websocket';
+import { BinaryReader } from '@bufbuild/protobuf/wire';
 
 /**
  * WebSocket connection state
@@ -44,6 +51,38 @@ const BASE_RECONNECT_DELAY = 1000;
 const MAX_RECONNECT_DELAY = 30000;
 
 /**
+ * Decode ChatMessageData from protobuf bytes
+ */
+function decodeChatMessageData(bytes: Uint8Array): ChatMessageData {
+	const reader = new BinaryReader(bytes);
+	return ChatMessageDataCodec.decode(reader);
+}
+
+/**
+ * Decode StartGameData from protobuf bytes
+ */
+function decodeStartGameData(bytes: Uint8Array): StartGameData {
+	const reader = new BinaryReader(bytes);
+	return StartGameDataCodec.decode(reader);
+}
+
+/**
+ * Decode GameUpdateData from protobuf bytes
+ */
+function decodeGameUpdateData(bytes: Uint8Array): GameUpdateData {
+	const reader = new BinaryReader(bytes);
+	return GameUpdateDataCodec.decode(reader);
+}
+
+/**
+ * Decode GameInitData from protobuf bytes
+ */
+function decodeGameInitData(bytes: Uint8Array): GameInitData {
+	const reader = new BinaryReader(bytes);
+	return GameInitDataCodec.decode(reader);
+}
+
+/**
  * WebSocket store
  */
 function createWebSocketStore() {
@@ -75,9 +114,24 @@ function createWebSocketStore() {
 	 */
 	function connect(newSessionId: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			if (ws && ws.readyState === WebSocket.OPEN) {
-				resolve();
-				return;
+			// Check if already connected or connecting
+			if (ws) {
+				if (ws.readyState === WebSocket.OPEN) {
+					resolve();
+					return;
+				} else if (ws.readyState === WebSocket.CONNECTING) {
+					// Already connecting, wait for it to finish
+					const checkConnection = setInterval(() => {
+						if (ws && ws.readyState === WebSocket.OPEN) {
+							clearInterval(checkConnection);
+							resolve();
+						} else if (!ws || ws.readyState === WebSocket.CLOSED) {
+							clearInterval(checkConnection);
+							reject(new Error('WebSocket connection failed'));
+						}
+					}, 100);
+					return;
+				}
 			}
 
 			sessionId = newSessionId;
@@ -107,25 +161,91 @@ function createWebSocketStore() {
 				ws.onmessage = (event) => {
 					try {
 						const serverEvent = JSON.parse(event.data) as ServerEvent;
+						console.log('[WebSocket] Raw message received:', {
+							method: serverEvent.method,
+							messageId: serverEvent.messageId,
+							sessionId: serverEvent.sessionId,
+							hasData: !!serverEvent.data
+						});
 
 						// Convert method string to enum if needed
 						if (typeof serverEvent.method === 'string') {
 							serverEvent.method = callbackMethodFromJSON(serverEvent.method);
 						}
 
+						// Unpack protobuf Any type if present
+						let eventData = serverEvent.data;
+						let decodedTypeUrl: string | null = null;
+						if (eventData && typeof eventData === 'object') {
+							// Check for protojson format (uses @type) or binary format (uses typeUrl + value)
+							const dataObj = eventData as Record<string, unknown>;
+							const typeUrl = (dataObj['@type'] as string) || (dataObj['typeUrl'] as string);
+							
+							if (typeUrl) {
+								decodedTypeUrl = typeUrl;
+								console.log('[WebSocket] Detected Any type:', typeUrl);
+								
+								// Check if this is JSON format (protojson) or binary format
+								if ('@type' in dataObj) {
+									// protojson format - data is already JSON decoded, just extract it
+									// The data fields are siblings of @type, not nested under 'value'
+									console.log('[WebSocket] Using protojson format (already decoded)');
+									// For protojson, the wrapped message fields are at the same level as @type
+									// We just pass the whole object through - handlers will access .game, .message, etc.
+									// eventData is already correctly set
+								} else if ('typeUrl' in dataObj && 'value' in dataObj) {
+									// Binary format - decode from base64
+									try {
+										const base64Value = dataObj.value as string;
+										const binaryString = atob(base64Value);
+										const bytes = new Uint8Array(binaryString.length);
+										for (let i = 0; i < binaryString.length; i++) {
+											bytes[i] = binaryString.charCodeAt(i);
+										}
+
+										// Parse based on type_url
+										if (typeUrl === 'type.googleapis.com/mage.v1.ChatMessageData') {
+											eventData = decodeChatMessageData(bytes);
+										} else if (typeUrl === 'type.googleapis.com/mage.v1.StartGameData') {
+											eventData = decodeStartGameData(bytes);
+										} else if (typeUrl === 'type.googleapis.com/mage.v1.GameUpdateData') {
+											eventData = decodeGameUpdateData(bytes);
+										} else if (typeUrl === 'type.googleapis.com/mage.v1.GameInitData') {
+											eventData = decodeGameInitData(bytes);
+										} else {
+											console.warn('[WebSocket] Unknown typeUrl, unable to decode:', typeUrl);
+										}
+									} catch (err) {
+										console.error('[WebSocket] Failed to decode binary Any type:', err);
+									}
+								}
+							}
+						}
+
+						console.log('[WebSocket] Decoded event:', {
+							method: serverEvent.method,
+							typeUrl: decodedTypeUrl,
+							data: eventData
+						});
+
 						// Call all registered handlers for this method
 						const methodHandlers = handlers.get(serverEvent.method);
+						const handlerCount = methodHandlers?.size || 0;
+						console.log(`[WebSocket] Found ${handlerCount} handler(s) for method ${serverEvent.method}`);
+						
 						if (methodHandlers) {
 							methodHandlers.forEach((handler) => {
 								try {
-									handler(serverEvent.data);
+									handler(eventData);
 								} catch (err) {
 									console.error(`[WebSocket] Handler error for method ${serverEvent.method}:`, err);
 								}
 							});
+						} else {
+							console.warn(`[WebSocket] No handlers registered for method: ${serverEvent.method}`);
 						}
 					} catch (err) {
-						console.error('[WebSocket] Failed to parse message:', err);
+						console.error('[WebSocket] Failed to parse message:', err, 'Raw data:', event.data);
 					}
 				};
 
@@ -213,12 +333,14 @@ function createWebSocketStore() {
 			handlers.set(method, new Set());
 		}
 		handlers.get(method)!.add(handler);
+		console.log(`[WebSocket] Handler registered for method ${method}, total handlers: ${handlers.get(method)!.size}`);
 
 		// Return unsubscribe function
 		return () => {
 			const methodHandlers = handlers.get(method);
 			if (methodHandlers) {
 				methodHandlers.delete(handler);
+				console.log(`[WebSocket] Handler unregistered for method ${method}, remaining: ${methodHandlers.size}`);
 				if (methodHandlers.size === 0) {
 					handlers.delete(method);
 				}
@@ -275,9 +397,5 @@ export const websocketStore = createWebSocketStore();
  * Helper function to get current connection state
  */
 export function getWebSocketState(): WebSocketState {
-	let state: WebSocketState = 'disconnected';
-	websocketStore.subscribe((s) => {
-		state = s.state;
-	})();
-	return state;
+	return get(websocketStore).state;
 }

@@ -31,8 +31,9 @@ func NewAbhorrentOverlord(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	if err != nil {
 		return nil, err
 	}
+	// Create tokens equal to your devotion to black
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, DevotionCount.B)).
+		AddEffect(abilities.NewCreateTokenEffectDynamic(token1_0, abilities.DevotionB)).
 		Build()
 	if err != nil {
 		return nil, err

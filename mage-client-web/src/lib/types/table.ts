@@ -28,7 +28,6 @@ export interface TablePlayer {
 	id: string;
 	username: string;
 	isHost: boolean;
-	isReady: boolean;
 	joinedAt: number;
 }
 

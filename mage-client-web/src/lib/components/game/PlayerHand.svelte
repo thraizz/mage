@@ -6,13 +6,17 @@
 	let {
 		cards = [],
 		selectedCardIds = [],
+		// eslint-disable-next-line no-unused-vars
 		onCardClick = (cardId: string) => {},
+		// eslint-disable-next-line no-unused-vars
 		onCardHover = (cardId: string) => {},
 		size = 'normal'
 	}: {
 		cards?: GameCard[];
 		selectedCardIds?: string[];
+		// eslint-disable-next-line no-unused-vars
 		onCardClick?: (cardId: string) => void;
+		// eslint-disable-next-line no-unused-vars
 		onCardHover?: (cardId: string) => void;
 		size?: 'small' | 'normal' | 'large';
 	} = $props();
@@ -47,8 +51,8 @@
 	/**
 	 * Handle card hover
 	 */
-	function handleCardHover(cardId: string): void {
-		onCardHover(cardId);
+	function handleCardHover(_cardId: string): void {
+		onCardHover(_cardId);
 	}
 
 	/**

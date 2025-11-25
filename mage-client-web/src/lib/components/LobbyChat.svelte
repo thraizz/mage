@@ -1,8 +1,19 @@
 <script lang="ts">
 	import type { ChatMessage } from '$lib/types/chat';
-	import { fetchLobbyMessages, sendLobbyMessage, sendWhisper } from '$lib/api/chat';
-	import { onMount } from 'svelte';
+	import { sendLobbyMessage, sendWhisper, joinChat } from '$lib/api/chat';
+	import { websocketStore } from '$lib/stores/websocket';
+	import { CallbackMethod } from '$lib/generated/mage/v1/websocket';
+	import type { ChatMessageData } from '$lib/generated/mage/v1/websocket';
+	import { getMageClient } from '$lib/grpc/client';
+	import { onMount, onDestroy } from 'svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
+	import {
+		convertProtoMessageToClientMessage,
+		formatMessageTime,
+		parseWhisperCommand,
+		validateWhisperCommand,
+		RateLimiter
+	} from '$lib/utils/chat';
 
 	// State
 	let messages = $state<ChatMessage[]>([]);
@@ -12,49 +23,16 @@
 	let error = $state<string | null>(null);
 	let messagesContainer: HTMLDivElement | undefined;
 	let isAtBottom = $state(true);
+	let chatId = $state<string | null>(null);
+	let connected = $state(false);
 
-	// Rate limiting state
-	const RATE_LIMIT_MAX_MESSAGES = 10;
-	const RATE_LIMIT_WINDOW_MS = 60000; // 60 seconds
-	let messageTimestamps = $state<number[]>([]);
+	// WebSocket unsubscribe function
+	let unsubscribeWebSocket: (() => void) | null = null;
+
+	// Rate limiting
+	const rateLimiter = new RateLimiter(10, 60000);
 	let rateLimitCooldownSeconds = $state(0);
 	let rateLimitTimer: ReturnType<typeof setInterval> | null = null;
-
-	/**
-	 * Format timestamp as HH:MM
-	 */
-	function formatTime(timestamp: number): string {
-		const date = new Date(timestamp);
-		return date.toLocaleTimeString('en-US', {
-			hour: '2-digit',
-			minute: '2-digit',
-			hour12: false
-		});
-	}
-
-	/**
-	 * Check if user is rate limited
-	 */
-	function isRateLimited(): boolean {
-		const now = Date.now();
-		// Remove timestamps older than the window
-		messageTimestamps = messageTimestamps.filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
-		return messageTimestamps.length >= RATE_LIMIT_MAX_MESSAGES;
-	}
-
-	/**
-	 * Calculate cooldown time remaining
-	 */
-	function getCooldownSeconds(): number {
-		if (messageTimestamps.length < RATE_LIMIT_MAX_MESSAGES) {
-			return 0;
-		}
-		const now = Date.now();
-		const oldestTimestamp = messageTimestamps[0];
-		const timeElapsed = now - oldestTimestamp;
-		const timeRemaining = RATE_LIMIT_WINDOW_MS - timeElapsed;
-		return Math.ceil(timeRemaining / 1000);
-	}
 
 	/**
 	 * Start cooldown timer
@@ -67,7 +45,7 @@
 
 		// Update cooldown display every second
 		rateLimitTimer = setInterval(() => {
-			const seconds = getCooldownSeconds();
+			const seconds = rateLimiter.getCooldownSeconds();
 			rateLimitCooldownSeconds = seconds;
 
 			if (seconds <= 0) {
@@ -81,58 +59,90 @@
 	}
 
 	/**
-	 * Record message timestamp
+	 * Initialize chat connection
 	 */
-	function recordMessageSent(): void {
-		const now = Date.now();
-		messageTimestamps.push(now);
-
-		// Check if now rate limited
-		if (isRateLimited()) {
-			rateLimitCooldownSeconds = getCooldownSeconds();
-			startCooldownTimer();
-		}
-	}
-
-	/**
-	 * Load initial messages
-	 */
-	async function loadMessages(): Promise<void> {
+	async function initializeChat(): Promise<void> {
 		loading = true;
 		error = null;
 
 		try {
-			messages = await fetchLobbyMessages(50);
-			// Scroll to bottom after loading
-			setTimeout(() => scrollToBottom(), 100);
+			const client = getMageClient();
+
+			// Get main room ID
+			const roomResponse = await client.getMainRoomId();
+			if (!roomResponse.roomId) {
+				throw new Error('Failed to get main room ID');
+			}
+
+			// Find chat ID for the lobby (main room)
+			const chatResponse = await client.call('ChatFindByRoom', {
+				sessionId: await client.ensureSessionId(),
+				roomId: roomResponse.roomId
+			});
+
+			if (!chatResponse.chatId) {
+				throw new Error('Failed to get chat ID for lobby');
+			}
+
+			chatId = chatResponse.chatId;
+			console.log('[LobbyChat] Got chat ID:', chatId);
+
+			// Join the chat room
+			await joinChat(chatId);
+			console.log('[LobbyChat] Joined chat');
+
+			// Subscribe to WebSocket chat messages
+			unsubscribeWebSocket = websocketStore.on(CallbackMethod.CHATMESSAGE, handleChatMessage);
+
+			connected = true;
+			console.log('[LobbyChat] Connected and listening for messages');
 		} catch (err) {
-			error = err instanceof Error ? err.message : 'Failed to load messages';
-			console.error('Failed to load messages:', err);
+			error = err instanceof Error ? err.message : 'Failed to connect to chat';
+			console.error('Failed to initialize chat:', err);
 		} finally {
 			loading = false;
 		}
 	}
 
 	/**
-	 * Parse whisper command (/w username message)
+	 * Handle incoming chat message from WebSocket
 	 */
-	function parseWhisperCommand(content: string): {
-		isWhisper: boolean;
-		username?: string;
-		message?: string;
-	} {
-		const whisperRegex = /^\/w\s+(\S+)\s+(.+)$/;
-		const match = content.match(whisperRegex);
+	function handleChatMessage(data: unknown): void {
+		console.log('[LobbyChat] Received WebSocket message:', data);
 
-		if (match) {
-			return {
-				isWhisper: true,
-				username: match[1],
-				message: match[2]
-			};
+		try {
+			const messageData = data as ChatMessageData;
+			console.log('[LobbyChat] Parsed as ChatMessageData:', messageData);
+			console.log('[LobbyChat] Current chatId:', chatId, 'Message chatId:', messageData.chatId);
+
+			// Only process messages for this chat
+			if (messageData.chatId !== chatId) {
+				console.log('[LobbyChat] Ignoring message for different chat');
+				return;
+			}
+
+			const protoMessage = messageData.message;
+			if (!protoMessage) {
+				console.log('[LobbyChat] No message in data');
+				return;
+			}
+
+			console.log('[LobbyChat] Proto message:', protoMessage);
+
+			// Convert proto message to client message using utility
+			const message = convertProtoMessageToClientMessage(protoMessage);
+
+			console.log('[LobbyChat] Adding message to list:', message);
+
+			// Add message to the list
+			messages.push(message);
+			messages = [...messages]; // Force reactivity
+
+			// Scroll to bottom after new message
+			setTimeout(() => scrollToBottom(), 50);
+		} catch (err) {
+			console.error('[LobbyChat] Error handling chat message:', err);
 		}
-
-		return { isWhisper: false };
 	}
 
 	/**
@@ -147,8 +157,8 @@
 		}
 
 		// Check rate limiting
-		if (isRateLimited()) {
-			const seconds = getCooldownSeconds();
+		if (rateLimiter.isLimited()) {
+			const seconds = rateLimiter.getCooldownSeconds();
 			error = `Sending too fast, wait ${seconds} second${seconds !== 1 ? 's' : ''}`;
 			setTimeout(() => (error = null), 3000);
 			return;
@@ -157,47 +167,44 @@
 		// Check if it's a whisper command
 		const whisperInfo = parseWhisperCommand(content);
 
-		// Validation for whisper
-		if (whisperInfo.isWhisper) {
-			if (!whisperInfo.username || !whisperInfo.message) {
-				error = 'Invalid whisper format. Use: /w username message';
-				setTimeout(() => (error = null), 3000);
-				return;
-			}
-
-			// Cannot whisper to self
-			if (whisperInfo.username.toLowerCase() === 'currentuser') {
-				error = 'You cannot whisper to yourself';
-				setTimeout(() => (error = null), 3000);
-				return;
-			}
+		// Validate whisper command
+		const whisperError = validateWhisperCommand(whisperInfo);
+		if (whisperError) {
+			error = whisperError;
+			setTimeout(() => (error = null), 3000);
+			return;
 		}
 
 		sending = true;
 		error = null;
 
-		try {
-			let message: ChatMessage;
+		console.log('[LobbyChat] Sending message:', content);
 
+		try {
 			if (whisperInfo.isWhisper && whisperInfo.username && whisperInfo.message) {
 				// Send whisper
-				message = await sendWhisper(whisperInfo.username, whisperInfo.message);
+				console.log('[LobbyChat] Sending whisper to:', whisperInfo.username);
+				await sendWhisper(whisperInfo.username, whisperInfo.message);
 			} else {
 				// Send regular message
-				message = await sendLobbyMessage({ content });
+				console.log('[LobbyChat] Sending regular message');
+				await sendLobbyMessage({ content });
 			}
 
+			console.log('[LobbyChat] Message sent successfully');
+
 			// Record message timestamp for rate limiting
-			recordMessageSent();
+			rateLimiter.recordMessage();
+			if (rateLimiter.isLimited()) {
+				rateLimitCooldownSeconds = rateLimiter.getCooldownSeconds();
+				startCooldownTimer();
+			}
 
-			messages.push(message);
+			// Clear input - message will be received through WebSocket
 			messageInput = '';
-
-			// Scroll to bottom after sending
-			setTimeout(() => scrollToBottom(), 50);
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to send message';
-			console.error('Failed to send message:', err);
+			console.error('[LobbyChat] Failed to send message:', err);
 			setTimeout(() => (error = null), 5000);
 		} finally {
 			sending = false;
@@ -224,10 +231,22 @@
 	}
 
 	/**
-	 * Load messages on mount
+	 * Initialize on mount
 	 */
 	onMount(() => {
-		loadMessages();
+		initializeChat();
+	});
+
+	/**
+	 * Cleanup on unmount
+	 */
+	onDestroy(() => {
+		// Unsubscribe from WebSocket events
+		if (unsubscribeWebSocket) {
+			unsubscribeWebSocket();
+		}
+
+		console.log('[LobbyChat] Cleaned up');
 	});
 </script>
 
@@ -235,6 +254,21 @@
 	<!-- Header -->
 	<div class="chat-header">
 		<h3 class="chat-title">Lobby Chat</h3>
+		<div class="header-right">
+			{#if connected}
+				<span class="connection-status connected" title="Connected to chat">
+					<span class="status-dot"></span>
+					Live
+				</span>
+			{:else if loading}
+				<span class="connection-status connecting">Connecting...</span>
+			{:else if error}
+				<span class="connection-status disconnected" title="Disconnected">
+					<span class="status-dot"></span>
+					Offline
+				</span>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Messages Container -->
@@ -286,7 +320,7 @@
 			<div class="message-list">
 				{#each messages as message (message.id)}
 					<div class="message message-{message.type}">
-						<span class="message-time">{formatTime(message.timestamp)}</span>
+						<span class="message-time">{formatMessageTime(message.timestamp)}</span>
 						{#if message.type === 'system'}
 							<span class="message-content">{message.content}</span>
 						{:else if message.type === 'whisper'}
@@ -402,6 +436,9 @@
 
 	/* Header */
 	.chat-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		padding: 1rem;
 		border-bottom: 1px solid #e5e7eb;
 		background-color: #f9fafb;
@@ -412,6 +449,55 @@
 		font-size: 1rem;
 		font-weight: 600;
 		color: #111827;
+	}
+
+	.header-right {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.connection-status {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.25rem 0.625rem;
+		border-radius: 1rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+
+	.connection-status.connected {
+		background: #d1fae5;
+		color: #065f46;
+	}
+
+	.connection-status.connecting {
+		background: #fef3c7;
+		color: #92400e;
+	}
+
+	.connection-status.disconnected {
+		background: #fee2e2;
+		color: #991b1b;
+	}
+
+	.status-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: currentColor;
+		animation: pulse 2s ease-in-out infinite;
+	}
+
+	@keyframes pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
 	}
 
 	/* Messages Container */

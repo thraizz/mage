@@ -138,22 +138,24 @@
 	.status-indicator {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.5rem 0.75rem;
-		background-color: rgba(255, 255, 255, 0.1);
-		border-radius: 0.5rem;
-		font-size: 0.875rem;
-		font-weight: 500;
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-3);
+		background: var(--bg-iron);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
 		cursor: default;
-		transition: background-color 0.2s;
+		transition: all var(--transition-fast);
 	}
 
 	.status-indicator:hover {
-		background-color: rgba(255, 255, 255, 0.15);
+		background: var(--bg-steel);
+		border-color: var(--border-strong);
 	}
 
 	.status-icon {
-		font-size: 1rem;
+		font-size: var(--text-base);
 		line-height: 1;
 	}
 
@@ -172,24 +174,25 @@
 	}
 
 	.status-text {
-		color: white;
+		color: var(--text-muted);
 		display: none;
 	}
 
 	/* Tooltip */
 	.tooltip {
 		position: absolute;
-		top: calc(100% + 0.5rem);
+		top: calc(100% + var(--space-2));
 		right: 0;
-		background-color: #1f2937;
-		color: white;
-		padding: 0.75rem;
-		border-radius: 0.5rem;
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+		background: var(--bg-slate);
+		border: 1px solid var(--border-subtle);
+		color: var(--text-bright);
+		padding: var(--space-3);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-lg);
 		min-width: 200px;
 		max-width: 300px;
-		z-index: 1000;
-		animation: fadeIn 0.2s ease-out;
+		z-index: var(--z-tooltip);
+		animation: fadeIn var(--transition-fast);
 	}
 
 	@keyframes fadeIn {
@@ -204,19 +207,20 @@
 	}
 
 	.tooltip-title {
-		font-weight: 600;
-		font-size: 0.875rem;
-		margin-bottom: 0.5rem;
+		font-weight: var(--weight-semibold);
+		font-size: var(--text-sm);
+		color: var(--text-bright);
+		margin-bottom: var(--space-2);
 	}
 
 	.tooltip-content {
-		font-size: 0.75rem;
-		color: #d1d5db;
-		line-height: 1.4;
+		font-size: var(--text-xs);
+		color: var(--text-muted);
+		line-height: var(--leading-normal);
 	}
 
 	.tooltip-content p {
-		margin: 0 0 0.25rem 0;
+		margin: 0 0 var(--space-1) 0;
 	}
 
 	.tooltip-content p:last-child {
@@ -224,37 +228,37 @@
 	}
 
 	.latency {
-		color: #10b981;
-		font-weight: 500;
+		color: var(--status-success);
+		font-weight: var(--weight-medium);
 	}
 
 	.attempt {
-		color: #f59e0b;
-		font-weight: 500;
+		color: var(--status-warning);
+		font-weight: var(--weight-medium);
 	}
 
 	.error {
-		color: #ef4444;
-		font-size: 0.7rem;
+		color: var(--status-error);
+		font-size: var(--text-xs);
 		font-style: italic;
 	}
 
 	.reconnect-btn {
-		margin-top: 0.5rem;
+		margin-top: var(--space-2);
 		width: 100%;
-		padding: 0.375rem 0.5rem;
-		background-color: #3b82f6;
-		color: white;
+		padding: var(--space-2) var(--space-3);
+		background: var(--accent-gold);
+		color: var(--bg-void);
 		border: none;
-		border-radius: 0.375rem;
-		font-size: 0.75rem;
-		font-weight: 500;
+		border-radius: var(--radius-md);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
-		transition: background-color 0.2s;
+		transition: background var(--transition-fast);
 	}
 
 	.reconnect-btn:hover {
-		background-color: #2563eb;
+		background: var(--accent-gold-bright);
 	}
 
 	/* Responsive */

@@ -6,6 +6,8 @@ import (
 )
 
 // GameType represents a game type (e.g., Two Player Duel, Commander, etc.)
+// This interface is intentionally minimal - format-specific metadata only.
+// Game rules and behaviors are provided via RulesProvider and BehaviorProvider interfaces.
 type GameType interface {
 	Name() string
 	MinPlayers() int

@@ -7,11 +7,13 @@
 		cards = [],
 		playerName = 'Player',
 		isOpponent = false,
+		// eslint-disable-next-line no-unused-vars
 		onCardClick = (cardId: string) => {}
 	}: {
 		cards?: GameCard[];
 		playerName?: string;
 		isOpponent?: boolean;
+		// eslint-disable-next-line no-unused-vars
 		onCardClick?: (cardId: string) => void;
 	} = $props();
 
@@ -36,9 +38,9 @@
 	/**
 	 * Handle card click in modal
 	 */
-	function handleCardClick(cardId: string): void {
-		selectedCardId = selectedCardId === cardId ? null : cardId;
-		onCardClick(cardId);
+	function handleCardClick(_cardId: string): void {
+		selectedCardId = selectedCardId === _cardId ? null : _cardId;
+		onCardClick(_cardId);
 	}
 
 	/**

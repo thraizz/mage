@@ -6,11 +6,13 @@
 		mana = { white: 0, blue: 0, black: 0, red: 0, green: 0, colorless: 0 },
 		showEmpty = false,
 		size = 'normal',
+		// eslint-disable-next-line no-unused-vars
 		onManaClick = (color: string) => {}
 	}: {
 		mana?: ManaPool;
 		showEmpty?: boolean;
 		size?: 'small' | 'normal' | 'large';
+		// eslint-disable-next-line no-unused-vars
 		onManaClick?: (color: string) => void;
 	} = $props();
 
@@ -27,8 +29,8 @@
 	/**
 	 * Handle mana orb click
 	 */
-	function handleManaClick(color: string): void {
-		onManaClick(color);
+	function handleManaClick(_color: string): void {
+		onManaClick(_color);
 	}
 
 	/**

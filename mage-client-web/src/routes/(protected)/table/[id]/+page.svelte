@@ -1,33 +1,35 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { auth } from '$lib/stores/auth';
 	import { confirm } from '$lib/stores/confirm';
-	import { fetchTable, toggleReady, leaveTable, startGame, kickPlayer } from '$lib/api/table';
+	import { websocketStore } from '$lib/stores/websocket';
+	import { fetchTable, leaveTable, startGame, kickPlayer } from '$lib/api/table';
 	import type { Table } from '$lib/types/table';
+	import { usePolling } from '$lib/utils/polling';
+	import { subscribeTableUpdates } from '$lib/services/table-updates';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import TableChat from '$lib/components/TableChat.svelte';
 	import GameStartCountdown from '$lib/components/GameStartCountdown.svelte';
+	import { getMageClient } from '$lib/grpc/client';
+	import { CallbackMethod } from '$lib/generated/mage/v1/websocket';
 
 	// Get table ID from URL
-	const tableId = $derived($page.params.id);
+	const tableId = $derived($page.params.id ?? '');
 
 	// State
 	let table = $state<Table | null>(null);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
-	let togglingReady = $state(false);
 	let startingGame = $state(false);
 	let showCountdown = $state(false);
 
 	// Derived state
 	const currentPlayer = $derived(table?.players.find((p) => p.username === $auth.user?.username));
 	const isHost = $derived(currentPlayer?.isHost ?? false);
-	const allPlayersReady = $derived(
-		table?.players.every((p) => p.isReady) && (table?.players.length ?? 0) >= 2
-	);
-	const canStartGame = $derived(isHost && allPlayersReady);
+	const hasMinPlayers = $derived((table?.players.length ?? 0) >= 2);
+	const canStartGame = $derived(isHost && hasMinPlayers);
 
 	/**
 	 * Load table data
@@ -35,7 +37,10 @@
 	async function loadTable(): Promise<void> {
 		if (!tableId) return;
 
-		loading = true;
+		// Only show loading spinner on initial load
+		if (!table) {
+			loading = true;
+		}
 		error = null;
 
 		try {
@@ -49,32 +54,14 @@
 	}
 
 	/**
-	 * Handle ready toggle
+	 * Setup polling for table data
 	 */
-	async function handleToggleReady(): Promise<void> {
-		if (!currentPlayer || togglingReady || !tableId) return;
-
-		const newReadyState = !currentPlayer.isReady;
-		togglingReady = true;
-
-		try {
-			await toggleReady(tableId, newReadyState);
-
-			// Update local state
-			if (table) {
-				const player = table.players.find((p) => p.username === currentPlayer.username);
-				if (player) {
-					player.isReady = newReadyState;
-				}
-			}
-		} catch (err) {
-			error = err instanceof Error ? err.message : 'Failed to toggle ready status';
-			console.error('Failed to toggle ready:', err);
-			setTimeout(() => (error = null), 3000);
-		} finally {
-			togglingReady = false;
-		}
-	}
+	usePolling(loadTable, {
+		interval: 5000, // Poll every 5s (safety net even when WS connected)
+		intervalWhenHidden: 30000, // Poll every 30s when tab hidden
+		pollWhenConnected: true, // Continue polling even when WS connected
+		immediate: false // Don't fetch immediately (we do it manually in onMount)
+	});
 
 	/**
 	 * Handle leave table
@@ -171,11 +158,85 @@
 		}
 	}
 
+	// WebSocket subscription cleanup functions
+	let unsubscribeTable: (() => void) | null = null;
+	let unsubscribeStartGame: (() => void) | null = null;
+
 	/**
-	 * Load table on mount
+	 * Handle table updates from WebSocket
 	 */
-	onMount(() => {
+	function handleTableUpdate(updatedTable: Table): void {
+		console.log('[Table] Received table update via WebSocket:', updatedTable);
+		table = updatedTable;
+	}
+
+	/**
+	 * Connect to WebSocket for real-time updates
+	 */
+	async function connectWebSocket(): Promise<void> {
+		try {
+			const client = getMageClient();
+			const sessionId = await client.ensureSessionId();
+
+			if (!sessionId) {
+				console.warn('[Table] No session ID available for WebSocket connection');
+				return;
+			}
+
+			// Connect to WebSocket
+			if (!websocketStore.isConnected()) {
+				await websocketStore.connect(sessionId);
+				console.log('[Table] WebSocket connected');
+			}
+
+			// Subscribe to table updates
+			unsubscribeTable = subscribeTableUpdates(tableId, handleTableUpdate);
+			console.log('[Table] Subscribed to table updates');
+
+			// Subscribe to START_GAME events to handle when host starts the game
+			unsubscribeStartGame = websocketStore.on(CallbackMethod.START_GAME, (data: unknown) => {
+				// Extract gameId from the event data
+				const eventData = data as { gameId?: string; playerNames?: string[] };
+				console.log('[Table] Received START_GAME event:', eventData);
+
+				if (eventData?.gameId) {
+					// Navigate to the game page
+					console.log('[Table] Game started, navigating to game:', eventData.gameId);
+					goto(`/game/${eventData.gameId}`);
+				}
+			});
+			console.log('[Table] Subscribed to START_GAME events');
+		} catch (err) {
+			console.error('[Table] Failed to connect WebSocket:', err);
+		}
+	}
+
+	/**
+	 * Load table on mount and connect WebSocket
+	 */
+	onMount(async () => {
 		loadTable();
+		await connectWebSocket();
+	});
+
+	/**
+	 * Cleanup on unmount
+	 */
+	onDestroy(() => {
+		// Unsubscribe from table updates
+		if (unsubscribeTable) {
+			unsubscribeTable();
+			unsubscribeTable = null;
+		}
+
+		// Unsubscribe from START_GAME events
+		if (unsubscribeStartGame) {
+			unsubscribeStartGame();
+			unsubscribeStartGame = null;
+		}
+
+		// Note: We don't disconnect WebSocket here as other pages might still need it
+		console.log('[Table] Page unmounted');
 	});
 </script>
 
@@ -316,11 +377,6 @@
 								{#if player.isHost}
 									<span class="host-badge">Host</span>
 								{/if}
-								{#if player.isReady}
-									<span class="ready-badge">✓ Ready</span>
-								{:else}
-									<span class="not-ready-badge">Not Ready</span>
-								{/if}
 							</div>
 							{#if isHost && !player.isHost}
 								<button
@@ -368,29 +424,12 @@
 			<div class="left-column">
 				<!-- Actions -->
 				<div class="actions">
-					{#if !isHost && currentPlayer}
-						<button
-							class="btn-primary btn-large"
-							class:btn-success={currentPlayer.isReady}
-							disabled={togglingReady}
-							onclick={handleToggleReady}
-						>
-							{#if togglingReady}
-								<LoadingSpinner size="small" color="white" />
-							{:else if currentPlayer.isReady}
-								✓ Ready
-							{:else}
-								Ready Up
-							{/if}
-						</button>
-					{/if}
-
 					{#if isHost}
 						<button
 							class="btn-primary btn-large btn-start-game"
 							disabled={!canStartGame || startingGame}
 							onclick={handleStartGame}
-							title={!allPlayersReady ? 'All players must be ready' : 'Start the game'}
+							title={!hasMinPlayers ? 'Need at least 2 players' : 'Start the game'}
 						>
 							{#if startingGame}
 								<LoadingSpinner size="small" color="white" />
@@ -399,9 +438,11 @@
 								Start Game
 							{/if}
 						</button>
-						{#if !allPlayersReady}
-							<p class="hint">Waiting for all players to ready up...</p>
+						{#if !hasMinPlayers}
+							<p class="hint">Waiting for more players to join...</p>
 						{/if}
+					{:else if currentPlayer}
+						<p class="hint">Waiting for host to start the game...</p>
 					{/if}
 				</div>
 			</div>
@@ -425,7 +466,9 @@
 	.container {
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 2rem;
+		padding: var(--space-8);
+		background: var(--bg-void);
+		min-height: 100vh;
 	}
 
 	/* Loading/Error States */
@@ -435,90 +478,92 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 1rem;
+		gap: var(--space-4);
 		min-height: 400px;
 		text-align: center;
 	}
 
 	.loading-container p,
 	.error-container p {
-		color: #6b7280;
-		font-size: 1.125rem;
+		color: var(--text-muted);
+		font-size: var(--text-lg);
 		margin: 0;
 	}
 
 	.error-container {
-		color: #dc2626;
+		color: var(--status-error);
 	}
 
 	.error-container svg {
-		color: #dc2626;
+		color: var(--status-error);
 	}
 
 	/* Header */
 	header {
-		margin-bottom: 2rem;
+		margin-bottom: var(--space-8);
 	}
 
 	.header-content {
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
-		gap: 2rem;
+		gap: var(--space-8);
 	}
 
 	h1 {
-		margin: 0 0 0.75rem 0;
-		font-size: 2rem;
-		color: #111827;
+		margin: 0 0 var(--space-3) 0;
+		font-family: var(--font-display);
+		font-size: var(--text-3xl);
+		font-weight: var(--weight-bold);
+		color: var(--text-bright);
 	}
 
 	.header-meta {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.75rem;
+		gap: var(--space-3);
 		align-items: center;
 	}
 
 	.format-badge {
 		display: inline-flex;
 		align-items: center;
-		padding: 0.375rem 0.875rem;
-		background: #667eea;
-		color: white;
-		border-radius: 1rem;
-		font-size: 0.875rem;
-		font-weight: 600;
+		padding: var(--space-2) var(--space-4);
+		background: var(--accent-gold);
+		color: var(--bg-void);
+		border-radius: var(--radius-full);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
 	}
 
 	.password-badge {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.375rem;
-		padding: 0.375rem 0.875rem;
-		background: #f59e0b;
-		color: white;
-		border-radius: 1rem;
-		font-size: 0.875rem;
-		font-weight: 600;
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-4);
+		background: var(--status-warning);
+		color: var(--bg-void);
+		border-radius: var(--radius-full);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
 	}
 
 	.player-count {
-		color: #6b7280;
-		font-size: 0.875rem;
+		color: var(--text-muted);
+		font-size: var(--text-sm);
 	}
 
 	/* Error Banner */
 	.error-banner {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		padding: 1rem;
-		background: #fef2f2;
-		border: 1px solid #fecaca;
-		border-radius: 0.5rem;
-		color: #dc2626;
-		margin-bottom: 1.5rem;
+		gap: var(--space-3);
+		padding: var(--space-4);
+		background: var(--status-error-dim);
+		border: 1px solid var(--status-error);
+		border-radius: var(--radius-md);
+		color: var(--status-error);
+		margin-bottom: var(--space-6);
 	}
 
 	.error-banner svg {
@@ -528,113 +573,116 @@
 	/* Table Info */
 	.table-info {
 		display: flex;
-		gap: 2rem;
-		padding: 1.5rem;
-		background: white;
-		border: 1px solid #e5e7eb;
-		border-radius: 0.5rem;
-		margin-bottom: 2rem;
+		gap: var(--space-8);
+		padding: var(--space-6);
+		background: var(--bg-obsidian);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-lg);
+		margin-bottom: var(--space-8);
 	}
 
 	.info-item {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: var(--space-2);
 	}
 
 	.info-label {
-		font-weight: 600;
-		color: #374151;
+		font-weight: var(--weight-semibold);
+		color: var(--text-muted);
 	}
 
 	.info-value {
-		color: #6b7280;
+		color: var(--text-bright);
 	}
 
 	.status-badge {
-		padding: 0.25rem 0.75rem;
-		border-radius: 1rem;
-		font-size: 0.875rem;
-		font-weight: 600;
+		padding: var(--space-1) var(--space-3);
+		border-radius: var(--radius-full);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
 		text-transform: capitalize;
 	}
 
 	.status-waiting {
-		background: #fef3c7;
-		color: #92400e;
+		background: var(--status-warning-dim);
+		color: var(--status-warning);
 	}
 
 	.status-ready {
-		background: #d1fae5;
-		color: #065f46;
+		background: var(--status-success-dim);
+		color: var(--status-success);
 	}
 
 	.status-playing {
-		background: #dbeafe;
-		color: #1e40af;
+		background: var(--status-info-dim);
+		color: var(--status-info);
 	}
 
 	/* Players Section */
 	.players-section {
-		margin-bottom: 2rem;
+		margin-bottom: var(--space-8);
 	}
 
 	.players-section h2 {
-		margin: 0 0 1rem 0;
-		font-size: 1.5rem;
-		color: #111827;
+		margin: 0 0 var(--space-4) 0;
+		font-family: var(--font-display);
+		font-size: var(--text-2xl);
+		font-weight: var(--weight-bold);
+		color: var(--text-bright);
 	}
 
 	.players-grid {
 		display: grid;
-		gap: 1rem;
+		gap: var(--space-4);
 	}
 
 	.player-slot {
-		background: white;
-		border: 2px solid #e5e7eb;
-		border-radius: 0.75rem;
-		padding: 1.5rem;
+		background: var(--bg-obsidian);
+		border: 2px solid var(--border-subtle);
+		border-radius: var(--radius-lg);
+		padding: var(--space-6);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--space-4);
 		min-height: 180px;
-		transition: all 0.2s;
+		transition: all var(--transition-fast);
 	}
 
 	.player-slot.occupied {
-		border-color: #667eea;
+		border-color: var(--accent-gold-dim);
 	}
 
 	.player-slot.is-current {
-		border-color: #10b981;
-		background: #f0fdf4;
+		border-color: var(--status-success);
+		background: var(--status-success-dim);
 	}
 
 	.player-slot.empty {
-		background: #f9fafb;
+		background: var(--bg-slate);
 		border-style: dashed;
-		color: #9ca3af;
+		border-color: var(--border-default);
 	}
 
 	.player-avatar {
 		width: 64px;
 		height: 64px;
-		border-radius: 50%;
-		background: #667eea;
+		border-radius: var(--radius-full);
+		background: var(--accent-gold);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: white;
+		color: var(--bg-void);
 	}
 
 	.player-slot.is-current .player-avatar {
-		background: #10b981;
+		background: var(--status-success);
 	}
 
 	.empty-icon {
 		opacity: 0.3;
+		color: var(--text-ghost);
 	}
 
 	.player-info {
@@ -643,79 +691,80 @@
 	}
 
 	.player-info h3 {
-		margin: 0 0 0.5rem 0;
-		font-size: 1.125rem;
-		color: #111827;
+		margin: 0 0 var(--space-2) 0;
+		font-size: var(--text-lg);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
 	}
 
 	.you-badge {
-		font-size: 0.875rem;
-		color: #10b981;
-		font-weight: 600;
+		font-size: var(--text-sm);
+		color: var(--status-success);
+		font-weight: var(--weight-semibold);
 	}
 
 	.player-badges {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 0.5rem;
-		margin-bottom: 0.5rem;
+		gap: var(--space-2);
+		margin-bottom: var(--space-2);
 	}
 
 	.host-badge {
 		display: inline-block;
-		padding: 0.25rem 0.625rem;
-		background: #fbbf24;
-		color: #78350f;
-		border-radius: 0.75rem;
-		font-size: 0.75rem;
-		font-weight: 600;
+		padding: var(--space-1) var(--space-3);
+		background: var(--accent-gold);
+		color: var(--bg-void);
+		border-radius: var(--radius-full);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-semibold);
 	}
 
 	.ready-badge {
 		display: inline-block;
-		padding: 0.25rem 0.625rem;
-		background: #10b981;
-		color: white;
-		border-radius: 0.75rem;
-		font-size: 0.75rem;
-		font-weight: 600;
+		padding: var(--space-1) var(--space-3);
+		background: var(--status-success);
+		color: var(--bg-void);
+		border-radius: var(--radius-full);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-semibold);
 	}
 
 	.not-ready-badge {
 		display: inline-block;
-		padding: 0.25rem 0.625rem;
-		background: #9ca3af;
-		color: white;
-		border-radius: 0.75rem;
-		font-size: 0.75rem;
-		font-weight: 600;
+		padding: var(--space-1) var(--space-3);
+		background: var(--text-ghost);
+		color: var(--text-bright);
+		border-radius: var(--radius-full);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-semibold);
 	}
 
 	.btn-kick {
-		margin-top: 0.5rem;
-		padding: 0.375rem 0.75rem;
-		background: white;
-		color: #ef4444;
-		border: 1px solid #ef4444;
-		border-radius: 0.375rem;
-		font-size: 0.75rem;
-		font-weight: 600;
+		margin-top: var(--space-2);
+		padding: var(--space-2) var(--space-3);
+		background: transparent;
+		color: var(--status-error);
+		border: 1px solid var(--status-error);
+		border-radius: var(--radius-md);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all var(--transition-fast);
 	}
 
 	.btn-kick:hover {
-		background: #ef4444;
-		color: white;
+		background: var(--status-error);
+		color: var(--text-bright);
 	}
 
 	/* Content Grid */
 	.content-grid {
 		display: grid;
 		grid-template-columns: 1fr 400px;
-		gap: 2rem;
-		margin-top: 2rem;
+		gap: var(--space-8);
+		margin-top: var(--space-8);
 	}
 
 	.left-column {
@@ -732,13 +781,13 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--space-4);
 	}
 
 	.hint {
 		margin: 0;
-		color: #6b7280;
-		font-size: 0.875rem;
+		color: var(--text-muted);
+		font-size: var(--text-sm);
 		font-style: italic;
 	}
 
@@ -748,33 +797,34 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		gap: 0.5rem;
-		padding: 0.75rem 1.5rem;
+		gap: var(--space-2);
+		padding: var(--space-3) var(--space-6);
 		border: none;
-		border-radius: 0.5rem;
-		font-size: 1rem;
-		font-weight: 600;
+		border-radius: var(--radius-md);
+		font-size: var(--text-base);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all var(--transition-fast);
 	}
 
 	.btn-primary {
-		background: #667eea;
-		color: white;
+		background: var(--accent-gold);
+		color: var(--bg-void);
 	}
 
 	.btn-primary:hover:not(:disabled) {
-		background: #5568d3;
+		background: var(--accent-gold-bright);
 	}
 
 	.btn-primary:disabled {
-		background: #9ca3af;
+		background: var(--bg-steel);
+		color: var(--text-ghost);
 		cursor: not-allowed;
 		opacity: 0.6;
 	}
 
 	.btn-success {
-		background: #10b981;
+		background: var(--status-success);
 	}
 
 	.btn-success:hover:not(:disabled) {
@@ -782,8 +832,8 @@
 	}
 
 	.btn-large {
-		padding: 1rem 2rem;
-		font-size: 1.125rem;
+		padding: var(--space-4) var(--space-8);
+		font-size: var(--text-lg);
 	}
 
 	.btn-start-game {
@@ -791,8 +841,8 @@
 	}
 
 	.btn-danger {
-		background: #ef4444;
-		color: white;
+		background: var(--status-error);
+		color: var(--text-bright);
 	}
 
 	.btn-danger:hover {
@@ -803,7 +853,7 @@
 	@media (max-width: 1024px) {
 		.content-grid {
 			grid-template-columns: 1fr;
-			gap: 1.5rem;
+			gap: var(--space-6);
 		}
 
 		.chat-column {
@@ -813,7 +863,7 @@
 
 	@media (max-width: 768px) {
 		.container {
-			padding: 1rem;
+			padding: var(--space-4);
 		}
 
 		.header-content {
@@ -822,7 +872,7 @@
 		}
 
 		h1 {
-			font-size: 1.5rem;
+			font-size: var(--text-2xl);
 		}
 
 		.players-grid {
@@ -831,11 +881,11 @@
 
 		.table-info {
 			flex-direction: column;
-			gap: 1rem;
+			gap: var(--space-4);
 		}
 
 		.content-grid {
-			gap: 1rem;
+			gap: var(--space-4);
 		}
 
 		.chat-column {

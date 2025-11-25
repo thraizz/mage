@@ -1240,6 +1240,7 @@ type MatchStartResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	GameId        string                 `protobuf:"bytes,3,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1284,6 +1285,13 @@ func (x *MatchStartResponse) GetSuccess() bool {
 func (x *MatchStartResponse) GetError() string {
 	if x != nil {
 		return x.Error
+	}
+	return ""
+}
+
+func (x *MatchStartResponse) GetGameId() string {
+	if x != nil {
+		return x.GameId
 	}
 	return ""
 }
@@ -2109,10 +2117,11 @@ const file_mage_v1_game_proto_rawDesc = "" +
 	"\x11MatchStartRequest\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x19\n" +
-	"\btable_id\x18\x02 \x01(\tR\atableId\"D\n" +
+	"\btable_id\x18\x02 \x01(\tR\atableId\"]\n" +
 	"\x12MatchStartResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error\"J\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\x12\x17\n" +
+	"\agame_id\x18\x03 \x01(\tR\x06gameId\"J\n" +
 	"\x10MatchQuitRequest\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +

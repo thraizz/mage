@@ -30,15 +30,19 @@ func NewAboshansDesire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	card.AddAbility(ability1)
+	// Enchanted creature has flying
+	flyingAbility := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect("FlyingAbility", abilities.AttachmentTypeAura)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(flyingAbility, abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "Enchanted creature has flying")).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
+	// Threshold: Enchanted creature has shroud (simplified - full implementation would check graveyard)
+	shroudAbility := abilities.NewKeywordAbility(card.ID, abilities.KeywordShroud)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect("ShroudAbility", abilities.AttachmentTypeAura)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(shroudAbility, abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "Enchanted creature has shroud")).
 		Build()
 	if err != nil {
 		return nil, err

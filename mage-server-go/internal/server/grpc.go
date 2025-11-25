@@ -27,6 +27,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -89,7 +90,7 @@ func NewMageServer(
 	logger *zap.Logger,
 	gameAdapter *game.EngineAdapter,
 ) *mageServer {
-	return &mageServer{
+	s := &mageServer{
 		config:           cfg,
 		logger:           logger,
 		serverVersion:    serverVersion,
@@ -112,6 +113,192 @@ func NewMageServer(
 		savedDecks:       make(map[string][]savedDeck),
 		gameAdapter:      gameAdapter,
 	}
+
+	// Set up game notifications to push updates via WebSocket
+	s.SetupGameNotifications()
+
+	return s
+}
+
+// SetupGameNotifications wires the game engine notifications to WebSocket push
+func (s *mageServer) SetupGameNotifications() {
+	if s.gameAdapter == nil {
+		s.logger.Warn("game adapter not configured, notifications disabled")
+		return
+	}
+
+	s.gameAdapter.SetNotificationCallback(func(notification game.GameNotification) {
+		s.handleGameNotification(notification)
+	})
+
+	s.logger.Info("game notifications configured")
+}
+
+// handleGameNotification processes a game notification and pushes to relevant clients
+func (s *mageServer) handleGameNotification(notification game.GameNotification) {
+	gameID := notification.GameID
+	if gameID == "" {
+		s.logger.Warn("received game notification with empty game ID")
+		return
+	}
+
+	gameInstance, ok := s.gameMgr.GetGame(gameID)
+	if !ok {
+		s.logger.Warn("game not found for notification", zap.String("game_id", gameID))
+		return
+	}
+
+	s.logger.Info("handling game notification",
+		zap.String("game_id", gameID),
+		zap.String("type", notification.Type),
+		zap.String("player_id", notification.PlayerID),
+		zap.Int("num_players", len(gameInstance.Players)),
+		zap.Any("data", notification.Data),
+	)
+
+	// Send game update to all players
+	for _, playerName := range gameInstance.Players {
+		s.logger.Info("sending GAME_UPDATE to player",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+		)
+		s.sendGameUpdateToPlayer(gameID, playerName)
+	}
+
+	// Also send to watchers
+	for _, watcher := range gameInstance.GetWatchers() {
+		s.logger.Info("sending GAME_UPDATE to watcher",
+			zap.String("game_id", gameID),
+			zap.String("watcher", watcher),
+		)
+		s.sendGameUpdateToPlayer(gameID, watcher)
+	}
+}
+
+// sendGameUpdateToPlayer sends a GAME_UPDATE event to a specific player
+func (s *mageServer) sendGameUpdateToPlayer(gameID, playerName string) {
+	// Get the player's view of the game
+	if s.gameAdapter == nil {
+		s.logger.Warn("game adapter is nil, cannot send update",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+		)
+		return
+	}
+
+	engineView, err := s.gameAdapter.GetGameView(gameID, playerName)
+	if err != nil {
+		s.logger.Warn("failed to get game view for notification",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+			zap.Error(err),
+		)
+		return
+	}
+
+	// Convert engine view to protobuf
+	gameView := s.engineViewToProto(engineView, playerName)
+	if gameView == nil {
+		s.logger.Warn("engineViewToProto returned nil",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+		)
+		return
+	}
+
+	// Create the GAME_UPDATE event
+	updateData := &pb.GameUpdateData{
+		Game: gameView,
+	}
+
+	event := &pb.ServerEvent{
+		ObjectId: gameID,
+		Method:   pb.CallbackMethod_GAME_UPDATE,
+	}
+
+	anyData, err := anypb.New(updateData)
+	if err != nil {
+		s.logger.Error("failed to marshal GameUpdateData",
+			zap.String("game_id", gameID),
+			zap.Error(err),
+		)
+		return
+	}
+	event.Data = anyData
+
+	// Send to all sessions for this player
+	sessions := s.sessionMgr.GetSessionsByUser(playerName)
+	if len(sessions) == 0 {
+		s.logger.Warn("no sessions found for player",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+		)
+		return
+	}
+
+	s.logger.Info("sending GAME_UPDATE via WebSocket",
+		zap.String("game_id", gameID),
+		zap.String("player", playerName),
+		zap.Int("session_count", len(sessions)),
+		zap.Int32("turn", gameView.Turn),
+		zap.String("phase", gameView.Phase),
+		zap.String("priority_player", gameView.PriorityPlayerId),
+	)
+
+	for _, sess := range sessions {
+		if !sess.SendCallback(event) {
+			s.logger.Warn("failed to send GAME_UPDATE to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		} else {
+			s.logger.Info("successfully sent GAME_UPDATE to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		}
+	}
+}
+
+// engineViewToProto converts an engine view to protobuf GameView
+func (s *mageServer) engineViewToProto(engineView interface{}, playerID string) *pb.GameView {
+	if engineView == nil {
+		return nil
+	}
+
+	data, ok := engineView.(*game.EngineGameView)
+	if !ok {
+		return nil
+	}
+
+	view := &pb.GameView{
+		GameId:           data.GameID,
+		State:            data.State.String(),
+		Phase:            data.Phase,
+		Step:             data.Step,
+		Turn:             int32(data.Turn),
+		ActivePlayerId:   data.ActivePlayerID,
+		PriorityPlayerId: data.PriorityPlayer,
+		Players:          enginePlayersToProto(data.Players),
+		Battlefield:      engineCardsToProto(data.Battlefield),
+		Stack:            engineCardsToProto(data.Stack),
+		Exile:            engineCardsToProto(data.Exile),
+		Command:          engineCardsToProto(data.Command),
+		Revealed:         engineRevealedToProto(data.Revealed),
+		LookedAt:         engineLookedAtToProto(data.LookedAt),
+	}
+
+	if combat := engineCombatToProto(data.Combat); combat != nil {
+		view.Combat = combat
+	}
+
+	if !data.StartedAt.IsZero() {
+		view.StartTime = timestamppb.New(data.StartedAt)
+	}
+
+	return view
 }
 
 // ==================== Authentication & Connection Methods ====================

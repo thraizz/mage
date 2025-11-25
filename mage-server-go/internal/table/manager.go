@@ -45,8 +45,9 @@ type Seat struct {
 
 // DeckList represents a player's deck submission.
 type DeckList struct {
-	MainDeck  []string
-	Sideboard []string
+	MainDeck   []string
+	Sideboard  []string
+	Commanders []string // Commander cards for commander format games
 }
 
 // Table represents a game table
@@ -214,8 +215,9 @@ func (t *Table) SubmitDeck(playerName string, deck DeckList) error {
 		if seat.PlayerName == playerName {
 			seat.DeckValid = true
 			copied := DeckList{
-				MainDeck:  append([]string(nil), deck.MainDeck...),
-				Sideboard: append([]string(nil), deck.Sideboard...),
+				MainDeck:   append([]string(nil), deck.MainDeck...),
+				Sideboard:  append([]string(nil), deck.Sideboard...),
+				Commanders: append([]string(nil), deck.Commanders...),
 			}
 			t.SubmittedDecks[playerName] = copied
 			return nil
@@ -236,8 +238,9 @@ func (t *Table) GetSubmittedDeck(playerName string) (DeckList, bool) {
 	}
 
 	copied := DeckList{
-		MainDeck:  append([]string(nil), deck.MainDeck...),
-		Sideboard: append([]string(nil), deck.Sideboard...),
+		MainDeck:   append([]string(nil), deck.MainDeck...),
+		Sideboard:  append([]string(nil), deck.Sideboard...),
+		Commanders: append([]string(nil), deck.Commanders...),
 	}
 
 	return copied, true

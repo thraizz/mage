@@ -10,7 +10,6 @@
 		structuredCardsToText,
 		parseDeckList,
 		validateDeck as validateDeckUtil,
-		type DeckStats,
 		type CardEntry,
 		type DeckFormat
 	} from '$lib/utils/deck-parser';
@@ -102,8 +101,8 @@
 		deckList = structuredCardsToText(structuredCards);
 	}
 
-	function removeCard(index: number) {
-		structuredCards.splice(index, 1);
+	function removeCard(_index: number) {
+		structuredCards.splice(_index, 1);
 		deckList = structuredCardsToText(structuredCards);
 	}
 
@@ -452,7 +451,7 @@ Sideboard:
 									</button>
 								</div>
 								<div class="card-list">
-									{#each structuredCards.filter((c) => c.section === 'commander') as card, index}
+									{#each structuredCards.filter((c) => c.section === 'commander') as card}
 										{@const globalIndex = structuredCards.findIndex((c) => c === card)}
 										<div class="card-item">
 											<input
@@ -501,7 +500,7 @@ Sideboard:
 								</button>
 							</div>
 							<div class="card-list">
-								{#each structuredCards.filter((c) => c.section === 'main') as card, index}
+								{#each structuredCards.filter((c) => c.section === 'main') as card}
 									{@const globalIndex = structuredCards.findIndex((c) => c === card)}
 									<div class="card-item">
 										<input
@@ -568,7 +567,7 @@ Sideboard:
 									</button>
 								</div>
 								<div class="card-list">
-									{#each structuredCards.filter((c) => c.section === 'sideboard') as card, index}
+									{#each structuredCards.filter((c) => c.section === 'sideboard') as card}
 										{@const globalIndex = structuredCards.findIndex((c) => c === card)}
 										<div class="card-item">
 											<input

@@ -1,23 +1,24 @@
 <script lang="ts">
-	import Card from './Card.svelte';
 	import type { StackObject } from '$lib/types/game';
 
 	// Props
 	let {
 		stackObjects = [],
 		playerNames = new Map<string, string>(),
+		// eslint-disable-next-line no-unused-vars
 		onStackObjectClick = (stackId: string) => {}
 	}: {
 		stackObjects?: StackObject[];
 		playerNames?: Map<string, string>;
+		// eslint-disable-next-line no-unused-vars
 		onStackObjectClick?: (stackId: string) => void;
 	} = $props();
 
 	/**
 	 * Handle stack object click
 	 */
-	function handleClick(stackId: string): void {
-		onStackObjectClick(stackId);
+	function handleClick(_stackId: string): void {
+		onStackObjectClick(_stackId);
 	}
 
 	/**
@@ -72,10 +73,7 @@
 					onkeydown={(e) => e.key === 'Enter' && handleClick(stackObj.id)}
 				>
 					<div class="stack-item-header">
-						<span
-							class="stack-type"
-							style="background: {getTypeColor(stackObj.type)}"
-						>
+						<span class="stack-type" style="background: {getTypeColor(stackObj.type)}">
 							{getTypeLabel(stackObj.type)}
 						</span>
 						<span class="stack-position">

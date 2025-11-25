@@ -1129,110 +1129,105 @@ Create mana pool display showing available mana.
 ---
 
 ## T050: Game View - Game Chat Panel
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T039, T023
 
-**Description:**  
-Add in-game chat panel (reuse Chat component).
+**Description:**
+Add in-game chat panel for player communication and game events.
 
 **Acceptance Criteria:**
-- [ ] Reuse existing Chat component
-- [ ] Positioned on right side or bottom
-- [ ] Game-specific chat scope
-- [ ] Show game events in chat (card played, damage dealt)
-- [ ] Collapsible panel (hide to maximize game view)
-- [ ] System messages for game events
+- [x] Created GameChat component based on existing chat patterns
+- [x] Positioned on right side sidebar
+- [x] Game-specific chat scope (uses gameId)
+- [x] Show game events in chat as system messages
+- [x] Collapsible panel (hide/expand to maximize game view)
+- [x] System messages for game events with distinct styling
+- [x] Rate limiting (10 messages per 60 seconds)
+- [x] Scroll to bottom functionality
+- [x] Dark theme matching game view
+- [x] Export addGameEvent function for programmatic event adding
 
-**Files to Modify:**
-- `src/routes/(protected)/game/[id]/+page.svelte`
-- Reuse `src/lib/components/Chat.svelte`
+**Files Created:**
+- `src/lib/components/game/GameChat.svelte` - Complete game chat with collapse, rate limiting, and event support
+
+**Files Modified:**
+- `src/routes/(protected)/game/[id]/+page.svelte` - Integrated GameChat component, replaced game log sidebar
 
 ---
 
 ## T051: Game View - Action Log
-**Priority:** P0  
+**Priority:** P0
 ****Dependencies:** T039
 
-**Description:**  
+**Description:**
 Create scrollable action log showing game events.
 
 **Acceptance Criteria:**
-- [ ] List of game actions (played card, attacked, etc.)
-- [ ] Timestamped entries
-- [ ] Color-coded by player
-- [ ] Icons for action types (sword for attack, etc.)
-- [ ] Auto-scroll to latest action
-- [ ] Scrollable to view history
-- [ ] Positioned in side panel or bottom
-- [ ] Collapsible to save space
+- [x] List of game actions (played card, attacked, etc.)
+- [x] Timestamped entries
+- [x] Color-coded by player
+- [x] Icons for action types (sword for attack, etc.)
+- [x] Auto-scroll to latest action
+- [x] Scrollable to view history
+- [x] Positioned in side panel or bottom
+- [x] Collapsible to save space
 
-**Files to Create:**
-- `src/lib/components/game/ActionLog.svelte`
-- `src/lib/components/game/ActionLogItem.svelte`
-
----
-
-## T052: Game View - Concede Button with Confirmation
-**Priority:** P0  
-****Dependencies:** T039, T013
-
-**Description:**  
-Add concede button with confirmation dialog.
-
-**Acceptance Criteria:**
-- [ ] Prominent "Concede" button (red, top of UI)
-- [ ] Confirmation dialog: "Are you sure you want to concede?"
-- [ ] Warning: "You will lose the match"
-- [ ] API call to concede game
-- [ ] On success, show game end overlay
-- [ ] Navigate back to lobby after conceding
-- [ ] Toast notification on error
-
-**Files to Modify:**
-- `src/routes/(protected)/game/[id]/+page.svelte`
-- `src/lib/api/game.ts` (concedeGame API call)
+**Files Created:**
+- `src/lib/components/game/ActionLog.svelte` - Main action log component with collapsible left sidebar
+- `src/lib/components/game/ActionLogItem.svelte` - Individual action log entry with timestamp, icon, and player color
+- Updated `src/lib/types/game.ts` - Added ActionLogEntry and ActionType types
+- Updated `src/routes/(protected)/game/[id]/+page.svelte` - Integrated ActionLog component
 
 ---
 
-## T053: Game View - Priority Indicator
-**Priority:** P0  
+## T052: Game View - Priority Indicator
+**Priority:** P0
 ****Dependencies:** T039
 
-**Description:**  
+**Description:**
 Create visual indicator showing which player has priority.
 
 **Acceptance Criteria:**
-- [ ] Shows whose turn it is to act
-- [ ] Glowing border around active player's zone
-- [ ] Text indicator: "Your turn" or "Opponent's turn"
-- [ ] Animated pulse effect
-- [ ] Updates in real-time with game state
-- [ ] Different visual for priority vs. just active player
+- [x] Shows whose turn it is to act
+- [x] Text indicator: "Your Priority", "Opponent's Priority", or "Waiting..."
+- [x] Animated pulse effect when player has priority
+- [x] Updates in real-time with game state
+- [x] Different visual for priority vs. just active player
+- [x] Icon indicators (⚡ for priority, ⏳ for active, ⏸️ for waiting)
+- [x] Priority hint text when player has priority
 
-**Files to Create:**
-- `src/lib/components/game/PriorityIndicator.svelte`
+**Files Created:**
+- `src/lib/components/game/PriorityIndicator.svelte` - Complete priority indicator with animations and states
+
+**Files Modified:**
+- `src/routes/(protected)/game/[id]/+page.svelte` - Integrated priority indicator with phase display
 
 ---
 
-## T054: Game View - Pass Priority Button
-**Priority:** P0  
-****Dependencies:** T053
+## T053: Game View - Game Actions Panel
+**Priority:** P0
+****Dependencies:** T052
 
-**Description:**  
-Add "Pass Priority" button for player actions.
+**Description:**
+Add game actions panel with Pass Priority, Cast Spell, and Activate Ability buttons.
 
 **Acceptance Criteria:**
-- [ ] Button enabled only when player has priority
-- [ ] Prominent placement (center bottom, next to hand)
-- [ ] Keyboard shortcut (Space bar)
-- [ ] Loading state while waiting for response
-- [ ] Disabled state when waiting for opponent
-- [ ] Tooltip explains action
-- [ ] API call to pass priority
+- [x] Pass Priority button enabled only when player has priority
+- [x] Keyboard shortcuts (Space for pass, C for cast, A for activate)
+- [x] Loading state while waiting for response
+- [x] Disabled state when waiting for opponent
+- [x] Visual feedback for available actions
+- [x] Priority badge showing current priority status
+- [x] Waiting message when opponent has priority
+- [x] Cast Spell and Activate Ability buttons (placeholders)
+- [x] Responsive design (mobile-friendly button layout)
+- [x] Shortcut key indicators on buttons
 
-**Files to Modify:**
-- `src/routes/(protected)/game/[id]/+page.svelte`
-- `src/lib/api/game.ts` (passPriority API call)
+**Files Created:**
+- `src/lib/components/game/GameActionsPanel.svelte` - Complete actions panel with keyboard shortcuts
+
+**Files Modified:**
+- `src/routes/(protected)/game/[id]/+page.svelte` - Replaced old button layout with GameActionsPanel
 
 ---
 

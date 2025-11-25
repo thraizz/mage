@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$lib/styles/variables.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
 	import GlobalConfirmDialog from '$lib/components/GlobalConfirmDialog.svelte';

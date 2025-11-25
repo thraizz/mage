@@ -23,8 +23,6 @@
 	function groupCardsByType(cards: DeckCard[]): CardGroup[] {
 		// Group cards by type - in a real implementation, we'd need card data with types
 		// For now, we'll create a simple grouped list by card name
-		const groups = new Map<string, Array<{ name: string; quantity: number }>>();
-		const typeCounts = new Map<string, number>();
 
 		// For this MVP, we'll group all cards under "Cards" since we don't have type data
 		// In production, this would query card database for types

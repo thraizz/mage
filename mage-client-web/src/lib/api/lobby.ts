@@ -51,7 +51,6 @@ function convertTableViewToTable(view: TableView): Table {
 			id: `${view.tableId}-${seat.seatNumber}`,
 			username: seat.playerName,
 			isHost: index === 0, // First player is typically the host
-			isReady: status !== 'waiting', // Assume ready if game is not waiting
 			joinedAt: createTime
 		}));
 

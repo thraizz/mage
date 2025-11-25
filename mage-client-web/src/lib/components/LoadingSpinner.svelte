@@ -6,7 +6,7 @@
 	export let size: LoadingSize = 'medium';
 	export let label: string | undefined = undefined;
 	export let overlay = false;
-	export let color = '#667eea';
+	export let color = 'var(--accent-gold)';
 
 	function getSizeClass(): string {
 		switch (size) {
@@ -49,18 +49,18 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background-color: rgba(0, 0, 0, 0.5);
+		background-color: var(--modal-backdrop);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 9999;
+		z-index: var(--z-modal);
 	}
 
 	.spinner-wrapper {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--space-4);
 	}
 
 	/* Inline Mode */
@@ -68,14 +68,14 @@
 		display: inline-flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.5rem;
+		gap: var(--space-2);
 	}
 
 	/* Spinner Animation */
 	.spinner {
-		border-radius: 50%;
+		border-radius: var(--radius-full);
 		border-style: solid;
-		border-color: rgba(255, 255, 255, 0.3);
+		border-color: var(--border-subtle);
 		animation: spin 0.8s linear infinite;
 	}
 
@@ -109,18 +109,18 @@
 
 	/* Label */
 	.spinner-label {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: white;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--text-bright);
 		text-align: center;
 	}
 
 	.spinner-inline .spinner-label {
-		color: #374151;
+		color: var(--text-muted);
 	}
 
-	/* Dark background variant (when overlay=false) */
+	/* Inline Mode spinner border */
 	.spinner-inline .spinner {
-		border-color: rgba(0, 0, 0, 0.1);
+		border-color: var(--bg-steel);
 	}
 </style>

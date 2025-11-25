@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
 
 	// Props
 	let {
+		// eslint-disable-next-line no-unused-vars
 		cardId,
 		cardName,
 		manaCost = '',
@@ -167,7 +168,9 @@
 
 <div
 	bind:this={cardElement}
-	class="card {sizeClasses()} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack ? 'card-back' : ''}"
+	class="card {sizeClasses()} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack
+		? 'card-back'
+		: ''}"
 	role="button"
 	tabindex="0"
 	onclick={handleClick}
@@ -362,13 +365,7 @@
 	.card-back-pattern {
 		width: 60%;
 		height: 60%;
-		background: repeating-linear-gradient(
-			45deg,
-			#3a4451,
-			#3a4451 10px,
-			#2a3441 10px,
-			#2a3441 20px
-		);
+		background: repeating-linear-gradient(45deg, #3a4451, #3a4451 10px, #2a3441 10px, #2a3441 20px);
 		border-radius: 4px;
 		opacity: 0.5;
 	}

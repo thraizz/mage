@@ -5,1596 +5,1542 @@
 // source: mage/v1/admin.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
-import { UserView } from './models';
+import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { UserView } from "./models";
 
 export interface AdminGetUsersRequest {
-	sessionId: string;
+  sessionId: string;
 }
 
 export interface AdminGetUsersResponse {
-	users: UserView[];
+  users: UserView[];
 }
 
 export interface AdminDisconnectUserRequest {
-	sessionId: string;
-	userName: string;
+  sessionId: string;
+  userName: string;
 }
 
 export interface AdminDisconnectUserResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface AdminMuteUserRequest {
-	sessionId: string;
-	userName: string;
-	durationMinutes: number;
+  sessionId: string;
+  userName: string;
+  durationMinutes: number;
 }
 
 export interface AdminMuteUserResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface AdminLockUserRequest {
-	sessionId: string;
-	userName: string;
-	durationMinutes: number;
-	reason: string;
+  sessionId: string;
+  userName: string;
+  durationMinutes: number;
+  reason: string;
 }
 
 export interface AdminLockUserResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface AdminActivateUserRequest {
-	sessionId: string;
-	userName: string;
+  sessionId: string;
+  userName: string;
 }
 
 export interface AdminActivateUserResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface AdminToggleActivateUserRequest {
-	sessionId: string;
-	userName: string;
+  sessionId: string;
+  userName: string;
 }
 
 export interface AdminToggleActivateUserResponse {
-	success: boolean;
-	error: string;
-	newStatus: boolean;
+  success: boolean;
+  error: string;
+  newStatus: boolean;
 }
 
 export interface AdminEndUserSessionRequest {
-	sessionId: string;
-	targetSessionId: string;
+  sessionId: string;
+  targetSessionId: string;
 }
 
 export interface AdminEndUserSessionResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface AdminTableRemoveRequest {
-	sessionId: string;
-	tableId: string;
+  sessionId: string;
+  tableId: string;
 }
 
 export interface AdminTableRemoveResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface AdminSendBroadcastMessageRequest {
-	sessionId: string;
-	message: string;
+  sessionId: string;
+  message: string;
 }
 
 export interface AdminSendBroadcastMessageResponse {
-	success: boolean;
-	error: string;
-	recipientCount: number;
+  success: boolean;
+  error: string;
+  recipientCount: number;
 }
 
 function createBaseAdminGetUsersRequest(): AdminGetUsersRequest {
-	return { sessionId: '' };
+  return { sessionId: "" };
 }
 
 export const AdminGetUsersRequest: MessageFns<AdminGetUsersRequest> = {
-	encode(message: AdminGetUsersRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		return writer;
-	},
+  encode(message: AdminGetUsersRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminGetUsersRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminGetUsersRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminGetUsersRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminGetUsersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.sessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminGetUsersRequest {
-		return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '' };
-	},
+  fromJSON(object: any): AdminGetUsersRequest {
+    return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "" };
+  },
 
-	toJSON(message: AdminGetUsersRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		return obj;
-	},
+  toJSON(message: AdminGetUsersRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminGetUsersRequest>): AdminGetUsersRequest {
-		return AdminGetUsersRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminGetUsersRequest>): AdminGetUsersRequest {
-		const message = createBaseAdminGetUsersRequest();
-		message.sessionId = object.sessionId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminGetUsersRequest>): AdminGetUsersRequest {
+    return AdminGetUsersRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminGetUsersRequest>): AdminGetUsersRequest {
+    const message = createBaseAdminGetUsersRequest();
+    message.sessionId = object.sessionId ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminGetUsersResponse(): AdminGetUsersResponse {
-	return { users: [] };
+  return { users: [] };
 }
 
 export const AdminGetUsersResponse: MessageFns<AdminGetUsersResponse> = {
-	encode(message: AdminGetUsersResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		for (const v of message.users) {
-			UserView.encode(v!, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: AdminGetUsersResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.users) {
+      UserView.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminGetUsersResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminGetUsersResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminGetUsersResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminGetUsersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.users.push(UserView.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.users.push(UserView.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminGetUsersResponse {
-		return {
-			users: globalThis.Array.isArray(object?.users)
-				? object.users.map((e: any) => UserView.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): AdminGetUsersResponse {
+    return { users: globalThis.Array.isArray(object?.users) ? object.users.map((e: any) => UserView.fromJSON(e)) : [] };
+  },
 
-	toJSON(message: AdminGetUsersResponse): unknown {
-		const obj: any = {};
-		if (message.users?.length) {
-			obj.users = message.users.map((e) => UserView.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: AdminGetUsersResponse): unknown {
+    const obj: any = {};
+    if (message.users?.length) {
+      obj.users = message.users.map((e) => UserView.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminGetUsersResponse>): AdminGetUsersResponse {
-		return AdminGetUsersResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminGetUsersResponse>): AdminGetUsersResponse {
-		const message = createBaseAdminGetUsersResponse();
-		message.users = object.users?.map((e) => UserView.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<AdminGetUsersResponse>): AdminGetUsersResponse {
+    return AdminGetUsersResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminGetUsersResponse>): AdminGetUsersResponse {
+    const message = createBaseAdminGetUsersResponse();
+    message.users = object.users?.map((e) => UserView.fromPartial(e)) || [];
+    return message;
+  },
 };
 
 function createBaseAdminDisconnectUserRequest(): AdminDisconnectUserRequest {
-	return { sessionId: '', userName: '' };
+  return { sessionId: "", userName: "" };
 }
 
 export const AdminDisconnectUserRequest: MessageFns<AdminDisconnectUserRequest> = {
-	encode(
-		message: AdminDisconnectUserRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.userName !== '') {
-			writer.uint32(18).string(message.userName);
-		}
-		return writer;
-	},
+  encode(message: AdminDisconnectUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(18).string(message.userName);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminDisconnectUserRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminDisconnectUserRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminDisconnectUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminDisconnectUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.userName = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.userName = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminDisconnectUserRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			userName: isSet(object.userName) ? globalThis.String(object.userName) : ''
-		};
-	},
+  fromJSON(object: any): AdminDisconnectUserRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+    };
+  },
 
-	toJSON(message: AdminDisconnectUserRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.userName !== '') {
-			obj.userName = message.userName;
-		}
-		return obj;
-	},
+  toJSON(message: AdminDisconnectUserRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminDisconnectUserRequest>): AdminDisconnectUserRequest {
-		return AdminDisconnectUserRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminDisconnectUserRequest>): AdminDisconnectUserRequest {
-		const message = createBaseAdminDisconnectUserRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.userName = object.userName ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminDisconnectUserRequest>): AdminDisconnectUserRequest {
+    return AdminDisconnectUserRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminDisconnectUserRequest>): AdminDisconnectUserRequest {
+    const message = createBaseAdminDisconnectUserRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.userName = object.userName ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminDisconnectUserResponse(): AdminDisconnectUserResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const AdminDisconnectUserResponse: MessageFns<AdminDisconnectUserResponse> = {
-	encode(
-		message: AdminDisconnectUserResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: AdminDisconnectUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminDisconnectUserResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminDisconnectUserResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminDisconnectUserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminDisconnectUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminDisconnectUserResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): AdminDisconnectUserResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: AdminDisconnectUserResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: AdminDisconnectUserResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminDisconnectUserResponse>): AdminDisconnectUserResponse {
-		return AdminDisconnectUserResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminDisconnectUserResponse>): AdminDisconnectUserResponse {
-		const message = createBaseAdminDisconnectUserResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminDisconnectUserResponse>): AdminDisconnectUserResponse {
+    return AdminDisconnectUserResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminDisconnectUserResponse>): AdminDisconnectUserResponse {
+    const message = createBaseAdminDisconnectUserResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminMuteUserRequest(): AdminMuteUserRequest {
-	return { sessionId: '', userName: '', durationMinutes: 0 };
+  return { sessionId: "", userName: "", durationMinutes: 0 };
 }
 
 export const AdminMuteUserRequest: MessageFns<AdminMuteUserRequest> = {
-	encode(message: AdminMuteUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.userName !== '') {
-			writer.uint32(18).string(message.userName);
-		}
-		if (message.durationMinutes !== 0) {
-			writer.uint32(24).int64(message.durationMinutes);
-		}
-		return writer;
-	},
+  encode(message: AdminMuteUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(18).string(message.userName);
+    }
+    if (message.durationMinutes !== 0) {
+      writer.uint32(24).int64(message.durationMinutes);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminMuteUserRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminMuteUserRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminMuteUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminMuteUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.userName = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.userName = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.durationMinutes = longToNumber(reader.int64());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.durationMinutes = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminMuteUserRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			userName: isSet(object.userName) ? globalThis.String(object.userName) : '',
-			durationMinutes: isSet(object.durationMinutes) ? globalThis.Number(object.durationMinutes) : 0
-		};
-	},
+  fromJSON(object: any): AdminMuteUserRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+      durationMinutes: isSet(object.durationMinutes) ? globalThis.Number(object.durationMinutes) : 0,
+    };
+  },
 
-	toJSON(message: AdminMuteUserRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.userName !== '') {
-			obj.userName = message.userName;
-		}
-		if (message.durationMinutes !== 0) {
-			obj.durationMinutes = Math.round(message.durationMinutes);
-		}
-		return obj;
-	},
+  toJSON(message: AdminMuteUserRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    if (message.durationMinutes !== 0) {
+      obj.durationMinutes = Math.round(message.durationMinutes);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminMuteUserRequest>): AdminMuteUserRequest {
-		return AdminMuteUserRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminMuteUserRequest>): AdminMuteUserRequest {
-		const message = createBaseAdminMuteUserRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.userName = object.userName ?? '';
-		message.durationMinutes = object.durationMinutes ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<AdminMuteUserRequest>): AdminMuteUserRequest {
+    return AdminMuteUserRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminMuteUserRequest>): AdminMuteUserRequest {
+    const message = createBaseAdminMuteUserRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.userName = object.userName ?? "";
+    message.durationMinutes = object.durationMinutes ?? 0;
+    return message;
+  },
 };
 
 function createBaseAdminMuteUserResponse(): AdminMuteUserResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const AdminMuteUserResponse: MessageFns<AdminMuteUserResponse> = {
-	encode(message: AdminMuteUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: AdminMuteUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminMuteUserResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminMuteUserResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminMuteUserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminMuteUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminMuteUserResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): AdminMuteUserResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: AdminMuteUserResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: AdminMuteUserResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminMuteUserResponse>): AdminMuteUserResponse {
-		return AdminMuteUserResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminMuteUserResponse>): AdminMuteUserResponse {
-		const message = createBaseAdminMuteUserResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminMuteUserResponse>): AdminMuteUserResponse {
+    return AdminMuteUserResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminMuteUserResponse>): AdminMuteUserResponse {
+    const message = createBaseAdminMuteUserResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminLockUserRequest(): AdminLockUserRequest {
-	return { sessionId: '', userName: '', durationMinutes: 0, reason: '' };
+  return { sessionId: "", userName: "", durationMinutes: 0, reason: "" };
 }
 
 export const AdminLockUserRequest: MessageFns<AdminLockUserRequest> = {
-	encode(message: AdminLockUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.userName !== '') {
-			writer.uint32(18).string(message.userName);
-		}
-		if (message.durationMinutes !== 0) {
-			writer.uint32(24).int64(message.durationMinutes);
-		}
-		if (message.reason !== '') {
-			writer.uint32(34).string(message.reason);
-		}
-		return writer;
-	},
+  encode(message: AdminLockUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(18).string(message.userName);
+    }
+    if (message.durationMinutes !== 0) {
+      writer.uint32(24).int64(message.durationMinutes);
+    }
+    if (message.reason !== "") {
+      writer.uint32(34).string(message.reason);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminLockUserRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminLockUserRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminLockUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminLockUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.userName = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.userName = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.durationMinutes = longToNumber(reader.int64());
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.durationMinutes = longToNumber(reader.int64());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.reason = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.reason = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminLockUserRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			userName: isSet(object.userName) ? globalThis.String(object.userName) : '',
-			durationMinutes: isSet(object.durationMinutes)
-				? globalThis.Number(object.durationMinutes)
-				: 0,
-			reason: isSet(object.reason) ? globalThis.String(object.reason) : ''
-		};
-	},
+  fromJSON(object: any): AdminLockUserRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+      durationMinutes: isSet(object.durationMinutes) ? globalThis.Number(object.durationMinutes) : 0,
+      reason: isSet(object.reason) ? globalThis.String(object.reason) : "",
+    };
+  },
 
-	toJSON(message: AdminLockUserRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.userName !== '') {
-			obj.userName = message.userName;
-		}
-		if (message.durationMinutes !== 0) {
-			obj.durationMinutes = Math.round(message.durationMinutes);
-		}
-		if (message.reason !== '') {
-			obj.reason = message.reason;
-		}
-		return obj;
-	},
+  toJSON(message: AdminLockUserRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    if (message.durationMinutes !== 0) {
+      obj.durationMinutes = Math.round(message.durationMinutes);
+    }
+    if (message.reason !== "") {
+      obj.reason = message.reason;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminLockUserRequest>): AdminLockUserRequest {
-		return AdminLockUserRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminLockUserRequest>): AdminLockUserRequest {
-		const message = createBaseAdminLockUserRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.userName = object.userName ?? '';
-		message.durationMinutes = object.durationMinutes ?? 0;
-		message.reason = object.reason ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminLockUserRequest>): AdminLockUserRequest {
+    return AdminLockUserRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminLockUserRequest>): AdminLockUserRequest {
+    const message = createBaseAdminLockUserRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.userName = object.userName ?? "";
+    message.durationMinutes = object.durationMinutes ?? 0;
+    message.reason = object.reason ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminLockUserResponse(): AdminLockUserResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const AdminLockUserResponse: MessageFns<AdminLockUserResponse> = {
-	encode(message: AdminLockUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: AdminLockUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminLockUserResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminLockUserResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminLockUserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminLockUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminLockUserResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): AdminLockUserResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: AdminLockUserResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: AdminLockUserResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminLockUserResponse>): AdminLockUserResponse {
-		return AdminLockUserResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminLockUserResponse>): AdminLockUserResponse {
-		const message = createBaseAdminLockUserResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminLockUserResponse>): AdminLockUserResponse {
+    return AdminLockUserResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminLockUserResponse>): AdminLockUserResponse {
+    const message = createBaseAdminLockUserResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminActivateUserRequest(): AdminActivateUserRequest {
-	return { sessionId: '', userName: '' };
+  return { sessionId: "", userName: "" };
 }
 
 export const AdminActivateUserRequest: MessageFns<AdminActivateUserRequest> = {
-	encode(
-		message: AdminActivateUserRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.userName !== '') {
-			writer.uint32(18).string(message.userName);
-		}
-		return writer;
-	},
+  encode(message: AdminActivateUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(18).string(message.userName);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminActivateUserRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminActivateUserRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminActivateUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminActivateUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.userName = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.userName = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminActivateUserRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			userName: isSet(object.userName) ? globalThis.String(object.userName) : ''
-		};
-	},
+  fromJSON(object: any): AdminActivateUserRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+    };
+  },
 
-	toJSON(message: AdminActivateUserRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.userName !== '') {
-			obj.userName = message.userName;
-		}
-		return obj;
-	},
+  toJSON(message: AdminActivateUserRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminActivateUserRequest>): AdminActivateUserRequest {
-		return AdminActivateUserRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminActivateUserRequest>): AdminActivateUserRequest {
-		const message = createBaseAdminActivateUserRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.userName = object.userName ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminActivateUserRequest>): AdminActivateUserRequest {
+    return AdminActivateUserRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminActivateUserRequest>): AdminActivateUserRequest {
+    const message = createBaseAdminActivateUserRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.userName = object.userName ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminActivateUserResponse(): AdminActivateUserResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const AdminActivateUserResponse: MessageFns<AdminActivateUserResponse> = {
-	encode(
-		message: AdminActivateUserResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: AdminActivateUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminActivateUserResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminActivateUserResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminActivateUserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminActivateUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminActivateUserResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): AdminActivateUserResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: AdminActivateUserResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: AdminActivateUserResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminActivateUserResponse>): AdminActivateUserResponse {
-		return AdminActivateUserResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminActivateUserResponse>): AdminActivateUserResponse {
-		const message = createBaseAdminActivateUserResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminActivateUserResponse>): AdminActivateUserResponse {
+    return AdminActivateUserResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminActivateUserResponse>): AdminActivateUserResponse {
+    const message = createBaseAdminActivateUserResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminToggleActivateUserRequest(): AdminToggleActivateUserRequest {
-	return { sessionId: '', userName: '' };
+  return { sessionId: "", userName: "" };
 }
 
 export const AdminToggleActivateUserRequest: MessageFns<AdminToggleActivateUserRequest> = {
-	encode(
-		message: AdminToggleActivateUserRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.userName !== '') {
-			writer.uint32(18).string(message.userName);
-		}
-		return writer;
-	},
+  encode(message: AdminToggleActivateUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(18).string(message.userName);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminToggleActivateUserRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminToggleActivateUserRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminToggleActivateUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminToggleActivateUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.userName = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.userName = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminToggleActivateUserRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			userName: isSet(object.userName) ? globalThis.String(object.userName) : ''
-		};
-	},
+  fromJSON(object: any): AdminToggleActivateUserRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+    };
+  },
 
-	toJSON(message: AdminToggleActivateUserRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.userName !== '') {
-			obj.userName = message.userName;
-		}
-		return obj;
-	},
+  toJSON(message: AdminToggleActivateUserRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminToggleActivateUserRequest>): AdminToggleActivateUserRequest {
-		return AdminToggleActivateUserRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminToggleActivateUserRequest>): AdminToggleActivateUserRequest {
-		const message = createBaseAdminToggleActivateUserRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.userName = object.userName ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminToggleActivateUserRequest>): AdminToggleActivateUserRequest {
+    return AdminToggleActivateUserRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminToggleActivateUserRequest>): AdminToggleActivateUserRequest {
+    const message = createBaseAdminToggleActivateUserRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.userName = object.userName ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminToggleActivateUserResponse(): AdminToggleActivateUserResponse {
-	return { success: false, error: '', newStatus: false };
+  return { success: false, error: "", newStatus: false };
 }
 
 export const AdminToggleActivateUserResponse: MessageFns<AdminToggleActivateUserResponse> = {
-	encode(
-		message: AdminToggleActivateUserResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		if (message.newStatus !== false) {
-			writer.uint32(24).bool(message.newStatus);
-		}
-		return writer;
-	},
+  encode(message: AdminToggleActivateUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    if (message.newStatus !== false) {
+      writer.uint32(24).bool(message.newStatus);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminToggleActivateUserResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminToggleActivateUserResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminToggleActivateUserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminToggleActivateUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.newStatus = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.newStatus = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminToggleActivateUserResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			newStatus: isSet(object.newStatus) ? globalThis.Boolean(object.newStatus) : false
-		};
-	},
+  fromJSON(object: any): AdminToggleActivateUserResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      newStatus: isSet(object.newStatus) ? globalThis.Boolean(object.newStatus) : false,
+    };
+  },
 
-	toJSON(message: AdminToggleActivateUserResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.newStatus !== false) {
-			obj.newStatus = message.newStatus;
-		}
-		return obj;
-	},
+  toJSON(message: AdminToggleActivateUserResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.newStatus !== false) {
+      obj.newStatus = message.newStatus;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminToggleActivateUserResponse>): AdminToggleActivateUserResponse {
-		return AdminToggleActivateUserResponse.fromPartial(base ?? {});
-	},
-	fromPartial(
-		object: DeepPartial<AdminToggleActivateUserResponse>
-	): AdminToggleActivateUserResponse {
-		const message = createBaseAdminToggleActivateUserResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.newStatus = object.newStatus ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<AdminToggleActivateUserResponse>): AdminToggleActivateUserResponse {
+    return AdminToggleActivateUserResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminToggleActivateUserResponse>): AdminToggleActivateUserResponse {
+    const message = createBaseAdminToggleActivateUserResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    message.newStatus = object.newStatus ?? false;
+    return message;
+  },
 };
 
 function createBaseAdminEndUserSessionRequest(): AdminEndUserSessionRequest {
-	return { sessionId: '', targetSessionId: '' };
+  return { sessionId: "", targetSessionId: "" };
 }
 
 export const AdminEndUserSessionRequest: MessageFns<AdminEndUserSessionRequest> = {
-	encode(
-		message: AdminEndUserSessionRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.targetSessionId !== '') {
-			writer.uint32(18).string(message.targetSessionId);
-		}
-		return writer;
-	},
+  encode(message: AdminEndUserSessionRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.targetSessionId !== "") {
+      writer.uint32(18).string(message.targetSessionId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminEndUserSessionRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminEndUserSessionRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminEndUserSessionRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminEndUserSessionRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.targetSessionId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.targetSessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminEndUserSessionRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			targetSessionId: isSet(object.targetSessionId)
-				? globalThis.String(object.targetSessionId)
-				: ''
-		};
-	},
+  fromJSON(object: any): AdminEndUserSessionRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      targetSessionId: isSet(object.targetSessionId) ? globalThis.String(object.targetSessionId) : "",
+    };
+  },
 
-	toJSON(message: AdminEndUserSessionRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.targetSessionId !== '') {
-			obj.targetSessionId = message.targetSessionId;
-		}
-		return obj;
-	},
+  toJSON(message: AdminEndUserSessionRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.targetSessionId !== "") {
+      obj.targetSessionId = message.targetSessionId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminEndUserSessionRequest>): AdminEndUserSessionRequest {
-		return AdminEndUserSessionRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminEndUserSessionRequest>): AdminEndUserSessionRequest {
-		const message = createBaseAdminEndUserSessionRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.targetSessionId = object.targetSessionId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminEndUserSessionRequest>): AdminEndUserSessionRequest {
+    return AdminEndUserSessionRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminEndUserSessionRequest>): AdminEndUserSessionRequest {
+    const message = createBaseAdminEndUserSessionRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.targetSessionId = object.targetSessionId ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminEndUserSessionResponse(): AdminEndUserSessionResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const AdminEndUserSessionResponse: MessageFns<AdminEndUserSessionResponse> = {
-	encode(
-		message: AdminEndUserSessionResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: AdminEndUserSessionResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminEndUserSessionResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminEndUserSessionResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminEndUserSessionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminEndUserSessionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminEndUserSessionResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): AdminEndUserSessionResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: AdminEndUserSessionResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: AdminEndUserSessionResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminEndUserSessionResponse>): AdminEndUserSessionResponse {
-		return AdminEndUserSessionResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminEndUserSessionResponse>): AdminEndUserSessionResponse {
-		const message = createBaseAdminEndUserSessionResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminEndUserSessionResponse>): AdminEndUserSessionResponse {
+    return AdminEndUserSessionResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminEndUserSessionResponse>): AdminEndUserSessionResponse {
+    const message = createBaseAdminEndUserSessionResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminTableRemoveRequest(): AdminTableRemoveRequest {
-	return { sessionId: '', tableId: '' };
+  return { sessionId: "", tableId: "" };
 }
 
 export const AdminTableRemoveRequest: MessageFns<AdminTableRemoveRequest> = {
-	encode(
-		message: AdminTableRemoveRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(18).string(message.tableId);
-		}
-		return writer;
-	},
+  encode(message: AdminTableRemoveRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(18).string(message.tableId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminTableRemoveRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminTableRemoveRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminTableRemoveRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminTableRemoveRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tableId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminTableRemoveRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
-		};
-	},
+  fromJSON(object: any): AdminTableRemoveRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+    };
+  },
 
-	toJSON(message: AdminTableRemoveRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		return obj;
-	},
+  toJSON(message: AdminTableRemoveRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminTableRemoveRequest>): AdminTableRemoveRequest {
-		return AdminTableRemoveRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminTableRemoveRequest>): AdminTableRemoveRequest {
-		const message = createBaseAdminTableRemoveRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.tableId = object.tableId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminTableRemoveRequest>): AdminTableRemoveRequest {
+    return AdminTableRemoveRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminTableRemoveRequest>): AdminTableRemoveRequest {
+    const message = createBaseAdminTableRemoveRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.tableId = object.tableId ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminTableRemoveResponse(): AdminTableRemoveResponse {
-	return { success: false, error: '' };
+  return { success: false, error: "" };
 }
 
 export const AdminTableRemoveResponse: MessageFns<AdminTableRemoveResponse> = {
-	encode(
-		message: AdminTableRemoveResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: AdminTableRemoveResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminTableRemoveResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminTableRemoveResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminTableRemoveResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminTableRemoveResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminTableRemoveResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): AdminTableRemoveResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
 
-	toJSON(message: AdminTableRemoveResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: AdminTableRemoveResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminTableRemoveResponse>): AdminTableRemoveResponse {
-		return AdminTableRemoveResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<AdminTableRemoveResponse>): AdminTableRemoveResponse {
-		const message = createBaseAdminTableRemoveResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminTableRemoveResponse>): AdminTableRemoveResponse {
+    return AdminTableRemoveResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminTableRemoveResponse>): AdminTableRemoveResponse {
+    const message = createBaseAdminTableRemoveResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminSendBroadcastMessageRequest(): AdminSendBroadcastMessageRequest {
-	return { sessionId: '', message: '' };
+  return { sessionId: "", message: "" };
 }
 
 export const AdminSendBroadcastMessageRequest: MessageFns<AdminSendBroadcastMessageRequest> = {
-	encode(
-		message: AdminSendBroadcastMessageRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.message !== '') {
-			writer.uint32(18).string(message.message);
-		}
-		return writer;
-	},
+  encode(message: AdminSendBroadcastMessageRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminSendBroadcastMessageRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminSendBroadcastMessageRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminSendBroadcastMessageRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminSendBroadcastMessageRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.message = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminSendBroadcastMessageRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			message: isSet(object.message) ? globalThis.String(object.message) : ''
-		};
-	},
+  fromJSON(object: any): AdminSendBroadcastMessageRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+    };
+  },
 
-	toJSON(message: AdminSendBroadcastMessageRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		return obj;
-	},
+  toJSON(message: AdminSendBroadcastMessageRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminSendBroadcastMessageRequest>): AdminSendBroadcastMessageRequest {
-		return AdminSendBroadcastMessageRequest.fromPartial(base ?? {});
-	},
-	fromPartial(
-		object: DeepPartial<AdminSendBroadcastMessageRequest>
-	): AdminSendBroadcastMessageRequest {
-		const message = createBaseAdminSendBroadcastMessageRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.message = object.message ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<AdminSendBroadcastMessageRequest>): AdminSendBroadcastMessageRequest {
+    return AdminSendBroadcastMessageRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminSendBroadcastMessageRequest>): AdminSendBroadcastMessageRequest {
+    const message = createBaseAdminSendBroadcastMessageRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.message = object.message ?? "";
+    return message;
+  },
 };
 
 function createBaseAdminSendBroadcastMessageResponse(): AdminSendBroadcastMessageResponse {
-	return { success: false, error: '', recipientCount: 0 };
+  return { success: false, error: "", recipientCount: 0 };
 }
 
 export const AdminSendBroadcastMessageResponse: MessageFns<AdminSendBroadcastMessageResponse> = {
-	encode(
-		message: AdminSendBroadcastMessageResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		if (message.recipientCount !== 0) {
-			writer.uint32(24).int32(message.recipientCount);
-		}
-		return writer;
-	},
+  encode(message: AdminSendBroadcastMessageResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    if (message.recipientCount !== 0) {
+      writer.uint32(24).int32(message.recipientCount);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): AdminSendBroadcastMessageResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseAdminSendBroadcastMessageResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminSendBroadcastMessageResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminSendBroadcastMessageResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.recipientCount = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.recipientCount = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): AdminSendBroadcastMessageResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			recipientCount: isSet(object.recipientCount) ? globalThis.Number(object.recipientCount) : 0
-		};
-	},
+  fromJSON(object: any): AdminSendBroadcastMessageResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      recipientCount: isSet(object.recipientCount) ? globalThis.Number(object.recipientCount) : 0,
+    };
+  },
 
-	toJSON(message: AdminSendBroadcastMessageResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.recipientCount !== 0) {
-			obj.recipientCount = Math.round(message.recipientCount);
-		}
-		return obj;
-	},
+  toJSON(message: AdminSendBroadcastMessageResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.recipientCount !== 0) {
+      obj.recipientCount = Math.round(message.recipientCount);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<AdminSendBroadcastMessageResponse>): AdminSendBroadcastMessageResponse {
-		return AdminSendBroadcastMessageResponse.fromPartial(base ?? {});
-	},
-	fromPartial(
-		object: DeepPartial<AdminSendBroadcastMessageResponse>
-	): AdminSendBroadcastMessageResponse {
-		const message = createBaseAdminSendBroadcastMessageResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.recipientCount = object.recipientCount ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<AdminSendBroadcastMessageResponse>): AdminSendBroadcastMessageResponse {
+    return AdminSendBroadcastMessageResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminSendBroadcastMessageResponse>): AdminSendBroadcastMessageResponse {
+    const message = createBaseAdminSendBroadcastMessageResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    message.recipientCount = object.recipientCount ?? 0;
+    return message;
+  },
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-	? T
-	: T extends globalThis.Array<infer U>
-		? globalThis.Array<DeepPartial<U>>
-		: T extends ReadonlyArray<infer U>
-			? ReadonlyArray<DeepPartial<U>>
-			: T extends {}
-				? { [K in keyof T]?: DeepPartial<T[K]> }
-				: Partial<T>;
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
 
 function longToNumber(int64: { toString(): string }): number {
-	const num = globalThis.Number(int64.toString());
-	if (num > globalThis.Number.MAX_SAFE_INTEGER) {
-		throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
-	}
-	if (num < globalThis.Number.MIN_SAFE_INTEGER) {
-		throw new globalThis.Error('Value is smaller than Number.MIN_SAFE_INTEGER');
-	}
-	return num;
+  const num = globalThis.Number(int64.toString());
+  if (num > globalThis.Number.MAX_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  if (num < globalThis.Number.MIN_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+  }
+  return num;
 }
 
 function isSet(value: any): boolean {
-	return value !== null && value !== undefined;
+  return value !== null && value !== undefined;
 }
 
 interface MessageFns<T> {
-	encode(message: T, writer?: BinaryWriter): BinaryWriter;
-	decode(input: BinaryReader | Uint8Array, length?: number): T;
-	fromJSON(object: any): T;
-	toJSON(message: T): unknown;
-	create(base?: DeepPartial<T>): T;
-	fromPartial(object: DeepPartial<T>): T;
+  encode(message: T, writer?: BinaryWriter): BinaryWriter;
+  decode(input: BinaryReader | Uint8Array, length?: number): T;
+  fromJSON(object: any): T;
+  toJSON(message: T): unknown;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }

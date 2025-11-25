@@ -183,23 +183,22 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background-color: rgba(0, 0, 0, 0.5);
+		background-color: var(--modal-backdrop);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 1000;
-		padding: 1rem;
+		z-index: var(--z-modal-backdrop);
+		padding: var(--space-4);
 	}
 
 	.modal-dialog {
-		background-color: white;
-		border-radius: 0.75rem;
-		box-shadow:
-			0 20px 25px -5px rgba(0, 0, 0, 0.1),
-			0 10px 10px -5px rgba(0, 0, 0, 0.04);
+		background: var(--modal-bg);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-xl);
+		box-shadow: var(--shadow-xl);
 		display: flex;
 		flex-direction: column;
-		max-height: calc(100vh - 2rem);
+		max-height: calc(100vh - var(--space-8));
 		width: 100%;
 		position: relative;
 	}
@@ -226,50 +225,52 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 1.5rem;
-		border-bottom: 1px solid #e5e7eb;
+		padding: var(--space-6);
+		border-bottom: 1px solid var(--border-subtle);
 	}
 
 	.modal-title {
 		margin: 0;
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: #111827;
+		font-family: var(--font-display);
+		font-size: var(--text-xl);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
 		flex: 1;
 	}
 
 	.modal-close-button {
-		background: none;
+		background: transparent;
 		border: none;
 		cursor: pointer;
-		padding: 0.5rem;
-		color: #6b7280;
-		transition: all 0.2s;
-		border-radius: 0.375rem;
+		padding: var(--space-2);
+		color: var(--text-dim);
+		transition: all var(--transition-fast);
+		border-radius: var(--radius-md);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin-left: 1rem;
+		margin-left: var(--space-4);
 	}
 
 	.modal-close-button:hover {
-		color: #111827;
-		background-color: #f3f4f6;
+		color: var(--text-bright);
+		background: var(--bg-iron);
 	}
 
 	/* Content */
 	.modal-content {
 		flex: 1;
-		padding: 1.5rem;
+		padding: var(--space-6);
 		overflow-y: auto;
+		color: var(--text-muted);
 	}
 
 	/* Footer */
 	.modal-footer {
-		padding: 1.5rem;
-		border-top: 1px solid #e5e7eb;
+		padding: var(--space-6);
+		border-top: 1px solid var(--border-subtle);
 		display: flex;
-		gap: 0.75rem;
+		gap: var(--space-3);
 		justify-content: flex-end;
 	}
 

@@ -38,7 +38,7 @@ func newGameServerEnv(t testing.TB) *gameServerEnv {
 
 	sessionMgr := session.NewManager(5*time.Minute, logger)
 	roomMgr := room.NewManager(logger)
-	chatMgr := chat.NewManager(logger)
+	chatMgr := chat.NewManager(logger, sessionMgr)
 	tableMgr := table.NewManager(logger)
 	gameMgr := game.NewManager(logger)
 	tournamentMgr := tournament.NewManager(logger)

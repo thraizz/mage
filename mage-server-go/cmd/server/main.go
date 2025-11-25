@@ -120,7 +120,7 @@ func main() {
 	)
 
 	// Initialize chat manager
-	chatMgr := chat.NewManager(logger)
+	chatMgr := chat.NewManager(logger, sessionMgr)
 	logger.Info("chat manager initialized")
 
 	// Initialize table manager

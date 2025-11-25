@@ -27,6 +27,7 @@ type Session struct {
 	LastActivity time.Time
 	LeasePeriod  time.Duration
 	CallbackChan chan interface{} // Channel for WebSocket callbacks
+	wsCloseChan  chan struct{}    // Signal to close current WebSocket
 	preferences  *Preferences
 	mu           sync.RWMutex
 	reqMu        sync.Mutex // Prevents concurrent requests for same session
@@ -41,6 +42,27 @@ func NewSession(id, host string, leasePeriod time.Duration) *Session {
 		LastActivity: time.Now(),
 		LeasePeriod:  leasePeriod,
 		CallbackChan: make(chan interface{}, 100),
+		wsCloseChan:  nil, // Will be set when WebSocket connects
+	}
+}
+
+// SetWebSocketCloseChan sets the close channel for the active WebSocket
+// Returns the old close channel if one exists (to close previous connection)
+func (s *Session) SetWebSocketCloseChan(closeChan chan struct{}) chan struct{} {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	oldChan := s.wsCloseChan
+	s.wsCloseChan = closeChan
+	return oldChan
+}
+
+// ClearWebSocketCloseChan clears the WebSocket close channel only if it matches
+func (s *Session) ClearWebSocketCloseChan(closeChan chan struct{}) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// Only clear if this is still the active close channel
+	if s.wsCloseChan == closeChan {
+		s.wsCloseChan = nil
 	}
 }
 

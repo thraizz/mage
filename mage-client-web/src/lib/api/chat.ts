@@ -1,34 +1,17 @@
 import type { ChatMessage as ClientChatMessage, SendMessageRequest } from '$lib/types/chat';
 import { getMageClient } from '$lib/grpc/client';
-import type { ChatMessage as ProtoChatMessage } from '$lib/generated/mage/v1/models';
 import type {
 	ChatFindByRoomRequest,
 	ChatFindByRoomResponse,
+	ChatFindByTableRequest,
+	ChatFindByTableResponse,
+	ChatFindByGameRequest,
+	ChatFindByGameResponse,
 	ChatJoinRequest,
 	ChatJoinResponse,
 	ChatSendMessageRequest,
 	ChatSendMessageResponse
 } from '$lib/generated/mage/v1/chat';
-
-/**
- * Convert proto ChatMessage to our client ChatMessage type
- */
-function convertProtoChatMessage(msg: ProtoChatMessage, id: string): ClientChatMessage {
-	// Determine message type based on message content or color
-	let type: 'system' | 'user' | 'whisper' = 'user';
-	if (msg.userName.toLowerCase() === 'system' || msg.userName === '') {
-		type = 'system';
-	}
-	// Note: Whispers would need additional logic from server to identify
-
-	return {
-		id,
-		type,
-		username: msg.userName || 'System',
-		content: msg.message,
-		timestamp: msg.time?.getTime() || Date.now()
-	};
-}
 
 /**
  * Fetch recent lobby chat messages
@@ -37,7 +20,7 @@ function convertProtoChatMessage(msg: ProtoChatMessage, id: string): ClientChatM
  * This function is a placeholder that shows how to find the chat ID.
  * Real chat messages should come through WebSocket callbacks.
  */
-export async function fetchLobbyMessages(limit: number = 50): Promise<ClientChatMessage[]> {
+export async function fetchLobbyMessages(_limit: number = 50): Promise<ClientChatMessage[]> {
 	const client = getMageClient();
 	const sessionId = await client.ensureSessionId();
 
@@ -159,8 +142,7 @@ export async function joinChat(chatId: string): Promise<void> {
 
 	const joinRequest: ChatJoinRequest = {
 		sessionId,
-		chatId,
-		userName: 'Player' // This should come from auth store
+		chatId
 	};
 
 	const response = await client.call<ChatJoinRequest, ChatJoinResponse>('ChatJoin', joinRequest);
@@ -190,16 +172,9 @@ export async function leaveChat(chatId: string): Promise<void> {
 }
 
 /**
- * Fetch recent table chat messages
- *
- * Note: The server uses streaming/callbacks for real-time chat.
- * This function is a placeholder that shows how to find the chat ID.
- * Real chat messages should come through WebSocket callbacks.
+ * Get the chat ID for a table
  */
-export async function fetchTableMessages(
-	tableId: string,
-	limit: number = 50
-): Promise<ClientChatMessage[]> {
+export async function getTableChatId(tableId: string): Promise<string> {
 	const client = getMageClient();
 	const sessionId = await client.ensureSessionId();
 
@@ -207,25 +182,37 @@ export async function fetchTableMessages(
 		throw new Error('No active session - please login first');
 	}
 
-	try {
-		// Get main room ID
-		const roomResponse = await client.getMainRoomId();
-		if (!roomResponse.roomId) {
-			throw new Error('Failed to get main room ID');
+	// Use ChatFindByTable to get the chat ID for this table
+	const chatResponse = await client.call<ChatFindByTableRequest, ChatFindByTableResponse>(
+		'ChatFindByTable',
+		{
+			sessionId,
+			tableId
 		}
+	);
 
-		// Note: In a real implementation, you would need to get the chat ID for this table
-		// For now, return empty array - messages will come via WebSocket
-		console.log(`Fetching chat for table: ${tableId}`);
-
-		// In a real implementation, you would:
-		// 1. Get the table's chat ID from the server
-		// 2. Store the chatId and listen for WebSocket callbacks of type CHATMESSAGE
-		return [];
-	} catch (error) {
-		console.error('Failed to fetch table messages:', error);
-		return [];
+	if (!chatResponse.chatId) {
+		throw new Error('Failed to get chat ID for table');
 	}
+
+	return chatResponse.chatId;
+}
+
+/**
+ * Fetch recent table chat messages
+ *
+ * Note: The server uses streaming/callbacks for real-time chat.
+ * This function is a placeholder that shows how to find the chat ID.
+ * Real chat messages should come through WebSocket callbacks.
+ */
+export async function fetchTableMessages(
+	_tableId: string,
+	_limit: number = 50
+): Promise<ClientChatMessage[]> {
+	// Note: Real chat messages should come through WebSocket callbacks
+	// This just returns empty array - the TableChat component should use WebSocket
+	console.log(`fetchTableMessages is a placeholder - use WebSocket for live chat`);
+	return [];
 }
 
 /**
@@ -242,15 +229,8 @@ export async function sendTableMessage(
 		throw new Error('No active session - please login first');
 	}
 
-	// Get main room ID
-	const roomResponse = await client.getMainRoomId();
-	if (!roomResponse.roomId) {
-		throw new Error('Failed to get main room ID');
-	}
-
-	// Note: In a real implementation, you would need to get the chat ID for this table
-	// For now, we'll construct a table-specific chat ID (server may handle differently)
-	const chatId = `table-${tableId}`;
+	// Get the chat ID for this table
+	const chatId = await getTableChatId(tableId);
 
 	// Send the message
 	const sendRequest: ChatSendMessageRequest = {
@@ -277,4 +257,103 @@ export async function sendTableMessage(
 		content: request.content,
 		timestamp: Date.now()
 	};
+}
+
+/**
+ * Get the chat ID for a game
+ */
+export async function getGameChatId(gameId: string): Promise<string> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	// Use ChatFindByGame to get the chat ID for this game
+	const chatResponse = await client.call<ChatFindByGameRequest, ChatFindByGameResponse>(
+		'ChatFindByGame',
+		{
+			sessionId,
+			gameId
+		}
+	);
+
+	if (!chatResponse.chatId) {
+		throw new Error('Failed to get chat ID for game');
+	}
+
+	return chatResponse.chatId;
+}
+
+/**
+ * Send a message to game chat
+ */
+export async function sendGameMessage(
+	gameId: string,
+	content: string
+): Promise<ClientChatMessage> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	// Get the chat ID for this game
+	const chatId = await getGameChatId(gameId);
+
+	// Send the message
+	const sendRequest: ChatSendMessageRequest = {
+		sessionId,
+		chatId: chatId,
+		message: content
+	};
+
+	const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
+		'ChatSendMessage',
+		sendRequest
+	);
+
+	if (!response.success) {
+		throw new Error('Failed to send message');
+	}
+
+	// Return a client message representation
+	// Note: The actual message will come back through WebSocket callback
+	return {
+		id: `msg-${Date.now()}`,
+		type: 'user',
+		username: 'You',
+		content: content,
+		timestamp: Date.now()
+	};
+}
+
+/**
+ * Send a chat message directly to a chat ID (for game/table/room chat)
+ * This is a lower-level function used when you already have the chat ID
+ */
+export async function sendChatMessage(chatId: string, content: string): Promise<void> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	const sendRequest: ChatSendMessageRequest = {
+		sessionId,
+		chatId,
+		message: content
+	};
+
+	const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
+		'ChatSendMessage',
+		sendRequest
+	);
+
+	if (!response.success) {
+		throw new Error('Failed to send message');
+	}
 }

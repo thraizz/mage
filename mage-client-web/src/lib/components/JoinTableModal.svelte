@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Table, GameFormat } from '$lib/types/table';
+	import type { Table } from '$lib/types/table';
 	import type { Deck } from '$lib/types/deck';
 	import { joinTable } from '$lib/api/table';
 	import { fetchUserDecks } from '$lib/api/decks';
@@ -12,10 +12,12 @@
 	let {
 		open = $bindable(false),
 		table,
+		// eslint-disable-next-line no-unused-vars
 		onSuccess
 	}: {
 		open: boolean;
 		table: Table | null;
+		// eslint-disable-next-line no-unused-vars
 		onSuccess: (tableId: string) => void;
 	} = $props();
 

@@ -29,8 +29,10 @@ func NewAangAirbendingMaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	if err != nil {
 		return nil, err
 	}
+	// Create tokens equal to the number of experience counters you have
+	xValue := abilities.NewCountersControllerCount("experience")
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, xValue)).
+		AddEffect(abilities.NewCreateTokenEffectDynamic(token0_0, xValue)).
 		Build()
 	if err != nil {
 		return nil, err
