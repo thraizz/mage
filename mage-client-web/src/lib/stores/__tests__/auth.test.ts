@@ -82,8 +82,7 @@ describe('Auth Store', () => {
 
 		const user = {
 			id: 'user123',
-			username: 'testuser',
-			email: 'test@example.com'
+			username: 'testuser'
 		};
 
 		auth.login(token, user);
@@ -109,8 +108,7 @@ describe('Auth Store', () => {
 
 		auth.login(token, {
 			id: 'user123',
-			username: 'testuser',
-			email: 'test@example.com'
+			username: 'testuser'
 		});
 
 		// Then logout
@@ -185,8 +183,7 @@ describe('Auth Store', () => {
 
 		auth.login(token, {
 			id: 'user123',
-			username: 'testuser',
-			email: 'test@example.com'
+			username: 'testuser'
 		});
 
 		const isValid = auth.checkTokenValidity();
@@ -208,15 +205,14 @@ describe('Auth Store', () => {
 
 		auth.login(token, {
 			id: 'user123',
-			username: 'testuser',
-			email: 'test@example.com'
+			username: 'testuser'
 		});
 
 		// Update user info
-		auth.updateUser({ email: 'newemail@example.com' });
+		auth.updateUser({ username: 'newusername' });
 
 		const state = get(auth);
-		expect(state.user?.email).toBe('newemail@example.com');
-		expect(state.user?.username).toBe('testuser'); // Should keep other fields
+		expect(state.user?.username).toBe('newusername');
+		expect(state.user?.id).toBe('user123'); // Should keep other fields
 	});
 });
