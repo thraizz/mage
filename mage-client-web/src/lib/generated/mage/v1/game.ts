@@ -83,6 +83,58 @@ export function playerActionToJSON(object: PlayerAction): string {
   }
 }
 
+/** Special action types (lands, foretell, etc.) */
+export enum SpecialActionType {
+  SPECIAL_ACTION_UNSPECIFIED = 0,
+  PLAY_LAND = 1,
+  FORETELL = 2,
+  SUSPEND = 3,
+  COMPANION = 4,
+  UNRECOGNIZED = -1,
+}
+
+export function specialActionTypeFromJSON(object: any): SpecialActionType {
+  switch (object) {
+    case 0:
+    case "SPECIAL_ACTION_UNSPECIFIED":
+      return SpecialActionType.SPECIAL_ACTION_UNSPECIFIED;
+    case 1:
+    case "PLAY_LAND":
+      return SpecialActionType.PLAY_LAND;
+    case 2:
+    case "FORETELL":
+      return SpecialActionType.FORETELL;
+    case 3:
+    case "SUSPEND":
+      return SpecialActionType.SUSPEND;
+    case 4:
+    case "COMPANION":
+      return SpecialActionType.COMPANION;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return SpecialActionType.UNRECOGNIZED;
+  }
+}
+
+export function specialActionTypeToJSON(object: SpecialActionType): string {
+  switch (object) {
+    case SpecialActionType.SPECIAL_ACTION_UNSPECIFIED:
+      return "SPECIAL_ACTION_UNSPECIFIED";
+    case SpecialActionType.PLAY_LAND:
+      return "PLAY_LAND";
+    case SpecialActionType.FORETELL:
+      return "FORETELL";
+    case SpecialActionType.SUSPEND:
+      return "SUSPEND";
+    case SpecialActionType.COMPANION:
+      return "COMPANION";
+    case SpecialActionType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface GameJoinRequest {
   sessionId: string;
   gameId: string;
@@ -186,6 +238,19 @@ export interface SendPlayerActionRequest {
 }
 
 export interface SendPlayerActionResponse {
+  success: boolean;
+  error: string;
+}
+
+export interface SendSpecialActionRequest {
+  sessionId: string;
+  gameId: string;
+  actionType: SpecialActionType;
+  /** Card UUID */
+  sourceId: string;
+}
+
+export interface SendSpecialActionResponse {
   success: boolean;
   error: string;
 }
@@ -1896,6 +1961,190 @@ export const SendPlayerActionResponse: MessageFns<SendPlayerActionResponse> = {
   },
   fromPartial(object: DeepPartial<SendPlayerActionResponse>): SendPlayerActionResponse {
     const message = createBaseSendPlayerActionResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
+};
+
+function createBaseSendSpecialActionRequest(): SendSpecialActionRequest {
+  return { sessionId: "", gameId: "", actionType: 0, sourceId: "" };
+}
+
+export const SendSpecialActionRequest: MessageFns<SendSpecialActionRequest> = {
+  encode(message: SendSpecialActionRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== "") {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.actionType !== 0) {
+      writer.uint32(24).int32(message.actionType);
+    }
+    if (message.sourceId !== "") {
+      writer.uint32(34).string(message.sourceId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SendSpecialActionRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendSpecialActionRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.actionType = reader.int32() as any;
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.sourceId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SendSpecialActionRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "",
+      actionType: isSet(object.actionType) ? specialActionTypeFromJSON(object.actionType) : 0,
+      sourceId: isSet(object.sourceId) ? globalThis.String(object.sourceId) : "",
+    };
+  },
+
+  toJSON(message: SendSpecialActionRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== "") {
+      obj.gameId = message.gameId;
+    }
+    if (message.actionType !== 0) {
+      obj.actionType = specialActionTypeToJSON(message.actionType);
+    }
+    if (message.sourceId !== "") {
+      obj.sourceId = message.sourceId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<SendSpecialActionRequest>): SendSpecialActionRequest {
+    return SendSpecialActionRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendSpecialActionRequest>): SendSpecialActionRequest {
+    const message = createBaseSendSpecialActionRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.gameId = object.gameId ?? "";
+    message.actionType = object.actionType ?? 0;
+    message.sourceId = object.sourceId ?? "";
+    return message;
+  },
+};
+
+function createBaseSendSpecialActionResponse(): SendSpecialActionResponse {
+  return { success: false, error: "" };
+}
+
+export const SendSpecialActionResponse: MessageFns<SendSpecialActionResponse> = {
+  encode(message: SendSpecialActionResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SendSpecialActionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendSpecialActionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SendSpecialActionResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
+
+  toJSON(message: SendSpecialActionResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<SendSpecialActionResponse>): SendSpecialActionResponse {
+    return SendSpecialActionResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendSpecialActionResponse>): SendSpecialActionResponse {
+    const message = createBaseSendSpecialActionResponse();
     message.success = object.success ?? false;
     message.error = object.error ?? "";
     return message;

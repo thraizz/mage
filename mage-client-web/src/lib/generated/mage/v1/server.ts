@@ -112,6 +112,8 @@ import {
   SendPlayerStringResponse,
   SendPlayerUUIDRequest,
   SendPlayerUUIDResponse,
+  SendSpecialActionRequest,
+  SendSpecialActionResponse,
 } from "./game";
 import {
   GetMatchByIdRequest,
@@ -538,6 +540,15 @@ export const MageServerDefinition = {
       requestType: SendPlayerActionRequest,
       requestStream: false,
       responseType: SendPlayerActionResponse,
+      responseStream: false,
+      options: {},
+    },
+    /** Send special action (play land, foretell, etc.) */
+    sendSpecialAction: {
+      name: "SendSpecialAction",
+      requestType: SendSpecialActionRequest,
+      requestStream: false,
+      responseType: SendSpecialActionResponse,
       responseStream: false,
       options: {},
     },

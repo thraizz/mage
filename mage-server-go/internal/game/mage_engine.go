@@ -2156,10 +2156,14 @@ func (e *MageEngine) handlePlayLand(gameState *engineGameState, player *internal
 	gameState.addMessage(fmt.Sprintf("%s plays %s", player.Name, card.Name), "action")
 
 	// Publish land played event
-	gameState.eventBus.Publish(rules.NewEvent(rules.EventCardPlayed, card.ID, "", player.PlayerID))
+	gameState.eventBus.Publish(rules.NewEvent(rules.EventLandPlayed, card.ID, "", player.PlayerID))
 
-	// Broadcast update
-	e.broadcastUpdate(gameState)
+	// Notify state change
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+		"player": player.PlayerID,
+		"action": "play_land",
+		"card":   card.Name,
+	})
 
 	if e.logger != nil {
 		e.logger.Debug("land played",
