@@ -408,6 +408,51 @@ func (h *HTTPJSONHandler) handleDeckSave(ctx context.Context, w http.ResponseWri
 	h.writeSuccessResponse(w, resp)
 }
 
+// camelToSnake converts camelCase to snake_case for proto field name compatibility
+func camelToSnake(s string) string {
+	var result []byte
+	for i, c := range s {
+		if c >= 'A' && c <= 'Z' {
+			if i > 0 {
+				result = append(result, '_')
+			}
+			result = append(result, byte(c-'A'+'a'))
+		} else {
+			result = append(result, byte(c))
+		}
+	}
+	return string(result)
+}
+
+// convertKeysToSnakeCase recursively converts all map keys from camelCase to snake_case
+func convertKeysToSnakeCase(v interface{}) interface{} {
+	switch val := v.(type) {
+	case map[string]interface{}:
+		result := make(map[string]interface{})
+		for k, v := range val {
+			snakeKey := camelToSnake(k)
+			result[snakeKey] = convertKeysToSnakeCase(v)
+		}
+		return result
+	case []interface{}:
+		result := make([]interface{}, len(val))
+		for i, item := range val {
+			result[i] = convertKeysToSnakeCase(item)
+		}
+		return result
+	default:
+		return v
+	}
+}
+
+// truncateString truncates a string to maxLen characters
+func truncateString(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen] + "..."
+}
+
 // unmarshalRequest unmarshals JSON request into proto message
 func (h *HTTPJSONHandler) unmarshalRequest(r *http.Request, msg proto.Message) error {
 	unmarshaler := protojson.UnmarshalOptions{
@@ -421,12 +466,40 @@ func (h *HTTPJSONHandler) unmarshalRequest(r *http.Request, msg proto.Message) e
 		return err
 	}
 
-	jsonBytes, err := json.Marshal(rawJSON)
+	// Convert camelCase keys to snake_case for proto compatibility
+	// The TypeScript client sends camelCase (deckList) but proto expects snake_case (deck_list)
+	convertedJSON := convertKeysToSnakeCase(rawJSON).(map[string]interface{})
+
+	jsonBytes, err := json.Marshal(convertedJSON)
 	if err != nil {
 		return err
 	}
 
 	return unmarshaler.Unmarshal(jsonBytes, msg)
+}
+
+// unmarshalRequestWithDebug unmarshals JSON request into proto message and returns raw JSON for debugging
+func (h *HTTPJSONHandler) unmarshalRequestWithDebug(r *http.Request, msg proto.Message) (map[string]interface{}, error) {
+	unmarshaler := protojson.UnmarshalOptions{
+		AllowPartial:   true,
+		DiscardUnknown: true,
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var rawJSON map[string]interface{}
+	if err := decoder.Decode(&rawJSON); err != nil {
+		return nil, err
+	}
+
+	// Convert camelCase keys to snake_case for proto compatibility
+	convertedJSON := convertKeysToSnakeCase(rawJSON).(map[string]interface{})
+
+	jsonBytes, err := json.Marshal(convertedJSON)
+	if err != nil {
+		return rawJSON, err
+	}
+
+	return rawJSON, unmarshaler.Unmarshal(jsonBytes, msg)
 }
 
 // writeSuccessResponse writes a successful JSON response
@@ -654,10 +727,40 @@ func (h *HTTPJSONHandler) handleRoomCreateTournament(ctx context.Context, w http
 // handleRoomJoinTable handles the RoomJoinTable method
 func (h *HTTPJSONHandler) handleRoomJoinTable(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	var req pb.RoomJoinTableRequest
-	if err := h.unmarshalRequest(r, &req); err != nil {
+	rawJSON, err := h.unmarshalRequestWithDebug(r, &req)
+	if err != nil {
 		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	// Debug logging to trace deck submission - show raw JSON keys
+	rawKeys := make([]string, 0)
+	for k := range rawJSON {
+		rawKeys = append(rawKeys, k)
+	}
+	deckListRaw := ""
+	if v, ok := rawJSON["deckList"]; ok {
+		if s, ok := v.(string); ok {
+			deckListRaw = s
+		}
+	}
+	if v, ok := rawJSON["deck_list"]; ok {
+		if s, ok := v.(string); ok {
+			deckListRaw = s
+		}
+	}
+
+	h.logger.Info("[HTTP DEBUG] RoomJoinTable raw request",
+		zap.Strings("raw_json_keys", rawKeys),
+		zap.Int("raw_deck_list_length", len(deckListRaw)),
+		zap.String("raw_deck_preview", truncateString(deckListRaw, 200)),
+	)
+
+	h.logger.Info("[HTTP DEBUG] RoomJoinTable request parsed",
+		zap.String("table_id", req.GetTableId()),
+		zap.Int("deck_list_length", len(req.GetDeckList())),
+		zap.Bool("has_deck", req.GetDeckList() != ""),
+	)
 
 	resp, err := h.mageServer.RoomJoinTable(ctx, &req)
 	if err != nil {
