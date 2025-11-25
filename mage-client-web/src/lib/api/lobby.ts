@@ -5,12 +5,12 @@ import type { TableView } from '$lib/generated/mage/v1/models';
 import type {
 	RoomCreateTableRequest,
 	RoomCreateTableResponse,
-	RoomJoinTableRequest,
-	RoomJoinTableResponse,
 	RoomLeaveTableOrTournamentRequest,
 	RoomLeaveTableOrTournamentResponse
 } from '$lib/generated/mage/v1/table';
 import type { RoomGetUsersResponse } from '$lib/generated/mage/v1/room';
+
+// Joining a table is handled by the table API
 
 /**
  * Convert TableView from proto to our Table type
@@ -155,44 +155,6 @@ export async function createTable(request: CreateTableRequest): Promise<Table> {
 		hasPassword: !!request.password,
 		createdAt: Date.now()
 	};
-}
-
-/**
- * Join an existing table
- */
-export async function joinTable(tableId: string, password?: string): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	// Get main room ID
-	const roomResponse = await client.getMainRoomId();
-	if (!roomResponse.roomId) {
-		throw new Error('Failed to get main room ID');
-	}
-
-	const joinRequest: RoomJoinTableRequest = {
-		sessionId,
-		roomId: roomResponse.roomId,
-		tableId,
-		playerName: '', // Server derives from session
-		playerType: 'Human',
-		skillLevel: 1,
-		deckList: '', // Deck will be selected later
-		password: password || ''
-	};
-
-	const response = await client.call<RoomJoinTableRequest, RoomJoinTableResponse>(
-		'RoomJoinTable',
-		joinRequest
-	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to join table');
-	}
 }
 
 /**

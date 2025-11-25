@@ -3,7 +3,7 @@
 	import type { Deck } from '$lib/types/deck';
 	import { getGameFormats, createTable } from '$lib/api/lobby';
 	import { submitDeck } from '$lib/api/table';
-	import { fetchUserDecks } from '$lib/api/decks';
+	import { fetchUserDecks, getDeckDetails } from '$lib/api/decks';
 	import Modal from './Modal.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 
@@ -140,12 +140,21 @@
 				return;
 			}
 
-			console.log('[CreateTable] Creating table with deck:', {
+			console.log('[CreateTable] Selected deck summary:', {
 				deckId: deck.id,
-				deckName: deck.name,
-				mainDeckCount: deck.mainDeck.length,
-				sideboardCount: deck.sideboard.length,
-				commanderCount: deck.commanders.length
+				deckName: deck.name
+			});
+
+			// Fetch full deck details (including card lists)
+			// fetchUserDecks only returns summary info without card details
+			const fullDeck = await getDeckDetails(deck.id);
+
+			console.log('[CreateTable] Full deck loaded:', {
+				deckId: fullDeck.id,
+				deckName: fullDeck.name,
+				mainDeckCount: fullDeck.mainDeck.length,
+				sideboardCount: fullDeck.sideboard.length,
+				commanderCount: fullDeck.commanders.length
 			});
 
 			const table = await createTable({
@@ -160,15 +169,15 @@
 			// Submit the deck for the creator
 			try {
 				await submitDeck(table.id, {
-					mainDeck: deck.mainDeck.map((c) => ({
+					mainDeck: fullDeck.mainDeck.map((c) => ({
 						name: c.cardName,
 						quantity: c.quantity
 					})),
-					sideboard: deck.sideboard.map((c) => ({
+					sideboard: fullDeck.sideboard.map((c) => ({
 						name: c.cardName,
 						quantity: c.quantity
 					})),
-					commanders: deck.commanders.map((c) => ({
+					commanders: fullDeck.commanders.map((c) => ({
 						name: c.cardName,
 						quantity: c.quantity
 					}))

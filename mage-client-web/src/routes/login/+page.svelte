@@ -503,7 +503,22 @@
 		align-items: center;
 		min-height: 100vh;
 		padding: 2rem;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		position: relative;
+		background-image: url('/images/Boros.jpg');
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	.container::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.4);
+		z-index: 0;
 	}
 
 	.card {
@@ -513,6 +528,8 @@
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		width: 100%;
 		max-width: 400px;
+		position: relative;
+		z-index: 1;
 	}
 
 	h1 {

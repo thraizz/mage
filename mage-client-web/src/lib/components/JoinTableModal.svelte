@@ -2,7 +2,7 @@
 	import type { Table } from '$lib/types/table';
 	import type { Deck } from '$lib/types/deck';
 	import { joinTable } from '$lib/api/table';
-	import { fetchUserDecks } from '$lib/api/decks';
+	import { fetchUserDecks, getDeckDetails } from '$lib/api/decks';
 	import { toast } from '$lib/stores/toast';
 	import Modal from './Modal.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
@@ -84,28 +84,38 @@
 				throw new Error('Selected deck not found');
 			}
 
-			console.log('[JoinTable] Selected deck:', {
+			console.log('[JoinTable] Selected deck summary:', {
 				id: deck.id,
 				name: deck.name,
-				format: deck.format,
-				mainDeckCount: deck.mainDeck.length,
-				sideboardCount: deck.sideboard.length,
-				commanderCount: deck.commanders.length
+				format: deck.format
+			});
+
+			// Fetch full deck details (including card lists)
+			// fetchUserDecks only returns summary info without card details
+			const fullDeck = await getDeckDetails(deck.id);
+
+			console.log('[JoinTable] Full deck loaded:', {
+				id: fullDeck.id,
+				name: fullDeck.name,
+				format: fullDeck.format,
+				mainDeckCount: fullDeck.mainDeck.length,
+				sideboardCount: fullDeck.sideboard.length,
+				commanderCount: fullDeck.commanders.length
 			});
 
 			// Convert deck to text format
 			const deckCards: CardEntry[] = [
-				...deck.commanders.map((c) => ({
+				...fullDeck.commanders.map((c) => ({
 					name: c.cardName,
 					quantity: c.quantity,
 					section: 'commander' as const
 				})),
-				...deck.mainDeck.map((c) => ({
+				...fullDeck.mainDeck.map((c) => ({
 					name: c.cardName,
 					quantity: c.quantity,
 					section: 'main' as const
 				})),
-				...deck.sideboard.map((c) => ({
+				...fullDeck.sideboard.map((c) => ({
 					name: c.cardName,
 					quantity: c.quantity,
 					section: 'sideboard' as const
