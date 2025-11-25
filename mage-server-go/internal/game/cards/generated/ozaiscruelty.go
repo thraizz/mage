@@ -25,7 +25,7 @@ func NewOzaisCruelty(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	//   - DiscardTargetEffect(2)
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

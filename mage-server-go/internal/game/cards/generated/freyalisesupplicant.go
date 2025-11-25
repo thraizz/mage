@@ -25,7 +25,7 @@ func NewFreyaliseSupplicant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: DamageTargetEffect with complex parameters
+		AddEffect(abilities.NewDamageEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

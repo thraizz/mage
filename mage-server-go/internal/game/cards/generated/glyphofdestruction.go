@@ -22,7 +22,7 @@ func NewGlyphOfDestruction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(10, 0)).
-		// TODO: DestroyTargetAtBeginningOfNextEndStepEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	if err != nil {
 		return nil, err

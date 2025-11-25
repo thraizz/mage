@@ -28,7 +28,7 @@ func NewVillainousOgre(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - RegenerateSourceEffect()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(regenAbility)).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

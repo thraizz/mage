@@ -36,7 +36,7 @@ func NewNightOfTheSweetsRevenge(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("GreenManaAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("GreenManaAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

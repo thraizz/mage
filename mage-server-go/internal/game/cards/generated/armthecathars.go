@@ -25,7 +25,7 @@ func NewArmTheCathars(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddEffect(abilities.NewBoostEffect(3, 3)).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

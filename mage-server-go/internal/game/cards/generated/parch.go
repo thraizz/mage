@@ -24,7 +24,7 @@ func NewParch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddEffect(abilities.NewDamageEffect(4)).
 		AddEffect(abilities.NewDamageEffect(2)).
 		AddEffect(abilities.NewDamageEffect(4)).
-		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

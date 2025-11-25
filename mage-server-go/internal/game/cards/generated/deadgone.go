@@ -22,8 +22,8 @@ func NewDeadGone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(2)).
-		// TODO: ReturnToHandTargetEffect with complex parameters
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

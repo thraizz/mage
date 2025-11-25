@@ -21,7 +21,7 @@ func NewShowerOfArrows(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewScryEffect(1)).
 		Build()
 	if err != nil {

@@ -35,7 +35,7 @@ func NewHeraldOfLeshrac(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: BoostSourceEffect with complex parameters
+		AddEffect(abilities.NewBoostEffect()).
 		Build()
 	if err != nil {
 		return nil, err

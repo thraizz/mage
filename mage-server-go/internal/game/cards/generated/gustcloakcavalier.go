@@ -24,8 +24,8 @@ func NewGustcloakCavalier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: TapTargetEffect with complex parameters
-		// TODO: UntapSourceEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
+		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	if err != nil {
 		return nil, err

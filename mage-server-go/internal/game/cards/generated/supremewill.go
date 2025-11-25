@@ -25,7 +25,7 @@ func NewSupremeWill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	//   - LookLibraryAndPickControllerEffect(4, 1, PutCards.HAND, PutCards.BOTTOM_ANY)
 	//
 	// Targets:
-	//   - abilities.NewSpellTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

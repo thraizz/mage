@@ -31,8 +31,8 @@ func NewTheBeamtownBullies(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationCustom)).
-		// TODO: ExileTargetEffect with complex parameters
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
+		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

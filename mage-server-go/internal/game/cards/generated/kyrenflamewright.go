@@ -31,7 +31,7 @@ func NewKyrenFlamewright(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		Build()

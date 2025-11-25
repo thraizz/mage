@@ -28,6 +28,7 @@ func NewOrosTheAvenger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(3, filter)
 	//   - DoIfCostPaid(new DamageAllEffect(3, filter), new ManaCostsImpl<...)
 	// card.AddAbility(ability1)
 	return card, nil

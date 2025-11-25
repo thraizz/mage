@@ -21,9 +21,9 @@ func NewCripplingChill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: TapTargetEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

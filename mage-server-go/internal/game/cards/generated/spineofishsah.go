@@ -21,14 +21,14 @@ func NewSpineOfIshSah(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnToHandSourceEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		Build()
 	if err != nil {
 		return nil, err

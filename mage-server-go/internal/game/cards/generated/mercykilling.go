@@ -24,7 +24,7 @@ func NewMercyKilling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	//   - SacrificeTargetEffect("Target creature's controller sacrifices it")
 	//
 	// Targets:
-	//   - abilities.NewCreatureTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

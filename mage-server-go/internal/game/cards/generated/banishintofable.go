@@ -26,7 +26,7 @@ func NewBanishIntoFable(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	if err != nil {

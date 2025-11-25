@@ -29,7 +29,7 @@ func NewKwendePrideOfFemeref(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("DoubleStrikeAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("DoubleStrikeAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

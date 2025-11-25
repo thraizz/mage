@@ -29,7 +29,7 @@ func NewAlquistProftMasterSleuth(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(GetXValue.instance, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
 		Build()
 	card.AddAbility(ability1)

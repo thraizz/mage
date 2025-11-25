@@ -22,6 +22,7 @@ func NewLavaAxe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(5)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

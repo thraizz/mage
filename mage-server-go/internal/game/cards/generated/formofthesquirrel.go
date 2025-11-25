@@ -28,7 +28,7 @@ func NewFormOfTheSquirrel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewGrantAbilityEffect(triggerAbility)).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

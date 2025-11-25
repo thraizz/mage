@@ -29,8 +29,8 @@ func NewRoarOfTheFifthPeople(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability2 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("GreenManaAbility", effects.DurationWhileOnBattlefield)).
-		AddEffect(abilities.NewGrantAbilityEffect("WhiteManaAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("GreenManaAbility", effects.DurationPermanent)).
+		AddEffect(abilities.NewGrantAbilityEffect("WhiteManaAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

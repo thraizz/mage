@@ -22,7 +22,7 @@ func NewGlimmerOfGenius(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewScryEffect(1)).
-		AddEffect(abilities.NewDrawCardsEffect(2)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

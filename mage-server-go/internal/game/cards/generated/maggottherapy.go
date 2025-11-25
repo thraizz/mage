@@ -27,7 +27,7 @@ func NewMaggotTherapy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeUnboostCreature)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		AddEffect(abilities.NewBoostEnchantedEffect(2, -2)).
 		Build()
 	if err != nil {

@@ -27,7 +27,7 @@ func NewCallowJushi(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
-		// TODO: CounterUnlessPaysEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

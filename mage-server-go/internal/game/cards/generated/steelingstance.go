@@ -24,7 +24,7 @@ func NewSteelingStance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddEffect(abilities.NewBoostEffect(1, 1)).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

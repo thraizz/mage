@@ -22,7 +22,7 @@ func NewAegisOfTheHeavens(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 7)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

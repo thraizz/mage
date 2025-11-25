@@ -26,7 +26,7 @@ func NewApocalypseRunner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

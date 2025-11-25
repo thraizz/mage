@@ -28,7 +28,7 @@ func NewSarkhanFireblood(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	//   - DoIfCostPaid(                 new DrawCardSourceControllerEffec...)
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(4)).
+		AddEffect(abilities.NewCreateTokenEffect( /* TODO: token extraction failed */ )).
 		Build()
 	if err != nil {
 		return nil, err

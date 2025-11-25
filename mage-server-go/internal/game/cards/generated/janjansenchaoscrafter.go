@@ -34,7 +34,7 @@ func NewJanJansenChaosCrafter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	}
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
 		Build()
 	card.AddAbility(ability1)
 	token2_0, err := token.GetToken("ConstructToken")
@@ -43,7 +43,7 @@ func NewJanJansenChaosCrafter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	}
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token2_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token2_0, 2)).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

@@ -26,7 +26,7 @@ func NewTrustyRetriever(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -30,7 +30,7 @@ func NewJudgesFamiliar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddManaCost("{1}").
-		// TODO: CounterUnlessPaysEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

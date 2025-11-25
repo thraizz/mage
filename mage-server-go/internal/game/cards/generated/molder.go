@@ -21,7 +21,7 @@ func NewMolder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect("Destroy target artifact or enchantment with mana value X. It can't be regenerated", true)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
 		Build()
 	if err != nil {

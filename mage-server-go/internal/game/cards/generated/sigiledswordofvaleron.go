@@ -23,7 +23,7 @@ func NewSigiledSwordOfValeron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect("VigilanceAbility", abilities.AttachmentTypeEquipment)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
 		Build()
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func NewSigiledSwordOfValeron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1, false, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token1_0, 1, false)).
 		Build()
 	if err != nil {
 		return nil, err

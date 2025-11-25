@@ -34,7 +34,7 @@ func NewCradleOfSafety(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect("HexproofAbility", abilities.AttachmentTypeAura)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordHexproof), abilities.AttachmentTypeAura, abilities.DurationUntilEndOfTurn, "")).
 		Build()
 	if err != nil {
 		return nil, err

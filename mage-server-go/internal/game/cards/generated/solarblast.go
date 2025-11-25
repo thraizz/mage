@@ -24,8 +24,8 @@ func NewSolarBlast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddEffect(abilities.NewDamageEffect(1)).
 		AddEffect(abilities.NewDamageEffect(3)).
 		AddEffect(abilities.NewDamageEffect(1)).
-		AddTarget(abilities.NewAnyTargetFilter()).
-		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

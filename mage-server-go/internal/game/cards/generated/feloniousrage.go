@@ -28,7 +28,7 @@ func NewFeloniousRage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	if err != nil {

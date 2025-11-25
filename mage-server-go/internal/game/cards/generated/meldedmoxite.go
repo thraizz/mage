@@ -28,7 +28,7 @@ func NewMeldedMoxite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token0_0, 1, true)).
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects

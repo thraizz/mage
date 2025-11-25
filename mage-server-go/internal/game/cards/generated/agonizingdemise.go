@@ -21,7 +21,7 @@ func NewAgonizingDemise(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect(true)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(TargetPermanentPowerCount.instance)).
 		Build()
 	if err != nil {

@@ -34,7 +34,7 @@ func NewKoilosRoc(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		return nil, err
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0, 1, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token2_0, 1, true)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -25,7 +25,7 @@ func NewDevoutChaplain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: ExileTargetEffect with complex parameters
+		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -26,8 +26,8 @@ func NewDiscipleOfTheRing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		// TODO: TapTargetEffect with complex parameters
-		// TODO: UntapTargetEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
+		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func NewDiscipleOfTheRing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
-		// TODO: CounterUnlessPaysEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

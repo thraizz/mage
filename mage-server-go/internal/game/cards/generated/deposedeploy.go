@@ -26,10 +26,10 @@ func NewDeposeDeploy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: TapTargetEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

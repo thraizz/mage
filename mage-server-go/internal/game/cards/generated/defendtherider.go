@@ -27,10 +27,10 @@ func NewDefendTheRider(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility")).
-		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility", effects.DurationEndOfTurn)).
+		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

@@ -25,7 +25,7 @@ func NewKagemarosClutch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(xMinusValue, xMinusValue)).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeUnboostCreature)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		Build()
 	if err != nil {
 		return nil, err

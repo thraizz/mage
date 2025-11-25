@@ -26,12 +26,12 @@ func NewIorethOfTheHealingHouse(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: UntapTargetEffect with complex parameters
+		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: UntapTargetEffect with complex parameters
+		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -28,7 +28,7 @@ func NewFlashThompsonSpiderFan(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: TapTargetEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		Build()
 	if err != nil {
 		return nil, err

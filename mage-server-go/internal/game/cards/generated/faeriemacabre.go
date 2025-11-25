@@ -27,7 +27,7 @@ func NewFaerieMacabre(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: ExileTargetEffect with complex parameters
+		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

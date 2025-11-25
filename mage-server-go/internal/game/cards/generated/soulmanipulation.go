@@ -22,8 +22,8 @@ func NewSoulManipulation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
-		// TODO: CounterTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	if err != nil {
 		return nil, err

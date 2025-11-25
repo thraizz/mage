@@ -26,7 +26,7 @@ func NewAdrianaCaptainOfTheGuard(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("MeleeAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("MeleeAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -23,7 +23,7 @@ func NewDuelistsFlame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
-		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

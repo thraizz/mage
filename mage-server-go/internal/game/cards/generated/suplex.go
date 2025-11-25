@@ -22,8 +22,9 @@ func NewSuplex(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(3)).
-		// TODO: ExileTargetEffect with complex parameters
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddEffect(abilities.NewExileTargetEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

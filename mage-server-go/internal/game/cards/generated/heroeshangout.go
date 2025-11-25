@@ -22,6 +22,7 @@ func NewHeroesHangout(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
+		AddTarget(abilities.NewTargetRequirement(1, 2, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

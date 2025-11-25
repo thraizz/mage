@@ -21,7 +21,7 @@ func NewUrborgRepossession(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		AddEffect(abilities.NewGainLifeEffect(2)).
 		Build()
 	if err != nil {

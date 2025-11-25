@@ -25,7 +25,7 @@ func NewKoglaAndYidaro(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability0)

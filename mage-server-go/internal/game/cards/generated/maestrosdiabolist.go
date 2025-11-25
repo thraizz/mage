@@ -34,7 +34,7 @@ func NewMaestrosDiabolist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0, 1, true, true)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token2_0, 1, true, true)).
 		Build()
 	if err != nil {
 		return nil, err

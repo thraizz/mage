@@ -30,7 +30,7 @@ func NewTheWorldTree(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("AnyColorManaAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("AnyColorManaAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

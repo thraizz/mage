@@ -22,7 +22,7 @@ func NewCrookOfCondemnation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: ExileTargetEffect with complex parameters
+		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement activated ability with unmapped effects

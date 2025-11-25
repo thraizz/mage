@@ -23,9 +23,9 @@ func NewValorousStance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
-		// TODO: DestroyTargetEffect with complex parameters
-		// TODO: DestroyTargetEffect with complex parameters
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

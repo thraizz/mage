@@ -22,7 +22,7 @@ func NewUndercitysEmbrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(4)).
-		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

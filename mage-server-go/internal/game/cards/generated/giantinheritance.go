@@ -39,7 +39,7 @@ func NewGiantInheritance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnToHandSourceEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		Build()
 	if err != nil {
 		return nil, err

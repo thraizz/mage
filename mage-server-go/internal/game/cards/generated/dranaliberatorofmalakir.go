@@ -31,7 +31,7 @@ func NewDranaLiberatorOfMalakir(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: AddCountersAllEffect with complex parameters
+		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), nil, "")).
 		Build()
 	if err != nil {
 		return nil, err

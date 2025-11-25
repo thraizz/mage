@@ -23,12 +23,8 @@ func NewThundercloudShaman(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(filterNonGiants)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(new PermanentsOnBattlefieldCount(filterGiants),fil...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

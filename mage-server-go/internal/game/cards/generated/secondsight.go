@@ -24,7 +24,7 @@ func NewSecondSight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	//   - LookLibraryControllerEffect(5)
 	//
 	// Targets:
-	//   - abilities.NewOpponentTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

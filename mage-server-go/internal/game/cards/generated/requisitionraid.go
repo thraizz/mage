@@ -21,9 +21,11 @@ func NewRequisitionRaid(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DestroyTargetEffect with complex parameters
-		// TODO: DestroyTargetEffect with complex parameters
-		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewEnchantmentTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

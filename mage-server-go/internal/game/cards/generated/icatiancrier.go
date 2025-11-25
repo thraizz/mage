@@ -30,7 +30,7 @@ func NewIcatianCrier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

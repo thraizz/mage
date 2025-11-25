@@ -24,7 +24,7 @@ func NewMindBurst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	//   - DiscardTargetEffect(numberOfCardsNamedMindBurst)
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

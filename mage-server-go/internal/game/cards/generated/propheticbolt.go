@@ -24,7 +24,7 @@ func NewPropheticBolt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	//   - LookLibraryAndPickControllerEffect(4, 1, PutCards.HAND, PutCards.BOTTOM_ANY)
 	//
 	// Targets:
-	//   - abilities.NewAnyTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

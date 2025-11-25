@@ -26,8 +26,8 @@ func NewNissaVoiceOfZendikar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: GainLifeEffect with complex parameters
-		// TODO: DrawCardSourceControllerEffect with complex parameters
+		AddEffect(abilities.NewGainLifeEffect()).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func NewNissaVoiceOfZendikar(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1))).
+		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), nil, "")).
 		Build()
 	if err != nil {
 		return nil, err

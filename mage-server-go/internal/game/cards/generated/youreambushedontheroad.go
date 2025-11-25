@@ -22,7 +22,7 @@ func NewYoureAmbushedOnTheRoad(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 3)).
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

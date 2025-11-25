@@ -29,7 +29,7 @@ func NewGraveyardMarshal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1, true, false)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, false)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -23,9 +23,9 @@ func NewWhirlingStrike(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
-		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility")).
-		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility")).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
+		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

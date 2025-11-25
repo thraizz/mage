@@ -23,7 +23,7 @@ func NewPelakkaPredation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "B")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

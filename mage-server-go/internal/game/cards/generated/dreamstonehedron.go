@@ -24,7 +24,7 @@ func NewDreamstoneHedron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{3}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDrawCardsEffect(3)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

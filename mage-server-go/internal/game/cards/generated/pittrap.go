@@ -24,7 +24,7 @@ func NewPitTrap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		AddManaCost("{2}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDestroyEffect(true)).
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

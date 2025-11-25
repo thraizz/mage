@@ -33,7 +33,7 @@ func NewArahboTheFirstFang(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: CreateTokenEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffect( /* TODO: token extraction failed */ )).
 		Build()
 	if err != nil {
 		return nil, err

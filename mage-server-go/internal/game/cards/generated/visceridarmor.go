@@ -26,7 +26,7 @@ func NewVisceridArmor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		AddEffect(abilities.NewBoostEnchantedEffect(1, 1)).
-		// TODO: ReturnToHandSourceEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		Build()
 	if err != nil {
 		return nil, err

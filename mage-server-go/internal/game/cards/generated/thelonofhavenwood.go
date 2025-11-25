@@ -26,7 +26,7 @@ func NewThelonOfHavenwood(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeSpore.CreateInstance(1), filterPermanent)).
+		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeSpore.CreateInstance(1), nil, "")).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

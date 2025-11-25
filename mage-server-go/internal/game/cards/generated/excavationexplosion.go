@@ -27,8 +27,8 @@ func NewExcavationExplosion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(3)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1, true)).
-		AddTarget(abilities.NewAnyTargetFilter()).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token0_0, 1, true)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

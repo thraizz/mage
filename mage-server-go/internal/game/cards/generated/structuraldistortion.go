@@ -21,7 +21,7 @@ func NewStructuralDistortion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ExileTargetEffect with complex parameters
+		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewDamageEffect(2)).
 		Build()
 	if err != nil {

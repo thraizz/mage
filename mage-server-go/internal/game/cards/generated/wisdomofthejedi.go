@@ -23,7 +23,7 @@ func NewWisdomOfTheJedi(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		// TODO: CounterTargetEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	if err != nil {
 		return nil, err

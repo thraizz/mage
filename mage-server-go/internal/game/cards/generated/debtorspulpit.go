@@ -24,7 +24,7 @@ func NewDebtorsPulpit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeTap)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeDetriment)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func NewDebtorsPulpit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: TapTargetEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

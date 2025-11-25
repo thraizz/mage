@@ -21,8 +21,9 @@ func NewFrenziedTilling(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		// TODO: SearchLibraryPutInPlayEffect with complex parameters
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

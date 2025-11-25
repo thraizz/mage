@@ -23,8 +23,8 @@ func NewYouSeeAGuardApproach(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility", effects.DurationEndOfTurn)).
-		// TODO: TapTargetEffect with complex parameters
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddEffect(abilities.NewTapEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

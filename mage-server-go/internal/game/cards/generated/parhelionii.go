@@ -37,7 +37,7 @@ func NewParhelionII(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		return nil, err
 	}
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token3_0, 2, false, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token3_0, 2, false)).
 		Build()
 	if err != nil {
 		return nil, err

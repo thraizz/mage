@@ -26,7 +26,7 @@ func NewEncroachingWastes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		AddManaCost("{4}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

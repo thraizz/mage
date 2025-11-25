@@ -25,7 +25,7 @@ func NewCreativeOutburst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	//   - LookLibraryAndPickControllerEffect(5, 1, PutCards.HAND, PutCards.BOTTOM_RANDOM)
 	//
 	// Targets:
-	//   - abilities.NewAnyTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
 	// card.AddAbility(ability0)
 	token1_0, err := token.GetToken("TreasureToken")
 	if err != nil {

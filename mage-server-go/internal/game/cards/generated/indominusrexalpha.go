@@ -51,7 +51,7 @@ func NewIndominusRexAlpha(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability11 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability11)
 	ability12, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(CountersSourceCount.ANY)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

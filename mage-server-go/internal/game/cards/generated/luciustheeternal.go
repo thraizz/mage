@@ -28,7 +28,7 @@ func NewLuciusTheEternal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ExileSourceEffect with complex parameters
+		AddEffect(abilities.NewExileSourceEffect()).
 		Build()
 	if err != nil {
 		return nil, err

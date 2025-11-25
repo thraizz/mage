@@ -36,5 +36,12 @@ func NewUrtetRemnantOfMemnarch(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 		return nil, err
 	}
 	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewUntapEffect(filter2)).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
 	return card, nil
 }

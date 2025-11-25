@@ -33,7 +33,7 @@ func NewZagrasThiefOfHeartbeats(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

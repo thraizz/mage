@@ -26,9 +26,8 @@ func NewIfhBiffEfreet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(1)).
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageAllEffect(1, StaticFilters.FILTER_CREATURE_FLYING)
+	// card.AddAbility(ability1)
 	return card, nil
 }

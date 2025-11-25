@@ -31,7 +31,7 @@ func NewGiantOpportunity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_1, 3)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_1, 3)).
 		Build()
 	if err != nil {
 		return nil, err

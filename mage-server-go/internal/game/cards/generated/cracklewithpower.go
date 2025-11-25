@@ -22,6 +22,7 @@ func NewCrackleWithPower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(value)).
+		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

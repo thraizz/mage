@@ -21,7 +21,8 @@ func NewCalamitousTide(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
+		AddTarget(abilities.NewTargetRequirement(0, 2, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

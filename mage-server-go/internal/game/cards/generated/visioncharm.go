@@ -34,7 +34,7 @@ func NewVisionCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	//   - PhaseOutTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	// card.AddAbility(ability5)
 	return card, nil
 }

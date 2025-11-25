@@ -24,7 +24,7 @@ func NewCruelUltimatum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - DiscardTargetEffect(3)
 	//
 	// Targets:
-	//   - abilities.NewOpponentTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

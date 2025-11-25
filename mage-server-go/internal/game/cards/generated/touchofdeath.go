@@ -24,6 +24,7 @@ func NewTouchOfDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddEffect(abilities.NewDamageEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

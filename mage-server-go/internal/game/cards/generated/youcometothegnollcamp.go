@@ -22,6 +22,7 @@ func NewYouComeToTheGnollCamp(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(3, 1)).
+		AddTarget(abilities.NewTargetRequirement(0, 2, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

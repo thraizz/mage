@@ -26,7 +26,7 @@ func NewSublimeEpiphany(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	//   - CreateTokenCopyTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewSpellTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

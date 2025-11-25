@@ -26,7 +26,7 @@ func NewMishrasOnslaught(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
 		Build()
 	if err != nil {

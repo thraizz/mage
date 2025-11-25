@@ -26,7 +26,7 @@ func NewBenthicore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: UntapSourceEffect with complex parameters
+		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewGrantAbilityEffect("ShroudAbility", effects.DurationEndOfTurn)).
 		Build()
 	card.AddAbility(ability0)
@@ -35,7 +35,7 @@ func NewBenthicore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err

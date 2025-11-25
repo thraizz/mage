@@ -25,7 +25,7 @@ func NewGrotagSiegeRunner(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(2)).
 		Build()
 	card.AddAbility(ability0)

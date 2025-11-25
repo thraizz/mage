@@ -29,7 +29,7 @@ func NewTheBattleOfEndor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, GetXValue.instance)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {

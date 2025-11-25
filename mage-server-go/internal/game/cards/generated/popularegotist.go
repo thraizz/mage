@@ -26,7 +26,7 @@ func NewPopularEgotist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
-		// TODO: TapSourceEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

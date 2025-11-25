@@ -22,7 +22,7 @@ func NewFinalPunishment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: LoseLifeTargetEffect with complex parameters
-		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

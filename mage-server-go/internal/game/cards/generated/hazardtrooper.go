@@ -25,7 +25,7 @@ func NewHazardTrooper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("IntimidateAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("IntimidateAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

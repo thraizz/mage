@@ -24,7 +24,7 @@ func NewPsychicDrain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
-		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

@@ -26,7 +26,7 @@ func NewAllyEncampment(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{1}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

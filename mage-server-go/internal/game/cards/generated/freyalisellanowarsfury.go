@@ -25,7 +25,7 @@ func NewFreyaliseLlanowarsFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func NewFreyaliseLlanowarsFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DrawCardSourceControllerEffect with complex parameters
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

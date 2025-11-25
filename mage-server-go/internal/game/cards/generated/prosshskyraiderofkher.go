@@ -33,7 +33,7 @@ func NewProsshSkyraiderOfKher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, ManaSpentToCastCount.instance)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	if err != nil {
 		return nil, err

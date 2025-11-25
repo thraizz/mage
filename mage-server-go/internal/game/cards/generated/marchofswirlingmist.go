@@ -22,6 +22,9 @@ func NewMarchOfSwirlingMist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - PhaseOutTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(0, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

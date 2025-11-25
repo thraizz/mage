@@ -20,13 +20,9 @@ func NewCaughtInTheCrossfire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DamageAllEffect with complex parameters
-		AddEffect(abilities.NewDamageEffect(2, filter2)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(2, filter)
+	//   - DamageAllEffect(2, filter2)
+	// card.AddAbility(ability0)
 	return card, nil
 }

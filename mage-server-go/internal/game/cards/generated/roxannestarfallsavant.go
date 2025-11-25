@@ -30,7 +30,7 @@ func NewRoxanneStarfallSavant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token0_0, 1, true)).
 		Build()
 	if err != nil {
 		return nil, err

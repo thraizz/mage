@@ -23,7 +23,7 @@ func NewBalaGedRecovery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -33,7 +33,7 @@ func NewThopterSquadron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), true)).
 		Build()
 	if err != nil {

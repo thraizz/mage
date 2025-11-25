@@ -30,7 +30,7 @@ func NewMemorialToGlory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

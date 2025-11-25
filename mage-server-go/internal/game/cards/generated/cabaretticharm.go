@@ -27,7 +27,7 @@ func NewCabarettiCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(CreaturesYouControlCount.PLURAL)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err

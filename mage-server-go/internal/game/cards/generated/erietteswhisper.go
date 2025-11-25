@@ -24,7 +24,7 @@ func NewEriettesWhisper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	//   - DiscardTargetEffect(2)
 	//
 	// Targets:
-	//   - abilities.NewOpponentTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

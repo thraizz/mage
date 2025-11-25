@@ -36,7 +36,7 @@ func NewGoldveinHydra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token3_0, SourcePermanentPowerValue.NOT_NEGATIVE, true, false)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token3_0, 1, true, false)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -29,7 +29,7 @@ func NewOriginSpellbomb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{1}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects

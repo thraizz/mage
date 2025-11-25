@@ -30,7 +30,7 @@ func NewSonicTheHedgehog(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: AddCountersAllEffect with complex parameters
+		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), nil, "")).
 		Build()
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func NewSonicTheHedgehog(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0, 1, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token2_0, 1, true)).
 		Build()
 	if err != nil {
 		return nil, err

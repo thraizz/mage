@@ -21,7 +21,7 @@ func NewNeverHappened(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

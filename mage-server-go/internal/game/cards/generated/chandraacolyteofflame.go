@@ -29,7 +29,7 @@ func NewChandraAcolyteOfFlame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	//   - SacrificeTargetEffect()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: AddCountersAllEffect with complex parameters
+		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeLoyalty.CreateInstance(1), nil, "")).
 		Build()
 	if err != nil {
 		return nil, err

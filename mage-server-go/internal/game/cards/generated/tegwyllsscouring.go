@@ -27,7 +27,7 @@ func NewTegwyllsScouring(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: DestroyAllEffect with complex parameters
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 3)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 3)).
 		Build()
 	if err != nil {
 		return nil, err

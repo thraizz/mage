@@ -39,7 +39,7 @@ func NewTattooWard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.AddAbility(ability2)
 	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	card.AddAbility(ability3)
 	return card, nil

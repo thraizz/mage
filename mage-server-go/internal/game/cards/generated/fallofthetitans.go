@@ -22,6 +22,7 @@ func NewFallOfTheTitans(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(GetXValue.instance, true)).
+		AddTarget(abilities.NewTargetRequirement(0, 2, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

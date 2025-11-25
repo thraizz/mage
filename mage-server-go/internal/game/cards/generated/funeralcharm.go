@@ -25,9 +25,9 @@ func NewFuneralCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	//   - DiscardTargetEffect(1)
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
-	//   - abilities.NewCreatureTargetFilter()
-	//   - abilities.NewCreatureTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

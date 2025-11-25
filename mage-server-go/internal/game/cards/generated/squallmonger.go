@@ -23,9 +23,8 @@ func NewSquallmonger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(1)).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageAllEffect(1, StaticFilters.FILTER_CREATURE_FLYING)
+	// card.AddAbility(ability0)
 	return card, nil
 }

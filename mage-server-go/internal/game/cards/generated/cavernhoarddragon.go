@@ -36,7 +36,7 @@ func NewCavernHoardDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: CreateTokenEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffect(token3_0)).
 		Build()
 	if err != nil {
 		return nil, err

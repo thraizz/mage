@@ -1,19 +1,17 @@
 <script lang="ts">
 	import Card from './Card.svelte';
 	import type { GameCard } from '$lib/types/game';
+	import type { CardView } from '$lib/generated/mage/v1/models';
+	import { myHand, selectedCards, gameStore } from '$lib/stores/game';
 
-	// Props
+	// Props (optional callbacks for additional handling like target selection)
 	let {
-		cards = [],
-		selectedCardIds = [],
 		// eslint-disable-next-line no-unused-vars
 		onCardClick = (cardId: string) => {},
 		// eslint-disable-next-line no-unused-vars
 		onCardHover = (cardId: string) => {},
 		size = 'normal'
 	}: {
-		cards?: GameCard[];
-		selectedCardIds?: string[];
 		// eslint-disable-next-line no-unused-vars
 		onCardClick?: (cardId: string) => void;
 		// eslint-disable-next-line no-unused-vars
@@ -22,30 +20,61 @@
 	} = $props();
 
 	// State
-	let selectedCardId = $state<string | null>(null);
 	let multiSelectMode = $state(false);
+
+	/**
+	 * Convert CardView from proto to GameCard for components
+	 */
+	function toGameCard(card: CardView): GameCard {
+		return {
+			id: card.id,
+			name: card.name,
+			manaCost: card.manaCost,
+			cardType: card.type,
+			power: card.power,
+			toughness: card.toughness,
+			imageUrl: '',
+			isTapped: card.tapped,
+			isSelected: false,
+			ownerId: card.ownerId,
+			controllerId: card.controllerId
+		};
+	}
+
+	// Always use game store for cards and selection
+	const handCards = $derived(($myHand || []).map(toGameCard));
+	const selectedCardIds = $derived($selectedCards || []);
 
 	/**
 	 * Handle card click
 	 */
-	function handleCardClick(cardId: string, event: MouseEvent): void {
+	function handleCardClick(cardId: string, event?: MouseEvent | KeyboardEvent): void {
 		// Check for multi-select (Shift key)
-		if (event.shiftKey) {
+		if (event?.shiftKey) {
 			multiSelectMode = true;
-			// Toggle selection
-			if (selectedCardIds.includes(cardId)) {
-				selectedCardIds = selectedCardIds.filter((id) => id !== cardId);
-			} else {
-				selectedCardIds = [...selectedCardIds, cardId];
-			}
+			// Toggle selection in game store
+			gameStore.toggleCardSelection(cardId);
 		} else {
-			// Single select
+			// Single select - clear all and select this one
 			multiSelectMode = false;
-			selectedCardId = selectedCardId === cardId ? null : cardId;
-			selectedCardIds = selectedCardId ? [selectedCardId] : [];
+			const isSelected = selectedCardIds.includes(cardId);
+			gameStore.clearSelection();
+			if (!isSelected) {
+				gameStore.toggleCardSelection(cardId);
+			}
 		}
 
 		onCardClick(cardId);
+	}
+
+	/**
+	 * Handle keyboard events for accessibility
+	 */
+	function handleKeydown(cardId: string, event: KeyboardEvent): void {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			handleCardClick(cardId, event);
+		}
 	}
 
 	/**
@@ -63,7 +92,7 @@
 	}
 
 	// Derived values
-	const handCount = $derived(cards.length);
+	const handCount = $derived(handCards.length);
 	const isEmpty = $derived(handCount === 0);
 </script>
 
@@ -82,8 +111,16 @@
 		</div>
 	{:else}
 		<div class="hand-cards">
-			{#each cards as card (card.id)}
-				<div class="card-wrapper">
+			{#each handCards as card (card.id)}
+				<div
+					class="card-wrapper"
+					role="button"
+					tabindex="0"
+					onclick={(e) => handleCardClick(card.id, e)}
+					onkeydown={(e) => handleKeydown(card.id, e)}
+					onmouseenter={() => handleCardHover(card.id)}
+					aria-label={`Card: ${card.name}`}
+				>
 					<Card
 						cardId={card.id}
 						cardName={card.name}
@@ -96,8 +133,8 @@
 						isSelected={isCardSelected(card.id)}
 						counters={card.counters || []}
 						{size}
-						onclick={() => handleCardClick(card.id, event as MouseEvent)}
-						onhover={() => handleCardHover(card.id)}
+						onclick={() => {}}
+						onhover={() => {}}
 					/>
 				</div>
 			{/each}

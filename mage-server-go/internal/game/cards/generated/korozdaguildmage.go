@@ -38,7 +38,7 @@ func NewKorozdaGuildmage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		return nil, err
 	}
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, SacrificeCostCreaturesToughness.instance)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

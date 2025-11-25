@@ -389,6 +389,7 @@
 				<span>DEV MODE</span>
 			</div>
 
+			<div class="dev-login-buttons">
 			<button type="button" class="btn-dev" on:click={handleDevLogin} disabled={isLoading}>
 				{#if isLoading}
 					<span class="spinner" aria-hidden="true"></span>
@@ -406,6 +407,7 @@
 					[DEV] thraizz2
 				{/if}
 			</button>
+			</div>
 		{/if}
 
 		<div class="links">
@@ -651,5 +653,11 @@
 		justify-content: flex-end;
 		gap: 0.75rem;
 		margin-top: 0.5rem;
+	}
+
+	.dev-login-buttons {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 </style>

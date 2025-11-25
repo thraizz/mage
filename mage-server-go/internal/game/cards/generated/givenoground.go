@@ -22,10 +22,10 @@ func NewGiveNoGround(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(gainedAbility)).
+		// TODO: GainAbilityTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(2, 6)).
-		AddEffect(abilities.NewGrantAbilityEffect(gainedAbility)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		// TODO: GainAbilityTargetEffect with complex parameters
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

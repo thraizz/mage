@@ -21,7 +21,7 @@ func NewReturnOfTheWildspeaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(xValue)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {

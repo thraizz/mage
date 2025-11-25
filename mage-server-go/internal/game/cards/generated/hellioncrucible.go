@@ -32,7 +32,7 @@ func NewHellionCrucible(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: CreateTokenEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffect( /* TODO: token extraction failed */ )).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

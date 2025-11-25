@@ -32,7 +32,7 @@ func NewHearthhullTheWorldseed(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability3 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(2)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability3)
 	return card, nil

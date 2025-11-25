@@ -34,7 +34,7 @@ func NewPhenaxGodOfDeception(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(false)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

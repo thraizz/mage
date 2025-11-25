@@ -24,7 +24,7 @@ func NewThaumatonTorpedo(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{6}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

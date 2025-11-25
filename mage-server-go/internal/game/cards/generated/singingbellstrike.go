@@ -25,7 +25,7 @@ func NewSingingBellStrike(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.AURA)).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeUnboostCreature)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func NewSingingBellStrike(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{6}").
-		// TODO: UntapSourceEffect with complex parameters
+		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

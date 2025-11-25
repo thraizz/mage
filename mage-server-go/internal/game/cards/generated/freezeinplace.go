@@ -22,7 +22,7 @@ func NewFreezeInPlace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: TapTargetEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 3))).
 		AddEffect(abilities.NewScryEffect(1)).
 		Build()

@@ -20,5 +20,14 @@ func NewUrgentNecropsy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewArtifactTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(0, 1, abilities.NewEnchantmentTargetFilter())).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

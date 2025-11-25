@@ -25,7 +25,7 @@ func NewFalkenrathExterminator(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: DamageTargetEffect with complex parameters
+		AddEffect(abilities.NewDamageEffect()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

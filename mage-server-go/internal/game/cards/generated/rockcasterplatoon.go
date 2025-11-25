@@ -23,9 +23,8 @@ func NewRockcasterPlatoon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(2)).
-		Build()
-	card.AddAbility(ability0)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageAllEffect(2, StaticFilters.FILTER_CREATURE_FLYING)
+	// card.AddAbility(ability0)
 	return card, nil
 }

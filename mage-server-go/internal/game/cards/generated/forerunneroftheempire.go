@@ -30,12 +30,8 @@ func NewForerunnerOfTheEmpire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		return nil, err
 	}
 	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(1)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(1, StaticFilters.FILTER_PERMANENT_CREATURE)
+	// card.AddAbility(ability1)
 	return card, nil
 }

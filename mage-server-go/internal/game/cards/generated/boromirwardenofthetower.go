@@ -35,7 +35,7 @@ func NewBoromirWardenOfTheTower(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: CounterTargetEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	if err != nil {
 		return nil, err

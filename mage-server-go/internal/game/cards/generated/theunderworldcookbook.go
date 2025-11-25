@@ -34,7 +34,7 @@ func NewTheUnderworldCookbook(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		AddManaCost("{4}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

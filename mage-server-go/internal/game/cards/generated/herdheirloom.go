@@ -23,7 +23,7 @@ func NewHerdHeirloom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()

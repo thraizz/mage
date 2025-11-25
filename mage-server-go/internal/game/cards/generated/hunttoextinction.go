@@ -21,14 +21,9 @@ func NewHuntToExtinction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DamageAllEffect with complex parameters
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeBounty.CreateInstance(1))).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(GetXValue.instance, filter)
+	//   - DamageAllEffect(GetXValue.instance, new FilterCreaturePermanent())
+	// card.AddAbility(ability0)
 	return card, nil
 }

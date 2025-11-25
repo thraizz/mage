@@ -36,7 +36,7 @@ func NewZacamaPrimalCalamity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		Build()
 	card.AddAbility(ability3)
 	ability4 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	card.AddAbility(ability4)
 	return card, nil

@@ -22,7 +22,7 @@ func NewHeliophial(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DamageTargetEffect with complex parameters
+		AddEffect(abilities.NewDamageEffect()).
 		Build()
 	if err != nil {
 		return nil, err

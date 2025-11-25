@@ -29,7 +29,7 @@ func NewBrineShaman(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: CounterTargetEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

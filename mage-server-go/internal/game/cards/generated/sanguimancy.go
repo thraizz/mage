@@ -21,7 +21,7 @@ func NewSanguimancy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(DevotionCount.B)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(DevotionCount.B)).
 		AddEffect(abilities.NewLoseLifeEffect(DevotionCount.B)).
 		Build()

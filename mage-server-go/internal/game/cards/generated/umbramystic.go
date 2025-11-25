@@ -25,7 +25,7 @@ func NewUmbraMystic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("UmbraArmorAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("UmbraArmorAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

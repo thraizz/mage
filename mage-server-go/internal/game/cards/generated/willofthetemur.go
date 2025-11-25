@@ -24,9 +24,9 @@ func NewWillOfTheTemur(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(WillOfTheTemurValue.instance)).
-		AddTarget(abilities.NewPermanentTargetFilter()).
-		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

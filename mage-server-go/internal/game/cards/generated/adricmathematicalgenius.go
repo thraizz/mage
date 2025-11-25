@@ -27,7 +27,7 @@ func NewAdricMathematicalGenius(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		// TODO: CounterTargetEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -20,12 +20,8 @@ func NewPlanetaryAnnihilation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(6)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(6, StaticFilters.FILTER_PERMANENT_CREATURE)
+	// card.AddAbility(ability0)
 	return card, nil
 }

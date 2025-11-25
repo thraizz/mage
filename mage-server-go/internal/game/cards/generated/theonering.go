@@ -28,7 +28,7 @@ func NewTheOneRing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("burden", 1))).
-		AddEffect(abilities.NewDrawCardsEffect(xValue)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

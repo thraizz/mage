@@ -27,7 +27,7 @@ func NewFrightshroudCourier(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewBoostEffect(2, 2)).
-		AddEffect(abilities.NewGrantAbilityEffect("FearAbility", effects.DurationCustom)).
+		AddEffect(abilities.NewGrantAbilityEffect("FearAbility", effects.DurationPermanent)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -20,14 +20,9 @@ func NewTheBattleOfGeonosis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DamageAllEffect with complex parameters
-		// TODO: DamageAllEffect with complex parameters
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(new IntPlusDynamicValue(1, GetXValue.instance), ne...)
+	//   - DamageAllEffect(new IntPlusDynamicValue(1, GetXValue.instance), ne...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

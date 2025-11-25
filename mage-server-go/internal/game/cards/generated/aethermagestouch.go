@@ -22,7 +22,7 @@ func NewAethermagesTouch(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnToHandSourceEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		// TODO: GainAbilityTargetEffect with complex parameters
 		Build()
 	if err != nil {

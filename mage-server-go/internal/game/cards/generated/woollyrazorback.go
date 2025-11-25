@@ -26,7 +26,7 @@ func NewWoollyRazorback(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("DefenderAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("DefenderAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

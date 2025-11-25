@@ -29,7 +29,7 @@ func NewDeathcapCultivator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

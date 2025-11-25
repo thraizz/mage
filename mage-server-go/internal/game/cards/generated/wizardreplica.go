@@ -30,7 +30,7 @@ func NewWizardReplica(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddSacrificeSourceCost().
-		// TODO: CounterUnlessPaysEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

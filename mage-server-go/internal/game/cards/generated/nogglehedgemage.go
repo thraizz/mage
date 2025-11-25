@@ -24,7 +24,7 @@ func NewNoggleHedgeMage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: TapTargetEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewDamageEffect(2)).
 		Build()
 	if err != nil {

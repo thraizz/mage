@@ -27,7 +27,7 @@ func NewSpellkeeperWeird(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 		AddManaCost("{2}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

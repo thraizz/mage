@@ -32,7 +32,7 @@ func NewLootThePathfinder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(3)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewDamageEffect(3)).
 		Build()
 	if err != nil {

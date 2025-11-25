@@ -23,7 +23,7 @@ func NewBargain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(7)).
-		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

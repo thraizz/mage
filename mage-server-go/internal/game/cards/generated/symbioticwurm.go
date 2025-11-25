@@ -29,7 +29,7 @@ func NewSymbioticWurm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 7)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 7)).
 		Build()
 	if err != nil {
 		return nil, err

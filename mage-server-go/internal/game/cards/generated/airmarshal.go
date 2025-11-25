@@ -26,7 +26,7 @@ func NewAirMarshal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
-		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

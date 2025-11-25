@@ -34,7 +34,7 @@ func NewApothecaryWhite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, GetXValue.instance)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	card.AddAbility(ability1)
 	token2_0, err := token.GetToken("FoodToken")
@@ -42,7 +42,7 @@ func NewApothecaryWhite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0, ApothecaryWhiteValue.instance)).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
 		Build()
 	if err != nil {
 		return nil, err

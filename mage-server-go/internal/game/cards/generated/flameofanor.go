@@ -21,11 +21,12 @@ func NewFlameOfAnor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(2)).
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(5)).
-		AddTarget(abilities.NewPlayerTargetFilter()).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

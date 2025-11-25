@@ -27,7 +27,7 @@ func NewIzoniCenterOfTheWeb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewSurveilEffect(1)).
-		AddEffect(abilities.NewDrawCardsEffect(2)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
 		Build()
 	card.AddAbility(ability0)

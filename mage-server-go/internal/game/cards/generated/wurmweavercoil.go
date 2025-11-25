@@ -31,7 +31,7 @@ func NewWurmweaverCoil(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		AddEffect(abilities.NewBoostEnchantedEffect(6, 6)).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func NewWurmweaverCoil(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCreateTokenEffect(token2_0, 1)).
+		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

@@ -29,7 +29,7 @@ func NewGodsEyeGateToTheReikai(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	if err != nil {
 		return nil, err

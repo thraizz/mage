@@ -30,7 +30,7 @@ func NewAurification(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("DefenderAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("DefenderAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

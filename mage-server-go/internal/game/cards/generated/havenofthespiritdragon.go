@@ -25,7 +25,7 @@ func NewHavenOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

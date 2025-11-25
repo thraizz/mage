@@ -30,7 +30,7 @@ func NewTheDestinedWhiteMage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

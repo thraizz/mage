@@ -27,8 +27,8 @@ func NewDonAndresTheRenegade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("MenaceAbility", effects.DurationWhileOnBattlefield)).
-		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("MenaceAbility", effects.DurationPermanent)).
+		AddEffect(abilities.NewGrantAbilityEffect("DeathtouchAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func NewDonAndresTheRenegade(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 2, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token1_0, 2, true)).
 		Build()
 	if err != nil {
 		return nil, err

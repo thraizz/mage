@@ -24,7 +24,7 @@ func NewDrudgeSentinel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: TapSourceEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
 		Build()
 	card.AddAbility(ability0)

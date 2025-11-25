@@ -25,7 +25,7 @@ func NewSapphireCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	//   - PhaseOutTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

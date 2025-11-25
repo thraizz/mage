@@ -21,8 +21,8 @@ func NewCloudsLimitBreak(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DestroyTargetEffect with complex parameters
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewDestroyEffect()).
 		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	if err != nil {

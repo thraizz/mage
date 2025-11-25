@@ -23,10 +23,10 @@ func NewEnterTheAvatarState(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility")).
-		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility")).
-		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility")).
-		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
+		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
+		AddEffect(abilities.NewGrantAbilityEffect("LifelinkAbility", effects.DurationEndOfTurn)).
+		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

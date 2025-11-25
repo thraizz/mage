@@ -25,7 +25,7 @@ func NewSurgeOfStrength(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewBoostEffect(TargetManaValue.instance, StaticValue.get(0))).
 		AddEffect(abilities.NewBoostEffect(TargetManaValue.instance, StaticValue.get(0))).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

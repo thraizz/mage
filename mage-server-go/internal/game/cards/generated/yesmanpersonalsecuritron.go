@@ -26,7 +26,7 @@ func NewYesManPersonalSecuritron(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(2)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeQuest.CreateInstance(1))).
 		Build()
 	if err != nil {

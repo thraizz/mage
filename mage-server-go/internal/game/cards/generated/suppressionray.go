@@ -25,7 +25,7 @@ func NewSuppressionRay(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

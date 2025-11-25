@@ -22,11 +22,11 @@ func NewVadersCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DestroyTargetEffect with complex parameters
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewGainLifeEffect(5)).
 		// TODO: CounterUnlessPaysEffect with complex parameters
-		AddTarget(abilities.NewSpellTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

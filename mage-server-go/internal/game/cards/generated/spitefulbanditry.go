@@ -21,13 +21,9 @@ func NewSpitefulBanditry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(                 GetXValue.instance, StaticFilters...)
+	// card.AddAbility(ability0)
 	token1_0, err := token.GetToken("TreasureToken")
 	if err != nil {
 		return nil, err

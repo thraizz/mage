@@ -33,7 +33,7 @@ func NewAshnodFleshMechanist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{5}").
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1, true, false)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token1_0, 1, true, false)).
 		Build()
 	card.AddAbility(ability1)
 	// TODO: Implement spell ability with unmapped effects

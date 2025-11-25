@@ -21,8 +21,9 @@ func NewGeomancersGambit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

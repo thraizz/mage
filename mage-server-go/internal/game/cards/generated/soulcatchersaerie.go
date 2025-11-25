@@ -29,7 +29,7 @@ func NewSoulcatchersAerie(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: BoostAllEffect with complex parameters
+		AddEffect(abilities.NewBoostEffect(filter2, false)).
 		Build()
 	if err != nil {
 		return nil, err

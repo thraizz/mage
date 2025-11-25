@@ -21,7 +21,7 @@ func NewBlacksmithsSkill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

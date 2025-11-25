@@ -26,7 +26,7 @@ func NewDawnCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	//   - RegenerateTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewCreatureTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

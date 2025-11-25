@@ -23,6 +23,9 @@ func NewElminstersSimulacrum(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(0, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -22,6 +22,7 @@ func NewPinnacleOfRage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(3)).
+		AddTarget(abilities.NewTargetRequirement(2, 2, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

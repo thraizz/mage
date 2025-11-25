@@ -26,7 +26,7 @@ func NewGatherTheWhiteLotus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, xValue)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewScryEffect(1)).
 		Build()
 	if err != nil {

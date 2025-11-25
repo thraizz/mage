@@ -20,14 +20,10 @@ func NewFireMagic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(1)).
-		AddEffect(abilities.NewDamageEffect(2)).
-		AddEffect(abilities.NewDamageEffect(3)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(1, StaticFilters.FILTER_PERMANENT_CREATURE)
+	//   - DamageAllEffect(2, StaticFilters.FILTER_PERMANENT_CREATURE)
+	//   - DamageAllEffect(3, StaticFilters.FILTER_PERMANENT_CREATURE)
+	// card.AddAbility(ability0)
 	return card, nil
 }

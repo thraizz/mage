@@ -24,7 +24,7 @@ func NewThawingGlaciers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddManaCost("{1}").
 		AddTapCost().
 		// TODO: SearchLibraryPutInPlayEffect with complex parameters
-		// TODO: ReturnToHandSourceEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -26,14 +26,14 @@ func NewEndlessScream(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		// TODO: BoostEnchantedEffect with complex parameters
+		AddEffect(abilities.NewBoostEnchantedEffect(StaticValue.get(0))).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: BoostEnchantedEffect with complex parameters
+		AddEffect(abilities.NewBoostEnchantedEffect(StaticValue.get(0))).
 		Build()
 	if err != nil {
 		return nil, err

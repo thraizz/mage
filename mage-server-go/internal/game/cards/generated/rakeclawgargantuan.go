@@ -25,7 +25,7 @@ func NewRakeclawGargantuan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", abilities.DurationUntilEndOfTurn)).
+		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

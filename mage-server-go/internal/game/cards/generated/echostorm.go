@@ -23,6 +23,9 @@ func NewEchoStorm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - CreateTokenCopyTargetEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -28,7 +28,7 @@ func NewJaheiraFriendOfTheForest(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("GreenManaAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("GreenManaAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

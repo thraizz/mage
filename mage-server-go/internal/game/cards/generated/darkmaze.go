@@ -28,7 +28,7 @@ func NewDarkMaze(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{0}").
-		// TODO: ExileSourceEffect with complex parameters
+		AddEffect(abilities.NewExileSourceEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -23,7 +23,7 @@ func NewOnWingsOfGold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func NewOnWingsOfGold(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1, false, false)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token1_0, 1, false)).
 		Build()
 	if err != nil {
 		return nil, err

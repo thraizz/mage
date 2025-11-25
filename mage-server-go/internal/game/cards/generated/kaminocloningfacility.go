@@ -29,7 +29,7 @@ func NewKaminoCloningFacility(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	}
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

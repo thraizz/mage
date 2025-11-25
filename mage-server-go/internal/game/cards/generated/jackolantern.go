@@ -24,7 +24,7 @@ func NewJackOLantern(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddManaCost("{1}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: ExileTargetEffect with complex parameters
+		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability0)

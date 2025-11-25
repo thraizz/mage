@@ -22,8 +22,8 @@ func NewValorMadeReal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(gainedAbility)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		// TODO: GainAbilityTargetEffect with complex parameters
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

@@ -32,7 +32,7 @@ func NewBrimazKingOfOreskos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1, false, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token1_0, 1, false)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -26,9 +26,9 @@ func NewRootcastApprenticeship(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	//   - CreateTokenCopyTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewCreatureTargetFilter()
-	//   - abilities.NewPlayerTargetFilter()
-	//   - abilities.NewOpponentTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

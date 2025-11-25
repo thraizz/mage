@@ -26,7 +26,7 @@ func NewRageWeaver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", abilities.DurationUntilEndOfTurn)).
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

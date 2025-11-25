@@ -41,7 +41,7 @@ func NewSetzerWanderingGambler(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 2, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token1_0, 2, true)).
 		Build()
 	if err != nil {
 		return nil, err

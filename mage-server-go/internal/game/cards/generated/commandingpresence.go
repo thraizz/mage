@@ -37,7 +37,7 @@ func NewCommandingPresence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect("FirstStrikeAbility", abilities.AttachmentTypeAura)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
 		AddEffect(abilities.NewCreateTokenEffect(token2_0)).
 		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()

@@ -32,7 +32,7 @@ func NewCryptcallerChariot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, SavedDiscardValue.MANY, true, false)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token1_0, 1, true, false)).
 		Build()
 	if err != nil {
 		return nil, err

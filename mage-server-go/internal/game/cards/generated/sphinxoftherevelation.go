@@ -31,7 +31,7 @@ func NewSphinxOfTheRevelation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(GetXValue.instance)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

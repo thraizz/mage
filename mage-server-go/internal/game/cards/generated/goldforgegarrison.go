@@ -28,7 +28,7 @@ func NewGoldForgeGarrison(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{4}").
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

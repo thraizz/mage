@@ -21,9 +21,9 @@ func NewExpelTheUnworthy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ExileTargetEffect with complex parameters
-		AddTarget(abilities.NewCreatureTargetFilter()).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddEffect(abilities.NewExileTargetEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

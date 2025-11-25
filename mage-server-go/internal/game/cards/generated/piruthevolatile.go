@@ -29,12 +29,8 @@ func NewPiruTheVolatile(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DamageAllEffect with complex parameters
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability2)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(7, "it", filter)
+	// card.AddAbility(ability2)
 	return card, nil
 }

@@ -22,8 +22,8 @@ func NewAnzragsRampage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationCustom)).
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	if err != nil {

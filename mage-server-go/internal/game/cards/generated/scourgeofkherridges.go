@@ -26,13 +26,11 @@ func NewScourgeOfKherRidges(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: DamageAllEffect with complex parameters
-		Build()
-	card.AddAbility(ability1)
-	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(6, filter2)).
-		Build()
-	card.AddAbility(ability2)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageAllEffect(2, filter)
+	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageAllEffect(6, filter2)
+	// card.AddAbility(ability2)
 	return card, nil
 }

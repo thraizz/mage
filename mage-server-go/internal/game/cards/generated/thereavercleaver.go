@@ -29,8 +29,8 @@ func NewTheReaverCleaver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(1, 1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect("TrampleAbility", abilities.AttachmentTypeEquipment)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, SavedDamageValue.MANY)).
+		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {

@@ -25,12 +25,12 @@ func NewVisceridDrone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDestroyEffect(true)).
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDestroyEffect(true)).
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

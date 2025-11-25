@@ -37,7 +37,7 @@ func NewChulaneTellerOfTales(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddTapCost().
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

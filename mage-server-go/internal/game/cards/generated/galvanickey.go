@@ -26,7 +26,7 @@ func NewGalvanicKey(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{3}").
 		AddTapCost().
-		// TODO: UntapTargetEffect with complex parameters
+		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

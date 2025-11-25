@@ -30,7 +30,7 @@ func NewMinesOfMoria(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

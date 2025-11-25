@@ -30,7 +30,7 @@ func NewIllustriousHistorian(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{5}").
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1, true, false)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, false)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

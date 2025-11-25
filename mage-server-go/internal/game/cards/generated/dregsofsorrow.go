@@ -21,8 +21,8 @@ func NewDregsOfSorrow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect("Destroy X target nonblack creatures")).
-		AddEffect(abilities.NewDrawCardsEffect(GetXValue.instance)).
+		AddEffect(abilities.NewDestroyEffect()).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

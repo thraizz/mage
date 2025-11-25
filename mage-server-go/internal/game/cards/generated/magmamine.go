@@ -24,7 +24,7 @@ func NewMagmaMine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: DamageTargetEffect with complex parameters
+		AddEffect(abilities.NewDamageEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

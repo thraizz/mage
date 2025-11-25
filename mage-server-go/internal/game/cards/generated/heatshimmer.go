@@ -25,7 +25,7 @@ func NewHeatShimmer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	//   - CreateTokenCopyTargetEffect(source.getControllerId(), null, true)
 	//
 	// Targets:
-	//   - abilities.NewCreatureTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

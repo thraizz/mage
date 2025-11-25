@@ -33,7 +33,7 @@ func NewRatadrabikOfUrborg(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	//   - CreateTokenCopyTargetEffect(controller.getId(), null, false,1,false,false,null...)
 	// card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

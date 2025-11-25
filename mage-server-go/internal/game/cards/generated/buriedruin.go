@@ -26,7 +26,7 @@ func NewBuriedRuin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		AddManaCost("{2}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

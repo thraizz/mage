@@ -29,7 +29,7 @@ func NewCloakwoodHermit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2, true, false)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 2, true, false)).
 		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {

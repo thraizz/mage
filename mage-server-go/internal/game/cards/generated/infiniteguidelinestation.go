@@ -31,14 +31,14 @@ func NewInfiniteGuidelineStation(ownerID uuid.UUID, info *cards.CardInfo) (*game
 		return nil, err
 	}
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, xValue, true, false)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token1_0, 1, true, false)).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(xValue)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

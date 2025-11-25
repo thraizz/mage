@@ -27,7 +27,7 @@ func NewWalkerOfTheWastes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: BoostSourceEffect with complex parameters
+		AddEffect(abilities.NewBoostEffect()).
 		Build()
 	if err != nil {
 		return nil, err

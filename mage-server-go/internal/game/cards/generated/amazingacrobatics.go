@@ -22,9 +22,9 @@ func NewAmazingAcrobatics(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: TapTargetEffect with complex parameters
-		// TODO: CounterTargetEffect with complex parameters
-		AddTarget(abilities.NewSpellTargetFilter()).
+		AddEffect(abilities.NewTapEffect()).
+		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

@@ -26,7 +26,7 @@ func NewDionusElvishArchdruid(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("DionusTriggeredAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("DionusTriggeredAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

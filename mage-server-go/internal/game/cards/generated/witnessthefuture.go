@@ -24,7 +24,7 @@ func NewWitnessTheFuture(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	//   - LookLibraryAndPickControllerEffect(4, 1, PutCards.HAND, PutCards.BOTTOM_RANDOM)
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

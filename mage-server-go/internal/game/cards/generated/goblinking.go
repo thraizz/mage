@@ -26,7 +26,7 @@ func NewGoblinKing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(1, 1, true)).
-		AddEffect(abilities.NewGrantAbilityEffect("MountainwalkAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("MountainwalkAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

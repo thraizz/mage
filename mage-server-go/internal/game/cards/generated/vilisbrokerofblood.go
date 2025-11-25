@@ -32,7 +32,7 @@ func NewVilisBrokerOfBlood(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(SavedLifeLossValue.MANY)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

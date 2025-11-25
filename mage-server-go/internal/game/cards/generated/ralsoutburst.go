@@ -24,7 +24,7 @@ func NewRalsOutburst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	//   - LookLibraryAndPickControllerEffect(2, 1, PutCards.HAND, PutCards.GRAVEYARD)
 	//
 	// Targets:
-	//   - abilities.NewAnyTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

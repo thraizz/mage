@@ -29,7 +29,7 @@ func NewTangledSkyline(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("ReachAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("ReachAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

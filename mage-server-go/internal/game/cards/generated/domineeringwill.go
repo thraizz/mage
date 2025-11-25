@@ -22,8 +22,8 @@ func NewDomineeringWill(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
-		// TODO: UntapTargetEffect with complex parameters
-		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

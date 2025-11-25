@@ -25,7 +25,7 @@ func NewSinkIntoTakenuma(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	//   - DiscardTargetEffect(SweepNumber.SWAMP)
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

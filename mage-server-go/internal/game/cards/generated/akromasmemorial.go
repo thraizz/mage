@@ -34,7 +34,7 @@ func NewAkromasMemorial(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability4 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability4)
 	ability5, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect(compoundAbilities)).
+		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

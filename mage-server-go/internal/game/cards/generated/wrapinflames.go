@@ -22,6 +22,7 @@ func NewWrapInFlames(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(1)).
+		AddTarget(abilities.NewTargetRequirement(0, 3, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

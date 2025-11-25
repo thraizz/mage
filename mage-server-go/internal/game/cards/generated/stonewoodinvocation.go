@@ -25,7 +25,7 @@ func NewStonewoodInvocation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddEffect(abilities.NewBoostEffect(5, 5)).
 		AddEffect(abilities.NewGrantAbilityEffect("ShroudAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("ShroudAbility", effects.DurationEndOfTurn)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

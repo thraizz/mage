@@ -26,7 +26,7 @@ func NewJaceUnravelerOfSecrets(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewScryEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

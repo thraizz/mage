@@ -28,12 +28,8 @@ func NewCloudthresher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
 	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(2)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability2)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(2, "it", StaticFilters.FILTER_CREATURE_FLYING)
+	// card.AddAbility(ability2)
 	return card, nil
 }

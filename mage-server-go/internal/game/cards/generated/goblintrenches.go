@@ -27,7 +27,7 @@ func NewGoblinTrenches(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

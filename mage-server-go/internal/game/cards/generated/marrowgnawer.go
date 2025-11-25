@@ -32,11 +32,11 @@ func NewMarrowGnawer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, xValue)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("FearAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("FearAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

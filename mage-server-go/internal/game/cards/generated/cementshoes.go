@@ -28,7 +28,7 @@ func NewCementShoes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(3, 3)).
-		// TODO: TapSourceEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {

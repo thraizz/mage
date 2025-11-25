@@ -21,9 +21,9 @@ func NewRemoveEnchantments(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect(filter4)).
-		AddEffect(abilities.NewDestroyEffect(filter5)).
-		AddEffect(abilities.NewDestroyEffect(filter6)).
+		// TODO: DestroyAllEffect with complex parameters
+		// TODO: DestroyAllEffect with complex parameters
+		// TODO: DestroyAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

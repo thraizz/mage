@@ -26,9 +26,9 @@ func NewAshlingsCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	//   - CreateTokenCopyTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
-	//   - abilities.NewPlayerTargetFilter()
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

@@ -30,7 +30,7 @@ func NewValdukKeeperOfTheFlame(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, value)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	if err != nil {
 		return nil, err

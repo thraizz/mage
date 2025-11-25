@@ -30,7 +30,7 @@ func NewRunadiBehemothCaller(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability1 := abilities.BuildSimpleManaAbility(card.ID, "G")
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -25,7 +25,7 @@ func NewEssenceLeak(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(sacAbility, AttachmentType.AURA)).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeUnboostCreature)).
+		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		Build()
 	if err != nil {
 		return nil, err

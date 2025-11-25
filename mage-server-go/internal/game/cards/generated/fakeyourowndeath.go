@@ -29,8 +29,8 @@ func NewFakeYourOwnDeath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
-		AddEffect(abilities.NewGrantAbilityEffect(gainedAbility)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		// TODO: GainAbilityTargetEffect with complex parameters
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

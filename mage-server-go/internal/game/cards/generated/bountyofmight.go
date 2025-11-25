@@ -24,9 +24,9 @@ func NewBountyOfMight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddEffect(abilities.NewBoostEffect(3, 3)).
 		AddEffect(abilities.NewBoostEffect(3, 3)).
 		AddEffect(abilities.NewBoostEffect(3, 3)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
-		AddTarget(abilities.NewCreatureTargetFilter()).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

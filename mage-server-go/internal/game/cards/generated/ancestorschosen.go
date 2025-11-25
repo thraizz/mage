@@ -27,7 +27,7 @@ func NewAncestorsChosen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: GainLifeEffect with complex parameters
+		AddEffect(abilities.NewGainLifeEffect()).
 		Build()
 	if err != nil {
 		return nil, err

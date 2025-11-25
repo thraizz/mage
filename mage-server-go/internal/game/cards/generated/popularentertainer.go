@@ -24,7 +24,7 @@ func NewPopularEntertainer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("PopularEntertainerAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("PopularEntertainerAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

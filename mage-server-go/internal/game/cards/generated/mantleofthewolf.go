@@ -43,7 +43,7 @@ func NewMantleOfTheWolf(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token3_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token3_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err

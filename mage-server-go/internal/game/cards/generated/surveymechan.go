@@ -32,7 +32,7 @@ func NewSurveyMechan(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		AddManaCost("{10}").
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewDamageEffect(3)).
-		AddEffect(abilities.NewDrawCardsEffect(3)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
 		Build()
 	card.AddAbility(ability2)

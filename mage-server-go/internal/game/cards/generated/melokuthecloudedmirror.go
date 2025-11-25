@@ -34,7 +34,7 @@ func NewMelokuTheCloudedMirror(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	}
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1)).
+		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

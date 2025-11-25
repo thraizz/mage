@@ -22,7 +22,7 @@ func NewWordOfBlasting(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(TargetManaValue.instance)).
-		AddEffect(abilities.NewDestroyEffect(true)).
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewDamageEffect(TargetManaValue.instance)).
 		Build()
 	if err != nil {

@@ -26,8 +26,8 @@ func NewMangaraOfCorondor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: ExileSourceEffect with complex parameters
-		// TODO: ExileTargetEffect with complex parameters
+		AddEffect(abilities.NewExileSourceEffect()).
+		AddEffect(abilities.NewExileTargetEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

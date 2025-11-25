@@ -25,7 +25,7 @@ func NewTombOfTheSpiritDragon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddTapCost().
-		// TODO: GainLifeEffect with complex parameters
+		AddEffect(abilities.NewGainLifeEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

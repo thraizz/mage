@@ -27,7 +27,7 @@ func NewRaffWeatherlightStalwart(ownerID uuid.UUID, info *cards.CardInfo) (*game
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewBoostEffect(1, 1)).
-		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", abilities.DurationUntilEndOfTurn)).
+		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationEndOfTurn)).
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects

@@ -25,7 +25,7 @@ func NewMasterOfThePearlTrident(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("IslandwalkAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("IslandwalkAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -27,7 +27,7 @@ func NewIndenturedDjinn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(StaticValue.get(3), false, true)).
+		AddEffect(abilities.NewDrawCardsEffect(3)).
 		Build()
 	if err != nil {
 		return nil, err

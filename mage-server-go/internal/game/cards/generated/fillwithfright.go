@@ -24,7 +24,7 @@ func NewFillWithFright(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - DiscardTargetEffect(2)
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

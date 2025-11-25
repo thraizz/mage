@@ -32,7 +32,7 @@ func NewMorgulKnifeWound(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(-3, 0)).
-		// TODO: ExileSourceEffect with complex parameters
+		AddEffect(abilities.NewExileSourceEffect()).
 		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {

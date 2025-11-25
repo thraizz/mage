@@ -23,8 +23,8 @@ func NewYouLookUponTheTarrasque(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(5, 5)).
-		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility")).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

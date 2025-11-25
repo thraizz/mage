@@ -18,6 +18,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/game/rules"
 	"github.com/magefree/mage-server-go/internal/game/targeting"
 	"github.com/magefree/mage-server-go/internal/plugin"
+	"github.com/magefree/mage-server-go/internal/repository"
 	"go.uber.org/zap"
 )
 
@@ -492,7 +493,8 @@ type MageEngine struct {
 	logger              *zap.Logger
 	mu                  sync.RWMutex
 	games               map[string]*engineGameState
-	notificationHandler NotificationHandler // Optional handler for UI/websocket notifications
+	notificationHandler NotificationHandler     // Optional handler for UI/websocket notifications
+	cardRepo            CardRepositoryInterface // Optional card repository for looking up card metadata
 
 	// State bookmarking for rollback/undo
 	// Maps gameID -> list of bookmarked states
@@ -518,6 +520,11 @@ type MageEngine struct {
 	// preventionEffects map[string]*effects.PreventionManager // gameID -> manager
 }
 
+// CardRepositoryInterface interface for looking up card metadata
+type CardRepositoryInterface interface {
+	GetByName(ctx context.Context, name string) ([]*repository.Card, error)
+}
+
 // NewMageEngine creates a new MageEngine instance
 func NewMageEngine(logger *zap.Logger) *MageEngine {
 	return &MageEngine{
@@ -538,6 +545,13 @@ func (e *MageEngine) SetNotificationHandler(handler NotificationHandler) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.notificationHandler = handler
+}
+
+// SetCardRepository sets the card repository for looking up card metadata
+func (e *MageEngine) SetCardRepository(repo CardRepositoryInterface) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.cardRepo = repo
 }
 
 // emitNotification sends a notification to the registered handler
@@ -962,27 +976,106 @@ func (e *MageEngine) shuffleLibrary(player *internalPlayer) {
 }
 
 // createStarterCard creates a simple starter card for testing
+// If cardRepo is available, it looks up the actual card metadata from the database
 func (e *MageEngine) createStarterCard(id, ownerID, cardName string) *internalCard {
 	if cardName == "" {
 		cardName = "Lightning Bolt"
+	}
+
+	// Default values (fallback if repository lookup fails)
+	manaCost := "{R}"
+	cardType := "Instant"
+	subTypes := []string{}
+	superTypes := []string{}
+	color := "Red"
+	power := ""
+	toughness := ""
+	loyalty := ""
+	cardNumber := 1
+	expansionSet := "M21"
+	rarity := "Common"
+	rulesText := fmt.Sprintf("%s deals damage.", cardName)
+
+	// Try to look up card metadata from repository if available
+	if e.cardRepo != nil {
+		ctx := context.Background()
+		cards, err := e.cardRepo.GetByName(ctx, cardName)
+		if err == nil && len(cards) > 0 {
+			// Use first printing
+			cardData := cards[0]
+			manaCost = cardData.ManaCost
+			cardType = cardData.CardType
+			power = cardData.Power
+			toughness = cardData.Toughness
+			cardNumber, _ = strconv.Atoi(cardData.CardNumber)
+			expansionSet = cardData.SetCode
+			rarity = cardData.Rarity
+			if cardData.RulesText != "" {
+				rulesText = cardData.RulesText
+			}
+
+			// Parse card type string to extract types, subtypes, and supertypes
+			// Format is typically: "Supertype Type — Subtype" or "Type — Subtype"
+			typeParts := strings.Split(cardType, " — ")
+			if len(typeParts) > 1 {
+				// Has subtypes
+				mainType := strings.TrimSpace(typeParts[0])
+				subtypeStr := strings.TrimSpace(typeParts[1])
+				subTypes = strings.Fields(subtypeStr)
+
+				// Check for supertypes (Legendary, Basic, etc.)
+				mainTypeParts := strings.Fields(mainType)
+				if len(mainTypeParts) > 1 {
+					// First parts are supertypes, last is the main type
+					superTypes = mainTypeParts[:len(mainTypeParts)-1]
+					cardType = mainTypeParts[len(mainTypeParts)-1]
+				} else {
+					cardType = mainType
+				}
+			} else {
+				// No subtypes, but might have supertypes
+				typeParts := strings.Fields(cardType)
+				if len(typeParts) > 1 {
+					superTypes = typeParts[:len(typeParts)-1]
+					cardType = typeParts[len(typeParts)-1]
+				}
+			}
+
+			// Parse color from mana cost (simple heuristic)
+			if strings.Contains(manaCost, "{W}") {
+				color = "White"
+			} else if strings.Contains(manaCost, "{U}") {
+				color = "Blue"
+			} else if strings.Contains(manaCost, "{B}") {
+				color = "Black"
+			} else if strings.Contains(manaCost, "{R}") {
+				color = "Red"
+			} else if strings.Contains(manaCost, "{G}") {
+				color = "Green"
+			} else if manaCost == "" {
+				color = "Colorless"
+			} else {
+				color = "Multicolor"
+			}
+		}
 	}
 
 	return &internalCard{
 		ID:           id,
 		Name:         cardName,
 		DisplayName:  cardName,
-		ManaCost:     "{R}",
-		Type:         "Instant",
-		SubTypes:     []string{},
-		SuperTypes:   []string{},
-		Color:        "Red",
-		Power:        "",
-		Toughness:    "",
-		Loyalty:      "",
-		CardNumber:   1,
-		ExpansionSet: "M21",
-		Rarity:       "Common",
-		RulesText:    fmt.Sprintf("%s deals damage.", cardName),
+		ManaCost:     manaCost,
+		Type:         cardType,
+		SubTypes:     subTypes,
+		SuperTypes:   superTypes,
+		Color:        color,
+		Power:        power,
+		Toughness:    toughness,
+		Loyalty:      loyalty,
+		CardNumber:   cardNumber,
+		ExpansionSet: expansionSet,
+		Rarity:       rarity,
+		RulesText:    rulesText,
 		Tapped:       false,
 		Flipped:      false,
 		Transformed:  false,

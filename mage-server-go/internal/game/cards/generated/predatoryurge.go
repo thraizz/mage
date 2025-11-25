@@ -23,21 +23,17 @@ func NewPredatoryUrge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		// TODO: DamageEachOtherEffect with complex parameters
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
-	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddTapCost().
-		// TODO: DamageEachOtherEffect with complex parameters
-		Build()
-	card.AddAbility(ability2)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageEachOtherEffect()
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	// card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageEachOtherEffect()
+	//
+	// Costs:
+	//   - AddTapCost()
+	// card.AddAbility(ability2)
 	return card, nil
 }

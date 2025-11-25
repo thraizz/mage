@@ -36,11 +36,11 @@ func NewSamutVoiceOfDissent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.AddAbility(ability3)
 	ability4 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: UntapTargetEffect with complex parameters
+		AddEffect(abilities.NewUntapEffect()).
 		Build()
 	card.AddAbility(ability4)
 	ability5, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

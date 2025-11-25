@@ -26,8 +26,8 @@ func NewTrickeryCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	//   - LookLibraryControllerEffect(4)
 	//
 	// Targets:
-	//   - abilities.NewCreatureTargetFilter()
-	//   - abilities.NewCreatureTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

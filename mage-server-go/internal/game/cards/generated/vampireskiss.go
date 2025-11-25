@@ -28,8 +28,8 @@ func NewVampiresKiss(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
-		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

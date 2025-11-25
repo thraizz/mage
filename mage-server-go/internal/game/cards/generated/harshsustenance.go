@@ -24,7 +24,7 @@ func NewHarshSustenance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewDamageEffect(CreaturesYouControlCount.PLURAL)).
 		AddEffect(abilities.NewGainLifeEffect(CreaturesYouControlCount.PLURAL)).
 		AddEffect(abilities.NewGainLifeEffect(CreaturesYouControlCount.PLURAL)).
-		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

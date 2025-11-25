@@ -29,7 +29,7 @@ func NewQuestingPhelddagrif(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewGrantAbilityEffect(ProtectionAbility.from(ObjectColor.BLACK, ObjectColor.RED))).
+		// TODO: GainAbilitySourceEffect with complex parameters
 		AddEffect(abilities.NewGainLifeEffect(2)).
 		Build()
 	card.AddAbility(ability1)

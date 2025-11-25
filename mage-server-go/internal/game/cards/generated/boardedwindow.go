@@ -28,7 +28,7 @@ func NewBoardedWindow(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ExileSourceEffect with complex parameters
+		AddEffect(abilities.NewExileSourceEffect()).
 		Build()
 	if err != nil {
 		return nil, err

@@ -30,7 +30,7 @@ func NewCemeteryReaper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: ExileTargetEffect with complex parameters
+		AddEffect(abilities.NewExileTargetEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)

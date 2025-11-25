@@ -25,7 +25,7 @@ func NewDiscombobulate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - LookLibraryControllerEffect(4)
 	//
 	// Targets:
-	//   - abilities.NewSpellTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

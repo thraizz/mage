@@ -35,7 +35,7 @@ func NewDogUmbra(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("UmbraArmorAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("UmbraArmorAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -102,8 +102,8 @@
 		gameState.gameView?.state?.toLowerCase() === 'mulligan'
 	);
 
-	// Get active player name
-	const activePlayerName = $derived(() => {
+	// Get active player name (derived from game state)
+	const activePlayerName = $derived.by(() => {
 		const gv = gameState.gameView;
 		if (!gv) return '';
 		const active = allPlayers.find((p) => p.playerId === gv.activePlayerId);
@@ -382,11 +382,27 @@
 	}
 
 	/**
-	 * Format life total for display (Commander starts at 40)
+	 * Format life total for display
+	 * Note: Starting life is format-dependent (Commander=40, Standard=20, etc.)
+	 * but we just display the current value for now
 	 */
 	function formatLife(life: number): string {
 		return life.toString();
 	}
+
+	/**
+	 * Get game format/type for display
+	 * For now, we'll try to infer from game state or default to "Game"
+	 * TODO: Get actual game type from table/game metadata when available
+	 */
+	const gameFormat = $derived.by(() => {
+		// Try to infer from player count or other game state
+		// For now, default to "Commander" for 4-player games, "Standard" for 2-player
+		const playerCount = allPlayers.length;
+		if (playerCount >= 3) return 'Commander';
+		if (playerCount === 2) return 'Standard';
+		return 'Game';
+	});
 
 	/**
 	 * Get position class for opponent based on index (for 4-player layout)
@@ -454,10 +470,10 @@
 		<!-- Game Header -->
 		<div class="game-header">
 			<div class="game-info">
-				<div class="format-badge">Commander</div>
+				<div class="format-badge">{gameFormat}</div>
 				<div class="turn-info">
 					<span class="turn-number">Turn {turn}</span>
-					<span class="active-player">{activePlayerName()}'s turn</span>
+					<span class="active-player">{activePlayerName}'s turn</span>
 				</div>
 			</div>
 			<div class="header-actions">
@@ -483,7 +499,7 @@
 					hasPriority={havePriority}
 					activePlayerId={gameState.gameView?.activePlayerId || ''}
 					{localPlayerId}
-					playerName={activePlayerName()}
+					playerName={activePlayerName}
 					animated={true}
 				/>
 			</div>
@@ -564,7 +580,7 @@
 								cards={opponent.graveyard.map(toGameCard)}
 								playerName={opponent.name}
 								isOpponent={true}
-								onCardClick={() => {}}
+								onCardClick={handleBattlefieldCardClick}
 							/>
 						</div>
 					</div>
@@ -646,23 +662,20 @@
 								cards={myGrave.map(toGameCard)}
 								playerName="You"
 								isOpponent={false}
-								onCardClick={() => {}}
+								onCardClick={handleCardClick}
 							/>
 							<ManaPool
 								mana={myMana}
 								showEmpty={false}
 								size="normal"
-								onManaClick={() => {}}
+								onManaClick={() => {
+									// TODO: Implement mana payment UI when needed
+								}}
 							/>
 						</div>
 
 						<!-- Player hand -->
-						<PlayerHand
-							cards={myCards.map(toGameCard)}
-							selectedCardIds={gameState.selectedCardIds}
-							onCardClick={handleCardClick}
-							size="normal"
-						/>
+						<PlayerHand onCardClick={handleCardClick} size="normal" />
 					</div>
 				{/if}
 			</div>
@@ -681,7 +694,10 @@
 							sourceCardId: c.id
 						}))}
 						{playerNames}
-						onStackObjectClick={() => {}}
+						onStackObjectClick={(stackId) => {
+							// Toggle selection for stack object
+							gameStore.toggleCardSelection(stackId);
+						}}
 					/>
 				</div>
 			</div>

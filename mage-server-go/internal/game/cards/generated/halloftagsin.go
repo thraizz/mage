@@ -30,7 +30,7 @@ func NewHallOfTagsin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{4}").
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 1, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token1_0, 1, true)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

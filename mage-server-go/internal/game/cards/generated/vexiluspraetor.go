@@ -30,7 +30,7 @@ func NewVexilusPraetor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("ProtectionFromEverythingAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("ProtectionFromEverythingAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

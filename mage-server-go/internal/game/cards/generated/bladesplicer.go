@@ -36,7 +36,7 @@ func NewBladeSplicer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -25,7 +25,7 @@ func NewMythosOfIlluna(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - CreateTokenCopyTargetEffect(source.getControllerId())
 	//
 	// Targets:
-	//   - abilities.NewPermanentTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

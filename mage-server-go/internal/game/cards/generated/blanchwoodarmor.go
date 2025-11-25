@@ -25,14 +25,14 @@ func NewBlanchwoodArmor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		// TODO: BoostEnchantedEffect with complex parameters
+		AddEffect(abilities.NewBoostEnchantedEffect()).
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: BoostEnchantedEffect with complex parameters
+		AddEffect(abilities.NewBoostEnchantedEffect()).
 		Build()
 	if err != nil {
 		return nil, err

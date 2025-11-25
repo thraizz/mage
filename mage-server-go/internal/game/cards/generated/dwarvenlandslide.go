@@ -21,7 +21,9 @@ func NewDwarvenLandslide(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect("Destroy target land. If spell was kicked, destroy another target land")).
+		AddEffect(abilities.NewDestroyEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(2, 2, abilities.NewLandTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

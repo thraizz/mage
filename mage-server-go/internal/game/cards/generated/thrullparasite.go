@@ -26,7 +26,7 @@ func NewThrullParasite(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: RemoveCounterTargetEffect with complex parameters
+		AddEffect(abilities.NewRemoveCounterTargetEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

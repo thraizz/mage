@@ -24,8 +24,8 @@ func NewJwariDisruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "U")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: CounterUnlessPaysEffect with complex parameters
-		AddTarget(abilities.NewSpellTargetFilter()).
+		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

@@ -23,7 +23,7 @@ func NewPumpkinBombs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(3)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("fuse", 1))).
 		AddEffect(abilities.NewDamageEffect(xValue)).
 		Build()

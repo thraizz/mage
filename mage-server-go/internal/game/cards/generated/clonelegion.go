@@ -25,7 +25,7 @@ func NewCloneLegion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	//   - CreateTokenCopyTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

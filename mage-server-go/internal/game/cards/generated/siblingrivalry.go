@@ -30,7 +30,7 @@ func NewSiblingRivalry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).
 		AddEffect(abilities.NewUntapEffect("untap it")).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1, true)).
+		AddEffect(abilities.NewCreateTokenEffectTapped(token0_0, 1, true)).
 		Build()
 	if err != nil {
 		return nil, err

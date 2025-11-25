@@ -24,7 +24,7 @@ func NewVampiricFeast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddEffect(abilities.NewDamageEffect(4)).
 		AddEffect(abilities.NewGainLifeEffect(4)).
 		AddEffect(abilities.NewGainLifeEffect(4)).
-		AddTarget(abilities.NewAnyTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

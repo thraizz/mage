@@ -25,7 +25,7 @@ func NewSpittingImage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	//   - CreateTokenCopyTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewCreatureTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

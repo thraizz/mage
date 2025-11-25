@@ -133,6 +133,7 @@ func main() {
 
 	// Initialize game engine adapter
 	mageEngine := game.NewMageEngine(logger)
+	mageEngine.SetCardRepository(cardRepo) // Enable card metadata lookup
 	gameAdapter := game.NewEngineAdapter(mageEngine, logger)
 
 	// Initialize tournament manager

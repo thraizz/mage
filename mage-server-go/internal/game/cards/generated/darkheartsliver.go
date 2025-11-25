@@ -24,15 +24,17 @@ func NewDarkheartSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// Activated ability: Sacrifice this permanent: You gain 3 life
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
 		AddEffect(abilities.NewGainLifeEffect(3)).
 		Build()
 	card.AddAbility(ability0)
-
-	// TODO: Grant ability effect needs proper transpilation
-	// This card grants "Sacrifice this permanent: You gain 3 life" to all Slivers
-	// Temporarily stubbed until card transpiler is fixed
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: GainAbilityAllEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
 	return card, nil
 }

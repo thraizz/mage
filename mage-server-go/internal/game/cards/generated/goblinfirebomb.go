@@ -27,7 +27,7 @@ func NewGoblinFirebomb(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		AddManaCost("{7}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

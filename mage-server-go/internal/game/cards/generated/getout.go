@@ -22,8 +22,8 @@ func NewGetOut(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: CounterTargetEffect with complex parameters
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		Build()
 	if err != nil {
 		return nil, err

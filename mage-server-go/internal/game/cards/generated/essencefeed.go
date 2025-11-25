@@ -28,8 +28,8 @@ func NewEssenceFeed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(3)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 3)).
-		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 3)).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

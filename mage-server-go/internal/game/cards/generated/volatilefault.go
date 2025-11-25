@@ -32,7 +32,7 @@ func NewVolatileFault(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{1}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
 		Build()
 	card.AddAbility(ability1)

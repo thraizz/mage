@@ -21,6 +21,7 @@ func NewGallifreyFallsNoMore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(4, new FilterCreaturePermanent())
 	//   - PhaseOutTargetEffect()
 	// card.AddAbility(ability0)
 	return card, nil

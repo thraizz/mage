@@ -28,7 +28,7 @@ func NewArcticNishoba(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: GainLifeEffect with complex parameters
+		AddEffect(abilities.NewGainLifeEffect()).
 		Build()
 	if err != nil {
 		return nil, err

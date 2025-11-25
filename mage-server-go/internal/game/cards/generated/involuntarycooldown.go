@@ -22,7 +22,7 @@ func NewInvoluntaryCooldown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: TapTargetEffect with complex parameters
+		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("stun", 2))).
 		Build()
 	if err != nil {

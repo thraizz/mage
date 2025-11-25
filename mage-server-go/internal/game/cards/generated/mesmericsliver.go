@@ -24,9 +24,12 @@ func NewMesmericSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Complex grant ability effects need proper transpilation
-	// This card grants "When this enters, you may fateseal 1" to all Slivers
-	// Temporarily stubbed until card transpiler is fixed
-	_ = card // Use card to avoid unused variable error
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: GainAbilityAllEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
 	return card, nil
 }

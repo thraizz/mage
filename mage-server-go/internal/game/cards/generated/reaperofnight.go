@@ -28,7 +28,7 @@ func NewReaperOfNight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	//   - DiscardTargetEffect(2)
 	//
 	// Targets:
-	//   - abilities.NewOpponentTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).

@@ -26,12 +26,8 @@ func NewCinderslashRavager(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(1)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(                 1, "it", StaticFilters.FILTER_OPP...)
+	// card.AddAbility(ability1)
 	return card, nil
 }

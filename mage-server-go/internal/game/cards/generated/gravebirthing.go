@@ -29,7 +29,7 @@ func NewGraveBirthing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

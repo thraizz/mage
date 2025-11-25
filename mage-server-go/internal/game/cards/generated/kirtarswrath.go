@@ -26,8 +26,8 @@ func NewKirtarsWrath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDestroyEffect(true)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 2)).
+		// TODO: DestroyAllEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -34,7 +34,7 @@ func NewFeastingTrollKing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0, 3)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token2_0, 3)).
 		Build()
 	if err != nil {
 		return nil, err

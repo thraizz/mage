@@ -24,7 +24,7 @@ func NewSilverquillCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewCreatureTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

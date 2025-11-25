@@ -34,7 +34,7 @@ func NewHornetQueen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		return nil, err
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0, 4)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token2_0, 4)).
 		Build()
 	if err != nil {
 		return nil, err

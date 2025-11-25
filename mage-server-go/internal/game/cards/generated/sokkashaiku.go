@@ -23,11 +23,12 @@ func NewSokkasHaiku(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: CounterTargetEffect with complex parameters
+		AddEffect(abilities.NewCounterSpellEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewMillCardsControllerEffect(1)).
 		AddEffect(abilities.NewUntapEffect("untap target land")).
-		AddTarget(abilities.NewSpellTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

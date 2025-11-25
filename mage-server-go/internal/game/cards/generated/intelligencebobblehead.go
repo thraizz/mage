@@ -24,7 +24,7 @@ func NewIntelligenceBobblehead(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{5}").
 		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(xValue)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -23,11 +23,12 @@ func NewLeoninBladetrap(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability0)
-	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddManaCost("{2}").
-		AddSacrificeSourceCost().
-		// TODO: DamageAllEffect with complex parameters
-		Build()
-	card.AddAbility(ability1)
+	// TODO: Implement activated ability with unmapped effects
+	//   - DamageAllEffect(2, "it", filter)
+	//
+	// Costs:
+	//   - AddManaCost("{2}")
+	//   - AddSacrificeSourceCost()
+	// card.AddAbility(ability1)
 	return card, nil
 }

@@ -31,7 +31,7 @@ func NewOviyaPashiriSageLifecrafter(ownerID uuid.UUID, info *cards.CardInfo) (*g
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 1)).
+		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

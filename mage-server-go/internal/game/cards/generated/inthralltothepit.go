@@ -24,7 +24,7 @@ func NewInThrallToThePit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	//   - SacrificeTargetEffect("sacrifice that creature")
 	//
 	// Targets:
-	//   - abilities.NewCreatureTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

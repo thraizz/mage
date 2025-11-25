@@ -21,8 +21,8 @@ func NewConsumedByGreed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnFromGraveyardToHandTargetEffect with complex parameters
-		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddEffect(abilities.NewReturnFromGraveyardToHandTargetEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

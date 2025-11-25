@@ -21,17 +21,8 @@ func NewCataclysmicProspecting(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("TreasureToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, CataclysmicProspectingValue.instance, true, false)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(GetXValue.instance, StaticFilters.FILTER_PERMANENT...)
+	// card.AddAbility(ability0)
 	return card, nil
 }

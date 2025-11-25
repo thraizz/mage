@@ -22,9 +22,9 @@ func NewLostInTheMist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: CounterTargetEffect with complex parameters
-		AddTarget(abilities.NewSpellTargetFilter()).
-		AddTarget(abilities.NewPermanentTargetFilter()).
+		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

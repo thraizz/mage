@@ -22,10 +22,10 @@ func NewMysticConfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		// TODO: CounterUnlessPaysEffect with complex parameters
-		AddTarget(abilities.NewSpellTargetFilter()).
+		AddEffect(abilities.NewCounterSpellEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewSpellTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

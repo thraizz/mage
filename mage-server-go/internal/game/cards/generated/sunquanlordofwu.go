@@ -26,7 +26,7 @@ func NewSunQuanLordOfWu(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("HorsemanshipAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("HorsemanshipAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

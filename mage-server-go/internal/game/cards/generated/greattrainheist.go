@@ -21,8 +21,8 @@ func NewGreatTrainHeist(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: UntapAllEffect with complex parameters
-		AddTarget(abilities.NewOpponentTargetFilter()).
+		AddEffect(abilities.NewUntapEffect()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

@@ -23,7 +23,8 @@ func NewBedeckBedazzle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(StaticValue.get(2), true, true)).
 		AddEffect(abilities.NewBoostEffect(3, -3)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

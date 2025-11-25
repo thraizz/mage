@@ -24,9 +24,19 @@ func NewHibernationSliver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	// TODO: Complex grant ability effects need proper transpilation
-	// This card grants "Pay 2 life: Return this permanent to its owner's hand" to all Slivers
-	// Temporarily stubbed until card transpiler is fixed
-	_ = card // Use card to avoid unused variable error
+	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		AddEffect(abilities.NewReturnToHandSourceEffect()).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability0)
+	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
+		// TODO: GainAbilityAllEffect with complex parameters
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	card.AddAbility(ability1)
 	return card, nil
 }

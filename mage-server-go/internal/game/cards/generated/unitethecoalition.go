@@ -24,10 +24,10 @@ func NewUniteTheCoalition(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	//   - PhaseOutTargetEffect()
 	//
 	// Targets:
-	//   - abilities.NewPermanentTargetFilter()
-	//   - abilities.NewPlayerTargetFilter()
-	//   - abilities.NewPlayerTargetFilter()
-	//   - abilities.NewAnyTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

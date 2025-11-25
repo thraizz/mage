@@ -25,7 +25,7 @@ func NewShrineOfBurningRage(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		AddManaCost("{3}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: DamageTargetEffect with complex parameters
+		AddEffect(abilities.NewDamageEffect()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

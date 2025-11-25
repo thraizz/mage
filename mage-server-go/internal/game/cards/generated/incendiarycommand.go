@@ -20,16 +20,12 @@ func NewIncendiaryCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(2)).
-		// TODO: DestroyTargetEffect with complex parameters
-		AddEffect(abilities.NewDamageEffect(4)).
-		AddEffect(abilities.NewDamageEffect(2)).
-		// TODO: DestroyTargetEffect with complex parameters
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(2, new FilterCreaturePermanent())
+	//   - DamageAllEffect(2, new FilterCreaturePermanent())
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

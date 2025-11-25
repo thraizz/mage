@@ -31,7 +31,7 @@ func NewXathridGorgon(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersTargetEffect(counters.NewCounter("petrification", 1))).
-		AddEffect(abilities.NewGrantAbilityEffect("DefenderAbility", effects.DurationCustom)).
+		AddEffect(abilities.NewGrantAbilityEffect("DefenderAbility", effects.DurationPermanent)).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

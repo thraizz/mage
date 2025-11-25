@@ -26,7 +26,7 @@ func NewFromUnderTheFloorboards(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, xValue, true, false)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, false)).
 		AddEffect(abilities.NewGainLifeEffect(xValue)).
 		Build()
 	if err != nil {

@@ -23,7 +23,7 @@ func NewWintersIntervention(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(2)).
 		AddEffect(abilities.NewGainLifeEffect(2)).
-		AddTarget(abilities.NewCreatureTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

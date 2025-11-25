@@ -26,7 +26,7 @@ func NewMorselTheft(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		AddEffect(abilities.NewLoseLifeEffect(3)).
 		AddEffect(abilities.NewGainLifeEffect(3)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddTarget(abilities.NewPlayerTargetFilter()).
+		AddTarget(abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())).
 		Build()
 	if err != nil {
 		return nil, err

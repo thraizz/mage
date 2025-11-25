@@ -25,7 +25,7 @@ func NewGraveyardShift(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGrantAbilityEffect("FlashAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("FlashAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -21,18 +21,11 @@ func NewMegatonsFate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.SetCode = "M21"
 	card.Rarity = "common"
 
-	token0_0, err := token.GetToken("TreasureToken")
-	if err != nil {
-		return nil, err
-	}
-	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DestroyTargetEffect with complex parameters
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 4)).
-		AddEffect(abilities.NewDamageEffect(8)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability0)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(8, StaticFilters.FILTER_PERMANENT_CREATURE)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewArtifactTargetFilter())
+	// card.AddAbility(ability0)
 	return card, nil
 }

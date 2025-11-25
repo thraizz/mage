@@ -24,7 +24,7 @@ func NewTyvarJubilantBrawler(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: UntapTargetEffect with complex parameters
+		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewMillCardsControllerEffect(1)).
 		Build()
 	if err != nil {

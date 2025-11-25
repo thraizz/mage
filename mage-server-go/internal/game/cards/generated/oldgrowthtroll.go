@@ -50,7 +50,7 @@ func NewOldGrowthTroll(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability4 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddTapCost().
-		AddEffect(abilities.NewCreateTokenEffect(token4_0, 1, true, false)).
+		AddEffect(abilities.NewCreateTokenEffectAttacking(token4_0, 1, true, false)).
 		Build()
 	card.AddAbility(ability4)
 	return card, nil

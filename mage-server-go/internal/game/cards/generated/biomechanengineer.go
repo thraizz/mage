@@ -30,7 +30,7 @@ func NewBiomechanEngineer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{8}").
-		AddEffect(abilities.NewDrawCardsEffect(2)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()
 	card.AddAbility(ability0)

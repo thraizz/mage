@@ -24,7 +24,7 @@ func NewVeryCrypticCommandD(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	//   - DiscardControllerEffect(1)
 	//
 	// Targets:
-	//   - abilities.NewPermanentTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

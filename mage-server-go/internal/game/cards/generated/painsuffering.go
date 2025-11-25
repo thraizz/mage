@@ -24,7 +24,8 @@ func NewPainSuffering(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	//   - DiscardTargetEffect(1)
 	//
 	// Targets:
-	//   - abilities.NewPlayerTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPlayerTargetFilter())
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewLandTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

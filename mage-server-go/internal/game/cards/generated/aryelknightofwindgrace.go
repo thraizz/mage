@@ -39,7 +39,7 @@ func NewAryelKnightOfWindgrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		// TODO: DestroyTargetEffect with complex parameters
+		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

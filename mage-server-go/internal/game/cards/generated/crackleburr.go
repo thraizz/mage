@@ -29,7 +29,7 @@ func NewCrackleburr(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: ReturnToHandTargetEffect with complex parameters
+		AddEffect(abilities.NewReturnToHandTargetEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -26,7 +26,7 @@ func NewShadowheartDarkJusticiar(ownerID uuid.UUID, info *cards.CardInfo) (*game
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(SacrificeCostCreaturesPower.instance)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

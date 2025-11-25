@@ -25,7 +25,7 @@ func NewBlightedSteppe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		// TODO: GainLifeEffect with complex parameters
+		AddEffect(abilities.NewGainLifeEffect()).
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

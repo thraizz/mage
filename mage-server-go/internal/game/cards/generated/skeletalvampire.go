@@ -32,7 +32,7 @@ func NewSkeletalVampire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewCreateTokenEffect(token1_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token1_0, 2)).
 		Build()
 	card.AddAbility(ability1)
 	token2_0, err := token.GetToken("BatToken")
@@ -40,7 +40,7 @@ func NewSkeletalVampire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		return nil, err
 	}
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCreateTokenEffect(token2_0, 2)).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token2_0, 2)).
 		Build()
 	if err != nil {
 		return nil, err

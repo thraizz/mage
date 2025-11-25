@@ -32,12 +32,8 @@ func NewTiborAndLumia(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: DamageAllEffect with complex parameters
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(1, filter)
+	// card.AddAbility(ability1)
 	return card, nil
 }

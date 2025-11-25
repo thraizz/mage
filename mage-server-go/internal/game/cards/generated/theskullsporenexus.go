@@ -23,7 +23,7 @@ func NewTheSkullsporeNexus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: CreateTokenEffect with complex parameters
+		AddEffect(abilities.NewCreateTokenEffect( /* TODO: token extraction failed */ )).
 		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	if err != nil {

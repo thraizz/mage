@@ -26,7 +26,7 @@ func NewElvishChampion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		// TODO: BoostAllEffect with complex parameters
-		AddEffect(abilities.NewGrantAbilityEffect("ForestwalkAbility", effects.DurationWhileOnBattlefield)).
+		AddEffect(abilities.NewGrantAbilityEffect("ForestwalkAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {
 		return nil, err

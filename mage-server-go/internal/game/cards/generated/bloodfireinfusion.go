@@ -23,13 +23,8 @@ func NewBloodfireInfusion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
-	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(AttachedPermanentPowerCount.instance)).
-		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability1)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(AttachedPermanentPowerCount.instance, new FilterCr...)
+	// card.AddAbility(ability1)
 	return card, nil
 }

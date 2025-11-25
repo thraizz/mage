@@ -24,7 +24,7 @@ func NewDeadeyeNavigator(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		// TODO: ExileSourceEffect with complex parameters
+		AddEffect(abilities.NewExileSourceEffect()).
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -22,6 +22,9 @@ func NewBlightning(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	// TODO: Implement spell ability with unmapped effects
 	//   - DiscardTargetEffect(2)
+	//
+	// Targets:
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

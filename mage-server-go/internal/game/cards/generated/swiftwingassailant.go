@@ -29,7 +29,7 @@ func NewSwiftwingAssailant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(0, 1)).
-		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility")).
+		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {
 		return nil, err

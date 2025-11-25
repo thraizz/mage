@@ -27,8 +27,8 @@ func NewFussBother(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		// TODO: AddCountersAllEffect with complex parameters
-		AddEffect(abilities.NewCreateTokenEffect(token0_0, 3)).
+		AddEffect(abilities.NewAddCountersAllEffect(counters.CounterTypeP1P1.CreateInstance(1), nil, "")).
+		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 3)).
 		AddEffect(abilities.NewSurveilEffect(1)).
 		Build()
 	if err != nil {

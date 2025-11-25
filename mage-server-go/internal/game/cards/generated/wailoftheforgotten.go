@@ -24,7 +24,7 @@ func NewWailOfTheForgotten(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	//   - DiscardTargetEffect(1)
 	//
 	// Targets:
-	//   - abilities.NewOpponentTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewOpponentTargetFilter())
 	// card.AddAbility(ability0)
 	return card, nil
 }

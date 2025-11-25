@@ -27,7 +27,7 @@ func NewOrdealOfPurphoros(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	//   - SacrificeSourceEffect()
 	//
 	// Targets:
-	//   - abilities.NewAnyTargetFilter()
+	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
 	// card.AddAbility(ability1)
 	return card, nil
 }

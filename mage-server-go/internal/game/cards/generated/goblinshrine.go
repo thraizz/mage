@@ -31,12 +31,8 @@ func NewGoblinShrine(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 		return nil, err
 	}
 	card.AddAbility(ability1)
-	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(1, filterGoblin)).
-		Build()
-	if err != nil {
-		return nil, err
-	}
-	card.AddAbility(ability2)
+	// TODO: Implement spell ability with unmapped effects
+	//   - DamageAllEffect(1, "it", filterGoblin)
+	// card.AddAbility(ability2)
 	return card, nil
 }
