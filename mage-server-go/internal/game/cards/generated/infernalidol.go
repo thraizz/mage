@@ -25,7 +25,7 @@ func NewInfernalIdol(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDrawCardsEffect(2, true)).
+		AddEffect(abilities.NewDrawCardsEffect(2)).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		Build()
 	card.AddAbility(ability1)

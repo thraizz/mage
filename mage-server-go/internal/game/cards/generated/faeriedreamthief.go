@@ -27,7 +27,7 @@ func NewFaerieDreamthief(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		Build()
 	card.AddAbility(ability1)

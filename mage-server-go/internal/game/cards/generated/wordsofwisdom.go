@@ -21,7 +21,7 @@ func NewWordsOfWisdom(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(2, true)).
+		AddEffect(abilities.NewDrawCardsEffect(2)).
 		Build()
 	if err != nil {
 		return nil, err

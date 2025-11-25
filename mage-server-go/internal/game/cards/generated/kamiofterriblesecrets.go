@@ -24,7 +24,7 @@ func NewKamiOfTerribleSecrets(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

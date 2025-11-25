@@ -24,7 +24,7 @@ func NewDuskLegionZealot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		Build()
 	if err != nil {

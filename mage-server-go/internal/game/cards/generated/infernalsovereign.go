@@ -29,7 +29,7 @@ func NewInfernalSovereign(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

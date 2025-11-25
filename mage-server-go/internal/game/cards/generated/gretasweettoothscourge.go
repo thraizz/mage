@@ -26,7 +26,7 @@ func NewGretaSweettoothScourge(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		Build()
 	card.AddAbility(ability0)

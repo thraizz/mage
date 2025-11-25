@@ -26,7 +26,7 @@ func NewCircleOfPower(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(2, true)).
+		AddEffect(abilities.NewDrawCardsEffect(2)).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		Build()

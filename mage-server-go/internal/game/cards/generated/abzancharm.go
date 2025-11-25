@@ -21,7 +21,7 @@ func NewAbzanCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(2, true)).
+		AddEffect(abilities.NewDrawCardsEffect(2)).
 		// TODO: ExileTargetEffect with complex parameters
 		Build()
 	if err != nil {

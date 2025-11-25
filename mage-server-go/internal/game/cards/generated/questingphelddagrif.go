@@ -35,7 +35,7 @@ func NewQuestingPhelddagrif(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("FlyingAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	card.AddAbility(ability2)
 	return card, nil

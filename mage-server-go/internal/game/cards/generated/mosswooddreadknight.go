@@ -27,7 +27,7 @@ func NewMosswoodDreadknight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		Build()
 	if err != nil {

@@ -25,7 +25,7 @@ func NewShadowsLair(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		Build()
 	card.AddAbility(ability1)

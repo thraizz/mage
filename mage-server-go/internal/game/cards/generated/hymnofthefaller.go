@@ -22,7 +22,7 @@ func NewHymnOfTheFaller(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewSurveilEffect(1)).
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewLoseLifeEffect(1)).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()

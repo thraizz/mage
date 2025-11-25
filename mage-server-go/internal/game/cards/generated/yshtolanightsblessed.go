@@ -28,7 +28,7 @@ func NewYshtolaNightsBlessed(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(1, true)).
+		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {
 		return nil, err

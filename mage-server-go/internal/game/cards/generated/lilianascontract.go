@@ -21,7 +21,7 @@ func NewLilianasContract(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDrawCardsEffect(4, true)).
+		AddEffect(abilities.NewDrawCardsEffect(4)).
 		Build()
 	if err != nil {
 		return nil, err
