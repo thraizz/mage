@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import { getScryfallImageUrl, getScryfallVersionForSize } from '$lib/utils/scryfall';
 
 	// Props
 	let {
@@ -37,6 +38,20 @@
 		size?: 'small' | 'normal' | 'large';
 	} = $props();
 
+	// Derive the effective image URL - use Scryfall if no explicit imageUrl provided
+	const effectiveImageUrl = $derived(
+		imageUrl || (!isCardBack && !isPlaceholder && cardName
+			? getScryfallImageUrl(cardName, getScryfallVersionForSize(size))
+			: '')
+	);
+
+	// Larger image URL for the hover preview
+	const previewImageUrl = $derived(
+		imageUrl || (!isCardBack && !isPlaceholder && cardName
+			? getScryfallImageUrl(cardName, 'large')
+			: '')
+	);
+
 	// State
 	let showPreview = $state(false);
 	let previewPosition = $state({ x: 0, y: 0 });
@@ -44,6 +59,16 @@
 	let imageLoaded = $state(false);
 	let imageError = $state(false);
 	let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
+
+	// Create portal container for preview (to avoid transform issues with fixed positioning)
+	let portalContainer: HTMLDivElement | null = null;
+
+	onMount(() => {
+		// Create a container at the body level for the preview portal
+		portalContainer = document.createElement('div');
+		portalContainer.className = 'card-preview-portal';
+		document.body.appendChild(portalContainer);
+	});
 
 	/**
 	 * Handle mouse enter - show preview after delay
@@ -147,6 +172,26 @@
 		if (hoverTimeout) {
 			clearTimeout(hoverTimeout);
 		}
+		// Remove portal container
+		if (portalContainer && portalContainer.parentNode) {
+			portalContainer.parentNode.removeChild(portalContainer);
+		}
+	});
+
+	// Update preview element when showPreview changes
+	$effect(() => {
+		if (!portalContainer) return;
+		
+		if (showPreview && !isCardBack && !isPlaceholder && previewImageUrl) {
+			// Create/update preview element
+			portalContainer.innerHTML = `
+				<div class="card-preview" style="left: ${previewPosition.x}px; top: ${previewPosition.y}px;">
+					<img src="${previewImageUrl}" alt="${cardName} (preview)" class="preview-image" />
+				</div>
+			`;
+		} else {
+			portalContainer.innerHTML = '';
+		}
 	});
 
 	// Derived values
@@ -198,85 +243,54 @@
 		</div>
 	{:else}
 		<!-- Real Card -->
-		<div class="card-inner">
-			{#if imageUrl && !imageError}
-				<img
-					src={imageUrl}
-					alt={cardName}
-					class="card-image {imageLoaded ? 'loaded' : ''}"
-					onload={handleImageLoad}
-					onerror={handleImageError}
-				/>
-			{:else}
-				<!-- Fallback when no image -->
-				<div class="card-fallback">
-					<div class="card-name-text">{cardName}</div>
-					{#if manaCost}
-						<div class="mana-cost">
-							{#each manaSymbols as symbol}
-								<span class="mana-symbol mana-{symbol.toLowerCase()}">{symbol}</span>
-							{/each}
-						</div>
-					{/if}
-					{#if cardType}
-						<div class="card-type-text">{cardType}</div>
-					{/if}
-					{#if hasPowerToughness}
-						<div class="power-toughness">
-							{power}/{toughness}
-						</div>
-					{/if}
-				</div>
-			{/if}
-
-			<!-- Counters Badge -->
-			{#if hasCounters}
-				<div class="counters-badge">
-					{#each counters as counter}
-						<div class="counter" title="{counter.count} {counter.type} counter(s)">
-							{counter.count > 0 ? `+${counter.count}` : counter.count}
-						</div>
-					{/each}
-				</div>
-			{/if}
-
+		{#if effectiveImageUrl && !imageError}
+			<img
+				src={effectiveImageUrl}
+				alt={cardName}
+				class="card-image {imageLoaded ? 'loaded' : ''}"
+				onload={handleImageLoad}
+				onerror={handleImageError}
+			/>
 			<!-- Loading Spinner -->
-			{#if imageUrl && !imageLoaded && !imageError}
+			{#if !imageLoaded}
 				<div class="loading-spinner"></div>
 			{/if}
-		</div>
-	{/if}
-</div>
-
-<!-- Hover Preview Portal -->
-{#if showPreview && !isCardBack && !isPlaceholder}
-	<div
-		class="card-preview"
-		style="left: {previewPosition.x}px; top: {previewPosition.y}px;"
-		role="tooltip"
-	>
-		{#if imageUrl && !imageError}
-			<img src={imageUrl} alt="{cardName} (preview)" class="preview-image" />
 		{:else}
-			<div class="preview-fallback">
-				<div class="preview-name">{cardName}</div>
+			<!-- Fallback when no image -->
+			<div class="card-fallback">
+				<div class="card-name-text">{cardName}</div>
 				{#if manaCost}
-					<div class="preview-mana">
+					<div class="mana-cost">
 						{#each manaSymbols as symbol}
 							<span class="mana-symbol mana-{symbol.toLowerCase()}">{symbol}</span>
 						{/each}
 					</div>
 				{/if}
 				{#if cardType}
-					<div class="preview-type">{cardType}</div>
+					<div class="card-type-text">{cardType}</div>
 				{/if}
 				{#if hasPowerToughness}
-					<div class="preview-pt">{power}/{toughness}</div>
+					<div class="power-toughness">
+						{power}/{toughness}
+					</div>
 				{/if}
 			</div>
 		{/if}
-	</div>
-{/if}
+
+		<!-- Counters Badge -->
+		{#if hasCounters}
+			<div class="counters-badge">
+				{#each counters as counter}
+					<div class="counter" title="{counter.count} {counter.type} counter(s)">
+						{counter.count > 0 ? `+${counter.count}` : counter.count}
+					</div>
+				{/each}
+			</div>
+		{/if}
+	{/if}
+</div>
+
+<!-- Preview is rendered via portal to document.body to avoid transform issues -->
 
 <style>
 	/* Base Card Styles */
@@ -370,8 +384,7 @@
 		opacity: 0.5;
 	}
 
-	/* Card Inner */
-	.card-inner,
+	/* Card Placeholder Inner */
 	.card-placeholder-inner {
 		width: 100%;
 		height: 100%;
@@ -384,9 +397,13 @@
 
 	/* Card Image */
 	.card-image {
+		position: absolute;
+		top: 0;
+		left: 0;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		border-radius: 6px;
 		opacity: 0;
 		transition: opacity 0.3s;
 	}
@@ -513,22 +530,35 @@
 		}
 	}
 
-	/* Card Preview (Hover) */
-	.card-preview {
+	/* Card Preview (Hover) - Global styles for portal-rendered preview */
+	:global(.card-preview-portal) {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 0;
+		height: 0;
+		overflow: visible;
+		pointer-events: none;
+		z-index: 99999;
+	}
+
+	:global(.card-preview) {
 		position: fixed;
 		width: 250px;
 		height: 350px;
-		z-index: 9999;
+		z-index: 99999;
 		pointer-events: none;
-		animation: fadeIn 0.2s;
+		animation: cardPreviewFadeIn 0.2s ease-out;
 		border-radius: 12px;
 		box-shadow:
 			0 20px 25px -5px rgba(0, 0, 0, 0.5),
 			0 10px 10px -5px rgba(0, 0, 0, 0.3);
 		border: 3px solid #667eea;
+		overflow: hidden;
+		background: #1a1f2e;
 	}
 
-	@keyframes fadeIn {
+	@keyframes cardPreviewFadeIn {
 		from {
 			opacity: 0;
 			transform: scale(0.95);
@@ -539,54 +569,10 @@
 		}
 	}
 
-	.preview-image {
+	:global(.card-preview .preview-image) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		border-radius: 10px;
-	}
-
-	.preview-fallback {
-		width: 100%;
-		height: 100%;
-		padding: 1.5rem;
-		background: #1a1f2e;
-		border-radius: 10px;
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		color: white;
-	}
-
-	.preview-name {
-		font-size: 1.25rem;
-		font-weight: 700;
-		line-height: 1.3;
-	}
-
-	.preview-mana {
-		display: flex;
-		gap: 0.25rem;
-		flex-wrap: wrap;
-	}
-
-	.preview-mana .mana-symbol {
-		width: 1.5rem;
-		height: 1.5rem;
-		font-size: 0.875rem;
-	}
-
-	.preview-type {
-		font-size: 0.875rem;
-		color: #9ca3af;
-		margin-top: 1rem;
-	}
-
-	.preview-pt {
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: #fbbf24;
-		margin-top: auto;
-		text-align: center;
+		border-radius: 9px;
 	}
 </style>

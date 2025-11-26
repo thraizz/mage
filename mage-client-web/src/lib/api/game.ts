@@ -21,14 +21,17 @@ import type {
 	SendPlayerStringResponse,
 	SendPlayerManaTypeRequest,
 	SendPlayerManaTypeResponse,
+	SendSpecialActionRequest,
+	SendSpecialActionResponse,
 	MatchQuitRequest,
 	MatchQuitResponse,
 	PlayerAction
 } from '$lib/generated/mage/v1/game';
+import { SpecialActionType } from '$lib/generated/mage/v1/game';
 import type { GameView } from '$lib/generated/mage/v1/models';
 
-// Re-export PlayerAction enum for convenience
-export { PlayerAction } from '$lib/generated/mage/v1/game';
+// Re-export enums for convenience
+export { PlayerAction, SpecialActionType } from '$lib/generated/mage/v1/game';
 
 /**
  * Join a game as a player
@@ -328,4 +331,45 @@ export async function quitMatch(gameId: string): Promise<void> {
 	if (!response.success) {
 		throw new Error(response.error || 'Failed to quit match');
 	}
+}
+
+/**
+ * Send a special action (play land, foretell, etc.)
+ * Per MTG Rule 116.2a: Special actions don't use the stack
+ */
+export async function sendSpecialAction(
+	gameId: string,
+	actionType: SpecialActionType,
+	sourceId: string
+): Promise<void> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	const request: SendSpecialActionRequest = {
+		sessionId,
+		gameId,
+		actionType,
+		sourceId
+	};
+
+	const response = await client.call<SendSpecialActionRequest, SendSpecialActionResponse>(
+		'SendSpecialAction',
+		request
+	);
+
+	if (!response.success) {
+		throw new Error(response.error || 'Failed to execute special action');
+	}
+}
+
+/**
+ * Play a land from hand
+ * Convenience wrapper for sendSpecialAction with PLAY_LAND
+ */
+export async function playLand(gameId: string, cardId: string): Promise<void> {
+	return sendSpecialAction(gameId, SpecialActionType.PLAY_LAND, cardId);
 }

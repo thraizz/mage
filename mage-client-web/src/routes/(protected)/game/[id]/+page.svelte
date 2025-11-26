@@ -35,7 +35,8 @@
 		sendPlayerBoolean,
 		sendPlayerString,
 		keepHand,
-		mulligan
+		mulligan,
+		playLand
 	} from '$lib/api/game';
 	import type { CardView } from '$lib/generated/mage/v1/models';
 	import type { GameCard, GamePhase } from '$lib/types/game';
@@ -237,6 +238,48 @@
 			addLogEntry('You passed until end of turn');
 		} catch (err) {
 			console.error('Failed to pass until EOT:', err);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Handle cast spell / play land
+	 * Determines if selected card is a land or spell and calls the appropriate API
+	 */
+	async function handleCastSpell() {
+		if (!havePriority || isActionLoading || !gameId) return;
+
+		const selectedIds = gameState.selectedCardIds;
+		if (selectedIds.length === 0) {
+			addLogEntry('No card selected');
+			return;
+		}
+
+		const cardId = selectedIds[0];
+		const card = myCards.find((c) => c.id === cardId);
+		if (!card) {
+			addLogEntry('Selected card not found in hand');
+			return;
+		}
+
+		isActionLoading = true;
+		try {
+			// Check if it's a land - lands need special action (don't use stack)
+			const isLand = card.type.toLowerCase().includes('land');
+			if (isLand) {
+				await playLand(gameId, cardId);
+				addLogEntry(`Playing land: ${card.name}`);
+			} else {
+				// For spells, send the card name to trigger casting
+				await sendPlayerString(gameId, card.name);
+				addLogEntry(`Casting spell: ${card.name}`);
+			}
+			gameStore.clearSelection();
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to cast spell:', err);
+			addLogEntry(`Failed: ${errorMessage}`);
 		} finally {
 			isActionLoading = false;
 		}
@@ -714,7 +757,7 @@
 					canPassPriority={havePriority}
 					isLoading={isActionLoading}
 					onPassPriority={handlePassPriority}
-					onCastSpell={() => {}}
+					onCastSpell={handleCastSpell}
 					onActivateAbility={() => {}}
 				/>
 				<button class="btn-f6" onclick={handlePassUntilEOT} disabled={!havePriority}>
