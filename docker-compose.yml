@@ -1,0 +1,145 @@
+# MAGE - Multi-Service Docker Compose Configuration
+# 
+# Services:
+#   - mage-server: Go backend server (gRPC + WebSocket + HTTP)
+#   - mage-client: Svelte web client
+#   - redis: Redis cache (for future use)
+#   - postgres: PostgreSQL database
+#
+# Usage:
+#   docker compose up -d              # Start all services
+#   docker compose up -d --build      # Rebuild and start
+#   docker compose logs -f            # View logs
+#   docker compose down               # Stop all services
+#   docker compose down -v            # Stop and remove volumes
+
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:16-alpine
+    container_name: mage-postgres
+    environment:
+      POSTGRES_DB: mage
+      POSTGRES_USER: mage
+      POSTGRES_PASSWORD: mage
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./mage-server-go/migrations:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mage -d mage"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - mage-network
+    restart: unless-stopped
+
+  # Redis cache (for future use)
+  redis:
+    image: redis:7-alpine
+    container_name: mage-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - mage-network
+    restart: unless-stopped
+
+  # MAGE Go backend server
+  mage-server:
+    build:
+      context: ./mage-server-go
+      dockerfile: Dockerfile
+    container_name: mage-server
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # Database configuration
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: mage
+      DATABASE_USER: mage
+      DATABASE_PASSWORD: mage
+      DATABASE_SSLMODE: disable
+      # Redis configuration (for future use)
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Server configuration
+      SERVER_NAME: mage-server
+      GRPC_ADDRESS: "0.0.0.0:17171"
+      WEBSOCKET_ADDRESS: "0.0.0.0:17179"
+      HEALTH_ADDRESS: "0.0.0.0:8080"
+    ports:
+      - "17171:17171"  # gRPC / HTTP-JSON API
+      - "17179:17179"  # WebSocket
+      - "8080:8080"    # Health check
+      - "9090:9090"    # Metrics
+    volumes:
+      # Mount the Docker-specific config file
+      - ./mage-server-go/config/config.docker.yaml:/app/config/config.yaml:ro
+    networks:
+      - mage-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # MAGE Svelte web client
+  mage-client:
+    build:
+      context: ./mage-client-web
+      dockerfile: Dockerfile
+      args:
+        # API URL for the client to connect to the server
+        # In production, this should be the public URL of mage-server
+        VITE_GRPC_SERVER_URL: http://localhost:17171
+    container_name: mage-client
+    depends_on:
+      mage-server:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      # Runtime environment variables (if needed)
+      ORIGIN: http://localhost:3000
+    ports:
+      - "3000:3000"
+    networks:
+      - mage-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  mage-network:
+    driver: bridge
+

@@ -1,0 +1,42 @@
+# Binary
+server
+bin/
+*.exe
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test files
+*_test.go
+coverage.out
+*.test
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+
+# Scripts (not needed in container)
+scripts/
+
+# Development files
+docker-compose.yml
+Makefile
+
+# Python cache (from transpile scripts)
+__pycache__/
+*.pyc
+

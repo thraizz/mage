@@ -1,0 +1,101 @@
+# MAGE Server Configuration for Docker Deployment
+# This config file is used when running in Docker containers
+# Service hostnames reference Docker Compose service names
+
+server:
+  name: "mage-server"
+
+  # gRPC server configuration
+  grpc:
+    address: "0.0.0.0:17171"
+    max_concurrent_streams: 1000
+    max_connection_age: 1h
+
+  # WebSocket server configuration
+  websocket:
+    address: "0.0.0.0:17179"
+    ping_interval: 30s
+    pong_timeout: 10s
+
+  # Session management
+  max_sessions: 10000
+  lease_period: 120s
+  max_idle_seconds: 300
+
+  # Game execution
+  max_game_threads: 10
+
+database:
+  # Use Docker service name 'postgres' instead of localhost
+  host: "postgres"
+  port: 5432
+  database: "mage"
+  user: "mage"
+  password: "mage"
+  sslmode: "disable"
+  max_open_conns: 25
+  max_idle_conns: 5
+  conn_max_lifetime: 5m
+
+validation:
+  username:
+    min_length: 3
+    max_length: 14
+    pattern: "^[a-z0-9_]+$"
+  password:
+    min_length: 8
+    max_length: 100
+
+auth:
+  mode: "optional"
+  require_email: false
+  password_reset_token_ttl: 1h
+  admin_password: ""
+
+mail:
+  provider: ""
+
+logging:
+  level: "info"
+  format: "json"
+  output: "stdout"
+
+cache:
+  cards:
+    enabled: true
+    ttl: 24h
+    max_size: 100000
+
+plugins:
+  game_types:
+    - TwoPlayerDuel
+    - FreeForAll
+    - CommanderFreeForAll
+    - CommanderDuel
+    - Brawl
+    - BrawlDuel
+    - CanadianHighlander
+    - MomirBasic
+    - Oathbreaker
+    - PennyDreadfulCommander
+    - TinyLeaders
+
+  tournament_types:
+    - Constructed
+    - BoosterDraft
+    - Sealed
+
+  player_types:
+    - Human
+    - ComputerMAX
+    - ComputerDraft
+
+health:
+  enabled: true
+  address: "0.0.0.0:8080"
+
+metrics:
+  enabled: true
+  port: 9090
+  path: "/metrics"
+
