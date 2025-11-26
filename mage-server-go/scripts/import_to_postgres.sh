@@ -71,8 +71,8 @@ echo "Sample cards:"
 PAGER=cat psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "SELECT name, setcode, manacosts FROM card WHERE name LIKE 'Lightning%' LIMIT 5;" 2>/dev/null || true
 echo ""
 
-# Create indexes for performance
-echo "Creating indexes..."
+# Create indexes for H2 card table
+echo "Creating indexes on H2 card table..."
 PAGER=cat psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" <<'EOF'
 CREATE INDEX IF NOT EXISTS idx_card_name ON card(name);
 CREATE INDEX IF NOT EXISTS idx_card_setcode ON card(setcode);
@@ -83,11 +83,41 @@ CREATE INDEX IF NOT EXISTS idx_card_manavalue ON card(manavalue);
 ANALYZE card;
 ANALYZE expansion;
 EOF
-
 echo "✓ Indexes created"
+
+# Migrate data to Go server's cards table
+echo ""
+echo "Migrating data to Go server's cards table..."
+PAGER=cat psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" <<'EOF'
+-- Clear existing cards (they're auto-generated placeholders)
+TRUNCATE cards CASCADE;
+
+-- Migrate from H2 card table to Go cards table with column mapping
+INSERT INTO cards (card_number, set_code, name, card_type, mana_cost, power, toughness, rules_text, rarity, card_class_name)
+SELECT 
+    cardnumber,
+    setcode,
+    name,
+    types,
+    -- Remove @@@ delimiter from mana costs
+    REPLACE(manacosts, '@@@', ''),
+    power,
+    toughness,
+    rules,
+    rarity,
+    classname
+FROM card;
+
+-- Update indexes
+ANALYZE cards;
+EOF
+
+MIGRATED_COUNT=$(PAGER=cat psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM cards;" 2>/dev/null | xargs || echo "0")
+echo "✓ Migrated $MIGRATED_COUNT cards to Go server format"
+
 echo ""
 echo "Database ready!"
 echo ""
 echo "Test with:"
-echo "  PAGER=cat psql -d $DB_NAME -c 'SELECT COUNT(*) FROM card;'"
-echo "  PAGER=cat psql -d $DB_NAME -c \"SELECT name, manacosts FROM card WHERE name = 'Lightning Bolt';\""
+echo "  PAGER=cat psql -d $DB_NAME -c 'SELECT COUNT(*) FROM cards;'"
+echo "  PAGER=cat psql -d $DB_NAME -c \"SELECT name, mana_cost FROM cards WHERE name = 'Lightning Bolt';\""
