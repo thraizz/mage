@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/magefree/mage-server-go/internal/repository"
@@ -1424,59 +1423,33 @@ func (s *mageServer) DeckGet(ctx context.Context, req *pb.DeckGetRequest) (*pb.D
 	}, nil
 }
 
-// normalizeCardName normalizes a card name to match database format
-// Removes punctuation (commas, apostrophes, hyphens, colons) and normalizes spacing
-func normalizeCardName(name string) string {
-	// Trim whitespace
-	name = strings.TrimSpace(name)
-	if name == "" {
-		return ""
-	}
-
-	// Replace common punctuation with spaces
-	name = strings.ReplaceAll(name, ",", " ")
-	name = strings.ReplaceAll(name, "'", "")
-	name = strings.ReplaceAll(name, "’", "") // Unicode apostrophe
-	name = strings.ReplaceAll(name, "-", " ")
-	name = strings.ReplaceAll(name, "/", " ")
-	name = strings.ReplaceAll(name, "//", " ")
-	name = strings.ReplaceAll(name, ":", " ")
-
-	// Normalize multiple spaces to single space
-	spaceRegex := regexp.MustCompile(`\s+`)
-	name = spaceRegex.ReplaceAllString(name, " ")
-
-	return strings.TrimSpace(name)
-}
-
 // validateCardNames checks that all card names exist in the database
 func (s *mageServer) validateCardNames(ctx context.Context, cardNames []string) error {
 	if len(cardNames) == 0 {
 		return nil
 	}
 
-	// Normalize and get unique card names to avoid duplicate database queries
-	// Map: normalized name -> original name (for error messages)
-	uniqueNames := make(map[string]string)
+	// Get unique card names to avoid duplicate database queries
+	// Use lowercase for deduplication but preserve original name for search
+	uniqueNames := make(map[string]string) // lowercase -> original
 	for _, name := range cardNames {
-		normalized := normalizeCardName(name)
-		if normalized != "" {
-			// Store mapping from normalized to original for error messages
-			// If multiple cards normalize to the same name, keep the first original
-			if _, exists := uniqueNames[normalized]; !exists {
-				uniqueNames[normalized] = name
+		trimmed := strings.TrimSpace(name)
+		if trimmed != "" {
+			key := strings.ToLower(trimmed)
+			if _, exists := uniqueNames[key]; !exists {
+				uniqueNames[key] = trimmed
 			}
 		}
 	}
 
-	// Validate each unique normalized card name (case-insensitive)
+	// Validate each unique card name (case-insensitive search with original name)
 	var invalidCards []string
-	for normalizedName, originalName := range uniqueNames {
-		cards, err := s.cardRepo.GetByNameCaseInsensitive(ctx, normalizedName)
+	for _, originalName := range uniqueNames {
+		// Search using the ORIGINAL name (with apostrophes etc.) - database has original names
+		cards, err := s.cardRepo.GetByNameCaseInsensitive(ctx, originalName)
 		if err != nil {
 			s.logger.Warn("failed to validate card",
 				zap.String("card_name", originalName),
-				zap.String("normalized", normalizedName),
 				zap.Error(err),
 			)
 			invalidCards = append(invalidCards, originalName)
@@ -1486,15 +1459,12 @@ func (s *mageServer) validateCardNames(ctx context.Context, cardNames []string) 
 		if len(cards) == 0 {
 			s.logger.Info("card not found in database",
 				zap.String("card_name", originalName),
-				zap.String("normalized", normalizedName),
-				zap.String("normalized_length", fmt.Sprintf("%d", len(normalizedName))),
-				zap.String("normalized_bytes", fmt.Sprintf("%v", []byte(normalizedName))),
+				zap.Int("name_length", len(originalName)),
 			)
 			invalidCards = append(invalidCards, originalName)
 		} else {
 			s.logger.Debug("card found in database",
 				zap.String("card_name", originalName),
-				zap.String("normalized", normalizedName),
 				zap.Int("matches", len(cards)),
 			)
 		}
