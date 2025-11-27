@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "total_java_cards": 30600,
+  "processed_cards": 30600,
+  "successful": 30600,
+  "failed": 0,
+  "missing_cards": [],
+  "extra_cards": [],
+  "failures_by_type": {}
+}

@@ -373,3 +373,11 @@ export async function sendSpecialAction(
 export async function playLand(gameId: string, cardId: string): Promise<void> {
 	return sendSpecialAction(gameId, SpecialActionType.PLAY_LAND, cardId);
 }
+
+/**
+ * Advance to the next phase/step
+ * Debug/development feature for manual turn progression
+ */
+export async function advancePhase(gameId: string): Promise<void> {
+	return sendSpecialAction(gameId, SpecialActionType.ADVANCE_PHASE, '');
+}

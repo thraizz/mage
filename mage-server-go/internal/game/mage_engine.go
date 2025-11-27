@@ -113,55 +113,75 @@ type EngineGameView struct {
 	StartedAt      time.Time
 	Messages       []EngineMessage
 	Prompts        []EnginePrompt
+
+	// Pre-computed display values (server source of truth)
+	ActivePlayerName     string
+	PriorityPlayerName   string
+	GameFormat           string
+	IsMulliganPhase      bool
+	LandsPlayedThisTurn  int
+	LandsAllowedThisTurn int
 }
 
 // EnginePlayerView represents a player's view in the game
 type EnginePlayerView struct {
-	PlayerID     string
-	Name         string
-	Life         int
-	Poison       int
-	Energy       int
-	LibraryCount int
-	HandCount    int
-	Hand         []EngineCardView
-	Graveyard    []EngineCardView
-	ManaPool     EngineManaPoolView
-	HasPriority  bool
-	Passed       bool
-	StateOrdinal int
-	Lost         bool
-	Left         bool
-	Wins         int
+	PlayerID            string
+	Name                string
+	Life                int
+	Poison              int
+	Energy              int
+	LibraryCount        int
+	HandCount           int
+	Hand                []EngineCardView
+	Graveyard           []EngineCardView
+	ManaPool            EngineManaPoolView
+	HasPriority         bool
+	Passed              bool
+	StateOrdinal        int
+	Lost                bool
+	Left                bool
+	Wins                int
+	KeptHand            bool // Whether player has kept their hand during mulligan phase
+	HasAvailableActions bool // Server-computed: does this player have any legal actions right now?
 }
 
 // EngineCardView represents a card in any zone
 type EngineCardView struct {
-	ID             string
-	Name           string
-	DisplayName    string
-	ManaCost       string
-	Type           string
-	SubTypes       []string
-	SuperTypes     []string
-	Color          string
-	Power          string
-	Toughness      string
-	Loyalty        string
-	CardNumber     int
-	ExpansionSet   string
-	Rarity         string
-	RulesText      string
-	Tapped         bool
-	Flipped        bool
-	Transformed    bool
-	FaceDown       bool
-	Zone           int
-	ControllerID   string
-	OwnerID        string
-	AttachedToCard []string
-	Abilities      []EngineAbilityView
-	Counters       []EngineCounterView
+	ID               string
+	Name             string
+	DisplayName      string
+	ManaCost         string
+	Type             string
+	SubTypes         []string
+	SuperTypes       []string
+	Color            string
+	Power            string
+	Toughness        string
+	Loyalty          string
+	CardNumber       int
+	ExpansionSet     string
+	Rarity           string
+	RulesText        string
+	Tapped           bool
+	Flipped          bool
+	Transformed      bool
+	FaceDown         bool
+	Zone             int
+	ControllerID     string
+	OwnerID          string
+	AttachedToCard   []string
+	Abilities        []EngineAbilityView
+	Counters         []EngineCounterView
+	AvailableActions []EngineCardAction // Server-computed available actions
+}
+
+// EngineCardAction represents an available action for a card
+type EngineCardAction struct {
+	ActionType     string // "CAST_SPELL", "PLAY_LAND", "ACTIVATE_ABILITY", "ACTIVATE_MANA_ABILITY"
+	ActionID       string // For abilities with multiple options
+	DisplayText    string // "Cast", "Play Land", "Tap: Add {G}"
+	IsEnabled      bool   // Can perform right now?
+	DisabledReason string // "Not enough mana", "Wrong phase"
 }
 
 // EngineAbilityView represents an ability on a card
@@ -1453,7 +1473,7 @@ func (e *MageEngine) completeMulliganPhase(gameState *engineGameState) {
 	gameState.turnManager.SetPriority(startingPlayerID)
 
 	gameState.addMessage("Mulligan phase complete, game begins", "system")
-	gameState.addMessage(fmt.Sprintf("Turn 1 - %s's turn", startingPlayerID), "phase")
+	gameState.addMessage(fmt.Sprintf("Turn 1 - %s's turn (Beginning Phase)", startingPlayerID), "phase")
 
 	// Notify all players that game is now in progress
 	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
@@ -2090,6 +2110,8 @@ func (e *MageEngine) handleSpecialAction(gameState *engineGameState, action Play
 	switch actionType {
 	case "PLAY_LAND":
 		return e.handlePlayLand(gameState, player, sourceID)
+	case "ADVANCE_PHASE":
+		return e.handleAdvancePhase(gameState, player)
 	default:
 		return fmt.Errorf("unknown special action: %s", actionType)
 	}
@@ -2170,6 +2192,60 @@ func (e *MageEngine) handlePlayLand(gameState *engineGameState, player *internal
 			zap.String("player", player.PlayerID),
 			zap.String("card", card.Name),
 			zap.Int("lands_played_this_turn", player.LandsPlayedThisTurn),
+		)
+	}
+
+	return nil
+}
+
+// handleAdvancePhase manually advances to the next phase/step
+// This is a debug/development feature to allow manual turn progression
+func (e *MageEngine) handleAdvancePhase(gameState *engineGameState, player *internalPlayer) error {
+	// Check if player has priority (only priority player can advance)
+	if gameState.turnManager.PriorityPlayer() != player.PlayerID {
+		return fmt.Errorf("player %s does not have priority", player.PlayerID)
+	}
+
+	// Get next player in turn order for turn transitions
+	nextPlayer := gameState.playerOrder[0]
+	for i, pid := range gameState.playerOrder {
+		if pid == gameState.turnManager.ActivePlayer() {
+			nextPlayer = gameState.playerOrder[(i+1)%len(gameState.playerOrder)]
+			break
+		}
+	}
+
+	// Advance to next step
+	oldPhase := gameState.turnManager.CurrentPhase()
+	oldStep := gameState.turnManager.CurrentStep()
+	newPhase, newStep := gameState.turnManager.AdvanceStep(nextPlayer)
+
+	// Reset lands played on new turn
+	if newStep == rules.StepUntap {
+		e.performUntapStep(gameState, gameState.turnManager.ActivePlayer())
+	}
+
+	gameState.addMessage(fmt.Sprintf("Advanced from %s/%s to %s/%s",
+		oldPhase.String(), oldStep.String(),
+		newPhase.String(), newStep.String()), "phase")
+
+	// Notify phase change
+	e.notifyPhaseChange(gameState.gameID, map[string]interface{}{
+		"old_phase":       oldPhase.String(),
+		"old_step":        oldStep.String(),
+		"new_phase":       newPhase.String(),
+		"new_step":        newStep.String(),
+		"active_player":   gameState.turnManager.ActivePlayer(),
+		"priority_player": gameState.turnManager.PriorityPlayer(),
+		"turn":            gameState.turnManager.TurnNumber(),
+	})
+
+	if e.logger != nil {
+		e.logger.Info("phase advanced",
+			zap.String("game_id", gameState.gameID),
+			zap.String("player", player.PlayerID),
+			zap.String("new_phase", newPhase.String()),
+			zap.String("new_step", newStep.String()),
 		)
 	}
 
@@ -2309,6 +2385,24 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
 
+	// Get player names for display
+	activePlayerName := ""
+	priorityPlayerName := ""
+	if activePlayer, exists := gameState.players[gameState.turnManager.ActivePlayer()]; exists {
+		activePlayerName = activePlayer.Name
+	}
+	if priorityPlayer, exists := gameState.players[gameState.turnManager.PriorityPlayer()]; exists {
+		priorityPlayerName = priorityPlayer.Name
+	}
+
+	// Get requesting player's land tracking
+	landsPlayedThisTurn := 0
+	landsAllowedThisTurn := 1
+	if requestingPlayer, exists := gameState.players[playerID]; exists {
+		landsPlayedThisTurn = requestingPlayer.LandsPlayedThisTurn
+		landsAllowedThisTurn = requestingPlayer.LandsPerTurn
+	}
+
 	view := &EngineGameView{
 		GameID:         gameID,
 		State:          gameState.state,
@@ -2317,7 +2411,7 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 		Turn:           gameState.turnManager.TurnNumber(),
 		ActivePlayerID: gameState.turnManager.ActivePlayer(),
 		PriorityPlayer: gameState.turnManager.PriorityPlayer(),
-		Players:        e.buildPlayerViews(gameState, playerID),
+		Players:        e.buildPlayerViewsWithActions(gameState, playerID),
 		Battlefield:    e.buildCardViews(gameState.battlefield),
 		Stack:          e.buildStackViews(gameState),
 		Exile:          e.buildCardViews(gameState.exile),
@@ -2328,6 +2422,14 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 		StartedAt:      gameState.startedAt,
 		Messages:       make([]EngineMessage, len(gameState.messages)),
 		Prompts:        make([]EnginePrompt, len(gameState.prompts)),
+
+		// Pre-computed display values
+		ActivePlayerName:     activePlayerName,
+		PriorityPlayerName:   priorityPlayerName,
+		GameFormat:           gameState.gameType,
+		IsMulliganPhase:      gameState.state == GameStateMulligan,
+		LandsPlayedThisTurn:  landsPlayedThisTurn,
+		LandsAllowedThisTurn: landsAllowedThisTurn,
 	}
 
 	copy(view.Messages, gameState.messages)
@@ -2336,7 +2438,7 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 	return view, nil
 }
 
-// buildPlayerViews builds player views
+// buildPlayerViews builds player views (without available actions)
 func (e *MageEngine) buildPlayerViews(gameState *engineGameState, requestingPlayerID string) []EnginePlayerView {
 	views := make([]EnginePlayerView, 0, len(gameState.playerOrder))
 
@@ -2365,6 +2467,7 @@ func (e *MageEngine) buildPlayerViews(gameState *engineGameState, requestingPlay
 			Lost:         player.Lost,
 			Left:         player.Left,
 			Wins:         player.Wins,
+			KeptHand:     player.KeptHand,
 		}
 
 		// Only show hand to the owning player
@@ -2385,6 +2488,161 @@ func (e *MageEngine) buildPlayerViews(gameState *engineGameState, requestingPlay
 	}
 
 	return views
+}
+
+// buildPlayerViewsWithActions builds player views with available actions for the requesting player's hand
+func (e *MageEngine) buildPlayerViewsWithActions(gameState *engineGameState, requestingPlayerID string) []EnginePlayerView {
+	views := make([]EnginePlayerView, 0, len(gameState.playerOrder))
+
+	for _, playerID := range gameState.playerOrder {
+		player := gameState.players[playerID]
+		view := EnginePlayerView{
+			PlayerID:     player.PlayerID,
+			Name:         player.Name,
+			Life:         player.Life,
+			Poison:       player.Poison,
+			Energy:       player.Energy,
+			LibraryCount: len(player.Library),
+			HandCount:    len(player.Hand),
+			Graveyard:    e.buildCardViews(player.Graveyard),
+			ManaPool: EngineManaPoolView{
+				White:     player.ManaPool.GetTotal(mana.ManaWhite),
+				Blue:      player.ManaPool.GetTotal(mana.ManaBlue),
+				Black:     player.ManaPool.GetTotal(mana.ManaBlack),
+				Red:       player.ManaPool.GetTotal(mana.ManaRed),
+				Green:     player.ManaPool.GetTotal(mana.ManaGreen),
+				Colorless: player.ManaPool.GetTotal(mana.ManaColorless),
+			},
+			HasPriority:  player.HasPriority,
+			Passed:       player.Passed,
+			StateOrdinal: player.StateOrdinal,
+			Lost:         player.Lost,
+			Left:         player.Left,
+			Wins:         player.Wins,
+			KeptHand:     player.KeptHand,
+		}
+
+		// Only show hand to the owning player
+		if playerID == requestingPlayerID {
+			// Build card views with available actions
+			view.Hand = e.buildCardViewsWithActions(gameState, player.Hand, playerID)
+		} else {
+			view.Hand = make([]EngineCardView, len(player.Hand))
+			for i := range player.Hand {
+				view.Hand[i] = EngineCardView{
+					ID:       player.Hand[i].ID,
+					FaceDown: true,
+					Zone:     zoneHand,
+				}
+			}
+		}
+
+		views = append(views, view)
+	}
+
+	return views
+}
+
+// buildCardViewsWithActions converts internal cards to view cards with available actions
+func (e *MageEngine) buildCardViewsWithActions(gameState *engineGameState, cards []*internalCard, playerID string) []EngineCardView {
+	views := make([]EngineCardView, len(cards))
+	for i, card := range cards {
+		views[i] = EngineCardView{
+			ID:               card.ID,
+			Name:             card.Name,
+			DisplayName:      card.DisplayName,
+			ManaCost:         card.ManaCost,
+			Type:             card.Type,
+			SubTypes:         append([]string(nil), card.SubTypes...),
+			SuperTypes:       append([]string(nil), card.SuperTypes...),
+			Color:            card.Color,
+			Power:            card.Power,
+			Toughness:        card.Toughness,
+			Loyalty:          card.Loyalty,
+			CardNumber:       card.CardNumber,
+			ExpansionSet:     card.ExpansionSet,
+			Rarity:           card.Rarity,
+			RulesText:        card.RulesText,
+			Tapped:           card.Tapped,
+			Flipped:          card.Flipped,
+			Transformed:      card.Transformed,
+			FaceDown:         card.FaceDown,
+			Zone:             card.Zone,
+			ControllerID:     card.ControllerID,
+			OwnerID:          card.OwnerID,
+			AttachedToCard:   append([]string(nil), card.AttachedToCard...),
+			Abilities:        append([]EngineAbilityView(nil), card.Abilities...),
+			Counters:         e.buildCounterViews(card.Counters),
+			AvailableActions: e.getAvailableActionsForCard(gameState, card, playerID),
+		}
+	}
+	return views
+}
+
+// getAvailableActionsForCard computes available actions for a card in hand
+func (e *MageEngine) getAvailableActionsForCard(gameState *engineGameState, card *internalCard, playerID string) []EngineCardAction {
+	var actions []EngineCardAction
+
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return actions
+	}
+
+	hasPriority := gameState.turnManager.PriorityPlayer() == playerID
+	currentPhase := gameState.turnManager.CurrentPhase()
+	isMainPhase := currentPhase == rules.PhasePrecombatMain || currentPhase == rules.PhasePostcombatMain
+	stackEmpty := gameState.stack.IsEmpty()
+
+	// Check if card is a land
+	isLand := strings.Contains(strings.ToLower(card.Type), "land")
+
+	if isLand {
+		// Land play action
+		canPlay := true
+		reason := ""
+
+		if !hasPriority {
+			canPlay = false
+			reason = "You don't have priority"
+		} else if !isMainPhase {
+			canPlay = false
+			reason = "Only during main phase"
+		} else if !stackEmpty {
+			canPlay = false
+			reason = "Stack must be empty"
+		} else if player.LandsPlayedThisTurn >= player.LandsPerTurn {
+			canPlay = false
+			reason = "Already played a land this turn"
+		}
+
+		actions = append(actions, EngineCardAction{
+			ActionType:     "PLAY_LAND",
+			DisplayText:    "Play Land",
+			IsEnabled:      canPlay,
+			DisabledReason: reason,
+		})
+	} else {
+		// Spell casting action
+		canCast := true
+		reason := ""
+
+		if !hasPriority {
+			canCast = false
+			reason = "You don't have priority"
+		}
+		// TODO: Add mana cost checking, timing restrictions (sorcery vs instant), etc.
+
+		actions = append(actions, EngineCardAction{
+			ActionType:     "CAST_SPELL",
+			DisplayText:    "Cast " + card.Name,
+			IsEnabled:      canCast,
+			DisabledReason: reason,
+		})
+	}
+
+	// TODO: Add activated abilities from the card
+
+	return actions
 }
 
 // buildCardViews converts internal cards to view cards

@@ -153,6 +153,8 @@ func (h *HTTPJSONHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleMatchStart(ctx, w, r)
 	case "MatchQuit":
 		h.handleMatchQuit(ctx, w, r)
+	case "SendSpecialAction":
+		h.handleSendSpecialAction(ctx, w, r)
 
 	// Draft
 	case "DraftJoin":
@@ -1103,6 +1105,23 @@ func (h *HTTPJSONHandler) handleMatchQuit(ctx context.Context, w http.ResponseWr
 	}
 
 	resp, err := h.mageServer.MatchQuit(ctx, &req)
+	if err != nil {
+		h.writeErrorResponse(w, err)
+		return
+	}
+
+	h.writeSuccessResponse(w, resp)
+}
+
+// handleSendSpecialAction handles the SendSpecialAction method (play land, foretell, etc.)
+func (h *HTTPJSONHandler) handleSendSpecialAction(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	var req pb.SendSpecialActionRequest
+	if err := h.unmarshalRequest(r, &req); err != nil {
+		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.mageServer.SendSpecialAction(ctx, &req)
 	if err != nil {
 		h.writeErrorResponse(w, err)
 		return

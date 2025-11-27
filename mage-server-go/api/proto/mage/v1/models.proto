@@ -89,6 +89,14 @@ message GameView {
   CombatView combat = 16;
   bool special = 17;
   google.protobuf.Timestamp start_time = 18;
+
+  // Pre-computed display values (server source of truth)
+  string active_player_name = 20;
+  string priority_player_name = 21;
+  string game_format = 22;
+  bool is_mulligan_phase = 23;
+  int32 lands_played_this_turn = 24;
+  int32 lands_allowed_this_turn = 25;
 }
 
 // PlayerView represents a player's state
@@ -109,6 +117,8 @@ message PlayerView {
   bool lost = 14;
   bool left = 15;
   int32 wins = 16;
+  bool kept_hand = 17;  // Whether player has kept their hand during mulligan phase
+  bool has_available_actions = 18;  // Server-computed: does this player have any legal actions right now?
 }
 
 // CardView represents a card
@@ -138,6 +148,9 @@ message CardView {
   string owner_id = 23;
   repeated CounterView counters = 24;
   repeated string attached_to = 25;
+
+  // Available actions for this card (context-aware, server source of truth)
+  repeated CardAction available_actions = 30;
 }
 
 // AbilityView represents a card ability
@@ -145,6 +158,24 @@ message AbilityView {
   string id = 1;
   string text = 2;
   string rule = 3;
+}
+
+// CardAction represents an action available for a card
+message CardAction {
+  CardActionType action_type = 1;
+  string action_id = 2;           // For abilities with multiple options
+  string display_text = 3;        // "Cast", "Play Land", "Tap: Add {G}"
+  bool is_enabled = 4;            // Can perform right now?
+  string disabled_reason = 5;     // "Not enough mana", "Wrong phase"
+}
+
+// CardActionType enumerates possible card actions
+enum CardActionType {
+  CARD_ACTION_UNSPECIFIED = 0;
+  CARD_ACTION_CAST_SPELL = 1;
+  CARD_ACTION_PLAY_LAND = 2;
+  CARD_ACTION_ACTIVATE_ABILITY = 3;
+  CARD_ACTION_ACTIVATE_MANA_ABILITY = 4;
 }
 
 // CounterView represents a counter on a card

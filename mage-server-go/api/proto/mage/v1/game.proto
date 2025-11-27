@@ -134,6 +134,7 @@ enum SpecialActionType {
   FORETELL = 2;
   SUSPEND = 3;
   COMPANION = 4;
+  ADVANCE_PHASE = 5;  // Manually advance to next phase/step
 }
 
 message SendSpecialActionRequest {

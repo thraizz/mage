@@ -108,7 +108,7 @@ def convert_h2_to_postgres(input_file, output_file):
     with open(output_file, 'w', encoding='utf-8') as f_out:
         f_out.write('\n'.join(converted_lines))
     
-    print(f"✓ Conversion complete")
+    print("✓ Conversion complete")
     print(f"  CREATE TABLE: {stats['create_table']}")
     print(f"  INSERT: {stats['insert']}")
     print(f"  CREATE INDEX: {stats['create_index']}")

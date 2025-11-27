@@ -356,6 +356,14 @@ func (s *mageServer) GameGetView(ctx context.Context, req *pb.GameGetViewRequest
 					view.StartTime = timestamppb.New(data.StartedAt)
 				}
 
+				// Add pre-computed display values (server source of truth)
+				view.ActivePlayerName = data.ActivePlayerName
+				view.PriorityPlayerName = data.PriorityPlayerName
+				view.GameFormat = data.GameFormat
+				view.IsMulliganPhase = data.IsMulliganPhase
+				view.LandsPlayedThisTurn = int32(data.LandsPlayedThisTurn)
+				view.LandsAllowedThisTurn = int32(data.LandsAllowedThisTurn)
+
 				nextID := int32(len(view.Messages) + 1)
 				engineMessages := engineMessagesToProto(data.Messages, nextID)
 				view.Messages = append(view.Messages, engineMessages...)
@@ -547,7 +555,8 @@ func (s *mageServer) SendSpecialAction(ctx context.Context, req *pb.SendSpecialA
 	}
 
 	sourceID := req.GetSourceId()
-	if sourceID == "" {
+	// source_id is required for most actions, but not for ADVANCE_PHASE
+	if sourceID == "" && actionType != pb.SpecialActionType_ADVANCE_PHASE {
 		return &pb.SendSpecialActionResponse{Success: false, Error: "source_id is required"}, nil
 	}
 
@@ -654,6 +663,7 @@ func enginePlayersToProto(players []game.EnginePlayerView) []*pb.PlayerView {
 			Lost:         p.Lost,
 			Left:         p.Left,
 			Wins:         int32(p.Wins),
+			KeptHand:     p.KeptHand,
 		}
 		result = append(result, playerView)
 	}
@@ -714,6 +724,11 @@ func engineCardsToProto(cards []game.EngineCardView) []*pb.CardView {
 				})
 			}
 			cardView.Counters = counters
+		}
+
+		// Add available actions (server source of truth)
+		if len(card.AvailableActions) > 0 {
+			cardView.AvailableActions = engineCardActionsToProto(card.AvailableActions)
 		}
 
 		result = append(result, cardView)
@@ -830,6 +845,39 @@ func engineColorToString(color string) string {
 		return "BLACK"
 	default:
 		return "BLACK"
+	}
+}
+
+func engineCardActionsToProto(actions []game.EngineCardAction) []*pb.CardAction {
+	if len(actions) == 0 {
+		return nil
+	}
+
+	result := make([]*pb.CardAction, 0, len(actions))
+	for _, action := range actions {
+		result = append(result, &pb.CardAction{
+			ActionType:     stringToCardActionType(action.ActionType),
+			ActionId:       action.ActionID,
+			DisplayText:    action.DisplayText,
+			IsEnabled:      action.IsEnabled,
+			DisabledReason: action.DisabledReason,
+		})
+	}
+	return result
+}
+
+func stringToCardActionType(actionType string) pb.CardActionType {
+	switch actionType {
+	case "CAST_SPELL":
+		return pb.CardActionType_CARD_ACTION_CAST_SPELL
+	case "PLAY_LAND":
+		return pb.CardActionType_CARD_ACTION_PLAY_LAND
+	case "ACTIVATE_ABILITY":
+		return pb.CardActionType_CARD_ACTION_ACTIVATE_ABILITY
+	case "ACTIVATE_MANA_ABILITY":
+		return pb.CardActionType_CARD_ACTION_ACTIVATE_MANA_ABILITY
+	default:
+		return pb.CardActionType_CARD_ACTION_UNSPECIFIED
 	}
 }
 

@@ -28,6 +28,7 @@ type Session struct {
 	LeasePeriod  time.Duration
 	CallbackChan chan interface{} // Channel for WebSocket callbacks
 	wsCloseChan  chan struct{}    // Signal to close current WebSocket
+	wsCloseFunc  func()           // Safe close function for the WebSocket (uses sync.Once internally)
 	preferences  *Preferences
 	mu           sync.RWMutex
 	reqMu        sync.Mutex // Prevents concurrent requests for same session
@@ -46,23 +47,26 @@ func NewSession(id, host string, leasePeriod time.Duration) *Session {
 	}
 }
 
-// SetWebSocketCloseChan sets the close channel for the active WebSocket
-// Returns the old close channel if one exists (to close previous connection)
-func (s *Session) SetWebSocketCloseChan(closeChan chan struct{}) chan struct{} {
+// SetWebSocketCloseFunc sets the close function for the active WebSocket.
+// The closeFunc should be a function that safely closes the done channel using sync.Once.
+// Returns the old close function if one exists (to close previous connection safely).
+func (s *Session) SetWebSocketCloseFunc(closeChan chan struct{}, closeFunc func()) func() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	oldChan := s.wsCloseChan
+	oldFunc := s.wsCloseFunc
 	s.wsCloseChan = closeChan
-	return oldChan
+	s.wsCloseFunc = closeFunc
+	return oldFunc
 }
 
-// ClearWebSocketCloseChan clears the WebSocket close channel only if it matches
-func (s *Session) ClearWebSocketCloseChan(closeChan chan struct{}) {
+// ClearWebSocketCloseFunc clears the WebSocket close function only if the channel matches
+func (s *Session) ClearWebSocketCloseFunc(closeChan chan struct{}) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	// Only clear if this is still the active close channel
 	if s.wsCloseChan == closeChan {
 		s.wsCloseChan = nil
+		s.wsCloseFunc = nil
 	}
 }
 

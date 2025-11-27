@@ -8,9 +8,10 @@
 		onKeep: () => void;
 		onMulligan: () => void;
 		isLoading?: boolean;
+		hasKeptHand?: boolean;
 	}
 
-	let { cards, mulliganCount, onKeep, onMulligan, isLoading = false }: Props = $props();
+	let { cards, mulliganCount, onKeep, onMulligan, isLoading = false, hasKeptHand = false }: Props = $props();
 
 	// Calculate next hand size after mulligan
 	const nextHandSize = $derived(Math.max(0, 7 - (mulliganCount + 1)));
@@ -60,7 +61,12 @@
 		</div>
 
 		<div class="mulligan-info">
-			{#if nextHandSize > 0}
+			{#if hasKeptHand}
+				<p class="waiting-info">
+					<span class="waiting-spinner"></span>
+					Waiting for other players to decide...
+				</p>
+			{:else if nextHandSize > 0}
 				<p class="next-hand-info">
 					If you mulligan, you'll draw 7 cards and put <strong>{mulliganCount + 1}</strong> on the bottom.
 				</p>
@@ -72,31 +78,37 @@
 		</div>
 
 		<div class="dialog-actions">
-			<button
-				class="btn-keep"
-				onclick={onKeep}
-				disabled={isLoading}
-			>
-				{#if isLoading}
-					<span class="spinner-small"></span>
-				{:else}
-					Keep Hand
-				{/if}
-			</button>
-			<button
-				class="btn-mulligan"
-				onclick={onMulligan}
-				disabled={isLoading || nextHandSize === 0}
-				class:warning={showWarning}
-			>
-				{#if isLoading}
-					<span class="spinner-small"></span>
-				{:else if nextHandSize === 0}
-					No Mulligan Available
-				{:else}
-					Mulligan to {nextHandSize} cards
-				{/if}
-			</button>
+			{#if hasKeptHand}
+				<div class="kept-badge">
+					✓ Hand Kept
+				</div>
+			{:else}
+				<button
+					class="btn-keep"
+					onclick={onKeep}
+					disabled={isLoading}
+				>
+					{#if isLoading}
+						<span class="spinner-small"></span>
+					{:else}
+						Keep Hand
+					{/if}
+				</button>
+				<button
+					class="btn-mulligan"
+					onclick={onMulligan}
+					disabled={isLoading || nextHandSize === 0}
+					class:warning={showWarning}
+				>
+					{#if isLoading}
+						<span class="spinner-small"></span>
+					{:else if nextHandSize === 0}
+						No Mulligan Available
+					{:else}
+						Mulligan to {nextHandSize} cards
+					{/if}
+				</button>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -192,6 +204,38 @@
 		color: #fbbf24;
 		margin: 0;
 		font-weight: 600;
+	}
+
+	.waiting-info {
+		color: #94a3b8;
+		margin: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		font-size: 1.1rem;
+	}
+
+	.waiting-spinner {
+		width: 20px;
+		height: 20px;
+		border: 3px solid rgba(102, 126, 234, 0.3);
+		border-top-color: #667eea;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+	}
+
+	.kept-badge {
+		padding: 1rem 2.5rem;
+		font-size: 1.125rem;
+		font-weight: 700;
+		border-radius: 8px;
+		background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+		color: white;
+		box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	.dialog-actions {

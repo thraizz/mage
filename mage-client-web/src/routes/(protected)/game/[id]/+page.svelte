@@ -12,6 +12,7 @@
 		opponents,
 		hasPriority,
 		currentPhase,
+		currentStep,
 		currentTurn,
 		battlefield,
 		stack,
@@ -36,9 +37,10 @@
 		sendPlayerString,
 		keepHand,
 		mulligan,
-		playLand
+		playLand,
+		advancePhase
 	} from '$lib/api/game';
-	import type { CardView } from '$lib/generated/mage/v1/models';
+	import { CardActionType, type CardView } from '$lib/generated/mage/v1/models';
 	import type { GameCard, GamePhase } from '$lib/types/game';
 
 	// Game components
@@ -48,29 +50,41 @@
 	import ManaPool from '$lib/components/game/ManaPool.svelte';
 	import PhaseIndicator from '$lib/components/game/PhaseIndicator.svelte';
 	import Stack from '$lib/components/game/Stack.svelte';
-	import PriorityIndicator from '$lib/components/game/PriorityIndicator.svelte';
-	import GameActionsPanel from '$lib/components/game/GameActionsPanel.svelte';
-	import GameChat from '$lib/components/game/GameChat.svelte';
-	import ActionLog from '$lib/components/game/ActionLog.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
+	
+	import PriorityActionBar from '$lib/components/game/PriorityActionBar.svelte';
+	import ActionLogOverlay from '$lib/components/game/ActionLogOverlay.svelte';
+	import GameChatOverlay from '$lib/components/game/GameChatOverlay.svelte';
+	import OpponentPanel from '$lib/components/game/OpponentPanel.svelte';
+	import DebugOverlay from '$lib/components/game/DebugOverlay.svelte';
 
 	// Game ID from route params
 	const gameId = $derived($page.params.id);
 
 	// UI state
-	let chatCollapsed = $state(false);
-	let actionLogCollapsed = $state(false);
-	let gameChatRef: GameChat | undefined;
-	let actionLogRef: ActionLog | undefined;
+	let showActionLog = $state(false);
+	let showChat = $state(false);
+	let showDebugOverlay = $state(false);
+	let actionLogRef = $state<ActionLogOverlay | undefined>(undefined);
+	let gameChatRef = $state<GameChatOverlay | undefined>(undefined);
 	let isActionLoading = $state(false);
 	let showStackOverlay = $state(false);
 	let initialized = $state(false);
+
+	// Opponent panel states (for collapsing)
+	let opponentExpanded = $state<Record<string, boolean>>({});
+
+	// Auto-pass settings
+	let autoPassSettings = $state({
+		noActions: false,
+		opponentTurn: false
+	});
 
 	// Mulligan state
 	let mulliganCount = $state(0);
 	let isMulliganLoading = $state(false);
 
-	// Get local player ID from auth (server uses usernames as player IDs)
+	// Get local player ID from auth
 	const localPlayerId = $derived($auth.user?.username || '');
 
 	// Derived state from stores
@@ -83,6 +97,7 @@
 	const myMana = $derived($myManaPool);
 	const havePriority = $derived($hasPriority);
 	const phase = $derived($currentPhase);
+	const step = $derived($currentStep);
 	const turn = $derived($currentTurn);
 	const battlefieldCards = $derived($battlefield);
 	const stackCards = $derived($stack);
@@ -98,18 +113,23 @@
 		new Map(allPlayers.map((p) => [p.playerId, p.name]))
 	);
 
-	// Mulligan phase detection
+	// Mulligan phase detection - use server-provided value
 	const isMulliganPhase = $derived(
-		gameState.gameView?.state?.toLowerCase() === 'mulligan'
+		gameState.gameView?.isMulliganPhase ?? gameState.gameView?.state?.toLowerCase() === 'mulligan'
 	);
 
-	// Get active player name (derived from game state)
-	const activePlayerName = $derived.by(() => {
-		const gv = gameState.gameView;
-		if (!gv) return '';
-		const active = allPlayers.find((p) => p.playerId === gv.activePlayerId);
-		return active?.name || 'Unknown';
-	});
+	// Check if local player has already kept their hand (waiting for other players)
+	const hasKeptHand = $derived(me?.keptHand ?? false);
+
+	// Get active player name - use server-provided value
+	const activePlayerName = $derived(
+		gameState.gameView?.activePlayerName || 'Unknown'
+	);
+
+	// Game format - use server-provided value
+	const gameFormat = $derived(
+		gameState.gameView?.gameFormat || 'Game'
+	);
 
 	/**
 	 * Convert CardView from proto to GameCard for components
@@ -131,26 +151,42 @@
 	}
 
 	/**
-	 * Convert phase string to GamePhase type
+	 * Convert phase/step string to GamePhase type
+	 * Maps server step names to client phase keys for PhaseIndicator
+	 * 
+	 * Server sends steps like: UNTAP, UPKEEP, DRAW, MAIN1, BEGIN_COMBAT, etc.
+	 * Client expects: UNTAP, UPKEEP, DRAW, PRECOMBAT_MAIN, COMBAT, etc.
 	 */
-	function toGamePhase(phase: string): GamePhase {
-		const phases: Record<string, GamePhase> = {
-			'BEGINNING': 'BEGINNING',
+	function toGamePhase(phaseOrStep: string): GamePhase {
+		const mapping: Record<string, GamePhase> = {
+			// Direct matches (server step = client key)
 			'UNTAP': 'UNTAP',
 			'UPKEEP': 'UPKEEP',
 			'DRAW': 'DRAW',
-			'PRECOMBAT_MAIN': 'PRECOMBAT_MAIN',
-			'COMBAT': 'COMBAT',
 			'DECLARE_ATTACKERS': 'DECLARE_ATTACKERS',
 			'DECLARE_BLOCKERS': 'DECLARE_BLOCKERS',
 			'COMBAT_DAMAGE': 'COMBAT_DAMAGE',
+			'END': 'END',
+			'CLEANUP': 'CLEANUP',
+			
+			// Server step names that need mapping to client keys
+			'MAIN1': 'PRECOMBAT_MAIN',
+			'BEGIN_COMBAT': 'COMBAT',
+			'END_COMBAT': 'END_OF_COMBAT',
+			'MAIN2': 'POSTCOMBAT_MAIN',
+			
+			// Client-only keys (for backwards compatibility)
+			'BEGINNING': 'BEGINNING',
+			'PRECOMBAT_MAIN': 'PRECOMBAT_MAIN',
+			'COMBAT': 'COMBAT',
 			'END_OF_COMBAT': 'END_OF_COMBAT',
 			'POSTCOMBAT_MAIN': 'POSTCOMBAT_MAIN',
-			'END': 'END',
 			'END_OF_TURN': 'END_OF_TURN',
-			'CLEANUP': 'CLEANUP'
+			
+			// Phase names (fallback when step not available)
+			'ENDING': 'END'
 		};
-		return phases[phase] || 'PRECOMBAT_MAIN';
+		return mapping[phaseOrStep] || 'PRECOMBAT_MAIN';
 	}
 
 	/**
@@ -165,7 +201,6 @@
 		try {
 			console.log('[GamePage] Starting game initialization...', { gameId, localPlayerId });
 
-			// Step 1: Connect to WebSocket FIRST to ensure we receive events
 			const wsState = $websocketStore;
 			if (wsState.state !== 'connected') {
 				const token = $auth.token;
@@ -177,20 +212,15 @@
 				} else {
 					throw new Error('No session ID available');
 				}
-			} else {
-				console.log('[GamePage] WebSocket already connected');
 			}
 
-			// Step 2: Initialize game store and subscribe to events AFTER WebSocket is connected
-			console.log('[GamePage] Initializing game store and subscribing to events...');
+			console.log('[GamePage] Initializing game store...');
 			gameStore.initGame(gameId, localPlayerId);
 
-			// Step 3: Join the game (server will send updates to our connected WebSocket)
 			console.log('[GamePage] Joining game...');
 			await joinGame(gameId);
 			console.log('[GamePage] Joined game successfully');
 
-			// Step 4: Fetch initial game state as fallback (in case we missed GAME_INIT)
 			console.log('[GamePage] Fetching initial game state...');
 			const gameView = await fetchGameView(gameId, localPlayerId);
 			console.log('[GamePage] Got game state:', {
@@ -200,6 +230,11 @@
 				priorityPlayerId: gameView.priorityPlayerId
 			});
 			gameStore.setGameView(gameView);
+
+			// Initialize opponent expanded states
+			otherPlayers.forEach(p => {
+				opponentExpanded[p.playerId] = true;
+			});
 
 			initialized = true;
 			console.log('[GamePage] Game initialization complete');
@@ -244,42 +279,118 @@
 	}
 
 	/**
-	 * Handle cast spell / play land
-	 * Determines if selected card is a land or spell and calls the appropriate API
+	 * Handle cast spell / play land - uses server-provided availableActions
 	 */
 	async function handleCastSpell() {
-		if (!havePriority || isActionLoading || !gameId) return;
+		console.log('[handleCastSpell] Called', {
+			havePriority,
+			isActionLoading,
+			gameId,
+			selectedCardIds: gameState.selectedCardIds,
+			myCardsCount: myCards.length
+		});
+
+		if (!havePriority) {
+			console.log('[handleCastSpell] No priority, returning');
+			return;
+		}
+		if (isActionLoading) {
+			console.log('[handleCastSpell] Action loading, returning');
+			return;
+		}
+		if (!gameId) {
+			console.log('[handleCastSpell] No gameId, returning');
+			return;
+		}
 
 		const selectedIds = gameState.selectedCardIds;
+		console.log('[handleCastSpell] Selected IDs:', selectedIds);
+
 		if (selectedIds.length === 0) {
+			console.log('[handleCastSpell] No cards selected');
 			addLogEntry('No card selected');
 			return;
 		}
 
 		const cardId = selectedIds[0];
+		console.log('[handleCastSpell] Looking for card:', cardId);
+		console.log('[handleCastSpell] myCards:', myCards.map(c => ({ id: c.id, name: c.name, type: c.type, actions: c.availableActions })));
+
 		const card = myCards.find((c) => c.id === cardId);
 		if (!card) {
+			console.log('[handleCastSpell] Card not found in hand');
 			addLogEntry('Selected card not found in hand');
+			return;
+		}
+
+		console.log('[handleCastSpell] Found card:', { id: card.id, name: card.name, type: card.type, actions: card.availableActions });
+
+		// Use server-provided availableActions to determine action type
+		const playLandAction = card.availableActions?.find(a => a.actionType === CardActionType.CARD_ACTION_PLAY_LAND);
+		const castSpellAction = card.availableActions?.find(a => a.actionType === CardActionType.CARD_ACTION_CAST_SPELL);
+
+		// Check if action is enabled
+		if (playLandAction && !playLandAction.isEnabled) {
+			console.log('[handleCastSpell] Play land action disabled:', playLandAction.disabledReason);
+			addLogEntry(`Cannot play land: ${playLandAction.disabledReason}`);
+			return;
+		}
+		if (castSpellAction && !castSpellAction.isEnabled) {
+			console.log('[handleCastSpell] Cast spell action disabled:', castSpellAction.disabledReason);
+			addLogEntry(`Cannot cast spell: ${castSpellAction.disabledReason}`);
 			return;
 		}
 
 		isActionLoading = true;
 		try {
-			// Check if it's a land - lands need special action (don't use stack)
-			const isLand = card.type.toLowerCase().includes('land');
+			// Use server-provided action type, fall back to type check for backward compatibility
+			const isLand = playLandAction !== undefined || (!castSpellAction && card.type.toLowerCase().includes('land'));
+			console.log('[handleCastSpell] isLand:', isLand, 'playLandAction:', !!playLandAction, 'castSpellAction:', !!castSpellAction);
+
 			if (isLand) {
+				console.log('[handleCastSpell] Calling playLand with gameId:', gameId, 'cardId:', cardId);
 				await playLand(gameId, cardId);
+				console.log('[handleCastSpell] playLand returned successfully');
 				addLogEntry(`Playing land: ${card.name}`);
 			} else {
-				// For spells, send the card name to trigger casting
+				console.log('[handleCastSpell] Calling sendPlayerString with:', card.name);
 				await sendPlayerString(gameId, card.name);
+				console.log('[handleCastSpell] sendPlayerString returned successfully');
 				addLogEntry(`Casting spell: ${card.name}`);
 			}
 			gameStore.clearSelection();
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to cast spell:', err);
+			console.error('[handleCastSpell] Failed:', err);
 			addLogEntry(`Failed: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Handle activate ability
+	 */
+	function handleActivateAbility() {
+		if (!havePriority || isActionLoading) return;
+		// TODO: Implement ability activation UI
+		addLogEntry('Activate ability: select a permanent first');
+	}
+
+	/**
+	 * Handle advancing to the next phase/step
+	 */
+	async function handleAdvancePhase() {
+		if (!havePriority || isActionLoading || !gameId) return;
+
+		isActionLoading = true;
+		try {
+			await advancePhase(gameId);
+			addLogEntry('Advanced to next phase');
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to advance phase:', err);
+			addLogEntry(`Failed to advance phase: ${errorMessage}`);
 		} finally {
 			isActionLoading = false;
 		}
@@ -307,17 +418,15 @@
 
 	/**
 	 * Handle card click (for selection/targeting)
+	 * Note: PlayerHand already handles selection toggle via gameStore.toggleCardSelection
+	 * This handler is for additional logic (target prompts, logging)
 	 */
 	function handleCardClick(cardId: string) {
-		// If we have a target prompt, send the selection
 		if (prompt?.type === 'target' && gameId) {
 			sendPlayerUUID(gameId, cardId).catch(console.error);
 			gameStore.clearPrompt();
 			return;
 		}
-
-		// Otherwise toggle selection
-		gameStore.toggleCardSelection(cardId);
 
 		const card = myCards.find((c) => c.id === cardId);
 		if (card) {
@@ -329,14 +438,12 @@
 	 * Handle battlefield card click
 	 */
 	function handleBattlefieldCardClick(cardId: string) {
-		// If we have a target prompt, send the selection
 		if (prompt?.type === 'target' && gameId) {
 			sendPlayerUUID(gameId, cardId).catch(console.error);
 			gameStore.clearPrompt();
 			return;
 		}
 
-		// Toggle selection
 		gameStore.toggleCardSelection(cardId);
 	}
 
@@ -383,7 +490,7 @@
 	}
 
 	/**
-	 * Handle mulligan during mulligan phase
+	 * Handle mulligan
 	 */
 	async function handleMulligan() {
 		if (!gameId || isMulliganLoading) return;
@@ -425,32 +532,16 @@
 	}
 
 	/**
-	 * Format life total for display
-	 * Note: Starting life is format-dependent (Commander=40, Standard=20, etc.)
-	 * but we just display the current value for now
+	 * Format life total
 	 */
 	function formatLife(life: number): string {
 		return life.toString();
 	}
 
 	/**
-	 * Get game format/type for display
-	 * For now, we'll try to infer from game state or default to "Game"
-	 * TODO: Get actual game type from table/game metadata when available
+	 * Get opponent position for layout
 	 */
-	const gameFormat = $derived.by(() => {
-		// Try to infer from player count or other game state
-		// For now, default to "Commander" for 4-player games, "Standard" for 2-player
-		const playerCount = allPlayers.length;
-		if (playerCount >= 3) return 'Commander';
-		if (playerCount === 2) return 'Standard';
-		return 'Game';
-	});
-
-	/**
-	 * Get position class for opponent based on index (for 4-player layout)
-	 */
-	function getOpponentPosition(index: number, total: number): string {
+	function getOpponentPosition(index: number, total: number): 'top' | 'left' | 'right' {
 		if (total === 1) return 'top';
 		if (total === 2) return index === 0 ? 'left' : 'right';
 		if (total === 3) {
@@ -481,7 +572,7 @@
 	<title>Game {gameId} - MAGE</title>
 </svelte:head>
 
-<div class="game-container">
+<div class="game-container" class:has-priority={havePriority}>
 	{#if loading && !initialized}
 		<div class="loading-overlay">
 			<div class="spinner"></div>
@@ -501,52 +592,51 @@
 			</div>
 		</div>
 	{:else if isMulliganPhase}
-		<!-- Mulligan Phase -->
 		<MulliganDialog
 			cards={myCards}
 			mulliganCount={mulliganCount}
 			onKeep={handleKeepHand}
 			onMulligan={handleMulligan}
 			isLoading={isMulliganLoading}
+			hasKeptHand={hasKeptHand}
 		/>
 	{:else}
-		<!-- Game Header -->
-		<div class="game-header">
-			<div class="game-info">
-				<div class="format-badge">{gameFormat}</div>
-				<div class="turn-info">
-					<span class="turn-number">Turn {turn}</span>
+		<!-- Compact Header with Sidebar Toggles -->
+		<header class="game-header">
+			<div class="header-left">
+				<button class="icon-btn" onclick={() => showActionLog = true} title="Action Log">
+					📋
+				</button>
+				<div class="game-info">
+					<span class="format-badge">{gameFormat}</span>
+					<span class="turn-info">Turn {turn}</span>
 					<span class="active-player">{activePlayerName}'s turn</span>
 				</div>
 			</div>
-			<div class="header-actions">
+			
+			<div class="header-center">
+				<PhaseIndicator
+					currentPhase={toGamePhase(step || phase)}
+					activePlayerId={gameState.gameView?.activePlayerId || ''}
+					{localPlayerId}
+					animated={true}
+				/>
+			</div>
+
+			<div class="header-right">
 				{#if stackCards.length > 0}
-					<button class="btn-stack" onclick={toggleStack}>
-						Stack ({stackCards.length})
+					<button class="icon-btn stack-btn" onclick={toggleStack} title="View Stack">
+						📚 <span class="badge">{stackCards.length}</span>
 					</button>
 				{/if}
-				<button class="btn-concede" onclick={handleConcede}>Concede</button>
+				<button class="icon-btn" onclick={() => showChat = true} title="Game Chat">
+					💬
+				</button>
+				<button class="btn-concede" onclick={handleConcede} title="Concede Game">
+					🏳️ Concede
+				</button>
 			</div>
-		</div>
-
-		<!-- Phase & Priority Row -->
-		<div class="phase-section">
-			<div class="phase-priority-row">
-				<PhaseIndicator
-					currentPhase={toGamePhase(phase)}
-					activePlayerId={gameState.gameView?.activePlayerId || ''}
-					{localPlayerId}
-					animated={true}
-				/>
-				<PriorityIndicator
-					hasPriority={havePriority}
-					activePlayerId={gameState.gameView?.activePlayerId || ''}
-					{localPlayerId}
-					playerName={activePlayerName}
-					animated={true}
-				/>
-			</div>
-		</div>
+		</header>
 
 		<!-- Prompt Overlay -->
 		{#if prompt}
@@ -574,69 +664,29 @@
 			</div>
 		{/if}
 
-		<!-- Main 4-Player Layout -->
-		<div class="game-layout commander-layout">
-			<!-- Opponent Areas (up to 3 opponents) -->
-			{#each otherPlayers as opponent, idx (opponent.playerId)}
-				{@const position = getOpponentPosition(idx, otherPlayers.length)}
-				<div class="opponent-area opponent-{position}">
-					<div class="player-panel">
-						<div class="player-header">
-							<span class="player-name" class:has-priority={opponent.hasPriority}>
-								{opponent.name}
-								{#if opponent.hasPriority}
-									<span class="priority-dot"></span>
-								{/if}
-							</span>
-							<div class="player-stats">
-								<span class="life" title="Life">{formatLife(opponent.life)}</span>
-								<span class="poison" title="Poison" class:active={opponent.poison > 0}>
-									{opponent.poison}
-								</span>
-								<span class="library" title="Library">{opponent.libraryCount}</span>
-								<span class="hand-count" title="Hand">{opponent.handCount}</span>
-							</div>
-						</div>
-						<!-- Opponent's battlefield section -->
-						<div class="opponent-battlefield">
-							{#each getPlayerBattlefieldCards(opponent.playerId) as card (card.id)}
-								<div class="battlefield-card">
-									<Card
-										cardId={card.id}
-										cardName={card.name}
-										manaCost={card.manaCost}
-										cardType={card.type}
-										power={card.power}
-										toughness={card.toughness}
-										imageUrl=""
-										isTapped={card.tapped}
-										isSelected={gameState.selectedCardIds.includes(card.id)}
-										size="small"
-										onclick={() => handleBattlefieldCardClick(card.id)}
-									/>
-								</div>
-							{/each}
-						</div>
-						<!-- Opponent zones -->
-						<div class="opponent-zones">
-							<Graveyard
-								cards={opponent.graveyard.map(toGameCard)}
-								playerName={opponent.name}
-								isOpponent={true}
-								onCardClick={handleBattlefieldCardClick}
-							/>
-						</div>
-					</div>
-				</div>
-			{/each}
+		<!-- Main Game Layout - Full Width -->
+		<main class="game-layout" class:four-player={otherPlayers.length >= 3}>
+			<!-- Opponents Row -->
+			<div class="opponents-row">
+				{#each otherPlayers as opponent, idx (opponent.playerId)}
+					{@const position = getOpponentPosition(idx, otherPlayers.length)}
+					<OpponentPanel
+						{opponent}
+						battlefieldCards={getPlayerBattlefieldCards(opponent.playerId)}
+						selectedCardIds={gameState.selectedCardIds}
+						bind:expanded={opponentExpanded[opponent.playerId]}
+						{position}
+						onCardClick={handleBattlefieldCardClick}
+					/>
+				{/each}
+			</div>
 
-			<!-- Central Battlefield (shared zone) -->
-			<div class="central-battlefield">
-				<div class="zone-label">Battlefield</div>
+			<!-- Central Battlefield Area -->
+			<div class="battlefield-area">
 				<!-- Command Zone -->
 				{#if commandCards.length > 0}
 					<div class="command-zone">
-						<span class="zone-sublabel">Command Zone</span>
+						<span class="zone-label">Command Zone</span>
 						<div class="command-cards">
 							{#each commandCards as card (card.id)}
 								<Card
@@ -656,73 +706,73 @@
 						</div>
 					</div>
 				{/if}
+
+				<!-- My Battlefield -->
+				<div class="my-battlefield">
+					<span class="zone-label">Your Battlefield</span>
+					<div class="battlefield-cards">
+						{#each getPlayerBattlefieldCards(localPlayerId) as card (card.id)}
+							<Card
+								cardId={card.id}
+								cardName={card.name}
+								manaCost={card.manaCost}
+								cardType={card.type}
+								power={card.power}
+								toughness={card.toughness}
+								imageUrl=""
+								isTapped={card.tapped}
+								isSelected={gameState.selectedCardIds.includes(card.id)}
+								size="normal"
+								onclick={() => handleBattlefieldCardClick(card.id)}
+							/>
+						{/each}
+						{#if getPlayerBattlefieldCards(localPlayerId).length === 0}
+							<div class="empty-battlefield">No permanents</div>
+						{/if}
+					</div>
+				</div>
 			</div>
 
-			<!-- Local Player Area -->
-			<div class="player-area">
+			<!-- Player Info & Zones Row -->
+			<div class="player-info-row">
 				{#if me}
-					<div class="player-panel local-player">
-						<div class="player-header">
-							<span class="player-name" class:has-priority={havePriority}>
-								You
-								{#if havePriority}
-									<span class="priority-dot"></span>
-								{/if}
-							</span>
-							<div class="player-stats">
-								<span class="life" title="Life">{formatLife(me.life)}</span>
-								<span class="poison" title="Poison" class:active={me.poison > 0}>
-									{me.poison}
-								</span>
-								<span class="library" title="Library">{me.libraryCount}</span>
-							</div>
+					<div class="player-identity">
+						<span class="player-name" class:has-priority={havePriority}>
+							You
+							{#if havePriority}
+								<span class="priority-dot"></span>
+							{/if}
+						</span>
+						<div class="player-stats">
+							<span class="life" title="Life">❤️ {formatLife(me.life)}</span>
+							{#if me.poison > 0}
+								<span class="poison" title="Poison">☠️ {me.poison}</span>
+							{/if}
+							<span class="library" title="Library">📚 {me.libraryCount}</span>
 						</div>
-
-						<!-- Local player's battlefield -->
-						<div class="my-battlefield">
-							{#each getPlayerBattlefieldCards(localPlayerId) as card (card.id)}
-								<div class="battlefield-card">
-									<Card
-										cardId={card.id}
-										cardName={card.name}
-										manaCost={card.manaCost}
-										cardType={card.type}
-										power={card.power}
-										toughness={card.toughness}
-										imageUrl=""
-										isTapped={card.tapped}
-										isSelected={gameState.selectedCardIds.includes(card.id)}
-										size="normal"
-										onclick={() => handleBattlefieldCardClick(card.id)}
-									/>
-								</div>
-							{/each}
-						</div>
-
-						<!-- Player zones row -->
-						<div class="zones-row">
-							<Graveyard
-								cards={myGrave.map(toGameCard)}
-								playerName="You"
-								isOpponent={false}
-								onCardClick={handleCardClick}
-							/>
-							<ManaPool
-								mana={myMana}
-								showEmpty={false}
-								size="normal"
-								onManaClick={() => {
-									// TODO: Implement mana payment UI when needed
-								}}
-							/>
-						</div>
-
-						<!-- Player hand -->
-						<PlayerHand onCardClick={handleCardClick} size="normal" />
+					</div>
+					<div class="player-zones">
+						<Graveyard
+							cards={myGrave.map(toGameCard)}
+							playerName="You"
+							isOpponent={false}
+							onCardClick={handleCardClick}
+						/>
+						<ManaPool
+							mana={myMana}
+							showEmpty={false}
+							size="normal"
+							onManaClick={() => {}}
+						/>
 					</div>
 				{/if}
 			</div>
-		</div>
+
+			<!-- Player Hand -->
+			<div class="hand-area">
+				<PlayerHand onCardClick={handleCardClick} size="normal" />
+			</div>
+		</main>
 
 		<!-- Stack Overlay -->
 		{#if showStackOverlay && stackCards.length > 0}
@@ -738,7 +788,6 @@
 						}))}
 						{playerNames}
 						onStackObjectClick={(stackId) => {
-							// Toggle selection for stack object
 							gameStore.toggleCardSelection(stackId);
 						}}
 					/>
@@ -746,37 +795,91 @@
 			</div>
 		{/if}
 
-		<!-- Sidebars -->
-		<ActionLog bind:this={actionLogRef} bind:collapsed={actionLogCollapsed} />
-		<div class="game-sidebar" class:collapsed={chatCollapsed}>
-			<GameChat bind:this={gameChatRef} gameId={gameId || ''} bind:collapsed={chatCollapsed} />
-			<!-- Action buttons -->
-			<div class="sidebar-actions">
-				<GameActionsPanel
-					hasPriority={havePriority}
-					canPassPriority={havePriority}
-					isLoading={isActionLoading}
-					onPassPriority={handlePassPriority}
-					onCastSpell={handleCastSpell}
-					onActivateAbility={() => {}}
-				/>
-				<button class="btn-f6" onclick={handlePassUntilEOT} disabled={!havePriority}>
-					F6 (Pass Turn)
-				</button>
-			</div>
-		</div>
+		<!-- Overlay Panels -->
+		<ActionLogOverlay bind:this={actionLogRef} bind:open={showActionLog} />
+		<GameChatOverlay bind:this={gameChatRef} gameId={gameId || ''} bind:open={showChat} />
+
+		<!-- Priority Action Bar (Docked at bottom) -->
+		<PriorityActionBar
+			hasPriority={havePriority}
+			activePlayerId={gameState.gameView?.activePlayerId || ''}
+			{localPlayerId}
+			activePlayerName={activePlayerName}
+			canPassPriority={havePriority}
+			isLoading={isActionLoading}
+			onPassPriority={handlePassPriority}
+			onPassUntilEOT={handlePassUntilEOT}
+			onCastSpell={handleCastSpell}
+			onActivateAbility={handleActivateAbility}
+			onAdvancePhase={handleAdvancePhase}
+			bind:autoPassSettings
+		/>
+
+		<!-- Floating Debug Button -->
+		<button 
+			class="debug-fab" 
+			onclick={() => showDebugOverlay = true}
+			title="Open Debug View"
+		>
+			🔧
+		</button>
+
+		<!-- Debug Overlay Modal -->
+		<DebugOverlay
+			bind:open={showDebugOverlay}
+			{gameId}
+			{localPlayerId}
+			{gameState}
+			{allPlayers}
+			{battlefieldCards}
+			{stackCards}
+			{commandCards}
+			{turn}
+			{phase}
+			{havePriority}
+			{isMulliganPhase}
+			{gameFormat}
+			{isGameOver}
+			{gameWinner}
+			{activePlayerName}
+			{prompt}
+			{error}
+			onClose={() => showDebugOverlay = false}
+		/>
 	{/if}
 </div>
 
 <style>
+	/* Container with priority glow effect */
 	.game-container {
 		position: fixed;
 		inset: 0;
-		background: #0f1419;
+		background: #0a0d12;
 		color: white;
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
+		transition: box-shadow 0.5s ease;
+	}
+
+	/* Full-screen priority glow */
+	.game-container.has-priority {
+		box-shadow: inset 0 0 80px rgba(251, 191, 36, 0.08);
+	}
+
+	.game-container.has-priority::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border: 2px solid rgba(251, 191, 36, 0.25);
+		pointer-events: none;
+		z-index: 1000;
+		animation: priority-border-pulse 2s ease-in-out infinite;
+	}
+
+	@keyframes priority-border-pulse {
+		0%, 100% { border-color: rgba(251, 191, 36, 0.25); }
+		50% { border-color: rgba(251, 191, 36, 0.5); }
 	}
 
 	/* Loading & Error & Game Over States */
@@ -789,7 +892,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		background: #0f1419;
+		background: #0a0d12;
 		z-index: 100;
 		gap: 1rem;
 	}
@@ -828,110 +931,129 @@
 		margin-bottom: 1.5rem;
 	}
 
-	/* Game Header */
+	/* Header */
 	.game-header {
-		background: #1a1f2e;
-		padding: 0.75rem 1.5rem;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-bottom: 2px solid #2a3441;
+		padding: 0.5rem 1rem;
+		background: linear-gradient(to bottom, #141821, #0f1419);
+		border-bottom: 1px solid #2a3441;
 		z-index: 10;
+		flex-shrink: 0;
+	}
+
+	.header-left,
+	.header-right {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.header-center {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		max-width: 600px;
+	}
+
+	.icon-btn {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #1a1f2e;
+		border: 1px solid #2a3441;
+		border-radius: 8px;
+		font-size: 1.125rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		color: #fff;
+		position: relative;
+	}
+
+	.icon-btn:hover {
+		background: #2a3441;
+		border-color: #374151;
+	}
+
+	.icon-btn .badge {
+		position: absolute;
+		top: -4px;
+		right: -4px;
+		min-width: 18px;
+		height: 18px;
+		padding: 0 4px;
+		background: #ef4444;
+		border-radius: 9px;
+		font-size: 0.625rem;
+		font-weight: 700;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.game-info {
 		display: flex;
 		align-items: center;
-		gap: 2rem;
+		gap: 1rem;
 	}
 
 	.format-badge {
-		padding: 0.375rem 0.75rem;
+		padding: 0.25rem 0.625rem;
 		background: #667eea;
 		border-radius: 4px;
-		font-size: 0.875rem;
+		font-size: 0.75rem;
 		font-weight: 600;
 	}
 
 	.turn-info {
-		display: flex;
-		gap: 1rem;
-		font-size: 0.9375rem;
-	}
-
-	.turn-number {
+		font-size: 0.875rem;
 		color: #fbbf24;
 		font-weight: 600;
 	}
 
 	.active-player {
-		color: #94a3b8;
-	}
-
-	.header-actions {
-		display: flex;
-		gap: 1rem;
-	}
-
-	.btn-stack,
-	.btn-concede,
-	.btn-primary,
-	.btn-f6 {
-		padding: 0.5rem 1rem;
-		border: none;
-		border-radius: 4px;
 		font-size: 0.875rem;
+		color: #9ca3af;
+	}
+
+	.btn-concede {
+		padding: 0.5rem 0.875rem;
+		background: rgba(239, 68, 68, 0.15);
+		border: 1px solid rgba(239, 68, 68, 0.3);
+		border-radius: 6px;
+		color: #ef4444;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-concede:hover {
+		background: rgba(239, 68, 68, 0.25);
+		border-color: #ef4444;
+	}
+
+	.btn-primary {
+		padding: 0.75rem 1.5rem;
+		background: #667eea;
+		color: white;
+		border: none;
+		border-radius: 6px;
 		font-weight: 600;
 		cursor: pointer;
 		transition: background 0.2s;
 	}
 
-	.btn-stack {
-		background: #667eea;
-		color: white;
-	}
-
-	.btn-stack:hover { background: #5568d3; }
-
-	.btn-concede {
-		background: #ef4444;
-		color: white;
-	}
-
-	.btn-concede:hover { background: #dc2626; }
-
-	.btn-primary {
-		background: #667eea;
-		color: white;
-	}
-
 	.btn-primary:hover { background: #5568d3; }
-
-	.btn-f6 {
-		background: #374151;
-		color: white;
-	}
-
-	.btn-f6:hover:not(:disabled) { background: #4b5563; }
-	.btn-f6:disabled { opacity: 0.5; cursor: not-allowed; }
-
-	/* Phase Section */
-	.phase-section {
-		padding: 0.5rem 1rem;
-		margin: 0 320px;
-	}
-
-	.phase-priority-row {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
-	}
 
 	/* Prompt Overlay */
 	.prompt-overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.8);
+		background: rgba(0, 0, 0, 0.85);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -970,9 +1092,10 @@
 		color: white;
 		padding: 0.75rem 2rem;
 		border: none;
-		border-radius: 4px;
+		border-radius: 6px;
 		font-weight: 600;
 		cursor: pointer;
+		transition: background 0.2s;
 	}
 
 	.btn-yes:hover { background: #16a34a; }
@@ -982,9 +1105,10 @@
 		color: white;
 		padding: 0.75rem 2rem;
 		border: none;
-		border-radius: 4px;
+		border-radius: 6px;
 		font-weight: 600;
 		cursor: pointer;
+		transition: background 0.2s;
 	}
 
 	.btn-no:hover { background: #dc2626; }
@@ -994,59 +1118,118 @@
 		color: white;
 		padding: 0.5rem 1rem;
 		border: none;
-		border-radius: 4px;
+		border-radius: 6px;
 		cursor: pointer;
+		transition: background 0.2s;
 	}
 
 	.btn-choice:hover { background: #4b5563; }
 
-	/* 4-Player Commander Layout */
-	.game-layout.commander-layout {
+	/* Main Game Layout - Full Width */
+	.game-layout {
 		flex: 1;
-		display: grid;
-		grid-template-areas:
-			"left top right"
-			"left center right"
-			"bottom bottom bottom";
-		grid-template-columns: 250px 1fr 250px;
-		grid-template-rows: 1fr 200px 400px;
-		gap: 0.5rem;
-		padding: 0.5rem;
-		margin: 0 320px;
-		overflow: hidden;
-	}
-
-	/* Opponent areas */
-	.opponent-area {
-		background: #1a1f2e;
-		border-radius: 8px;
-		border: 1px solid #2a3441;
-		overflow: hidden;
-	}
-
-	.opponent-left { grid-area: left; }
-	.opponent-top { grid-area: top; }
-	.opponent-right { grid-area: right; }
-
-	.player-panel {
-		height: 100%;
 		display: flex;
 		flex-direction: column;
-		padding: 0.5rem;
+		padding: 0.75rem;
+		padding-bottom: 80px; /* Space for action bar */
+		gap: 0.75rem;
+		overflow: hidden;
 	}
 
-	.player-header {
+	/* Opponents Row */
+	.opponents-row {
 		display: flex;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.opponents-row > :global(*) {
+		flex: 1;
+		min-width: 250px;
+		max-width: 400px;
+	}
+
+	/* For 4 players, use different layout */
+	.game-layout.four-player .opponents-row {
 		justify-content: space-between;
-		align-items: center;
-		padding: 0.5rem;
-		background: #141821;
-		border-radius: 4px;
+	}
+
+	.game-layout.four-player .opponents-row > :global(*) {
+		flex: 1;
+		min-width: 200px;
+		max-width: 350px;
+	}
+
+	/* Battlefield Area */
+	.battlefield-area {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		background: linear-gradient(135deg, #0d1117, #141821);
+		border: 1px solid #2a3441;
+		border-radius: 12px;
+		padding: 1rem;
+		overflow: auto;
+		min-height: 200px;
+	}
+
+	.zone-label {
+		font-size: 0.6875rem;
+		color: #6b7280;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		font-weight: 600;
 		margin-bottom: 0.5rem;
 	}
 
+	.command-zone {
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid #2a3441;
+	}
+
+	.command-cards,
+	.battlefield-cards {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-content: flex-start;
+	}
+
+	.my-battlefield {
+		flex: 1;
+	}
+
+	.empty-battlefield {
+		color: #4b5563;
+		font-style: italic;
+		font-size: 0.875rem;
+		padding: 2rem;
+		text-align: center;
+	}
+
+	/* Player Info Row */
+	.player-info-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.5rem 1rem;
+		background: #1a1f2e;
+		border-radius: 8px;
+		border: 1px solid #2a3441;
+	}
+
+	.player-identity {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
 	.player-name {
-		font-weight: 600;
+		font-weight: 700;
+		font-size: 1rem;
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -1057,119 +1240,44 @@
 	}
 
 	.priority-dot {
-		width: 8px;
-		height: 8px;
+		width: 10px;
+		height: 10px;
 		background: #22c55e;
 		border-radius: 50%;
 		animation: pulse 1.5s infinite;
 	}
 
 	@keyframes pulse {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.5; }
+		0%, 100% { opacity: 1; transform: scale(1); }
+		50% { opacity: 0.6; transform: scale(1.2); }
 	}
 
 	.player-stats {
 		display: flex;
-		gap: 0.75rem;
+		gap: 1rem;
 		font-size: 0.875rem;
 	}
 
-	.player-stats span {
-		display: flex;
-		align-items: center;
-		gap: 0.25rem;
-	}
-
 	.player-stats .life { color: #ef4444; font-weight: 700; }
-	.player-stats .poison { color: #6b7280; }
-	.player-stats .poison.active { color: #a855f7; }
+	.player-stats .poison { color: #a855f7; }
 	.player-stats .library { color: #3b82f6; }
-	.player-stats .hand-count { color: #fbbf24; }
 
-	.opponent-battlefield,
-	.my-battlefield {
-		flex: 1;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.25rem;
-		align-content: flex-start;
-		overflow-y: auto;
-	}
-
-	.opponent-zones {
-		display: flex;
-		gap: 0.5rem;
-		padding-top: 0.5rem;
-		border-top: 1px solid #2a3441;
-	}
-
-	/* Central battlefield */
-	.central-battlefield {
-		grid-area: center;
-		background: #0d1117;
-		border-radius: 8px;
-		border: 1px solid #2a3441;
-		padding: 1rem;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.zone-label {
-		font-size: 0.75rem;
-		color: #6b7280;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		margin-bottom: 0.5rem;
-	}
-
-	.zone-sublabel {
-		font-size: 0.625rem;
-		color: #4b5563;
-	}
-
-	.command-zone {
-		margin-bottom: 1rem;
-	}
-
-	.command-cards {
-		display: flex;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-	}
-
-	/* Local player area */
-	.player-area {
-		grid-area: bottom;
-		background: #1a1f2e;
-		border-radius: 8px;
-		border: 1px solid #2a3441;
-	}
-
-	.local-player {
-		padding: 1rem;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-	}
-
-	.zones-row {
+	.player-zones {
 		display: flex;
 		gap: 1rem;
-		padding: 0.5rem 0;
-		align-items: flex-start;
+		align-items: center;
 	}
 
-	.battlefield-card {
+	/* Hand Area */
+	.hand-area {
 		flex-shrink: 0;
 	}
 
-	/* Stack overlay */
+	/* Stack Overlay */
 	.stack-overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.75);
+		background: rgba(0, 0, 0, 0.8);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1182,110 +1290,77 @@
 		max-height: 80vh;
 	}
 
-	/* Sidebars */
-	.game-sidebar {
-		position: fixed;
-		right: 0;
-		top: 0;
-		bottom: 0;
-		width: 320px;
-		z-index: 20;
-		display: flex;
-		flex-direction: column;
-		padding: 0.5rem;
-		gap: 0.5rem;
-		overflow-y: auto;
-		background: #0f1419;
-	}
-
-	.game-sidebar.collapsed {
-		width: auto;
-	}
-
-	.game-sidebar > :global(.game-chat) {
-		flex: 1 1 auto;
-		min-height: 0;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.sidebar-actions {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		flex-shrink: 0;
-		padding-top: 0.5rem;
-		border-top: 1px solid #2a3441;
-		margin-top: 0.5rem;
-	}
-
-	.sidebar-actions .btn-f6 {
-		width: 100%;
-		padding: 0.75rem 1rem;
-		background: #374151;
-		color: white;
-		border: none;
-		border-radius: 6px;
-		font-size: 0.875rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: background 0.2s;
-	}
-
-	.sidebar-actions .btn-f6:hover:not(:disabled) {
-		background: #4b5563;
-	}
-
-	.sidebar-actions .btn-f6:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
 	/* Responsive */
-	@media (max-width: 1400px) {
-		.phase-section,
-		.game-layout.commander-layout {
-			margin: 0 280px;
+	@media (max-width: 900px) {
+		.game-header {
+			flex-wrap: wrap;
+			gap: 0.5rem;
 		}
 
-		.game-sidebar:not(.collapsed) {
-			width: 280px;
-		}
-	}
-
-	@media (max-width: 1024px) {
-		.phase-section {
-			margin: 0 0 0 48px;
+		.header-center {
+			order: 3;
+			width: 100%;
+			max-width: none;
 		}
 
-		.game-layout.commander-layout {
-			margin: 0 0 0 48px;
-			grid-template-columns: 200px 1fr 200px;
-		}
-
-		.game-sidebar {
-			width: 280px;
-		}
-	}
-
-	@media (max-width: 768px) {
-		.phase-section,
-		.game-layout.commander-layout {
-			margin: 0;
-		}
-
-		.game-layout.commander-layout {
-			grid-template-areas:
-				"top"
-				"center"
-				"bottom";
-			grid-template-columns: 1fr;
-			grid-template-rows: 150px 1fr 300px;
-		}
-
-		.opponent-left,
-		.opponent-right {
+		.active-player {
 			display: none;
 		}
+
+		.opponents-row > :global(*) {
+			min-width: 200px;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.game-layout {
+			padding: 0.5rem;
+			padding-bottom: 70px;
+		}
+
+		.game-info {
+			gap: 0.5rem;
+		}
+
+		.format-badge {
+			display: none;
+		}
+
+		.opponents-row > :global(*) {
+			min-width: 150px;
+			max-width: none;
+		}
+
+		.battlefield-area {
+			padding: 0.75rem;
+		}
+
+		.player-info-row {
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+	}
+
+	/* Debug FAB Button */
+	.debug-fab {
+		position: fixed;
+		bottom: 100px;
+		right: 20px;
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		background: linear-gradient(135deg, #1a1a2e, #16213e);
+		border: 2px solid #00ff00;
+		color: #00ff00;
+		font-size: 1.25rem;
+		cursor: pointer;
+		z-index: 500;
+		box-shadow: 0 4px 20px rgba(0, 255, 0, 0.2);
+		transition: all 0.2s;
+	}
+
+	.debug-fab:hover {
+		transform: scale(1.1);
+		box-shadow: 0 6px 30px rgba(0, 255, 0, 0.4);
 	}
 </style>

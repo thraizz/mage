@@ -118,8 +118,13 @@ func (r *CardRepository) GetByName(ctx context.Context, name string) ([]*Card, e
 
 // GetByNameCaseInsensitive retrieves cards by name (case-insensitive)
 func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name string) ([]*Card, error) {
-	// Trim the input name to handle any whitespace issues
+	// Trim and normalize the input name
 	name = strings.TrimSpace(name)
+	// Normalize Unicode apostrophes to ASCII apostrophe
+	// U+2019 (') -> U+0027 (')
+	// U+2018 (') -> U+0027 (')
+	name = strings.ReplaceAll(name, "'", "'")
+	name = strings.ReplaceAll(name, "'", "'")
 
 	query := `
 		SELECT id, card_number, set_code, name, card_type, mana_cost,

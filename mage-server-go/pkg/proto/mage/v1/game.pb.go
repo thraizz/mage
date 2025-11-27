@@ -97,6 +97,7 @@ const (
 	SpecialActionType_FORETELL                   SpecialActionType = 2
 	SpecialActionType_SUSPEND                    SpecialActionType = 3
 	SpecialActionType_COMPANION                  SpecialActionType = 4
+	SpecialActionType_ADVANCE_PHASE              SpecialActionType = 5 // Manually advance to next phase/step
 )
 
 // Enum value maps for SpecialActionType.
@@ -107,6 +108,7 @@ var (
 		2: "FORETELL",
 		3: "SUSPEND",
 		4: "COMPANION",
+		5: "ADVANCE_PHASE",
 	}
 	SpecialActionType_value = map[string]int32{
 		"SPECIAL_ACTION_UNSPECIFIED": 0,
@@ -114,6 +116,7 @@ var (
 		"FORETELL":                   2,
 		"SUSPEND":                    3,
 		"COMPANION":                  4,
+		"ADVANCE_PHASE":              5,
 	}
 )
 
@@ -2367,13 +2370,14 @@ const file_mage_v1_game_proto_rawDesc = "" +
 	"\x16PASS_UNTIL_END_OF_TURN\x10\x05\x12\x18\n" +
 	"\x14PASS_UNTIL_NEXT_TURN\x10\x06\x12\x1d\n" +
 	"\x19PASS_UNTIL_STACK_RESOLVED\x10\a\x12\x1b\n" +
-	"\x17PASS_UNTIL_MY_NEXT_TURN\x10\b*l\n" +
+	"\x17PASS_UNTIL_MY_NEXT_TURN\x10\b*\x7f\n" +
 	"\x11SpecialActionType\x12\x1e\n" +
 	"\x1aSPECIAL_ACTION_UNSPECIFIED\x10\x00\x12\r\n" +
 	"\tPLAY_LAND\x10\x01\x12\f\n" +
 	"\bFORETELL\x10\x02\x12\v\n" +
 	"\aSUSPEND\x10\x03\x12\r\n" +
-	"\tCOMPANION\x10\x04B6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
+	"\tCOMPANION\x10\x04\x12\x11\n" +
+	"\rADVANCE_PHASE\x10\x05B6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
 
 var (
 	file_mage_v1_game_proto_rawDescOnce sync.Once

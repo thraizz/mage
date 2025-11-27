@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -67,22 +68,33 @@ func (ws *WebSocketServer) handleConnection(w http.ResponseWriter, r *http.Reque
 	}
 	defer conn.Close()
 
-	// Create close channel for this connection
+	// Create close channel for this connection with sync.Once for safe closing
+	// This prevents "close of closed channel" panic when multiple goroutines
+	// try to close the done channel (e.g., readHandler, pingHandler, main loop,
+	// or when a new connection replaces this one)
 	done := make(chan struct{})
+	var closeOnce sync.Once
+	closeDone := func() {
+		closeOnce.Do(func() {
+			close(done)
+		})
+	}
 
-	// Set this as the active WebSocket and get the old one
-	oldCloseChan := sess.SetWebSocketCloseChan(done)
-	if oldCloseChan != nil {
-		// Close the previous WebSocket connection
+	// Set this as the active WebSocket and get the old close function
+	// We store the closeDone function (not just the channel) so that when a new
+	// connection comes in, it can safely close the old one via the sync.Once
+	oldCloseFunc := sess.SetWebSocketCloseFunc(done, closeDone)
+	if oldCloseFunc != nil {
+		// Safely close the previous WebSocket connection using its sync.Once
 		ws.logger.Info("closing previous WebSocket connection",
 			zap.String("session", sessionID),
 			zap.String("user", sess.GetUserID()),
 		)
-		close(oldCloseChan)
+		oldCloseFunc()
 	}
 
-	// Clear the close channel when this connection ends (only if still active)
-	defer sess.ClearWebSocketCloseChan(done)
+	// Clear the close function when this connection ends (only if still active)
+	defer sess.ClearWebSocketCloseFunc(done)
 
 	ws.logger.Info("WebSocket connected",
 		zap.String("session", sessionID),
@@ -90,10 +102,10 @@ func (ws *WebSocketServer) handleConnection(w http.ResponseWriter, r *http.Reque
 	)
 
 	// Start ping handler in background
-	go ws.pingHandler(conn, done)
+	go ws.pingHandler(conn, done, closeDone)
 
 	// Start read handler to process pong messages from client
-	go ws.readHandler(conn, done, sessionID)
+	go ws.readHandler(conn, done, closeDone, sessionID)
 
 	// Read callback channel and send to client
 	for {
@@ -102,7 +114,7 @@ func (ws *WebSocketServer) handleConnection(w http.ResponseWriter, r *http.Reque
 			if !ok {
 				// Channel closed, connection terminated
 				ws.logger.Info("callback channel closed", zap.String("session", sessionID))
-				close(done)
+				closeDone()
 				return
 			}
 
@@ -116,7 +128,7 @@ func (ws *WebSocketServer) handleConnection(w http.ResponseWriter, r *http.Reque
 					zap.Error(err),
 					zap.String("session", sessionID),
 				)
-				close(done)
+				closeDone()
 				return
 			}
 
@@ -168,7 +180,7 @@ func (ws *WebSocketServer) sendEvent(conn *websocket.Conn, event interface{}) er
 }
 
 // readHandler reads messages from the client (handles pong responses)
-func (ws *WebSocketServer) readHandler(conn *websocket.Conn, done chan struct{}, sessionID string) {
+func (ws *WebSocketServer) readHandler(conn *websocket.Conn, done chan struct{}, closeDone func(), sessionID string) {
 	// Set pong handler
 	conn.SetPongHandler(func(string) error {
 		ws.logger.Debug("received pong from client", zap.String("session", sessionID))
@@ -193,7 +205,7 @@ func (ws *WebSocketServer) readHandler(conn *websocket.Conn, done chan struct{},
 						zap.Error(err),
 					)
 				}
-				close(done)
+				closeDone()
 				return
 			}
 			// Client shouldn't send messages, but if they do, ignore them
@@ -202,7 +214,7 @@ func (ws *WebSocketServer) readHandler(conn *websocket.Conn, done chan struct{},
 }
 
 // pingHandler sends periodic ping messages to keep connection alive
-func (ws *WebSocketServer) pingHandler(conn *websocket.Conn, done chan struct{}) {
+func (ws *WebSocketServer) pingHandler(conn *websocket.Conn, done chan struct{}, closeDone func()) {
 	ticker := time.NewTicker(ws.config.PingInterval)
 	defer ticker.Stop()
 
@@ -212,7 +224,7 @@ func (ws *WebSocketServer) pingHandler(conn *websocket.Conn, done chan struct{})
 			conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				ws.logger.Debug("ping failed, closing connection", zap.Error(err))
-				close(done)
+				closeDone()
 				return
 			}
 

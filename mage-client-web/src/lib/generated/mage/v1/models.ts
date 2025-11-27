@@ -8,6 +8,58 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { Timestamp } from "../../google/protobuf/timestamp";
 
+/** CardActionType enumerates possible card actions */
+export enum CardActionType {
+  CARD_ACTION_UNSPECIFIED = 0,
+  CARD_ACTION_CAST_SPELL = 1,
+  CARD_ACTION_PLAY_LAND = 2,
+  CARD_ACTION_ACTIVATE_ABILITY = 3,
+  CARD_ACTION_ACTIVATE_MANA_ABILITY = 4,
+  UNRECOGNIZED = -1,
+}
+
+export function cardActionTypeFromJSON(object: any): CardActionType {
+  switch (object) {
+    case 0:
+    case "CARD_ACTION_UNSPECIFIED":
+      return CardActionType.CARD_ACTION_UNSPECIFIED;
+    case 1:
+    case "CARD_ACTION_CAST_SPELL":
+      return CardActionType.CARD_ACTION_CAST_SPELL;
+    case 2:
+    case "CARD_ACTION_PLAY_LAND":
+      return CardActionType.CARD_ACTION_PLAY_LAND;
+    case 3:
+    case "CARD_ACTION_ACTIVATE_ABILITY":
+      return CardActionType.CARD_ACTION_ACTIVATE_ABILITY;
+    case 4:
+    case "CARD_ACTION_ACTIVATE_MANA_ABILITY":
+      return CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return CardActionType.UNRECOGNIZED;
+  }
+}
+
+export function cardActionTypeToJSON(object: CardActionType): string {
+  switch (object) {
+    case CardActionType.CARD_ACTION_UNSPECIFIED:
+      return "CARD_ACTION_UNSPECIFIED";
+    case CardActionType.CARD_ACTION_CAST_SPELL:
+      return "CARD_ACTION_CAST_SPELL";
+    case CardActionType.CARD_ACTION_PLAY_LAND:
+      return "CARD_ACTION_PLAY_LAND";
+    case CardActionType.CARD_ACTION_ACTIVATE_ABILITY:
+      return "CARD_ACTION_ACTIVATE_ABILITY";
+    case CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY:
+      return "CARD_ACTION_ACTIVATE_MANA_ABILITY";
+    case CardActionType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export enum MessageColor {
   MESSAGE_COLOR_UNSPECIFIED = 0,
   BLACK = 1,
@@ -202,7 +254,16 @@ export interface GameView {
   lookedAt: LookedAtView[];
   combat?: CombatView | undefined;
   special: boolean;
-  startTime?: Date | undefined;
+  startTime?:
+    | Date
+    | undefined;
+  /** Pre-computed display values (server source of truth) */
+  activePlayerName: string;
+  priorityPlayerName: string;
+  gameFormat: string;
+  isMulliganPhase: boolean;
+  landsPlayedThisTurn: number;
+  landsAllowedThisTurn: number;
 }
 
 /** PlayerView represents a player's state */
@@ -223,6 +284,8 @@ export interface PlayerView {
   lost: boolean;
   left: boolean;
   wins: number;
+  /** Whether player has kept their hand during mulligan phase */
+  keptHand: boolean;
 }
 
 /** CardView represents a card */
@@ -252,6 +315,8 @@ export interface CardView {
   ownerId: string;
   counters: CounterView[];
   attachedTo: string[];
+  /** Available actions for this card (context-aware, server source of truth) */
+  availableActions: CardAction[];
 }
 
 /** AbilityView represents a card ability */
@@ -259,6 +324,19 @@ export interface AbilityView {
   id: string;
   text: string;
   rule: string;
+}
+
+/** CardAction represents an action available for a card */
+export interface CardAction {
+  actionType: CardActionType;
+  /** For abilities with multiple options */
+  actionId: string;
+  /** "Cast", "Play Land", "Tap: Add {G}" */
+  displayText: string;
+  /** Can perform right now? */
+  isEnabled: boolean;
+  /** "Not enough mana", "Wrong phase" */
+  disabledReason: string;
 }
 
 /** CounterView represents a counter on a card */
@@ -1362,6 +1440,12 @@ function createBaseGameView(): GameView {
     combat: undefined,
     special: false,
     startTime: undefined,
+    activePlayerName: "",
+    priorityPlayerName: "",
+    gameFormat: "",
+    isMulliganPhase: false,
+    landsPlayedThisTurn: 0,
+    landsAllowedThisTurn: 0,
   };
 }
 
@@ -1420,6 +1504,24 @@ export const GameView: MessageFns<GameView> = {
     }
     if (message.startTime !== undefined) {
       Timestamp.encode(toTimestamp(message.startTime), writer.uint32(146).fork()).join();
+    }
+    if (message.activePlayerName !== "") {
+      writer.uint32(162).string(message.activePlayerName);
+    }
+    if (message.priorityPlayerName !== "") {
+      writer.uint32(170).string(message.priorityPlayerName);
+    }
+    if (message.gameFormat !== "") {
+      writer.uint32(178).string(message.gameFormat);
+    }
+    if (message.isMulliganPhase !== false) {
+      writer.uint32(184).bool(message.isMulliganPhase);
+    }
+    if (message.landsPlayedThisTurn !== 0) {
+      writer.uint32(192).int32(message.landsPlayedThisTurn);
+    }
+    if (message.landsAllowedThisTurn !== 0) {
+      writer.uint32(200).int32(message.landsAllowedThisTurn);
     }
     return writer;
   },
@@ -1575,6 +1677,54 @@ export const GameView: MessageFns<GameView> = {
           message.startTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
+        case 20: {
+          if (tag !== 162) {
+            break;
+          }
+
+          message.activePlayerName = reader.string();
+          continue;
+        }
+        case 21: {
+          if (tag !== 170) {
+            break;
+          }
+
+          message.priorityPlayerName = reader.string();
+          continue;
+        }
+        case 22: {
+          if (tag !== 178) {
+            break;
+          }
+
+          message.gameFormat = reader.string();
+          continue;
+        }
+        case 23: {
+          if (tag !== 184) {
+            break;
+          }
+
+          message.isMulliganPhase = reader.bool();
+          continue;
+        }
+        case 24: {
+          if (tag !== 192) {
+            break;
+          }
+
+          message.landsPlayedThisTurn = reader.int32();
+          continue;
+        }
+        case 25: {
+          if (tag !== 200) {
+            break;
+          }
+
+          message.landsAllowedThisTurn = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1612,6 +1762,12 @@ export const GameView: MessageFns<GameView> = {
       combat: isSet(object.combat) ? CombatView.fromJSON(object.combat) : undefined,
       special: isSet(object.special) ? globalThis.Boolean(object.special) : false,
       startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
+      activePlayerName: isSet(object.activePlayerName) ? globalThis.String(object.activePlayerName) : "",
+      priorityPlayerName: isSet(object.priorityPlayerName) ? globalThis.String(object.priorityPlayerName) : "",
+      gameFormat: isSet(object.gameFormat) ? globalThis.String(object.gameFormat) : "",
+      isMulliganPhase: isSet(object.isMulliganPhase) ? globalThis.Boolean(object.isMulliganPhase) : false,
+      landsPlayedThisTurn: isSet(object.landsPlayedThisTurn) ? globalThis.Number(object.landsPlayedThisTurn) : 0,
+      landsAllowedThisTurn: isSet(object.landsAllowedThisTurn) ? globalThis.Number(object.landsAllowedThisTurn) : 0,
     };
   },
 
@@ -1671,6 +1827,24 @@ export const GameView: MessageFns<GameView> = {
     if (message.startTime !== undefined) {
       obj.startTime = message.startTime.toISOString();
     }
+    if (message.activePlayerName !== "") {
+      obj.activePlayerName = message.activePlayerName;
+    }
+    if (message.priorityPlayerName !== "") {
+      obj.priorityPlayerName = message.priorityPlayerName;
+    }
+    if (message.gameFormat !== "") {
+      obj.gameFormat = message.gameFormat;
+    }
+    if (message.isMulliganPhase !== false) {
+      obj.isMulliganPhase = message.isMulliganPhase;
+    }
+    if (message.landsPlayedThisTurn !== 0) {
+      obj.landsPlayedThisTurn = Math.round(message.landsPlayedThisTurn);
+    }
+    if (message.landsAllowedThisTurn !== 0) {
+      obj.landsAllowedThisTurn = Math.round(message.landsAllowedThisTurn);
+    }
     return obj;
   },
 
@@ -1699,6 +1873,12 @@ export const GameView: MessageFns<GameView> = {
       : undefined;
     message.special = object.special ?? false;
     message.startTime = object.startTime ?? undefined;
+    message.activePlayerName = object.activePlayerName ?? "";
+    message.priorityPlayerName = object.priorityPlayerName ?? "";
+    message.gameFormat = object.gameFormat ?? "";
+    message.isMulliganPhase = object.isMulliganPhase ?? false;
+    message.landsPlayedThisTurn = object.landsPlayedThisTurn ?? 0;
+    message.landsAllowedThisTurn = object.landsAllowedThisTurn ?? 0;
     return message;
   },
 };
@@ -1721,6 +1901,7 @@ function createBasePlayerView(): PlayerView {
     lost: false,
     left: false,
     wins: 0,
+    keptHand: false,
   };
 }
 
@@ -1773,6 +1954,9 @@ export const PlayerView: MessageFns<PlayerView> = {
     }
     if (message.wins !== 0) {
       writer.uint32(128).int32(message.wins);
+    }
+    if (message.keptHand !== false) {
+      writer.uint32(136).bool(message.keptHand);
     }
     return writer;
   },
@@ -1912,6 +2096,14 @@ export const PlayerView: MessageFns<PlayerView> = {
           message.wins = reader.int32();
           continue;
         }
+        case 17: {
+          if (tag !== 136) {
+            break;
+          }
+
+          message.keptHand = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1941,6 +2133,7 @@ export const PlayerView: MessageFns<PlayerView> = {
       lost: isSet(object.lost) ? globalThis.Boolean(object.lost) : false,
       left: isSet(object.left) ? globalThis.Boolean(object.left) : false,
       wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
+      keptHand: isSet(object.keptHand) ? globalThis.Boolean(object.keptHand) : false,
     };
   },
 
@@ -1994,6 +2187,9 @@ export const PlayerView: MessageFns<PlayerView> = {
     if (message.wins !== 0) {
       obj.wins = Math.round(message.wins);
     }
+    if (message.keptHand !== false) {
+      obj.keptHand = message.keptHand;
+    }
     return obj;
   },
 
@@ -2020,6 +2216,7 @@ export const PlayerView: MessageFns<PlayerView> = {
     message.lost = object.lost ?? false;
     message.left = object.left ?? false;
     message.wins = object.wins ?? 0;
+    message.keptHand = object.keptHand ?? false;
     return message;
   },
 };
@@ -2051,6 +2248,7 @@ function createBaseCardView(): CardView {
     ownerId: "",
     counters: [],
     attachedTo: [],
+    availableActions: [],
   };
 }
 
@@ -2130,6 +2328,9 @@ export const CardView: MessageFns<CardView> = {
     }
     for (const v of message.attachedTo) {
       writer.uint32(202).string(v!);
+    }
+    for (const v of message.availableActions) {
+      CardAction.encode(v!, writer.uint32(242).fork()).join();
     }
     return writer;
   },
@@ -2341,6 +2542,14 @@ export const CardView: MessageFns<CardView> = {
           message.attachedTo.push(reader.string());
           continue;
         }
+        case 30: {
+          if (tag !== 242) {
+            break;
+          }
+
+          message.availableActions.push(CardAction.decode(reader, reader.uint32()));
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2382,6 +2591,9 @@ export const CardView: MessageFns<CardView> = {
         : [],
       attachedTo: globalThis.Array.isArray(object?.attachedTo)
         ? object.attachedTo.map((e: any) => globalThis.String(e))
+        : [],
+      availableActions: globalThis.Array.isArray(object?.availableActions)
+        ? object.availableActions.map((e: any) => CardAction.fromJSON(e))
         : [],
     };
   },
@@ -2463,6 +2675,9 @@ export const CardView: MessageFns<CardView> = {
     if (message.attachedTo?.length) {
       obj.attachedTo = message.attachedTo;
     }
+    if (message.availableActions?.length) {
+      obj.availableActions = message.availableActions.map((e) => CardAction.toJSON(e));
+    }
     return obj;
   },
 
@@ -2496,6 +2711,7 @@ export const CardView: MessageFns<CardView> = {
     message.ownerId = object.ownerId ?? "";
     message.counters = object.counters?.map((e) => CounterView.fromPartial(e)) || [];
     message.attachedTo = object.attachedTo?.map((e) => e) || [];
+    message.availableActions = object.availableActions?.map((e) => CardAction.fromPartial(e)) || [];
     return message;
   },
 };
@@ -2588,6 +2804,130 @@ export const AbilityView: MessageFns<AbilityView> = {
     message.id = object.id ?? "";
     message.text = object.text ?? "";
     message.rule = object.rule ?? "";
+    return message;
+  },
+};
+
+function createBaseCardAction(): CardAction {
+  return { actionType: 0, actionId: "", displayText: "", isEnabled: false, disabledReason: "" };
+}
+
+export const CardAction: MessageFns<CardAction> = {
+  encode(message: CardAction, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.actionType !== 0) {
+      writer.uint32(8).int32(message.actionType);
+    }
+    if (message.actionId !== "") {
+      writer.uint32(18).string(message.actionId);
+    }
+    if (message.displayText !== "") {
+      writer.uint32(26).string(message.displayText);
+    }
+    if (message.isEnabled !== false) {
+      writer.uint32(32).bool(message.isEnabled);
+    }
+    if (message.disabledReason !== "") {
+      writer.uint32(42).string(message.disabledReason);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CardAction {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCardAction();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.actionType = reader.int32() as any;
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.actionId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.displayText = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.isEnabled = reader.bool();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.disabledReason = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CardAction {
+    return {
+      actionType: isSet(object.actionType) ? cardActionTypeFromJSON(object.actionType) : 0,
+      actionId: isSet(object.actionId) ? globalThis.String(object.actionId) : "",
+      displayText: isSet(object.displayText) ? globalThis.String(object.displayText) : "",
+      isEnabled: isSet(object.isEnabled) ? globalThis.Boolean(object.isEnabled) : false,
+      disabledReason: isSet(object.disabledReason) ? globalThis.String(object.disabledReason) : "",
+    };
+  },
+
+  toJSON(message: CardAction): unknown {
+    const obj: any = {};
+    if (message.actionType !== 0) {
+      obj.actionType = cardActionTypeToJSON(message.actionType);
+    }
+    if (message.actionId !== "") {
+      obj.actionId = message.actionId;
+    }
+    if (message.displayText !== "") {
+      obj.displayText = message.displayText;
+    }
+    if (message.isEnabled !== false) {
+      obj.isEnabled = message.isEnabled;
+    }
+    if (message.disabledReason !== "") {
+      obj.disabledReason = message.disabledReason;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CardAction>): CardAction {
+    return CardAction.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CardAction>): CardAction {
+    const message = createBaseCardAction();
+    message.actionType = object.actionType ?? 0;
+    message.actionId = object.actionId ?? "";
+    message.displayText = object.displayText ?? "";
+    message.isEnabled = object.isEnabled ?? false;
+    message.disabledReason = object.disabledReason ?? "";
     return message;
   },
 };

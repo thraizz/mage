@@ -90,6 +90,8 @@ export enum SpecialActionType {
   FORETELL = 2,
   SUSPEND = 3,
   COMPANION = 4,
+  /** ADVANCE_PHASE - Manually advance to next phase/step */
+  ADVANCE_PHASE = 5,
   UNRECOGNIZED = -1,
 }
 
@@ -110,6 +112,9 @@ export function specialActionTypeFromJSON(object: any): SpecialActionType {
     case 4:
     case "COMPANION":
       return SpecialActionType.COMPANION;
+    case 5:
+    case "ADVANCE_PHASE":
+      return SpecialActionType.ADVANCE_PHASE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -129,6 +134,8 @@ export function specialActionTypeToJSON(object: SpecialActionType): string {
       return "SUSPEND";
     case SpecialActionType.COMPANION:
       return "COMPANION";
+    case SpecialActionType.ADVANCE_PHASE:
+      return "ADVANCE_PHASE";
     case SpecialActionType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
