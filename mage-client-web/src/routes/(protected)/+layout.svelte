@@ -6,21 +6,24 @@
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { fly, fade } from 'svelte/transition';
 
-	let isChecking = true;
+	let isChecking = $state(true);
 
 	// Check if we're on a game page - hide navbar for immersive experience
 	const isGamePage = $derived($page.url.pathname.startsWith('/game/'));
 
 	// Check authentication on mount
 	onMount(() => {
-		// Try to restore auth from storage
-		const restored = auth.loadAuthFromStorage();
-
-		if (!restored) {
-			// Not authenticated, redirect to login
-			const returnUrl = $page.url.pathname + $page.url.search;
-			goto(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
-			return;
+		// Check if already authenticated (e.g., from root layout load)
+		// Only call loadAuthFromStorage if not already authenticated
+		if (!$auth.isAuthenticated) {
+			// Try to restore auth from storage
+			const restored = auth.loadAuthFromStorage();
+			if (!restored) {
+				// Not authenticated, redirect to login
+				const returnUrl = $page.url.pathname + $page.url.search;
+				goto(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+				return;
+			}
 		}
 
 		// Authenticated, show content
