@@ -28,6 +28,13 @@ func NewHTTPJSONHandler(mageServer pb.MageServerServer, logger *zap.Logger) *HTT
 
 // ServeHTTP handles HTTP/JSON requests
 func (h *HTTPJSONHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Log all incoming requests for debugging
+	h.logger.Debug("HTTP request received",
+		zap.String("method", r.Method),
+		zap.String("path", r.URL.Path),
+		zap.String("remote_addr", r.RemoteAddr),
+	)
+
 	// Add CORS headers
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
@@ -35,12 +42,14 @@ func (h *HTTPJSONHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Handle preflight
 	if r.Method == http.MethodOptions {
+		h.logger.Debug("CORS preflight request")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
 	// Only handle POST requests for RPC
 	if r.Method != http.MethodPost {
+		h.logger.Warn("non-POST request rejected", zap.String("method", r.Method))
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -49,12 +58,18 @@ func (h *HTTPJSONHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
 	if len(parts) != 2 || parts[0] != "mage.v1.MageServer" {
+		h.logger.Warn("invalid path format", zap.String("path", r.URL.Path))
 		http.Error(w, "Invalid path format. Expected: /mage.v1.MageServer/MethodName", http.StatusBadRequest)
 		return
 	}
 
 	methodName := parts[1]
 	ctx := r.Context()
+
+	h.logger.Info("handling RPC request",
+		zap.String("rpc_method", methodName),
+		zap.String("remote_addr", r.RemoteAddr),
+	)
 
 	// Route to the appropriate handler
 	switch methodName {
@@ -911,18 +926,31 @@ func (h *HTTPJSONHandler) handleDeckSubmit(ctx context.Context, w http.ResponseW
 
 // handleGameJoin handles the GameJoin method
 func (h *HTTPJSONHandler) handleGameJoin(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	h.logger.Info("handleGameJoin started")
+
 	var req pb.GameJoinRequest
 	if err := h.unmarshalRequest(r, &req); err != nil {
+		h.logger.Error("handleGameJoin unmarshal error", zap.Error(err))
 		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	h.logger.Info("handleGameJoin calling mageServer.GameJoin",
+		zap.String("session_id", req.GetSessionId()),
+		zap.String("game_id", req.GetGameId()),
+	)
+
 	resp, err := h.mageServer.GameJoin(ctx, &req)
 	if err != nil {
+		h.logger.Error("handleGameJoin error", zap.Error(err))
 		h.writeErrorResponse(w, err)
 		return
 	}
 
+	h.logger.Info("handleGameJoin success",
+		zap.String("game_id", req.GetGameId()),
+		zap.Bool("success", resp.GetSuccess()),
+	)
 	h.writeSuccessResponse(w, resp)
 }
 
@@ -962,18 +990,32 @@ func (h *HTTPJSONHandler) handleGameWatchStop(ctx context.Context, w http.Respon
 
 // handleGameGetView handles the GameGetView method
 func (h *HTTPJSONHandler) handleGameGetView(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	h.logger.Info("handleGameGetView started")
+
 	var req pb.GameGetViewRequest
 	if err := h.unmarshalRequest(r, &req); err != nil {
+		h.logger.Error("handleGameGetView unmarshal error", zap.Error(err))
 		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	h.logger.Info("handleGameGetView calling mageServer.GameGetView",
+		zap.String("session_id", req.GetSessionId()),
+		zap.String("game_id", req.GetGameId()),
+		zap.String("player_id", req.GetPlayerId()),
+	)
+
 	resp, err := h.mageServer.GameGetView(ctx, &req)
 	if err != nil {
+		h.logger.Error("handleGameGetView error", zap.Error(err))
 		h.writeErrorResponse(w, err)
 		return
 	}
 
+	h.logger.Info("handleGameGetView success",
+		zap.String("game_id", req.GetGameId()),
+		zap.Bool("has_game", resp.GetGame() != nil),
+	)
 	h.writeSuccessResponse(w, resp)
 }
 

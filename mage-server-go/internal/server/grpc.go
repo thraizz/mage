@@ -156,6 +156,16 @@ func (s *mageServer) handleGameNotification(notification game.GameNotification) 
 		zap.Any("data", notification.Data),
 	)
 
+	// Handle GAME_ERROR notifications - send only to the specific player
+	if notification.Type == "GAME_ERROR" {
+		if notification.PlayerID != "" {
+			if errorMsg, exists := notification.Data["error"]; exists {
+				s.sendGameErrorToPlayer(gameID, notification.PlayerID, fmt.Sprintf("%v", errorMsg))
+			}
+		}
+		return
+	}
+
 	// Send game update to all players
 	for _, playerName := range gameInstance.Players {
 		s.logger.Info("sending GAME_UPDATE to player",
@@ -254,6 +264,62 @@ func (s *mageServer) sendGameUpdateToPlayer(gameID, playerName string) {
 			)
 		} else {
 			s.logger.Info("successfully sent GAME_UPDATE to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		}
+	}
+}
+
+// sendGameErrorToPlayer sends a GAME_ERROR event to a specific player
+func (s *mageServer) sendGameErrorToPlayer(gameID, playerName, errorMsg string) {
+	// Create the GAME_ERROR event
+	errorData := &pb.GameErrorData{
+		Error: errorMsg,
+	}
+
+	event := &pb.ServerEvent{
+		ObjectId: gameID,
+		Method:   pb.CallbackMethod_GAME_ERROR,
+	}
+
+	anyData, err := anypb.New(errorData)
+	if err != nil {
+		s.logger.Error("failed to marshal GameErrorData",
+			zap.String("game_id", gameID),
+			zap.Error(err),
+		)
+		return
+	}
+	event.Data = anyData
+
+	// Send to all sessions for this player
+	sessions := s.sessionMgr.GetSessionsByUser(playerName)
+	if len(sessions) == 0 {
+		s.logger.Warn("no sessions found for player to send error",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+		)
+		return
+	}
+
+	s.logger.Info("sending GAME_ERROR via WebSocket",
+		zap.String("game_id", gameID),
+		zap.String("player", playerName),
+		zap.Int("session_count", len(sessions)),
+		zap.String("error", errorMsg),
+	)
+
+	for _, sess := range sessions {
+		if !sess.SendCallback(event) {
+			s.logger.Warn("failed to send GAME_ERROR to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		} else {
+			s.logger.Info("successfully sent GAME_ERROR to session",
 				zap.String("game_id", gameID),
 				zap.String("player", playerName),
 				zap.String("session_id", sess.ID),

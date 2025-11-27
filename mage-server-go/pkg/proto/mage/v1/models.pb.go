@@ -939,26 +939,27 @@ func (x *GameView) GetLandsAllowedThisTurn() int32 {
 
 // PlayerView represents a player's state
 type PlayerView struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlayerId      string                 `protobuf:"bytes,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Life          int32                  `protobuf:"varint,3,opt,name=life,proto3" json:"life,omitempty"`
-	Poison        int32                  `protobuf:"varint,4,opt,name=poison,proto3" json:"poison,omitempty"`
-	Energy        int32                  `protobuf:"varint,5,opt,name=energy,proto3" json:"energy,omitempty"`
-	LibraryCount  int32                  `protobuf:"varint,6,opt,name=library_count,json=libraryCount,proto3" json:"library_count,omitempty"`
-	HandCount     int32                  `protobuf:"varint,7,opt,name=hand_count,json=handCount,proto3" json:"hand_count,omitempty"`
-	Hand          []*CardView            `protobuf:"bytes,8,rep,name=hand,proto3" json:"hand,omitempty"`
-	Graveyard     []*CardView            `protobuf:"bytes,9,rep,name=graveyard,proto3" json:"graveyard,omitempty"`
-	ManaPool      *ManaPoolView          `protobuf:"bytes,10,opt,name=mana_pool,json=manaPool,proto3" json:"mana_pool,omitempty"`
-	HasPriority   bool                   `protobuf:"varint,11,opt,name=has_priority,json=hasPriority,proto3" json:"has_priority,omitempty"`
-	Passed        bool                   `protobuf:"varint,12,opt,name=passed,proto3" json:"passed,omitempty"`
-	StateOrdinal  int32                  `protobuf:"varint,13,opt,name=state_ordinal,json=stateOrdinal,proto3" json:"state_ordinal,omitempty"`
-	Lost          bool                   `protobuf:"varint,14,opt,name=lost,proto3" json:"lost,omitempty"`
-	Left          bool                   `protobuf:"varint,15,opt,name=left,proto3" json:"left,omitempty"`
-	Wins          int32                  `protobuf:"varint,16,opt,name=wins,proto3" json:"wins,omitempty"`
-	KeptHand      bool                   `protobuf:"varint,17,opt,name=kept_hand,json=keptHand,proto3" json:"kept_hand,omitempty"` // Whether player has kept their hand during mulligan phase
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId            string                 `protobuf:"bytes,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
+	Name                string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Life                int32                  `protobuf:"varint,3,opt,name=life,proto3" json:"life,omitempty"`
+	Poison              int32                  `protobuf:"varint,4,opt,name=poison,proto3" json:"poison,omitempty"`
+	Energy              int32                  `protobuf:"varint,5,opt,name=energy,proto3" json:"energy,omitempty"`
+	LibraryCount        int32                  `protobuf:"varint,6,opt,name=library_count,json=libraryCount,proto3" json:"library_count,omitempty"`
+	HandCount           int32                  `protobuf:"varint,7,opt,name=hand_count,json=handCount,proto3" json:"hand_count,omitempty"`
+	Hand                []*CardView            `protobuf:"bytes,8,rep,name=hand,proto3" json:"hand,omitempty"`
+	Graveyard           []*CardView            `protobuf:"bytes,9,rep,name=graveyard,proto3" json:"graveyard,omitempty"`
+	ManaPool            *ManaPoolView          `protobuf:"bytes,10,opt,name=mana_pool,json=manaPool,proto3" json:"mana_pool,omitempty"`
+	HasPriority         bool                   `protobuf:"varint,11,opt,name=has_priority,json=hasPriority,proto3" json:"has_priority,omitempty"`
+	Passed              bool                   `protobuf:"varint,12,opt,name=passed,proto3" json:"passed,omitempty"`
+	StateOrdinal        int32                  `protobuf:"varint,13,opt,name=state_ordinal,json=stateOrdinal,proto3" json:"state_ordinal,omitempty"`
+	Lost                bool                   `protobuf:"varint,14,opt,name=lost,proto3" json:"lost,omitempty"`
+	Left                bool                   `protobuf:"varint,15,opt,name=left,proto3" json:"left,omitempty"`
+	Wins                int32                  `protobuf:"varint,16,opt,name=wins,proto3" json:"wins,omitempty"`
+	KeptHand            bool                   `protobuf:"varint,17,opt,name=kept_hand,json=keptHand,proto3" json:"kept_hand,omitempty"`                                    // Whether player has kept their hand during mulligan phase
+	HasAvailableActions bool                   `protobuf:"varint,18,opt,name=has_available_actions,json=hasAvailableActions,proto3" json:"has_available_actions,omitempty"` // Server-computed: does this player have any legal actions right now?
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *PlayerView) Reset() {
@@ -1106,6 +1107,13 @@ func (x *PlayerView) GetWins() int32 {
 func (x *PlayerView) GetKeptHand() bool {
 	if x != nil {
 		return x.KeptHand
+	}
+	return false
+}
+
+func (x *PlayerView) GetHasAvailableActions() bool {
+	if x != nil {
+		return x.HasAvailableActions
 	}
 	return false
 }
@@ -2886,7 +2894,7 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"gameFormat\x12*\n" +
 	"\x11is_mulligan_phase\x18\x17 \x01(\bR\x0fisMulliganPhase\x123\n" +
 	"\x16lands_played_this_turn\x18\x18 \x01(\x05R\x13landsPlayedThisTurn\x125\n" +
-	"\x17lands_allowed_this_turn\x18\x19 \x01(\x05R\x14landsAllowedThisTurn\"\x8a\x04\n" +
+	"\x17lands_allowed_this_turn\x18\x19 \x01(\x05R\x14landsAllowedThisTurn\"\xbe\x04\n" +
 	"\n" +
 	"PlayerView\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\tR\bplayerId\x12\x12\n" +
@@ -2907,7 +2915,8 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\x04lost\x18\x0e \x01(\bR\x04lost\x12\x12\n" +
 	"\x04left\x18\x0f \x01(\bR\x04left\x12\x12\n" +
 	"\x04wins\x18\x10 \x01(\x05R\x04wins\x12\x1b\n" +
-	"\tkept_hand\x18\x11 \x01(\bR\bkeptHand\"\xb8\x06\n" +
+	"\tkept_hand\x18\x11 \x01(\bR\bkeptHand\x122\n" +
+	"\x15has_available_actions\x18\x12 \x01(\bR\x13hasAvailableActions\"\xb8\x06\n" +
 	"\bCardView\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +

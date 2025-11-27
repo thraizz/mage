@@ -93,6 +93,17 @@ const (
 	abilityBanding                  = "BandingAbility"
 )
 
+// PassUntilType represents different auto-pass modes
+type PassUntilType int
+
+const (
+	PassUntilNone          PassUntilType = iota // No auto-pass
+	PassUntilEndOfTurn                          // Pass until end of current turn
+	PassUntilNextTurn                           // Pass until start of next turn
+	PassUntilStackResolved                      // Pass until current stack resolves
+	PassUntilMyNextTurn                         // Pass until player's next upkeep (F6)
+)
+
 // EngineGameView represents the complete game state view for a player
 type EngineGameView struct {
 	GameID         string
@@ -466,6 +477,8 @@ type internalPlayer struct {
 	CommanderDamage     map[string]int // Tracks combat damage from each commander (commander ID -> damage)
 	LandsPlayedThisTurn int            // Number of lands played this turn
 	LandsPerTurn        int            // Maximum lands allowed per turn (default 1)
+	PassUntil           PassUntilType  // Auto-pass mode for this player
+	PassUntilTurn       int            // Turn number to pass until (for PassUntilMyNextTurn)
 }
 
 // triggeredAbilityQueueItem represents a triggered ability waiting to be put on the stack
@@ -715,6 +728,19 @@ func (e *MageEngine) notifyPhaseChange(gameID string, data map[string]interface{
 		PlayerID:  "", // Broadcast to all players
 		Timestamp: time.Now(),
 		Data:      data,
+	})
+}
+
+// notifyGameError notifies a specific player about an error
+func (e *MageEngine) notifyGameError(gameID, playerID string, errorMsg string) {
+	e.emitNotification(GameNotification{
+		Type:      "GAME_ERROR",
+		GameID:    gameID,
+		PlayerID:  playerID, // Send only to the player who caused the error
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"error": errorMsg,
+		},
 	})
 }
 
@@ -1258,6 +1284,17 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 				// Update error message to indicate restoration
 				err = fmt.Errorf("action failed and state restored: %w", err)
 			}
+
+			// Notify the player about the error
+			// Use the original error message (before wrapping) for cleaner user display
+			gameState.mu.Unlock() // Temporarily unlock to emit notification
+			e.notifyGameError(gameID, action.PlayerID, err.Error())
+			gameState.mu.Lock() // Re-acquire lock
+		} else if err != nil {
+			// Error occurred but no bookmark to restore - still notify the player
+			gameState.mu.Unlock() // Temporarily unlock to emit notification
+			e.notifyGameError(gameID, action.PlayerID, err.Error())
+			gameState.mu.Lock() // Re-acquire lock
 		} else if bookmarkID > 0 {
 			// Action succeeded, check if any player is using this bookmark
 			// If so, don't remove it (player undo takes precedence)
@@ -1312,6 +1349,14 @@ func (e *MageEngine) handlePlayerAction(gameState *engineGameState, action Playe
 		return e.handleKeepHand(gameState, action.PlayerID)
 	case "MULLIGAN":
 		return e.handleMulligan(gameState, action.PlayerID)
+	case "PASS_UNTIL_END_OF_TURN":
+		return e.handlePassUntil(gameState, action.PlayerID, PassUntilEndOfTurn)
+	case "PASS_UNTIL_NEXT_TURN":
+		return e.handlePassUntil(gameState, action.PlayerID, PassUntilNextTurn)
+	case "PASS_UNTIL_STACK_RESOLVED":
+		return e.handlePassUntil(gameState, action.PlayerID, PassUntilStackResolved)
+	case "PASS_UNTIL_MY_NEXT_TURN":
+		return e.handlePassUntil(gameState, action.PlayerID, PassUntilMyNextTurn)
 	default:
 		return fmt.Errorf("unknown player action: %s", dataStr)
 	}
@@ -1596,6 +1641,11 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		// Emit phase/step change events
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventChangePhase, "", "", activePlayerID))
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventChangeStep, "", "", activePlayerID))
+
+		// Check if active player should auto-pass (F6 etc.)
+		if e.shouldAutoPass(gameState, activePlayerID) {
+			return e.handlePass(gameState, activePlayerID)
+		}
 	} else {
 		// Pass priority to next player
 		nextPlayerID := e.getNextPlayerWithPriority(gameState, playerID)
@@ -1670,9 +1720,100 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 			"phase":         gameState.turnManager.CurrentPhase().String(),
 			"step":          gameState.turnManager.CurrentStep().String(),
 		})
+
+		// Check if next player should auto-pass (F6 etc.)
+		if e.shouldAutoPass(gameState, nextPlayerID) {
+			// Auto-pass for this player
+			return e.handlePass(gameState, nextPlayerID)
+		}
 	}
 
 	return nil
+}
+
+// handlePassUntil sets up auto-pass mode for a player
+// The player will automatically pass priority until the specified condition is met
+func (e *MageEngine) handlePassUntil(gameState *engineGameState, playerID string, passType PassUntilType) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Check if player has priority
+	if gameState.turnManager.PriorityPlayer() != playerID {
+		return fmt.Errorf("player %s does not have priority", playerID)
+	}
+
+	// Set up pass-until mode
+	player.PassUntil = passType
+
+	// For PassUntilMyNextTurn, record the target turn
+	if passType == PassUntilMyNextTurn {
+		// Pass until the next time it's this player's turn and we're in upkeep
+		player.PassUntilTurn = gameState.turnManager.TurnNumber()
+	}
+
+	var passDesc string
+	switch passType {
+	case PassUntilEndOfTurn:
+		passDesc = "until end of turn"
+	case PassUntilNextTurn:
+		passDesc = "until next turn"
+	case PassUntilStackResolved:
+		passDesc = "until stack resolves"
+	case PassUntilMyNextTurn:
+		passDesc = "until their next turn"
+	}
+
+	gameState.addMessage(fmt.Sprintf("%s will pass %s", playerID, passDesc), "action")
+
+	// Immediately pass priority
+	return e.handlePass(gameState, playerID)
+}
+
+// shouldAutoPass checks if a player should automatically pass based on their PassUntil mode
+func (e *MageEngine) shouldAutoPass(gameState *engineGameState, playerID string) bool {
+	player, exists := gameState.players[playerID]
+	if !exists || player.PassUntil == PassUntilNone {
+		return false
+	}
+
+	switch player.PassUntil {
+	case PassUntilEndOfTurn:
+		// Auto-pass until cleanup step of current turn
+		// Stop at end of turn (cleanup)
+		return true
+
+	case PassUntilNextTurn:
+		// Auto-pass until the next turn begins
+		return true
+
+	case PassUntilStackResolved:
+		// Auto-pass until stack is empty
+		return !gameState.stack.IsEmpty()
+
+	case PassUntilMyNextTurn:
+		// Auto-pass until it's this player's upkeep again
+		isMyTurn := gameState.turnManager.ActivePlayer() == playerID
+		isUpkeep := gameState.turnManager.CurrentStep() == rules.StepUpkeep
+		turnAdvanced := gameState.turnManager.TurnNumber() > player.PassUntilTurn
+
+		// Stop auto-passing when it's our upkeep (and turn has advanced)
+		if isMyTurn && isUpkeep && turnAdvanced {
+			player.PassUntil = PassUntilNone // Clear the auto-pass
+			return false
+		}
+		return true
+	}
+
+	return false
+}
+
+// clearPassUntilOnAction clears a player's auto-pass mode when they take an action
+func (e *MageEngine) clearPassUntilOnAction(gameState *engineGameState, playerID string) {
+	if player, exists := gameState.players[playerID]; exists {
+		player.PassUntil = PassUntilNone
+	}
 }
 
 // handleStringAction handles SEND_STRING type actions (spell casting or passing)
@@ -2526,6 +2667,9 @@ func (e *MageEngine) buildPlayerViewsWithActions(gameState *engineGameState, req
 		if playerID == requestingPlayerID {
 			// Build card views with available actions
 			view.Hand = e.buildCardViewsWithActions(gameState, player.Hand, playerID)
+
+			// Compute HasAvailableActions for the requesting player
+			view.HasAvailableActions = e.playerHasAvailableActions(gameState, playerID, view.Hand)
 		} else {
 			view.Hand = make([]EngineCardView, len(player.Hand))
 			for i := range player.Hand {
@@ -2541,6 +2685,62 @@ func (e *MageEngine) buildPlayerViewsWithActions(gameState *engineGameState, req
 	}
 
 	return views
+}
+
+// playerHasAvailableActions checks if a player has any legal actions they can take right now
+func (e *MageEngine) playerHasAvailableActions(gameState *engineGameState, playerID string, handCards []EngineCardView) bool {
+	player, exists := gameState.players[playerID]
+	if !exists || player.Lost || player.Left {
+		return false
+	}
+
+	// Player must have priority to take actions
+	hasPriority := gameState.turnManager.PriorityPlayer() == playerID
+	if !hasPriority {
+		return false
+	}
+
+	// Check hand cards for enabled actions
+	for _, card := range handCards {
+		for _, action := range card.AvailableActions {
+			if action.IsEnabled {
+				return true
+			}
+		}
+	}
+
+	// Check battlefield permanents for activated abilities
+	for _, card := range gameState.battlefield {
+		if card.ControllerID != playerID {
+			continue
+		}
+		actions := e.getAvailableActionsForPermanent(gameState, card, playerID)
+		for _, action := range actions {
+			if action.IsEnabled {
+				return true
+			}
+		}
+	}
+
+	// TODO: Check for special actions (e.g., suspend, morph face-up, etc.)
+
+	return false
+}
+
+// getAvailableActionsForPermanent computes available actions for a permanent on the battlefield
+func (e *MageEngine) getAvailableActionsForPermanent(gameState *engineGameState, card *internalCard, playerID string) []EngineCardAction {
+	var actions []EngineCardAction
+
+	hasPriority := gameState.turnManager.PriorityPlayer() == playerID
+	if !hasPriority {
+		return actions
+	}
+
+	// Check for mana abilities (can be activated even without priority during mana payment)
+	// For now, simplified: check if card has any activated abilities
+	// TODO: Parse abilities and check activation costs/requirements
+
+	return actions
 }
 
 // buildCardViewsWithActions converts internal cards to view cards with available actions

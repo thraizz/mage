@@ -301,10 +301,22 @@ func (s *mageServer) GameWatchStop(ctx context.Context, req *pb.GameWatchStopReq
 
 // GameGetView returns a simplified game snapshot.
 func (s *mageServer) GameGetView(ctx context.Context, req *pb.GameGetViewRequest) (*pb.GameGetViewResponse, error) {
+	s.logger.Info("GameGetView called",
+		zap.String("session_id", req.GetSessionId()),
+		zap.String("game_id", req.GetGameId()),
+		zap.String("player_id", req.GetPlayerId()),
+	)
+
 	sess, gameInstance, err := s.resolveGameAccess(req.GetSessionId(), req.GetGameId(), true)
 	if err != nil {
+		s.logger.Error("GameGetView resolveGameAccess failed", zap.Error(err))
 		return nil, err
 	}
+
+	s.logger.Info("GameGetView resolved game access",
+		zap.String("game_id", gameInstance.ID),
+		zap.Int("num_players", len(gameInstance.Players)),
+	)
 
 	gamePlayers := make([]*pb.PlayerView, 0, len(gameInstance.Players))
 	for _, name := range gameInstance.Players {
@@ -657,13 +669,14 @@ func enginePlayersToProto(players []game.EnginePlayerView) []*pb.PlayerView {
 				Green:     int32(p.ManaPool.Green),
 				Colorless: int32(p.ManaPool.Colorless),
 			},
-			HasPriority:  p.HasPriority,
-			Passed:       p.Passed,
-			StateOrdinal: int32(p.StateOrdinal),
-			Lost:         p.Lost,
-			Left:         p.Left,
-			Wins:         int32(p.Wins),
-			KeptHand:     p.KeptHand,
+			HasPriority:         p.HasPriority,
+			Passed:              p.Passed,
+			StateOrdinal:        int32(p.StateOrdinal),
+			Lost:                p.Lost,
+			Left:                p.Left,
+			Wins:                int32(p.Wins),
+			KeptHand:            p.KeptHand,
+			HasAvailableActions: p.HasAvailableActions,
 		}
 		result = append(result, playerView)
 	}
