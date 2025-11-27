@@ -210,7 +210,7 @@
 			class="action-btn f6"
 			disabled={!hasPriority || isLoading}
 			onclick={handlePassUntilEOT}
-			title="Pass until end of turn (F6)"
+			title="Pass until your next upkeep (F6)"
 		>
 			<span class="btn-icon">⏭️</span>
 			<span class="btn-label">Pass Turn</span>

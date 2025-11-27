@@ -8,6 +8,9 @@
 
 	let isChecking = true;
 
+	// Check if we're on a game page - hide navbar for immersive experience
+	const isGamePage = $derived($page.url.pathname.startsWith('/game/'));
+
 	// Check authentication on mount
 	onMount(() => {
 		// Try to restore auth from storage
@@ -44,10 +47,12 @@
 		<p>Gathering Mana...</p>
 	</div>
 {:else}
-	<div class="app-container" transition:fade={{ duration: 300 }}>
-		<Navbar />
-		<main class="main-content">
-			<div class="content-wrapper" in:fly={{ y: 20, duration: 300, delay: 100 }}>
+	<div class="app-container" class:game-mode={isGamePage} transition:fade={{ duration: 300 }}>
+		{#if !isGamePage}
+			<Navbar />
+		{/if}
+		<main class="main-content" class:full-screen={isGamePage}>
+			<div class="content-wrapper" class:no-padding={isGamePage} in:fly={{ y: 20, duration: 300, delay: 100 }}>
 				<slot />
 			</div>
 		</main>
@@ -110,6 +115,22 @@
 		flex: 1;
 		width: 100%;
 		margin: 0 auto;
+	}
+
+	/* Game Mode - Full screen immersive experience */
+	.app-container.game-mode {
+		background: #0a0d12;
+	}
+
+	.main-content.full-screen {
+		position: fixed;
+		inset: 0;
+		padding: 0;
+	}
+
+	.content-wrapper.no-padding {
+		padding: 0;
+		height: 100%;
 	}
 
 	/* Responsive */

@@ -30,7 +30,7 @@
 		joinGame,
 		fetchGameView,
 		passPriority,
-		passUntilEndOfTurn,
+		passUntilMyNextTurn,
 		concedeGame,
 		sendPlayerUUID,
 		sendPlayerBoolean,
@@ -48,7 +48,7 @@
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
 	import Graveyard from '$lib/components/game/Graveyard.svelte';
 	import ManaPool from '$lib/components/game/ManaPool.svelte';
-	import PhaseIndicator from '$lib/components/game/PhaseIndicator.svelte';
+	import GameHeader from '$lib/components/game/GameHeader.svelte';
 	import Stack from '$lib/components/game/Stack.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	
@@ -121,6 +121,14 @@
 	// Check if local player has already kept their hand (waiting for other players)
 	const hasKeptHand = $derived(me?.keptHand ?? false);
 
+	// Is it the local player's turn?
+	const isYourTurn = $derived(
+		gameState.gameView?.activePlayerId === localPlayerId
+	);
+
+	// Does the local player have any available actions? (server-computed)
+	const myHasAvailableActions = $derived(me?.hasAvailableActions ?? false);
+
 	// Get active player name - use server-provided value
 	const activePlayerName = $derived(
 		gameState.gameView?.activePlayerName || 'Unknown'
@@ -129,6 +137,13 @@
 	// Game format - use server-provided value
 	const gameFormat = $derived(
 		gameState.gameView?.gameFormat || 'Game'
+	);
+
+	// Priority player name - who currently has priority
+	const priorityPlayerName = $derived(
+		gameState.gameView?.priorityPlayerId 
+			? playerNames.get(gameState.gameView.priorityPlayerId) || gameState.gameView.priorityPlayerId
+			: ''
 	);
 
 	/**
@@ -193,13 +208,24 @@
 	 * Initialize game connection
 	 */
 	async function initializeGame() {
-		if (!localPlayerId || !gameId) {
-			console.error('Missing player ID or game ID');
+		// Read player ID directly from auth store to avoid timing issues with $derived
+		const playerId = $auth.user?.username || '';
+		
+		console.log('[GamePage] initializeGame called', { 
+			gameId, 
+			playerId,
+			localPlayerId,
+			authUser: $auth.user,
+			isAuthenticated: $auth.isAuthenticated 
+		});
+		
+		if (!playerId || !gameId) {
+			console.error('[GamePage] Missing player ID or game ID', { playerId, gameId });
 			return;
 		}
 
 		try {
-			console.log('[GamePage] Starting game initialization...', { gameId, localPlayerId });
+			console.log('[GamePage] Starting game initialization...', { gameId, playerId });
 
 			const wsState = $websocketStore;
 			if (wsState.state !== 'connected') {
@@ -215,14 +241,14 @@
 			}
 
 			console.log('[GamePage] Initializing game store...');
-			gameStore.initGame(gameId, localPlayerId);
+			gameStore.initGame(gameId, playerId);
 
 			console.log('[GamePage] Joining game...');
 			await joinGame(gameId);
 			console.log('[GamePage] Joined game successfully');
 
 			console.log('[GamePage] Fetching initial game state...');
-			const gameView = await fetchGameView(gameId, localPlayerId);
+			const gameView = await fetchGameView(gameId, playerId);
 			console.log('[GamePage] Got game state:', {
 				players: gameView.players?.length,
 				turn: gameView.turn,
@@ -264,15 +290,19 @@
 	/**
 	 * Handle pass until end of turn (F6)
 	 */
+	/**
+	 * Handle pass until player's next turn (F6)
+	 * This passes priority automatically until your next upkeep step
+	 */
 	async function handlePassUntilEOT() {
 		if (!havePriority || isActionLoading || !gameId) return;
 
 		isActionLoading = true;
 		try {
-			await passUntilEndOfTurn(gameId);
-			addLogEntry('You passed until end of turn');
+			await passUntilMyNextTurn(gameId);
+			addLogEntry('You will pass until your next turn');
 		} catch (err) {
-			console.error('Failed to pass until EOT:', err);
+			console.error('Failed to pass until next turn:', err);
 		} finally {
 			isActionLoading = false;
 		}
@@ -552,9 +582,81 @@
 		return 'top';
 	}
 
+	// Track if we're in the middle of an auto-pass to prevent double-triggers
+	let isAutoPassPending = $state(false);
+
+	/**
+	 * Auto-pass effect - triggers when auto-pass conditions are met
+	 * Conditions checked:
+	 * 1. Player has priority
+	 * 2. Not in mulligan phase
+	 * 3. Not already loading an action
+	 * 4. Game is initialized
+	 * 5. Either:
+	 *    - "Auto-pass on opponent's turn" is enabled AND it's not your turn
+	 *    - "Auto-pass when no actions" is enabled AND server says no available actions
+	 */
+	$effect(() => {
+		// Skip if not ready for auto-pass
+		if (!initialized || isMulliganPhase || isActionLoading || isAutoPassPending || !gameId) {
+			return;
+		}
+
+		// Must have priority to pass
+		if (!havePriority) {
+			return;
+		}
+
+		// Check auto-pass conditions
+		let shouldAutoPass = false;
+		let reason = '';
+
+		// Condition 1: Auto-pass on opponent's turn
+		if (autoPassSettings.opponentTurn && !isYourTurn) {
+			shouldAutoPass = true;
+			reason = "opponent's turn";
+		}
+
+		// Condition 2: Auto-pass when no available actions (server-computed)
+		if (autoPassSettings.noActions && !myHasAvailableActions) {
+			shouldAutoPass = true;
+			reason = 'no available actions';
+		}
+
+		if (shouldAutoPass) {
+			console.log(`[AutoPass] Triggering auto-pass: ${reason}`);
+			isAutoPassPending = true;
+
+			// Capture gameId in local scope for the async callback
+			const currentGameId = gameId;
+
+			// Use setTimeout to avoid synchronous state updates in effect
+			setTimeout(async () => {
+				try {
+					if (currentGameId) {
+						await passPriority(currentGameId);
+						addLogEntry(`Auto-passed (${reason})`);
+					}
+				} catch (err) {
+					console.error('[AutoPass] Failed to auto-pass:', err);
+				} finally {
+					isAutoPassPending = false;
+				}
+			}, 50); // Small delay for smoother UX
+		}
+	});
+
 	// Initialize on mount
 	onMount(() => {
+		console.log('[GamePage] onMount called', {
+			isAuthenticated: $auth.isAuthenticated,
+			user: $auth.user,
+			gameId,
+			localPlayerId
+		});
+		
 		if (!$auth.isAuthenticated) {
+			console.log('[GamePage] Not authenticated, redirecting to login');
 			goto('/login');
 			return;
 		}
@@ -601,42 +703,29 @@
 			hasKeptHand={hasKeptHand}
 		/>
 	{:else}
-		<!-- Compact Header with Sidebar Toggles -->
-		<header class="game-header">
-			<div class="header-left">
-				<button class="icon-btn" onclick={() => showActionLog = true} title="Action Log">
-					📋
-				</button>
-				<div class="game-info">
-					<span class="format-badge">{gameFormat}</span>
-					<span class="turn-info">Turn {turn}</span>
-					<span class="active-player">{activePlayerName}'s turn</span>
-				</div>
-			</div>
-			
-			<div class="header-center">
-				<PhaseIndicator
-					currentPhase={toGamePhase(step || phase)}
-					activePlayerId={gameState.gameView?.activePlayerId || ''}
-					{localPlayerId}
-					animated={true}
-				/>
-			</div>
+		<!-- Game Header - Clean UX answering key questions -->
+		<GameHeader
+			{turn}
+			{activePlayerName}
+			{priorityPlayerName}
+			localPlayerName={localPlayerId}
+			{hasPriority}
+			currentPhase={toGamePhase(step || phase)}
+			onLogClick={() => showActionLog = true}
+			onConcedeClick={handleConcede}
+		/>
 
-			<div class="header-right">
-				{#if stackCards.length > 0}
-					<button class="icon-btn stack-btn" onclick={toggleStack} title="View Stack">
-						📚 <span class="badge">{stackCards.length}</span>
-					</button>
-				{/if}
-				<button class="icon-btn" onclick={() => showChat = true} title="Game Chat">
-					💬
+		<!-- Floating action buttons -->
+		<div class="floating-actions">
+			{#if stackCards.length > 0}
+				<button class="floating-btn stack-btn" onclick={toggleStack} title="View Stack">
+					📚 <span class="badge">{stackCards.length}</span>
 				</button>
-				<button class="btn-concede" onclick={handleConcede} title="Concede Game">
-					🏳️ Concede
-				</button>
-			</div>
-		</header>
+			{/if}
+			<button class="floating-btn" onclick={() => showChat = true} title="Game Chat">
+				💬
+			</button>
+		</div>
 
 		<!-- Prompt Overlay -->
 		{#if prompt}
@@ -931,54 +1020,41 @@
 		margin-bottom: 1.5rem;
 	}
 
-	/* Header */
-	.game-header {
+	/* Floating action buttons */
+	.floating-actions {
+		position: fixed;
+		top: 100px;
+		right: 16px;
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 0.5rem 1rem;
-		background: linear-gradient(to bottom, #141821, #0f1419);
-		border-bottom: 1px solid #2a3441;
-		z-index: 10;
-		flex-shrink: 0;
+		flex-direction: column;
+		gap: 0.5rem;
+		z-index: 50;
 	}
 
-	.header-left,
-	.header-right {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.header-center {
-		flex: 1;
-		display: flex;
-		justify-content: center;
-		max-width: 600px;
-	}
-
-	.icon-btn {
-		width: 40px;
-		height: 40px;
+	.floating-btn {
+		width: 44px;
+		height: 44px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #1a1f2e;
+		background: rgba(26, 31, 46, 0.95);
 		border: 1px solid #2a3441;
-		border-radius: 8px;
-		font-size: 1.125rem;
+		border-radius: 10px;
+		font-size: 1.25rem;
 		cursor: pointer;
 		transition: all 0.2s;
 		color: #fff;
 		position: relative;
+		backdrop-filter: blur(8px);
 	}
 
-	.icon-btn:hover {
+	.floating-btn:hover {
 		background: #2a3441;
 		border-color: #374151;
+		transform: scale(1.05);
 	}
 
-	.icon-btn .badge {
+	.floating-btn .badge {
 		position: absolute;
 		top: -4px;
 		right: -4px;
@@ -994,46 +1070,14 @@
 		justify-content: center;
 	}
 
-	.game-info {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
+	.floating-btn.stack-btn {
+		background: rgba(251, 191, 36, 0.15);
+		border-color: rgba(251, 191, 36, 0.3);
 	}
 
-	.format-badge {
-		padding: 0.25rem 0.625rem;
-		background: #667eea;
-		border-radius: 4px;
-		font-size: 0.75rem;
-		font-weight: 600;
-	}
-
-	.turn-info {
-		font-size: 0.875rem;
-		color: #fbbf24;
-		font-weight: 600;
-	}
-
-	.active-player {
-		font-size: 0.875rem;
-		color: #9ca3af;
-	}
-
-	.btn-concede {
-		padding: 0.5rem 0.875rem;
-		background: rgba(239, 68, 68, 0.15);
-		border: 1px solid rgba(239, 68, 68, 0.3);
-		border-radius: 6px;
-		color: #ef4444;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-
-	.btn-concede:hover {
-		background: rgba(239, 68, 68, 0.25);
-		border-color: #ef4444;
+	.floating-btn.stack-btn:hover {
+		background: rgba(251, 191, 36, 0.25);
+		border-color: rgba(251, 191, 36, 0.5);
 	}
 
 	.btn-primary {
@@ -1292,23 +1336,19 @@
 
 	/* Responsive */
 	@media (max-width: 900px) {
-		.game-header {
-			flex-wrap: wrap;
-			gap: 0.5rem;
-		}
-
-		.header-center {
-			order: 3;
-			width: 100%;
-			max-width: none;
-		}
-
-		.active-player {
-			display: none;
-		}
-
 		.opponents-row > :global(*) {
 			min-width: 200px;
+		}
+
+		.floating-actions {
+			top: 80px;
+			right: 8px;
+		}
+
+		.floating-btn {
+			width: 38px;
+			height: 38px;
+			font-size: 1.125rem;
 		}
 	}
 
@@ -1316,14 +1356,6 @@
 		.game-layout {
 			padding: 0.5rem;
 			padding-bottom: 70px;
-		}
-
-		.game-info {
-			gap: 0.5rem;
-		}
-
-		.format-badge {
-			display: none;
 		}
 
 		.opponents-row > :global(*) {

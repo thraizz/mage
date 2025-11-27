@@ -316,6 +316,7 @@
 	.debug-overlay {
 		position: fixed;
 		inset: 0;
+        top: 9rem;
 		background: #2d2d2d;
 		z-index: 2000;
 		overflow: hidden;

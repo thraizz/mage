@@ -286,6 +286,8 @@ export interface PlayerView {
   wins: number;
   /** Whether player has kept their hand during mulligan phase */
   keptHand: boolean;
+  /** Server-computed: does this player have any legal actions right now? */
+  hasAvailableActions: boolean;
 }
 
 /** CardView represents a card */
@@ -1902,6 +1904,7 @@ function createBasePlayerView(): PlayerView {
     left: false,
     wins: 0,
     keptHand: false,
+    hasAvailableActions: false,
   };
 }
 
@@ -1957,6 +1960,9 @@ export const PlayerView: MessageFns<PlayerView> = {
     }
     if (message.keptHand !== false) {
       writer.uint32(136).bool(message.keptHand);
+    }
+    if (message.hasAvailableActions !== false) {
+      writer.uint32(144).bool(message.hasAvailableActions);
     }
     return writer;
   },
@@ -2104,6 +2110,14 @@ export const PlayerView: MessageFns<PlayerView> = {
           message.keptHand = reader.bool();
           continue;
         }
+        case 18: {
+          if (tag !== 144) {
+            break;
+          }
+
+          message.hasAvailableActions = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2134,6 +2148,7 @@ export const PlayerView: MessageFns<PlayerView> = {
       left: isSet(object.left) ? globalThis.Boolean(object.left) : false,
       wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
       keptHand: isSet(object.keptHand) ? globalThis.Boolean(object.keptHand) : false,
+      hasAvailableActions: isSet(object.hasAvailableActions) ? globalThis.Boolean(object.hasAvailableActions) : false,
     };
   },
 
@@ -2190,6 +2205,9 @@ export const PlayerView: MessageFns<PlayerView> = {
     if (message.keptHand !== false) {
       obj.keptHand = message.keptHand;
     }
+    if (message.hasAvailableActions !== false) {
+      obj.hasAvailableActions = message.hasAvailableActions;
+    }
     return obj;
   },
 
@@ -2217,6 +2235,7 @@ export const PlayerView: MessageFns<PlayerView> = {
     message.left = object.left ?? false;
     message.wins = object.wins ?? 0;
     message.keptHand = object.keptHand ?? false;
+    message.hasAvailableActions = object.hasAvailableActions ?? false;
     return message;
   },
 };

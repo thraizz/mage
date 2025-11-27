@@ -5,6 +5,7 @@
 
 import { writable, derived, get } from 'svelte/store';
 import { websocketStore } from './websocket';
+import { toast } from './toast';
 import { CallbackMethod } from '$lib/generated/mage/v1/websocket';
 import type {
 	GameInitData,
@@ -206,6 +207,18 @@ function createGameStore() {
 			websocketStore.on(CallbackMethod.GAME_ERROR, (data) => {
 				const errorData = data as GameErrorData;
 				console.error('[GameStore] GAME_ERROR:', errorData);
+				
+				// Show toast notification for game errors
+				if (errorData.error) {
+					// Clean up the error message for display
+					let errorMessage = errorData.error;
+					// Remove the "action failed and state restored: " prefix if present
+					if (errorMessage.includes('action failed and state restored: ')) {
+						errorMessage = errorMessage.replace('action failed and state restored: ', '');
+					}
+					toast.error(errorMessage);
+				}
+				
 				update((s) => ({
 					...s,
 					error: errorData.error
