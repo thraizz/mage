@@ -157,6 +157,9 @@ service MageServer {
   // Quit a match
   rpc MatchQuit(MatchQuitRequest) returns (MatchQuitResponse);
 
+  // Get list of active games user is participating in (for reconnection)
+  rpc GetMyActiveGames(GetMyActiveGamesRequest) returns (GetMyActiveGamesResponse);
+
   // ==================== Draft (6 methods) ====================
 
   // Join a draft

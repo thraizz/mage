@@ -232,3 +232,27 @@ message ReplaySkipForwardResponse {
   bool success = 1;
   string error = 2;
 }
+
+// Active Game Recovery Messages
+
+// GetMyActiveGames retrieves all active games the current user is participating in
+// Used for reconnection after disconnection or server restart
+message GetMyActiveGamesRequest {
+  string session_id = 1;
+}
+
+// ActiveGameInfo represents summary information about an active game
+message ActiveGameInfo {
+  string game_id = 1;
+  string table_id = 2;
+  string game_type = 3;
+  repeated string players = 4;
+  int32 turn_number = 5;
+  string state = 6;  // STARTING, MULLIGAN, IN_PROGRESS, PAUSED
+  string created_at = 7;  // ISO8601 timestamp
+  string updated_at = 8;  // ISO8601 timestamp
+}
+
+message GetMyActiveGamesResponse {
+  repeated ActiveGameInfo games = 1;
+}

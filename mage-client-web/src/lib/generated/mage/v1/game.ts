@@ -344,6 +344,33 @@ export interface ReplaySkipForwardResponse {
   error: string;
 }
 
+/**
+ * GetMyActiveGames retrieves all active games the current user is participating in
+ * Used for reconnection after disconnection or server restart
+ */
+export interface GetMyActiveGamesRequest {
+  sessionId: string;
+}
+
+/** ActiveGameInfo represents summary information about an active game */
+export interface ActiveGameInfo {
+  gameId: string;
+  tableId: string;
+  gameType: string;
+  players: string[];
+  turnNumber: number;
+  /** STARTING, MULLIGAN, IN_PROGRESS, PAUSED */
+  state: string;
+  /** ISO8601 timestamp */
+  createdAt: string;
+  /** ISO8601 timestamp */
+  updatedAt: string;
+}
+
+export interface GetMyActiveGamesResponse {
+  games: ActiveGameInfo[];
+}
+
 function createBaseGameJoinRequest(): GameJoinRequest {
   return { sessionId: "", gameId: "" };
 }
@@ -3402,6 +3429,296 @@ export const ReplaySkipForwardResponse: MessageFns<ReplaySkipForwardResponse> = 
     const message = createBaseReplaySkipForwardResponse();
     message.success = object.success ?? false;
     message.error = object.error ?? "";
+    return message;
+  },
+};
+
+function createBaseGetMyActiveGamesRequest(): GetMyActiveGamesRequest {
+  return { sessionId: "" };
+}
+
+export const GetMyActiveGamesRequest: MessageFns<GetMyActiveGamesRequest> = {
+  encode(message: GetMyActiveGamesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetMyActiveGamesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetMyActiveGamesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.sessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetMyActiveGamesRequest {
+    return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "" };
+  },
+
+  toJSON(message: GetMyActiveGamesRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetMyActiveGamesRequest>): GetMyActiveGamesRequest {
+    return GetMyActiveGamesRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetMyActiveGamesRequest>): GetMyActiveGamesRequest {
+    const message = createBaseGetMyActiveGamesRequest();
+    message.sessionId = object.sessionId ?? "";
+    return message;
+  },
+};
+
+function createBaseActiveGameInfo(): ActiveGameInfo {
+  return { gameId: "", tableId: "", gameType: "", players: [], turnNumber: 0, state: "", createdAt: "", updatedAt: "" };
+}
+
+export const ActiveGameInfo: MessageFns<ActiveGameInfo> = {
+  encode(message: ActiveGameInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.gameId !== "") {
+      writer.uint32(10).string(message.gameId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(18).string(message.tableId);
+    }
+    if (message.gameType !== "") {
+      writer.uint32(26).string(message.gameType);
+    }
+    for (const v of message.players) {
+      writer.uint32(34).string(v!);
+    }
+    if (message.turnNumber !== 0) {
+      writer.uint32(40).int32(message.turnNumber);
+    }
+    if (message.state !== "") {
+      writer.uint32(50).string(message.state);
+    }
+    if (message.createdAt !== "") {
+      writer.uint32(58).string(message.createdAt);
+    }
+    if (message.updatedAt !== "") {
+      writer.uint32(66).string(message.updatedAt);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ActiveGameInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseActiveGameInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.gameId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.tableId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.gameType = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.players.push(reader.string());
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.turnNumber = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.state = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.createdAt = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.updatedAt = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ActiveGameInfo {
+    return {
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+      gameType: isSet(object.gameType) ? globalThis.String(object.gameType) : "",
+      players: globalThis.Array.isArray(object?.players) ? object.players.map((e: any) => globalThis.String(e)) : [],
+      turnNumber: isSet(object.turnNumber) ? globalThis.Number(object.turnNumber) : 0,
+      state: isSet(object.state) ? globalThis.String(object.state) : "",
+      createdAt: isSet(object.createdAt) ? globalThis.String(object.createdAt) : "",
+      updatedAt: isSet(object.updatedAt) ? globalThis.String(object.updatedAt) : "",
+    };
+  },
+
+  toJSON(message: ActiveGameInfo): unknown {
+    const obj: any = {};
+    if (message.gameId !== "") {
+      obj.gameId = message.gameId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    if (message.gameType !== "") {
+      obj.gameType = message.gameType;
+    }
+    if (message.players?.length) {
+      obj.players = message.players;
+    }
+    if (message.turnNumber !== 0) {
+      obj.turnNumber = Math.round(message.turnNumber);
+    }
+    if (message.state !== "") {
+      obj.state = message.state;
+    }
+    if (message.createdAt !== "") {
+      obj.createdAt = message.createdAt;
+    }
+    if (message.updatedAt !== "") {
+      obj.updatedAt = message.updatedAt;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ActiveGameInfo>): ActiveGameInfo {
+    return ActiveGameInfo.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ActiveGameInfo>): ActiveGameInfo {
+    const message = createBaseActiveGameInfo();
+    message.gameId = object.gameId ?? "";
+    message.tableId = object.tableId ?? "";
+    message.gameType = object.gameType ?? "";
+    message.players = object.players?.map((e) => e) || [];
+    message.turnNumber = object.turnNumber ?? 0;
+    message.state = object.state ?? "";
+    message.createdAt = object.createdAt ?? "";
+    message.updatedAt = object.updatedAt ?? "";
+    return message;
+  },
+};
+
+function createBaseGetMyActiveGamesResponse(): GetMyActiveGamesResponse {
+  return { games: [] };
+}
+
+export const GetMyActiveGamesResponse: MessageFns<GetMyActiveGamesResponse> = {
+  encode(message: GetMyActiveGamesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.games) {
+      ActiveGameInfo.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetMyActiveGamesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetMyActiveGamesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.games.push(ActiveGameInfo.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetMyActiveGamesResponse {
+    return {
+      games: globalThis.Array.isArray(object?.games) ? object.games.map((e: any) => ActiveGameInfo.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: GetMyActiveGamesResponse): unknown {
+    const obj: any = {};
+    if (message.games?.length) {
+      obj.games = message.games.map((e) => ActiveGameInfo.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetMyActiveGamesResponse>): GetMyActiveGamesResponse {
+    return GetMyActiveGamesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetMyActiveGamesResponse>): GetMyActiveGamesResponse {
+    const message = createBaseGetMyActiveGamesResponse();
+    message.games = object.games?.map((e) => ActiveGameInfo.fromPartial(e)) || [];
     return message;
   },
 };

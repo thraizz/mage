@@ -170,6 +170,8 @@ func (h *HTTPJSONHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleMatchQuit(ctx, w, r)
 	case "SendSpecialAction":
 		h.handleSendSpecialAction(ctx, w, r)
+	case "GetMyActiveGames":
+		h.handleGetMyActiveGames(ctx, w, r)
 
 	// Draft
 	case "DraftJoin":
@@ -1164,6 +1166,23 @@ func (h *HTTPJSONHandler) handleSendSpecialAction(ctx context.Context, w http.Re
 	}
 
 	resp, err := h.mageServer.SendSpecialAction(ctx, &req)
+	if err != nil {
+		h.writeErrorResponse(w, err)
+		return
+	}
+
+	h.writeSuccessResponse(w, resp)
+}
+
+// handleGetMyActiveGames handles the GetMyActiveGames method for game reconnection
+func (h *HTTPJSONHandler) handleGetMyActiveGames(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	var req pb.GetMyActiveGamesRequest
+	if err := h.unmarshalRequest(r, &req); err != nil {
+		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.mageServer.GetMyActiveGames(ctx, &req)
 	if err != nil {
 		h.writeErrorResponse(w, err)
 		return

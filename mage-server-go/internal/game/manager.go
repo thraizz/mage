@@ -172,6 +172,45 @@ func (m *Manager) CreateGame(tableID, gameType string, players []string) *Game {
 	return game
 }
 
+// RestoreGame restores a game with a specific ID (for crash recovery)
+func (m *Manager) RestoreGame(gameID, tableID, gameType string, players []string, state GameState) *Game {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// Check if game already exists
+	if _, exists := m.games[gameID]; exists {
+		m.logger.Warn("attempted to restore game that already exists",
+			zap.String("game_id", gameID),
+		)
+		return m.games[gameID]
+	}
+
+	// Create a new game struct with the restored ID
+	game := &Game{
+		ID:          gameID,
+		TableID:     tableID,
+		GameType:    gameType,
+		State:       state,
+		Players:     players,
+		Turn:        1, // Will be updated by engine
+		StartTime:   time.Now(),
+		ActionQueue: make(chan PlayerAction, 100),
+		Watchers:    make(map[string]bool),
+	}
+
+	m.games[gameID] = game
+	m.gamesByTable[tableID] = gameID
+
+	m.logger.Info("game restored",
+		zap.String("game_id", gameID),
+		zap.String("table_id", tableID),
+		zap.String("game_type", gameType),
+		zap.Strings("players", players),
+	)
+
+	return game
+}
+
 // GetGame retrieves a game by ID
 func (m *Manager) GetGame(gameID string) (*Game, bool) {
 	m.mu.RLock()

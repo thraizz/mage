@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { auth } from '$lib/stores/auth';
 	import { websocketStore } from '$lib/stores/websocket';
 	import type { Table, GameFormat } from '$lib/types/table';
 	import type { OnlinePlayer } from '$lib/types/player';
-	import { fetchTables, fetchOnlinePlayers, getGameFormats } from '$lib/api/lobby';
+	import type { ActiveGame } from '$lib/types/game';
+	import { fetchTables, fetchOnlinePlayers, getGameFormats, fetchMyActiveGames } from '$lib/api/lobby';
 	import {
 		subscribeLobbyUpdates,
 		connectLobbyUpdates,
@@ -24,6 +26,9 @@
 	let tables = $state<Table[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+
+	// Active games state (for reconnection)
+	let activeGames = $state<ActiveGame[]>([]);
 
 	// Online players state
 	let onlinePlayers = $state<OnlinePlayer[]>([]);
@@ -72,6 +77,51 @@
 		} catch (err) {
 			console.error('Failed to load online players:', err);
 		}
+	}
+
+	/**
+	 * Load active games for reconnection
+	 */
+	async function loadActiveGames(): Promise<void> {
+		try {
+			activeGames = await fetchMyActiveGames();
+		} catch (err) {
+			console.error('Failed to load active games:', err);
+		}
+	}
+
+	/**
+	 * Rejoin an active game
+	 */
+	function rejoinGame(gameId: string): void {
+		goto(`/game/${gameId}`);
+	}
+
+	/**
+	 * Format game state for display
+	 */
+	function formatGameState(state: string): string {
+		switch (state) {
+			case 'STARTING':
+				return 'Starting';
+			case 'MULLIGAN':
+				return 'Mulligan';
+			case 'IN_PROGRESS':
+				return 'In Progress';
+			case 'PAUSED':
+				return 'Paused';
+			default:
+				return state;
+		}
+	}
+
+	/**
+	 * Get opponent names from players list
+	 */
+	function getOpponents(players: string[]): string {
+		const currentUsername = $auth.user?.username;
+		const opponents = players.filter(p => p !== currentUsername);
+		return opponents.length > 0 ? opponents.join(', ') : 'Unknown';
 	}
 
 	/**
@@ -254,6 +304,7 @@
 					// Load initial data
 					await loadTables();
 					await loadOnlinePlayers();
+					await loadActiveGames();
 
 					// Connect WebSocket for real-time updates
 					await connectWebSocket();
@@ -457,33 +508,74 @@
 					<p class="error-message">{error}</p>
 					<button class="retry-button" onclick={handleRefresh}>Try Again</button>
 				</div>
-			{:else if tables.length === 0}
-				<!-- Empty State - No Tables -->
-				<div class="empty-container">
-					<div class="empty-icon">🎮</div>
-					<h2 class="empty-title">The Battlefield Awaits</h2>
-					<p class="empty-message">
-						No planeswalkers have arrived yet. Be the first to summon a table!
-					</p>
-					<button class="create-table-button" onclick={openCreateModal}>Summon Table</button>
-				</div>
-			{:else if filteredTables().length === 0}
-				<!-- Empty State - No Results -->
-				<div class="empty-container">
-					<div class="empty-icon">🔍</div>
-					<h2 class="empty-title">Tutor Failed</h2>
-					<p class="empty-message">
-						No tables match your scry filters. Adjust your search or clear filters.
-					</p>
-					<button class="clear-filters-button" onclick={clearFilters}>Clear Filters</button>
-				</div>
 			{:else}
-				<!-- Tables Grid -->
-				<div class="tables-grid">
-					{#each filteredTables() as table (table.id)}
-						<TableCard {table} onClick={handleTableClick} />
-					{/each}
-				</div>
+				<!-- Active Games Section (if any) -->
+				{#if activeGames.length > 0}
+					<div class="active-games-section">
+						<div class="section-header">
+							<div class="section-title">
+								<span class="section-icon">⚔️</span>
+								<h2>Your Active Games</h2>
+								<span class="active-count">{activeGames.length}</span>
+							</div>
+							<p class="section-description">You have ongoing games awaiting your return</p>
+						</div>
+						<div class="active-games-list">
+							{#each activeGames as game (game.gameId)}
+								<div class="active-game-card">
+									<div class="game-info">
+										<div class="game-header">
+											<span class="game-type">{game.gameType}</span>
+											<span class="game-state" class:in-progress={game.state === 'IN_PROGRESS'} class:mulligan={game.state === 'MULLIGAN'}>
+												{formatGameState(game.state)}
+											</span>
+										</div>
+										<div class="game-details">
+											<span class="game-opponent">vs {getOpponents(game.players)}</span>
+											<span class="game-turn">Turn {game.turnNumber}</span>
+										</div>
+									</div>
+									<button class="rejoin-button" onclick={() => rejoinGame(game.gameId)}>
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M5 12h14"></path>
+											<path d="m12 5 7 7-7 7"></path>
+										</svg>
+										Rejoin
+									</button>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				{#if tables.length === 0}
+					<!-- Empty State - No Tables -->
+					<div class="empty-container">
+						<div class="empty-icon">🎮</div>
+						<h2 class="empty-title">The Battlefield Awaits</h2>
+						<p class="empty-message">
+							No planeswalkers have arrived yet. Be the first to summon a table!
+						</p>
+						<button class="create-table-button" onclick={openCreateModal}>Summon Table</button>
+					</div>
+				{:else if filteredTables().length === 0}
+					<!-- Empty State - No Results -->
+					<div class="empty-container">
+						<div class="empty-icon">🔍</div>
+						<h2 class="empty-title">Tutor Failed</h2>
+						<p class="empty-message">
+							No tables match your scry filters. Adjust your search or clear filters.
+						</p>
+						<button class="clear-filters-button" onclick={clearFilters}>Clear Filters</button>
+					</div>
+				{:else}
+					<!-- Tables Grid -->
+					<div class="tables-grid">
+						{#each filteredTables() as table (table.id)}
+							<TableCard {table} onClick={handleTableClick} />
+						{/each}
+					</div>
+				{/if}
 			{/if}
 		</div>
 
@@ -999,6 +1091,155 @@
 	.clear-filters-button:hover {
 		background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
 		box-shadow: 0 4px 12px rgba(255, 77, 77, 0.4);
+		transform: translateY(-1px);
+	}
+
+	/* Active Games Section */
+	.active-games-section {
+		margin-bottom: var(--space-8);
+		background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+		border: 1px solid var(--ci-jace-cloak);
+		border-radius: var(--radius-lg);
+		padding: var(--space-6);
+	}
+
+	.section-header {
+		margin-bottom: var(--space-4);
+	}
+
+	.section-title {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		margin-bottom: var(--space-2);
+	}
+
+	.section-icon {
+		font-size: var(--text-2xl);
+	}
+
+	.section-title h2 {
+		font-family: var(--font-display);
+		font-size: var(--text-xl);
+		font-weight: var(--weight-bold);
+		color: var(--ci-scroll-parchment);
+		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
+	.active-count {
+		background: var(--ci-jace-cloak);
+		color: var(--ci-scroll-parchment);
+		padding: var(--space-1) var(--space-3);
+		border-radius: var(--radius-full);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
+	}
+
+	.section-description {
+		color: var(--text-muted);
+		font-size: var(--text-sm);
+		margin: 0;
+		font-style: italic;
+	}
+
+	.active-games-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+	}
+
+	.active-game-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		background: var(--bg-obsidian);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		padding: var(--space-4);
+		transition: all var(--transition-fast);
+	}
+
+	.active-game-card:hover {
+		border-color: var(--ci-jace-cloak);
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+	}
+
+	.game-info {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.game-header {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+	}
+
+	.game-type {
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
+		font-size: var(--text-base);
+	}
+
+	.game-state {
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--radius-sm);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-semibold);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		background: var(--bg-steel);
+		color: var(--text-muted);
+	}
+
+	.game-state.in-progress {
+		background: rgba(46, 204, 113, 0.2);
+		color: var(--ci-forest-emerald);
+	}
+
+	.game-state.mulligan {
+		background: rgba(245, 158, 11, 0.2);
+		color: var(--status-warning);
+	}
+
+	.game-details {
+		display: flex;
+		align-items: center;
+		gap: var(--space-4);
+		color: var(--text-muted);
+		font-size: var(--text-sm);
+	}
+
+	.game-opponent {
+		font-weight: var(--weight-medium);
+	}
+
+	.game-turn {
+		opacity: 0.8;
+	}
+
+	.rejoin-button {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-4);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		color: var(--ci-scroll-parchment);
+		border: none;
+		border-radius: var(--radius-md);
+		font-weight: var(--weight-semibold);
+		font-size: var(--text-sm);
+		cursor: pointer;
+		transition: all var(--transition-fast);
+		box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+	}
+
+	.rejoin-button:hover {
+		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 		transform: translateY(-1px);
 	}
 

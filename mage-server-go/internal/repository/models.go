@@ -165,3 +165,35 @@ func (m *MatchHistory) SetPlayersFromJSON(jsonStr string) error {
 func (m *MatchHistory) Duration() time.Duration {
 	return time.Duration(m.DurationSeconds) * time.Second
 }
+
+// ActiveGame represents an ongoing game that can be persisted and restored
+type ActiveGame struct {
+	ID         int64
+	GameID     string
+	TableID    string
+	GameType   string
+	Players    []string // Player usernames
+	GameState  []byte   // Serialized gameStateSnapshot (gob encoded)
+	TurnNumber int
+	State      string // STARTING, MULLIGAN, IN_PROGRESS, PAUSED, FINISHED
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
+// PlayersJSON returns the players slice as JSON string
+func (ag *ActiveGame) PlayersJSON() (string, error) {
+	data, err := json.Marshal(ag.Players)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+// SetPlayersFromJSON parses JSON string into Players slice
+func (ag *ActiveGame) SetPlayersFromJSON(jsonStr string) error {
+	if jsonStr == "" {
+		ag.Players = []string{}
+		return nil
+	}
+	return json.Unmarshal([]byte(jsonStr), &ag.Players)
+}

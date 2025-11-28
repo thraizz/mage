@@ -189,3 +189,24 @@ export type ActionType =
 	| 'mana'
 	| 'life'
 	| 'system';
+
+/**
+ * Active game info for reconnection after disconnect or server restart
+ */
+export interface ActiveGame {
+	gameId: string;
+	tableId: string;
+	gameType: string;
+	players: string[];
+	turnNumber: number;
+	state: ActiveGameState;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export type ActiveGameState =
+	| 'STARTING'
+	| 'MULLIGAN'
+	| 'IN_PROGRESS'
+	| 'PAUSED'
+	| 'FINISHED';

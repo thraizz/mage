@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/google/uuid"
@@ -597,13 +598,23 @@ type gameStateSnapshot struct {
 	Timestamp time.Time
 }
 
+// PersistenceRepository interface for persisting game state to database
+// This allows the engine to save/restore games without direct DB dependency
+type PersistenceRepository interface {
+	// SaveGameState persists the current game state
+	SaveGameState(ctx context.Context, gameID, tableID, gameType string, players []string, gameState []byte, turnNumber int, state string) error
+	// DeleteActiveGame removes a game from persistence (when finished)
+	DeleteActiveGame(ctx context.Context, gameID string) error
+}
+
 // MageEngine is the main game engine implementation
 type MageEngine struct {
 	logger              *zap.Logger
 	mu                  sync.RWMutex
 	games               map[string]*engineGameState
-	notificationHandler NotificationHandler     // Optional handler for UI/websocket notifications
+	notificationHandler atomic.Value            // Stores NotificationHandler; uses atomic to avoid deadlock with gameState.mu
 	cardRepo            CardRepositoryInterface // Optional card repository for looking up card metadata
+	persistenceRepo     PersistenceRepository   // Optional persistence repository for crash recovery
 
 	// State bookmarking for rollback/undo
 	// Maps gameID -> list of bookmarked states
@@ -650,10 +661,9 @@ func NewMageEngine(logger *zap.Logger) *MageEngine {
 
 // SetNotificationHandler sets the handler for game notifications
 // This allows external systems (UI, websockets) to receive real-time game updates
+// Uses atomic.Value to avoid lock contention with emitNotification
 func (e *MageEngine) SetNotificationHandler(handler NotificationHandler) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	e.notificationHandler = handler
+	e.notificationHandler.Store(handler)
 }
 
 // SetCardRepository sets the card repository for looking up card metadata
@@ -663,28 +673,43 @@ func (e *MageEngine) SetCardRepository(repo CardRepositoryInterface) {
 	e.cardRepo = repo
 }
 
+// SetPersistenceRepository sets the persistence repository for crash recovery
+// When set, game state will be persisted to database at turn boundaries
+func (e *MageEngine) SetPersistenceRepository(repo PersistenceRepository) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.persistenceRepo = repo
+}
+
 // emitNotification sends a notification to the registered handler
 // This method is safe to call while holding gameState locks because:
-//  1. It only briefly acquires e.mu.RLock() to read the handler
+//  1. It uses atomic.Value to read the handler without acquiring any locks
 //  2. The handler is called in a separate goroutine, so it doesn't block
 //  3. The goroutine can safely call back into the engine (e.g., GetGameView)
 //     because it runs asynchronously after emitNotification returns
+//
+// IMPORTANT: This method must NOT acquire e.mu to avoid deadlock:
+// - ProcessAction holds gameState.mu.Lock(), releases it, calls BookmarkState
+// - BookmarkState acquires e.mu.Lock(), then tries gameState.mu.RLock()
+// - Concurrent ProcessAction holds gameState.mu.Lock(), calls notify* -> emitNotification
+// - If emitNotification tried e.mu.RLock(), it would deadlock (AB-BA pattern)
 func (e *MageEngine) emitNotification(notification GameNotification) {
-	// Read handler with RLock to prevent data race with SetNotificationHandler
-	// This is safe even when called while holding gameState.mu because:
-	// - e.mu and gameState.mu are different mutexes (no deadlock)
-	// - RLock allows concurrent reads (no contention)
-	// - The lock is held very briefly (just to read a pointer)
-	e.mu.RLock()
-	handler := e.notificationHandler
-	e.mu.RUnlock()
-
-	if handler != nil {
-		// Call handler in a goroutine to avoid blocking game logic
-		// The goroutine runs asynchronously, so it can safely acquire locks
-		// (e.g., call GetGameView) after emitNotification returns
-		go handler(notification)
+	// Use atomic.Load to read handler without any mutex
+	// This prevents deadlock when called while holding gameState.mu
+	handlerVal := e.notificationHandler.Load()
+	if handlerVal == nil {
+		return
 	}
+
+	handler, ok := handlerVal.(NotificationHandler)
+	if !ok || handler == nil {
+		return
+	}
+
+	// Call handler in a goroutine to avoid blocking game logic
+	// The goroutine runs asynchronously, so it can safely acquire locks
+	// (e.g., call GetGameView) after emitNotification returns
+	go handler(notification)
 }
 
 // notifyPriorityChange notifies that priority has changed
@@ -1216,6 +1241,13 @@ func (e *MageEngine) createStarterCard(id, ownerID, cardName string) *internalCa
 // ProcessAction processes a player action with automatic error recovery
 // Per Java GameImpl.playPriority(): creates bookmark before action, restores on error
 func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err error) {
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] ProcessAction entering",
+			zap.String("game_id", gameID),
+			zap.String("player_id", action.PlayerID),
+			zap.String("action_type", action.ActionType))
+	}
+
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
@@ -1224,8 +1256,22 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 		return fmt.Errorf("game %s not found", gameID)
 	}
 
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] ProcessAction acquiring gameState.mu.Lock",
+			zap.String("game_id", gameID))
+	}
 	gameState.mu.Lock()
-	defer gameState.mu.Unlock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] ProcessAction acquired gameState.mu.Lock",
+			zap.String("game_id", gameID))
+	}
+	defer func() {
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] ProcessAction releasing gameState.mu.Lock (defer)",
+				zap.String("game_id", gameID))
+		}
+		gameState.mu.Unlock()
+	}()
 
 	if gameState.state == GameStateFinished {
 		return fmt.Errorf("game %s has ended", gameID)
@@ -1234,9 +1280,21 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 	// Create bookmark before processing action for error recovery
 	// Per Java GameImpl.playPriority() line 1728: rollbackBookmarkOnPriorityStart = bookmarkState()
 	var bookmarkID int
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] ProcessAction releasing gameState.mu for BookmarkState",
+			zap.String("game_id", gameID))
+	}
 	gameState.mu.Unlock() // Temporarily unlock to call BookmarkState
 	bookmarkID, bookmarkErr := e.BookmarkState(gameID)
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] ProcessAction re-acquiring gameState.mu after BookmarkState",
+			zap.String("game_id", gameID))
+	}
 	gameState.mu.Lock() // Re-acquire lock
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] ProcessAction re-acquired gameState.mu after BookmarkState",
+			zap.String("game_id", gameID))
+	}
 
 	if bookmarkErr != nil {
 		if e.logger != nil {
@@ -1942,6 +2000,15 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 	gameState.turnManager.SetPriority(playerID)
 	gameState.addPrompt(playerID, "You have priority. Cast another spell or pass?", []string{"PASS", "CAST"})
 
+	// Notify clients that caster retains priority after casting
+	// Per MTG rule 117.3c: After casting, the player retains priority
+	e.notifyPriorityChange(gameState.gameID, playerID, map[string]interface{}{
+		"active_player": gameState.turnManager.ActivePlayer(),
+		"phase":         gameState.turnManager.CurrentPhase().String(),
+		"step":          gameState.turnManager.CurrentStep().String(),
+		"reason":        "spell_cast",
+	})
+
 	return nil
 }
 
@@ -2065,6 +2132,14 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 					gameState.turnManager.SetPriority(nextPlayerID)
 					gameState.players[nextPlayerID].HasPriority = true
 					gameState.players[nextPlayerID].Passed = false
+
+					// Notify clients of priority change after countering
+					e.notifyPriorityChange(gameState.gameID, nextPlayerID, map[string]interface{}{
+						"active_player": gameState.turnManager.ActivePlayer(),
+						"phase":         gameState.turnManager.CurrentPhase().String(),
+						"step":          gameState.turnManager.CurrentStep().String(),
+						"reason":        "spell_countered",
+					})
 				}
 
 				return nil
@@ -2220,6 +2295,15 @@ func (e *MageEngine) resolveStack(gameState *engineGameState) error {
 	gameState.turnManager.SetPriority(activePlayerID)
 	gameState.players[activePlayerID].HasPriority = true
 	gameState.addPrompt(activePlayerID, "You have priority. Pass?", []string{"PASS", "CAST"})
+
+	// Notify clients that priority has changed after stack resolution
+	// Per MTG rule 117.3b: After a spell/ability resolves, active player receives priority
+	e.notifyPriorityChange(gameState.gameID, activePlayerID, map[string]interface{}{
+		"active_player": activePlayerID,
+		"phase":         gameState.turnManager.CurrentPhase().String(),
+		"step":          gameState.turnManager.CurrentStep().String(),
+		"reason":        "stack_resolved",
+	})
 
 	return nil
 }
@@ -2515,6 +2599,10 @@ func (e *MageEngine) createTriggeredAbilityForSpell(gameState *engineGameState, 
 
 // GetGameView returns the current game view for a player
 func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
+	if e.logger != nil {
+		e.logger.Info("GetGameView entering", zap.String("game_id", gameID), zap.String("player_id", playerID))
+	}
+
 	e.mu.RLock()
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
@@ -2523,7 +2611,13 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 		return nil, fmt.Errorf("game %s not found", gameID)
 	}
 
+	if e.logger != nil {
+		e.logger.Info("GetGameView acquiring gameState.mu.RLock")
+	}
 	gameState.mu.RLock()
+	if e.logger != nil {
+		e.logger.Info("GetGameView acquired gameState.mu.RLock")
+	}
 	defer gameState.mu.RUnlock()
 
 	// Get player names for display
@@ -4597,17 +4691,43 @@ func (e *MageEngine) copyCard(card *internalCard) *internalCard {
 // The bookmark can be used later to restore the game to this state
 // Per Java GameImpl.bookmarkState(): saves state and returns index for later restoration
 func (e *MageEngine) BookmarkState(gameID string) (int, error) {
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] BookmarkState acquiring e.mu.Lock",
+			zap.String("game_id", gameID))
+	}
 	e.mu.Lock()
-	defer e.mu.Unlock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] BookmarkState acquired e.mu.Lock",
+			zap.String("game_id", gameID))
+	}
+	defer func() {
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] BookmarkState releasing e.mu.Lock",
+				zap.String("game_id", gameID))
+		}
+		e.mu.Unlock()
+	}()
 
 	gameState, exists := e.games[gameID]
 	if !exists {
 		return 0, fmt.Errorf("game %s not found", gameID)
 	}
 
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] BookmarkState acquiring gameState.mu.RLock",
+			zap.String("game_id", gameID))
+	}
 	gameState.mu.RLock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] BookmarkState acquired gameState.mu.RLock",
+			zap.String("game_id", gameID))
+	}
 	snapshot := e.createSnapshot(gameState)
 	gameState.mu.RUnlock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] BookmarkState released gameState.mu.RUnlock",
+			zap.String("game_id", gameID))
+	}
 
 	// Add snapshot to bookmarks
 	if e.bookmarks[gameID] == nil {
@@ -4631,8 +4751,23 @@ func (e *MageEngine) BookmarkState(gameID string) (int, error) {
 // Returns error if bookmark doesn't exist or restoration fails
 // Per Java GameImpl.restoreState(): rolls back to saved state and removes newer bookmarks
 func (e *MageEngine) RestoreState(gameID string, bookmarkID int, context string) error {
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] RestoreState acquiring e.mu.Lock",
+			zap.String("game_id", gameID),
+			zap.Int("bookmark_id", bookmarkID))
+	}
 	e.mu.Lock()
-	defer e.mu.Unlock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] RestoreState acquired e.mu.Lock",
+			zap.String("game_id", gameID))
+	}
+	defer func() {
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] RestoreState releasing e.mu.Lock",
+				zap.String("game_id", gameID))
+		}
+		e.mu.Unlock()
+	}()
 
 	gameState, exists := e.games[gameID]
 	if !exists {
@@ -4646,8 +4781,22 @@ func (e *MageEngine) RestoreState(gameID string, bookmarkID int, context string)
 
 	snapshot := bookmarks[bookmarkID-1]
 
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] RestoreState acquiring gameState.mu.Lock",
+			zap.String("game_id", gameID))
+	}
 	gameState.mu.Lock()
-	defer gameState.mu.Unlock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] RestoreState acquired gameState.mu.Lock",
+			zap.String("game_id", gameID))
+	}
+	defer func() {
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] RestoreState releasing gameState.mu.Lock",
+				zap.String("game_id", gameID))
+		}
+		gameState.mu.Unlock()
+	}()
 
 	// Restore game state from snapshot
 	gameState.state = snapshot.State
@@ -4701,8 +4850,23 @@ func (e *MageEngine) RestoreState(gameID string, bookmarkID int, context string)
 // RemoveBookmark removes a bookmark and all newer bookmarks
 // Per Java GameImpl.removeBookmark(): cleanup after restoration
 func (e *MageEngine) RemoveBookmark(gameID string, bookmarkID int) error {
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] RemoveBookmark acquiring e.mu.Lock",
+			zap.String("game_id", gameID),
+			zap.Int("bookmark_id", bookmarkID))
+	}
 	e.mu.Lock()
-	defer e.mu.Unlock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] RemoveBookmark acquired e.mu.Lock",
+			zap.String("game_id", gameID))
+	}
+	defer func() {
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] RemoveBookmark releasing e.mu.Lock",
+				zap.String("game_id", gameID))
+		}
+		e.mu.Unlock()
+	}()
 
 	bookmarks := e.bookmarks[gameID]
 	if bookmarks == nil || bookmarkID < 1 || bookmarkID > len(bookmarks) {
@@ -4872,14 +5036,19 @@ func (e *MageEngine) SaveTurnSnapshot(gameID string, turnNumber int) error {
 		e.mu.Unlock()
 		return fmt.Errorf("game %s not found", gameID)
 	}
+	persistenceRepo := e.persistenceRepo
 	e.mu.Unlock()
 
 	gameState.mu.RLock()
 	snapshot := e.createSnapshot(gameState)
+	tableID := gameState.gameID // Table ID is stored as gameID for now (can be enhanced)
+	gameType := gameState.gameType
+	players := make([]string, len(gameState.playerOrder))
+	copy(players, gameState.playerOrder)
+	state := gameState.state.String()
 	gameState.mu.RUnlock()
 
 	e.mu.Lock()
-	defer e.mu.Unlock()
 
 	// Initialize turn snapshots map for this game if needed
 	if e.turnSnapshots[gameID] == nil {
@@ -4903,7 +5072,260 @@ func (e *MageEngine) SaveTurnSnapshot(gameID string, turnNumber int) error {
 		)
 	}
 
+	e.mu.Unlock()
+
+	// Persist to database if repository is configured
+	if persistenceRepo != nil {
+		serializedState, err := snapshot.SerializeToBytes()
+		if err != nil {
+			if e.logger != nil {
+				e.logger.Error("failed to serialize game state for persistence",
+					zap.String("game_id", gameID),
+					zap.Error(err),
+				)
+			}
+			return nil // Don't fail the game for persistence errors
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		if err := persistenceRepo.SaveGameState(ctx, gameID, tableID, gameType, players, serializedState, turnNumber, state); err != nil {
+			if e.logger != nil {
+				e.logger.Error("failed to persist game state to database",
+					zap.String("game_id", gameID),
+					zap.Error(err),
+				)
+			}
+			// Don't fail the game for persistence errors
+		} else if e.logger != nil {
+			e.logger.Debug("persisted game state to database",
+				zap.String("game_id", gameID),
+				zap.Int("turn", turnNumber),
+				zap.Int("state_size", len(serializedState)),
+			)
+		}
+	}
+
 	return nil
+}
+
+// PersistGameState manually persists the current game state to the database
+// This can be called at important moments like game start, mulligan complete, etc.
+func (e *MageEngine) PersistGameState(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	persistenceRepo := e.persistenceRepo
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	if persistenceRepo == nil {
+		return nil // No persistence configured
+	}
+
+	gameState.mu.RLock()
+	snapshot := e.createSnapshot(gameState)
+	tableID := gameState.gameID
+	gameType := gameState.gameType
+	players := make([]string, len(gameState.playerOrder))
+	copy(players, gameState.playerOrder)
+	turnNumber := gameState.turnManager.TurnNumber()
+	state := gameState.state.String()
+	gameState.mu.RUnlock()
+
+	serializedState, err := snapshot.SerializeToBytes()
+	if err != nil {
+		return fmt.Errorf("failed to serialize game state: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := persistenceRepo.SaveGameState(ctx, gameID, tableID, gameType, players, serializedState, turnNumber, state); err != nil {
+		return fmt.Errorf("failed to persist game state: %w", err)
+	}
+
+	if e.logger != nil {
+		e.logger.Debug("persisted game state",
+			zap.String("game_id", gameID),
+			zap.Int("turn", turnNumber),
+			zap.String("state", state),
+		)
+	}
+
+	return nil
+}
+
+// DeletePersistedGame removes a game from the persistence database
+// This should be called when a game finishes
+func (e *MageEngine) DeletePersistedGame(gameID string) error {
+	e.mu.RLock()
+	persistenceRepo := e.persistenceRepo
+	e.mu.RUnlock()
+
+	if persistenceRepo == nil {
+		return nil // No persistence configured
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	return persistenceRepo.DeleteActiveGame(ctx, gameID)
+}
+
+// LoadGameFromSnapshot restores a game from a serialized snapshot
+// Used for server restart recovery - recreates the full game state
+func (e *MageEngine) LoadGameFromSnapshot(gameID, tableID, gameType string, players []string, serializedState []byte) error {
+	// Deserialize the snapshot
+	snapshot, err := DeserializeFromBytes(serializedState)
+	if err != nil {
+		return fmt.Errorf("failed to deserialize game state: %w", err)
+	}
+
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	if _, exists := e.games[gameID]; exists {
+		return fmt.Errorf("game %s already exists", gameID)
+	}
+
+	// Look up game type configuration from registry
+	var gameTypeConfig plugin.GameType
+	gameRules := plugin.DefaultGameRules()
+	var behaviors []plugin.GameBehavior
+
+	if gt, err := plugin.GetGameType(gameType); err == nil {
+		gameTypeConfig = gt
+		gameRules = plugin.GetRulesForGameType(gt)
+		behaviors = plugin.GetBehaviorsForGameType(gt)
+	}
+
+	// Create a new game state structure
+	gameState := &engineGameState{
+		gameID:           gameID,
+		gameType:         gameType,
+		gameTypeConfig:   gameTypeConfig,
+		gameRules:        gameRules,
+		behaviors:        behaviors,
+		state:            snapshot.State,
+		players:          make(map[string]*internalPlayer),
+		playerOrder:      make([]string, len(snapshot.PlayerOrder)),
+		cards:            make(map[string]*internalCard),
+		battlefield:      make([]*internalCard, 0),
+		exile:            make([]*internalCard, 0),
+		command:          make([]*internalCard, 0),
+		revealed:         make([]EngineRevealedView, 0),
+		lookedAt:         make([]EngineLookedAtView, 0),
+		combat:           newCombatState(),
+		triggeredQueue:   make([]*triggeredAbilityQueueItem, 0),
+		combatTriggers:   make([]*combatTrigger, 0),
+		concedingPlayers: make([]string, 0),
+		analytics: &gameAnalytics{
+			actionsPerTurn: make(map[int]int),
+			turnStartTimes: make(map[int]time.Time),
+			gameStartTime:  time.Now(),
+		},
+		messages:       make([]EngineMessage, 0),
+		prompts:        make([]EnginePrompt, 0),
+		startedAt:      time.Now(), // Use current time for restored game
+		lki:            make(map[string]*LastKnownInfo),
+		lkiZoneCounter: make(map[string]int),
+	}
+
+	// Restore player order
+	copy(gameState.playerOrder, snapshot.PlayerOrder)
+
+	// Restore players
+	for id, player := range snapshot.Players {
+		gameState.players[id] = player
+	}
+
+	// Restore cards
+	for id, card := range snapshot.Cards {
+		gameState.cards[id] = card
+	}
+
+	// Restore zones
+	gameState.battlefield = append(gameState.battlefield, snapshot.Battlefield...)
+	gameState.exile = append(gameState.exile, snapshot.Exile...)
+	gameState.command = append(gameState.command, snapshot.Command...)
+
+	// Initialize turn manager and restore turn state
+	activePlayer := snapshot.ActivePlayer
+	if activePlayer == "" && len(players) > 0 {
+		activePlayer = players[0]
+	}
+	gameState.turnManager = rules.NewTurnManager(activePlayer)
+	gameState.turnManager.RestoreTurnState(snapshot.TurnNumber, snapshot.ActivePlayer, snapshot.PriorityPlayer)
+
+	// Initialize stack manager and restore stack
+	gameState.stack = rules.NewStackManager()
+	for _, item := range snapshot.StackItems {
+		gameState.stack.Push(item)
+	}
+
+	// Initialize event bus
+	gameState.eventBus = rules.NewEventBus()
+
+	// Initialize watcher registry
+	gameState.watchers = rules.NewWatcherRegistry()
+
+	// Initialize legality checker and target validator
+	gameState.legality = rules.NewLegalityChecker(gameState)
+	gameState.targetValidator = targeting.NewTargetValidator(gameState)
+
+	// Initialize layer system
+	gameState.layerSystem = effects.NewLayerSystem()
+
+	// Initialize ability registry
+	gameState.abilityRegistry = NewAbilityRegistry()
+
+	// Restore messages
+	gameState.messages = append(gameState.messages, snapshot.Messages...)
+
+	// Restore prompts
+	gameState.prompts = append(gameState.prompts, snapshot.Prompts...)
+
+	// Add a restoration message
+	gameState.addMessage(fmt.Sprintf("Game restored from server persistence (turn %d)", snapshot.TurnNumber), "system")
+
+	// Register the game
+	e.games[gameID] = gameState
+
+	// Initialize turn snapshots and bookmarks for this game
+	e.turnSnapshots[gameID] = make(map[int]*gameStateSnapshot)
+	e.bookmarks[gameID] = make([]*gameStateSnapshot, 0)
+
+	// Initialize replacement effects manager for this game
+	e.replacementEffects[gameID] = effects.NewReplacementManager(e.logger)
+
+	if e.logger != nil {
+		e.logger.Info("restored game from persistence",
+			zap.String("game_id", gameID),
+			zap.String("game_type", gameType),
+			zap.Int("turn", snapshot.TurnNumber),
+			zap.String("state", snapshot.State.String()),
+			zap.Int("player_count", len(players)),
+		)
+	}
+
+	return nil
+}
+
+// GetRestoredGameIDs returns a list of all game IDs currently loaded in the engine
+// Useful for verifying restoration completed correctly
+func (e *MageEngine) GetRestoredGameIDs() []string {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	ids := make([]string, 0, len(e.games))
+	for id := range e.games {
+		ids = append(ids, id)
+	}
+	return ids
 }
 
 // CanRollbackTurns checks if it's possible to rollback N turns
@@ -5281,6 +5703,8 @@ func (e *MageEngine) EndMulligan(gameID string) error {
 
 // processForcedAttackers processes "attacks if able" effects and automatically declares forced attackers
 // Per Java Combat.checkAttackRequirements() (lines 474-591)
+// NOTE: This function is called while holding gameState.mu.Lock(), so it uses internal
+// helper methods that don't acquire locks to avoid self-deadlock.
 func (e *MageEngine) processForcedAttackers(gameState *engineGameState) error {
 	activePlayerID := gameState.combat.attackingPlayerID
 
@@ -5304,17 +5728,15 @@ func (e *MageEngine) processForcedAttackers(gameState *engineGameState) error {
 			continue
 		}
 
-		// Check if creature can attack
-		canAttack, _ := e.CanAttack(gameState.gameID, card.ID)
-		if !canAttack {
+		// Check if creature can attack (using internal version that doesn't acquire locks)
+		if !e.canAttackInternal(gameState, card) {
 			continue // Can't attack due to restrictions (tapped, summoning sickness, etc.)
 		}
 
 		// Find valid defenders this creature can attack
 		validDefenders := make([]string, 0)
 		for defenderID := range gameState.combat.defenders {
-			canAttackDefender, _ := e.CanAttackDefender(gameState.gameID, card.ID, defenderID)
-			if canAttackDefender {
+			if canAttack, _ := e.canAttackDefenderInternal(gameState, card, defenderID); canAttack {
 				validDefenders = append(validDefenders, defenderID)
 			}
 		}
@@ -5327,8 +5749,8 @@ func (e *MageEngine) processForcedAttackers(gameState *engineGameState) error {
 		// For now, just attack the first defender in the map
 		defenderID := validDefenders[0]
 
-		// Declare the attacker
-		if err := e.DeclareAttacker(gameState.gameID, card.ID, defenderID, activePlayerID); err != nil {
+		// Declare the attacker (using internal version that doesn't acquire locks)
+		if err := e.declareAttackerInternal(gameState, card.ID, defenderID, activePlayerID); err != nil {
 			if e.logger != nil {
 				e.logger.Warn("failed to declare forced attacker",
 					zap.String("game_id", gameState.gameID),
@@ -5637,9 +6059,17 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		// Per Java DeclareAttackersStep.beginStep() (line 33-36)
 		// This is where selectAttackers() would be called in Java
 		// In our implementation, attacker selection is handled via player actions
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepDeclareAttackers publishing event",
+				zap.String("game_id", gameState.gameID))
+		}
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareAttackersStepPre, "", "", activePlayerID))
 
 		// Check for creatures that lost creature type (Per Java Combat.checkForRemoveFromCombat())
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepDeclareAttackers releasing gameState.mu for CheckForRemoveFromCombat",
+				zap.String("game_id", gameState.gameID))
+		}
 		gameState.mu.Unlock()
 		if err := e.CheckForRemoveFromCombat(gameState.gameID); err != nil && e.logger != nil {
 			e.logger.Error("failed to check for removal from combat",
@@ -5647,7 +6077,15 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 				zap.Error(err),
 			)
 		}
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepDeclareAttackers re-acquiring gameState.mu after CheckForRemoveFromCombat",
+				zap.String("game_id", gameState.gameID))
+		}
 		gameState.mu.Lock()
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepDeclareAttackers re-acquired gameState.mu",
+				zap.String("game_id", gameState.gameID))
+		}
 
 		// Process forced attackers ("attacks if able" effects)
 		// Per Java Combat.checkAttackRequirements()
@@ -5679,6 +6117,10 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareBlockersStepPre, "", "", activePlayerID))
 
 		// Check for creatures that lost creature type (Per Java Combat.checkForRemoveFromCombat())
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepDeclareBlockers releasing gameState.mu for CheckForRemoveFromCombat",
+				zap.String("game_id", gameState.gameID))
+		}
 		gameState.mu.Unlock()
 		if err := e.CheckForRemoveFromCombat(gameState.gameID); err != nil && e.logger != nil {
 			e.logger.Error("failed to check for removal from combat",
@@ -5686,7 +6128,15 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 				zap.Error(err),
 			)
 		}
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepDeclareBlockers re-acquiring gameState.mu after CheckForRemoveFromCombat",
+				zap.String("game_id", gameState.gameID))
+		}
 		gameState.mu.Lock()
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepDeclareBlockers re-acquired gameState.mu",
+				zap.String("game_id", gameState.gameID))
+		}
 
 		// Process "must be blocked if able" requirements
 		// Per Java Combat.retrieveMustBlockAttackerRequirements()
@@ -5712,7 +6162,8 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 
 		// After blockers are declared, check if there are creatures with first/double strike
 		// If so, update the turn sequence to include the first strike damage step
-		if hasFirstStrike, err := e.HasFirstOrDoubleStrike(gameState.gameID); err == nil && hasFirstStrike {
+		// Note: Use internal version since we already hold gameState.mu.Lock()
+		if e.hasFirstOrDoubleStrikeInternal(gameState) {
 			gameState.turnManager.SetHasFirstStrike(true)
 			if e.logger != nil {
 				e.logger.Debug("first strike damage step added to turn sequence",
@@ -5733,6 +6184,10 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageStepPre, "", "", activePlayerID))
 
 		// Check for creatures that lost creature type (Per Java Combat.checkForRemoveFromCombat())
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepFirstStrikeDamage releasing gameState.mu for CheckForRemoveFromCombat",
+				zap.String("game_id", gameState.gameID))
+		}
 		gameState.mu.Unlock()
 		if err := e.CheckForRemoveFromCombat(gameState.gameID); err != nil && e.logger != nil {
 			e.logger.Error("failed to check for removal from combat",
@@ -5740,11 +6195,20 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 				zap.Error(err),
 			)
 		}
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepFirstStrikeDamage re-acquiring gameState.mu after CheckForRemoveFromCombat",
+				zap.String("game_id", gameState.gameID))
+		}
 		gameState.mu.Lock()
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepFirstStrikeDamage re-acquired gameState.mu",
+				zap.String("game_id", gameState.gameID))
+		}
 
 		// Automatically assign and apply first strike damage
-		if err := e.AssignCombatDamage(gameState.gameID, true); err == nil {
-			if err := e.ApplyCombatDamage(gameState.gameID); err != nil && e.logger != nil {
+		// Note: Use internal versions since we already hold gameState.mu.Lock()
+		if err := e.assignCombatDamageInternal(gameState, true); err == nil {
+			if err := e.applyCombatDamageInternal(gameState); err != nil && e.logger != nil {
 				e.logger.Error("failed to apply first strike damage",
 					zap.String("game_id", gameState.gameID),
 					zap.Error(err),
@@ -5768,6 +6232,10 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageStepPre, "", "", activePlayerID))
 
 		// Check for creatures that lost creature type (Per Java Combat.checkForRemoveFromCombat())
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepCombatDamage releasing gameState.mu for CheckForRemoveFromCombat",
+				zap.String("game_id", gameState.gameID))
+		}
 		gameState.mu.Unlock()
 		if err := e.CheckForRemoveFromCombat(gameState.gameID); err != nil && e.logger != nil {
 			e.logger.Error("failed to check for removal from combat",
@@ -5775,11 +6243,20 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 				zap.Error(err),
 			)
 		}
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepCombatDamage re-acquiring gameState.mu after CheckForRemoveFromCombat",
+				zap.String("game_id", gameState.gameID))
+		}
 		gameState.mu.Lock()
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] StepCombatDamage re-acquired gameState.mu",
+				zap.String("game_id", gameState.gameID))
+		}
 
 		// Automatically assign and apply normal damage
-		if err := e.AssignCombatDamage(gameState.gameID, false); err == nil {
-			if err := e.ApplyCombatDamage(gameState.gameID); err != nil && e.logger != nil {
+		// Note: Use internal versions since we already hold gameState.mu.Lock()
+		if err := e.assignCombatDamageInternal(gameState, false); err == nil {
+			if err := e.applyCombatDamageInternal(gameState); err != nil && e.logger != nil {
 				e.logger.Error("failed to apply normal combat damage",
 					zap.String("game_id", gameState.gameID),
 					zap.Error(err),
@@ -5803,7 +6280,8 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventEndCombatStepPre, "", "", activePlayerID))
 
 		// End combat and clean up combat state
-		if err := e.EndCombat(gameState.gameID); err != nil && e.logger != nil {
+		// Note: Use internal version since we already hold gameState.mu.Lock()
+		if err := e.endCombatInternal(gameState); err != nil && e.logger != nil {
 			e.logger.Error("failed to end combat",
 				zap.String("game_id", gameState.gameID),
 				zap.Error(err),
@@ -6027,6 +6505,44 @@ func (e *MageEngine) CanAttackDefender(gameID, creatureID, defenderID string) (b
 	return e.canAttackDefenderInternal(gameState, creature, defenderID)
 }
 
+// canAttackInternal checks if a creature can attack (any defender) without acquiring locks
+// This is an internal helper for use when gameState.mu is already held
+// Per Java Permanent.canAttack(null, game) and canAttackInPrinciple(null, game)
+func (e *MageEngine) canAttackInternal(gameState *engineGameState, creature *internalCard) bool {
+	// Basic checks (Java: Permanent.canAttack line 1485)
+	if creature.Tapped {
+		return false
+	}
+
+	// Check if can attack in principle (Java: canAttackInPrinciple line 1504)
+	// Check summoning sickness
+	// TODO: Implement AsThoughEffectType.ATTACK_AS_HASTE for haste effects
+	if creature.SummoningSickness {
+		return false
+	}
+
+	// Check defender ability (Java: line 1527)
+	// TODO: Implement AsThoughEffectType.ATTACK for effects that allow defender to attack
+	if e.hasAbility(creature, abilityDefender) {
+		return false
+	}
+
+	// Check for continuous effects that prevent attacking
+	// Per Java: RestrictionEffect.applies() and canAttack() checks
+	if e.hasCantAttackEffect(gameState, creature.ID) {
+		return false
+	}
+
+	// Check if can attack at least one defender (Java: line 1516-1522)
+	for defenderID := range gameState.combat.defenders {
+		if canAttack, _ := e.canAttackDefenderInternal(gameState, creature, defenderID); canAttack {
+			return true
+		}
+	}
+
+	return false
+}
+
 // canAttackDefenderInternal checks if a creature can attack a specific defender (internal helper)
 // Per Java Permanent.canAttackInPrinciple(defenderId, game)
 func (e *MageEngine) canAttackDefenderInternal(gameState *engineGameState, creature *internalCard, defenderID string) (bool, error) {
@@ -6054,6 +6570,110 @@ func (e *MageEngine) canAttackDefenderInternal(gameState *engineGameState, creat
 	// Examples: "can't attack", "can only attack if X", "can't attack player Y"
 
 	return true, nil
+}
+
+// declareAttackerInternal declares a creature as an attacker without acquiring locks
+// This is an internal helper for use when gameState.mu is already held
+// Per Java Combat.declareAttacker()
+func (e *MageEngine) declareAttackerInternal(gameState *engineGameState, creatureID, defenderID, playerID string) error {
+	// Validate player
+	if playerID != gameState.combat.attackingPlayerID {
+		return fmt.Errorf("player %s is not the attacking player", playerID)
+	}
+
+	// Validate creature exists and is controlled by player
+	creature, exists := gameState.cards[creatureID]
+	if !exists {
+		return fmt.Errorf("creature %s not found", creatureID)
+	}
+
+	if creature.ControllerID != playerID {
+		return fmt.Errorf("creature %s is not controlled by player %s", creatureID, playerID)
+	}
+
+	// Validate creature is on battlefield
+	if creature.Zone != zoneBattlefield {
+		return fmt.Errorf("creature %s is not on battlefield", creatureID)
+	}
+
+	// Validate creature can attack (not tapped, not summoning sick)
+	if creature.Tapped {
+		return fmt.Errorf("creature %s is tapped", creatureID)
+	}
+
+	// Check for defender ability
+	if e.hasAbility(creature, abilityDefender) {
+		return fmt.Errorf("creature %s has defender and cannot attack", creatureID)
+	}
+
+	// Fire declare attackers step pre event (before first attacker)
+	if len(gameState.combat.attackers) == 0 {
+		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareAttackersStepPre, "", "", playerID))
+	}
+
+	// Validate defender exists
+	if !gameState.combat.defenders[defenderID] {
+		return fmt.Errorf("invalid defender %s", defenderID)
+	}
+
+	// Determine if defender is a permanent (planeswalker/battle) or player
+	defenderIsPermanent := false
+	defendingPlayerID := defenderID
+
+	if defenderCard, exists := gameState.cards[defenderID]; exists {
+		defenderIsPermanent = true
+		defendingPlayerID = defenderCard.ControllerID
+	}
+
+	group := newCombatGroup(defenderID, defenderIsPermanent, defendingPlayerID)
+	group.attackers = append(group.attackers, creatureID)
+	gameState.combat.groups = append(gameState.combat.groups, group)
+	gameState.combat.attackers[creatureID] = true
+
+	// Tap creature (unless it has vigilance)
+	hasVigilance := e.hasAbilityWithEffects(gameState, creature, abilityVigilance)
+	if !hasVigilance && !creature.Tapped {
+		creature.Tapped = true
+		gameState.combat.attackersTapped[creatureID] = true
+	}
+
+	// Set creature combat state
+	creature.Attacking = true
+	creature.AttackingWhat = defenderID
+
+	// Fire attacker declared event
+	event := rules.NewEvent(rules.EventAttackerDeclared, creatureID, creatureID, playerID)
+	event.Metadata["defender_id"] = defenderID
+	gameState.eventBus.Publish(event)
+
+	// Check for combat triggers
+	e.checkCombatTriggers(gameState, event)
+
+	// Fire defender attacked event
+	defenderEvent := rules.NewEvent(rules.EventDefenderAttacked, defenderID, creatureID, playerID)
+	defenderEvent.Metadata["attacker_id"] = creatureID
+	gameState.eventBus.Publish(defenderEvent)
+
+	// Track attacks
+	attackingPlayerID := gameState.combat.attackingPlayerID
+	if defenderIsPermanent {
+		if defenderCard, exists := gameState.cards[defenderID]; exists && e.isPlaneswalker(defenderCard) {
+			controllerID := defenderCard.ControllerID
+			if gameState.combat.planeswalkerControllersAttackedThisTurn[attackingPlayerID] == nil {
+				gameState.combat.planeswalkerControllersAttackedThisTurn[attackingPlayerID] = make(map[string]bool)
+			}
+			gameState.combat.planeswalkerControllersAttackedThisTurn[attackingPlayerID][controllerID] = true
+		}
+	} else {
+		if gameState.combat.playersAttackedThisTurn[attackingPlayerID] == nil {
+			gameState.combat.playersAttackedThisTurn[attackingPlayerID] = make(map[string]bool)
+		}
+		gameState.combat.playersAttackedThisTurn[attackingPlayerID][defenderID] = true
+	}
+
+	gameState.addMessage(fmt.Sprintf("%s attacks", creature.Name), "combat")
+
+	return nil
 }
 
 // DeclareAttacker declares a creature as an attacker
@@ -6800,16 +7420,42 @@ func (e *MageEngine) RemoveFromCombat(gameID, creatureID string) error {
 // CheckForRemoveFromCombat checks all attacking and blocking creatures and removes those that are no longer creatures
 // Per Java Combat.checkForRemoveFromCombat() - called during combat steps to enforce rule that non-creatures can't attack/block
 func (e *MageEngine) CheckForRemoveFromCombat(gameID string) error {
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] CheckForRemoveFromCombat acquiring e.mu.RLock",
+			zap.String("game_id", gameID))
+	}
 	e.mu.RLock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] CheckForRemoveFromCombat acquired e.mu.RLock",
+			zap.String("game_id", gameID))
+	}
 	gameState, exists := e.games[gameID]
 	e.mu.RUnlock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] CheckForRemoveFromCombat released e.mu.RUnlock",
+			zap.String("game_id", gameID))
+	}
 
 	if !exists {
 		return fmt.Errorf("game %s not found", gameID)
 	}
 
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] CheckForRemoveFromCombat acquiring gameState.mu.Lock",
+			zap.String("game_id", gameID))
+	}
 	gameState.mu.Lock()
-	defer gameState.mu.Unlock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] CheckForRemoveFromCombat acquired gameState.mu.Lock",
+			zap.String("game_id", gameID))
+	}
+	defer func() {
+		if e.logger != nil {
+			e.logger.Info("[LOCK-DEBUG] CheckForRemoveFromCombat releasing gameState.mu (defer)",
+				zap.String("game_id", gameID))
+		}
+		gameState.mu.Unlock()
+	}()
 
 	// Collect all attackers and blockers that need to be removed
 	// We collect first, then remove, to avoid modifying maps while iterating
@@ -6833,6 +7479,11 @@ func (e *MageEngine) CheckForRemoveFromCombat(gameID string) error {
 
 	// Remove all non-creatures from combat
 	// We need to temporarily unlock to call RemoveFromCombat which takes its own lock
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] CheckForRemoveFromCombat releasing gameState.mu for RemoveFromCombat loop",
+			zap.String("game_id", gameID),
+			zap.Int("creatures_to_remove", len(toRemove)))
+	}
 	gameState.mu.Unlock()
 	for _, creatureID := range toRemove {
 		if err := e.RemoveFromCombat(gameID, creatureID); err != nil && e.logger != nil {
@@ -6843,7 +7494,15 @@ func (e *MageEngine) CheckForRemoveFromCombat(gameID string) error {
 			)
 		}
 	}
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] CheckForRemoveFromCombat re-acquiring gameState.mu after RemoveFromCombat loop",
+			zap.String("game_id", gameID))
+	}
 	gameState.mu.Lock()
+	if e.logger != nil {
+		e.logger.Info("[LOCK-DEBUG] CheckForRemoveFromCombat re-acquired gameState.mu",
+			zap.String("game_id", gameID))
+	}
 
 	return nil
 }
@@ -7242,6 +7901,12 @@ func (e *MageEngine) AssignCombatDamage(gameID string, firstStrike bool) error {
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
 
+	return e.assignCombatDamageInternal(gameState, firstStrike)
+}
+
+// assignCombatDamageInternal assigns combat damage without acquiring locks
+// Caller must hold gameState.mu.Lock()
+func (e *MageEngine) assignCombatDamageInternal(gameState *engineGameState, firstStrike bool) error {
 	// Fire combat damage step pre event
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventCombatDamageStepPre, "", "", ""))
 
@@ -7268,7 +7933,7 @@ func (e *MageEngine) AssignCombatDamage(gameID string, firstStrike bool) error {
 
 	if e.logger != nil {
 		e.logger.Debug("combat damage assigned",
-			zap.String("game_id", gameID),
+			zap.String("game_id", gameState.gameID),
 			zap.Bool("first_strike", firstStrike),
 		)
 	}
@@ -7453,6 +8118,12 @@ func (e *MageEngine) ApplyCombatDamage(gameID string) error {
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
 
+	return e.applyCombatDamageInternal(gameState)
+}
+
+// applyCombatDamageInternal applies combat damage without acquiring locks
+// Caller must hold gameState.mu.Lock()
+func (e *MageEngine) applyCombatDamageInternal(gameState *engineGameState) error {
 	// Apply damage to all creatures in combat
 	for _, group := range gameState.combat.groups {
 		// Apply damage to attackers
@@ -7472,7 +8143,7 @@ func (e *MageEngine) ApplyCombatDamage(gameID string) error {
 
 	if e.logger != nil {
 		e.logger.Debug("combat damage applied",
-			zap.String("game_id", gameID),
+			zap.String("game_id", gameState.gameID),
 		)
 	}
 
@@ -7816,6 +8487,12 @@ func (e *MageEngine) EndCombat(gameID string) error {
 	gameState.mu.Lock()
 	defer gameState.mu.Unlock()
 
+	return e.endCombatInternal(gameState)
+}
+
+// endCombatInternal ends combat phase without acquiring locks
+// Caller must hold gameState.mu.Lock()
+func (e *MageEngine) endCombatInternal(gameState *engineGameState) error {
 	// Fire end combat step pre event
 	gameState.eventBus.Publish(rules.NewEvent(rules.EventEndCombatStepPre, "", "", ""))
 
@@ -7876,7 +8553,7 @@ func (e *MageEngine) EndCombat(gameID string) error {
 
 	if e.logger != nil {
 		e.logger.Debug("ended combat",
-			zap.String("game_id", gameID),
+			zap.String("game_id", gameState.gameID),
 			zap.Int("former_groups", len(gameState.combat.formerGroups)),
 		)
 	}
@@ -7929,13 +8606,19 @@ func (e *MageEngine) HasFirstOrDoubleStrike(gameID string) (bool, error) {
 	gameState.mu.RLock()
 	defer gameState.mu.RUnlock()
 
+	return e.hasFirstOrDoubleStrikeInternal(gameState), nil
+}
+
+// hasFirstOrDoubleStrikeInternal checks if any creature in combat has first or double strike
+// This internal version does NOT acquire locks - caller must hold gameState.mu
+func (e *MageEngine) hasFirstOrDoubleStrikeInternal(gameState *engineGameState) bool {
 	// Check all creatures in combat groups
 	for _, group := range gameState.combat.groups {
 		// Check attackers
 		for _, attackerID := range group.attackers {
 			if attacker, exists := gameState.cards[attackerID]; exists {
 				if e.hasFirstOrDoubleStrikeWithEffects(gameState, attacker) {
-					return true, nil
+					return true
 				}
 			}
 		}
@@ -7944,13 +8627,13 @@ func (e *MageEngine) HasFirstOrDoubleStrike(gameID string) (bool, error) {
 		for _, blockerID := range group.blockers {
 			if blocker, exists := gameState.cards[blockerID]; exists {
 				if e.hasFirstOrDoubleStrikeWithEffects(gameState, blocker) {
-					return true, nil
+					return true
 				}
 			}
 		}
 	}
 
-	return false, nil
+	return false
 }
 
 // Helper methods

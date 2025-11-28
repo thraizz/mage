@@ -57,50 +57,51 @@ services:
       - mage-network
     restart: unless-stopped
 
+  # NOTE: During development, we run the server locally for faster builds
   # MAGE Go backend server
-  mage-server:
-    build:
-      context: ./mage-server-go
-      dockerfile: Dockerfile
-    container_name: mage-server
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    environment:
-      # Database configuration
-      DATABASE_HOST: postgres
-      DATABASE_PORT: 5432
-      DATABASE_NAME: mage
-      DATABASE_USER: mage
-      DATABASE_PASSWORD: mage
-      DATABASE_SSLMODE: disable
-      # Redis configuration (for future use)
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      # Server configuration
-      SERVER_NAME: mage-server
-      GRPC_ADDRESS: "0.0.0.0:17171"
-      WEBSOCKET_ADDRESS: "0.0.0.0:17179"
-      HEALTH_ADDRESS: "0.0.0.0:8080"
-    ports:
-      - "17171:17171"  # gRPC / HTTP-JSON API
-      - "17179:17179"  # WebSocket
-      - "8080:8080"    # Health check
-      - "9090:9090"    # Metrics
-    volumes:
-      # Mount the Docker-specific config file
-      - ./mage-server-go/config/config.docker.yaml:/app/config/config.yaml:ro
-    networks:
-      - mage-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
+  # mage-server:
+  #   build:
+  #     context: ./mage-server-go
+  #     dockerfile: Dockerfile
+  #   container_name: mage-server
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   environment:
+  #     # Database configuration
+  #     DATABASE_HOST: postgres
+  #     DATABASE_PORT: 5432
+  #     DATABASE_NAME: mage
+  #     DATABASE_USER: mage
+  #     DATABASE_PASSWORD: mage
+  #     DATABASE_SSLMODE: disable
+  #     # Redis configuration (for future use)
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     # Server configuration
+  #     SERVER_NAME: mage-server
+  #     GRPC_ADDRESS: "0.0.0.0:17171"
+  #     WEBSOCKET_ADDRESS: "0.0.0.0:17179"
+  #     HEALTH_ADDRESS: "0.0.0.0:8080"
+  #   ports:
+  #     - "17171:17171"  # gRPC / HTTP-JSON API
+  #     - "17179:17179"  # WebSocket
+  #     - "8080:8080"    # Health check
+  #     - "9090:9090"    # Metrics
+  #   volumes:
+  #     # Mount the Docker-specific config file
+  #     - ./mage-server-go/config/config.docker.yaml:/app/config/config.yaml:ro
+  #   networks:
+  #     - mage-network
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #    start_period: 15s
 
   # MAGE Svelte web client
   mage-client:

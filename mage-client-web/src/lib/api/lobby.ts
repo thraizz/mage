@@ -1,5 +1,6 @@
 import type { Table, CreateTableRequest, GameFormat } from '$lib/types/table';
 import type { OnlinePlayer } from '$lib/types/player';
+import type { ActiveGame } from '$lib/types/game';
 import { getMageClient } from '$lib/grpc/client';
 import type { TableView } from '$lib/generated/mage/v1/models';
 import type {
@@ -9,6 +10,11 @@ import type {
 	RoomLeaveTableOrTournamentResponse
 } from '$lib/generated/mage/v1/table';
 import type { RoomGetUsersResponse } from '$lib/generated/mage/v1/room';
+import type {
+	GetMyActiveGamesRequest,
+	GetMyActiveGamesResponse,
+	ActiveGameInfo
+} from '$lib/generated/mage/v1/game';
 
 // Joining a table is handled by the table API
 
@@ -261,4 +267,43 @@ export async function fetchOnlinePlayers(currentUsername?: string): Promise<Onli
 			joinedAt: getConnectedAt()
 		};
 	});
+}
+
+/**
+ * Fetch active games for the current user (for reconnection)
+ * Returns games the user is participating in that are not yet finished
+ */
+export async function fetchMyActiveGames(): Promise<ActiveGame[]> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		return []; // No session = no active games
+	}
+
+	try {
+		const request: GetMyActiveGamesRequest = {
+			sessionId
+		};
+
+		const response = await client.call<GetMyActiveGamesRequest, GetMyActiveGamesResponse>(
+			'GetMyActiveGames',
+			request
+		);
+
+		// Convert proto format to our ActiveGame type
+		return (response.games || []).map((game: ActiveGameInfo) => ({
+			gameId: game.gameId,
+			tableId: game.tableId,
+			gameType: game.gameType,
+			players: game.players || [],
+			turnNumber: game.turnNumber,
+			state: game.state as ActiveGame['state'],
+			createdAt: game.createdAt,
+			updatedAt: game.updatedAt
+		}));
+	} catch (error) {
+		console.warn('Failed to fetch active games:', error);
+		return []; // Return empty array on error - don't block the lobby
+	}
 }

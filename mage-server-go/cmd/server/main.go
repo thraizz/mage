@@ -131,9 +131,27 @@ func main() {
 	gameMgr := game.NewManager(logger)
 	logger.Info("game manager initialized")
 
+	// Initialize active game repository for persistence
+	activeGameRepo := repository.NewActiveGameRepository(db)
+	logger.Info("active game repository initialized")
+
 	// Initialize game engine adapter
 	mageEngine := game.NewMageEngine(logger)
 	mageEngine.SetCardRepository(cardRepo) // Enable card metadata lookup
+
+	// Set up persistence for crash recovery
+	persistenceAdapter := game.NewPersistenceAdapter(activeGameRepo)
+	mageEngine.SetPersistenceRepository(persistenceAdapter)
+	logger.Info("game persistence configured")
+
+	// Restore active games from database (crash recovery)
+	restoredCount := restoreActiveGames(ctx, activeGameRepo, mageEngine, gameMgr, logger)
+	if restoredCount > 0 {
+		logger.Info("restored active games from persistence",
+			zap.Int("count", restoredCount),
+		)
+	}
+
 	gameAdapter := game.NewEngineAdapter(mageEngine, logger)
 
 	// Initialize tournament manager
@@ -163,6 +181,7 @@ func main() {
 		deckRepo,
 		cardRepo,
 		matchHistoryRepo,
+		activeGameRepo,
 		roomMgr,
 		chatMgr,
 		tableMgr,
@@ -335,4 +354,78 @@ func initLogger(cfg config.LoggingConfig) (*zap.Logger, error) {
 	zapCfg.Level = zap.NewAtomicLevelAt(level)
 
 	return zapCfg.Build()
+}
+
+// restoreActiveGames loads and restores active games from the database
+// This enables crash recovery - games survive server restarts
+func restoreActiveGames(
+	ctx context.Context,
+	activeGameRepo *repository.ActiveGameRepository,
+	mageEngine *game.MageEngine,
+	gameMgr *game.Manager,
+	logger *zap.Logger,
+) int {
+	// Load all active games from database
+	activeGames, err := activeGameRepo.LoadAllActiveGames(ctx)
+	if err != nil {
+		logger.Error("failed to load active games from database", zap.Error(err))
+		return 0
+	}
+
+	if len(activeGames) == 0 {
+		logger.Debug("no active games to restore")
+		return 0
+	}
+
+	restoredCount := 0
+	for _, ag := range activeGames {
+		// Skip finished games (shouldn't be in DB, but just in case)
+		if ag.State == "FINISHED" {
+			logger.Debug("skipping finished game during restore",
+				zap.String("game_id", ag.GameID),
+			)
+			continue
+		}
+
+		// Restore the game in the engine
+		err := mageEngine.LoadGameFromSnapshot(
+			ag.GameID,
+			ag.TableID,
+			ag.GameType,
+			ag.Players,
+			ag.GameState,
+		)
+		if err != nil {
+			logger.Error("failed to restore game from persistence",
+				zap.String("game_id", ag.GameID),
+				zap.Error(err),
+			)
+			continue
+		}
+
+		// Also register the game in the game manager with the original ID
+		gameState := game.GameStateInProgress
+		switch ag.State {
+		case "STARTING":
+			gameState = game.GameStateStarting
+		case "MULLIGAN":
+			gameState = game.GameStateMulligan
+		case "IN_PROGRESS":
+			gameState = game.GameStateInProgress
+		case "PAUSED":
+			gameState = game.GameStatePaused
+		}
+		gameMgr.RestoreGame(ag.GameID, ag.TableID, ag.GameType, ag.Players, gameState)
+
+		logger.Info("restored game from persistence",
+			zap.String("game_id", ag.GameID),
+			zap.String("game_type", ag.GameType),
+			zap.Int("turn", ag.TurnNumber),
+			zap.Strings("players", ag.Players),
+		)
+
+		restoredCount++
+	}
+
+	return restoredCount
 }

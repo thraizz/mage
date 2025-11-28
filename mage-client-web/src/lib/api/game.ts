@@ -62,8 +62,11 @@ export async function joinGame(gameId: string): Promise<void> {
  * Returns the full game state from the player's perspective
  */
 export async function fetchGameView(gameId: string, playerId?: string): Promise<GameView> {
+	console.log('[fetchGameView] Starting', { gameId, playerId });
+	
 	const client = getMageClient();
 	const sessionId = await client.ensureSessionId();
+	console.log('[fetchGameView] Got sessionId', { sessionId });
 
 	if (!sessionId) {
 		throw new Error('No active session - please login first');
@@ -75,10 +78,12 @@ export async function fetchGameView(gameId: string, playerId?: string): Promise<
 		playerId: playerId || ''
 	};
 
+	console.log('[fetchGameView] Calling GameGetView RPC...');
 	const response = await client.call<GameGetViewRequest, GameGetViewResponse>(
 		'GameGetView',
 		request
 	);
+	console.log('[fetchGameView] Got response', { hasGame: !!response.game });
 
 	if (!response.game) {
 		throw new Error('Failed to get game view - no game data returned');

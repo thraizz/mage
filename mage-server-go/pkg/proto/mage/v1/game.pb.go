@@ -2211,6 +2211,197 @@ func (x *ReplaySkipForwardResponse) GetError() string {
 	return ""
 }
 
+// GetMyActiveGames retrieves all active games the current user is participating in
+// Used for reconnection after disconnection or server restart
+type GetMyActiveGamesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMyActiveGamesRequest) Reset() {
+	*x = GetMyActiveGamesRequest{}
+	mi := &file_mage_v1_game_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMyActiveGamesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMyActiveGamesRequest) ProtoMessage() {}
+
+func (x *GetMyActiveGamesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMyActiveGamesRequest.ProtoReflect.Descriptor instead.
+func (*GetMyActiveGamesRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *GetMyActiveGamesRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+// ActiveGameInfo represents summary information about an active game
+type ActiveGameInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GameId        string                 `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	TableId       string                 `protobuf:"bytes,2,opt,name=table_id,json=tableId,proto3" json:"table_id,omitempty"`
+	GameType      string                 `protobuf:"bytes,3,opt,name=game_type,json=gameType,proto3" json:"game_type,omitempty"`
+	Players       []string               `protobuf:"bytes,4,rep,name=players,proto3" json:"players,omitempty"`
+	TurnNumber    int32                  `protobuf:"varint,5,opt,name=turn_number,json=turnNumber,proto3" json:"turn_number,omitempty"`
+	State         string                 `protobuf:"bytes,6,opt,name=state,proto3" json:"state,omitempty"`                          // STARTING, MULLIGAN, IN_PROGRESS, PAUSED
+	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // ISO8601 timestamp
+	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"` // ISO8601 timestamp
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ActiveGameInfo) Reset() {
+	*x = ActiveGameInfo{}
+	mi := &file_mage_v1_game_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ActiveGameInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ActiveGameInfo) ProtoMessage() {}
+
+func (x *ActiveGameInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ActiveGameInfo.ProtoReflect.Descriptor instead.
+func (*ActiveGameInfo) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *ActiveGameInfo) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *ActiveGameInfo) GetTableId() string {
+	if x != nil {
+		return x.TableId
+	}
+	return ""
+}
+
+func (x *ActiveGameInfo) GetGameType() string {
+	if x != nil {
+		return x.GameType
+	}
+	return ""
+}
+
+func (x *ActiveGameInfo) GetPlayers() []string {
+	if x != nil {
+		return x.Players
+	}
+	return nil
+}
+
+func (x *ActiveGameInfo) GetTurnNumber() int32 {
+	if x != nil {
+		return x.TurnNumber
+	}
+	return 0
+}
+
+func (x *ActiveGameInfo) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
+func (x *ActiveGameInfo) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *ActiveGameInfo) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+type GetMyActiveGamesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Games         []*ActiveGameInfo      `protobuf:"bytes,1,rep,name=games,proto3" json:"games,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMyActiveGamesResponse) Reset() {
+	*x = GetMyActiveGamesResponse{}
+	mi := &file_mage_v1_game_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMyActiveGamesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMyActiveGamesResponse) ProtoMessage() {}
+
+func (x *GetMyActiveGamesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMyActiveGamesResponse.ProtoReflect.Descriptor instead.
+func (*GetMyActiveGamesResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *GetMyActiveGamesResponse) GetGames() []*ActiveGameInfo {
+	if x != nil {
+		return x.Games
+	}
+	return nil
+}
+
 var File_mage_v1_game_proto protoreflect.FileDescriptor
 
 const file_mage_v1_game_proto_rawDesc = "" +
@@ -2360,7 +2551,24 @@ const file_mage_v1_game_proto_rawDesc = "" +
 	"\x05steps\x18\x03 \x01(\x05R\x05steps\"K\n" +
 	"\x19ReplaySkipForwardResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error*\xcf\x01\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"8\n" +
+	"\x17GetMyActiveGamesRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\"\xf0\x01\n" +
+	"\x0eActiveGameInfo\x12\x17\n" +
+	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12\x19\n" +
+	"\btable_id\x18\x02 \x01(\tR\atableId\x12\x1b\n" +
+	"\tgame_type\x18\x03 \x01(\tR\bgameType\x12\x18\n" +
+	"\aplayers\x18\x04 \x03(\tR\aplayers\x12\x1f\n" +
+	"\vturn_number\x18\x05 \x01(\x05R\n" +
+	"turnNumber\x12\x14\n" +
+	"\x05state\x18\x06 \x01(\tR\x05state\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\b \x01(\tR\tupdatedAt\"I\n" +
+	"\x18GetMyActiveGamesResponse\x12-\n" +
+	"\x05games\x18\x01 \x03(\v2\x17.mage.v1.ActiveGameInfoR\x05games*\xcf\x01\n" +
 	"\fPlayerAction\x12\x1d\n" +
 	"\x19PLAYER_ACTION_UNSPECIFIED\x10\x00\x12\b\n" +
 	"\x04PASS\x10\x01\x12\r\n" +
@@ -2392,7 +2600,7 @@ func file_mage_v1_game_proto_rawDescGZIP() []byte {
 }
 
 var file_mage_v1_game_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_mage_v1_game_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
+var file_mage_v1_game_proto_msgTypes = make([]protoimpl.MessageInfo, 41)
 var file_mage_v1_game_proto_goTypes = []any{
 	(PlayerAction)(0),                  // 0: mage.v1.PlayerAction
 	(SpecialActionType)(0),             // 1: mage.v1.SpecialActionType
@@ -2434,17 +2642,21 @@ var file_mage_v1_game_proto_goTypes = []any{
 	(*ReplayPreviousResponse)(nil),     // 37: mage.v1.ReplayPreviousResponse
 	(*ReplaySkipForwardRequest)(nil),   // 38: mage.v1.ReplaySkipForwardRequest
 	(*ReplaySkipForwardResponse)(nil),  // 39: mage.v1.ReplaySkipForwardResponse
-	(*GameView)(nil),                   // 40: mage.v1.GameView
+	(*GetMyActiveGamesRequest)(nil),    // 40: mage.v1.GetMyActiveGamesRequest
+	(*ActiveGameInfo)(nil),             // 41: mage.v1.ActiveGameInfo
+	(*GetMyActiveGamesResponse)(nil),   // 42: mage.v1.GetMyActiveGamesResponse
+	(*GameView)(nil),                   // 43: mage.v1.GameView
 }
 var file_mage_v1_game_proto_depIdxs = []int32{
-	40, // 0: mage.v1.GameGetViewResponse.game:type_name -> mage.v1.GameView
+	43, // 0: mage.v1.GameGetViewResponse.game:type_name -> mage.v1.GameView
 	0,  // 1: mage.v1.SendPlayerActionRequest.action:type_name -> mage.v1.PlayerAction
 	1,  // 2: mage.v1.SendSpecialActionRequest.action_type:type_name -> mage.v1.SpecialActionType
-	3,  // [3:3] is the sub-list for method output_type
-	3,  // [3:3] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	41, // 3: mage.v1.GetMyActiveGamesResponse.games:type_name -> mage.v1.ActiveGameInfo
+	4,  // [4:4] is the sub-list for method output_type
+	4,  // [4:4] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_game_proto_init() }
@@ -2459,7 +2671,7 @@ func file_mage_v1_game_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_game_proto_rawDesc), len(file_mage_v1_game_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   38,
+			NumMessages:   41,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

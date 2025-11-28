@@ -83,6 +83,9 @@
 	// Mulligan state
 	let mulliganCount = $state(0);
 	let isMulliganLoading = $state(false);
+	
+	// Guard to prevent double initialization
+	let isInitializing = $state(false);
 
 	// Get local player ID from auth
 	const localPlayerId = $derived($auth.user?.username || '');
@@ -208,6 +211,13 @@
 	 * Initialize game connection
 	 */
 	async function initializeGame() {
+		// Guard against double initialization
+		if (isInitializing || initialized) {
+			console.log('[GamePage] Skipping initialization - already in progress or completed');
+			return;
+		}
+		isInitializing = true;
+		
 		// Read player ID directly from auth store to avoid timing issues with $derived
 		const playerId = $auth.user?.username || '';
 		
@@ -221,6 +231,7 @@
 		
 		if (!playerId || !gameId) {
 			console.error('[GamePage] Missing player ID or game ID', { playerId, gameId });
+			isInitializing = false;
 			return;
 		}
 
@@ -267,6 +278,8 @@
 		} catch (err) {
 			console.error('[GamePage] Failed to initialize game:', err);
 			gameStore.setError(err instanceof Error ? err.message : 'Failed to load game');
+		} finally {
+			isInitializing = false;
 		}
 	}
 
@@ -709,7 +722,7 @@
 			{activePlayerName}
 			{priorityPlayerName}
 			localPlayerName={localPlayerId}
-			{hasPriority}
+			hasPriority={havePriority}
 			currentPhase={toGamePhase(step || phase)}
 			onLogClick={() => showActionLog = true}
 			onConcedeClick={handleConcede}

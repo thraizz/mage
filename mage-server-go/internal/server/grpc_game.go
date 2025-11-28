@@ -342,7 +342,12 @@ func (s *mageServer) GameGetView(ctx context.Context, req *pb.GameGetViewRequest
 	}
 
 	if s.gameAdapter != nil {
+		s.logger.Info("GameGetView calling gameAdapter.GetGameView",
+			zap.String("game_id", gameInstance.ID),
+			zap.String("player_id", playerID),
+		)
 		if engineView, engineErr := s.gameAdapter.GetGameView(gameInstance.ID, playerID); engineErr == nil && engineView != nil {
+			s.logger.Info("GameGetView got engine view")
 			switch data := engineView.(type) {
 			case *game.EngineGameView:
 				if data.GameID != "" {
@@ -974,4 +979,63 @@ func (s *mageServer) ReplaySkipForward(ctx context.Context, req *pb.ReplaySkipFo
 		Success: false,
 		Error:   "Replay functionality not yet implemented",
 	}, nil
+}
+
+// ==================== Active Game Recovery ====================
+
+// GetMyActiveGames returns all active games the current user is participating in
+// This enables reconnection after disconnection or server restart
+func (s *mageServer) GetMyActiveGames(ctx context.Context, req *pb.GetMyActiveGamesRequest) (*pb.GetMyActiveGamesResponse, error) {
+	sessionID := strings.TrimSpace(req.GetSessionId())
+	if sessionID == "" {
+		return &pb.GetMyActiveGamesResponse{Games: nil}, nil
+	}
+
+	sess, ok := s.sessionMgr.GetSession(sessionID)
+	if !ok {
+		return &pb.GetMyActiveGamesResponse{Games: nil}, nil
+	}
+
+	username := sess.GetUserID()
+	if username == "" {
+		return &pb.GetMyActiveGamesResponse{Games: nil}, nil
+	}
+
+	// Query active games from database
+	if s.activeGameRepo == nil {
+		s.logger.Warn("GetMyActiveGames called but activeGameRepo is nil")
+		return &pb.GetMyActiveGamesResponse{Games: nil}, nil
+	}
+
+	activeGames, err := s.activeGameRepo.GetActiveGamesForPlayer(ctx, username)
+	if err != nil {
+		s.logger.Error("failed to get active games for player",
+			zap.String("username", username),
+			zap.Error(err),
+		)
+		return &pb.GetMyActiveGamesResponse{Games: nil}, nil
+	}
+
+	// Convert to proto format
+	games := make([]*pb.ActiveGameInfo, 0, len(activeGames))
+	for _, ag := range activeGames {
+		gameInfo := &pb.ActiveGameInfo{
+			GameId:     ag.GameID,
+			TableId:    ag.TableID,
+			GameType:   ag.GameType,
+			Players:    ag.Players,
+			TurnNumber: int32(ag.TurnNumber),
+			State:      ag.State,
+			CreatedAt:  ag.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt:  ag.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		}
+		games = append(games, gameInfo)
+	}
+
+	s.logger.Info("returned active games for player",
+		zap.String("username", username),
+		zap.Int("count", len(games)),
+	)
+
+	return &pb.GetMyActiveGamesResponse{Games: games}, nil
 }

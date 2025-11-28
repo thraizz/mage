@@ -62,6 +62,7 @@ const (
 	MageServer_SendSpecialAction_FullMethodName          = "/mage.v1.MageServer/SendSpecialAction"
 	MageServer_MatchStart_FullMethodName                 = "/mage.v1.MageServer/MatchStart"
 	MageServer_MatchQuit_FullMethodName                  = "/mage.v1.MageServer/MatchQuit"
+	MageServer_GetMyActiveGames_FullMethodName           = "/mage.v1.MageServer/GetMyActiveGames"
 	MageServer_DraftJoin_FullMethodName                  = "/mage.v1.MageServer/DraftJoin"
 	MageServer_SendDraftCardPick_FullMethodName          = "/mage.v1.MageServer/SendDraftCardPick"
 	MageServer_SendDraftCardMark_FullMethodName          = "/mage.v1.MageServer/SendDraftCardMark"
@@ -190,6 +191,8 @@ type MageServerClient interface {
 	MatchStart(ctx context.Context, in *MatchStartRequest, opts ...grpc.CallOption) (*MatchStartResponse, error)
 	// Quit a match
 	MatchQuit(ctx context.Context, in *MatchQuitRequest, opts ...grpc.CallOption) (*MatchQuitResponse, error)
+	// Get list of active games user is participating in (for reconnection)
+	GetMyActiveGames(ctx context.Context, in *GetMyActiveGamesRequest, opts ...grpc.CallOption) (*GetMyActiveGamesResponse, error)
 	// Join a draft
 	DraftJoin(ctx context.Context, in *DraftJoinRequest, opts ...grpc.CallOption) (*DraftJoinResponse, error)
 	// Pick a card from booster
@@ -696,6 +699,16 @@ func (c *mageServerClient) MatchQuit(ctx context.Context, in *MatchQuitRequest, 
 	return out, nil
 }
 
+func (c *mageServerClient) GetMyActiveGames(ctx context.Context, in *GetMyActiveGamesRequest, opts ...grpc.CallOption) (*GetMyActiveGamesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMyActiveGamesResponse)
+	err := c.cc.Invoke(ctx, MageServer_GetMyActiveGames_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *mageServerClient) DraftJoin(ctx context.Context, in *DraftJoinRequest, opts ...grpc.CallOption) (*DraftJoinResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DraftJoinResponse)
@@ -1119,6 +1132,8 @@ type MageServerServer interface {
 	MatchStart(context.Context, *MatchStartRequest) (*MatchStartResponse, error)
 	// Quit a match
 	MatchQuit(context.Context, *MatchQuitRequest) (*MatchQuitResponse, error)
+	// Get list of active games user is participating in (for reconnection)
+	GetMyActiveGames(context.Context, *GetMyActiveGamesRequest) (*GetMyActiveGamesResponse, error)
 	// Join a draft
 	DraftJoin(context.Context, *DraftJoinRequest) (*DraftJoinResponse, error)
 	// Pick a card from booster
@@ -1323,6 +1338,9 @@ func (UnimplementedMageServerServer) MatchStart(context.Context, *MatchStartRequ
 }
 func (UnimplementedMageServerServer) MatchQuit(context.Context, *MatchQuitRequest) (*MatchQuitResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MatchQuit not implemented")
+}
+func (UnimplementedMageServerServer) GetMyActiveGames(context.Context, *GetMyActiveGamesRequest) (*GetMyActiveGamesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMyActiveGames not implemented")
 }
 func (UnimplementedMageServerServer) DraftJoin(context.Context, *DraftJoinRequest) (*DraftJoinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DraftJoin not implemented")
@@ -2218,6 +2236,24 @@ func _MageServer_MatchQuit_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MageServer_GetMyActiveGames_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMyActiveGamesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MageServerServer).GetMyActiveGames(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MageServer_GetMyActiveGames_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MageServerServer).GetMyActiveGames(ctx, req.(*GetMyActiveGamesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MageServer_DraftJoin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DraftJoinRequest)
 	if err := dec(in); err != nil {
@@ -2990,6 +3026,10 @@ var MageServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "MatchQuit",
 			Handler:    _MageServer_MatchQuit_Handler,
+		},
+		{
+			MethodName: "GetMyActiveGames",
+			Handler:    _MageServer_GetMyActiveGames_Handler,
 		},
 		{
 			MethodName: "DraftJoin",

@@ -247,3 +247,15 @@ type turnEntryWrapper interface {
 func (te turnEntry) Step() Step {
 	return te.step
 }
+
+// RestoreTurnState restores the turn manager to a specific state
+// Used for loading persisted games after server restart
+func (tm *TurnManager) RestoreTurnState(turnNumber int, activePlayer, priorityPlayer string) {
+	tm.turnNumber = turnNumber
+	tm.activePlayer = activePlayer
+	tm.priorityPlayer = priorityPlayer
+	// Reset to beginning of turn (untap step)
+	tm.orderIndex = 0
+	tm.sequence = buildTurnSequence(false)
+	tm.hasFirstStrike = false
+}
