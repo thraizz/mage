@@ -339,6 +339,31 @@ type EnginePrompt struct {
 	Timestamp time.Time
 }
 
+// PendingTargetRequest represents an active target selection request
+// The game engine waits for the player to respond via SEND_UUID
+type PendingTargetRequest struct {
+	// PlayerID is the player who needs to select targets
+	PlayerID string
+	// SourceID is the ID of the spell/ability requiring targets
+	SourceID string
+	// Requirement defines what kind of targets are needed
+	Requirement targeting.TargetRequirement
+	// ValidTargetIDs is a list of IDs that are valid targets
+	ValidTargetIDs []string
+	// SelectedTargetIDs contains targets selected so far (for multi-target)
+	SelectedTargetIDs []string
+	// Message is a human-readable description shown to the player
+	Message string
+	// Required indicates if the player MUST select targets (can't cancel)
+	Required bool
+	// Timestamp when the request was created
+	Timestamp time.Time
+	// OnComplete is called when target selection is complete
+	OnComplete func(selectedTargets []string) error
+	// OnCancel is called when the player cancels target selection (if allowed)
+	OnCancel func() error
+}
+
 // internalCard represents a card in the game state
 type internalCard struct {
 	ID             string
@@ -380,6 +405,8 @@ type internalCard struct {
 	SummoningSickness bool // Does this creature have summoning sickness
 	IsToken           bool // Is this a token (doesn't go to graveyard when destroyed)
 	IsCommander       bool // Is this a commander card
+	// Spell metadata
+	Metadata map[string]string // Generic metadata for storing targets, choices, etc.
 }
 
 // LastKnownInfo stores the state of a permanent at the moment it left a zone
@@ -549,6 +576,11 @@ type engineGameState struct {
 	startedAt          time.Time
 	startingPlayerID   string // Player who won the coin flip and goes first (skips first draw)
 	firstTurnDrawDone  bool   // Whether the first turn draw skip has been applied
+
+	// Target selection system
+	// When a spell/ability needs targets, we store the pending request here
+	// and wait for the player to respond via SEND_UUID
+	pendingTargetRequest *PendingTargetRequest
 	// Last Known Information (LKI) system
 	// Java: GameImpl.lki (Map<Zone, Map<UUID, MageObject>>)
 	// Stores permanent state when it leaves the battlefield for triggered abilities
@@ -789,6 +821,256 @@ func (e *MageEngine) notifyTrigger(gameID string, data map[string]interface{}) {
 		Timestamp: time.Now(),
 		Data:      data,
 	})
+}
+
+// notifyTargetRequest notifies a player that they need to select targets
+// This sends a GAME_TARGET notification to the UI
+func (e *MageEngine) notifyTargetRequest(gameID, playerID string, data map[string]interface{}) {
+	e.emitNotification(GameNotification{
+		Type:      "GAME_TARGET",
+		GameID:    gameID,
+		PlayerID:  playerID, // Send only to the player who needs to select
+		Timestamp: time.Now(),
+		Data:      data,
+	})
+}
+
+// RequestTargetSelection initiates target selection for a spell or ability.
+// This sets up the pending target request and notifies the player via GAME_TARGET.
+// The game engine will wait for SEND_UUID responses from the player.
+//
+// Parameters:
+//   - gameID: The game ID
+//   - playerID: The player who needs to select targets
+//   - sourceID: The ID of the spell/ability requiring targets
+//   - requirement: The target requirement specification
+//   - message: Human-readable message to show the player
+//   - required: Whether the player must select targets (can't cancel)
+//   - onComplete: Callback when target selection is complete
+//   - onCancel: Callback when player cancels (if allowed)
+//
+// Returns error if game not found or player doesn't have priority
+func (e *MageEngine) RequestTargetSelection(
+	gameID, playerID, sourceID string,
+	requirement targeting.TargetRequirement,
+	message string,
+	required bool,
+	onComplete func(selectedTargets []string) error,
+	onCancel func() error,
+) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	gameState, exists := e.games[gameID]
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	// Verify the player exists
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Check if there's already a pending target request
+	if gameState.pendingTargetRequest != nil {
+		return fmt.Errorf("there is already a pending target request")
+	}
+
+	// Find all valid targets based on the requirement
+	validTargetIDs := e.findValidTargets(gameState, requirement)
+
+	// If no valid targets and targeting is required, return error
+	if len(validTargetIDs) == 0 && requirement.MinTargets > 0 {
+		return fmt.Errorf("no valid targets available for %s", requirement.Description)
+	}
+
+	// Create the pending target request
+	gameState.pendingTargetRequest = &PendingTargetRequest{
+		PlayerID:          playerID,
+		SourceID:          sourceID,
+		Requirement:       requirement,
+		ValidTargetIDs:    validTargetIDs,
+		SelectedTargetIDs: make([]string, 0),
+		Message:           message,
+		Required:          required,
+		Timestamp:         time.Now(),
+		OnComplete:        onComplete,
+		OnCancel:          onCancel,
+	}
+
+	// Build target card views for the UI
+	targetViews := make([]map[string]interface{}, 0, len(validTargetIDs))
+	for _, targetID := range validTargetIDs {
+		if card, found := gameState.cards[targetID]; found {
+			targetViews = append(targetViews, map[string]interface{}{
+				"id":         card.ID,
+				"name":       card.Name,
+				"type":       card.Type,
+				"zone":       zoneToString(card.Zone),
+				"controller": card.ControllerID,
+			})
+		} else if _, isPlayer := gameState.players[targetID]; isPlayer {
+			targetViews = append(targetViews, map[string]interface{}{
+				"id":   targetID,
+				"name": targetID,
+				"type": "player",
+			})
+		}
+	}
+
+	// Log the target request
+	if e.logger != nil {
+		e.logger.Info("requesting target selection",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.String("source_id", sourceID),
+			zap.String("message", message),
+			zap.Int("valid_targets", len(validTargetIDs)),
+			zap.Int("min_targets", requirement.MinTargets),
+			zap.Int("max_targets", requirement.MaxTargets),
+			zap.Bool("required", required),
+		)
+	}
+
+	// Notify the player that they need to select targets
+	e.notifyTargetRequest(gameID, playerID, map[string]interface{}{
+		"message":     message,
+		"targets":     targetViews,
+		"required":    required,
+		"min_targets": requirement.MinTargets,
+		"max_targets": requirement.MaxTargets,
+		"source_id":   sourceID,
+	})
+
+	// Add a prompt for the player
+	gameState.addPrompt(playerID, message, validTargetIDs)
+	_ = player // Mark as used
+
+	return nil
+}
+
+// findValidTargets finds all valid targets for a given requirement
+func (e *MageEngine) findValidTargets(gameState *engineGameState, requirement targeting.TargetRequirement) []string {
+	validTargets := make([]string, 0)
+
+	switch requirement.Type {
+	case targeting.TargetTypeCreature:
+		// Find all creatures on the battlefield
+		for _, card := range gameState.battlefield {
+			if strings.Contains(strings.ToLower(card.Type), "creature") {
+				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
+					validTargets = append(validTargets, card.ID)
+				}
+			}
+		}
+
+	case targeting.TargetTypePlayer:
+		// All players who haven't lost/left are valid targets
+		for playerID, player := range gameState.players {
+			if !player.Lost && !player.Left {
+				validTargets = append(validTargets, playerID)
+			}
+		}
+
+	case targeting.TargetTypePermanent:
+		// All permanents on the battlefield
+		for _, card := range gameState.battlefield {
+			if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
+				validTargets = append(validTargets, card.ID)
+			}
+		}
+
+	case targeting.TargetTypeSpell:
+		// All spells on the stack
+		stackItems := gameState.stack.List()
+		for _, item := range stackItems {
+			if item.Kind == "spell" {
+				validTargets = append(validTargets, item.ID)
+			}
+		}
+
+	case targeting.TargetTypeArtifact:
+		for _, card := range gameState.battlefield {
+			if strings.Contains(strings.ToLower(card.Type), "artifact") {
+				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
+					validTargets = append(validTargets, card.ID)
+				}
+			}
+		}
+
+	case targeting.TargetTypeEnchantment:
+		for _, card := range gameState.battlefield {
+			if strings.Contains(strings.ToLower(card.Type), "enchantment") {
+				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
+					validTargets = append(validTargets, card.ID)
+				}
+			}
+		}
+
+	case targeting.TargetTypeLand:
+		for _, card := range gameState.battlefield {
+			if strings.Contains(strings.ToLower(card.Type), "land") {
+				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
+					validTargets = append(validTargets, card.ID)
+				}
+			}
+		}
+
+	case targeting.TargetTypePlaneswalker:
+		for _, card := range gameState.battlefield {
+			if strings.Contains(strings.ToLower(card.Type), "planeswalker") {
+				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
+					validTargets = append(validTargets, card.ID)
+				}
+			}
+		}
+	}
+
+	return validTargets
+}
+
+// CancelTargetSelection cancels the current pending target request
+// Returns error if no pending request or if request is required (can't cancel)
+func (e *MageEngine) CancelTargetSelection(gameID, playerID string) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	gameState, exists := e.games[gameID]
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	if gameState.pendingTargetRequest == nil {
+		return fmt.Errorf("no pending target request")
+	}
+
+	if gameState.pendingTargetRequest.PlayerID != playerID {
+		return fmt.Errorf("target request is for player %s, not %s", gameState.pendingTargetRequest.PlayerID, playerID)
+	}
+
+	if gameState.pendingTargetRequest.Required {
+		return fmt.Errorf("target selection is required and cannot be cancelled")
+	}
+
+	// Call the cancel callback
+	if gameState.pendingTargetRequest.OnCancel != nil {
+		if err := gameState.pendingTargetRequest.OnCancel(); err != nil {
+			return fmt.Errorf("cancel callback failed: %v", err)
+		}
+	}
+
+	// Clear the pending request
+	gameState.pendingTargetRequest = nil
+
+	if e.logger != nil {
+		e.logger.Info("target selection cancelled",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+		)
+	}
+
+	return nil
 }
 
 // StartGame initializes a new game state
@@ -1232,6 +1514,7 @@ func (e *MageEngine) createStarterCard(id, ownerID, cardName string) *internalCa
 		Transformed:  false,
 		FaceDown:     false,
 		Zone:         zoneLibrary,
+		Metadata:     make(map[string]string),
 		ControllerID: ownerID,
 		OwnerID:      ownerID,
 		Counters:     counters.NewCounters(),
@@ -1925,7 +2208,59 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 		return fmt.Errorf("card %s not found in hand", spellName)
 	}
 
-	// Move card to stack
+	// Check if spell requires targets
+	targetRequirements := targeting.ParseTargetRequirements(card.Type, card.RulesText)
+	if len(targetRequirements) > 0 {
+		// This spell requires targets - initiate target selection
+		req := targetRequirements[0] // Use first requirement for now
+		req.SourceID = card.ID
+		req.ControllerID = playerID
+
+		// Create callback for when targets are selected
+		onComplete := func(selectedTargets []string) error {
+			// Store targets in card metadata for resolution
+			card.Metadata["targets"] = targeting.FormatTargets(selectedTargets)
+
+			// Now proceed with casting the spell
+			return e.proceedWithSpellCast(gameState, playerID, card)
+		}
+
+		// Create callback for cancellation
+		onCancel := func() error {
+			// Return card to hand
+			card.Zone = zoneHand
+			player.Hand = append(player.Hand, card)
+			gameState.addMessage(fmt.Sprintf("%s cancelled casting %s", playerID, card.Name), "action")
+			return nil
+		}
+
+		// Request target selection
+		message := fmt.Sprintf("Choose target for %s: %s", card.Name, req.Description)
+		return e.RequestTargetSelection(
+			gameState.gameID,
+			playerID,
+			card.ID,
+			req,
+			message,
+			!req.Optional, // Required if not optional
+			onComplete,
+			onCancel,
+		)
+	}
+
+	// No targets required - proceed directly with casting
+	return e.proceedWithSpellCast(gameState, playerID, card)
+}
+
+// proceedWithSpellCast handles the actual spell casting after targets are selected (if any)
+// This moves the card to stack and sets up the resolution callback
+func (e *MageEngine) proceedWithSpellCast(gameState *engineGameState, playerID string, card *internalCard) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Move card from hand to stack
 	player.Hand = e.removeCardFromSlice(player.Hand, card.ID)
 	card.Zone = zoneStack
 
@@ -1947,6 +2282,11 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 			}
 			return e.resolveSpell(gameState, resolveCard)
 		},
+	}
+
+	// Copy any target information to stack item metadata
+	if targets, ok := card.Metadata["targets"]; ok && targets != "" {
+		stackItem.Metadata["targets"] = targets
 	}
 
 	gameState.stack.Push(stackItem)
@@ -2082,6 +2422,11 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 		return fmt.Errorf("player %s not found", playerID)
 	}
 
+	// Check if there's a pending target request for this player
+	if gameState.pendingTargetRequest != nil && gameState.pendingTargetRequest.PlayerID == playerID {
+		return e.handleTargetSelection(gameState, playerID, uuidStr)
+	}
+
 	// Check if player has priority
 	if gameState.turnManager.PriorityPlayer() != playerID {
 		return fmt.Errorf("player %s does not have priority", playerID)
@@ -2148,6 +2493,190 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 	}
 
 	return fmt.Errorf("UUID %s not found on stack", uuidStr)
+}
+
+// handleTargetSelection processes a target selection from a player
+// This is called when there's a pending target request and the player sends a SEND_UUID
+func (e *MageEngine) handleTargetSelection(gameState *engineGameState, playerID, targetID string) error {
+	req := gameState.pendingTargetRequest
+	if req == nil {
+		return fmt.Errorf("no pending target request")
+	}
+
+	if req.PlayerID != playerID {
+		return fmt.Errorf("target request is for player %s, not %s", req.PlayerID, playerID)
+	}
+
+	// Check if this is a cancel request (empty UUID or special cancel marker)
+	if targetID == "" || targetID == "CANCEL" {
+		if req.Required {
+			return fmt.Errorf("target selection is required and cannot be cancelled")
+		}
+		// Call cancel callback
+		if req.OnCancel != nil {
+			if err := req.OnCancel(); err != nil {
+				return fmt.Errorf("cancel callback failed: %v", err)
+			}
+		}
+		gameState.pendingTargetRequest = nil
+		gameState.addMessage(fmt.Sprintf("%s cancelled target selection", playerID), "action")
+
+		if e.logger != nil {
+			e.logger.Info("target selection cancelled",
+				zap.String("game_id", gameState.gameID),
+				zap.String("player_id", playerID),
+			)
+		}
+		return nil
+	}
+
+	// Validate that the target is in the valid targets list
+	isValid := false
+	for _, validID := range req.ValidTargetIDs {
+		if validID == targetID {
+			isValid = true
+			break
+		}
+	}
+	if !isValid {
+		return fmt.Errorf("target %s is not a valid target", targetID)
+	}
+
+	// Check if this target is already selected (toggle off)
+	alreadySelected := false
+	for i, selected := range req.SelectedTargetIDs {
+		if selected == targetID {
+			alreadySelected = true
+			// Remove from selected targets
+			req.SelectedTargetIDs = append(req.SelectedTargetIDs[:i], req.SelectedTargetIDs[i+1:]...)
+			gameState.addMessage(fmt.Sprintf("%s deselected target", playerID), "action")
+			break
+		}
+	}
+
+	if !alreadySelected {
+		// Check if we've already selected the maximum number of targets
+		if len(req.SelectedTargetIDs) >= req.Requirement.MaxTargets {
+			return fmt.Errorf("maximum targets already selected (%d)", req.Requirement.MaxTargets)
+		}
+
+		// Add to selected targets
+		req.SelectedTargetIDs = append(req.SelectedTargetIDs, targetID)
+
+		// Get target name for message
+		targetName := targetID
+		if card, found := gameState.cards[targetID]; found {
+			targetName = card.Name
+		}
+		gameState.addMessage(fmt.Sprintf("%s selected target: %s", playerID, targetName), "action")
+	}
+
+	if e.logger != nil {
+		e.logger.Debug("target selection updated",
+			zap.String("game_id", gameState.gameID),
+			zap.String("player_id", playerID),
+			zap.String("target_id", targetID),
+			zap.Int("selected_count", len(req.SelectedTargetIDs)),
+			zap.Int("min_targets", req.Requirement.MinTargets),
+			zap.Int("max_targets", req.Requirement.MaxTargets),
+		)
+	}
+
+	// Check if we have enough targets to complete
+	if len(req.SelectedTargetIDs) >= req.Requirement.MinTargets {
+		// Check if we've hit max or if this is a single-target requirement
+		if len(req.SelectedTargetIDs) >= req.Requirement.MaxTargets || req.Requirement.MaxTargets == 1 {
+			// Auto-complete single target selections
+			return e.completeTargetSelection(gameState)
+		}
+	}
+
+	// Notify client of updated selection
+	e.notifyTargetRequest(gameState.gameID, playerID, map[string]interface{}{
+		"message":          req.Message,
+		"targets":          req.ValidTargetIDs,
+		"selected_targets": req.SelectedTargetIDs,
+		"required":         req.Required,
+		"min_targets":      req.Requirement.MinTargets,
+		"max_targets":      req.Requirement.MaxTargets,
+		"source_id":        req.SourceID,
+		"can_confirm":      len(req.SelectedTargetIDs) >= req.Requirement.MinTargets,
+	})
+
+	return nil
+}
+
+// completeTargetSelection finalizes the target selection and calls the completion callback
+func (e *MageEngine) completeTargetSelection(gameState *engineGameState) error {
+	req := gameState.pendingTargetRequest
+	if req == nil {
+		return fmt.Errorf("no pending target request to complete")
+	}
+
+	// Validate final selection
+	if len(req.SelectedTargetIDs) < req.Requirement.MinTargets {
+		return fmt.Errorf("not enough targets selected: need %d, have %d", req.Requirement.MinTargets, len(req.SelectedTargetIDs))
+	}
+	if len(req.SelectedTargetIDs) > req.Requirement.MaxTargets {
+		return fmt.Errorf("too many targets selected: max %d, have %d", req.Requirement.MaxTargets, len(req.SelectedTargetIDs))
+	}
+
+	// Copy the selected targets
+	selectedTargets := make([]string, len(req.SelectedTargetIDs))
+	copy(selectedTargets, req.SelectedTargetIDs)
+
+	if e.logger != nil {
+		e.logger.Info("completing target selection",
+			zap.String("game_id", gameState.gameID),
+			zap.String("player_id", req.PlayerID),
+			zap.Strings("selected_targets", selectedTargets),
+		)
+	}
+
+	// Call the completion callback
+	if req.OnComplete != nil {
+		if err := req.OnComplete(selectedTargets); err != nil {
+			return fmt.Errorf("completion callback failed: %v", err)
+		}
+	}
+
+	// Clear the pending request
+	gameState.pendingTargetRequest = nil
+
+	// Build target names for message
+	targetNames := make([]string, 0, len(selectedTargets))
+	for _, targetID := range selectedTargets {
+		if card, found := gameState.cards[targetID]; found {
+			targetNames = append(targetNames, card.Name)
+		} else {
+			targetNames = append(targetNames, targetID)
+		}
+	}
+	gameState.addMessage(fmt.Sprintf("%s confirmed targets: %s", req.PlayerID, strings.Join(targetNames, ", ")), "action")
+
+	return nil
+}
+
+// ConfirmTargetSelection manually completes target selection (e.g., when player clicks "Confirm")
+// Used for multi-target scenarios where auto-complete doesn't trigger
+func (e *MageEngine) ConfirmTargetSelection(gameID, playerID string) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	gameState, exists := e.games[gameID]
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	if gameState.pendingTargetRequest == nil {
+		return fmt.Errorf("no pending target request")
+	}
+
+	if gameState.pendingTargetRequest.PlayerID != playerID {
+		return fmt.Errorf("target request is for player %s, not %s", gameState.pendingTargetRequest.PlayerID, playerID)
+	}
+
+	return e.completeTargetSelection(gameState)
 }
 
 // resolveStack resolves all items on the stack
@@ -4684,7 +5213,20 @@ func (e *MageEngine) copyCard(card *internalCard) *internalCard {
 		AttachedToCard: append([]string(nil), card.AttachedToCard...),
 		Abilities:      append([]EngineAbilityView(nil), card.Abilities...),
 		Counters:       card.Counters.Copy(),
+		Metadata:       copyMetadata(card.Metadata),
 	}
+}
+
+// copyMetadata creates a deep copy of a metadata map
+func copyMetadata(src map[string]string) map[string]string {
+	if src == nil {
+		return make(map[string]string)
+	}
+	dst := make(map[string]string, len(src))
+	for k, v := range src {
+		dst[k] = v
+	}
+	return dst
 }
 
 // BookmarkState creates a bookmark of the current game state and returns the bookmark ID

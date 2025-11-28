@@ -169,6 +169,14 @@ func (s *mageServer) handleGameNotification(notification game.GameNotification) 
 		return
 	}
 
+	// Handle GAME_TARGET notifications - send only to the specific player
+	if notification.Type == "GAME_TARGET" {
+		if notification.PlayerID != "" {
+			s.handleTargetNotification(gameID, notification.PlayerID, notification.Data)
+		}
+		return
+	}
+
 	// Send game update to all players
 	for _, playerName := range gameInstance.Players {
 		s.logger.Info("sending GAME_UPDATE to player",
@@ -329,6 +337,128 @@ func (s *mageServer) sendGameErrorToPlayer(gameID, playerName, errorMsg string) 
 			)
 		}
 	}
+}
+
+// sendGameTargetToPlayer sends a GAME_TARGET event to a specific player for target selection
+// This is triggered when a spell or ability requires the player to choose targets
+func (s *mageServer) sendGameTargetToPlayer(gameID, playerName string, targetData *pb.GameTargetData) {
+	// Create the GAME_TARGET event
+	event := &pb.ServerEvent{
+		ObjectId: gameID,
+		Method:   pb.CallbackMethod_GAME_TARGET,
+	}
+
+	anyData, err := anypb.New(targetData)
+	if err != nil {
+		s.logger.Error("failed to marshal GameTargetData",
+			zap.String("game_id", gameID),
+			zap.Error(err),
+		)
+		return
+	}
+	event.Data = anyData
+
+	// Send to all sessions for this player
+	sessions := s.sessionMgr.GetSessionsByUser(playerName)
+	if len(sessions) == 0 {
+		s.logger.Warn("no sessions found for player to send target request",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+		)
+		return
+	}
+
+	s.logger.Info("sending GAME_TARGET via WebSocket",
+		zap.String("game_id", gameID),
+		zap.String("player", playerName),
+		zap.Int("session_count", len(sessions)),
+		zap.String("message", targetData.Message),
+		zap.Int("target_count", len(targetData.Targets)),
+		zap.Bool("required", targetData.Required),
+	)
+
+	for _, sess := range sessions {
+		if !sess.SendCallback(event) {
+			s.logger.Warn("failed to send GAME_TARGET to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		} else {
+			s.logger.Info("successfully sent GAME_TARGET to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		}
+	}
+}
+
+// handleTargetNotification processes a GAME_TARGET notification and sends to the player
+func (s *mageServer) handleTargetNotification(gameID, playerName string, data map[string]interface{}) {
+	// Extract target data from the notification
+	message, _ := data["message"].(string)
+	required, _ := data["required"].(bool)
+
+	// Extract options
+	options := make(map[string]string)
+	if minTargets, ok := data["min_targets"].(int); ok {
+		options["minTargets"] = strconv.Itoa(minTargets)
+	}
+	if maxTargets, ok := data["max_targets"].(int); ok {
+		options["maxTargets"] = strconv.Itoa(maxTargets)
+	}
+	if sourceID, ok := data["source_id"].(string); ok {
+		options["sourceId"] = sourceID
+	}
+
+	// Build CardView targets from the notification data
+	var targets []*pb.CardView
+	if targetsData, ok := data["targets"].([]map[string]interface{}); ok {
+		for _, t := range targetsData {
+			cardView := &pb.CardView{
+				Id:   t["id"].(string),
+				Name: t["name"].(string),
+			}
+			if cardType, ok := t["type"].(string); ok {
+				cardView.Type = cardType
+			}
+			if zone, ok := t["zone"].(string); ok {
+				// Convert zone string to int32 (zone codes are stored as strings in notifications)
+				switch zone {
+				case "LIBRARY":
+					cardView.Zone = 0
+				case "HAND":
+					cardView.Zone = 1
+				case "BATTLEFIELD":
+					cardView.Zone = 2
+				case "GRAVEYARD":
+					cardView.Zone = 3
+				case "STACK":
+					cardView.Zone = 4
+				case "EXILE":
+					cardView.Zone = 5
+				case "COMMAND":
+					cardView.Zone = 6
+				}
+			}
+			if controller, ok := t["controller"].(string); ok {
+				cardView.ControllerId = controller
+			}
+			targets = append(targets, cardView)
+		}
+	}
+
+	// Create the target data
+	targetData := &pb.GameTargetData{
+		Message:  message,
+		Targets:  targets,
+		Required: required,
+		Options:  options,
+	}
+
+	// Send to the player
+	s.sendGameTargetToPlayer(gameID, playerName, targetData)
 }
 
 // engineViewToProto converts an engine view to protobuf GameView

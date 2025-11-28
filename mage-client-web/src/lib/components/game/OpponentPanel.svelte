@@ -7,6 +7,12 @@
 	import Card from './Card.svelte';
 	import Graveyard from './Graveyard.svelte';
 	import type { GameCard } from '$lib/types/game';
+	import {
+		isTargetingActive,
+		validTargetIds,
+		selectedTargetIds,
+		targetingStore
+	} from '$lib/stores/game-targeting';
 
 	// Props
 	let {
@@ -22,8 +28,26 @@
 		selectedCardIds?: string[];
 		expanded?: boolean;
 		position?: 'top' | 'left' | 'right';
+		// eslint-disable-next-line no-unused-vars
 		onCardClick?: (cardId: string) => void;
 	} = $props();
+
+	// Targeting state from store
+	const isTargeting = $derived($isTargetingActive);
+	const validTargets = $derived($validTargetIds);
+	const selectedTargets = $derived($selectedTargetIds);
+
+	/**
+	 * Handle card click - supports both normal selection and targeting mode
+	 */
+	function handleCardClick(id: string): void {
+		// Handle targeting mode
+		if (isTargeting) {
+			targetingStore.toggleTarget(id);
+		}
+		// Always call the parent handler
+		onCardClick(id);
+	}
 
 	/**
 	 * Convert CardView to GameCard for Graveyard component
@@ -114,7 +138,10 @@
 									isTapped={card.tapped}
 									isSelected={selectedCardIds.includes(card.id)}
 									size="small"
-									onclick={() => onCardClick(card.id)}
+									onclick={() => handleCardClick(card.id)}
+									isTargetingActive={isTargeting}
+									isValidTarget={validTargets.has(card.id)}
+									isTargetSelected={selectedTargets.includes(card.id)}
 								/>
 							</div>
 						{/each}

@@ -51,12 +51,22 @@
 	import GameHeader from '$lib/components/game/GameHeader.svelte';
 	import Stack from '$lib/components/game/Stack.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
+	import TargetingMode from '$lib/components/game/TargetingMode.svelte';
 	
 	import PriorityActionBar from '$lib/components/game/PriorityActionBar.svelte';
 	import ActionLogOverlay from '$lib/components/game/ActionLogOverlay.svelte';
 	import GameChatOverlay from '$lib/components/game/GameChatOverlay.svelte';
 	import OpponentPanel from '$lib/components/game/OpponentPanel.svelte';
 	import DebugOverlay from '$lib/components/game/DebugOverlay.svelte';
+
+	// Targeting store
+	import {
+		targetingStore,
+		isTargetingActive,
+		validTargetIds,
+		selectedTargetIds,
+		syncWithGamePrompt
+	} from '$lib/stores/game-targeting';
 
 	// Game ID from route params
 	const gameId = $derived($page.params.id);
@@ -70,6 +80,14 @@
 	let isActionLoading = $state(false);
 	let showStackOverlay = $state(false);
 	let initialized = $state(false);
+
+	// Targeting state (from store)
+	const isTargeting = $derived($isTargetingActive);
+	const validTargets = $derived($validTargetIds);
+	const selectedTargets = $derived($selectedTargetIds);
+
+	// Track targeting sync unsubscriber
+	let targetingSyncUnsub: (() => void) | null = null;
 
 	// Opponent panel states (for collapsing)
 	let opponentExpanded = $state<Record<string, boolean>>({});
@@ -465,9 +483,15 @@
 	 * This handler is for additional logic (target prompts, logging)
 	 */
 	function handleCardClick(cardId: string) {
-		if (prompt?.type === 'target' && gameId) {
-			sendPlayerUUID(gameId, cardId).catch(console.error);
-			gameStore.clearPrompt();
+		// Handle targeting mode - toggle target selection
+		if (isTargeting) {
+			const toggled = targetingStore.toggleTarget(cardId);
+			if (toggled) {
+				const card = myCards.find((c) => c.id === cardId);
+				if (card) {
+					addLogEntry(`Target: ${card.name}`);
+				}
+			}
 			return;
 		}
 
@@ -481,13 +505,69 @@
 	 * Handle battlefield card click
 	 */
 	function handleBattlefieldCardClick(cardId: string) {
-		if (prompt?.type === 'target' && gameId) {
-			sendPlayerUUID(gameId, cardId).catch(console.error);
-			gameStore.clearPrompt();
+		// Handle targeting mode - toggle target selection
+		if (isTargeting) {
+			const toggled = targetingStore.toggleTarget(cardId);
+			if (toggled) {
+				const card = battlefieldCards.find((c) => c.id === cardId);
+				if (card) {
+					addLogEntry(`Target: ${card.name}`);
+				}
+			}
 			return;
 		}
 
 		gameStore.toggleCardSelection(cardId);
+	}
+
+	/**
+	 * Handle target selection confirmation
+	 * Sends selected target UUID(s) to the server
+	 * 
+	 * Note: The server typically handles multi-target by:
+	 * 1. Sending separate GAME_TARGET events for each target slot
+	 * 2. Or accepting targets sequentially via SendPlayerUUID
+	 * 
+	 * Current implementation sends targets one at a time.
+	 * If server expects all targets at once, use SendPlayerUUIDs API instead.
+	 */
+	async function handleTargetConfirm(targetIds: string[]) {
+		if (!gameId || targetIds.length === 0) return;
+
+		isActionLoading = true;
+		try {
+			// Send each target to the server
+			// For most MTG implementations, the server expects one target per call
+			// and will send another GAME_TARGET if more targets are needed
+			for (const targetId of targetIds) {
+				await sendPlayerUUID(gameId, targetId);
+			}
+			gameStore.clearPrompt();
+			addLogEntry(`Confirmed ${targetIds.length} target(s)`);
+		} catch (err) {
+			console.error('Failed to confirm target:', err);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Handle target selection cancellation
+	 */
+	async function handleTargetCancel() {
+		if (!gameId) return;
+
+		isActionLoading = true;
+		try {
+			// Send empty UUID to cancel targeting
+			await sendPlayerUUID(gameId, '');
+			gameStore.clearPrompt();
+			addLogEntry('Cancelled target selection');
+		} catch (err) {
+			console.error('Failed to cancel targeting:', err);
+		} finally {
+			isActionLoading = false;
+		}
 	}
 
 	/**
@@ -674,11 +754,21 @@
 			return;
 		}
 
+		// Sync targeting store with game prompts
+		targetingSyncUnsub = syncWithGamePrompt();
+
 		initializeGame();
 	});
 
 	// Cleanup on destroy
 	onDestroy(() => {
+		// Cleanup targeting sync
+		if (targetingSyncUnsub) {
+			targetingSyncUnsub();
+			targetingSyncUnsub = null;
+		}
+		// Reset targeting state
+		targetingStore.exitTargetingMode();
 		gameStore.reset();
 	});
 </script>
@@ -740,8 +830,14 @@
 			</button>
 		</div>
 
-		<!-- Prompt Overlay -->
-		{#if prompt}
+		<!-- Target Selection Mode Overlay -->
+		<TargetingMode
+			onConfirm={handleTargetConfirm}
+			onCancel={handleTargetCancel}
+		/>
+
+		<!-- Prompt Overlay (non-target prompts) -->
+		{#if prompt && prompt.type !== 'target'}
 			<div class="prompt-overlay">
 				<div class="prompt-content">
 					<p class="prompt-message">{prompt.message}</p>
@@ -759,8 +855,6 @@
 								</button>
 							{/each}
 						</div>
-					{:else if prompt.type === 'target'}
-						<p class="prompt-hint">Click a valid target to select it</p>
 					{/if}
 				</div>
 			</div>
@@ -803,6 +897,9 @@
 									isSelected={gameState.selectedCardIds.includes(card.id)}
 									size="small"
 									onclick={() => handleBattlefieldCardClick(card.id)}
+									isTargetingActive={isTargeting}
+									isValidTarget={validTargets.has(card.id)}
+									isTargetSelected={selectedTargets.includes(card.id)}
 								/>
 							{/each}
 						</div>
@@ -826,6 +923,9 @@
 								isSelected={gameState.selectedCardIds.includes(card.id)}
 								size="normal"
 								onclick={() => handleBattlefieldCardClick(card.id)}
+								isTargetingActive={isTargeting}
+								isValidTarget={validTargets.has(card.id)}
+								isTargetSelected={selectedTargets.includes(card.id)}
 							/>
 						{/each}
 						{#if getPlayerBattlefieldCards(localPlayerId).length === 0}

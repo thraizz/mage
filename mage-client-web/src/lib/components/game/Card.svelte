@@ -19,7 +19,11 @@
 		isCardBack = false,
 		onclick = () => {},
 		onhover = () => {},
-		size = 'normal'
+		size = 'normal',
+		// Targeting mode props
+		isValidTarget = false,
+		isTargetSelected = false,
+		isTargetingActive = false
 	}: {
 		cardId?: string;
 		cardName: string;
@@ -36,6 +40,10 @@
 		onclick?: () => void;
 		onhover?: () => void;
 		size?: 'small' | 'normal' | 'large';
+		// Targeting mode props
+		isValidTarget?: boolean;
+		isTargetSelected?: boolean;
+		isTargetingActive?: boolean;
 	} = $props();
 
 	// Derive the effective image URL - use Scryfall if no explicit imageUrl provided
@@ -215,7 +223,7 @@
 	bind:this={cardElement}
 	class="card {sizeClasses()} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack
 		? 'card-back'
-		: ''}"
+		: ''} {isTargetingActive ? 'targeting-mode' : ''} {isValidTarget ? 'valid-target' : ''} {isTargetSelected ? 'target-selected' : ''} {isTargetingActive && !isValidTarget ? 'invalid-target' : ''}"
 	role="button"
 	tabindex="0"
 	onclick={handleClick}
@@ -352,6 +360,107 @@
 	}
 
 	.card.tapped:hover {
+		transform: rotate(90deg) translateY(-15px) scale(1.05);
+	}
+
+	/* Targeting Mode States */
+	.card.targeting-mode {
+		cursor: crosshair;
+	}
+
+	.card.valid-target {
+		cursor: pointer;
+		border-color: #fbbf24;
+		box-shadow:
+			0 0 0 3px rgba(251, 191, 36, 0.4),
+			0 0 20px rgba(251, 191, 36, 0.6),
+			0 0 40px rgba(251, 191, 36, 0.3);
+		animation: target-pulse 1.5s ease-in-out infinite;
+	}
+
+	@keyframes target-pulse {
+		0%, 100% {
+			box-shadow:
+				0 0 0 3px rgba(251, 191, 36, 0.4),
+				0 0 20px rgba(251, 191, 36, 0.6),
+				0 0 40px rgba(251, 191, 36, 0.3);
+		}
+		50% {
+			box-shadow:
+				0 0 0 4px rgba(251, 191, 36, 0.6),
+				0 0 30px rgba(251, 191, 36, 0.8),
+				0 0 50px rgba(251, 191, 36, 0.5);
+		}
+	}
+
+	.card.valid-target:hover {
+		transform: translateY(-20px) scale(1.1);
+		border-color: #f59e0b;
+		box-shadow:
+			0 0 0 4px rgba(245, 158, 11, 0.6),
+			0 0 35px rgba(245, 158, 11, 0.8),
+			0 8px 16px rgba(0, 0, 0, 0.3);
+	}
+
+	.card.valid-target.tapped:hover {
+		transform: rotate(90deg) translateY(-20px) scale(1.1);
+	}
+
+	.card.invalid-target {
+		opacity: 0.4;
+		filter: grayscale(60%);
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+
+	.card.invalid-target:hover {
+		transform: none;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		border-color: #3a4451;
+	}
+
+	.card.target-selected {
+		border-color: #22c55e;
+		box-shadow:
+			0 0 0 4px rgba(34, 197, 94, 0.5),
+			0 0 25px rgba(34, 197, 94, 0.7),
+			inset 0 0 30px rgba(34, 197, 94, 0.15);
+		animation: target-selected-glow 1s ease-in-out infinite;
+	}
+
+	@keyframes target-selected-glow {
+		0%, 100% {
+			box-shadow:
+				0 0 0 4px rgba(34, 197, 94, 0.5),
+				0 0 25px rgba(34, 197, 94, 0.7),
+				inset 0 0 30px rgba(34, 197, 94, 0.15);
+		}
+		50% {
+			box-shadow:
+				0 0 0 5px rgba(34, 197, 94, 0.7),
+				0 0 35px rgba(34, 197, 94, 0.9),
+				inset 0 0 40px rgba(34, 197, 94, 0.2);
+		}
+	}
+
+	.card.target-selected::after {
+		content: '✓';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-size: 2rem;
+		color: #22c55e;
+		text-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+		z-index: 10;
+		pointer-events: none;
+	}
+
+	.card.target-selected:hover {
+		transform: translateY(-15px) scale(1.05);
+	}
+
+	.card.target-selected.tapped:hover {
 		transform: rotate(90deg) translateY(-15px) scale(1.05);
 	}
 

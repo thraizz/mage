@@ -3,6 +3,12 @@
 	import type { GameCard } from '$lib/types/game';
 	import type { CardView } from '$lib/generated/mage/v1/models';
 	import { myHand, selectedCards, gameStore } from '$lib/stores/game';
+	import {
+		isTargetingActive,
+		validTargetIds,
+		selectedTargetIds,
+		targetingStore
+	} from '$lib/stores/game-targeting';
 
 	// Props (optional callbacks for additional handling like target selection)
 	let {
@@ -18,6 +24,11 @@
 		onCardHover?: (cardId: string) => void;
 		size?: 'small' | 'normal' | 'large';
 	} = $props();
+
+	// Targeting state from store
+	const isTargeting = $derived($isTargetingActive);
+	const validTargets = $derived($validTargetIds);
+	const selectedTargets = $derived($selectedTargetIds);
 
 	// State
 	let multiSelectMode = $state(false);
@@ -49,6 +60,13 @@
 	 * Handle card click
 	 */
 	function handleCardClick(cardId: string, event?: MouseEvent | KeyboardEvent): void {
+		// Handle targeting mode - toggle target selection
+		if (isTargeting) {
+			targetingStore.toggleTarget(cardId);
+			onCardClick(cardId);
+			return;
+		}
+
 		// Check for multi-select (Shift key)
 		if (event?.shiftKey) {
 			multiSelectMode = true;
@@ -135,6 +153,9 @@
 						{size}
 						onclick={() => {}}
 						onhover={() => {}}
+						isTargetingActive={isTargeting}
+						isValidTarget={validTargets.has(card.id)}
+						isTargetSelected={selectedTargets.includes(card.id)}
 					/>
 				</div>
 			{/each}
