@@ -386,3 +386,11 @@ export async function playLand(gameId: string, cardId: string): Promise<void> {
 export async function advancePhase(gameId: string): Promise<void> {
 	return sendSpecialAction(gameId, SpecialActionType.ADVANCE_PHASE, '');
 }
+
+/**
+ * Activate a mana ability on a permanent (tap for mana)
+ * Per MTG Rule 605: Mana abilities don't use the stack and resolve immediately
+ */
+export async function activateManaAbility(gameId: string, permanentId: string): Promise<void> {
+	return sendSpecialAction(gameId, SpecialActionType.ACTIVATE_MANA_ABILITY, permanentId);
+}

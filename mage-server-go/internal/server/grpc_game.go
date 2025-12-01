@@ -207,6 +207,18 @@ func (s *mageServer) GameJoin(ctx context.Context, req *pb.GameJoinRequest) (*pb
 
 	game, ok := s.gameMgr.GetGame(gameID)
 	if !ok {
+		// Game not found in active games - check if it's a completed game
+		if s.matchHistoryRepo != nil {
+			exists, err := s.matchHistoryRepo.ExistsByGameID(ctx, gameID)
+			if err != nil {
+				s.logger.Warn("failed to check match history",
+					zap.String("game_id", gameID),
+					zap.Error(err),
+				)
+			} else if exists {
+				return &pb.GameJoinResponse{Success: false, Error: "game has ended"}, nil
+			}
+		}
 		return &pb.GameJoinResponse{Success: false, Error: "game not found"}, nil
 	}
 

@@ -101,6 +101,54 @@ export interface AdminSendBroadcastMessageResponse {
   recipientCount: number;
 }
 
+/** Debug active game info with full details */
+export interface DebugActiveGameInfo {
+  gameId: string;
+  tableId: string;
+  gameType: string;
+  players: string[];
+  turnNumber: number;
+  state: string;
+  createdAt: string;
+  updatedAt: string;
+  /** Whether game exists in server memory */
+  inMemory: boolean;
+  /** Whether game exists in database */
+  inDatabase: boolean;
+}
+
+/** Get all active games from database (admin debug) */
+export interface AdminGetAllActiveGamesRequest {
+  sessionId: string;
+}
+
+export interface AdminGetAllActiveGamesResponse {
+  games: DebugActiveGameInfo[];
+  totalInMemory: number;
+  totalInDatabase: number;
+}
+
+/** Get server debug state including memory vs database comparison */
+export interface AdminGetServerDebugStateRequest {
+  sessionId: string;
+}
+
+export interface AdminGetServerDebugStateResponse {
+  /** Server memory state */
+  memoryActiveGames: number;
+  memoryActiveTables: number;
+  memoryActiveSessions: number;
+  /** Database state */
+  dbActiveGames: number;
+  dbMatchHistory: number;
+  /** Discrepancies */
+  gamesInMemoryOnly: string[];
+  gamesInDbOnly: string[];
+  /** Server info */
+  serverUptime: string;
+  lastGameSave: string;
+}
+
 function createBaseAdminGetUsersRequest(): AdminGetUsersRequest {
   return { sessionId: "" };
 }
@@ -1509,6 +1557,633 @@ export const AdminSendBroadcastMessageResponse: MessageFns<AdminSendBroadcastMes
     message.success = object.success ?? false;
     message.error = object.error ?? "";
     message.recipientCount = object.recipientCount ?? 0;
+    return message;
+  },
+};
+
+function createBaseDebugActiveGameInfo(): DebugActiveGameInfo {
+  return {
+    gameId: "",
+    tableId: "",
+    gameType: "",
+    players: [],
+    turnNumber: 0,
+    state: "",
+    createdAt: "",
+    updatedAt: "",
+    inMemory: false,
+    inDatabase: false,
+  };
+}
+
+export const DebugActiveGameInfo: MessageFns<DebugActiveGameInfo> = {
+  encode(message: DebugActiveGameInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.gameId !== "") {
+      writer.uint32(10).string(message.gameId);
+    }
+    if (message.tableId !== "") {
+      writer.uint32(18).string(message.tableId);
+    }
+    if (message.gameType !== "") {
+      writer.uint32(26).string(message.gameType);
+    }
+    for (const v of message.players) {
+      writer.uint32(34).string(v!);
+    }
+    if (message.turnNumber !== 0) {
+      writer.uint32(40).int32(message.turnNumber);
+    }
+    if (message.state !== "") {
+      writer.uint32(50).string(message.state);
+    }
+    if (message.createdAt !== "") {
+      writer.uint32(58).string(message.createdAt);
+    }
+    if (message.updatedAt !== "") {
+      writer.uint32(66).string(message.updatedAt);
+    }
+    if (message.inMemory !== false) {
+      writer.uint32(72).bool(message.inMemory);
+    }
+    if (message.inDatabase !== false) {
+      writer.uint32(80).bool(message.inDatabase);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DebugActiveGameInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDebugActiveGameInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.gameId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.tableId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.gameType = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.players.push(reader.string());
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.turnNumber = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.state = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.createdAt = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.updatedAt = reader.string();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.inMemory = reader.bool();
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.inDatabase = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DebugActiveGameInfo {
+    return {
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "",
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
+      gameType: isSet(object.gameType) ? globalThis.String(object.gameType) : "",
+      players: globalThis.Array.isArray(object?.players) ? object.players.map((e: any) => globalThis.String(e)) : [],
+      turnNumber: isSet(object.turnNumber) ? globalThis.Number(object.turnNumber) : 0,
+      state: isSet(object.state) ? globalThis.String(object.state) : "",
+      createdAt: isSet(object.createdAt) ? globalThis.String(object.createdAt) : "",
+      updatedAt: isSet(object.updatedAt) ? globalThis.String(object.updatedAt) : "",
+      inMemory: isSet(object.inMemory) ? globalThis.Boolean(object.inMemory) : false,
+      inDatabase: isSet(object.inDatabase) ? globalThis.Boolean(object.inDatabase) : false,
+    };
+  },
+
+  toJSON(message: DebugActiveGameInfo): unknown {
+    const obj: any = {};
+    if (message.gameId !== "") {
+      obj.gameId = message.gameId;
+    }
+    if (message.tableId !== "") {
+      obj.tableId = message.tableId;
+    }
+    if (message.gameType !== "") {
+      obj.gameType = message.gameType;
+    }
+    if (message.players?.length) {
+      obj.players = message.players;
+    }
+    if (message.turnNumber !== 0) {
+      obj.turnNumber = Math.round(message.turnNumber);
+    }
+    if (message.state !== "") {
+      obj.state = message.state;
+    }
+    if (message.createdAt !== "") {
+      obj.createdAt = message.createdAt;
+    }
+    if (message.updatedAt !== "") {
+      obj.updatedAt = message.updatedAt;
+    }
+    if (message.inMemory !== false) {
+      obj.inMemory = message.inMemory;
+    }
+    if (message.inDatabase !== false) {
+      obj.inDatabase = message.inDatabase;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DebugActiveGameInfo>): DebugActiveGameInfo {
+    return DebugActiveGameInfo.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DebugActiveGameInfo>): DebugActiveGameInfo {
+    const message = createBaseDebugActiveGameInfo();
+    message.gameId = object.gameId ?? "";
+    message.tableId = object.tableId ?? "";
+    message.gameType = object.gameType ?? "";
+    message.players = object.players?.map((e) => e) || [];
+    message.turnNumber = object.turnNumber ?? 0;
+    message.state = object.state ?? "";
+    message.createdAt = object.createdAt ?? "";
+    message.updatedAt = object.updatedAt ?? "";
+    message.inMemory = object.inMemory ?? false;
+    message.inDatabase = object.inDatabase ?? false;
+    return message;
+  },
+};
+
+function createBaseAdminGetAllActiveGamesRequest(): AdminGetAllActiveGamesRequest {
+  return { sessionId: "" };
+}
+
+export const AdminGetAllActiveGamesRequest: MessageFns<AdminGetAllActiveGamesRequest> = {
+  encode(message: AdminGetAllActiveGamesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminGetAllActiveGamesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminGetAllActiveGamesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.sessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminGetAllActiveGamesRequest {
+    return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "" };
+  },
+
+  toJSON(message: AdminGetAllActiveGamesRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminGetAllActiveGamesRequest>): AdminGetAllActiveGamesRequest {
+    return AdminGetAllActiveGamesRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminGetAllActiveGamesRequest>): AdminGetAllActiveGamesRequest {
+    const message = createBaseAdminGetAllActiveGamesRequest();
+    message.sessionId = object.sessionId ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminGetAllActiveGamesResponse(): AdminGetAllActiveGamesResponse {
+  return { games: [], totalInMemory: 0, totalInDatabase: 0 };
+}
+
+export const AdminGetAllActiveGamesResponse: MessageFns<AdminGetAllActiveGamesResponse> = {
+  encode(message: AdminGetAllActiveGamesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.games) {
+      DebugActiveGameInfo.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.totalInMemory !== 0) {
+      writer.uint32(16).int32(message.totalInMemory);
+    }
+    if (message.totalInDatabase !== 0) {
+      writer.uint32(24).int32(message.totalInDatabase);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminGetAllActiveGamesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminGetAllActiveGamesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.games.push(DebugActiveGameInfo.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.totalInMemory = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.totalInDatabase = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminGetAllActiveGamesResponse {
+    return {
+      games: globalThis.Array.isArray(object?.games)
+        ? object.games.map((e: any) => DebugActiveGameInfo.fromJSON(e))
+        : [],
+      totalInMemory: isSet(object.totalInMemory) ? globalThis.Number(object.totalInMemory) : 0,
+      totalInDatabase: isSet(object.totalInDatabase) ? globalThis.Number(object.totalInDatabase) : 0,
+    };
+  },
+
+  toJSON(message: AdminGetAllActiveGamesResponse): unknown {
+    const obj: any = {};
+    if (message.games?.length) {
+      obj.games = message.games.map((e) => DebugActiveGameInfo.toJSON(e));
+    }
+    if (message.totalInMemory !== 0) {
+      obj.totalInMemory = Math.round(message.totalInMemory);
+    }
+    if (message.totalInDatabase !== 0) {
+      obj.totalInDatabase = Math.round(message.totalInDatabase);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminGetAllActiveGamesResponse>): AdminGetAllActiveGamesResponse {
+    return AdminGetAllActiveGamesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminGetAllActiveGamesResponse>): AdminGetAllActiveGamesResponse {
+    const message = createBaseAdminGetAllActiveGamesResponse();
+    message.games = object.games?.map((e) => DebugActiveGameInfo.fromPartial(e)) || [];
+    message.totalInMemory = object.totalInMemory ?? 0;
+    message.totalInDatabase = object.totalInDatabase ?? 0;
+    return message;
+  },
+};
+
+function createBaseAdminGetServerDebugStateRequest(): AdminGetServerDebugStateRequest {
+  return { sessionId: "" };
+}
+
+export const AdminGetServerDebugStateRequest: MessageFns<AdminGetServerDebugStateRequest> = {
+  encode(message: AdminGetServerDebugStateRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminGetServerDebugStateRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminGetServerDebugStateRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.sessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminGetServerDebugStateRequest {
+    return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "" };
+  },
+
+  toJSON(message: AdminGetServerDebugStateRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminGetServerDebugStateRequest>): AdminGetServerDebugStateRequest {
+    return AdminGetServerDebugStateRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminGetServerDebugStateRequest>): AdminGetServerDebugStateRequest {
+    const message = createBaseAdminGetServerDebugStateRequest();
+    message.sessionId = object.sessionId ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminGetServerDebugStateResponse(): AdminGetServerDebugStateResponse {
+  return {
+    memoryActiveGames: 0,
+    memoryActiveTables: 0,
+    memoryActiveSessions: 0,
+    dbActiveGames: 0,
+    dbMatchHistory: 0,
+    gamesInMemoryOnly: [],
+    gamesInDbOnly: [],
+    serverUptime: "",
+    lastGameSave: "",
+  };
+}
+
+export const AdminGetServerDebugStateResponse: MessageFns<AdminGetServerDebugStateResponse> = {
+  encode(message: AdminGetServerDebugStateResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.memoryActiveGames !== 0) {
+      writer.uint32(8).int32(message.memoryActiveGames);
+    }
+    if (message.memoryActiveTables !== 0) {
+      writer.uint32(16).int32(message.memoryActiveTables);
+    }
+    if (message.memoryActiveSessions !== 0) {
+      writer.uint32(24).int32(message.memoryActiveSessions);
+    }
+    if (message.dbActiveGames !== 0) {
+      writer.uint32(32).int32(message.dbActiveGames);
+    }
+    if (message.dbMatchHistory !== 0) {
+      writer.uint32(40).int32(message.dbMatchHistory);
+    }
+    for (const v of message.gamesInMemoryOnly) {
+      writer.uint32(50).string(v!);
+    }
+    for (const v of message.gamesInDbOnly) {
+      writer.uint32(58).string(v!);
+    }
+    if (message.serverUptime !== "") {
+      writer.uint32(66).string(message.serverUptime);
+    }
+    if (message.lastGameSave !== "") {
+      writer.uint32(74).string(message.lastGameSave);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminGetServerDebugStateResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminGetServerDebugStateResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.memoryActiveGames = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.memoryActiveTables = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.memoryActiveSessions = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.dbActiveGames = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.dbMatchHistory = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.gamesInMemoryOnly.push(reader.string());
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.gamesInDbOnly.push(reader.string());
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.serverUptime = reader.string();
+          continue;
+        }
+        case 9: {
+          if (tag !== 74) {
+            break;
+          }
+
+          message.lastGameSave = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminGetServerDebugStateResponse {
+    return {
+      memoryActiveGames: isSet(object.memoryActiveGames) ? globalThis.Number(object.memoryActiveGames) : 0,
+      memoryActiveTables: isSet(object.memoryActiveTables) ? globalThis.Number(object.memoryActiveTables) : 0,
+      memoryActiveSessions: isSet(object.memoryActiveSessions) ? globalThis.Number(object.memoryActiveSessions) : 0,
+      dbActiveGames: isSet(object.dbActiveGames) ? globalThis.Number(object.dbActiveGames) : 0,
+      dbMatchHistory: isSet(object.dbMatchHistory) ? globalThis.Number(object.dbMatchHistory) : 0,
+      gamesInMemoryOnly: globalThis.Array.isArray(object?.gamesInMemoryOnly)
+        ? object.gamesInMemoryOnly.map((e: any) => globalThis.String(e))
+        : [],
+      gamesInDbOnly: globalThis.Array.isArray(object?.gamesInDbOnly)
+        ? object.gamesInDbOnly.map((e: any) => globalThis.String(e))
+        : [],
+      serverUptime: isSet(object.serverUptime) ? globalThis.String(object.serverUptime) : "",
+      lastGameSave: isSet(object.lastGameSave) ? globalThis.String(object.lastGameSave) : "",
+    };
+  },
+
+  toJSON(message: AdminGetServerDebugStateResponse): unknown {
+    const obj: any = {};
+    if (message.memoryActiveGames !== 0) {
+      obj.memoryActiveGames = Math.round(message.memoryActiveGames);
+    }
+    if (message.memoryActiveTables !== 0) {
+      obj.memoryActiveTables = Math.round(message.memoryActiveTables);
+    }
+    if (message.memoryActiveSessions !== 0) {
+      obj.memoryActiveSessions = Math.round(message.memoryActiveSessions);
+    }
+    if (message.dbActiveGames !== 0) {
+      obj.dbActiveGames = Math.round(message.dbActiveGames);
+    }
+    if (message.dbMatchHistory !== 0) {
+      obj.dbMatchHistory = Math.round(message.dbMatchHistory);
+    }
+    if (message.gamesInMemoryOnly?.length) {
+      obj.gamesInMemoryOnly = message.gamesInMemoryOnly;
+    }
+    if (message.gamesInDbOnly?.length) {
+      obj.gamesInDbOnly = message.gamesInDbOnly;
+    }
+    if (message.serverUptime !== "") {
+      obj.serverUptime = message.serverUptime;
+    }
+    if (message.lastGameSave !== "") {
+      obj.lastGameSave = message.lastGameSave;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminGetServerDebugStateResponse>): AdminGetServerDebugStateResponse {
+    return AdminGetServerDebugStateResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminGetServerDebugStateResponse>): AdminGetServerDebugStateResponse {
+    const message = createBaseAdminGetServerDebugStateResponse();
+    message.memoryActiveGames = object.memoryActiveGames ?? 0;
+    message.memoryActiveTables = object.memoryActiveTables ?? 0;
+    message.memoryActiveSessions = object.memoryActiveSessions ?? 0;
+    message.dbActiveGames = object.dbActiveGames ?? 0;
+    message.dbMatchHistory = object.dbMatchHistory ?? 0;
+    message.gamesInMemoryOnly = object.gamesInMemoryOnly?.map((e) => e) || [];
+    message.gamesInDbOnly = object.gamesInDbOnly?.map((e) => e) || [];
+    message.serverUptime = object.serverUptime ?? "";
+    message.lastGameSave = object.lastGameSave ?? "";
     return message;
   },
 };

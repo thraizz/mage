@@ -25,7 +25,9 @@
 	 * Toggle graveyard modal
 	 */
 	function toggleModal(): void {
-		showModal = !showModal;
+		if (!isEmpty) {
+			showModal = !showModal;
+		}
 	}
 
 	/**
@@ -58,40 +60,17 @@
 	const topCard = $derived(cards.length > 0 ? cards[cards.length - 1] : null);
 </script>
 
-<div class="graveyard-zone" class:opponent={isOpponent}>
-	<button
-		class="graveyard-button"
-		class:empty={isEmpty}
-		onclick={toggleModal}
-		disabled={isEmpty}
-		title="{playerName}'s Graveyard ({cardCount} cards)"
-	>
-		{#if topCard}
-			<div class="top-card-preview">
-				<Card
-					cardId={topCard.id}
-					cardName={topCard.name}
-					manaCost={topCard.manaCost || ''}
-					cardType={topCard.cardType || ''}
-					power={topCard.power || ''}
-					toughness={topCard.toughness || ''}
-					imageUrl={topCard.imageUrl || ''}
-					size="small"
-					onclick={() => {}}
-					onhover={() => {}}
-				/>
-			</div>
-		{:else}
-			<div class="empty-graveyard-icon">🪦</div>
-		{/if}
-
-		<div class="card-count-badge" class:zero={cardCount === 0}>
-			{cardCount}
-		</div>
-	</button>
-
-	<div class="graveyard-label">Graveyard</div>
-</div>
+<button
+	class="graveyard-compact"
+	class:has-cards={!isEmpty}
+	class:opponent={isOpponent}
+	onclick={toggleModal}
+	title="{playerName}'s Graveyard ({cardCount} cards){isEmpty ? '' : ' - Click to view'}"
+>
+	<span class="graveyard-icon">🪦</span>
+	<span class="graveyard-label">Grave</span>
+	<span class="card-count" class:zero={isEmpty}>{cardCount}</span>
+</button>
 
 <!-- Graveyard Modal -->
 {#if showModal}
@@ -136,86 +115,63 @@
 {/if}
 
 <style>
-	/* Graveyard Zone */
-	.graveyard-zone {
+	/* Compact Graveyard Button */
+	.graveyard-compact {
 		display: flex;
-		flex-direction: column;
 		align-items: center;
 		gap: 0.5rem;
+		padding: 0.375rem 0.625rem;
+		background: rgba(26, 31, 46, 0.6);
+		border: 1px solid #2a3441;
+		border-radius: 6px;
+		min-height: 32px;
+		cursor: default;
+		transition: all 0.15s;
+		color: inherit;
 	}
 
-	.graveyard-button {
-		position: relative;
-		width: 80px;
-		height: 112px;
-		border: 2px solid #4b5563;
-		border-radius: 8px;
-		background: #1a1f2e;
+	.graveyard-compact.has-cards {
 		cursor: pointer;
-		transition:
-			transform 0.2s,
-			border-color 0.2s,
-			box-shadow 0.2s;
-		overflow: hidden;
+		background: rgba(26, 31, 46, 0.9);
+		border-color: rgba(107, 114, 128, 0.4);
 	}
 
-	.graveyard-button:not(.empty):hover {
-		transform: scale(1.05);
-		border-color: #9ca3af;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+	.graveyard-compact.has-cards:hover {
+		background: rgba(42, 52, 65, 0.9);
+		border-color: rgba(156, 163, 175, 0.5);
 	}
 
-	.graveyard-button:disabled {
-		cursor: not-allowed;
-		opacity: 0.5;
+	.graveyard-icon {
+		font-size: 0.875rem;
+		opacity: 0.7;
 	}
 
-	.graveyard-button.empty {
-		border-style: dashed;
-		border-color: #374151;
-	}
-
-	.top-card-preview {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.empty-graveyard-icon {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 2rem;
-		opacity: 0.3;
-	}
-
-	.card-count-badge {
-		position: absolute;
-		top: 0.25rem;
-		right: 0.25rem;
-		padding: 0.25rem 0.5rem;
-		background: #374151;
-		border-radius: 4px;
-		font-size: 0.75rem;
-		font-weight: 700;
-		color: white;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-	}
-
-	.card-count-badge.zero {
-		background: #1f2937;
-		color: #6b7280;
+	.graveyard-compact.has-cards .graveyard-icon {
+		opacity: 1;
 	}
 
 	.graveyard-label {
-		font-size: 0.75rem;
+		font-size: 0.6875rem;
 		color: #6b7280;
+		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+	}
+
+	.card-count {
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: #9ca3af;
+		background: rgba(55, 65, 81, 0.5);
+		padding: 0.125rem 0.375rem;
+		border-radius: 4px;
+		min-width: 1.25rem;
+		text-align: center;
+	}
+
+	.card-count.zero {
+		color: #4b5563;
+		background: transparent;
 	}
 
 	/* Modal Backdrop */
@@ -274,6 +230,7 @@
 		padding: 1.5rem;
 		border-bottom: 1px solid #2a3441;
 		background: #141821;
+		border-radius: 10px 10px 0 0;
 	}
 
 	.modal-header h3 {

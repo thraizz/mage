@@ -135,6 +135,7 @@ enum SpecialActionType {
   SUSPEND = 3;
   COMPANION = 4;
   ADVANCE_PHASE = 5;  // Manually advance to next phase/step
+  ACTIVATE_MANA_ABILITY = 6;  // Tap a land for mana
 }
 
 message SendSpecialActionRequest {

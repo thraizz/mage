@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { getScryfallImageUrl, getScryfallVersionForSize } from '$lib/utils/scryfall';
+	import ManaSymbol from '$lib/components/mtg/ManaSymbol.svelte';
 
 	// Props
 	let {
@@ -45,6 +46,23 @@
 		isTargetSelected?: boolean;
 		isTargetingActive?: boolean;
 	} = $props();
+
+	// Track tap state changes for animation
+	let prevTapped = $state(isTapped);
+	let isAnimatingTap = $state(false);
+
+	// Detect tap state changes and trigger animation
+	$effect(() => {
+		if (isTapped !== prevTapped) {
+			isAnimatingTap = true;
+			prevTapped = isTapped;
+			// Reset animation state after animation completes
+			const timeout = setTimeout(() => {
+				isAnimatingTap = false;
+			}, 200); // Match animation duration
+			return () => clearTimeout(timeout);
+		}
+	});
 
 	// Derive the effective image URL - use Scryfall if no explicit imageUrl provided
 	const effectiveImageUrl = $derived(
@@ -223,7 +241,7 @@
 	bind:this={cardElement}
 	class="card {sizeClasses()} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack
 		? 'card-back'
-		: ''} {isTargetingActive ? 'targeting-mode' : ''} {isValidTarget ? 'valid-target' : ''} {isTargetSelected ? 'target-selected' : ''} {isTargetingActive && !isValidTarget ? 'invalid-target' : ''}"
+		: ''} {isTargetingActive ? 'targeting-mode' : ''} {isValidTarget ? 'valid-target' : ''} {isTargetSelected ? 'target-selected' : ''} {isTargetingActive && !isValidTarget ? 'invalid-target' : ''} {isAnimatingTap ? 'tap-animating' : ''}"
 	role="button"
 	tabindex="0"
 	onclick={handleClick}
@@ -244,7 +262,7 @@
 			{#if manaCost}
 				<div class="mana-cost-placeholder">
 					{#each manaSymbols as symbol}
-						<span class="mana-symbol">{symbol}</span>
+						<ManaSymbol {symbol} size="sm" />
 					{/each}
 				</div>
 			{/if}
@@ -270,7 +288,7 @@
 				{#if manaCost}
 					<div class="mana-cost">
 						{#each manaSymbols as symbol}
-							<span class="mana-symbol mana-{symbol.toLowerCase()}">{symbol}</span>
+							<ManaSymbol {symbol} size="sm" />
 						{/each}
 					</div>
 				{/if}
@@ -306,14 +324,22 @@
 		position: relative;
 		border-radius: 8px;
 		cursor: pointer;
+		/* Smooth transitions for all interactive states */
 		transition:
-			transform 0.2s,
-			box-shadow 0.2s,
-			filter 0.2s;
+			transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+			box-shadow 0.2s ease-out,
+			filter 0.2s ease-out,
+			border-color 0.15s ease-out;
+		transform-origin: center center;
 		user-select: none;
 		background: #1a1f2e;
 		border: 2px solid #3a4451;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		/* Enable GPU acceleration for smooth animations */
+		will-change: transform;
+		/* Touch device optimization */
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
 	}
 
 	/* Card Sizes */
@@ -354,6 +380,7 @@
 		box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.4);
 	}
 
+	/* Tapped State - 90° clockwise rotation */
 	.card.tapped {
 		transform: rotate(90deg);
 		transform-origin: center center;
@@ -361,6 +388,69 @@
 
 	.card.tapped:hover {
 		transform: rotate(90deg) translateY(-15px) scale(1.05);
+	}
+
+	/* Tap Animation - Visual feedback during tap/untap */
+	.card.tap-animating {
+		animation: tap-glow 0.2s ease-out;
+	}
+
+	.card.tap-animating.tapped {
+		animation: tap-rotate-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
+	.card.tap-animating:not(.tapped) {
+		animation: tap-rotate-out 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
+	/* Tap animation keyframes - Clockwise rotation with slight overshoot */
+	@keyframes tap-rotate-in {
+		0% {
+			transform: rotate(0deg);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		}
+		50% {
+			box-shadow: 
+				0 4px 12px rgba(102, 126, 234, 0.4),
+				0 0 20px rgba(102, 126, 234, 0.2);
+		}
+		70% {
+			transform: rotate(95deg);
+		}
+		100% {
+			transform: rotate(90deg);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		}
+	}
+
+	/* Untap animation keyframes - Counter-clockwise rotation with slight overshoot */
+	@keyframes tap-rotate-out {
+		0% {
+			transform: rotate(90deg);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		}
+		50% {
+			box-shadow: 
+				0 4px 12px rgba(16, 185, 129, 0.4),
+				0 0 20px rgba(16, 185, 129, 0.2);
+		}
+		70% {
+			transform: rotate(-5deg);
+		}
+		100% {
+			transform: rotate(0deg);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+		}
+	}
+
+	/* Subtle glow pulse during any tap state change */
+	@keyframes tap-glow {
+		0%, 100% {
+			filter: brightness(1);
+		}
+		50% {
+			filter: brightness(1.15);
+		}
 	}
 
 	/* Targeting Mode States */

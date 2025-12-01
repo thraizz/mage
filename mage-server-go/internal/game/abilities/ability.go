@@ -100,6 +100,9 @@ type GameContext interface {
 	// UntapPermanent untaps a permanent
 	UntapPermanent(permanentID uuid.UUID) error
 
+	// IsPermanentTapped checks if a permanent is tapped
+	IsPermanentTapped(permanentID uuid.UUID) bool
+
 	// SacrificePermanent sacrifices a permanent (moves to graveyard, triggers dies events)
 	SacrificePermanent(permanentID uuid.UUID) error
 

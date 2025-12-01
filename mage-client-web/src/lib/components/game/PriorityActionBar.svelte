@@ -55,7 +55,7 @@
 	}
 
 	/**
-	 * Handle F6 - pass until end of turn
+	 * Handle pass turn - pass through remaining phases until next turn begins
 	 */
 	function handlePassUntilEOT(): void {
 		if (!hasPriority || isLoading) return;
@@ -210,7 +210,7 @@
 			class="action-btn f6"
 			disabled={!hasPriority || isLoading}
 			onclick={handlePassUntilEOT}
-			title="Pass until your next upkeep (F6)"
+			title="Pass through remaining phases until next turn begins (F6)"
 		>
 			<span class="btn-icon">⏭️</span>
 			<span class="btn-label">Pass Turn</span>

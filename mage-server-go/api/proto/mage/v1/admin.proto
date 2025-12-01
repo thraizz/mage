@@ -100,3 +100,54 @@ message AdminSendBroadcastMessageResponse {
   string error = 2;
   int32 recipient_count = 3;
 }
+
+// ==================== Debug/Diagnostic Messages ====================
+
+// Debug active game info with full details
+message DebugActiveGameInfo {
+  string game_id = 1;
+  string table_id = 2;
+  string game_type = 3;
+  repeated string players = 4;
+  int32 turn_number = 5;
+  string state = 6;
+  string created_at = 7;
+  string updated_at = 8;
+  bool in_memory = 9;  // Whether game exists in server memory
+  bool in_database = 10;  // Whether game exists in database
+}
+
+// Get all active games from database (admin debug)
+message AdminGetAllActiveGamesRequest {
+  string session_id = 1;
+}
+
+message AdminGetAllActiveGamesResponse {
+  repeated DebugActiveGameInfo games = 1;
+  int32 total_in_memory = 2;
+  int32 total_in_database = 3;
+}
+
+// Get server debug state including memory vs database comparison
+message AdminGetServerDebugStateRequest {
+  string session_id = 1;
+}
+
+message AdminGetServerDebugStateResponse {
+  // Server memory state
+  int32 memory_active_games = 1;
+  int32 memory_active_tables = 2;
+  int32 memory_active_sessions = 3;
+  
+  // Database state
+  int32 db_active_games = 4;
+  int32 db_match_history = 5;
+  
+  // Discrepancies
+  repeated string games_in_memory_only = 6;
+  repeated string games_in_db_only = 7;
+  
+  // Server info
+  string server_uptime = 8;
+  string last_game_save = 9;
+}

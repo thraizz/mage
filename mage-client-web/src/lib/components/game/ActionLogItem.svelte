@@ -5,6 +5,7 @@
 	 */
 
 	import type { ActionLogEntry } from '$lib/types/game';
+	import ManaText from '$lib/components/mtg/ManaText.svelte';
 
 	let {
 		action,
@@ -75,7 +76,7 @@
 				</span>
 			{/if}
 
-			<span class="action-text">{action.text}</span>
+			<span class="action-text"><ManaText text={action.text} size="sm" /></span>
 
 			{#if action.cardName}
 				<span class="action-card">{action.cardName}</span>

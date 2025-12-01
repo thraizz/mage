@@ -242,6 +242,12 @@
 	 * Initialize chat connection
 	 */
 	async function initializeChat(): Promise<void> {
+		// Don't initialize if gameId is empty or undefined
+		if (!gameId) {
+			console.log('[GameChat] Skipping initialization - no gameId');
+			return;
+		}
+
 		loading = true;
 		error = null;
 

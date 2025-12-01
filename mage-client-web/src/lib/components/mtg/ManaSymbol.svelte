@@ -1,106 +1,107 @@
 <script lang="ts">
-	type ManaColor = 'W' | 'U' | 'B' | 'R' | 'G' | 'C' | 'X';
+	type ManaColor = 'W' | 'U' | 'B' | 'R' | 'G' | 'C' | 'X' | 'T' | 'Q';
 
 	interface Props {
-		symbol: ManaColor | number;
-		size?: 'sm' | 'md' | 'lg' | 'xl';
+		symbol: ManaColor | number | string;
+		size?: 'sm' | 'md' | 'lg' | 'xl' | '2x' | '3x';
 		interactive?: boolean;
 		onclick?: () => void;
 	}
 
 	let { symbol, size = 'md', interactive = false, onclick }: Props = $props();
 
-	const colorStyles: Record<string, { bg: string; text: string; border: string }> = {
-		W: { bg: '#f8f6e3', text: '#1a1a1a', border: '#c9c5a8' },
-		U: { bg: '#0e68ab', text: '#ffffff', border: '#0a4d80' },
-		B: { bg: '#150b00', text: '#a8a8a8', border: '#3d2d1a' },
-		R: { bg: '#d3202a', text: '#ffffff', border: '#a01920' },
-		G: { bg: '#00733e', text: '#ffffff', border: '#005830' },
-		C: { bg: '#9ca3af', text: '#1a1a1a', border: '#6b7280' },
-		X: { bg: '#6b7280', text: '#ffffff', border: '#4b5563' }
-	};
+	// Convert symbol to mana-font class
+	function getManaClass(sym: ManaColor | number | string): string {
+		if (typeof sym === 'number') {
+			return `ms-${sym}`;
+		}
+		// Handle string symbols - normalize to lowercase for mana-font
+		const s = String(sym).toLowerCase();
+		switch (s) {
+			case 'w': return 'ms-w';
+			case 'u': return 'ms-u';
+			case 'b': return 'ms-b';
+			case 'r': return 'ms-r';
+			case 'g': return 'ms-g';
+			case 'c': return 'ms-c';
+			case 'x': return 'ms-x';
+			case 't': return 'ms-tap';
+			case 'q': return 'ms-untap';
+			case 's': return 'ms-s'; // snow
+			case 'e': return 'ms-e'; // energy
+			default:
+				// Try parsing as number
+				const num = parseInt(s, 10);
+				if (!isNaN(num)) {
+					return `ms-${num}`;
+				}
+				return 'ms-c'; // fallback to colorless
+		}
+	}
 
-	const isNumeric = $derived(typeof symbol === 'number');
-	const displaySymbol = $derived(isNumeric ? symbol.toString() : symbol);
-	const style = $derived(isNumeric ? colorStyles['C'] : (colorStyles[symbol as string] || colorStyles['C']));
+	const manaClass = $derived(getManaClass(symbol));
+	
+	// Size classes - mana-font uses ms-cost for circle backgrounds, ms-shadow for shadows
+	const sizeClass = $derived({
+		sm: 'mana-size-sm',
+		md: 'mana-size-md',
+		lg: 'mana-size-lg',
+		xl: 'mana-size-xl',
+		'2x': 'ms-2x',
+		'3x': 'ms-3x'
+	}[size] || 'mana-size-md');
 </script>
 
 {#if interactive}
 	<button
 		type="button"
-		class="mana-symbol mana-symbol-{size} mana-interactive"
-		style="--mana-bg: {style.bg}; --mana-text: {style.text}; --mana-border: {style.border}"
+		class="mana-symbol-wrapper mana-interactive {sizeClass}"
 		{onclick}
 	>
-		{displaySymbol}
+		<i class="ms ms-cost {manaClass}"></i>
 	</button>
 {:else}
-	<span
-		class="mana-symbol mana-symbol-{size}"
-		style="--mana-bg: {style.bg}; --mana-text: {style.text}; --mana-border: {style.border}"
-	>
-		{displaySymbol}
+	<span class="mana-symbol-wrapper {sizeClass}">
+		<i class="ms ms-cost {manaClass}"></i>
 	</span>
 {/if}
 
 <style>
-	.mana-symbol {
+	.mana-symbol-wrapper {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		font-family: var(--font-body);
-		font-weight: var(--weight-bold);
-		border-radius: var(--radius-full);
-		background: var(--mana-bg);
-		color: var(--mana-text);
-		border: 2px solid var(--mana-border);
-		box-shadow:
-			inset 0 2px 4px rgba(255, 255, 255, 0.2),
-			inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-			0 1px 2px rgba(0, 0, 0, 0.3);
-		user-select: none;
-		flex-shrink: 0;
+		vertical-align: middle;
 	}
 
-	/* Sizes */
-	.mana-symbol-sm {
-		width: 1rem;
-		height: 1rem;
-		font-size: 0.625rem;
-		border-width: 1px;
-	}
-
-	.mana-symbol-md {
-		width: 1.25rem;
-		height: 1.25rem;
-		font-size: 0.75rem;
-	}
-
-	.mana-symbol-lg {
-		width: 1.5rem;
-		height: 1.5rem;
+	/* Size overrides for our custom sizes */
+	.mana-size-sm :global(.ms) {
 		font-size: 0.875rem;
 	}
 
-	.mana-symbol-xl {
-		width: 2rem;
-		height: 2rem;
-		font-size: 1rem;
-		border-width: 3px;
+	.mana-size-md :global(.ms) {
+		font-size: 1.125rem;
+	}
+
+	.mana-size-lg :global(.ms) {
+		font-size: 1.5rem;
+	}
+
+	.mana-size-xl :global(.ms) {
+		font-size: 2rem;
 	}
 
 	/* Interactive state */
 	.mana-interactive {
 		cursor: pointer;
-		transition: all var(--transition-fast);
+		transition: transform var(--transition-fast, 0.15s);
+		background: none;
+		border: none;
+		padding: 0;
 	}
 
 	.mana-interactive:hover {
-		transform: scale(1.1);
-		box-shadow:
-			inset 0 2px 4px rgba(255, 255, 255, 0.2),
-			inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-			0 2px 8px rgba(0, 0, 0, 0.4);
+		transform: scale(1.15);
 	}
 
 	.mana-interactive:active {
@@ -108,7 +109,8 @@
 	}
 
 	.mana-interactive:focus-visible {
-		outline: 2px solid var(--accent-gold);
+		outline: 2px solid var(--accent-gold, #d4af37);
 		outline-offset: 2px;
+		border-radius: 50%;
 	}
 </style>

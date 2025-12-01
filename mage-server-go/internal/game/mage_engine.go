@@ -958,6 +958,9 @@ func (e *MageEngine) findValidTargets(gameState *engineGameState, requirement ta
 	case targeting.TargetTypeCreature:
 		// Find all creatures on the battlefield
 		for _, card := range gameState.battlefield {
+			if card == nil {
+				continue
+			}
 			if strings.Contains(strings.ToLower(card.Type), "creature") {
 				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
 					validTargets = append(validTargets, card.ID)
@@ -976,6 +979,9 @@ func (e *MageEngine) findValidTargets(gameState *engineGameState, requirement ta
 	case targeting.TargetTypePermanent:
 		// All permanents on the battlefield
 		for _, card := range gameState.battlefield {
+			if card == nil {
+				continue
+			}
 			if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
 				validTargets = append(validTargets, card.ID)
 			}
@@ -992,6 +998,9 @@ func (e *MageEngine) findValidTargets(gameState *engineGameState, requirement ta
 
 	case targeting.TargetTypeArtifact:
 		for _, card := range gameState.battlefield {
+			if card == nil {
+				continue
+			}
 			if strings.Contains(strings.ToLower(card.Type), "artifact") {
 				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
 					validTargets = append(validTargets, card.ID)
@@ -1001,6 +1010,9 @@ func (e *MageEngine) findValidTargets(gameState *engineGameState, requirement ta
 
 	case targeting.TargetTypeEnchantment:
 		for _, card := range gameState.battlefield {
+			if card == nil {
+				continue
+			}
 			if strings.Contains(strings.ToLower(card.Type), "enchantment") {
 				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
 					validTargets = append(validTargets, card.ID)
@@ -1010,6 +1022,9 @@ func (e *MageEngine) findValidTargets(gameState *engineGameState, requirement ta
 
 	case targeting.TargetTypeLand:
 		for _, card := range gameState.battlefield {
+			if card == nil {
+				continue
+			}
 			if strings.Contains(strings.ToLower(card.Type), "land") {
 				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
 					validTargets = append(validTargets, card.ID)
@@ -1019,6 +1034,9 @@ func (e *MageEngine) findValidTargets(gameState *engineGameState, requirement ta
 
 	case targeting.TargetTypePlaneswalker:
 		for _, card := range gameState.battlefield {
+			if card == nil {
+				continue
+			}
 			if strings.Contains(strings.ToLower(card.Type), "planeswalker") {
 				if err := gameState.targetValidator.ValidateTarget(card.ID, requirement); err == nil {
 					validTargets = append(validTargets, card.ID)
@@ -1548,12 +1566,15 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 		e.logger.Info("[LOCK-DEBUG] ProcessAction acquired gameState.mu.Lock",
 			zap.String("game_id", gameID))
 	}
+	lockHeld := true // Track lock state for panic safety
 	defer func() {
-		if e.logger != nil {
-			e.logger.Info("[LOCK-DEBUG] ProcessAction releasing gameState.mu.Lock (defer)",
-				zap.String("game_id", gameID))
+		if lockHeld {
+			if e.logger != nil {
+				e.logger.Info("[LOCK-DEBUG] ProcessAction releasing gameState.mu.Lock (defer)",
+					zap.String("game_id", gameID))
+			}
+			gameState.mu.Unlock()
 		}
-		gameState.mu.Unlock()
 	}()
 
 	if gameState.state == GameStateFinished {
@@ -1568,12 +1589,14 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 			zap.String("game_id", gameID))
 	}
 	gameState.mu.Unlock() // Temporarily unlock to call BookmarkState
+	lockHeld = false
 	bookmarkID, bookmarkErr := e.BookmarkState(gameID)
 	if e.logger != nil {
 		e.logger.Info("[LOCK-DEBUG] ProcessAction re-acquiring gameState.mu after BookmarkState",
 			zap.String("game_id", gameID))
 	}
 	gameState.mu.Lock() // Re-acquire lock
+	lockHeld = true
 	if e.logger != nil {
 		e.logger.Info("[LOCK-DEBUG] ProcessAction re-acquired gameState.mu after BookmarkState",
 			zap.String("game_id", gameID))
@@ -1705,29 +1728,83 @@ func (e *MageEngine) handlePlayerAction(gameState *engineGameState, action Playe
 
 // handleKeepHand handles a player choosing to keep their hand during mulligan
 func (e *MageEngine) handleKeepHand(gameState *engineGameState, playerID string) error {
+	if e.logger != nil {
+		e.logger.Info("[MULLIGAN] handleKeepHand called",
+			zap.String("game_id", gameState.gameID),
+			zap.String("player_id", playerID),
+			zap.String("current_state", gameState.state.String()),
+		)
+	}
+
 	player, exists := gameState.players[playerID]
 	if !exists {
+		if e.logger != nil {
+			e.logger.Warn("[MULLIGAN] handleKeepHand failed - player not found",
+				zap.String("game_id", gameState.gameID),
+				zap.String("player_id", playerID),
+			)
+		}
 		return fmt.Errorf("player %s not found", playerID)
 	}
 
+	if e.logger != nil {
+		e.logger.Info("[MULLIGAN] Player state before keep",
+			zap.String("game_id", gameState.gameID),
+			zap.String("player_id", playerID),
+			zap.Bool("already_kept_hand", player.KeptHand),
+			zap.Int("hand_size", len(player.Hand)),
+			zap.Int("mulligan_count", player.MulliganCount),
+		)
+	}
+
 	if gameState.state != GameStateMulligan {
+		if e.logger != nil {
+			e.logger.Warn("[MULLIGAN] handleKeepHand failed - not in mulligan phase",
+				zap.String("game_id", gameState.gameID),
+				zap.String("player_id", playerID),
+				zap.String("actual_state", gameState.state.String()),
+			)
+		}
 		return fmt.Errorf("not in mulligan phase")
 	}
 
 	if player.KeptHand {
+		if e.logger != nil {
+			e.logger.Warn("[MULLIGAN] handleKeepHand failed - player already kept hand",
+				zap.String("game_id", gameState.gameID),
+				zap.String("player_id", playerID),
+			)
+		}
 		return fmt.Errorf("player %s has already kept hand", playerID)
 	}
 
 	player.KeptHand = true
 	gameState.addMessage(fmt.Sprintf("%s keeps their hand (%d cards)", playerID, len(player.Hand)), "action")
 
+	if e.logger != nil {
+		e.logger.Info("[MULLIGAN] Player kept hand successfully",
+			zap.String("game_id", gameState.gameID),
+			zap.String("player_id", playerID),
+			zap.Int("hand_size", len(player.Hand)),
+		)
+	}
+
 	// Check if all players have kept their hands
 	allKept := true
-	for _, p := range gameState.players {
+	playersNotKept := []string{}
+	for pid, p := range gameState.players {
 		if !p.KeptHand {
 			allKept = false
-			break
+			playersNotKept = append(playersNotKept, pid)
 		}
+	}
+
+	if e.logger != nil {
+		e.logger.Info("[MULLIGAN] Checking if all players kept",
+			zap.String("game_id", gameState.gameID),
+			zap.Bool("all_kept", allKept),
+			zap.Strings("players_still_deciding", playersNotKept),
+		)
 	}
 
 	if allKept {
@@ -1772,6 +1849,9 @@ func (e *MageEngine) handleMulligan(gameState *engineGameState, playerID string)
 
 	// Return current hand to library
 	for _, card := range player.Hand {
+		if card == nil {
+			continue
+		}
 		card.Zone = zoneLibrary
 		player.Library = append(player.Library, card)
 	}
@@ -1844,6 +1924,13 @@ func (e *MageEngine) handleMulligan(gameState *engineGameState, playerID string)
 
 // completeMulliganPhase transitions from mulligan to main game
 func (e *MageEngine) completeMulliganPhase(gameState *engineGameState) {
+	if e.logger != nil {
+		e.logger.Info("[MULLIGAN] completeMulliganPhase called - transitioning to IN_PROGRESS",
+			zap.String("game_id", gameState.gameID),
+			zap.String("old_state", gameState.state.String()),
+		)
+	}
+
 	gameState.state = GameStateInProgress
 
 	// Give priority to the starting player
@@ -1868,11 +1955,37 @@ func (e *MageEngine) completeMulliganPhase(gameState *engineGameState) {
 	})
 
 	if e.logger != nil {
-		e.logger.Info("mulligan phase completed, game in progress",
+		e.logger.Info("[MULLIGAN] Mulligan phase completed, game now IN_PROGRESS",
 			zap.String("game_id", gameState.gameID),
+			zap.String("new_state", gameState.state.String()),
 			zap.String("priority_player", startingPlayerID),
 		)
 	}
+
+	// Persist the game state immediately after mulligan completion.
+	// This is critical for crash recovery - if the server restarts before the next
+	// turn snapshot, the database will have the correct IN_PROGRESS state.
+	// Use a goroutine to avoid lock issues (caller holds gameState.mu).
+	gameID := gameState.gameID
+	go func() {
+		if e.logger != nil {
+			e.logger.Info("[MULLIGAN] Persisting game state after mulligan completion (async)",
+				zap.String("game_id", gameID),
+			)
+		}
+		if err := e.PersistGameState(gameID); err != nil {
+			if e.logger != nil {
+				e.logger.Error("[MULLIGAN] FAILED to persist game state after mulligan completion",
+					zap.String("game_id", gameID),
+					zap.Error(err),
+				)
+			}
+		} else if e.logger != nil {
+			e.logger.Info("[MULLIGAN] Successfully persisted game state after mulligan completion",
+				zap.String("game_id", gameID),
+			)
+		}
+	}()
 }
 
 // handlePass handles a pass action
@@ -1925,6 +2038,18 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		phase, step := gameState.turnManager.AdvanceStep(nextPlayer)
 		newTurn := gameState.turnManager.TurnNumber()
 		gameState.addMessage(fmt.Sprintf("Game advances to %s - %s", phase.String(), step.String()), "action")
+
+		if e.logger != nil {
+			e.logger.Info("[TURN_ADVANCE] Step advanced",
+				zap.String("game_id", gameState.gameID),
+				zap.Int("old_turn", oldTurn),
+				zap.Int("new_turn", newTurn),
+				zap.String("phase", phase.String()),
+				zap.String("step", step.String()),
+				zap.String("next_active_player", nextPlayer),
+				zap.String("actual_active_player", gameState.turnManager.ActivePlayer()),
+			)
+		}
 
 		// Save turn snapshot if we advanced to a new turn
 		// Per Java GameImpl.saveRollBackGameState(): save at start of each turn
@@ -2088,9 +2213,26 @@ func (e *MageEngine) handlePassUntil(gameState *engineGameState, playerID string
 	// Set up pass-until mode
 	player.PassUntil = passType
 
-	// For PassUntilMyNextTurn, record the target turn
-	if passType == PassUntilMyNextTurn {
+	// Record the current turn number for turn-based auto-pass modes
+	// This is used to detect when the turn has advanced
+	switch passType {
+	case PassUntilMyNextTurn:
 		// Pass until the next time it's this player's turn and we're in upkeep
+		player.PassUntilTurn = gameState.turnManager.TurnNumber()
+	case PassUntilNextTurn:
+		// Pass until any new turn begins (next player's turn)
+		player.PassUntilTurn = gameState.turnManager.TurnNumber()
+		if e.logger != nil {
+			e.logger.Info("[PASS_UNTIL_NEXT_TURN] Setting up auto-pass",
+				zap.String("player_id", playerID),
+				zap.Int("pass_until_turn", player.PassUntilTurn),
+				zap.Int("current_turn", gameState.turnManager.TurnNumber()),
+				zap.String("current_step", gameState.turnManager.CurrentStep().String()),
+				zap.String("active_player", gameState.turnManager.ActivePlayer()),
+			)
+		}
+	case PassUntilEndOfTurn:
+		// Pass until cleanup step of the current turn
 		player.PassUntilTurn = gameState.turnManager.TurnNumber()
 	}
 
@@ -2122,16 +2264,63 @@ func (e *MageEngine) shouldAutoPass(gameState *engineGameState, playerID string)
 	switch player.PassUntil {
 	case PassUntilEndOfTurn:
 		// Auto-pass until cleanup step of current turn
-		// Stop at end of turn (cleanup)
+		// Stop at cleanup step (end of turn) on the same turn
+		currentTurn := gameState.turnManager.TurnNumber()
+		isCleanup := gameState.turnManager.CurrentStep() == rules.StepCleanup
+
+		// If turn has advanced beyond when we set this, stop auto-passing
+		if currentTurn > player.PassUntilTurn {
+			player.PassUntil = PassUntilNone
+			return false
+		}
+
+		// Stop auto-passing when we reach cleanup on the same turn
+		if isCleanup && currentTurn == player.PassUntilTurn {
+			player.PassUntil = PassUntilNone
+			return false
+		}
 		return true
 
 	case PassUntilNextTurn:
-		// Auto-pass until the next turn begins
+		// Auto-pass until a new turn begins (turn number increases)
+		// This passes through all remaining phases of the current turn
+		// and stops at the beginning of the NEXT turn (any player's turn)
+		currentTurn := gameState.turnManager.TurnNumber()
+		currentStep := gameState.turnManager.CurrentStep()
+		activePlayer := gameState.turnManager.ActivePlayer()
+
+		if e.logger != nil {
+			e.logger.Info("[PASS_UNTIL_NEXT_TURN] shouldAutoPass check",
+				zap.String("player_id", playerID),
+				zap.Int("current_turn", currentTurn),
+				zap.Int("pass_until_turn", player.PassUntilTurn),
+				zap.String("current_step", currentStep.String()),
+				zap.String("active_player", activePlayer),
+				zap.Bool("should_stop", currentTurn > player.PassUntilTurn),
+			)
+		}
+
+		// Stop auto-passing when the turn number has advanced
+		if currentTurn > player.PassUntilTurn {
+			if e.logger != nil {
+				e.logger.Info("[PASS_UNTIL_NEXT_TURN] STOPPING auto-pass - turn advanced",
+					zap.String("player_id", playerID),
+					zap.Int("current_turn", currentTurn),
+					zap.Int("pass_until_turn", player.PassUntilTurn),
+				)
+			}
+			player.PassUntil = PassUntilNone
+			return false
+		}
 		return true
 
 	case PassUntilStackResolved:
 		// Auto-pass until stack is empty
-		return !gameState.stack.IsEmpty()
+		if gameState.stack.IsEmpty() {
+			player.PassUntil = PassUntilNone
+			return false
+		}
+		return true
 
 	case PassUntilMyNextTurn:
 		// Auto-pass until it's this player's upkeep again
@@ -2198,6 +2387,9 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 	// Find card in hand
 	var card *internalCard
 	for _, c := range player.Hand {
+		if c == nil {
+			continue
+		}
 		if strings.EqualFold(c.Name, spellName) {
 			card = c
 			break
@@ -2258,6 +2450,28 @@ func (e *MageEngine) proceedWithSpellCast(gameState *engineGameState, playerID s
 	player, exists := gameState.players[playerID]
 	if !exists {
 		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Parse and check mana cost (Rule 601.2f-h)
+	if card.ManaCost != "" {
+		cost, err := mana.ParseCost(card.ManaCost)
+		if err != nil {
+			return fmt.Errorf("failed to parse mana cost %s: %w", card.ManaCost, err)
+		}
+
+		// Check if player can pay the mana cost
+		if !cost.CanPay(player.ManaPool, 0) {
+			return fmt.Errorf("insufficient mana to cast %s (cost: %s)", card.Name, card.ManaCost)
+		}
+
+		// Pay the mana cost
+		if err := e.payManaCost(player.ManaPool, cost); err != nil {
+			return fmt.Errorf("failed to pay mana cost for %s: %w", card.Name, err)
+		}
+
+		e.logger.Debug("mana cost paid",
+			zap.String("card", card.Name),
+			zap.String("cost", card.ManaCost))
 	}
 
 	// Move card from hand to stack
@@ -2348,6 +2562,81 @@ func (e *MageEngine) proceedWithSpellCast(gameState *engineGameState, playerID s
 		"step":          gameState.turnManager.CurrentStep().String(),
 		"reason":        "spell_cast",
 	})
+
+	return nil
+}
+
+// payManaCost pays a mana cost from a player's mana pool
+// It pays colored mana first (exact match required), then generic mana from any available source
+func (e *MageEngine) payManaCost(pool *mana.ManaPool, cost *mana.ManaCost) error {
+	// Pay colored mana first (these must be exact)
+	if cost.White > 0 {
+		if !pool.Spend(mana.ManaWhite, cost.White) {
+			return fmt.Errorf("insufficient white mana: need %d", cost.White)
+		}
+	}
+	if cost.Blue > 0 {
+		if !pool.Spend(mana.ManaBlue, cost.Blue) {
+			return fmt.Errorf("insufficient blue mana: need %d", cost.Blue)
+		}
+	}
+	if cost.Black > 0 {
+		if !pool.Spend(mana.ManaBlack, cost.Black) {
+			return fmt.Errorf("insufficient black mana: need %d", cost.Black)
+		}
+	}
+	if cost.Red > 0 {
+		if !pool.Spend(mana.ManaRed, cost.Red) {
+			return fmt.Errorf("insufficient red mana: need %d", cost.Red)
+		}
+	}
+	if cost.Green > 0 {
+		if !pool.Spend(mana.ManaGreen, cost.Green) {
+			return fmt.Errorf("insufficient green mana: need %d", cost.Green)
+		}
+	}
+	if cost.Colorless > 0 {
+		if !pool.Spend(mana.ManaColorless, cost.Colorless) {
+			return fmt.Errorf("insufficient colorless mana: need %d", cost.Colorless)
+		}
+	}
+
+	// Pay generic mana from any available source
+	// Prefer colorless first, then colors in WUBRG order
+	genericRemaining := cost.Generic
+	if genericRemaining > 0 {
+		// Try colorless first
+		colorlessAvail := pool.GetTotal(mana.ManaColorless)
+		if colorlessAvail > 0 {
+			spend := colorlessAvail
+			if spend > genericRemaining {
+				spend = genericRemaining
+			}
+			pool.Spend(mana.ManaColorless, spend)
+			genericRemaining -= spend
+		}
+
+		// Then try each color
+		manaTypes := []mana.ManaType{mana.ManaWhite, mana.ManaBlue, mana.ManaBlack, mana.ManaRed, mana.ManaGreen}
+		for _, mt := range manaTypes {
+			if genericRemaining <= 0 {
+				break
+			}
+			avail := pool.GetTotal(mt)
+			if avail > 0 {
+				spend := avail
+				if spend > genericRemaining {
+					spend = genericRemaining
+				}
+				pool.Spend(mt, spend)
+				genericRemaining -= spend
+			}
+		}
+
+		if genericRemaining > 0 {
+			return fmt.Errorf("insufficient mana for generic cost: need %d more", genericRemaining)
+		}
+	}
 
 	return nil
 }
@@ -2866,6 +3155,8 @@ func (e *MageEngine) handleSpecialAction(gameState *engineGameState, action Play
 		return e.handlePlayLand(gameState, player, sourceID)
 	case "ADVANCE_PHASE":
 		return e.handleAdvancePhase(gameState, player)
+	case "ACTIVATE_MANA_ABILITY":
+		return e.handleActivateManaAbility(gameState, player, sourceID)
 	default:
 		return fmt.Errorf("unknown special action: %s", actionType)
 	}
@@ -2900,6 +3191,9 @@ func (e *MageEngine) handlePlayLand(gameState *engineGameState, player *internal
 	var card *internalCard
 	var idx int = -1
 	for i, c := range player.Hand {
+		if c == nil {
+			continue
+		}
 		if c.ID == cardID {
 			card = c
 			idx = i
@@ -2946,6 +3240,123 @@ func (e *MageEngine) handlePlayLand(gameState *engineGameState, player *internal
 			zap.String("player", player.PlayerID),
 			zap.String("card", card.Name),
 			zap.Int("lands_played_this_turn", player.LandsPlayedThisTurn),
+		)
+	}
+
+	return nil
+}
+
+// handleActivateManaAbility activates a mana ability on a permanent
+// Per MTG Rule 605: Mana abilities don't use the stack and resolve immediately
+func (e *MageEngine) handleActivateManaAbility(gameState *engineGameState, player *internalPlayer, permanentID string) error {
+	// Check if player has priority
+	if gameState.turnManager.PriorityPlayer() != player.PlayerID {
+		return fmt.Errorf("player %s does not have priority", player.PlayerID)
+	}
+
+	// Find permanent on battlefield
+	var permanent *internalCard
+	for _, card := range gameState.battlefield {
+		if card == nil {
+			continue
+		}
+		if card.ID == permanentID {
+			permanent = card
+			break
+		}
+	}
+
+	if permanent == nil {
+		return fmt.Errorf("permanent %s not found on battlefield", permanentID)
+	}
+
+	// Verify controller
+	if permanent.ControllerID != player.PlayerID {
+		return fmt.Errorf("you don't control this permanent")
+	}
+
+	// Check if already tapped
+	if permanent.Tapped {
+		return fmt.Errorf("permanent is already tapped")
+	}
+
+	// Parse mana production from rules text first
+	production := parseManaAbilityFromText(permanent.RulesText)
+
+	// Fall back to basic land subtypes if no rules text mana ability
+	if production == nil {
+		production = &ManaProduction{}
+		for _, st := range permanent.SubTypes {
+			switch strings.ToUpper(st) {
+			case "PLAINS":
+				production.White++
+			case "ISLAND":
+				production.Blue++
+			case "SWAMP":
+				production.Black++
+			case "MOUNTAIN":
+				production.Red++
+			case "FOREST":
+				production.Green++
+			}
+		}
+	}
+
+	if production.Total() == 0 {
+		return fmt.Errorf("permanent %s has no mana ability", permanent.Name)
+	}
+
+	// Tap the permanent (pay the cost)
+	permanent.Tapped = true
+
+	// Add mana to player's pool
+	if production.White > 0 {
+		player.ManaPool.Add(mana.ManaWhite, production.White)
+	}
+	if production.Blue > 0 {
+		player.ManaPool.Add(mana.ManaBlue, production.Blue)
+	}
+	if production.Black > 0 {
+		player.ManaPool.Add(mana.ManaBlack, production.Black)
+	}
+	if production.Red > 0 {
+		player.ManaPool.Add(mana.ManaRed, production.Red)
+	}
+	if production.Green > 0 {
+		player.ManaPool.Add(mana.ManaGreen, production.Green)
+	}
+	if production.Colorless > 0 {
+		player.ManaPool.Add(mana.ManaColorless, production.Colorless)
+	}
+
+	manaSymbol := production.String()
+	gameState.addMessage(fmt.Sprintf("%s taps %s for %s", player.Name, permanent.Name, manaSymbol), "mana")
+
+	// Publish event for triggers
+	gameState.eventBus.Publish(rules.Event{
+		Type:        rules.EventTapped,
+		ID:          uuid.New().String(),
+		TargetID:    permanent.ID,
+		SourceID:    permanent.ID,
+		Controller:  player.PlayerID,
+		PlayerID:    player.PlayerID,
+		Description: fmt.Sprintf("%s tapped for mana", permanent.Name),
+	})
+
+	// Notify state change
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+		"player":    player.PlayerID,
+		"action":    "activate_mana_ability",
+		"permanent": permanent.Name,
+		"mana":      manaSymbol,
+	})
+
+	if e.logger != nil {
+		e.logger.Debug("mana ability activated",
+			zap.String("player", player.PlayerID),
+			zap.String("permanent", permanent.Name),
+			zap.String("mana", manaSymbol),
+			zap.Int("total", production.Total()),
 		)
 	}
 
@@ -3149,6 +3560,31 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 	}
 	defer gameState.mu.RUnlock()
 
+	// Log current game state for debugging restoration issues
+	if e.logger != nil {
+		e.logger.Info("[GAMEVIEW] Current game state",
+			zap.String("game_id", gameID),
+			zap.String("player_id", playerID),
+			zap.String("state", gameState.state.String()),
+			zap.Bool("is_mulligan", gameState.state == GameStateMulligan),
+			zap.Int("turn", gameState.turnManager.TurnNumber()),
+			zap.String("phase", gameState.turnManager.CurrentPhase().String()),
+			zap.String("active_player", gameState.turnManager.ActivePlayer()),
+			zap.Int("prompt_count", len(gameState.prompts)),
+		)
+
+		// Log each player's mulligan status
+		for pid, player := range gameState.players {
+			e.logger.Info("[GAMEVIEW] Player mulligan status",
+				zap.String("game_id", gameID),
+				zap.String("player_id", pid),
+				zap.Bool("kept_hand", player.KeptHand),
+				zap.Int("mulligan_count", player.MulliganCount),
+				zap.Int("hand_size", len(player.Hand)),
+			)
+		}
+	}
+
 	// Get player names for display
 	activePlayerName := ""
 	priorityPlayerName := ""
@@ -3176,7 +3612,7 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 		ActivePlayerID: gameState.turnManager.ActivePlayer(),
 		PriorityPlayer: gameState.turnManager.PriorityPlayer(),
 		Players:        e.buildPlayerViewsWithActions(gameState, playerID),
-		Battlefield:    e.buildCardViews(gameState.battlefield),
+		Battlefield:    e.buildBattlefieldViewsWithActions(gameState, playerID),
 		Stack:          e.buildStackViews(gameState),
 		Exile:          e.buildCardViews(gameState.exile),
 		Command:        e.buildCardViews(gameState.command),
@@ -3208,6 +3644,16 @@ func (e *MageEngine) buildPlayerViews(gameState *engineGameState, requestingPlay
 
 	for _, playerID := range gameState.playerOrder {
 		player := gameState.players[playerID]
+		if player == nil {
+			if e.logger != nil {
+				e.logger.Error("[GAMEVIEW] Player not found in players map (buildPlayerViews)",
+					zap.String("game_id", gameState.gameID),
+					zap.String("player_id", playerID),
+					zap.Strings("player_order", gameState.playerOrder),
+				)
+			}
+			continue
+		}
 		view := EnginePlayerView{
 			PlayerID:     player.PlayerID,
 			Name:         player.Name,
@@ -3238,13 +3684,16 @@ func (e *MageEngine) buildPlayerViews(gameState *engineGameState, requestingPlay
 		if playerID == requestingPlayerID {
 			view.Hand = e.buildCardViews(player.Hand)
 		} else {
-			view.Hand = make([]EngineCardView, len(player.Hand))
-			for i := range player.Hand {
-				view.Hand[i] = EngineCardView{
-					ID:       player.Hand[i].ID,
+			view.Hand = make([]EngineCardView, 0, len(player.Hand))
+			for _, card := range player.Hand {
+				if card == nil {
+					continue
+				}
+				view.Hand = append(view.Hand, EngineCardView{
+					ID:       card.ID,
 					FaceDown: true,
 					Zone:     zoneHand,
-				}
+				})
 			}
 		}
 
@@ -3260,6 +3709,16 @@ func (e *MageEngine) buildPlayerViewsWithActions(gameState *engineGameState, req
 
 	for _, playerID := range gameState.playerOrder {
 		player := gameState.players[playerID]
+		if player == nil {
+			if e.logger != nil {
+				e.logger.Error("[GAMEVIEW] Player not found in players map",
+					zap.String("game_id", gameState.gameID),
+					zap.String("player_id", playerID),
+					zap.Strings("player_order", gameState.playerOrder),
+				)
+			}
+			continue
+		}
 		view := EnginePlayerView{
 			PlayerID:     player.PlayerID,
 			Name:         player.Name,
@@ -3294,13 +3753,16 @@ func (e *MageEngine) buildPlayerViewsWithActions(gameState *engineGameState, req
 			// Compute HasAvailableActions for the requesting player
 			view.HasAvailableActions = e.playerHasAvailableActions(gameState, playerID, view.Hand)
 		} else {
-			view.Hand = make([]EngineCardView, len(player.Hand))
-			for i := range player.Hand {
-				view.Hand[i] = EngineCardView{
-					ID:       player.Hand[i].ID,
+			view.Hand = make([]EngineCardView, 0, len(player.Hand))
+			for _, card := range player.Hand {
+				if card == nil {
+					continue
+				}
+				view.Hand = append(view.Hand, EngineCardView{
+					ID:       card.ID,
 					FaceDown: true,
 					Zone:     zoneHand,
-				}
+				})
 			}
 		}
 
@@ -3334,6 +3796,9 @@ func (e *MageEngine) playerHasAvailableActions(gameState *engineGameState, playe
 
 	// Check battlefield permanents for activated abilities
 	for _, card := range gameState.battlefield {
+		if card == nil {
+			continue
+		}
 		if card.ControllerID != playerID {
 			continue
 		}
@@ -3354,23 +3819,232 @@ func (e *MageEngine) playerHasAvailableActions(gameState *engineGameState, playe
 func (e *MageEngine) getAvailableActionsForPermanent(gameState *engineGameState, card *internalCard, playerID string) []EngineCardAction {
 	var actions []EngineCardAction
 
-	hasPriority := gameState.turnManager.PriorityPlayer() == playerID
-	if !hasPriority {
+	// Only controller can activate abilities on their permanents
+	if card.ControllerID != playerID {
+		if e.logger != nil {
+			e.logger.Debug("getAvailableActionsForPermanent: not controller",
+				zap.String("card", card.Name),
+				zap.String("cardController", card.ControllerID),
+				zap.String("requestingPlayer", playerID))
+		}
 		return actions
 	}
 
-	// Check for mana abilities (can be activated even without priority during mana payment)
-	// For now, simplified: check if card has any activated abilities
-	// TODO: Parse abilities and check activation costs/requirements
+	hasPriority := gameState.turnManager.PriorityPlayer() == playerID
+
+	if e.logger != nil {
+		e.logger.Debug("getAvailableActionsForPermanent: checking mana ability",
+			zap.String("card", card.Name),
+			zap.String("cardID", card.ID),
+			zap.String("rulesText", card.RulesText),
+			zap.Bool("hasPriority", hasPriority),
+			zap.Strings("subTypes", card.SubTypes))
+	}
+
+	// Check for mana abilities - these can be activated any time player has priority
+	// or during mana payment (Rule 605.3a)
+	if manaAbility := e.getManaAbilityAction(card, hasPriority); manaAbility != nil {
+		if e.logger != nil {
+			e.logger.Debug("getAvailableActionsForPermanent: mana ability found",
+				zap.String("card", card.Name),
+				zap.String("displayText", manaAbility.DisplayText),
+				zap.Bool("isEnabled", manaAbility.IsEnabled))
+		}
+		actions = append(actions, *manaAbility)
+	} else if e.logger != nil {
+		e.logger.Debug("getAvailableActionsForPermanent: no mana ability found",
+			zap.String("card", card.Name))
+	}
 
 	return actions
 }
 
+// ManaProduction represents the mana produced by a mana ability
+type ManaProduction struct {
+	White     int
+	Blue      int
+	Black     int
+	Red       int
+	Green     int
+	Colorless int
+}
+
+// Total returns the total amount of mana produced
+func (mp *ManaProduction) Total() int {
+	return mp.White + mp.Blue + mp.Black + mp.Red + mp.Green + mp.Colorless
+}
+
+// String returns a display string like "{C}{C}" or "{G}"
+func (mp *ManaProduction) String() string {
+	var parts []string
+	for i := 0; i < mp.White; i++ {
+		parts = append(parts, "{W}")
+	}
+	for i := 0; i < mp.Blue; i++ {
+		parts = append(parts, "{U}")
+	}
+	for i := 0; i < mp.Black; i++ {
+		parts = append(parts, "{B}")
+	}
+	for i := 0; i < mp.Red; i++ {
+		parts = append(parts, "{R}")
+	}
+	for i := 0; i < mp.Green; i++ {
+		parts = append(parts, "{G}")
+	}
+	for i := 0; i < mp.Colorless; i++ {
+		parts = append(parts, "{C}")
+	}
+	return strings.Join(parts, "")
+}
+
+// parseManaAbilityFromText extracts mana production from rules text
+// Supports patterns like:
+// - "{T}: Add {W}" - single colored mana
+// - "{T}: Add {C}" - single colorless
+// - "{T}: Add {C}{C}" - multiple mana (Sol Ring)
+// - "{T}: Add {G} or {W}" - choice abilities (returns first option for now)
+func parseManaAbilityFromText(rulesText string) *ManaProduction {
+	if rulesText == "" {
+		return nil
+	}
+
+	// Normalize the text - handle HTML entities and separators
+	text := strings.ReplaceAll(rulesText, "@@@", "\n")
+	text = strings.ReplaceAll(text, "&mdash;", "—")
+
+	// Look for tap-for-mana pattern: {T}: Add {X}...
+	// The pattern matches lines that start with {T}: Add and captures the mana symbols
+	lines := strings.Split(text, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+
+		// Check if this line is a tap-for-mana ability
+		if !strings.HasPrefix(line, "{T}: Add ") && !strings.HasPrefix(line, "{T}: Add{") {
+			// Also check for "{T}: Add " after other text (like "I -")
+			if !strings.Contains(line, "{T}: Add ") {
+				continue
+			}
+			// Extract just the mana ability part
+			idx := strings.Index(line, "{T}: Add ")
+			if idx >= 0 {
+				line = line[idx:]
+			}
+		}
+
+		// Extract the mana symbols after "Add "
+		addIdx := strings.Index(line, "Add ")
+		if addIdx < 0 {
+			continue
+		}
+
+		manaStr := line[addIdx+4:]
+
+		// Parse mana symbols - stop at period, "or", comma, or end of line
+		production := &ManaProduction{}
+		i := 0
+		for i < len(manaStr) {
+			if manaStr[i] == '{' {
+				endBrace := strings.Index(manaStr[i:], "}")
+				if endBrace < 0 {
+					break
+				}
+				symbol := strings.ToUpper(manaStr[i+1 : i+endBrace])
+				switch symbol {
+				case "W":
+					production.White++
+				case "U":
+					production.Blue++
+				case "B":
+					production.Black++
+				case "R":
+					production.Red++
+				case "G":
+					production.Green++
+				case "C":
+					production.Colorless++
+				}
+				i += endBrace + 1
+			} else if manaStr[i] == '.' || manaStr[i] == ',' {
+				break
+			} else if strings.HasPrefix(strings.ToLower(manaStr[i:]), " or ") {
+				// Stop at "or" - we only handle the first option for now
+				break
+			} else {
+				i++
+			}
+		}
+
+		if production.Total() > 0 {
+			return production
+		}
+	}
+
+	return nil
+}
+
+// getManaAbilityAction checks if a permanent has a mana ability and returns the action
+func (e *MageEngine) getManaAbilityAction(card *internalCard, hasPriority bool) *EngineCardAction {
+	// First try to parse mana ability from rules text
+	production := parseManaAbilityFromText(card.RulesText)
+
+	// If no mana ability found in rules text, check for basic land subtypes
+	if production == nil {
+		production = &ManaProduction{}
+		for _, st := range card.SubTypes {
+			switch strings.ToUpper(st) {
+			case "PLAINS":
+				production.White++
+			case "ISLAND":
+				production.Blue++
+			case "SWAMP":
+				production.Black++
+			case "MOUNTAIN":
+				production.Red++
+			case "FOREST":
+				production.Green++
+			}
+		}
+
+		// If no mana production from subtypes either, no mana ability
+		if production.Total() == 0 {
+			return nil
+		}
+	}
+
+	// Check if the permanent is tapped
+	canActivate := true
+	reason := ""
+
+	if card.Tapped {
+		canActivate = false
+		reason = "Already tapped"
+	} else if !hasPriority {
+		// Mana abilities can technically be activated without priority during payment
+		// but for now, require priority for simplicity
+		canActivate = false
+		reason = "You don't have priority"
+	}
+
+	displayText := fmt.Sprintf("{T}: Add %s", production.String())
+
+	return &EngineCardAction{
+		ActionType:     "ACTIVATE_MANA_ABILITY",
+		ActionID:       card.ID, // Use card ID as the ability identifier
+		DisplayText:    displayText,
+		IsEnabled:      canActivate,
+		DisabledReason: reason,
+	}
+}
+
 // buildCardViewsWithActions converts internal cards to view cards with available actions
 func (e *MageEngine) buildCardViewsWithActions(gameState *engineGameState, cards []*internalCard, playerID string) []EngineCardView {
-	views := make([]EngineCardView, len(cards))
-	for i, card := range cards {
-		views[i] = EngineCardView{
+	views := make([]EngineCardView, 0, len(cards))
+	for _, card := range cards {
+		if card == nil {
+			continue
+		}
+		views = append(views, EngineCardView{
 			ID:               card.ID,
 			Name:             card.Name,
 			DisplayName:      card.DisplayName,
@@ -3397,7 +4071,7 @@ func (e *MageEngine) buildCardViewsWithActions(gameState *engineGameState, cards
 			Abilities:        append([]EngineAbilityView(nil), card.Abilities...),
 			Counters:         e.buildCounterViews(card.Counters),
 			AvailableActions: e.getAvailableActionsForCard(gameState, card, playerID),
-		}
+		})
 	}
 	return views
 }
@@ -3468,11 +4142,53 @@ func (e *MageEngine) getAvailableActionsForCard(gameState *engineGameState, card
 	return actions
 }
 
+// buildBattlefieldViewsWithActions builds battlefield card views with available actions for a player
+func (e *MageEngine) buildBattlefieldViewsWithActions(gameState *engineGameState, playerID string) []EngineCardView {
+	views := make([]EngineCardView, 0, len(gameState.battlefield))
+	for _, card := range gameState.battlefield {
+		if card == nil {
+			continue
+		}
+		views = append(views, EngineCardView{
+			ID:               card.ID,
+			Name:             card.Name,
+			DisplayName:      card.DisplayName,
+			ManaCost:         card.ManaCost,
+			Type:             card.Type,
+			SubTypes:         append([]string(nil), card.SubTypes...),
+			SuperTypes:       append([]string(nil), card.SuperTypes...),
+			Color:            card.Color,
+			Power:            card.Power,
+			Toughness:        card.Toughness,
+			Loyalty:          card.Loyalty,
+			CardNumber:       card.CardNumber,
+			ExpansionSet:     card.ExpansionSet,
+			Rarity:           card.Rarity,
+			RulesText:        card.RulesText,
+			Tapped:           card.Tapped,
+			Flipped:          card.Flipped,
+			Transformed:      card.Transformed,
+			FaceDown:         card.FaceDown,
+			Zone:             card.Zone,
+			ControllerID:     card.ControllerID,
+			OwnerID:          card.OwnerID,
+			AttachedToCard:   append([]string(nil), card.AttachedToCard...),
+			Abilities:        append([]EngineAbilityView(nil), card.Abilities...),
+			Counters:         e.buildCounterViews(card.Counters),
+			AvailableActions: e.getAvailableActionsForPermanent(gameState, card, playerID),
+		})
+	}
+	return views
+}
+
 // buildCardViews converts internal cards to view cards
 func (e *MageEngine) buildCardViews(cards []*internalCard) []EngineCardView {
-	views := make([]EngineCardView, len(cards))
-	for i, card := range cards {
-		views[i] = EngineCardView{
+	views := make([]EngineCardView, 0, len(cards))
+	for _, card := range cards {
+		if card == nil {
+			continue
+		}
+		views = append(views, EngineCardView{
 			ID:             card.ID,
 			Name:           card.Name,
 			DisplayName:    card.DisplayName,
@@ -3498,7 +4214,7 @@ func (e *MageEngine) buildCardViews(cards []*internalCard) []EngineCardView {
 			AttachedToCard: append([]string(nil), card.AttachedToCard...),
 			Abilities:      append([]EngineAbilityView(nil), card.Abilities...),
 			Counters:       e.buildCounterViews(card.Counters),
-		}
+		})
 	}
 	return views
 }
@@ -3803,6 +4519,9 @@ func (e *MageEngine) removePlayerObjects(gameState *engineGameState, playerID st
 	// Remove permanents from battlefield
 	remainingBattlefield := make([]*internalCard, 0)
 	for _, card := range gameState.battlefield {
+		if card == nil {
+			continue
+		}
 		if card.OwnerID != playerID {
 			remainingBattlefield = append(remainingBattlefield, card)
 		}
@@ -3819,6 +4538,9 @@ func (e *MageEngine) removePlayerObjects(gameState *engineGameState, playerID st
 	// Remove from exile
 	remainingExile := make([]*internalCard, 0)
 	for _, card := range gameState.exile {
+		if card == nil {
+			continue
+		}
 		if card.OwnerID != playerID {
 			remainingExile = append(remainingExile, card)
 		}
@@ -3828,6 +4550,9 @@ func (e *MageEngine) removePlayerObjects(gameState *engineGameState, playerID st
 	// Remove from command zone
 	remainingCommand := make([]*internalCard, 0)
 	for _, card := range gameState.command {
+		if card == nil {
+			continue
+		}
 		if card.OwnerID != playerID {
 			remainingCommand = append(remainingCommand, card)
 		}
@@ -4520,6 +5245,9 @@ func (e *MageEngine) checkStateBasedActions(gameState *engineGameState) bool {
 	planeswalkersToRemove := make([]*internalCard, 0)
 
 	for _, card := range gameState.battlefield {
+		if card == nil {
+			continue
+		}
 		if card.Zone != zoneBattlefield {
 			continue
 		}
@@ -4975,6 +5703,9 @@ func (gameState *engineGameState) allPassed() bool {
 
 func (e *MageEngine) removeCardFromSlice(cards []*internalCard, cardID string) []*internalCard {
 	for i, card := range cards {
+		if card == nil {
+			continue
+		}
 		if card.ID == cardID {
 			return append(cards[:i], cards[i+1:]...)
 		}
@@ -5137,24 +5868,28 @@ func (e *MageEngine) createSnapshot(gameState *engineGameState) *gameStateSnapsh
 
 		// Update player zone references
 		if player, exists := snapshot.Players[card.OwnerID]; exists {
+			ownerPlayer := gameState.players[card.OwnerID]
+			if ownerPlayer == nil {
+				continue
+			}
 			switch card.Zone {
 			case zoneLibrary:
-				for i, c := range gameState.players[card.OwnerID].Library {
-					if c.ID == card.ID {
+				for i, c := range ownerPlayer.Library {
+					if c != nil && c.ID == card.ID {
 						player.Library[i] = cardCopy
 						break
 					}
 				}
 			case zoneHand:
-				for i, c := range gameState.players[card.OwnerID].Hand {
-					if c.ID == card.ID {
+				for i, c := range ownerPlayer.Hand {
+					if c != nil && c.ID == card.ID {
 						player.Hand[i] = cardCopy
 						break
 					}
 				}
 			case zoneGraveyard:
-				for i, c := range gameState.players[card.OwnerID].Graveyard {
-					if c.ID == card.ID {
+				for i, c := range ownerPlayer.Graveyard {
+					if c != nil && c.ID == card.ID {
 						player.Graveyard[i] = cardCopy
 						break
 					}
@@ -5721,16 +6456,82 @@ func (e *MageEngine) DeletePersistedGame(gameID string) error {
 // LoadGameFromSnapshot restores a game from a serialized snapshot
 // Used for server restart recovery - recreates the full game state
 func (e *MageEngine) LoadGameFromSnapshot(gameID, tableID, gameType string, players []string, serializedState []byte) error {
+	if e.logger != nil {
+		e.logger.Info("[RESTORE] LoadGameFromSnapshot starting",
+			zap.String("game_id", gameID),
+			zap.String("table_id", tableID),
+			zap.String("game_type", gameType),
+			zap.Strings("players", players),
+			zap.Int("serialized_state_size", len(serializedState)),
+		)
+	}
+
 	// Deserialize the snapshot
 	snapshot, err := DeserializeFromBytes(serializedState)
 	if err != nil {
+		if e.logger != nil {
+			e.logger.Error("[RESTORE] Failed to deserialize snapshot",
+				zap.String("game_id", gameID),
+				zap.Error(err),
+			)
+		}
 		return fmt.Errorf("failed to deserialize game state: %w", err)
+	}
+
+	if e.logger != nil {
+		e.logger.Info("[RESTORE] Snapshot deserialized successfully",
+			zap.String("game_id", gameID),
+			zap.String("snapshot_game_id", snapshot.GameID),
+			zap.String("snapshot_state", snapshot.State.String()),
+			zap.Int("snapshot_turn", snapshot.TurnNumber),
+			zap.String("snapshot_active_player", snapshot.ActivePlayer),
+			zap.String("snapshot_priority_player", snapshot.PriorityPlayer),
+			zap.Int("snapshot_player_count", len(snapshot.Players)),
+			zap.Int("snapshot_card_count", len(snapshot.Cards)),
+			zap.Int("snapshot_battlefield_count", len(snapshot.Battlefield)),
+			zap.Int("snapshot_prompt_count", len(snapshot.Prompts)),
+			zap.Int("snapshot_message_count", len(snapshot.Messages)),
+		)
+
+		// Log detailed player state from snapshot
+		for playerID, player := range snapshot.Players {
+			e.logger.Info("[RESTORE] Snapshot player state",
+				zap.String("game_id", gameID),
+				zap.String("player_id", playerID),
+				zap.String("player_name", player.Name),
+				zap.Int("life", player.Life),
+				zap.Int("hand_size", len(player.Hand)),
+				zap.Int("library_size", len(player.Library)),
+				zap.Int("graveyard_size", len(player.Graveyard)),
+				zap.Bool("kept_hand", player.KeptHand),
+				zap.Int("mulligan_count", player.MulliganCount),
+				zap.Bool("passed", player.Passed),
+				zap.Bool("lost", player.Lost),
+				zap.Bool("left", player.Left),
+			)
+		}
+
+		// Log prompts from snapshot
+		for i, prompt := range snapshot.Prompts {
+			e.logger.Info("[RESTORE] Snapshot prompt",
+				zap.String("game_id", gameID),
+				zap.Int("prompt_index", i),
+				zap.String("player_id", prompt.PlayerID),
+				zap.String("text", prompt.Text),
+				zap.Strings("options", prompt.Options),
+			)
+		}
 	}
 
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
 	if _, exists := e.games[gameID]; exists {
+		if e.logger != nil {
+			e.logger.Warn("[RESTORE] Game already exists, cannot restore",
+				zap.String("game_id", gameID),
+			)
+		}
 		return fmt.Errorf("game %s already exists", gameID)
 	}
 
@@ -5844,13 +6645,83 @@ func (e *MageEngine) LoadGameFromSnapshot(gameID, tableID, gameType string, play
 	// Initialize replacement effects manager for this game
 	e.replacementEffects[gameID] = effects.NewReplacementManager(e.logger)
 
+	// Fix inconsistent state: if state is MULLIGAN but all players have kept their hands,
+	// the game was restored from a snapshot taken before mulligan completion was persisted.
+	// In this case, automatically transition to IN_PROGRESS to fix the inconsistent state.
 	if e.logger != nil {
-		e.logger.Info("restored game from persistence",
+		e.logger.Info("[RESTORE] Checking for inconsistent mulligan state",
+			zap.String("game_id", gameID),
+			zap.String("current_state", gameState.state.String()),
+			zap.Bool("is_mulligan_state", gameState.state == GameStateMulligan),
+		)
+	}
+
+	if gameState.state == GameStateMulligan {
+		allKept := true
+		playersNotKept := []string{}
+		playersKept := []string{}
+		for playerID, player := range gameState.players {
+			if !player.KeptHand {
+				allKept = false
+				playersNotKept = append(playersNotKept, playerID)
+			} else {
+				playersKept = append(playersKept, playerID)
+			}
+		}
+
+		if e.logger != nil {
+			e.logger.Info("[RESTORE] Mulligan state analysis",
+				zap.String("game_id", gameID),
+				zap.Bool("all_kept", allKept),
+				zap.Int("total_players", len(gameState.players)),
+				zap.Strings("players_kept", playersKept),
+				zap.Strings("players_not_kept", playersNotKept),
+			)
+		}
+
+		if allKept && len(gameState.players) > 0 {
+			if e.logger != nil {
+				e.logger.Warn("[RESTORE] FIXING INCONSISTENT STATE: MULLIGAN state but all players kept hands",
+					zap.String("game_id", gameID),
+					zap.Int("turn", snapshot.TurnNumber),
+					zap.String("old_state", "MULLIGAN"),
+					zap.String("new_state", "IN_PROGRESS"),
+					zap.Int("prompt_count_before_clear", len(gameState.prompts)),
+				)
+			}
+			gameState.state = GameStateInProgress
+			gameState.addMessage("Game state corrected: mulligan phase was already complete", "system")
+
+			// Clear any stale mulligan prompts
+			gameState.prompts = nil
+
+			if e.logger != nil {
+				e.logger.Info("[RESTORE] State fix complete",
+					zap.String("game_id", gameID),
+					zap.String("final_state", gameState.state.String()),
+				)
+			}
+		} else if !allKept {
+			// Legitimate mulligan state - some players haven't kept hands
+			if e.logger != nil {
+				e.logger.Info("[RESTORE] Legitimate MULLIGAN state - waiting for players to keep hands",
+					zap.String("game_id", gameID),
+					zap.Strings("players_pending", playersNotKept),
+				)
+			}
+		}
+	}
+
+	if e.logger != nil {
+		e.logger.Info("[RESTORE] Game restoration complete",
 			zap.String("game_id", gameID),
 			zap.String("game_type", gameType),
 			zap.Int("turn", snapshot.TurnNumber),
-			zap.String("state", snapshot.State.String()),
+			zap.String("final_state", gameState.state.String()),
 			zap.Int("player_count", len(players)),
+			zap.Int("battlefield_cards", len(gameState.battlefield)),
+			zap.Int("stack_items", len(gameState.stack.List())),
+			zap.Int("active_prompts", len(gameState.prompts)),
 		)
 	}
 
@@ -6429,6 +7300,9 @@ func (e *MageEngine) performUntapStep(gameState *engineGameState, activePlayerID
 
 	untappedCount := 0
 	for _, card := range gameState.battlefield {
+		if card == nil {
+			continue
+		}
 		if card.ControllerID == activePlayerID && card.Tapped {
 			// TODO: Check for "doesn't untap" effects
 			card.Tapped = false
@@ -6519,21 +7393,29 @@ func (e *MageEngine) performCleanupStep(gameState *engineGameState, activePlayer
 	maxHandSize := 7
 	if len(player.Hand) > maxHandSize {
 		discardCount := len(player.Hand) - maxHandSize
+		actualDiscarded := 0
 		// TODO: Let player choose which cards to discard
 		// For now, discard from the end of hand
 		for i := 0; i < discardCount && len(player.Hand) > maxHandSize; i++ {
 			card := player.Hand[len(player.Hand)-1]
 			player.Hand = player.Hand[:len(player.Hand)-1]
+			if card == nil {
+				continue
+			}
 			card.Zone = zoneGraveyard
 			player.Graveyard = append(player.Graveyard, card)
+			actualDiscarded++
 		}
-		if discardCount > 0 {
-			gameState.addMessage(fmt.Sprintf("%s discards %d cards to hand size", activePlayerID, discardCount), "action")
+		if actualDiscarded > 0 {
+			gameState.addMessage(fmt.Sprintf("%s discards %d cards to hand size", activePlayerID, actualDiscarded), "action")
 		}
 	}
 
 	// 514.2: Remove all damage from creatures
 	for _, card := range gameState.battlefield {
+		if card == nil {
+			continue
+		}
 		if strings.Contains(card.Type, "Creature") && card.Damage > 0 {
 			card.Damage = 0
 		}
@@ -10158,6 +11040,9 @@ func (s *engineGameState) GetProtectionQualities(cardID string) []string {
 func (s *engineGameState) GetCardColor(cardID string) []string {
 	// Find the card
 	for _, card := range s.battlefield {
+		if card == nil {
+			continue
+		}
 		if card.ID == cardID {
 			return parseColors(card.Color)
 		}
@@ -10165,12 +11050,21 @@ func (s *engineGameState) GetCardColor(cardID string) []string {
 
 	// Check other zones if needed
 	for _, player := range s.players {
+		if player == nil {
+			continue
+		}
 		for _, card := range player.Hand {
+			if card == nil {
+				continue
+			}
 			if card.ID == cardID {
 				return parseColors(card.Color)
 			}
 		}
 		for _, card := range player.Graveyard {
+			if card == nil {
+				continue
+			}
 			if card.ID == cardID {
 				return parseColors(card.Color)
 			}

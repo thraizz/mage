@@ -487,6 +487,13 @@ func (s *mageServer) engineViewToProto(engineView interface{}, playerID string) 
 		Command:          engineCardsToProto(data.Command),
 		Revealed:         engineRevealedToProto(data.Revealed),
 		LookedAt:         engineLookedAtToProto(data.LookedAt),
+		// Pre-computed display values (server source of truth)
+		ActivePlayerName:     data.ActivePlayerName,
+		PriorityPlayerName:   data.PriorityPlayerName,
+		GameFormat:           data.GameFormat,
+		IsMulliganPhase:      data.IsMulliganPhase,
+		LandsPlayedThisTurn:  int32(data.LandsPlayedThisTurn),
+		LandsAllowedThisTurn: int32(data.LandsAllowedThisTurn),
 	}
 
 	if combat := engineCombatToProto(data.Combat); combat != nil {

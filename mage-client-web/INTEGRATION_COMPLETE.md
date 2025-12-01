@@ -260,3 +260,4 @@ All request/response RPCs are working. The client can:
 
 Real-time features (live chat, game state updates) require WebSocket connection.
 
+

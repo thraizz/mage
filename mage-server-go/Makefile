@@ -32,6 +32,10 @@ run: build ## Build and run the server
 	@echo "Running $(BINARY_NAME)..."
 	$(BUILD_DIR)/$(BINARY_NAME) -config config/config.yaml
 
+run-log: build ## Build and run server with output logged to server.log
+	@echo "Running $(BINARY_NAME) with logging to server.log..."
+	$(BUILD_DIR)/$(BINARY_NAME) -config config/config.yaml 2>&1 | tee server.log
+
 test: ## Run tests
 	@echo "Running tests..."
 	$(GOTEST) -v -race -coverprofile=coverage.out ./...

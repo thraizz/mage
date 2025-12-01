@@ -29,3 +29,4 @@ CREATE INDEX idx_active_games_state ON active_games(state);
 CREATE INDEX idx_active_games_updated_at ON active_games(updated_at);
 
 
+

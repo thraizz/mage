@@ -104,35 +104,35 @@ services:
   #    start_period: 15s
 
   # MAGE Svelte web client
-  mage-client:
-    build:
-      context: ./mage-client-web
-      dockerfile: Dockerfile
-      args:
-        # API URL for the client to connect to the server
-        # In production, this should be the public URL of mage-server
-        VITE_GRPC_SERVER_URL: http://localhost:17171
-    container_name: mage-client
-    depends_on:
-      mage-server:
-        condition: service_healthy
-    environment:
-      NODE_ENV: production
-      PORT: 3000
-      HOST: 0.0.0.0
-      # Runtime environment variables (if needed)
-      ORIGIN: http://localhost:3000
-    ports:
-      - "3000:3000"
-    networks:
-      - mage-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+  # mage-client:
+  #   build:
+  #     context: ./mage-client-web
+  #     dockerfile: Dockerfile
+  #     args:
+  #       # API URL for the client to connect to the server
+  #       # In production, this should be the public URL of mage-server
+  #       VITE_GRPC_SERVER_URL: http://localhost:17171
+  #   container_name: mage-client
+  #   depends_on:
+  #     mage-server:
+  #       condition: service_healthy
+  #   environment:
+  #     NODE_ENV: production
+  #     PORT: 3000
+  #     HOST: 0.0.0.0
+  #     # Runtime environment variables (if needed)
+  #     ORIGIN: http://localhost:3000
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - mage-network
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 10s
 
 volumes:
   postgres-data:

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { auth } from '$lib/stores/auth';
 	import { websocketStore } from '$lib/stores/websocket';
@@ -30,7 +29,7 @@
 		joinGame,
 		fetchGameView,
 		passPriority,
-		passUntilMyNextTurn,
+		passUntilNextTurn,
 		concedeGame,
 		sendPlayerUUID,
 		sendPlayerBoolean,
@@ -38,7 +37,8 @@
 		keepHand,
 		mulligan,
 		playLand,
-		advancePhase
+		advancePhase,
+		activateManaAbility
 	} from '$lib/api/game';
 	import { CardActionType, type CardView } from '$lib/generated/mage/v1/models';
 	import type { GameCard, GamePhase } from '$lib/types/game';
@@ -58,6 +58,9 @@
 	import GameChatOverlay from '$lib/components/game/GameChatOverlay.svelte';
 	import OpponentPanel from '$lib/components/game/OpponentPanel.svelte';
 	import DebugOverlay from '$lib/components/game/DebugOverlay.svelte';
+	import ManaPayment from '$lib/components/game/ManaPayment.svelte';
+	import XManaSelector from '$lib/components/game/XManaSelector.svelte';
+	import type { GamePlayManaData, GamePlayXManaData } from '$lib/generated/mage/v1/websocket';
 
 	// Targeting store
 	import {
@@ -68,8 +71,11 @@
 		syncWithGamePrompt
 	} from '$lib/stores/game-targeting';
 
-	// Game ID from route params
-	const gameId = $derived($page.params.id);
+	// Page data from load function
+	const { data } = $props();
+	
+	// Game ID from load function (more reliable than accessing $page.params directly)
+	const gameId = $derived(data.gameId);
 
 	// UI state
 	let showActionLog = $state(false);
@@ -226,6 +232,60 @@
 	}
 
 	/**
+	 * Parse error message to provide user-friendly feedback
+	 */
+	function parseGameError(err: unknown): { title: string; message: string } {
+		const errorMsg = err instanceof Error ? err.message : String(err);
+		const lowerMsg = errorMsg.toLowerCase();
+		
+		// Game has ended (found in match history)
+		if (lowerMsg.includes('game has ended')) {
+			return {
+				title: 'Game Has Ended',
+				message: 'This game has already finished. You can view your match history from the lobby.'
+			};
+		}
+		
+		// Game not found errors
+		if (lowerMsg.includes('game not found') || lowerMsg.includes('no game data')) {
+			return {
+				title: 'Game Not Found',
+				message: 'This game does not exist. The link may be invalid or the game was never created.'
+			};
+		}
+		
+		// Player not in game
+		if (lowerMsg.includes('not part of this game')) {
+			return {
+				title: 'Access Denied',
+				message: 'You are not a participant in this game. You may need to join as a spectator instead.'
+			};
+		}
+		
+		// Session/auth errors
+		if (lowerMsg.includes('session') || lowerMsg.includes('login') || lowerMsg.includes('auth')) {
+			return {
+				title: 'Session Expired',
+				message: 'Your session has expired. Please log in again to continue.'
+			};
+		}
+		
+		// WebSocket/connection errors
+		if (lowerMsg.includes('websocket') || lowerMsg.includes('connection')) {
+			return {
+				title: 'Connection Failed',
+				message: 'Unable to connect to the game server. Please check your internet connection and try again.'
+			};
+		}
+		
+		// Default error
+		return {
+			title: 'Error Loading Game',
+			message: errorMsg || 'An unexpected error occurred while loading the game.'
+		};
+	}
+
+	/**
 	 * Initialize game connection
 	 */
 	async function initializeGame() {
@@ -256,6 +316,26 @@
 		try {
 			console.log('[GamePage] Starting game initialization...', { gameId, playerId });
 
+			// Initialize game store first
+			console.log('[GamePage] Initializing game store...');
+			gameStore.initGame(gameId, playerId);
+
+			// Try to join the game first (via HTTP) to verify it exists
+			// This gives us a cleaner error if the game doesn't exist
+			console.log('[GamePage] Joining game...');
+			try {
+				await joinGame(gameId);
+				console.log('[GamePage] Joined game successfully');
+			} catch (joinErr) {
+				// Re-throw with context about the game not being found
+				const errorMsg = joinErr instanceof Error ? joinErr.message : String(joinErr);
+				if (errorMsg.toLowerCase().includes('game not found')) {
+					throw new Error('Game not found');
+				}
+				throw joinErr;
+			}
+
+			// Now connect WebSocket for real-time updates
 			const wsState = $websocketStore;
 			if (wsState.state !== 'connected') {
 				const token = $auth.token;
@@ -265,16 +345,9 @@
 					await websocketStore.connect(sessionId);
 					console.log('[GamePage] WebSocket connected');
 				} else {
-					throw new Error('No session ID available');
+					throw new Error('No session ID available - please log in again');
 				}
 			}
-
-			console.log('[GamePage] Initializing game store...');
-			gameStore.initGame(gameId, playerId);
-
-			console.log('[GamePage] Joining game...');
-			await joinGame(gameId);
-			console.log('[GamePage] Joined game successfully');
 
 			console.log('[GamePage] Fetching initial game state...');
 			const gameView = await fetchGameView(gameId, playerId);
@@ -295,7 +368,8 @@
 			console.log('[GamePage] Game initialization complete');
 		} catch (err) {
 			console.error('[GamePage] Failed to initialize game:', err);
-			gameStore.setError(err instanceof Error ? err.message : 'Failed to load game');
+			const parsedError = parseGameError(err);
+			gameStore.setError(`${parsedError.title}: ${parsedError.message}`);
 		} finally {
 			isInitializing = false;
 		}
@@ -322,16 +396,16 @@
 	 * Handle pass until end of turn (F6)
 	 */
 	/**
-	 * Handle pass until player's next turn (F6)
-	 * This passes priority automatically until your next upkeep step
+	 * Handle pass turn - passes through remaining phases until next turn begins
+	 * This skips all remaining phases of your turn and lets the next player start fresh
 	 */
 	async function handlePassUntilEOT() {
 		if (!havePriority || isActionLoading || !gameId) return;
 
 		isActionLoading = true;
 		try {
-			await passUntilMyNextTurn(gameId);
-			addLogEntry('You will pass until your next turn');
+			await passUntilNextTurn(gameId);
+			addLogEntry('You will pass until the next turn');
 		} catch (err) {
 			console.error('Failed to pass until next turn:', err);
 		} finally {
@@ -431,11 +505,12 @@
 
 	/**
 	 * Handle activate ability
+	 * For mana abilities, click directly on the land to tap it
 	 */
 	function handleActivateAbility() {
 		if (!havePriority || isActionLoading) return;
-		// TODO: Implement ability activation UI
-		addLogEntry('Activate ability: select a permanent first');
+		// Hint to user how to activate mana abilities
+		addLogEntry('Click on an untapped land to tap it for mana');
 	}
 
 	/**
@@ -504,7 +579,7 @@
 	/**
 	 * Handle battlefield card click
 	 */
-	function handleBattlefieldCardClick(cardId: string) {
+	async function handleBattlefieldCardClick(cardId: string) {
 		// Handle targeting mode - toggle target selection
 		if (isTargeting) {
 			const toggled = targetingStore.toggleTarget(cardId);
@@ -517,6 +592,73 @@
 			return;
 		}
 
+		// Find the card on the battlefield
+		const card = battlefieldCards.find((c) => c.id === cardId);
+		if (!card) {
+			console.log('[handleBattlefieldCardClick] Card not found:', cardId);
+			return;
+		}
+
+		// Debug: Log card info for mana ability checking
+		console.log('[handleBattlefieldCardClick] Clicked card:', {
+			id: card.id,
+			name: card.name,
+			type: card.type,
+			tapped: card.tapped,
+			controllerId: card.controllerId,
+			availableActions: card.availableActions,
+			availableActionsLength: card.availableActions?.length,
+			availableActionsJSON: JSON.stringify(card.availableActions),
+			havePriority,
+			isActionLoading,
+			gameId
+		});
+		
+		// Log each action for debugging
+		if (card.availableActions && card.availableActions.length > 0) {
+			card.availableActions.forEach((action, i) => {
+				console.log(`[handleBattlefieldCardClick] Action ${i}:`, {
+					actionType: action.actionType,
+					actionTypeValue: typeof action.actionType,
+					expectedManaAbilityType: CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY,
+					isMatch: action.actionType === CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY,
+					displayText: action.displayText,
+					isEnabled: action.isEnabled
+				});
+			});
+		} else {
+			console.log('[handleBattlefieldCardClick] No available actions on card');
+		}
+
+		// Check for mana ability activation
+		// Only for cards we control, and only if we have priority
+		if (havePriority && !isActionLoading && gameId) {
+			// Note: actionType can be either a number (enum) or string (JSON serialized)
+			// so we check for both using string comparison
+			const manaAbilityAction = card.availableActions?.find(
+				(a) => (a.actionType === CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY || 
+				        String(a.actionType) === 'CARD_ACTION_ACTIVATE_MANA_ABILITY') && a.isEnabled
+			);
+
+			console.log('[handleBattlefieldCardClick] Mana ability action found:', manaAbilityAction);
+
+			if (manaAbilityAction) {
+				isActionLoading = true;
+				try {
+					await activateManaAbility(gameId, cardId);
+					addLogEntry(`${card.name} - ${manaAbilityAction.displayText}`);
+				} catch (err) {
+					const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+					console.error('Failed to activate mana ability:', err);
+					addLogEntry(`Failed to tap for mana: ${errorMessage}`);
+				} finally {
+					isActionLoading = false;
+				}
+				return;
+			}
+		}
+
+		// Default behavior: toggle selection
 		gameStore.toggleCardSelection(cardId);
 	}
 
@@ -757,6 +899,7 @@
 		// Sync targeting store with game prompts
 		targetingSyncUnsub = syncWithGamePrompt();
 
+		// Initialize game - gameId should always be available from load function
 		initializeGame();
 	});
 
@@ -774,7 +917,7 @@
 </script>
 
 <svelte:head>
-	<title>Game {gameId} - MAGE</title>
+	<title>{gameId ? `Game ${gameId}` : 'Loading Game'} - MAGE</title>
 </svelte:head>
 
 <div class="game-container" class:has-priority={havePriority}>
@@ -784,9 +927,40 @@
 			<p>Loading game...</p>
 		</div>
 	{:else if error && !gameState.gameView}
+		{@const parsedError = (() => {
+			// Check if error already includes title: message format
+			if (error.includes(': ')) {
+				const [title, ...rest] = error.split(': ');
+				return { title, message: rest.join(': ') };
+			}
+			return parseGameError(new Error(error));
+		})()}
 		<div class="error-overlay">
-			<p class="error-message">{error}</p>
-			<button class="btn-primary" onclick={() => goto('/lobby')}>Return to Lobby</button>
+			<div class="error-icon">
+				{#if parsedError.title.toLowerCase().includes('has ended')}
+					🏁
+				{:else if parsedError.title.toLowerCase().includes('not found')}
+					❓
+				{:else if parsedError.title.toLowerCase().includes('access denied')}
+					🚫
+				{:else if parsedError.title.toLowerCase().includes('session') || parsedError.title.toLowerCase().includes('expired')}
+					🔐
+				{:else if parsedError.title.toLowerCase().includes('connection')}
+					📡
+				{:else}
+					⚠️
+				{/if}
+			</div>
+			<h2 class="error-title">{parsedError.title}</h2>
+			<p class="error-message">{parsedError.message}</p>
+			<div class="error-actions">
+				<button class="btn-primary" onclick={() => goto('/lobby')}>Return to Lobby</button>
+				{#if parsedError.title.toLowerCase().includes('connection')}
+					<button class="btn-secondary" onclick={() => { isInitializing = false; initialized = false; initializeGame(); }}>
+						Try Again
+					</button>
+				{/if}
+			</div>
 		</div>
 	{:else if isGameOver}
 		<div class="game-over-overlay">
@@ -836,8 +1010,28 @@
 			onCancel={handleTargetCancel}
 		/>
 
-		<!-- Prompt Overlay (non-target prompts) -->
-		{#if prompt && prompt.type !== 'target'}
+		<!-- Mana Payment Modal -->
+		{#if prompt && prompt.type === 'mana' && gameId}
+			<ManaPayment
+				{gameId}
+				manaData={prompt.data as GamePlayManaData}
+				onComplete={() => gameStore.clearPrompt()}
+				onCancel={() => gameStore.clearPrompt()}
+			/>
+		{/if}
+
+		<!-- X Mana Selector Modal -->
+		{#if prompt && prompt.type === 'xmana' && gameId}
+			<XManaSelector
+				{gameId}
+				xManaData={prompt.data as GamePlayXManaData}
+				onComplete={() => gameStore.clearPrompt()}
+				onCancel={() => gameStore.clearPrompt()}
+			/>
+		{/if}
+
+		<!-- Prompt Overlay (non-target, non-mana prompts) -->
+		{#if prompt && !['target', 'mana', 'xmana'].includes(prompt.type)}
 			<div class="prompt-overlay">
 				<div class="prompt-content">
 					<p class="prompt-message">{prompt.message}</p>
@@ -1029,7 +1223,7 @@
 		<!-- Debug Overlay Modal -->
 		<DebugOverlay
 			bind:open={showDebugOverlay}
-			{gameId}
+			gameId={gameId || ''}
 			{localPlayerId}
 			{gameState}
 			{allPlayers}
@@ -1112,7 +1306,49 @@
 		to { transform: rotate(360deg); }
 	}
 
-	.error-message { color: #ef4444; }
+	.error-icon {
+		font-size: 4rem;
+		margin-bottom: 0.5rem;
+		opacity: 0.9;
+	}
+
+	.error-title {
+		font-size: 1.5rem;
+		color: #f8fafc;
+		margin: 0 0 0.5rem;
+		font-weight: 600;
+	}
+
+	.error-message {
+		color: #94a3b8;
+		max-width: 400px;
+		text-align: center;
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	.error-actions {
+		display: flex;
+		gap: 0.75rem;
+		margin-top: 1rem;
+	}
+
+	.btn-secondary {
+		padding: 0.75rem 1.5rem;
+		border-radius: 8px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+		background: transparent;
+		border: 1px solid #374151;
+		color: #9ca3af;
+	}
+
+	.btn-secondary:hover {
+		background: #1f2937;
+		border-color: #4b5563;
+		color: #f8fafc;
+	}
 
 	.game-over-content {
 		text-align: center;
@@ -1371,25 +1607,26 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		gap: 1rem;
-		padding: 0.5rem 1rem;
-		background: #1a1f2e;
+		gap: 0.75rem;
+		padding: 0.375rem 0.75rem;
+		background: rgba(26, 31, 46, 0.8);
 		border-radius: 8px;
 		border: 1px solid #2a3441;
 	}
 
 	.player-identity {
 		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
+		align-items: center;
+		gap: 0.75rem;
 	}
 
 	.player-name {
 		font-weight: 700;
-		font-size: 1rem;
+		font-size: 0.9375rem;
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.375rem;
+		white-space: nowrap;
 	}
 
 	.player-name.has-priority {
@@ -1397,8 +1634,8 @@
 	}
 
 	.priority-dot {
-		width: 10px;
-		height: 10px;
+		width: 8px;
+		height: 8px;
 		background: #22c55e;
 		border-radius: 50%;
 		animation: pulse 1.5s infinite;
@@ -1411,8 +1648,8 @@
 
 	.player-stats {
 		display: flex;
-		gap: 1rem;
-		font-size: 0.875rem;
+		gap: 0.75rem;
+		font-size: 0.8125rem;
 	}
 
 	.player-stats .life { color: #ef4444; font-weight: 700; }
@@ -1421,7 +1658,7 @@
 
 	.player-zones {
 		display: flex;
-		gap: 1rem;
+		gap: 0.5rem;
 		align-items: center;
 	}
 

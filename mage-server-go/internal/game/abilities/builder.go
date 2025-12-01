@@ -97,9 +97,9 @@ func (b *ActivatedAbilityBuilder) AddManaCost(costStr string) *ActivatedAbilityB
 	return b
 }
 
-// AddTapCost adds a tap cost
+// AddTapCost adds a tap cost (uses the source permanent)
 func (b *ActivatedAbilityBuilder) AddTapCost() *ActivatedAbilityBuilder {
-	b.costs = append(b.costs, NewTapCost())
+	b.costs = append(b.costs, NewTapCostWithSource(b.sourceID))
 	return b
 }
 

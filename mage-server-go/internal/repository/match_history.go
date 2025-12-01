@@ -245,6 +245,67 @@ func (r *MatchHistoryRepository) GetMatchesByGameType(ctx context.Context, gameT
 	return matches, nil
 }
 
+// ExistsByGameID checks if a match exists with the given game_id
+// Returns true if the game was found in match history (i.e., it has ended)
+func (r *MatchHistoryRepository) ExistsByGameID(ctx context.Context, gameID string) (bool, error) {
+	query := `SELECT EXISTS(SELECT 1 FROM match_history WHERE game_id = $1)`
+
+	var exists bool
+	err := r.db.Pool.QueryRow(ctx, query, gameID).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("failed to check if game exists: %w", err)
+	}
+
+	return exists, nil
+}
+
+// GetMatchByGameID retrieves a match by its game_id (UUID)
+func (r *MatchHistoryRepository) GetMatchByGameID(ctx context.Context, gameID string) (*MatchHistory, error) {
+	query := `
+		SELECT id, game_id, table_id, tournament_id, players, game_type,
+		       start_time, end_time, duration_seconds,
+		       winner_id, winner_name, match_options, replay_data, created_at
+		FROM match_history
+		WHERE game_id = $1
+	`
+
+	match := &MatchHistory{}
+	var playersJSON string
+
+	err := r.db.Pool.QueryRow(ctx, query, gameID).Scan(
+		&match.ID, &match.GameID, &match.TableID, &match.TournamentID,
+		&playersJSON, &match.GameType,
+		&match.StartTime, &match.EndTime, &match.DurationSeconds,
+		&match.WinnerID, &match.WinnerName, &match.MatchOptions, &match.ReplayData,
+		&match.CreatedAt,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil // Game not found - return nil, nil to indicate not found vs error
+		}
+		return nil, fmt.Errorf("failed to get match by game_id: %w", err)
+	}
+
+	if err := match.SetPlayersFromJSON(playersJSON); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal players: %w", err)
+	}
+
+	return match, nil
+}
+
+// CountMatches returns the total number of matches in history
+func (r *MatchHistoryRepository) CountMatches(ctx context.Context) (int, error) {
+	query := `SELECT COUNT(*) FROM match_history`
+
+	var count int
+	err := r.db.Pool.QueryRow(ctx, query).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("failed to count matches: %w", err)
+	}
+
+	return count, nil
+}
+
 // GetMatchesByTournament retrieves all matches from a specific tournament
 func (r *MatchHistoryRepository) GetMatchesByTournament(ctx context.Context, tournamentID string) ([]*MatchHistory, error) {
 	query := `

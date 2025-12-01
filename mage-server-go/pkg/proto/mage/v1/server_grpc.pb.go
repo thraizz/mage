@@ -96,6 +96,8 @@ const (
 	MageServer_AdminEndUserSession_FullMethodName        = "/mage.v1.MageServer/AdminEndUserSession"
 	MageServer_AdminTableRemove_FullMethodName           = "/mage.v1.MageServer/AdminTableRemove"
 	MageServer_AdminSendBroadcastMessage_FullMethodName  = "/mage.v1.MageServer/AdminSendBroadcastMessage"
+	MageServer_AdminGetAllActiveGames_FullMethodName     = "/mage.v1.MageServer/AdminGetAllActiveGames"
+	MageServer_AdminGetServerDebugState_FullMethodName   = "/mage.v1.MageServer/AdminGetServerDebugState"
 )
 
 // MageServerClient is the client API for MageServer service.
@@ -259,6 +261,10 @@ type MageServerClient interface {
 	AdminTableRemove(ctx context.Context, in *AdminTableRemoveRequest, opts ...grpc.CallOption) (*AdminTableRemoveResponse, error)
 	// Send broadcast message to all users
 	AdminSendBroadcastMessage(ctx context.Context, in *AdminSendBroadcastMessageRequest, opts ...grpc.CallOption) (*AdminSendBroadcastMessageResponse, error)
+	// Get all active games (admin debug) - shows both memory and database state
+	AdminGetAllActiveGames(ctx context.Context, in *AdminGetAllActiveGamesRequest, opts ...grpc.CallOption) (*AdminGetAllActiveGamesResponse, error)
+	// Get server debug state with memory vs database comparison
+	AdminGetServerDebugState(ctx context.Context, in *AdminGetServerDebugStateRequest, opts ...grpc.CallOption) (*AdminGetServerDebugStateResponse, error)
 }
 
 type mageServerClient struct {
@@ -1039,6 +1045,26 @@ func (c *mageServerClient) AdminSendBroadcastMessage(ctx context.Context, in *Ad
 	return out, nil
 }
 
+func (c *mageServerClient) AdminGetAllActiveGames(ctx context.Context, in *AdminGetAllActiveGamesRequest, opts ...grpc.CallOption) (*AdminGetAllActiveGamesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminGetAllActiveGamesResponse)
+	err := c.cc.Invoke(ctx, MageServer_AdminGetAllActiveGames_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mageServerClient) AdminGetServerDebugState(ctx context.Context, in *AdminGetServerDebugStateRequest, opts ...grpc.CallOption) (*AdminGetServerDebugStateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminGetServerDebugStateResponse)
+	err := c.cc.Invoke(ctx, MageServer_AdminGetServerDebugState_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MageServerServer is the server API for MageServer service.
 // All implementations must embed UnimplementedMageServerServer
 // for forward compatibility.
@@ -1200,6 +1226,10 @@ type MageServerServer interface {
 	AdminTableRemove(context.Context, *AdminTableRemoveRequest) (*AdminTableRemoveResponse, error)
 	// Send broadcast message to all users
 	AdminSendBroadcastMessage(context.Context, *AdminSendBroadcastMessageRequest) (*AdminSendBroadcastMessageResponse, error)
+	// Get all active games (admin debug) - shows both memory and database state
+	AdminGetAllActiveGames(context.Context, *AdminGetAllActiveGamesRequest) (*AdminGetAllActiveGamesResponse, error)
+	// Get server debug state with memory vs database comparison
+	AdminGetServerDebugState(context.Context, *AdminGetServerDebugStateRequest) (*AdminGetServerDebugStateResponse, error)
 	mustEmbedUnimplementedMageServerServer()
 }
 
@@ -1440,6 +1470,12 @@ func (UnimplementedMageServerServer) AdminTableRemove(context.Context, *AdminTab
 }
 func (UnimplementedMageServerServer) AdminSendBroadcastMessage(context.Context, *AdminSendBroadcastMessageRequest) (*AdminSendBroadcastMessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AdminSendBroadcastMessage not implemented")
+}
+func (UnimplementedMageServerServer) AdminGetAllActiveGames(context.Context, *AdminGetAllActiveGamesRequest) (*AdminGetAllActiveGamesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminGetAllActiveGames not implemented")
+}
+func (UnimplementedMageServerServer) AdminGetServerDebugState(context.Context, *AdminGetServerDebugStateRequest) (*AdminGetServerDebugStateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminGetServerDebugState not implemented")
 }
 func (UnimplementedMageServerServer) mustEmbedUnimplementedMageServerServer() {}
 func (UnimplementedMageServerServer) testEmbeddedByValue()                    {}
@@ -2848,6 +2884,42 @@ func _MageServer_AdminSendBroadcastMessage_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MageServer_AdminGetAllActiveGames_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminGetAllActiveGamesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MageServerServer).AdminGetAllActiveGames(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MageServer_AdminGetAllActiveGames_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MageServerServer).AdminGetAllActiveGames(ctx, req.(*AdminGetAllActiveGamesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MageServer_AdminGetServerDebugState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminGetServerDebugStateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MageServerServer).AdminGetServerDebugState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MageServer_AdminGetServerDebugState_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MageServerServer).AdminGetServerDebugState(ctx, req.(*AdminGetServerDebugStateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MageServer_ServiceDesc is the grpc.ServiceDesc for MageServer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -3162,6 +3234,14 @@ var MageServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AdminSendBroadcastMessage",
 			Handler:    _MageServer_AdminSendBroadcastMessage_Handler,
+		},
+		{
+			MethodName: "AdminGetAllActiveGames",
+			Handler:    _MageServer_AdminGetAllActiveGames_Handler,
+		},
+		{
+			MethodName: "AdminGetServerDebugState",
+			Handler:    _MageServer_AdminGetServerDebugState_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

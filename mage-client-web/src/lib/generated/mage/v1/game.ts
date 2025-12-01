@@ -92,6 +92,8 @@ export enum SpecialActionType {
   COMPANION = 4,
   /** ADVANCE_PHASE - Manually advance to next phase/step */
   ADVANCE_PHASE = 5,
+  /** ACTIVATE_MANA_ABILITY - Tap a land for mana */
+  ACTIVATE_MANA_ABILITY = 6,
   UNRECOGNIZED = -1,
 }
 
@@ -115,6 +117,9 @@ export function specialActionTypeFromJSON(object: any): SpecialActionType {
     case 5:
     case "ADVANCE_PHASE":
       return SpecialActionType.ADVANCE_PHASE;
+    case 6:
+    case "ACTIVATE_MANA_ABILITY":
+      return SpecialActionType.ACTIVATE_MANA_ABILITY;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -136,6 +141,8 @@ export function specialActionTypeToJSON(object: SpecialActionType): string {
       return "COMPANION";
     case SpecialActionType.ADVANCE_PHASE:
       return "ADVANCE_PHASE";
+    case SpecialActionType.ACTIVATE_MANA_ABILITY:
+      return "ACTIVATE_MANA_ABILITY";
     case SpecialActionType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

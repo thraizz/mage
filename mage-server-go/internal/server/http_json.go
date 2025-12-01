@@ -251,6 +251,12 @@ func (h *HTTPJSONHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "AdminSendBroadcastMessage":
 		h.handleAdminSendBroadcastMessage(ctx, w, r)
 
+	case "AdminGetAllActiveGames":
+		h.handleAdminGetAllActiveGames(ctx, w, r)
+
+	case "AdminGetServerDebugState":
+		h.handleAdminGetServerDebugState(ctx, w, r)
+
 	default:
 		h.logger.Warn("unsupported method", zap.String("method", methodName))
 		http.Error(w, "Method not supported in HTTP/JSON mode: "+methodName, http.StatusNotImplemented)
@@ -1744,6 +1750,40 @@ func (h *HTTPJSONHandler) handleAdminSendBroadcastMessage(ctx context.Context, w
 	}
 
 	resp, err := h.mageServer.AdminSendBroadcastMessage(ctx, &req)
+	if err != nil {
+		h.writeErrorResponse(w, err)
+		return
+	}
+
+	h.writeSuccessResponse(w, resp)
+}
+
+// handleAdminGetAllActiveGames handles the AdminGetAllActiveGames method (debug)
+func (h *HTTPJSONHandler) handleAdminGetAllActiveGames(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	var req pb.AdminGetAllActiveGamesRequest
+	if err := h.unmarshalRequest(r, &req); err != nil {
+		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.mageServer.AdminGetAllActiveGames(ctx, &req)
+	if err != nil {
+		h.writeErrorResponse(w, err)
+		return
+	}
+
+	h.writeSuccessResponse(w, resp)
+}
+
+// handleAdminGetServerDebugState handles the AdminGetServerDebugState method (debug)
+func (h *HTTPJSONHandler) handleAdminGetServerDebugState(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	var req pb.AdminGetServerDebugStateRequest
+	if err := h.unmarshalRequest(r, &req); err != nil {
+		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.mageServer.AdminGetServerDebugState(ctx, &req)
 	if err != nil {
 		h.writeErrorResponse(w, err)
 		return

@@ -136,6 +136,8 @@ func AdminInterceptor(sessionMgr session.Manager) grpc.UnaryServerInterceptor {
 		"/mage.v1.MageServer/AdminEndUserSession":       true,
 		"/mage.v1.MageServer/AdminTableRemove":          true,
 		"/mage.v1.MageServer/AdminSendBroadcastMessage": true,
+		"/mage.v1.MageServer/AdminGetAllActiveGames":    true,
+		"/mage.v1.MageServer/AdminGetServerDebugState":  true,
 	}
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {

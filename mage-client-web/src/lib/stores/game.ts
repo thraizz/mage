@@ -652,9 +652,11 @@ export const currentStep = derived(gameStore, ($game) => $game.gameView?.step ||
 export const currentTurn = derived(gameStore, ($game) => $game.gameView?.turn || 0);
 
 /**
- * Battlefield cards
+ * Battlefield cards (sorted by UUID ascending for consistent ordering)
  */
-export const battlefield = derived(gameStore, ($game) => $game.gameView?.battlefield || []);
+export const battlefield = derived(gameStore, ($game) =>
+	[...($game.gameView?.battlefield || [])].sort((a, b) => a.id.localeCompare(b.id))
+);
 
 /**
  * Stack
@@ -682,12 +684,12 @@ export const combat = derived(gameStore, ($game) => $game.gameView?.combat || nu
 export const gameMessages = derived(gameStore, ($game) => $game.gameView?.messages || []);
 
 /**
- * Local player's hand
+ * Local player's hand (sorted by UUID ascending for consistent ordering)
  */
 export const myHand = derived(gameStore, ($game) => {
 	if (!$game.gameView || !$game.localPlayerId) return [];
 	const player = $game.gameView.players.find((p) => p.playerId === $game.localPlayerId);
-	return player?.hand || [];
+	return [...(player?.hand || [])].sort((a, b) => a.id.localeCompare(b.id));
 });
 
 /**

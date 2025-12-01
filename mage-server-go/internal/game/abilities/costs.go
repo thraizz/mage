@@ -248,21 +248,54 @@ func (c *ManaCost) String() string {
 // Tap Cost
 // ========================================
 
-// TapCost represents tapping the source as a cost
-type TapCost struct{}
+// TapCost represents tapping the source permanent as a cost
+type TapCost struct {
+	sourceID uuid.UUID
+}
 
+// NewTapCost creates a new tap cost (sourceID will be set by the ability builder)
 func NewTapCost() *TapCost {
 	return &TapCost{}
 }
 
+// NewTapCostWithSource creates a tap cost with a specific source permanent
+func NewTapCostWithSource(sourceID uuid.UUID) *TapCost {
+	return &TapCost{sourceID: sourceID}
+}
+
+// SetSource sets the source permanent ID for this tap cost
+func (c *TapCost) SetSource(sourceID uuid.UUID) {
+	c.sourceID = sourceID
+}
+
+// GetSource returns the source permanent ID
+func (c *TapCost) GetSource() uuid.UUID {
+	return c.sourceID
+}
+
 func (c *TapCost) CanPay(ctx context.Context, game GameContext, playerID uuid.UUID) bool {
-	// TODO: Check if source is tapped
-	return true
+	// If no source is set, we can't pay
+	if c.sourceID == uuid.Nil {
+		return false
+	}
+
+	// Check if the source permanent is already tapped
+	return !game.IsPermanentTapped(c.sourceID)
 }
 
 func (c *TapCost) Pay(ctx context.Context, game GameContext, playerID uuid.UUID) error {
-	// TODO: Tap the source
-	return fmt.Errorf("tap cost not yet implemented")
+	// If no source is set, we can't pay
+	if c.sourceID == uuid.Nil {
+		return fmt.Errorf("tap cost has no source permanent set")
+	}
+
+	// Check if already tapped
+	if game.IsPermanentTapped(c.sourceID) {
+		return fmt.Errorf("permanent is already tapped")
+	}
+
+	// Tap the permanent
+	return game.TapPermanent(c.sourceID)
 }
 
 func (c *TapCost) String() string {

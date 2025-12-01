@@ -7,3 +7,4 @@ DROP INDEX IF EXISTS idx_active_games_players;
 DROP TABLE IF EXISTS active_games;
 
 
+

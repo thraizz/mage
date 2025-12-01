@@ -383,6 +383,29 @@ func (gc *GameContext) UntapPermanent(permanentID uuid.UUID) error {
 	return fmt.Errorf("permanent %s not found", permanentID)
 }
 
+// IsPermanentTapped checks if a permanent is tapped.
+func (gc *GameContext) IsPermanentTapped(permanentID uuid.UUID) bool {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return false
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	// Find the permanent
+	for _, permanent := range gameState.battlefield {
+		if permanent.ID == permanentID.String() {
+			return permanent.Tapped
+		}
+	}
+
+	return false
+}
+
 // SacrificePermanent sacrifices a permanent (moves to graveyard, triggers dies events).
 func (gc *GameContext) SacrificePermanent(permanentID uuid.UUID) error {
 	gc.engine.mu.RLock()

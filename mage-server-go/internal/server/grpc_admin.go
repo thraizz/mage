@@ -339,3 +339,159 @@ func (s *mageServer) AdminSendBroadcastMessage(ctx context.Context, req *pb.Admi
 		RecipientCount: int32(broadcastCount),
 	}, nil
 }
+
+// AdminGetAllActiveGames returns all active games with memory vs database comparison
+func (s *mageServer) AdminGetAllActiveGames(ctx context.Context, req *pb.AdminGetAllActiveGamesRequest) (*pb.AdminGetAllActiveGamesResponse, error) {
+	// Session is already validated as admin by AdminInterceptor
+
+	// Get games from server memory
+	memoryGames := s.gameMgr.ListGames()
+	memoryGameIDs := make(map[string]bool)
+	for _, g := range memoryGames {
+		memoryGameIDs[g.ID] = true
+	}
+
+	// Get games from database
+	var dbGames []*pb.DebugActiveGameInfo
+	dbGameIDs := make(map[string]bool)
+
+	if s.activeGameRepo != nil {
+		activeGames, err := s.activeGameRepo.LoadAllActiveGames(ctx)
+		if err != nil {
+			s.logger.Warn("failed to load active games from database", zap.Error(err))
+		} else {
+			for _, ag := range activeGames {
+				dbGameIDs[ag.GameID] = true
+
+				// Check if also in memory
+				inMemory := memoryGameIDs[ag.GameID]
+
+				gameInfo := &pb.DebugActiveGameInfo{
+					GameId:     ag.GameID,
+					TableId:    ag.TableID,
+					GameType:   ag.GameType,
+					Players:    ag.Players,
+					TurnNumber: int32(ag.TurnNumber),
+					State:      ag.State,
+					CreatedAt:  ag.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+					UpdatedAt:  ag.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+					InMemory:   inMemory,
+					InDatabase: true,
+				}
+				dbGames = append(dbGames, gameInfo)
+			}
+		}
+	}
+
+	// Add memory-only games
+	for _, g := range memoryGames {
+		if !dbGameIDs[g.ID] {
+			// Game is only in memory, not in database
+			gameInfo := &pb.DebugActiveGameInfo{
+				GameId:     g.ID,
+				TableId:    g.TableID,
+				GameType:   g.GameType,
+				Players:    g.Players,
+				TurnNumber: int32(g.Turn),
+				State:      g.State.String(),
+				InMemory:   true,
+				InDatabase: false,
+			}
+			dbGames = append(dbGames, gameInfo)
+		}
+	}
+
+	s.logger.Info("admin retrieved all active games",
+		zap.Int("total_in_memory", len(memoryGames)),
+		zap.Int("total_in_database", len(dbGameIDs)),
+		zap.String("admin_session", req.GetSessionId()),
+	)
+
+	return &pb.AdminGetAllActiveGamesResponse{
+		Games:           dbGames,
+		TotalInMemory:   int32(len(memoryGames)),
+		TotalInDatabase: int32(len(dbGameIDs)),
+	}, nil
+}
+
+// AdminGetServerDebugState returns detailed server debug state
+func (s *mageServer) AdminGetServerDebugState(ctx context.Context, req *pb.AdminGetServerDebugStateRequest) (*pb.AdminGetServerDebugStateResponse, error) {
+	// Session is already validated as admin by AdminInterceptor
+
+	// Server memory stats
+	memoryActiveGames := s.gameMgr.GetActiveGameCount()
+	memoryActiveTables := s.tableMgr.GetActiveTableCount()
+	memoryActiveSessions := len(s.sessionMgr.GetAllSessionIDs())
+
+	// Database stats
+	var dbActiveGames int
+	var dbMatchHistory int
+
+	if s.activeGameRepo != nil {
+		count, err := s.activeGameRepo.CountActiveGames(ctx)
+		if err != nil {
+			s.logger.Warn("failed to count active games in database", zap.Error(err))
+		} else {
+			dbActiveGames = count
+		}
+	}
+
+	if s.matchHistoryRepo != nil {
+		count, err := s.matchHistoryRepo.CountMatches(ctx)
+		if err != nil {
+			s.logger.Warn("failed to count match history in database", zap.Error(err))
+		} else {
+			dbMatchHistory = count
+		}
+	}
+
+	// Find discrepancies
+	var gamesInMemoryOnly []string
+	var gamesInDbOnly []string
+
+	memoryGames2 := s.gameMgr.ListGames()
+	memoryGameIDs2 := make(map[string]bool)
+	for _, g := range memoryGames2 {
+		memoryGameIDs2[g.ID] = true
+	}
+
+	if s.activeGameRepo != nil {
+		dbGames, err := s.activeGameRepo.LoadAllActiveGames(ctx)
+		if err == nil {
+			dbGameIDs := make(map[string]bool)
+			for _, ag := range dbGames {
+				dbGameIDs[ag.GameID] = true
+				if !memoryGameIDs2[ag.GameID] {
+					gamesInDbOnly = append(gamesInDbOnly, ag.GameID)
+				}
+			}
+			for id := range memoryGameIDs2 {
+				if !dbGameIDs[id] {
+					gamesInMemoryOnly = append(gamesInMemoryOnly, id)
+				}
+			}
+		}
+	}
+
+	// Calculate uptime (placeholder - would need startup time tracking)
+	uptime := "unknown"
+
+	s.logger.Info("admin retrieved server debug state",
+		zap.Int("memory_games", memoryActiveGames),
+		zap.Int("db_games", dbActiveGames),
+		zap.Int("discrepancies", len(gamesInMemoryOnly)+len(gamesInDbOnly)),
+		zap.String("admin_session", req.GetSessionId()),
+	)
+
+	return &pb.AdminGetServerDebugStateResponse{
+		MemoryActiveGames:    int32(memoryActiveGames),
+		MemoryActiveTables:   int32(memoryActiveTables),
+		MemoryActiveSessions: int32(memoryActiveSessions),
+		DbActiveGames:        int32(dbActiveGames),
+		DbMatchHistory:       int32(dbMatchHistory),
+		GamesInMemoryOnly:    gamesInMemoryOnly,
+		GamesInDbOnly:        gamesInDbOnly,
+		ServerUptime:         uptime,
+		LastGameSave:         "", // TODO: Track last save time
+	}, nil
+}

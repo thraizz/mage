@@ -144,15 +144,16 @@ func main() {
 	mageEngine.SetPersistenceRepository(persistenceAdapter)
 	logger.Info("game persistence configured")
 
+	// Create game adapter BEFORE restoring games so we can start action processing
+	gameAdapter := game.NewEngineAdapter(mageEngine, logger)
+
 	// Restore active games from database (crash recovery)
-	restoredCount := restoreActiveGames(ctx, activeGameRepo, mageEngine, gameMgr, logger)
+	restoredCount := restoreActiveGames(ctx, activeGameRepo, mageEngine, gameMgr, gameAdapter, logger)
 	if restoredCount > 0 {
 		logger.Info("restored active games from persistence",
 			zap.Int("count", restoredCount),
 		)
 	}
-
-	gameAdapter := game.NewEngineAdapter(mageEngine, logger)
 
 	// Initialize tournament manager
 	tournamentMgr := tournament.NewManager(logger)
@@ -363,6 +364,7 @@ func restoreActiveGames(
 	activeGameRepo *repository.ActiveGameRepository,
 	mageEngine *game.MageEngine,
 	gameMgr *game.Manager,
+	gameAdapter *game.EngineAdapter,
 	logger *zap.Logger,
 ) int {
 	// Load all active games from database
@@ -415,7 +417,16 @@ func restoreActiveGames(
 		case "PAUSED":
 			gameState = game.GameStatePaused
 		}
-		gameMgr.RestoreGame(ag.GameID, ag.TableID, ag.GameType, ag.Players, gameState)
+		restoredGame := gameMgr.RestoreGame(ag.GameID, ag.TableID, ag.GameType, ag.Players, gameState)
+
+		// CRITICAL: Start the action processing goroutine for restored games
+		// Without this, player actions (like "KEEP" for mulligan) won't be processed!
+		if restoredGame != nil && gameAdapter != nil {
+			go gameAdapter.ProcessGameActions(restoredGame)
+			logger.Info("started action processing for restored game",
+				zap.String("game_id", ag.GameID),
+			)
+		}
 
 		logger.Info("restored game from persistence",
 			zap.String("game_id", ag.GameID),

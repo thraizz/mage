@@ -981,6 +981,385 @@ func (x *AdminSendBroadcastMessageResponse) GetRecipientCount() int32 {
 	return 0
 }
 
+// Debug active game info with full details
+type DebugActiveGameInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GameId        string                 `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	TableId       string                 `protobuf:"bytes,2,opt,name=table_id,json=tableId,proto3" json:"table_id,omitempty"`
+	GameType      string                 `protobuf:"bytes,3,opt,name=game_type,json=gameType,proto3" json:"game_type,omitempty"`
+	Players       []string               `protobuf:"bytes,4,rep,name=players,proto3" json:"players,omitempty"`
+	TurnNumber    int32                  `protobuf:"varint,5,opt,name=turn_number,json=turnNumber,proto3" json:"turn_number,omitempty"`
+	State         string                 `protobuf:"bytes,6,opt,name=state,proto3" json:"state,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	InMemory      bool                   `protobuf:"varint,9,opt,name=in_memory,json=inMemory,proto3" json:"in_memory,omitempty"`        // Whether game exists in server memory
+	InDatabase    bool                   `protobuf:"varint,10,opt,name=in_database,json=inDatabase,proto3" json:"in_database,omitempty"` // Whether game exists in database
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DebugActiveGameInfo) Reset() {
+	*x = DebugActiveGameInfo{}
+	mi := &file_mage_v1_admin_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DebugActiveGameInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DebugActiveGameInfo) ProtoMessage() {}
+
+func (x *DebugActiveGameInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_admin_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DebugActiveGameInfo.ProtoReflect.Descriptor instead.
+func (*DebugActiveGameInfo) Descriptor() ([]byte, []int) {
+	return file_mage_v1_admin_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *DebugActiveGameInfo) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *DebugActiveGameInfo) GetTableId() string {
+	if x != nil {
+		return x.TableId
+	}
+	return ""
+}
+
+func (x *DebugActiveGameInfo) GetGameType() string {
+	if x != nil {
+		return x.GameType
+	}
+	return ""
+}
+
+func (x *DebugActiveGameInfo) GetPlayers() []string {
+	if x != nil {
+		return x.Players
+	}
+	return nil
+}
+
+func (x *DebugActiveGameInfo) GetTurnNumber() int32 {
+	if x != nil {
+		return x.TurnNumber
+	}
+	return 0
+}
+
+func (x *DebugActiveGameInfo) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
+func (x *DebugActiveGameInfo) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *DebugActiveGameInfo) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+func (x *DebugActiveGameInfo) GetInMemory() bool {
+	if x != nil {
+		return x.InMemory
+	}
+	return false
+}
+
+func (x *DebugActiveGameInfo) GetInDatabase() bool {
+	if x != nil {
+		return x.InDatabase
+	}
+	return false
+}
+
+// Get all active games from database (admin debug)
+type AdminGetAllActiveGamesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminGetAllActiveGamesRequest) Reset() {
+	*x = AdminGetAllActiveGamesRequest{}
+	mi := &file_mage_v1_admin_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminGetAllActiveGamesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminGetAllActiveGamesRequest) ProtoMessage() {}
+
+func (x *AdminGetAllActiveGamesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_admin_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminGetAllActiveGamesRequest.ProtoReflect.Descriptor instead.
+func (*AdminGetAllActiveGamesRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_admin_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *AdminGetAllActiveGamesRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+type AdminGetAllActiveGamesResponse struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Games           []*DebugActiveGameInfo `protobuf:"bytes,1,rep,name=games,proto3" json:"games,omitempty"`
+	TotalInMemory   int32                  `protobuf:"varint,2,opt,name=total_in_memory,json=totalInMemory,proto3" json:"total_in_memory,omitempty"`
+	TotalInDatabase int32                  `protobuf:"varint,3,opt,name=total_in_database,json=totalInDatabase,proto3" json:"total_in_database,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *AdminGetAllActiveGamesResponse) Reset() {
+	*x = AdminGetAllActiveGamesResponse{}
+	mi := &file_mage_v1_admin_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminGetAllActiveGamesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminGetAllActiveGamesResponse) ProtoMessage() {}
+
+func (x *AdminGetAllActiveGamesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_admin_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminGetAllActiveGamesResponse.ProtoReflect.Descriptor instead.
+func (*AdminGetAllActiveGamesResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_admin_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *AdminGetAllActiveGamesResponse) GetGames() []*DebugActiveGameInfo {
+	if x != nil {
+		return x.Games
+	}
+	return nil
+}
+
+func (x *AdminGetAllActiveGamesResponse) GetTotalInMemory() int32 {
+	if x != nil {
+		return x.TotalInMemory
+	}
+	return 0
+}
+
+func (x *AdminGetAllActiveGamesResponse) GetTotalInDatabase() int32 {
+	if x != nil {
+		return x.TotalInDatabase
+	}
+	return 0
+}
+
+// Get server debug state including memory vs database comparison
+type AdminGetServerDebugStateRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminGetServerDebugStateRequest) Reset() {
+	*x = AdminGetServerDebugStateRequest{}
+	mi := &file_mage_v1_admin_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminGetServerDebugStateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminGetServerDebugStateRequest) ProtoMessage() {}
+
+func (x *AdminGetServerDebugStateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_admin_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminGetServerDebugStateRequest.ProtoReflect.Descriptor instead.
+func (*AdminGetServerDebugStateRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_admin_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *AdminGetServerDebugStateRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+type AdminGetServerDebugStateResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Server memory state
+	MemoryActiveGames    int32 `protobuf:"varint,1,opt,name=memory_active_games,json=memoryActiveGames,proto3" json:"memory_active_games,omitempty"`
+	MemoryActiveTables   int32 `protobuf:"varint,2,opt,name=memory_active_tables,json=memoryActiveTables,proto3" json:"memory_active_tables,omitempty"`
+	MemoryActiveSessions int32 `protobuf:"varint,3,opt,name=memory_active_sessions,json=memoryActiveSessions,proto3" json:"memory_active_sessions,omitempty"`
+	// Database state
+	DbActiveGames  int32 `protobuf:"varint,4,opt,name=db_active_games,json=dbActiveGames,proto3" json:"db_active_games,omitempty"`
+	DbMatchHistory int32 `protobuf:"varint,5,opt,name=db_match_history,json=dbMatchHistory,proto3" json:"db_match_history,omitempty"`
+	// Discrepancies
+	GamesInMemoryOnly []string `protobuf:"bytes,6,rep,name=games_in_memory_only,json=gamesInMemoryOnly,proto3" json:"games_in_memory_only,omitempty"`
+	GamesInDbOnly     []string `protobuf:"bytes,7,rep,name=games_in_db_only,json=gamesInDbOnly,proto3" json:"games_in_db_only,omitempty"`
+	// Server info
+	ServerUptime  string `protobuf:"bytes,8,opt,name=server_uptime,json=serverUptime,proto3" json:"server_uptime,omitempty"`
+	LastGameSave  string `protobuf:"bytes,9,opt,name=last_game_save,json=lastGameSave,proto3" json:"last_game_save,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminGetServerDebugStateResponse) Reset() {
+	*x = AdminGetServerDebugStateResponse{}
+	mi := &file_mage_v1_admin_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminGetServerDebugStateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminGetServerDebugStateResponse) ProtoMessage() {}
+
+func (x *AdminGetServerDebugStateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_admin_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminGetServerDebugStateResponse.ProtoReflect.Descriptor instead.
+func (*AdminGetServerDebugStateResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_admin_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *AdminGetServerDebugStateResponse) GetMemoryActiveGames() int32 {
+	if x != nil {
+		return x.MemoryActiveGames
+	}
+	return 0
+}
+
+func (x *AdminGetServerDebugStateResponse) GetMemoryActiveTables() int32 {
+	if x != nil {
+		return x.MemoryActiveTables
+	}
+	return 0
+}
+
+func (x *AdminGetServerDebugStateResponse) GetMemoryActiveSessions() int32 {
+	if x != nil {
+		return x.MemoryActiveSessions
+	}
+	return 0
+}
+
+func (x *AdminGetServerDebugStateResponse) GetDbActiveGames() int32 {
+	if x != nil {
+		return x.DbActiveGames
+	}
+	return 0
+}
+
+func (x *AdminGetServerDebugStateResponse) GetDbMatchHistory() int32 {
+	if x != nil {
+		return x.DbMatchHistory
+	}
+	return 0
+}
+
+func (x *AdminGetServerDebugStateResponse) GetGamesInMemoryOnly() []string {
+	if x != nil {
+		return x.GamesInMemoryOnly
+	}
+	return nil
+}
+
+func (x *AdminGetServerDebugStateResponse) GetGamesInDbOnly() []string {
+	if x != nil {
+		return x.GamesInDbOnly
+	}
+	return nil
+}
+
+func (x *AdminGetServerDebugStateResponse) GetServerUptime() string {
+	if x != nil {
+		return x.ServerUptime
+	}
+	return ""
+}
+
+func (x *AdminGetServerDebugStateResponse) GetLastGameSave() string {
+	if x != nil {
+		return x.LastGameSave
+	}
+	return ""
+}
+
 var File_mage_v1_admin_proto protoreflect.FileDescriptor
 
 const file_mage_v1_admin_proto_rawDesc = "" +
@@ -1052,7 +1431,43 @@ const file_mage_v1_admin_proto_rawDesc = "" +
 	"!AdminSendBroadcastMessageResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12'\n" +
-	"\x0frecipient_count\x18\x03 \x01(\x05R\x0erecipientCountB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
+	"\x0frecipient_count\x18\x03 \x01(\x05R\x0erecipientCount\"\xb3\x02\n" +
+	"\x13DebugActiveGameInfo\x12\x17\n" +
+	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12\x19\n" +
+	"\btable_id\x18\x02 \x01(\tR\atableId\x12\x1b\n" +
+	"\tgame_type\x18\x03 \x01(\tR\bgameType\x12\x18\n" +
+	"\aplayers\x18\x04 \x03(\tR\aplayers\x12\x1f\n" +
+	"\vturn_number\x18\x05 \x01(\x05R\n" +
+	"turnNumber\x12\x14\n" +
+	"\x05state\x18\x06 \x01(\tR\x05state\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\b \x01(\tR\tupdatedAt\x12\x1b\n" +
+	"\tin_memory\x18\t \x01(\bR\binMemory\x12\x1f\n" +
+	"\vin_database\x18\n" +
+	" \x01(\bR\n" +
+	"inDatabase\">\n" +
+	"\x1dAdminGetAllActiveGamesRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\"\xa8\x01\n" +
+	"\x1eAdminGetAllActiveGamesResponse\x122\n" +
+	"\x05games\x18\x01 \x03(\v2\x1c.mage.v1.DebugActiveGameInfoR\x05games\x12&\n" +
+	"\x0ftotal_in_memory\x18\x02 \x01(\x05R\rtotalInMemory\x12*\n" +
+	"\x11total_in_database\x18\x03 \x01(\x05R\x0ftotalInDatabase\"@\n" +
+	"\x1fAdminGetServerDebugStateRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\"\xb1\x03\n" +
+	" AdminGetServerDebugStateResponse\x12.\n" +
+	"\x13memory_active_games\x18\x01 \x01(\x05R\x11memoryActiveGames\x120\n" +
+	"\x14memory_active_tables\x18\x02 \x01(\x05R\x12memoryActiveTables\x124\n" +
+	"\x16memory_active_sessions\x18\x03 \x01(\x05R\x14memoryActiveSessions\x12&\n" +
+	"\x0fdb_active_games\x18\x04 \x01(\x05R\rdbActiveGames\x12(\n" +
+	"\x10db_match_history\x18\x05 \x01(\x05R\x0edbMatchHistory\x12/\n" +
+	"\x14games_in_memory_only\x18\x06 \x03(\tR\x11gamesInMemoryOnly\x12'\n" +
+	"\x10games_in_db_only\x18\a \x03(\tR\rgamesInDbOnly\x12#\n" +
+	"\rserver_uptime\x18\b \x01(\tR\fserverUptime\x12$\n" +
+	"\x0elast_game_save\x18\t \x01(\tR\flastGameSaveB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
 
 var (
 	file_mage_v1_admin_proto_rawDescOnce sync.Once
@@ -1066,7 +1481,7 @@ func file_mage_v1_admin_proto_rawDescGZIP() []byte {
 	return file_mage_v1_admin_proto_rawDescData
 }
 
-var file_mage_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_mage_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_mage_v1_admin_proto_goTypes = []any{
 	(*AdminGetUsersRequest)(nil),              // 0: mage.v1.AdminGetUsersRequest
 	(*AdminGetUsersResponse)(nil),             // 1: mage.v1.AdminGetUsersResponse
@@ -1086,15 +1501,21 @@ var file_mage_v1_admin_proto_goTypes = []any{
 	(*AdminTableRemoveResponse)(nil),          // 15: mage.v1.AdminTableRemoveResponse
 	(*AdminSendBroadcastMessageRequest)(nil),  // 16: mage.v1.AdminSendBroadcastMessageRequest
 	(*AdminSendBroadcastMessageResponse)(nil), // 17: mage.v1.AdminSendBroadcastMessageResponse
-	(*UserView)(nil),                          // 18: mage.v1.UserView
+	(*DebugActiveGameInfo)(nil),               // 18: mage.v1.DebugActiveGameInfo
+	(*AdminGetAllActiveGamesRequest)(nil),     // 19: mage.v1.AdminGetAllActiveGamesRequest
+	(*AdminGetAllActiveGamesResponse)(nil),    // 20: mage.v1.AdminGetAllActiveGamesResponse
+	(*AdminGetServerDebugStateRequest)(nil),   // 21: mage.v1.AdminGetServerDebugStateRequest
+	(*AdminGetServerDebugStateResponse)(nil),  // 22: mage.v1.AdminGetServerDebugStateResponse
+	(*UserView)(nil),                          // 23: mage.v1.UserView
 }
 var file_mage_v1_admin_proto_depIdxs = []int32{
-	18, // 0: mage.v1.AdminGetUsersResponse.users:type_name -> mage.v1.UserView
-	1,  // [1:1] is the sub-list for method output_type
-	1,  // [1:1] is the sub-list for method input_type
-	1,  // [1:1] is the sub-list for extension type_name
-	1,  // [1:1] is the sub-list for extension extendee
-	0,  // [0:1] is the sub-list for field type_name
+	23, // 0: mage.v1.AdminGetUsersResponse.users:type_name -> mage.v1.UserView
+	18, // 1: mage.v1.AdminGetAllActiveGamesResponse.games:type_name -> mage.v1.DebugActiveGameInfo
+	2,  // [2:2] is the sub-list for method output_type
+	2,  // [2:2] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_admin_proto_init() }
@@ -1109,7 +1530,7 @@ func file_mage_v1_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_admin_proto_rawDesc), len(file_mage_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

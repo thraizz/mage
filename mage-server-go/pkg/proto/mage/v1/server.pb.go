@@ -24,7 +24,7 @@ var File_mage_v1_server_proto protoreflect.FileDescriptor
 
 const file_mage_v1_server_proto_rawDesc = "" +
 	"\n" +
-	"\x14mage/v1/server.proto\x12\amage.v1\x1a\x12mage/v1/auth.proto\x1a\x12mage/v1/room.proto\x1a\x13mage/v1/table.proto\x1a\x12mage/v1/game.proto\x1a\x18mage/v1/tournament.proto\x1a\x13mage/v1/draft.proto\x1a\x12mage/v1/chat.proto\x1a\x13mage/v1/admin.proto2\x9f3\n" +
+	"\x14mage/v1/server.proto\x12\amage.v1\x1a\x12mage/v1/auth.proto\x1a\x12mage/v1/room.proto\x1a\x13mage/v1/table.proto\x1a\x12mage/v1/game.proto\x1a\x18mage/v1/tournament.proto\x1a\x13mage/v1/draft.proto\x1a\x12mage/v1/chat.proto\x1a\x13mage/v1/admin.proto2\xfb4\n" +
 	"\n" +
 	"MageServer\x12K\n" +
 	"\fAuthRegister\x12\x1c.mage.v1.AuthRegisterRequest\x1a\x1d.mage.v1.AuthRegisterResponse\x12c\n" +
@@ -109,7 +109,9 @@ const file_mage_v1_server_proto_rawDesc = "" +
 	"\x17AdminToggleActivateUser\x12'.mage.v1.AdminToggleActivateUserRequest\x1a(.mage.v1.AdminToggleActivateUserResponse\x12`\n" +
 	"\x13AdminEndUserSession\x12#.mage.v1.AdminEndUserSessionRequest\x1a$.mage.v1.AdminEndUserSessionResponse\x12W\n" +
 	"\x10AdminTableRemove\x12 .mage.v1.AdminTableRemoveRequest\x1a!.mage.v1.AdminTableRemoveResponse\x12r\n" +
-	"\x19AdminSendBroadcastMessage\x12).mage.v1.AdminSendBroadcastMessageRequest\x1a*.mage.v1.AdminSendBroadcastMessageResponseB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
+	"\x19AdminSendBroadcastMessage\x12).mage.v1.AdminSendBroadcastMessageRequest\x1a*.mage.v1.AdminSendBroadcastMessageResponse\x12i\n" +
+	"\x16AdminGetAllActiveGames\x12&.mage.v1.AdminGetAllActiveGamesRequest\x1a'.mage.v1.AdminGetAllActiveGamesResponse\x12o\n" +
+	"\x18AdminGetServerDebugState\x12(.mage.v1.AdminGetServerDebugStateRequest\x1a).mage.v1.AdminGetServerDebugStateResponseB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
 
 var file_mage_v1_server_proto_goTypes = []any{
 	(*AuthRegisterRequest)(nil),                // 0: mage.v1.AuthRegisterRequest
@@ -189,83 +191,87 @@ var file_mage_v1_server_proto_goTypes = []any{
 	(*AdminEndUserSessionRequest)(nil),         // 74: mage.v1.AdminEndUserSessionRequest
 	(*AdminTableRemoveRequest)(nil),            // 75: mage.v1.AdminTableRemoveRequest
 	(*AdminSendBroadcastMessageRequest)(nil),   // 76: mage.v1.AdminSendBroadcastMessageRequest
-	(*AuthRegisterResponse)(nil),               // 77: mage.v1.AuthRegisterResponse
-	(*AuthSendTokenToEmailResponse)(nil),       // 78: mage.v1.AuthSendTokenToEmailResponse
-	(*AuthResetPasswordResponse)(nil),          // 79: mage.v1.AuthResetPasswordResponse
-	(*ConnectUserResponse)(nil),                // 80: mage.v1.ConnectUserResponse
-	(*ConnectAdminResponse)(nil),               // 81: mage.v1.ConnectAdminResponse
-	(*ConnectSetUserDataResponse)(nil),         // 82: mage.v1.ConnectSetUserDataResponse
-	(*PingResponse)(nil),                       // 83: mage.v1.PingResponse
-	(*GetServerStateResponse)(nil),             // 84: mage.v1.GetServerStateResponse
-	(*ServerGetPromotionMessagesResponse)(nil), // 85: mage.v1.ServerGetPromotionMessagesResponse
-	(*ServerAddFeedbackMessageResponse)(nil),   // 86: mage.v1.ServerAddFeedbackMessageResponse
-	(*ServerGetMainRoomIdResponse)(nil),        // 87: mage.v1.ServerGetMainRoomIdResponse
-	(*RoomGetUsersResponse)(nil),               // 88: mage.v1.RoomGetUsersResponse
-	(*RoomGetFinishedMatchesResponse)(nil),     // 89: mage.v1.RoomGetFinishedMatchesResponse
-	(*RoomGetAllTablesResponse)(nil),           // 90: mage.v1.RoomGetAllTablesResponse
-	(*RoomGetTableByIdResponse)(nil),           // 91: mage.v1.RoomGetTableByIdResponse
-	(*RoomCreateTableResponse)(nil),            // 92: mage.v1.RoomCreateTableResponse
-	(*RoomCreateTournamentResponse)(nil),       // 93: mage.v1.RoomCreateTournamentResponse
-	(*RoomJoinTableResponse)(nil),              // 94: mage.v1.RoomJoinTableResponse
-	(*RoomJoinTournamentResponse)(nil),         // 95: mage.v1.RoomJoinTournamentResponse
-	(*RoomLeaveTableOrTournamentResponse)(nil), // 96: mage.v1.RoomLeaveTableOrTournamentResponse
-	(*RoomWatchTableResponse)(nil),             // 97: mage.v1.RoomWatchTableResponse
-	(*RoomWatchTournamentResponse)(nil),        // 98: mage.v1.RoomWatchTournamentResponse
-	(*TableSwapSeatsResponse)(nil),             // 99: mage.v1.TableSwapSeatsResponse
-	(*TableRemoveResponse)(nil),                // 100: mage.v1.TableRemoveResponse
-	(*TableIsOwnerResponse)(nil),               // 101: mage.v1.TableIsOwnerResponse
-	(*DeckSubmitResponse)(nil),                 // 102: mage.v1.DeckSubmitResponse
-	(*DeckSaveResponse)(nil),                   // 103: mage.v1.DeckSaveResponse
-	(*DeckListResponse)(nil),                   // 104: mage.v1.DeckListResponse
-	(*DeckDeleteResponse)(nil),                 // 105: mage.v1.DeckDeleteResponse
-	(*DeckGetResponse)(nil),                    // 106: mage.v1.DeckGetResponse
-	(*GameJoinResponse)(nil),                   // 107: mage.v1.GameJoinResponse
-	(*GameWatchStartResponse)(nil),             // 108: mage.v1.GameWatchStartResponse
-	(*GameWatchStopResponse)(nil),              // 109: mage.v1.GameWatchStopResponse
-	(*GameGetViewResponse)(nil),                // 110: mage.v1.GameGetViewResponse
-	(*SendPlayerUUIDResponse)(nil),             // 111: mage.v1.SendPlayerUUIDResponse
-	(*SendPlayerStringResponse)(nil),           // 112: mage.v1.SendPlayerStringResponse
-	(*SendPlayerBooleanResponse)(nil),          // 113: mage.v1.SendPlayerBooleanResponse
-	(*SendPlayerIntegerResponse)(nil),          // 114: mage.v1.SendPlayerIntegerResponse
-	(*SendPlayerManaTypeResponse)(nil),         // 115: mage.v1.SendPlayerManaTypeResponse
-	(*SendPlayerActionResponse)(nil),           // 116: mage.v1.SendPlayerActionResponse
-	(*SendSpecialActionResponse)(nil),          // 117: mage.v1.SendSpecialActionResponse
-	(*MatchStartResponse)(nil),                 // 118: mage.v1.MatchStartResponse
-	(*MatchQuitResponse)(nil),                  // 119: mage.v1.MatchQuitResponse
-	(*GetMyActiveGamesResponse)(nil),           // 120: mage.v1.GetMyActiveGamesResponse
-	(*DraftJoinResponse)(nil),                  // 121: mage.v1.DraftJoinResponse
-	(*SendDraftCardPickResponse)(nil),          // 122: mage.v1.SendDraftCardPickResponse
-	(*SendDraftCardMarkResponse)(nil),          // 123: mage.v1.SendDraftCardMarkResponse
-	(*DraftSetBoosterLoadedResponse)(nil),      // 124: mage.v1.DraftSetBoosterLoadedResponse
-	(*DraftQuitResponse)(nil),                  // 125: mage.v1.DraftQuitResponse
-	(*TournamentJoinResponse)(nil),             // 126: mage.v1.TournamentJoinResponse
-	(*TournamentStartResponse)(nil),            // 127: mage.v1.TournamentStartResponse
-	(*TournamentQuitResponse)(nil),             // 128: mage.v1.TournamentQuitResponse
-	(*TournamentFindByIdResponse)(nil),         // 129: mage.v1.TournamentFindByIdResponse
-	(*ChatJoinResponse)(nil),                   // 130: mage.v1.ChatJoinResponse
-	(*ChatLeaveResponse)(nil),                  // 131: mage.v1.ChatLeaveResponse
-	(*ChatSendMessageResponse)(nil),            // 132: mage.v1.ChatSendMessageResponse
-	(*ChatFindByTableResponse)(nil),            // 133: mage.v1.ChatFindByTableResponse
-	(*ChatFindByGameResponse)(nil),             // 134: mage.v1.ChatFindByGameResponse
-	(*ChatFindByTournamentResponse)(nil),       // 135: mage.v1.ChatFindByTournamentResponse
-	(*ChatFindByRoomResponse)(nil),             // 136: mage.v1.ChatFindByRoomResponse
-	(*GetMatchHistoryResponse)(nil),            // 137: mage.v1.GetMatchHistoryResponse
-	(*GetMatchByIdResponse)(nil),               // 138: mage.v1.GetMatchByIdResponse
-	(*ReplayInitResponse)(nil),                 // 139: mage.v1.ReplayInitResponse
-	(*ReplayStartResponse)(nil),                // 140: mage.v1.ReplayStartResponse
-	(*ReplayStopResponse)(nil),                 // 141: mage.v1.ReplayStopResponse
-	(*ReplayNextResponse)(nil),                 // 142: mage.v1.ReplayNextResponse
-	(*ReplayPreviousResponse)(nil),             // 143: mage.v1.ReplayPreviousResponse
-	(*ReplaySkipForwardResponse)(nil),          // 144: mage.v1.ReplaySkipForwardResponse
-	(*AdminGetUsersResponse)(nil),              // 145: mage.v1.AdminGetUsersResponse
-	(*AdminDisconnectUserResponse)(nil),        // 146: mage.v1.AdminDisconnectUserResponse
-	(*AdminMuteUserResponse)(nil),              // 147: mage.v1.AdminMuteUserResponse
-	(*AdminLockUserResponse)(nil),              // 148: mage.v1.AdminLockUserResponse
-	(*AdminActivateUserResponse)(nil),          // 149: mage.v1.AdminActivateUserResponse
-	(*AdminToggleActivateUserResponse)(nil),    // 150: mage.v1.AdminToggleActivateUserResponse
-	(*AdminEndUserSessionResponse)(nil),        // 151: mage.v1.AdminEndUserSessionResponse
-	(*AdminTableRemoveResponse)(nil),           // 152: mage.v1.AdminTableRemoveResponse
-	(*AdminSendBroadcastMessageResponse)(nil),  // 153: mage.v1.AdminSendBroadcastMessageResponse
+	(*AdminGetAllActiveGamesRequest)(nil),      // 77: mage.v1.AdminGetAllActiveGamesRequest
+	(*AdminGetServerDebugStateRequest)(nil),    // 78: mage.v1.AdminGetServerDebugStateRequest
+	(*AuthRegisterResponse)(nil),               // 79: mage.v1.AuthRegisterResponse
+	(*AuthSendTokenToEmailResponse)(nil),       // 80: mage.v1.AuthSendTokenToEmailResponse
+	(*AuthResetPasswordResponse)(nil),          // 81: mage.v1.AuthResetPasswordResponse
+	(*ConnectUserResponse)(nil),                // 82: mage.v1.ConnectUserResponse
+	(*ConnectAdminResponse)(nil),               // 83: mage.v1.ConnectAdminResponse
+	(*ConnectSetUserDataResponse)(nil),         // 84: mage.v1.ConnectSetUserDataResponse
+	(*PingResponse)(nil),                       // 85: mage.v1.PingResponse
+	(*GetServerStateResponse)(nil),             // 86: mage.v1.GetServerStateResponse
+	(*ServerGetPromotionMessagesResponse)(nil), // 87: mage.v1.ServerGetPromotionMessagesResponse
+	(*ServerAddFeedbackMessageResponse)(nil),   // 88: mage.v1.ServerAddFeedbackMessageResponse
+	(*ServerGetMainRoomIdResponse)(nil),        // 89: mage.v1.ServerGetMainRoomIdResponse
+	(*RoomGetUsersResponse)(nil),               // 90: mage.v1.RoomGetUsersResponse
+	(*RoomGetFinishedMatchesResponse)(nil),     // 91: mage.v1.RoomGetFinishedMatchesResponse
+	(*RoomGetAllTablesResponse)(nil),           // 92: mage.v1.RoomGetAllTablesResponse
+	(*RoomGetTableByIdResponse)(nil),           // 93: mage.v1.RoomGetTableByIdResponse
+	(*RoomCreateTableResponse)(nil),            // 94: mage.v1.RoomCreateTableResponse
+	(*RoomCreateTournamentResponse)(nil),       // 95: mage.v1.RoomCreateTournamentResponse
+	(*RoomJoinTableResponse)(nil),              // 96: mage.v1.RoomJoinTableResponse
+	(*RoomJoinTournamentResponse)(nil),         // 97: mage.v1.RoomJoinTournamentResponse
+	(*RoomLeaveTableOrTournamentResponse)(nil), // 98: mage.v1.RoomLeaveTableOrTournamentResponse
+	(*RoomWatchTableResponse)(nil),             // 99: mage.v1.RoomWatchTableResponse
+	(*RoomWatchTournamentResponse)(nil),        // 100: mage.v1.RoomWatchTournamentResponse
+	(*TableSwapSeatsResponse)(nil),             // 101: mage.v1.TableSwapSeatsResponse
+	(*TableRemoveResponse)(nil),                // 102: mage.v1.TableRemoveResponse
+	(*TableIsOwnerResponse)(nil),               // 103: mage.v1.TableIsOwnerResponse
+	(*DeckSubmitResponse)(nil),                 // 104: mage.v1.DeckSubmitResponse
+	(*DeckSaveResponse)(nil),                   // 105: mage.v1.DeckSaveResponse
+	(*DeckListResponse)(nil),                   // 106: mage.v1.DeckListResponse
+	(*DeckDeleteResponse)(nil),                 // 107: mage.v1.DeckDeleteResponse
+	(*DeckGetResponse)(nil),                    // 108: mage.v1.DeckGetResponse
+	(*GameJoinResponse)(nil),                   // 109: mage.v1.GameJoinResponse
+	(*GameWatchStartResponse)(nil),             // 110: mage.v1.GameWatchStartResponse
+	(*GameWatchStopResponse)(nil),              // 111: mage.v1.GameWatchStopResponse
+	(*GameGetViewResponse)(nil),                // 112: mage.v1.GameGetViewResponse
+	(*SendPlayerUUIDResponse)(nil),             // 113: mage.v1.SendPlayerUUIDResponse
+	(*SendPlayerStringResponse)(nil),           // 114: mage.v1.SendPlayerStringResponse
+	(*SendPlayerBooleanResponse)(nil),          // 115: mage.v1.SendPlayerBooleanResponse
+	(*SendPlayerIntegerResponse)(nil),          // 116: mage.v1.SendPlayerIntegerResponse
+	(*SendPlayerManaTypeResponse)(nil),         // 117: mage.v1.SendPlayerManaTypeResponse
+	(*SendPlayerActionResponse)(nil),           // 118: mage.v1.SendPlayerActionResponse
+	(*SendSpecialActionResponse)(nil),          // 119: mage.v1.SendSpecialActionResponse
+	(*MatchStartResponse)(nil),                 // 120: mage.v1.MatchStartResponse
+	(*MatchQuitResponse)(nil),                  // 121: mage.v1.MatchQuitResponse
+	(*GetMyActiveGamesResponse)(nil),           // 122: mage.v1.GetMyActiveGamesResponse
+	(*DraftJoinResponse)(nil),                  // 123: mage.v1.DraftJoinResponse
+	(*SendDraftCardPickResponse)(nil),          // 124: mage.v1.SendDraftCardPickResponse
+	(*SendDraftCardMarkResponse)(nil),          // 125: mage.v1.SendDraftCardMarkResponse
+	(*DraftSetBoosterLoadedResponse)(nil),      // 126: mage.v1.DraftSetBoosterLoadedResponse
+	(*DraftQuitResponse)(nil),                  // 127: mage.v1.DraftQuitResponse
+	(*TournamentJoinResponse)(nil),             // 128: mage.v1.TournamentJoinResponse
+	(*TournamentStartResponse)(nil),            // 129: mage.v1.TournamentStartResponse
+	(*TournamentQuitResponse)(nil),             // 130: mage.v1.TournamentQuitResponse
+	(*TournamentFindByIdResponse)(nil),         // 131: mage.v1.TournamentFindByIdResponse
+	(*ChatJoinResponse)(nil),                   // 132: mage.v1.ChatJoinResponse
+	(*ChatLeaveResponse)(nil),                  // 133: mage.v1.ChatLeaveResponse
+	(*ChatSendMessageResponse)(nil),            // 134: mage.v1.ChatSendMessageResponse
+	(*ChatFindByTableResponse)(nil),            // 135: mage.v1.ChatFindByTableResponse
+	(*ChatFindByGameResponse)(nil),             // 136: mage.v1.ChatFindByGameResponse
+	(*ChatFindByTournamentResponse)(nil),       // 137: mage.v1.ChatFindByTournamentResponse
+	(*ChatFindByRoomResponse)(nil),             // 138: mage.v1.ChatFindByRoomResponse
+	(*GetMatchHistoryResponse)(nil),            // 139: mage.v1.GetMatchHistoryResponse
+	(*GetMatchByIdResponse)(nil),               // 140: mage.v1.GetMatchByIdResponse
+	(*ReplayInitResponse)(nil),                 // 141: mage.v1.ReplayInitResponse
+	(*ReplayStartResponse)(nil),                // 142: mage.v1.ReplayStartResponse
+	(*ReplayStopResponse)(nil),                 // 143: mage.v1.ReplayStopResponse
+	(*ReplayNextResponse)(nil),                 // 144: mage.v1.ReplayNextResponse
+	(*ReplayPreviousResponse)(nil),             // 145: mage.v1.ReplayPreviousResponse
+	(*ReplaySkipForwardResponse)(nil),          // 146: mage.v1.ReplaySkipForwardResponse
+	(*AdminGetUsersResponse)(nil),              // 147: mage.v1.AdminGetUsersResponse
+	(*AdminDisconnectUserResponse)(nil),        // 148: mage.v1.AdminDisconnectUserResponse
+	(*AdminMuteUserResponse)(nil),              // 149: mage.v1.AdminMuteUserResponse
+	(*AdminLockUserResponse)(nil),              // 150: mage.v1.AdminLockUserResponse
+	(*AdminActivateUserResponse)(nil),          // 151: mage.v1.AdminActivateUserResponse
+	(*AdminToggleActivateUserResponse)(nil),    // 152: mage.v1.AdminToggleActivateUserResponse
+	(*AdminEndUserSessionResponse)(nil),        // 153: mage.v1.AdminEndUserSessionResponse
+	(*AdminTableRemoveResponse)(nil),           // 154: mage.v1.AdminTableRemoveResponse
+	(*AdminSendBroadcastMessageResponse)(nil),  // 155: mage.v1.AdminSendBroadcastMessageResponse
+	(*AdminGetAllActiveGamesResponse)(nil),     // 156: mage.v1.AdminGetAllActiveGamesResponse
+	(*AdminGetServerDebugStateResponse)(nil),   // 157: mage.v1.AdminGetServerDebugStateResponse
 }
 var file_mage_v1_server_proto_depIdxs = []int32{
 	0,   // 0: mage.v1.MageServer.AuthRegister:input_type -> mage.v1.AuthRegisterRequest
@@ -345,85 +351,89 @@ var file_mage_v1_server_proto_depIdxs = []int32{
 	74,  // 74: mage.v1.MageServer.AdminEndUserSession:input_type -> mage.v1.AdminEndUserSessionRequest
 	75,  // 75: mage.v1.MageServer.AdminTableRemove:input_type -> mage.v1.AdminTableRemoveRequest
 	76,  // 76: mage.v1.MageServer.AdminSendBroadcastMessage:input_type -> mage.v1.AdminSendBroadcastMessageRequest
-	77,  // 77: mage.v1.MageServer.AuthRegister:output_type -> mage.v1.AuthRegisterResponse
-	78,  // 78: mage.v1.MageServer.AuthSendTokenToEmail:output_type -> mage.v1.AuthSendTokenToEmailResponse
-	79,  // 79: mage.v1.MageServer.AuthResetPassword:output_type -> mage.v1.AuthResetPasswordResponse
-	80,  // 80: mage.v1.MageServer.ConnectUser:output_type -> mage.v1.ConnectUserResponse
-	81,  // 81: mage.v1.MageServer.ConnectAdmin:output_type -> mage.v1.ConnectAdminResponse
-	82,  // 82: mage.v1.MageServer.ConnectSetUserData:output_type -> mage.v1.ConnectSetUserDataResponse
-	83,  // 83: mage.v1.MageServer.Ping:output_type -> mage.v1.PingResponse
-	84,  // 84: mage.v1.MageServer.GetServerState:output_type -> mage.v1.GetServerStateResponse
-	85,  // 85: mage.v1.MageServer.ServerGetPromotionMessages:output_type -> mage.v1.ServerGetPromotionMessagesResponse
-	86,  // 86: mage.v1.MageServer.ServerAddFeedbackMessage:output_type -> mage.v1.ServerAddFeedbackMessageResponse
-	87,  // 87: mage.v1.MageServer.ServerGetMainRoomId:output_type -> mage.v1.ServerGetMainRoomIdResponse
-	88,  // 88: mage.v1.MageServer.RoomGetUsers:output_type -> mage.v1.RoomGetUsersResponse
-	89,  // 89: mage.v1.MageServer.RoomGetFinishedMatches:output_type -> mage.v1.RoomGetFinishedMatchesResponse
-	90,  // 90: mage.v1.MageServer.RoomGetAllTables:output_type -> mage.v1.RoomGetAllTablesResponse
-	91,  // 91: mage.v1.MageServer.RoomGetTableById:output_type -> mage.v1.RoomGetTableByIdResponse
-	92,  // 92: mage.v1.MageServer.RoomCreateTable:output_type -> mage.v1.RoomCreateTableResponse
-	93,  // 93: mage.v1.MageServer.RoomCreateTournament:output_type -> mage.v1.RoomCreateTournamentResponse
-	94,  // 94: mage.v1.MageServer.RoomJoinTable:output_type -> mage.v1.RoomJoinTableResponse
-	95,  // 95: mage.v1.MageServer.RoomJoinTournament:output_type -> mage.v1.RoomJoinTournamentResponse
-	96,  // 96: mage.v1.MageServer.RoomLeaveTableOrTournament:output_type -> mage.v1.RoomLeaveTableOrTournamentResponse
-	97,  // 97: mage.v1.MageServer.RoomWatchTable:output_type -> mage.v1.RoomWatchTableResponse
-	98,  // 98: mage.v1.MageServer.RoomWatchTournament:output_type -> mage.v1.RoomWatchTournamentResponse
-	99,  // 99: mage.v1.MageServer.TableSwapSeats:output_type -> mage.v1.TableSwapSeatsResponse
-	100, // 100: mage.v1.MageServer.TableRemove:output_type -> mage.v1.TableRemoveResponse
-	101, // 101: mage.v1.MageServer.TableIsOwner:output_type -> mage.v1.TableIsOwnerResponse
-	102, // 102: mage.v1.MageServer.DeckSubmit:output_type -> mage.v1.DeckSubmitResponse
-	103, // 103: mage.v1.MageServer.DeckSave:output_type -> mage.v1.DeckSaveResponse
-	104, // 104: mage.v1.MageServer.DeckList:output_type -> mage.v1.DeckListResponse
-	105, // 105: mage.v1.MageServer.DeckDelete:output_type -> mage.v1.DeckDeleteResponse
-	106, // 106: mage.v1.MageServer.DeckGet:output_type -> mage.v1.DeckGetResponse
-	107, // 107: mage.v1.MageServer.GameJoin:output_type -> mage.v1.GameJoinResponse
-	108, // 108: mage.v1.MageServer.GameWatchStart:output_type -> mage.v1.GameWatchStartResponse
-	109, // 109: mage.v1.MageServer.GameWatchStop:output_type -> mage.v1.GameWatchStopResponse
-	110, // 110: mage.v1.MageServer.GameGetView:output_type -> mage.v1.GameGetViewResponse
-	111, // 111: mage.v1.MageServer.SendPlayerUUID:output_type -> mage.v1.SendPlayerUUIDResponse
-	112, // 112: mage.v1.MageServer.SendPlayerString:output_type -> mage.v1.SendPlayerStringResponse
-	113, // 113: mage.v1.MageServer.SendPlayerBoolean:output_type -> mage.v1.SendPlayerBooleanResponse
-	114, // 114: mage.v1.MageServer.SendPlayerInteger:output_type -> mage.v1.SendPlayerIntegerResponse
-	115, // 115: mage.v1.MageServer.SendPlayerManaType:output_type -> mage.v1.SendPlayerManaTypeResponse
-	116, // 116: mage.v1.MageServer.SendPlayerAction:output_type -> mage.v1.SendPlayerActionResponse
-	117, // 117: mage.v1.MageServer.SendSpecialAction:output_type -> mage.v1.SendSpecialActionResponse
-	118, // 118: mage.v1.MageServer.MatchStart:output_type -> mage.v1.MatchStartResponse
-	119, // 119: mage.v1.MageServer.MatchQuit:output_type -> mage.v1.MatchQuitResponse
-	120, // 120: mage.v1.MageServer.GetMyActiveGames:output_type -> mage.v1.GetMyActiveGamesResponse
-	121, // 121: mage.v1.MageServer.DraftJoin:output_type -> mage.v1.DraftJoinResponse
-	122, // 122: mage.v1.MageServer.SendDraftCardPick:output_type -> mage.v1.SendDraftCardPickResponse
-	123, // 123: mage.v1.MageServer.SendDraftCardMark:output_type -> mage.v1.SendDraftCardMarkResponse
-	124, // 124: mage.v1.MageServer.DraftSetBoosterLoaded:output_type -> mage.v1.DraftSetBoosterLoadedResponse
-	125, // 125: mage.v1.MageServer.DraftQuit:output_type -> mage.v1.DraftQuitResponse
-	126, // 126: mage.v1.MageServer.TournamentJoin:output_type -> mage.v1.TournamentJoinResponse
-	127, // 127: mage.v1.MageServer.TournamentStart:output_type -> mage.v1.TournamentStartResponse
-	128, // 128: mage.v1.MageServer.TournamentQuit:output_type -> mage.v1.TournamentQuitResponse
-	129, // 129: mage.v1.MageServer.TournamentFindById:output_type -> mage.v1.TournamentFindByIdResponse
-	130, // 130: mage.v1.MageServer.ChatJoin:output_type -> mage.v1.ChatJoinResponse
-	131, // 131: mage.v1.MageServer.ChatLeave:output_type -> mage.v1.ChatLeaveResponse
-	132, // 132: mage.v1.MageServer.ChatSendMessage:output_type -> mage.v1.ChatSendMessageResponse
-	133, // 133: mage.v1.MageServer.ChatFindByTable:output_type -> mage.v1.ChatFindByTableResponse
-	134, // 134: mage.v1.MageServer.ChatFindByGame:output_type -> mage.v1.ChatFindByGameResponse
-	135, // 135: mage.v1.MageServer.ChatFindByTournament:output_type -> mage.v1.ChatFindByTournamentResponse
-	136, // 136: mage.v1.MageServer.ChatFindByRoom:output_type -> mage.v1.ChatFindByRoomResponse
-	137, // 137: mage.v1.MageServer.GetMatchHistory:output_type -> mage.v1.GetMatchHistoryResponse
-	138, // 138: mage.v1.MageServer.GetMatchById:output_type -> mage.v1.GetMatchByIdResponse
-	139, // 139: mage.v1.MageServer.ReplayInit:output_type -> mage.v1.ReplayInitResponse
-	140, // 140: mage.v1.MageServer.ReplayStart:output_type -> mage.v1.ReplayStartResponse
-	141, // 141: mage.v1.MageServer.ReplayStop:output_type -> mage.v1.ReplayStopResponse
-	142, // 142: mage.v1.MageServer.ReplayNext:output_type -> mage.v1.ReplayNextResponse
-	143, // 143: mage.v1.MageServer.ReplayPrevious:output_type -> mage.v1.ReplayPreviousResponse
-	144, // 144: mage.v1.MageServer.ReplaySkipForward:output_type -> mage.v1.ReplaySkipForwardResponse
-	145, // 145: mage.v1.MageServer.AdminGetUsers:output_type -> mage.v1.AdminGetUsersResponse
-	146, // 146: mage.v1.MageServer.AdminDisconnectUser:output_type -> mage.v1.AdminDisconnectUserResponse
-	147, // 147: mage.v1.MageServer.AdminMuteUser:output_type -> mage.v1.AdminMuteUserResponse
-	148, // 148: mage.v1.MageServer.AdminLockUser:output_type -> mage.v1.AdminLockUserResponse
-	149, // 149: mage.v1.MageServer.AdminActivateUser:output_type -> mage.v1.AdminActivateUserResponse
-	150, // 150: mage.v1.MageServer.AdminToggleActivateUser:output_type -> mage.v1.AdminToggleActivateUserResponse
-	151, // 151: mage.v1.MageServer.AdminEndUserSession:output_type -> mage.v1.AdminEndUserSessionResponse
-	152, // 152: mage.v1.MageServer.AdminTableRemove:output_type -> mage.v1.AdminTableRemoveResponse
-	153, // 153: mage.v1.MageServer.AdminSendBroadcastMessage:output_type -> mage.v1.AdminSendBroadcastMessageResponse
-	77,  // [77:154] is the sub-list for method output_type
-	0,   // [0:77] is the sub-list for method input_type
+	77,  // 77: mage.v1.MageServer.AdminGetAllActiveGames:input_type -> mage.v1.AdminGetAllActiveGamesRequest
+	78,  // 78: mage.v1.MageServer.AdminGetServerDebugState:input_type -> mage.v1.AdminGetServerDebugStateRequest
+	79,  // 79: mage.v1.MageServer.AuthRegister:output_type -> mage.v1.AuthRegisterResponse
+	80,  // 80: mage.v1.MageServer.AuthSendTokenToEmail:output_type -> mage.v1.AuthSendTokenToEmailResponse
+	81,  // 81: mage.v1.MageServer.AuthResetPassword:output_type -> mage.v1.AuthResetPasswordResponse
+	82,  // 82: mage.v1.MageServer.ConnectUser:output_type -> mage.v1.ConnectUserResponse
+	83,  // 83: mage.v1.MageServer.ConnectAdmin:output_type -> mage.v1.ConnectAdminResponse
+	84,  // 84: mage.v1.MageServer.ConnectSetUserData:output_type -> mage.v1.ConnectSetUserDataResponse
+	85,  // 85: mage.v1.MageServer.Ping:output_type -> mage.v1.PingResponse
+	86,  // 86: mage.v1.MageServer.GetServerState:output_type -> mage.v1.GetServerStateResponse
+	87,  // 87: mage.v1.MageServer.ServerGetPromotionMessages:output_type -> mage.v1.ServerGetPromotionMessagesResponse
+	88,  // 88: mage.v1.MageServer.ServerAddFeedbackMessage:output_type -> mage.v1.ServerAddFeedbackMessageResponse
+	89,  // 89: mage.v1.MageServer.ServerGetMainRoomId:output_type -> mage.v1.ServerGetMainRoomIdResponse
+	90,  // 90: mage.v1.MageServer.RoomGetUsers:output_type -> mage.v1.RoomGetUsersResponse
+	91,  // 91: mage.v1.MageServer.RoomGetFinishedMatches:output_type -> mage.v1.RoomGetFinishedMatchesResponse
+	92,  // 92: mage.v1.MageServer.RoomGetAllTables:output_type -> mage.v1.RoomGetAllTablesResponse
+	93,  // 93: mage.v1.MageServer.RoomGetTableById:output_type -> mage.v1.RoomGetTableByIdResponse
+	94,  // 94: mage.v1.MageServer.RoomCreateTable:output_type -> mage.v1.RoomCreateTableResponse
+	95,  // 95: mage.v1.MageServer.RoomCreateTournament:output_type -> mage.v1.RoomCreateTournamentResponse
+	96,  // 96: mage.v1.MageServer.RoomJoinTable:output_type -> mage.v1.RoomJoinTableResponse
+	97,  // 97: mage.v1.MageServer.RoomJoinTournament:output_type -> mage.v1.RoomJoinTournamentResponse
+	98,  // 98: mage.v1.MageServer.RoomLeaveTableOrTournament:output_type -> mage.v1.RoomLeaveTableOrTournamentResponse
+	99,  // 99: mage.v1.MageServer.RoomWatchTable:output_type -> mage.v1.RoomWatchTableResponse
+	100, // 100: mage.v1.MageServer.RoomWatchTournament:output_type -> mage.v1.RoomWatchTournamentResponse
+	101, // 101: mage.v1.MageServer.TableSwapSeats:output_type -> mage.v1.TableSwapSeatsResponse
+	102, // 102: mage.v1.MageServer.TableRemove:output_type -> mage.v1.TableRemoveResponse
+	103, // 103: mage.v1.MageServer.TableIsOwner:output_type -> mage.v1.TableIsOwnerResponse
+	104, // 104: mage.v1.MageServer.DeckSubmit:output_type -> mage.v1.DeckSubmitResponse
+	105, // 105: mage.v1.MageServer.DeckSave:output_type -> mage.v1.DeckSaveResponse
+	106, // 106: mage.v1.MageServer.DeckList:output_type -> mage.v1.DeckListResponse
+	107, // 107: mage.v1.MageServer.DeckDelete:output_type -> mage.v1.DeckDeleteResponse
+	108, // 108: mage.v1.MageServer.DeckGet:output_type -> mage.v1.DeckGetResponse
+	109, // 109: mage.v1.MageServer.GameJoin:output_type -> mage.v1.GameJoinResponse
+	110, // 110: mage.v1.MageServer.GameWatchStart:output_type -> mage.v1.GameWatchStartResponse
+	111, // 111: mage.v1.MageServer.GameWatchStop:output_type -> mage.v1.GameWatchStopResponse
+	112, // 112: mage.v1.MageServer.GameGetView:output_type -> mage.v1.GameGetViewResponse
+	113, // 113: mage.v1.MageServer.SendPlayerUUID:output_type -> mage.v1.SendPlayerUUIDResponse
+	114, // 114: mage.v1.MageServer.SendPlayerString:output_type -> mage.v1.SendPlayerStringResponse
+	115, // 115: mage.v1.MageServer.SendPlayerBoolean:output_type -> mage.v1.SendPlayerBooleanResponse
+	116, // 116: mage.v1.MageServer.SendPlayerInteger:output_type -> mage.v1.SendPlayerIntegerResponse
+	117, // 117: mage.v1.MageServer.SendPlayerManaType:output_type -> mage.v1.SendPlayerManaTypeResponse
+	118, // 118: mage.v1.MageServer.SendPlayerAction:output_type -> mage.v1.SendPlayerActionResponse
+	119, // 119: mage.v1.MageServer.SendSpecialAction:output_type -> mage.v1.SendSpecialActionResponse
+	120, // 120: mage.v1.MageServer.MatchStart:output_type -> mage.v1.MatchStartResponse
+	121, // 121: mage.v1.MageServer.MatchQuit:output_type -> mage.v1.MatchQuitResponse
+	122, // 122: mage.v1.MageServer.GetMyActiveGames:output_type -> mage.v1.GetMyActiveGamesResponse
+	123, // 123: mage.v1.MageServer.DraftJoin:output_type -> mage.v1.DraftJoinResponse
+	124, // 124: mage.v1.MageServer.SendDraftCardPick:output_type -> mage.v1.SendDraftCardPickResponse
+	125, // 125: mage.v1.MageServer.SendDraftCardMark:output_type -> mage.v1.SendDraftCardMarkResponse
+	126, // 126: mage.v1.MageServer.DraftSetBoosterLoaded:output_type -> mage.v1.DraftSetBoosterLoadedResponse
+	127, // 127: mage.v1.MageServer.DraftQuit:output_type -> mage.v1.DraftQuitResponse
+	128, // 128: mage.v1.MageServer.TournamentJoin:output_type -> mage.v1.TournamentJoinResponse
+	129, // 129: mage.v1.MageServer.TournamentStart:output_type -> mage.v1.TournamentStartResponse
+	130, // 130: mage.v1.MageServer.TournamentQuit:output_type -> mage.v1.TournamentQuitResponse
+	131, // 131: mage.v1.MageServer.TournamentFindById:output_type -> mage.v1.TournamentFindByIdResponse
+	132, // 132: mage.v1.MageServer.ChatJoin:output_type -> mage.v1.ChatJoinResponse
+	133, // 133: mage.v1.MageServer.ChatLeave:output_type -> mage.v1.ChatLeaveResponse
+	134, // 134: mage.v1.MageServer.ChatSendMessage:output_type -> mage.v1.ChatSendMessageResponse
+	135, // 135: mage.v1.MageServer.ChatFindByTable:output_type -> mage.v1.ChatFindByTableResponse
+	136, // 136: mage.v1.MageServer.ChatFindByGame:output_type -> mage.v1.ChatFindByGameResponse
+	137, // 137: mage.v1.MageServer.ChatFindByTournament:output_type -> mage.v1.ChatFindByTournamentResponse
+	138, // 138: mage.v1.MageServer.ChatFindByRoom:output_type -> mage.v1.ChatFindByRoomResponse
+	139, // 139: mage.v1.MageServer.GetMatchHistory:output_type -> mage.v1.GetMatchHistoryResponse
+	140, // 140: mage.v1.MageServer.GetMatchById:output_type -> mage.v1.GetMatchByIdResponse
+	141, // 141: mage.v1.MageServer.ReplayInit:output_type -> mage.v1.ReplayInitResponse
+	142, // 142: mage.v1.MageServer.ReplayStart:output_type -> mage.v1.ReplayStartResponse
+	143, // 143: mage.v1.MageServer.ReplayStop:output_type -> mage.v1.ReplayStopResponse
+	144, // 144: mage.v1.MageServer.ReplayNext:output_type -> mage.v1.ReplayNextResponse
+	145, // 145: mage.v1.MageServer.ReplayPrevious:output_type -> mage.v1.ReplayPreviousResponse
+	146, // 146: mage.v1.MageServer.ReplaySkipForward:output_type -> mage.v1.ReplaySkipForwardResponse
+	147, // 147: mage.v1.MageServer.AdminGetUsers:output_type -> mage.v1.AdminGetUsersResponse
+	148, // 148: mage.v1.MageServer.AdminDisconnectUser:output_type -> mage.v1.AdminDisconnectUserResponse
+	149, // 149: mage.v1.MageServer.AdminMuteUser:output_type -> mage.v1.AdminMuteUserResponse
+	150, // 150: mage.v1.MageServer.AdminLockUser:output_type -> mage.v1.AdminLockUserResponse
+	151, // 151: mage.v1.MageServer.AdminActivateUser:output_type -> mage.v1.AdminActivateUserResponse
+	152, // 152: mage.v1.MageServer.AdminToggleActivateUser:output_type -> mage.v1.AdminToggleActivateUserResponse
+	153, // 153: mage.v1.MageServer.AdminEndUserSession:output_type -> mage.v1.AdminEndUserSessionResponse
+	154, // 154: mage.v1.MageServer.AdminTableRemove:output_type -> mage.v1.AdminTableRemoveResponse
+	155, // 155: mage.v1.MageServer.AdminSendBroadcastMessage:output_type -> mage.v1.AdminSendBroadcastMessageResponse
+	156, // 156: mage.v1.MageServer.AdminGetAllActiveGames:output_type -> mage.v1.AdminGetAllActiveGamesResponse
+	157, // 157: mage.v1.MageServer.AdminGetServerDebugState:output_type -> mage.v1.AdminGetServerDebugStateResponse
+	79,  // [79:158] is the sub-list for method output_type
+	0,   // [0:79] is the sub-list for method input_type
 	0,   // [0:0] is the sub-list for extension type_name
 	0,   // [0:0] is the sub-list for extension extendee
 	0,   // [0:0] is the sub-list for field type_name

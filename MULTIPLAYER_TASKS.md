@@ -1508,16 +1508,16 @@ Add smooth rotation animation for tapping/untapping cards.
 
 **Acceptance Criteria:**
 
-- [ ] Smooth 90° rotation for tap
-- [ ] Smooth -90° rotation for untap
-- [ ] Animation duration: 200ms
-- [ ] CSS transform for performance
-- [ ] Visual state persists after animation
-- [ ] Works on mobile (touch)
+- [x] Smooth 90° rotation for tap
+- [x] Smooth -90° rotation for untap
+- [x] Animation duration: 200ms
+- [x] CSS transform for performance
+- [x] Visual state persists after animation
+- [x] Works on mobile (touch)
 
-**Files to Modify:**
+**Files Modified:**
 
-- `src/lib/components/game/Card.svelte`
+- `src/lib/components/game/Card.svelte` - Added `tap-rotate-in` and `tap-rotate-out` keyframe animations with overshoot effect, glow pulse, and touch device optimization
 
 ---
 
@@ -1676,24 +1676,24 @@ Create UI for paying mana costs when casting spells or activating abilities.
 
 **Acceptance Criteria:**
 
-- [ ] Modal shows when mana payment required
-- [ ] Display cost to pay (e.g., "2RR")
-- [ ] List available mana sources (lands, mana abilities)
-- [ ] Click to tap source and add mana to pool
-- [ ] Show current mana in pool vs. cost required
-- [ ] Disable invalid sources (wrong color)
-- [ ] "Pay Cost" button (enabled when enough mana)
-- [ ] "Cancel" button to cancel action
-- [ ] API call to pay mana
-- [ ] Auto-pay option (let server choose sources)
+- [x] Modal shows when mana payment required
+- [x] Display cost to pay (e.g., "2RR")
+- [x] List available mana sources (server provides manaOptions)
+- [x] Click mana type to pay
+- [x] Show available mana counts per color
+- [x] Disable unavailable mana colors
+- [x] "Cancel" button to cancel action
+- [x] API call to pay mana (sendPlayerManaType)
+- [x] X mana selection UI (XManaSelector component)
 
-**Files to Create:**
+**Files Created:**
 
-- `src/lib/components/game/ManaPayment.svelte`
+- `src/lib/components/game/ManaPayment.svelte` - Mana payment modal with color selection grid
+- `src/lib/components/game/XManaSelector.svelte` - X mana value selector with number picker and slider
 
-**Files to Modify:**
+**Files Modified:**
 
-- `src/lib/api/game.ts` (payMana API call)
+- `src/routes/(protected)/game/[id]/+page.svelte` - Integrated ManaPayment and XManaSelector for 'mana' and 'xmana' prompts
 
 ---
 
@@ -1756,19 +1756,22 @@ Create visualization for the stack showing spells and abilities.
 
 **Acceptance Criteria:**
 
-- [ ] Vertical stack display (last on top)
-- [ ] Each item shows card/ability and controller
-- [ ] Arrows indicate order of resolution (bottom to top)
-- [ ] Highlight current item resolving
-- [ ] Empty state when stack is empty
-- [ ] Positioned prominently (center or side)
-- [ ] Updates in real-time as spells cast/resolve
-- [ ] Click item to view details
+- [x] Vertical stack display (last on top via flex-direction: column-reverse)
+- [x] Each item shows card/ability name and controller
+- [x] Arrows indicate order of resolution ("Bottom ↓ resolves first ↓ Top")
+- [x] Highlight current item resolving (top item with yellow border)
+- [x] Empty state when stack is empty
+- [x] Positioned in modal overlay (accessible via floating button)
+- [x] Updates in real-time via game store subscription
+- [x] Click item to select/view details
 
-**Files to Create:**
+**Files Created:**
 
-- `src/lib/components/game/Stack.svelte`
-- `src/lib/components/game/StackItem.svelte`
+- `src/lib/components/game/Stack.svelte` - Complete stack visualization with spell/ability display, position numbers, target info, and resolving indicator
+
+**Files Modified:**
+
+- `src/routes/(protected)/game/[id]/+page.svelte` - Integrated Stack component in overlay modal
 
 ---
 

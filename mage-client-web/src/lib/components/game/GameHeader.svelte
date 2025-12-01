@@ -47,6 +47,16 @@
 		{ key: 'CLEANUP', label: 'Cleanup', type: 'normal' }
 	] as const;
 
+	// Derived: is it the local player's turn?
+	const isYourTurn = $derived(
+		localPlayerName && activePlayerName && localPlayerName === activePlayerName
+	);
+
+	// Derived: turn display text
+	const turnDisplay = $derived(
+		isYourTurn ? 'Your Turn' : `${activePlayerName}'s turn`
+	);
+
 	// Derived: who has priority display text
 	const priorityDisplay = $derived(
 		hasPriority 
@@ -71,7 +81,7 @@
 		
 		<div class="turn-info">
 			<span class="turn-number">Turn {turn}</span>
-			<span class="turn-player">{activePlayerName}'s turn</span>
+			<span class="turn-player" class:your-turn={isYourTurn}>{turnDisplay}</span>
 		</div>
 	</div>
 
@@ -158,6 +168,11 @@
 	.turn-player {
 		color: #e6edf3;
 		font-size: 0.9375rem;
+	}
+
+	.turn-player.your-turn {
+		color: #f0b429;
+		font-weight: 600;
 	}
 
 	/* Right section */
@@ -327,5 +342,6 @@
 		}
 	}
 </style>
+
 
 

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { auth } from '$lib/stores/auth';
 	import { websocketStore } from '$lib/stores/websocket';
 	import type { Table, GameFormat } from '$lib/types/table';
@@ -21,6 +20,7 @@
 	import JoinTableModal from '$lib/components/JoinTableModal.svelte';
 	import OnlinePlayersList from '$lib/components/OnlinePlayersList.svelte';
 	import LobbyChat from '$lib/components/LobbyChat.svelte';
+	import ServerDebugPanel from '$lib/components/ServerDebugPanel.svelte';
 
 	// State
 	let tables = $state<Table[]>([]);
@@ -43,6 +43,9 @@
 	let showCreateModal = $state(false);
 	let showJoinModal = $state(false);
 	let joiningTable = $state<Table | null>(null);
+
+	// Debug panel state
+	let showDebugPanel = $state(false);
 
 	// Available formats
 	const formats = getGameFormats();
@@ -92,9 +95,18 @@
 
 	/**
 	 * Rejoin an active game
+	 * Uses window.location.href instead of goto() to avoid SvelteKit router
+	 * initialization issues that can occur when returning to the lobby
 	 */
 	function rejoinGame(gameId: string): void {
-		goto(`/game/${gameId}`);
+		if (!gameId) {
+			console.error('[Lobby] Cannot rejoin game: no gameId provided');
+			return;
+		}
+		console.log('[Lobby] Rejoining game:', gameId);
+		// Use direct navigation to avoid SvelteKit router state issues
+		// that can occur when the page hasn't fully hydrated
+		window.location.href = `/game/${gameId}`;
 	}
 
 	/**
@@ -368,6 +380,30 @@
 
 			<div class="header-right">
 				<button
+					class="debug-button"
+					onclick={() => (showDebugPanel = !showDebugPanel)}
+					title="Server Debug Panel"
+					class:active={showDebugPanel}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="m18 16 4-4-4-4" />
+						<path d="m6 8-4 4 4 4" />
+						<path d="m14.5 4-5 16" />
+					</svg>
+					<span>Debug</span>
+				</button>
+
+				<button
 					class="refresh-button"
 					onclick={handleRefresh}
 					disabled={loading}
@@ -586,6 +622,13 @@
 	</div>
 </div>
 
+<!-- Debug Panel (Floating) -->
+{#if showDebugPanel}
+	<div class="debug-panel-container">
+		<ServerDebugPanel bind:open={showDebugPanel} />
+	</div>
+{/if}
+
 <!-- Create Table Modal -->
 <CreateTableModal
 	bind:open={showCreateModal}
@@ -717,6 +760,7 @@
 		gap: var(--space-3);
 	}
 
+	.debug-button,
 	.refresh-button,
 	.create-button {
 		display: flex;
@@ -731,6 +775,19 @@
 		border: 1px solid var(--border-default);
 		background: var(--bg-iron);
 		color: var(--text-muted);
+	}
+
+	.debug-button.active {
+		background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+		color: white;
+		border-color: transparent;
+		box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+	}
+
+	.debug-button:hover:not(.active) {
+		background: var(--bg-steel);
+		border-color: #ff6b35;
+		color: #ff6b35;
 	}
 
 	.refresh-button:hover:not(:disabled),
@@ -1330,17 +1387,54 @@
 
 	@media (max-width: 640px) {
 		.refresh-button span,
-		.create-button span {
+		.create-button span,
+		.debug-button span {
 			display: none;
 		}
 
 		.refresh-button,
-		.create-button {
+		.create-button,
+		.debug-button {
 			padding: var(--space-2);
 		}
 
 		.filters-bar {
 			padding-top: var(--space-4);
+		}
+	}
+
+	/* Debug Panel Container */
+	.debug-panel-container {
+		position: fixed;
+		bottom: var(--space-6);
+		right: var(--space-6);
+		width: 600px;
+		max-width: calc(100vw - 2 * var(--space-6));
+		z-index: 100;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+		border-radius: 12px;
+		animation: slideUp 0.3s ease-out;
+	}
+
+	@keyframes slideUp {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@media (max-width: 768px) {
+		.debug-panel-container {
+			bottom: 0;
+			right: 0;
+			left: 0;
+			width: 100%;
+			max-width: 100%;
+			border-radius: 12px 12px 0 0;
 		}
 	}
 </style>
