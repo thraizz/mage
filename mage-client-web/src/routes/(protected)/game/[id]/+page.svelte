@@ -23,7 +23,8 @@
 		gameOver,
 		winner,
 		gameError,
-		isLoading
+		isLoading,
+		getCardById
 	} from '$lib/stores/game';
 	import {
 		joinGame,
@@ -42,6 +43,17 @@
 	} from '$lib/api/game';
 	import { CardActionType, type CardView } from '$lib/generated/mage/v1/models';
 	import type { GameCard, GamePhase } from '$lib/types/game';
+	import {
+		dragDropStore,
+		isDragging as isDraggingStore,
+		draggedCardId,
+		draggedCardName,
+		dragPosition,
+		isOverValidDropZone,
+		currentDropZone
+	} from '$lib/utils/drag-drop';
+	import { toast } from '$lib/stores/toast';
+	import { getScryfallImageUrl } from '$lib/utils/scryfall';
 
 	// Game components
 	import Card from '$lib/components/game/Card.svelte';
@@ -92,8 +104,21 @@
 	const validTargets = $derived($validTargetIds);
 	const selectedTargets = $derived($selectedTargetIds);
 
+	// Drag-drop state (from store)
+	const isDragging = $derived($isDraggingStore);
+	// eslint-disable-next-line no-unused-vars
+	const dragCardId = $derived($draggedCardId);
+	const dragCardName = $derived($draggedCardName);
+	const dragPos = $derived($dragPosition);
+	const isOverValidDrop = $derived($isOverValidDropZone);
+	const dropZone = $derived($currentDropZone);
+
 	// Track targeting sync unsubscriber
 	let targetingSyncUnsub: (() => void) | null = null;
+
+	// Battlefield drop zone element reference
+	let battlefieldDropZoneEl: HTMLDivElement | null = $state(null);
+	let dropZoneUnregister: (() => void) | null = null;
 
 	// Opponent panel states (for collapsing)
 	let opponentExpanded = $state<Record<string, boolean>>({});
@@ -514,6 +539,63 @@
 	}
 
 	/**
+	 * Play a card with optimistic UI update (used by drag-drop)
+	 * Shows the card as "being played" immediately while waiting for server confirmation
+	 */
+	async function playCardOptimistic(cardId: string): Promise<void> {
+		console.log('[playCardOptimistic] Playing card:', cardId);
+
+		if (!havePriority || isActionLoading || !gameId) {
+			console.log('[playCardOptimistic] Cannot play - no priority or loading');
+			return;
+		}
+
+		const card = getCardById(cardId);
+		if (!card) {
+			console.log('[playCardOptimistic] Card not found:', cardId);
+			toast.error('Card not found');
+			return;
+		}
+
+		// Start optimistic update
+		gameStore.addPendingCardPlay(cardId, card, 'hand', 'battlefield');
+		gameStore.clearSelection();
+		isActionLoading = true;
+
+		try {
+			// Determine if it's a land or spell
+			const isLand = card.type?.toLowerCase().includes('land');
+
+			if (isLand) {
+				console.log('[playCardOptimistic] Playing land:', card.name);
+				await playLand(gameId, cardId);
+				addLogEntry(`Playing land: ${card.name}`);
+			} else {
+				console.log('[playCardOptimistic] Casting spell:', card.name);
+				await sendPlayerString(gameId, card.name);
+				addLogEntry(`Casting spell: ${card.name}`);
+			}
+			// Server will send GAME_UPDATE which clears the pending state
+		} catch (err) {
+			console.error('[playCardOptimistic] Failed to play card:', err);
+			// Rollback on error
+			gameStore.rollbackCardPlay(cardId);
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			toast.error(`Failed to play ${card.name}: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Handle card drop on battlefield
+	 */
+	function handleBattlefieldDrop(cardId: string): void {
+		console.log('[handleBattlefieldDrop] Card dropped:', cardId);
+		playCardOptimistic(cardId);
+	}
+
+	/**
 	 * Handle advancing to the next phase/step
 	 */
 	async function handleAdvancePhase() {
@@ -881,6 +963,30 @@
 		}
 	});
 
+	// Register battlefield drop zone when element is available
+	$effect(() => {
+		if (battlefieldDropZoneEl && !dropZoneUnregister) {
+			console.log('[GamePage] Registering battlefield drop zone');
+			dropZoneUnregister = dragDropStore.registerDropZone({
+				id: 'battlefield',
+				type: 'battlefield',
+				element: battlefieldDropZoneEl,
+				accepts: (_cardId, sourceZone) => {
+					// Accept cards from hand when player has priority
+					return sourceZone === 'hand' && havePriority;
+				},
+				onDrop: handleBattlefieldDrop
+			});
+		}
+
+		return () => {
+			if (dropZoneUnregister) {
+				dropZoneUnregister();
+				dropZoneUnregister = null;
+			}
+		};
+	});
+
 	// Initialize on mount
 	onMount(() => {
 		console.log('[GamePage] onMount called', {
@@ -1071,8 +1177,13 @@
 				{/each}
 			</div>
 
-			<!-- Central Battlefield Area -->
-			<div class="battlefield-area">
+			<!-- Central Battlefield Area (Drop Zone) -->
+			<div
+				bind:this={battlefieldDropZoneEl}
+				class="battlefield-area"
+				class:drag-active={isDragging}
+				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'battlefield'}
+			>
 				<!-- Command Zone -->
 				{#if commandCards.length > 0}
 					<div class="command-zone">
@@ -1123,10 +1234,29 @@
 							/>
 						{/each}
 						{#if getPlayerBattlefieldCards(localPlayerId).length === 0}
-							<div class="empty-battlefield">No permanents</div>
+							<div class="empty-battlefield">
+								{#if isDragging}
+									<span class="drop-hint">Drop card here to play</span>
+								{:else}
+									No permanents
+								{/if}
+							</div>
 						{/if}
 					</div>
 				</div>
+
+				<!-- Drop zone overlay indicator -->
+				{#if isDragging}
+					<div class="drop-zone-overlay" class:valid={isOverValidDrop && dropZone === 'battlefield'}>
+						<span class="drop-label">
+							{#if isOverValidDrop && dropZone === 'battlefield'}
+								✓ Release to play
+							{:else}
+								Drag card here
+							{/if}
+						</span>
+					</div>
+				{/if}
 			</div>
 
 			<!-- Player Info & Zones Row -->
@@ -1166,7 +1296,12 @@
 
 			<!-- Player Hand -->
 			<div class="hand-area">
-				<PlayerHand onCardClick={handleCardClick} size="normal" />
+				<PlayerHand
+					onCardClick={handleCardClick}
+					size="normal"
+					currentPhase={step || phase}
+					canDrag={havePriority && !isTargeting}
+				/>
 			</div>
 		</main>
 
@@ -1242,6 +1377,28 @@
 			{error}
 			onClose={() => showDebugOverlay = false}
 		/>
+
+		<!-- Drag Ghost - Card following the cursor during drag -->
+		{#if isDragging && dragCardName}
+			{@const dragImageUrl = getScryfallImageUrl(dragCardName, 'small')}
+			<div
+				class="drag-ghost"
+				style="left: {dragPos.x}px; top: {dragPos.y}px;"
+			>
+				<div class="drag-ghost-card" class:valid={isOverValidDrop}>
+					{#if dragImageUrl}
+						<img
+							src={dragImageUrl}
+							alt={dragCardName}
+							class="drag-ghost-image"
+							draggable="false"
+						/>
+					{:else}
+						<span class="drag-ghost-name">{dragCardName}</span>
+					{/if}
+				</div>
+			</div>
+		{/if}
 	{/if}
 </div>
 
@@ -1566,6 +1723,64 @@
 		padding: 1rem;
 		overflow: auto;
 		min-height: 200px;
+		position: relative;
+		transition: border-color 0.2s, box-shadow 0.2s;
+	}
+
+	/* Battlefield drag state */
+	.battlefield-area.drag-active {
+		border-color: rgba(102, 126, 234, 0.5);
+		box-shadow: inset 0 0 30px rgba(102, 126, 234, 0.1);
+	}
+
+	.battlefield-area.drag-valid {
+		border-color: #22c55e;
+		box-shadow:
+			inset 0 0 40px rgba(34, 197, 94, 0.15),
+			0 0 0 2px rgba(34, 197, 94, 0.3);
+	}
+
+	/* Drop zone overlay */
+	.drop-zone-overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(102, 126, 234, 0.1);
+		border-radius: 12px;
+		pointer-events: none;
+		z-index: 10;
+		transition: background 0.2s;
+	}
+
+	.drop-zone-overlay.valid {
+		background: rgba(34, 197, 94, 0.15);
+	}
+
+	.drop-label {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: #667eea;
+		padding: 0.75rem 1.5rem;
+		background: rgba(26, 31, 46, 0.9);
+		border-radius: 8px;
+		border: 2px dashed rgba(102, 126, 234, 0.5);
+	}
+
+	.drop-zone-overlay.valid .drop-label {
+		color: #22c55e;
+		border-color: rgba(34, 197, 94, 0.5);
+	}
+
+	.drop-hint {
+		color: #667eea;
+		animation: drop-hint-pulse 1.5s ease-in-out infinite;
+	}
+
+	@keyframes drop-hint-pulse {
+		0%, 100% { opacity: 0.7; }
+		50% { opacity: 1; }
 	}
 
 	.zone-label {
@@ -1744,5 +1959,62 @@
 	.debug-fab:hover {
 		transform: scale(1.1);
 		box-shadow: 0 6px 30px rgba(0, 255, 0, 0.4);
+	}
+
+	/* Drag Ghost - Card following cursor */
+	.drag-ghost {
+		position: fixed;
+		pointer-events: none;
+		z-index: 10000;
+		transform: translate(-50%, -60%);
+	}
+
+	.drag-ghost-card {
+		width: 80px;
+		height: 112px;
+		background: linear-gradient(135deg, #1a1f2e, #0d1117);
+		border: 2px solid #667eea;
+		border-radius: 6px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		box-shadow:
+			0 15px 40px rgba(0, 0, 0, 0.6),
+			0 0 0 1px rgba(102, 126, 234, 0.3),
+			0 0 30px rgba(102, 126, 234, 0.2);
+		opacity: 0.95;
+		transform: scale(1.1) rotate(-5deg);
+		transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+	}
+
+	.drag-ghost-card.valid {
+		border-color: #22c55e;
+		box-shadow:
+			0 15px 40px rgba(0, 0, 0, 0.6),
+			0 0 30px rgba(34, 197, 94, 0.5),
+			0 0 60px rgba(34, 197, 94, 0.2);
+		transform: scale(1.15) rotate(0deg);
+	}
+
+	.drag-ghost-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		border-radius: 4px;
+	}
+
+	.drag-ghost-name {
+		font-size: 0.625rem;
+		font-weight: 600;
+		color: white;
+		text-align: center;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		line-height: 1.3;
+		padding: 0.25rem;
 	}
 </style>

@@ -34,6 +34,17 @@ import type {
 } from '$lib/generated/mage/v1/models';
 
 /**
+ * Pending card play action for optimistic updates
+ */
+export interface PendingCardPlay {
+	cardId: string;
+	card: CardView;
+	timestamp: number;
+	sourceZone: 'hand' | 'battlefield';
+	targetZone: 'battlefield' | 'stack';
+}
+
+/**
  * Pending prompt types for user interaction
  */
 export type PromptType =
@@ -79,6 +90,10 @@ export interface GameStoreState {
 	// UI state
 	selectedCardIds: string[];
 	showStack: boolean;
+
+	// Optimistic UI state
+	pendingCardPlays: Map<string, PendingCardPlay>;
+	cardsBeingPlayed: string[]; // Card IDs currently animating out
 }
 
 const initialState: GameStoreState = {
@@ -93,7 +108,9 @@ const initialState: GameStoreState = {
 	winner: null,
 	results: [],
 	selectedCardIds: [],
-	showStack: false
+	showStack: false,
+	pendingCardPlays: new Map(),
+	cardsBeingPlayed: []
 };
 
 /**
@@ -169,11 +186,33 @@ function createGameStore() {
 					});
 
 					const normalized = normalizeGameView(updateData.game);
-					update((s) => ({
-						...s,
-						gameView: normalized,
-						error: null
-					}));
+					update((s) => {
+						// Clear pending plays for cards that are now on battlefield or stack
+						// (server state is source of truth)
+						const newPending = new Map(s.pendingCardPlays);
+						const newPlaying = [...s.cardsBeingPlayed];
+						
+						for (const [cardId] of s.pendingCardPlays) {
+							// Check if card is now in battlefield or stack
+							const onBattlefield = normalized.battlefield.some((c) => c.id === cardId);
+							const onStack = normalized.stack.some((c) => c.id === cardId);
+							if (onBattlefield || onStack) {
+								newPending.delete(cardId);
+								const playingIdx = newPlaying.indexOf(cardId);
+								if (playingIdx >= 0) {
+									newPlaying.splice(playingIdx, 1);
+								}
+							}
+						}
+
+						return {
+							...s,
+							gameView: normalized,
+							error: null,
+							pendingCardPlays: newPending,
+							cardsBeingPlayed: newPlaying
+						};
+					});
 				}
 			})
 		);
@@ -219,10 +258,23 @@ function createGameStore() {
 					toast.error(errorMessage);
 				}
 				
-				update((s) => ({
-					...s,
-					error: errorData.error
-				}));
+				update((s) => {
+					// Rollback all pending card plays on error
+					// The server has rejected the action(s)
+					if (s.pendingCardPlays.size > 0) {
+						console.log('[GameStore] Rolling back pending plays due to error:', 
+							Array.from(s.pendingCardPlays.keys())
+						);
+					}
+					
+					return {
+						...s,
+						error: errorData.error,
+						// Clear all pending plays - server state is truth
+						pendingCardPlays: new Map(),
+						cardsBeingPlayed: []
+					};
+				});
 			})
 		);
 
@@ -426,7 +478,9 @@ function createGameStore() {
 			winner: null,
 			results: [],
 			pendingPrompt: null,
-			selectedCardIds: []
+			selectedCardIds: [],
+			pendingCardPlays: new Map(),
+			cardsBeingPlayed: []
 		}));
 
 		subscribeToGameEvents();
@@ -554,6 +608,122 @@ function createGameStore() {
 		set(initialState);
 	}
 
+	/**
+	 * Add a pending card play for optimistic UI updates
+	 * This immediately shows the card as "being played" before server confirmation
+	 */
+	function addPendingCardPlay(
+		cardId: string,
+		card: CardView,
+		sourceZone: 'hand' | 'battlefield' = 'hand',
+		targetZone: 'battlefield' | 'stack' = 'battlefield'
+	): void {
+		update((s) => {
+			const newPending = new Map(s.pendingCardPlays);
+			newPending.set(cardId, {
+				cardId,
+				card,
+				timestamp: Date.now(),
+				sourceZone,
+				targetZone
+			});
+			return {
+				...s,
+				pendingCardPlays: newPending,
+				cardsBeingPlayed: [...s.cardsBeingPlayed, cardId]
+			};
+		});
+	}
+
+	/**
+	 * Remove a pending card play (on success or failure)
+	 */
+	function removePendingCardPlay(cardId: string): void {
+		update((s) => {
+			const newPending = new Map(s.pendingCardPlays);
+			newPending.delete(cardId);
+			return {
+				...s,
+				pendingCardPlays: newPending,
+				cardsBeingPlayed: s.cardsBeingPlayed.filter((id) => id !== cardId)
+			};
+		});
+	}
+
+	/**
+	 * Mark a card as animating (being played)
+	 */
+	function setCardPlaying(cardId: string): void {
+		update((s) => ({
+			...s,
+			cardsBeingPlayed: s.cardsBeingPlayed.includes(cardId)
+				? s.cardsBeingPlayed
+				: [...s.cardsBeingPlayed, cardId]
+		}));
+	}
+
+	/**
+	 * Clear the playing state for a card (animation complete)
+	 */
+	function clearCardPlaying(cardId: string): void {
+		update((s) => ({
+			...s,
+			cardsBeingPlayed: s.cardsBeingPlayed.filter((id) => id !== cardId)
+		}));
+	}
+
+	/**
+	 * Rollback a pending card play on server rejection
+	 * Returns the card to its original zone
+	 */
+	function rollbackCardPlay(cardId: string): PendingCardPlay | null {
+		const state = get({ subscribe });
+		const pending = state.pendingCardPlays.get(cardId);
+
+		if (!pending) {
+			console.warn('[GameStore] Attempted to rollback non-pending card:', cardId);
+			return null;
+		}
+
+		console.log('[GameStore] Rolling back card play:', {
+			cardId,
+			cardName: pending.card.name,
+			sourceZone: pending.sourceZone
+		});
+
+		// Remove from pending and playing state
+		removePendingCardPlay(cardId);
+
+		return pending;
+	}
+
+	/**
+	 * Get a pending card play by ID
+	 */
+	function getPendingCardPlay(cardId: string): PendingCardPlay | null {
+		const state = get({ subscribe });
+		return state.pendingCardPlays.get(cardId) || null;
+	}
+
+	/**
+	 * Check if a card is currently being played (pending or animating)
+	 */
+	function isCardBeingPlayed(cardId: string): boolean {
+		const state = get({ subscribe });
+		return state.cardsBeingPlayed.includes(cardId) || state.pendingCardPlays.has(cardId);
+	}
+
+	/**
+	 * Clear all pending card plays (e.g., on game reset)
+	 */
+	function clearAllPendingPlays(): void {
+		update((s) => ({
+			...s,
+			pendingCardPlays: new Map(),
+			cardsBeingPlayed: []
+		}));
+	}
+
 	return {
 		subscribe,
 		initGame,
@@ -563,7 +733,16 @@ function createGameStore() {
 		toggleCardSelection,
 		clearSelection,
 		toggleStack,
-		reset
+		reset,
+		// Optimistic UI methods
+		addPendingCardPlay,
+		removePendingCardPlay,
+		setCardPlaying,
+		clearCardPlaying,
+		rollbackCardPlay,
+		getPendingCardPlay,
+		isCardBeingPlayed,
+		clearAllPendingPlays
 	};
 }
 
@@ -750,6 +929,24 @@ export const isLoading = derived(gameStore, ($game) => $game.isLoading);
  * Selected card IDs
  */
 export const selectedCards = derived(gameStore, ($game) => $game.selectedCardIds);
+
+/**
+ * Cards currently being played (animating)
+ */
+export const cardsBeingPlayed = derived(gameStore, ($game) => $game.cardsBeingPlayed);
+
+/**
+ * Pending card plays (for optimistic UI)
+ */
+export const pendingCardPlays = derived(gameStore, ($game) => $game.pendingCardPlays);
+
+/**
+ * Check if any cards are pending
+ */
+export const hasPendingPlays = derived(
+	gameStore,
+	($game) => $game.pendingCardPlays.size > 0 || $game.cardsBeingPlayed.length > 0
+);
 
 /**
  * Get player by ID

@@ -24,7 +24,11 @@
 		// Targeting mode props
 		isValidTarget = false,
 		isTargetSelected = false,
-		isTargetingActive = false
+		isTargetingActive = false,
+		// Drag and play animation props
+		isDragging = false,
+		isBeingPlayed = false,
+		isPending = false
 	}: {
 		cardId?: string;
 		cardName: string;
@@ -45,6 +49,10 @@
 		isValidTarget?: boolean;
 		isTargetSelected?: boolean;
 		isTargetingActive?: boolean;
+		// Drag and play animation props
+		isDragging?: boolean;
+		isBeingPlayed?: boolean;
+		isPending?: boolean;
 	} = $props();
 
 	// Track tap state changes for animation
@@ -241,9 +249,10 @@
 	bind:this={cardElement}
 	class="card {sizeClasses()} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack
 		? 'card-back'
-		: ''} {isTargetingActive ? 'targeting-mode' : ''} {isValidTarget ? 'valid-target' : ''} {isTargetSelected ? 'target-selected' : ''} {isTargetingActive && !isValidTarget ? 'invalid-target' : ''} {isAnimatingTap ? 'tap-animating' : ''}"
+		: ''} {isTargetingActive ? 'targeting-mode' : ''} {isValidTarget ? 'valid-target' : ''} {isTargetSelected ? 'target-selected' : ''} {isTargetingActive && !isValidTarget ? 'invalid-target' : ''} {isAnimatingTap ? 'tap-animating' : ''} {isDragging ? 'dragging' : ''} {isBeingPlayed ? 'being-played' : ''} {isPending ? 'pending' : ''}"
 	role="button"
 	tabindex="0"
+	draggable="false"
 	onclick={handleClick}
 	onmouseenter={handleMouseEnter}
 	onmouseleave={handleMouseLeave}
@@ -274,6 +283,7 @@
 				src={effectiveImageUrl}
 				alt={cardName}
 				class="card-image {imageLoaded ? 'loaded' : ''}"
+				draggable="false"
 				onload={handleImageLoad}
 				onerror={handleImageError}
 			/>
@@ -313,6 +323,13 @@
 				{/each}
 			</div>
 		{/if}
+
+		<!-- Pending Play Overlay -->
+		{#if isPending}
+			<div class="pending-overlay">
+				<div class="pending-spinner"></div>
+			</div>
+		{/if}
 	{/if}
 </div>
 
@@ -332,6 +349,8 @@
 			border-color 0.15s ease-out;
 		transform-origin: center center;
 		user-select: none;
+		-webkit-user-select: none;
+		-webkit-user-drag: none;
 		background: #1a1f2e;
 		border: 2px solid #3a4451;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -340,6 +359,11 @@
 		/* Touch device optimization */
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
+	}
+
+	.card * {
+		-webkit-user-drag: none;
+		user-select: none;
 	}
 
 	/* Card Sizes */
@@ -451,6 +475,66 @@
 		50% {
 			filter: brightness(1.15);
 		}
+	}
+
+	/* Drag State */
+	.card.dragging {
+		opacity: 0.5;
+		transform: scale(0.95);
+		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.5);
+		cursor: grabbing;
+	}
+
+	.card.dragging:hover {
+		transform: scale(0.95);
+	}
+
+	/* Being Played Animation (fly out of hand) */
+	.card.being-played {
+		animation: card-fly-out 0.4s ease-out forwards;
+		pointer-events: none;
+	}
+
+	@keyframes card-fly-out {
+		0% {
+			transform: translateY(0) scale(1);
+			opacity: 1;
+		}
+		30% {
+			transform: translateY(-30px) scale(1.1);
+			opacity: 1;
+		}
+		100% {
+			transform: translateY(-100px) scale(0.8);
+			opacity: 0;
+		}
+	}
+
+	/* Pending State (waiting for server confirmation) */
+	.card.pending {
+		opacity: 0.7;
+		filter: brightness(0.9);
+		pointer-events: none;
+	}
+
+	.pending-overlay {
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.4);
+		border-radius: 6px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 5;
+	}
+
+	.pending-spinner {
+		width: 28px;
+		height: 28px;
+		border: 3px solid rgba(255, 255, 255, 0.3);
+		border-top-color: #667eea;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
 	}
 
 	/* Targeting Mode States */

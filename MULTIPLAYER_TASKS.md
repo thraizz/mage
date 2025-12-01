@@ -1551,30 +1551,47 @@ Implement action to play a card from hand to battlefield.
 ## T062: Game Actions - Activate Ability
 
 **Priority:** P0  
-\***\*Dependencies:** T057, T059
+**Dependencies:** T057, T059
 
 **Description:**  
-Implement UI for activating card abilities.
+Implement UI for activating non-mana card abilities using a selection-first pattern consistent with casting spells. When a permanent with activatable abilities is selected, display available abilities in an action panel for easy discovery.
+
+**UX Flow:**
+
+1. Player clicks a permanent on the battlefield to select it
+2. If the permanent has activatable abilities (non-mana), show an **Abilities Panel** near the card or in the action bar area
+3. Panel lists each ability with its cost and effect text
+4. Player clicks an ability to activate it
+5. If ability requires targets → enter targeting mode (T059)
+6. If ability requires mana payment → show mana payment UI (T066)
+7. Server processes activation → game state updates
 
 **Acceptance Criteria:**
 
-- [ ] Right-click card to show context menu (or long-press mobile)
-- [ ] List available abilities
-- [ ] Click ability to activate
-- [ ] Show targeting mode if ability requires targets
-- [ ] Show mana/cost payment UI
-- [ ] API call to activate ability
-- [ ] Update game state on success
-- [ ] Error handling and rollback
+- [ ] Select permanent to reveal its activatable abilities
+- [ ] `AbilitiesPanel.svelte` component displays available abilities for selected card
+- [ ] Each ability shows: cost (mana/tap symbol), effect text, enabled/disabled state
+- [ ] Disabled abilities show reason (e.g., "Already tapped", "Not enough mana")
+- [ ] Click ability to activate (sends `activateAbility` API call)
+- [ ] Integrates with targeting mode if ability requires targets
+- [ ] Integrates with mana payment UI if ability has mana cost
+- [ ] Panel dismisses when clicking elsewhere or pressing ESC
+- [ ] Keyboard navigation: arrow keys to select ability, Enter to activate
+- [ ] Visual indicator on cards that have activatable abilities (subtle ⚡ badge)
+- [ ] Works on mobile (no right-click dependency)
+- [ ] Mana abilities continue to work via direct click (existing behavior)
 
 **Files to Create:**
 
-- `src/lib/components/game/CardContextMenu.svelte`
+- `src/lib/components/game/AbilitiesPanel.svelte` - Floating panel showing activatable abilities
+- `src/lib/components/game/AbilityItem.svelte` - Individual ability row with cost/effect
 
 **Files to Modify:**
 
-- `src/lib/components/game/Card.svelte`
-- `src/lib/api/game.ts` (activateAbility API call)
+- `src/lib/components/game/Card.svelte` - Add ability indicator badge
+- `src/routes/(protected)/game/[id]/+page.svelte` - Show AbilitiesPanel when permanent selected
+- `src/lib/api/game.ts` - Add `activateAbility(gameId, cardId, abilityId)` API call
+- `src/lib/stores/game.ts` - Track which card's abilities are being shown
 
 ---
 
