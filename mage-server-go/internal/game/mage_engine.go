@@ -1692,6 +1692,8 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 		return e.handleUUIDAction(gameState, action)
 	case "SPECIAL_ACTION":
 		return e.handleSpecialAction(gameState, action)
+	case "ACTIVATE_ABILITY":
+		return e.handleActivateAbilityAction(gameState, action)
 	default:
 		return fmt.Errorf("unknown action type: %s", action.ActionType)
 	}
@@ -3162,6 +3164,537 @@ func (e *MageEngine) handleSpecialAction(gameState *engineGameState, action Play
 	}
 }
 
+// handleActivateAbilityAction handles ACTIVATE_ABILITY type actions
+// Per MTG Rule 602: Activating an activated ability follows a specific sequence
+func (e *MageEngine) handleActivateAbilityAction(gameState *engineGameState, action PlayerAction) error {
+	payload, ok := action.Data.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("ACTIVATE_ABILITY data must be a map")
+	}
+
+	cardID, ok := payload["card_id"].(string)
+	if !ok {
+		return fmt.Errorf("card_id is required")
+	}
+
+	abilityID, ok := payload["ability_id"].(string)
+	if !ok {
+		return fmt.Errorf("ability_id is required")
+	}
+
+	// Parse targets (may be empty)
+	var targets []string
+	if targetsRaw, ok := payload["targets"]; ok {
+		if targetsSlice, ok := targetsRaw.([]interface{}); ok {
+			for _, t := range targetsSlice {
+				if str, ok := t.(string); ok {
+					targets = append(targets, str)
+				}
+			}
+		} else if targetsStrSlice, ok := targetsRaw.([]string); ok {
+			targets = targetsStrSlice
+		}
+	}
+
+	playerID := action.PlayerID
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	return e.handleActivateAbility(gameState, player, cardID, abilityID, targets)
+}
+
+// handleActivateAbility activates a non-mana activated ability
+// Per MTG Rule 602: The full activation sequence
+// Supports both registered abilities (UUID IDs) and rules-text-parsed abilities (cardID-ability-N format)
+func (e *MageEngine) handleActivateAbility(gameState *engineGameState, player *internalPlayer, cardID, abilityIDStr string, targets []string) error {
+	// Check if player has priority
+	if gameState.turnManager.PriorityPlayer() != player.PlayerID {
+		return fmt.Errorf("player %s does not have priority", player.PlayerID)
+	}
+
+	// Find the card/permanent on battlefield
+	var card *internalCard
+	for _, c := range gameState.battlefield {
+		if c.ID == cardID {
+			card = c
+			break
+		}
+	}
+	if card == nil {
+		return fmt.Errorf("permanent %s not found on battlefield", cardID)
+	}
+
+	// Verify controller
+	if card.ControllerID != player.PlayerID {
+		return fmt.Errorf("player does not control permanent %s", cardID)
+	}
+
+	// Check if this is a synthetic ability ID from rules text parsing (format: cardID-ability-N)
+	var abilityText string
+	var hasTapCost bool
+	var isSorcerySpeed bool
+	var resolveFunc func() error
+
+	if strings.Contains(abilityIDStr, "-ability-") {
+		// This is a synthetic ability parsed from rules text
+		// Extract the ability index
+		parts := strings.Split(abilityIDStr, "-ability-")
+		if len(parts) != 2 {
+			return fmt.Errorf("invalid synthetic ability ID format: %s", abilityIDStr)
+		}
+		abilityIndex := 0
+		if _, err := fmt.Sscanf(parts[1], "%d", &abilityIndex); err != nil {
+			return fmt.Errorf("invalid ability index in ID: %s", abilityIDStr)
+		}
+
+		// Parse activated abilities from rules text
+		parsedAbilities := parseActivatedAbilitiesFromText(card.RulesText)
+		if abilityIndex >= len(parsedAbilities) {
+			return fmt.Errorf("ability index %d out of range for card %s", abilityIndex, card.Name)
+		}
+
+		parsedAbility := parsedAbilities[abilityIndex]
+		abilityText = parsedAbility.FullText
+		hasTapCost = parsedAbility.HasTapCost
+		isSorcerySpeed = parsedAbility.IsSorcerySpeed
+
+		// Pay mana cost if present
+		// NOTE: We work directly with player.ManaPool here instead of using GameContext
+		// because we already hold gameState.mu.Lock() and GameContext methods try to acquire
+		// locks, causing a deadlock.
+		if parsedAbility.ManaCostString != "" {
+			manaCost, err := abilities.ParseManaCost(parsedAbility.ManaCostString)
+			if err == nil && manaCost != nil && manaCost.Mana != nil {
+				// Check if player can pay directly (no lock acquisition)
+				if !canPayManaCostDirect(player.ManaPool, manaCost.Mana) {
+					return fmt.Errorf("not enough mana to pay cost %s", parsedAbility.ManaCostString)
+				}
+				// Pay the cost directly
+				if err := payManaCostDirect(player.ManaPool, manaCost.Mana); err != nil {
+					return fmt.Errorf("failed to pay mana cost: %w", err)
+				}
+				if e.logger != nil {
+					e.logger.Info("paid mana cost for ability",
+						zap.String("card", card.Name),
+						zap.String("cost", parsedAbility.ManaCostString))
+				}
+			}
+		}
+
+		// Handle sacrifice cost - this moves the card to graveyard as part of the cost
+		hasSacrificeCost := parsedAbility.HasSacrificeCost
+		if hasSacrificeCost {
+			// Move card from battlefield to graveyard
+			if err := e.sacrificePermanent(gameState, card); err != nil {
+				return fmt.Errorf("failed to sacrifice permanent: %w", err)
+			}
+			if e.logger != nil {
+				e.logger.Info("sacrificed permanent for ability cost",
+					zap.String("card", card.Name))
+			}
+		}
+
+		// Create resolve function for rules-text abilities
+		// Captures card and ability info for deferred execution when ability resolves
+		capturedCard := card
+		capturedPlayer := player
+		capturedAbility := parsedAbility
+		resolveFunc = func() error {
+			if e.logger != nil {
+				e.logger.Info("resolving activated ability from rules text",
+					zap.String("card", capturedCard.Name),
+					zap.String("ability", capturedAbility.FullText))
+			}
+
+			// Execute the effect based on parsed ability info
+			return e.executeRulesTextAbilityEffect(gameState, capturedCard, capturedPlayer, capturedAbility)
+		}
+	} else {
+		// This is a registered ability with UUID
+		cardUUID, err := uuid.Parse(cardID)
+		if err != nil {
+			return fmt.Errorf("invalid card_id: %w", err)
+		}
+
+		abilityUUID, err := uuid.Parse(abilityIDStr)
+		if err != nil {
+			return fmt.Errorf("invalid ability_id: %w", err)
+		}
+
+		// Get the ability from the registry
+		if gameState.abilityRegistry == nil {
+			return fmt.Errorf("ability registry not initialized")
+		}
+
+		ability, err := gameState.abilityRegistry.GetAbility(abilityUUID)
+		if err != nil {
+			return fmt.Errorf("ability not found: %w", err)
+		}
+
+		// Verify ability belongs to this card
+		if ability.GetSourceID() != cardUUID {
+			return fmt.Errorf("ability does not belong to this permanent")
+		}
+
+		// Get activated ability type
+		activatedAbility, ok := ability.(*abilities.ActivatedAbility)
+		if !ok {
+			return fmt.Errorf("ability is not an activated ability")
+		}
+
+		// Skip mana abilities - they should use SPECIAL_ACTION/ACTIVATE_MANA_ABILITY
+		if activatedAbility.IsManaAbility {
+			return fmt.Errorf("use ACTIVATE_MANA_ABILITY for mana abilities")
+		}
+
+		abilityText = ability.String()
+		isSorcerySpeed = activatedAbility.GetTimingRule() == abilities.TimingSorcery
+
+		// Check for tap cost in registered ability
+		for _, cost := range activatedAbility.GetCosts() {
+			if _, isTapCost := cost.(*abilities.TapCost); isTapCost {
+				hasTapCost = true
+				break
+			}
+		}
+
+		// Pay non-tap costs for registered abilities
+		// NOTE: For registered abilities, we need to handle costs directly to avoid deadlock
+		// The lock is already held, so GameContext methods would deadlock
+		for _, cost := range activatedAbility.GetCosts() {
+			if _, isTapCost := cost.(*abilities.TapCost); isTapCost {
+				continue // Handle tap cost separately below
+			}
+			// Handle mana cost directly
+			if manaCost, isManaCost := cost.(*abilities.ManaCost); isManaCost && manaCost.Mana != nil {
+				if !canPayManaCostDirect(player.ManaPool, manaCost.Mana) {
+					return fmt.Errorf("not enough mana to pay cost")
+				}
+				if err := payManaCostDirect(player.ManaPool, manaCost.Mana); err != nil {
+					return fmt.Errorf("failed to pay mana cost: %w", err)
+				}
+			}
+			// TODO: Handle other cost types (sacrifice, discard) directly
+		}
+
+		// Create resolve function for registered abilities
+		// The resolve function will create a GameContext when called during stack resolution
+		// At that point, the lock should not be held
+		capturedAbility := ability
+		resolveFunc = func() error {
+			gameUUID, _ := uuid.Parse(gameState.gameID)
+			gameCtx := NewGameContext(gameUUID, e, e.logger)
+			return capturedAbility.Resolve(context.Background(), gameCtx)
+		}
+	}
+
+	// Check timing restrictions for sorcery-speed abilities
+	if isSorcerySpeed {
+		currentStep := gameState.turnManager.CurrentStep()
+		activePlayer := gameState.turnManager.ActivePlayer()
+
+		if currentStep != rules.StepMain1 && currentStep != rules.StepMain2 {
+			return fmt.Errorf("can only activate during main phase")
+		}
+		if activePlayer != player.PlayerID {
+			return fmt.Errorf("can only activate during your turn")
+		}
+	}
+
+	// Check if permanent is tapped and ability requires tap
+	if hasTapCost {
+		if card.Tapped {
+			return fmt.Errorf("permanent is already tapped")
+		}
+		// Pay the tap cost
+		card.Tapped = true
+	}
+
+	// TODO: Check if targets are required and none provided - send GAME_TARGET event
+	// TODO: Check if mana payment is required - trigger mana payment prompt
+
+	// Create stack item for the ability
+	stackItemID := uuid.New().String()
+
+	stackItem := rules.StackItem{
+		ID:          stackItemID,
+		Controller:  player.PlayerID,
+		Description: fmt.Sprintf("%s: %s", card.Name, abilityText),
+		Kind:        rules.StackItemKindActivated,
+		SourceID:    cardID,
+		Metadata: map[string]string{
+			"ability_id": abilityIDStr,
+			"card_name":  card.Name,
+		},
+		Resolve: resolveFunc,
+	}
+
+	// Push ability to stack
+	gameState.stack.Push(stackItem)
+	gameState.trackStackItem()
+	gameState.trackStackDepth()
+	gameState.trackAction()
+
+	if e.logger != nil {
+		e.logger.Info("activated ability added to stack",
+			zap.String("player", player.PlayerID),
+			zap.String("card", card.Name),
+			zap.String("ability", abilityIDStr))
+	}
+
+	// Add to game log
+	gameState.addMessage(fmt.Sprintf("%s activates ability of %s", player.PlayerID, card.Name), "action")
+
+	// Notify stack update
+	e.notifyStackUpdate(gameState.gameID, map[string]interface{}{
+		"action":     "ability_activated",
+		"player_id":  player.PlayerID,
+		"ability_id": abilityIDStr,
+		"card_id":    cardID,
+		"card_name":  card.Name,
+	})
+
+	return nil
+}
+
+// executeRulesTextAbilityEffect executes the effect of a rules-text-parsed ability
+// This handles common patterns like life gain, damage, etc.
+func (e *MageEngine) executeRulesTextAbilityEffect(
+	gameState *engineGameState,
+	card *internalCard,
+	player *internalPlayer,
+	ability ParsedActivatedAbility,
+) error {
+	effectText := strings.ToLower(ability.EffectText)
+
+	if e.logger != nil {
+		e.logger.Info("executing rules-text ability effect",
+			zap.String("card", card.Name),
+			zap.String("effect", ability.EffectText))
+	}
+
+	// Handle Martyr of Sands and similar "gain X life" abilities
+	if strings.Contains(effectText, "gain") && strings.Contains(effectText, "life") {
+		lifeGain := 0
+
+		// Check for "three times X" pattern (Martyr of Sands)
+		if strings.Contains(effectText, "three times x") || strings.Contains(effectText, "3x") {
+			// Count white cards in the player's hand
+			whiteCardCount := 0
+			for _, c := range player.Hand {
+				if isCardWhite(c) {
+					whiteCardCount++
+				}
+			}
+			lifeGain = whiteCardCount * 3
+
+			if e.logger != nil {
+				e.logger.Info("Martyr of Sands effect: counting white cards",
+					zap.Int("white_cards", whiteCardCount),
+					zap.Int("life_gain", lifeGain))
+			}
+		} else {
+			// Try to parse fixed life gain amount from effect text
+			// Pattern: "gain N life" where N is a number
+			lifeGain = parseLifeGainAmount(effectText)
+		}
+
+		if lifeGain > 0 {
+			player.Life += lifeGain
+			gameState.addMessage(fmt.Sprintf("%s gains %d life (now %d)", player.PlayerID, lifeGain, player.Life), "life")
+
+			if e.logger != nil {
+				e.logger.Info("player gained life",
+					zap.String("player", player.PlayerID),
+					zap.Int("amount", lifeGain),
+					zap.Int("new_life", player.Life))
+			}
+		}
+	}
+
+	// Handle damage effects
+	if strings.Contains(effectText, "deal") && strings.Contains(effectText, "damage") {
+		// TODO: Parse damage amount and target
+		// For now, log that this needs implementation
+		if e.logger != nil {
+			e.logger.Info("damage effect not yet fully implemented",
+				zap.String("effect", ability.EffectText))
+		}
+	}
+
+	// Handle draw effects
+	if strings.Contains(effectText, "draw") && strings.Contains(effectText, "card") {
+		// Parse number of cards to draw
+		numCards := parseDrawAmount(effectText)
+		if numCards > 0 && len(player.Library) >= numCards {
+			for i := 0; i < numCards; i++ {
+				if len(player.Library) > 0 {
+					drawnCard := player.Library[len(player.Library)-1]
+					player.Library = player.Library[:len(player.Library)-1]
+					player.Hand = append(player.Hand, drawnCard)
+					drawnCard.Zone = zoneHand
+				}
+			}
+			gameState.addMessage(fmt.Sprintf("%s draws %d card(s)", player.PlayerID, numCards), "draw")
+		}
+	}
+
+	// Log the resolution
+	gameState.addMessage(fmt.Sprintf("%s's ability resolves: %s", card.Name, ability.EffectText), "ability")
+
+	return nil
+}
+
+// isCardWhite checks if a card is white based on its color field
+func isCardWhite(card *internalCard) bool {
+	if card == nil {
+		return false
+	}
+	colorLower := strings.ToLower(card.Color)
+	return strings.Contains(colorLower, "white") || colorLower == "w"
+}
+
+// parseLifeGainAmount extracts the life gain amount from effect text
+func parseLifeGainAmount(effectText string) int {
+	// Common patterns: "gain 3 life", "gain N life"
+	effectLower := strings.ToLower(effectText)
+
+	// Number words to digits
+	numberWords := map[string]int{
+		"one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+		"six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+	}
+
+	// Try to find pattern "gain N life"
+	for word, num := range numberWords {
+		if strings.Contains(effectLower, "gain "+word+" life") {
+			return num
+		}
+	}
+
+	// Try numeric pattern
+	for i := 1; i <= 20; i++ {
+		if strings.Contains(effectLower, fmt.Sprintf("gain %d life", i)) {
+			return i
+		}
+	}
+
+	return 0
+}
+
+// parseDrawAmount extracts the number of cards to draw from effect text
+func parseDrawAmount(effectText string) int {
+	effectLower := strings.ToLower(effectText)
+
+	// Common patterns: "draw a card", "draw N cards"
+	if strings.Contains(effectLower, "draw a card") {
+		return 1
+	}
+
+	numberWords := map[string]int{
+		"two": 2, "three": 3, "four": 4, "five": 5,
+	}
+
+	for word, num := range numberWords {
+		if strings.Contains(effectLower, "draw "+word+" card") {
+			return num
+		}
+	}
+
+	// Try numeric pattern
+	for i := 2; i <= 10; i++ {
+		if strings.Contains(effectLower, fmt.Sprintf("draw %d card", i)) {
+			return i
+		}
+	}
+
+	return 0
+}
+
+// canPayManaCostDirect checks if a mana pool can pay the given mana cost
+// This function does NOT acquire any locks - caller must hold appropriate locks
+// Used to avoid deadlock when we already hold gameState.mu.Lock()
+func canPayManaCostDirect(pool *mana.ManaPool, manaCost *abilities.Mana) bool {
+	if pool == nil || manaCost == nil {
+		return manaCost == nil // No cost is always payable
+	}
+
+	// Check colored mana requirements
+	if pool.White < manaCost.White ||
+		pool.Blue < manaCost.Blue ||
+		pool.Black < manaCost.Black ||
+		pool.Red < manaCost.Red ||
+		pool.Green < manaCost.Green {
+		return false
+	}
+
+	// Calculate available generic mana (after paying colored)
+	availableGeneric := (pool.White - manaCost.White) +
+		(pool.Blue - manaCost.Blue) +
+		(pool.Black - manaCost.Black) +
+		(pool.Red - manaCost.Red) +
+		(pool.Green - manaCost.Green) +
+		pool.Colorless
+
+	return availableGeneric >= manaCost.Colorless
+}
+
+// payManaCostDirect pays a mana cost from a mana pool
+// This function does NOT acquire any locks - caller must hold appropriate locks
+// Used to avoid deadlock when we already hold gameState.mu.Lock()
+func payManaCostDirect(pool *mana.ManaPool, manaCost *abilities.Mana) error {
+	if pool == nil {
+		return fmt.Errorf("mana pool is nil")
+	}
+	if manaCost == nil {
+		return nil // No cost
+	}
+
+	// First check if we can pay
+	if !canPayManaCostDirect(pool, manaCost) {
+		return fmt.Errorf("insufficient mana")
+	}
+
+	// Pay colored mana
+	pool.White -= manaCost.White
+	pool.Blue -= manaCost.Blue
+	pool.Black -= manaCost.Black
+	pool.Red -= manaCost.Red
+	pool.Green -= manaCost.Green
+
+	// Pay generic mana from colorless first, then from excess colored
+	remaining := manaCost.Colorless
+	if remaining > 0 {
+		if pool.Colorless >= remaining {
+			pool.Colorless -= remaining
+			remaining = 0
+		} else {
+			remaining -= pool.Colorless
+			pool.Colorless = 0
+		}
+	}
+
+	// Pay remaining from any color (prioritize excess)
+	colors := []*int{&pool.White, &pool.Blue, &pool.Black, &pool.Red, &pool.Green}
+	for _, color := range colors {
+		if remaining <= 0 {
+			break
+		}
+		if *color > 0 {
+			take := remaining
+			if *color < take {
+				take = *color
+			}
+			*color -= take
+			remaining -= take
+		}
+	}
+
+	return nil
+}
+
 // handlePlayLand handles playing a land from hand
 // Per MTG Rule 116.2a: Playing a land is a special action (doesn't use stack)
 // Per MTG Rule 305.1: Can only play during main phase, with empty stack, once per turn
@@ -3856,7 +4389,281 @@ func (e *MageEngine) getAvailableActionsForPermanent(gameState *engineGameState,
 			zap.String("card", card.Name))
 	}
 
+	// Check for activated abilities (non-mana) from the registry
+	if gameState.abilityRegistry != nil {
+		cardUUID, err := uuid.Parse(card.ID)
+		if err == nil {
+			registeredAbilities := gameState.abilityRegistry.GetAbilitiesBySource(cardUUID)
+			for _, ability := range registeredAbilities {
+				// Only process activated abilities (not mana abilities)
+				if ability.GetType() == abilities.AbilityTypeActivated {
+					action := e.getActivatedAbilityAction(gameState, card, ability, hasPriority)
+					if action != nil {
+						actions = append(actions, *action)
+					}
+				}
+			}
+		}
+	}
+
+	// Parse activated abilities from rules text (for cards not yet registered)
+	activatedAbilityActions := e.parseActivatedAbilitiesFromText(gameState, card, hasPriority)
+	actions = append(actions, activatedAbilityActions...)
+
 	return actions
+}
+
+// parseActivatedAbilitiesFromText parses activated abilities from a card's rules text
+// and returns EngineCardActions for each detected ability.
+// This handles abilities like "{2}, {T}: Draw a card" or "Sacrifice {this}: You gain 3 life"
+func (e *MageEngine) parseActivatedAbilitiesFromText(gameState *engineGameState, card *internalCard, hasPriority bool) []EngineCardAction {
+	var actions []EngineCardAction
+
+	if card.RulesText == "" {
+		return actions
+	}
+
+	// Split rules text by ability separator
+	abilityLines := strings.Split(card.RulesText, "@@@")
+
+	for i, line := range abilityLines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		// Check if this looks like an activated ability (has a colon with cost before it)
+		colonIdx := strings.Index(line, ":")
+		if colonIdx == -1 || colonIdx == 0 {
+			continue
+		}
+
+		costPart := strings.TrimSpace(line[:colonIdx])
+		effectPart := strings.TrimSpace(line[colonIdx+1:])
+
+		// Skip if it doesn't look like a cost (should contain mana symbols, {T}, or sacrifice/discard keywords)
+		if !looksLikeCost(costPart) {
+			continue
+		}
+
+		// Skip if this is a mana ability (effect adds mana)
+		if isManaAbilityEffect(effectPart) {
+			continue
+		}
+
+		// Skip triggered abilities that have embedded activated abilities (e.g., Channel)
+		if strings.HasPrefix(strings.ToLower(line), "when") ||
+			strings.HasPrefix(strings.ToLower(line), "whenever") ||
+			strings.HasPrefix(strings.ToLower(line), "at the") {
+			continue
+		}
+
+		// Skip keyword abilities with reminder text
+		if isKeywordReminder(line) {
+			continue
+		}
+
+		// Skip equip abilities - they need a target creature selection flow
+		if strings.HasPrefix(strings.ToLower(costPart), "equip") {
+			continue
+		}
+
+		// This looks like a non-mana activated ability
+		displayText := line
+		abilityID := fmt.Sprintf("%s-ability-%d", card.ID, i)
+
+		// Determine if ability can be activated
+		isEnabled := hasPriority
+		disabledReason := ""
+
+		if !hasPriority {
+			isEnabled = false
+			disabledReason = "You don't have priority"
+		} else {
+			// Check tap cost
+			if strings.Contains(costPart, "{T}") && card.Tapped {
+				isEnabled = false
+				disabledReason = "Already tapped"
+			}
+
+			// Check for summoning sickness on creatures with tap abilities
+			if strings.Contains(costPart, "{T}") && card.SummoningSickness && strings.Contains(strings.ToUpper(card.Type), "CREATURE") {
+				isEnabled = false
+				disabledReason = "Summoning sickness"
+			}
+
+			// Check for "only as a sorcery" restriction
+			if strings.Contains(strings.ToLower(effectPart), "only as a sorcery") {
+				currentStep := gameState.turnManager.CurrentStep()
+				activePlayer := gameState.turnManager.ActivePlayer()
+				if currentStep != rules.StepMain1 && currentStep != rules.StepMain2 {
+					isEnabled = false
+					disabledReason = "Can only activate as a sorcery"
+				} else if activePlayer != card.ControllerID {
+					isEnabled = false
+					disabledReason = "Can only activate during your turn"
+				} else if !gameState.stack.IsEmpty() {
+					isEnabled = false
+					disabledReason = "Stack must be empty"
+				}
+			}
+		}
+
+		if e.logger != nil {
+			e.logger.Debug("parseActivatedAbilitiesFromText: found ability",
+				zap.String("card", card.Name),
+				zap.String("displayText", displayText),
+				zap.Bool("isEnabled", isEnabled),
+				zap.String("disabledReason", disabledReason))
+		}
+
+		actions = append(actions, EngineCardAction{
+			ActionType:     "ACTIVATE_ABILITY",
+			ActionID:       abilityID,
+			DisplayText:    displayText,
+			IsEnabled:      isEnabled,
+			DisabledReason: disabledReason,
+		})
+	}
+
+	return actions
+}
+
+// looksLikeCost checks if a string looks like an activated ability cost
+func looksLikeCost(s string) bool {
+	s = strings.ToLower(s)
+	// Contains mana symbols
+	if strings.Contains(s, "{") && strings.Contains(s, "}") {
+		return true
+	}
+	// Contains tap symbol (case insensitive variations)
+	if strings.Contains(s, "{t}") {
+		return true
+	}
+	// Contains sacrifice keyword
+	if strings.Contains(s, "sacrifice") {
+		return true
+	}
+	// Contains discard keyword
+	if strings.Contains(s, "discard") {
+		return true
+	}
+	// Contains pay life
+	if strings.Contains(s, "pay") {
+		return true
+	}
+	// Contains reveal
+	if strings.Contains(s, "reveal") {
+		return true
+	}
+	// Contains remove counters
+	if strings.Contains(s, "remove") && strings.Contains(s, "counter") {
+		return true
+	}
+	// Contains exile
+	if strings.Contains(s, "exile") {
+		return true
+	}
+	return false
+}
+
+// isManaAbilityEffect checks if an effect text produces mana (making it a mana ability)
+func isManaAbilityEffect(effectPart string) bool {
+	effectLower := strings.ToLower(effectPart)
+	// Check for "Add {X}" pattern where X is a mana symbol
+	if strings.Contains(effectLower, "add {") {
+		return true
+	}
+	// Check for "add one mana" pattern
+	if strings.Contains(effectLower, "add one mana") || strings.Contains(effectLower, "add mana") {
+		return true
+	}
+	return false
+}
+
+// isKeywordReminder checks if a line is just a keyword with reminder text
+func isKeywordReminder(line string) bool {
+	keywords := []string{
+		"vigilance", "lifelink", "flying", "trample", "haste", "deathtouch",
+		"first strike", "double strike", "hexproof", "indestructible", "reach",
+		"menace", "flash", "defender", "evolve",
+	}
+	lineLower := strings.ToLower(line)
+	for _, kw := range keywords {
+		if strings.HasPrefix(lineLower, kw) {
+			return true
+		}
+	}
+	return false
+}
+
+// getActivatedAbilityAction creates an EngineCardAction for an activated ability
+func (e *MageEngine) getActivatedAbilityAction(gameState *engineGameState, card *internalCard, ability abilities.Ability, hasPriority bool) *EngineCardAction {
+	// Check if this is an activated ability
+	activatedAbility, ok := ability.(*abilities.ActivatedAbility)
+	if !ok {
+		return nil
+	}
+
+	// Skip mana abilities - they're handled separately
+	if activatedAbility.IsManaAbility {
+		return nil
+	}
+
+	// Build display text from ability
+	displayText := ability.String()
+	if displayText == "" {
+		displayText = "Activate ability"
+	}
+
+	// Determine if the ability can be activated
+	isEnabled := hasPriority
+	disabledReason := ""
+
+	if !hasPriority {
+		isEnabled = false
+		disabledReason = "You don't have priority"
+	} else if card.Tapped {
+		// Check if the ability requires tapping (has tap cost)
+		for _, cost := range activatedAbility.GetCosts() {
+			if _, isTapCost := cost.(*abilities.TapCost); isTapCost {
+				isEnabled = false
+				disabledReason = "Already tapped"
+				break
+			}
+		}
+	}
+
+	// Check timing restrictions
+	if isEnabled && activatedAbility.GetTimingRule() == abilities.TimingSorcery {
+		// Sorcery-speed abilities can only be activated during main phases
+		currentStep := gameState.turnManager.CurrentStep()
+		activePlayer := gameState.turnManager.ActivePlayer()
+		if currentStep != rules.StepMain1 && currentStep != rules.StepMain2 {
+			isEnabled = false
+			disabledReason = "Can only activate during main phase"
+		} else if activePlayer != card.ControllerID {
+			isEnabled = false
+			disabledReason = "Can only activate during your turn"
+		}
+	}
+
+	if e.logger != nil {
+		e.logger.Debug("getActivatedAbilityAction: found activated ability",
+			zap.String("card", card.Name),
+			zap.String("abilityID", ability.GetID().String()),
+			zap.String("displayText", displayText),
+			zap.Bool("isEnabled", isEnabled),
+			zap.String("disabledReason", disabledReason))
+	}
+
+	return &EngineCardAction{
+		ActionType:     "ACTIVATE_ABILITY",
+		ActionID:       ability.GetID().String(),
+		DisplayText:    displayText,
+		IsEnabled:      isEnabled,
+		DisabledReason: disabledReason,
+	}
 }
 
 // ManaProduction represents the mana produced by a mana ability
@@ -3981,6 +4788,132 @@ func parseManaAbilityFromText(rulesText string) *ManaProduction {
 	}
 
 	return nil
+}
+
+// ParsedActivatedAbility represents an activated ability parsed from rules text
+type ParsedActivatedAbility struct {
+	FullText         string // The complete ability text (cost: effect)
+	CostText         string // Just the cost part
+	EffectText       string // Just the effect part
+	HasTapCost       bool   // Whether the ability requires tapping
+	HasSacrificeCost bool   // Whether the ability requires sacrificing this permanent
+	ManaCostString   string // The mana cost portion (e.g., "{1}", "{2}{B}")
+	IsSorcerySpeed   bool   // Whether the ability can only be activated at sorcery speed
+	AbilityIndex     int    // The index of this ability in the card's rules text
+}
+
+// parseActivatedAbilitiesFromText parses activated abilities from a card's rules text
+// This is used for ability execution, returning structured data about each ability
+func parseActivatedAbilitiesFromText(rulesText string) []ParsedActivatedAbility {
+	var abilities []ParsedActivatedAbility
+
+	if rulesText == "" {
+		return abilities
+	}
+
+	// Split rules text by ability separator
+	abilityLines := strings.Split(rulesText, "@@@")
+
+	for i, line := range abilityLines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		// Check if this looks like an activated ability (has a colon with cost before it)
+		colonIdx := strings.Index(line, ":")
+		if colonIdx == -1 || colonIdx == 0 {
+			continue
+		}
+
+		costPart := strings.TrimSpace(line[:colonIdx])
+		effectPart := strings.TrimSpace(line[colonIdx+1:])
+
+		// Skip if it doesn't look like a cost (should contain mana symbols, {T}, or sacrifice/discard keywords)
+		if !looksLikeCost(costPart) {
+			continue
+		}
+
+		// Skip if this is a mana ability (effect adds mana)
+		if isManaAbilityEffect(effectPart) {
+			continue
+		}
+
+		// Skip triggered abilities that have embedded activated abilities
+		lowerLine := strings.ToLower(line)
+		if strings.HasPrefix(lowerLine, "when") ||
+			strings.HasPrefix(lowerLine, "whenever") ||
+			strings.HasPrefix(lowerLine, "at the") {
+			continue
+		}
+
+		// Skip keyword abilities with reminder text
+		if isKeywordReminder(line) {
+			continue
+		}
+
+		// Skip equip abilities - they need a target creature selection flow
+		if strings.HasPrefix(strings.ToLower(costPart), "equip") {
+			continue
+		}
+
+		// Check for tap cost
+		hasTapCost := strings.Contains(costPart, "{T}")
+
+		// Check for sacrifice cost
+		costLower := strings.ToLower(costPart)
+		hasSacrificeCost := strings.Contains(costLower, "sacrifice {this}") ||
+			strings.Contains(costLower, "sacrifice this") ||
+			strings.Contains(costLower, ", sacrifice {this}")
+
+		// Extract mana cost (e.g., "{1}", "{2}{B}", etc.)
+		manaCost := extractManaCostFromCostText(costPart)
+
+		// Check for sorcery speed restriction
+		isSorcerySpeed := strings.Contains(strings.ToLower(effectPart), "only as a sorcery") ||
+			strings.Contains(strings.ToLower(effectPart), "activate only as a sorcery")
+
+		abilities = append(abilities, ParsedActivatedAbility{
+			FullText:         line,
+			CostText:         costPart,
+			EffectText:       effectPart,
+			HasTapCost:       hasTapCost,
+			HasSacrificeCost: hasSacrificeCost,
+			ManaCostString:   manaCost,
+			IsSorcerySpeed:   isSorcerySpeed,
+			AbilityIndex:     i,
+		})
+	}
+
+	return abilities
+}
+
+// extractManaCostFromCostText extracts mana symbols from a cost string
+// e.g., "{1}, {T}, Sacrifice {this}" -> "{1}"
+// e.g., "{2}{B}, Discard a card" -> "{2}{B}"
+func extractManaCostFromCostText(costText string) string {
+	var manaParts []string
+
+	// Split by comma to get individual cost components
+	parts := strings.Split(costText, ",")
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		// Check if this part is a mana cost (contains { and } and has mana symbols)
+		if strings.Contains(part, "{") && strings.Contains(part, "}") {
+			// Skip tap symbols and other non-mana costs
+			if part == "{T}" || part == "{Q}" {
+				continue
+			}
+			// Skip "Sacrifice {this}" type costs
+			if strings.Contains(strings.ToLower(part), "sacrifice") {
+				continue
+			}
+			// This looks like a mana cost
+			manaParts = append(manaParts, part)
+		}
+	}
+
+	return strings.Join(manaParts, "")
 }
 
 // getManaAbilityAction checks if a permanent has a mana ability and returns the action
@@ -5492,6 +6425,31 @@ func (e *MageEngine) moveCardToGraveyard(gameState *engineGameState, card *inter
 			)
 		}
 	}
+}
+
+// sacrificePermanent handles sacrificing a permanent (as a cost or effect)
+// Per MTG Rules: Sacrificing is moving a permanent to the graveyard
+func (e *MageEngine) sacrificePermanent(gameState *engineGameState, card *internalCard) error {
+	if card == nil {
+		return fmt.Errorf("cannot sacrifice nil card")
+	}
+
+	// Make sure the card is on the battlefield
+	if card.Zone != zoneBattlefield {
+		return fmt.Errorf("can only sacrifice permanents on the battlefield")
+	}
+
+	// Move to graveyard (tokens cease to exist instead)
+	if err := e.moveCard(gameState, card, zoneGraveyard, ""); err != nil {
+		return fmt.Errorf("failed to move sacrificed permanent to graveyard: %w", err)
+	}
+
+	// Add game message
+	gameState.addMessage(fmt.Sprintf("%s was sacrificed", card.Name), "sacrifice")
+
+	// TODO: Emit "sacrificed" event for death triggers
+
+	return nil
 }
 
 // Helper methods for engineGameState

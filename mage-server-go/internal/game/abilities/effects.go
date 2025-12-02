@@ -124,8 +124,13 @@ func NewGainLifeEffect(amount int) *GainLifeEffect {
 }
 
 func (e *GainLifeEffect) Apply(ctx context.Context, game GameContext, source uuid.UUID, targets []uuid.UUID) error {
-	// TODO: Implement life gain
-	return fmt.Errorf("life gain not yet implemented")
+	// Get the controller of the source to gain life
+	controllerID, err := game.GetControllerID(source)
+	if err != nil {
+		return fmt.Errorf("failed to get controller: %w", err)
+	}
+
+	return game.GainLife(controllerID, e.Amount)
 }
 
 func (e *GainLifeEffect) GetDescription() string {

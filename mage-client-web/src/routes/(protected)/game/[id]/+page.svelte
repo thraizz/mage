@@ -39,7 +39,8 @@
 		mulligan,
 		playLand,
 		advancePhase,
-		activateManaAbility
+		activateManaAbility,
+		activateAbility
 	} from '$lib/api/game';
 	import { CardActionType, type CardView } from '$lib/generated/mage/v1/models';
 	import type { GameCard, GamePhase } from '$lib/types/game';
@@ -72,6 +73,7 @@
 	import DebugOverlay from '$lib/components/game/DebugOverlay.svelte';
 	import ManaPayment from '$lib/components/game/ManaPayment.svelte';
 	import XManaSelector from '$lib/components/game/XManaSelector.svelte';
+	import AbilitiesPanel from '$lib/components/game/AbilitiesPanel.svelte';
 	import type { GamePlayManaData, GamePlayXManaData } from '$lib/generated/mage/v1/websocket';
 
 	// Targeting store
@@ -97,6 +99,8 @@
 	let gameChatRef = $state<GameChatOverlay | undefined>(undefined);
 	let isActionLoading = $state(false);
 	let showStackOverlay = $state(false);
+	let showAbilitiesPanel = $state(false);
+	let abilitiesPanelCardId = $state<string | null>(null);
 	let initialized = $state(false);
 
 	// Targeting state (from store)
@@ -529,13 +533,143 @@
 	}
 
 	/**
-	 * Handle activate ability
+	 * Handle activate ability button
+	 * Shows the abilities panel for the selected permanent
 	 * For mana abilities, click directly on the land to tap it
 	 */
 	function handleActivateAbility() {
-		if (!havePriority || isActionLoading) return;
-		// Hint to user how to activate mana abilities
-		addLogEntry('Click on an untapped land to tap it for mana');
+		console.log('[handleActivateAbility] Called', { havePriority, isActionLoading });
+		if (!havePriority || isActionLoading) {
+			console.log('[handleActivateAbility] Blocked - no priority or loading');
+			return;
+		}
+
+		const gameState = $gameStore;
+		const selectedIds = gameState.selectedCardIds;
+		console.log('[handleActivateAbility] Selected IDs:', selectedIds);
+
+		// Check if a permanent is selected
+		if (selectedIds.length === 0) {
+			addLogEntry('Select a permanent first, then press A to activate abilities');
+			toast.info('Select a permanent first');
+			return;
+		}
+
+		if (selectedIds.length > 1) {
+			addLogEntry('Select only one permanent to activate abilities');
+			toast.info('Select only one permanent');
+			return;
+		}
+
+		const cardId = selectedIds[0];
+		console.log('[handleActivateAbility] Looking for card:', cardId);
+		console.log('[handleActivateAbility] battlefieldCards:', battlefieldCards.map(c => ({ id: c.id, name: c.name })));
+		
+		const card = battlefieldCards.find((c) => c.id === cardId);
+
+		if (!card) {
+			console.log('[handleActivateAbility] Card not found on battlefield');
+			addLogEntry('Selected card not found on battlefield');
+			toast.error('Card not found');
+			return;
+		}
+
+		console.log('[handleActivateAbility] Found card:', { 
+			id: card.id, 
+			name: card.name, 
+			availableActions: card.availableActions,
+			availableActionsCount: card.availableActions?.length 
+		});
+
+		// Filter for non-mana activated abilities
+		// Note: actionType can be either a number (enum) or string (JSON serialized)
+		const activatedAbilities = card.availableActions?.filter(
+			(a) => {
+				const isMatch = a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY || 
+				                String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' ||
+				                a.actionType === 3; // Enum value for CARD_ACTION_ACTIVATE_ABILITY
+				console.log('[handleActivateAbility] Checking action:', { 
+					actionType: a.actionType, 
+					actionTypeString: String(a.actionType),
+					expected: CardActionType.CARD_ACTION_ACTIVATE_ABILITY,
+					isMatch 
+				});
+				return isMatch;
+			}
+		) || [];
+
+		console.log('[handleActivateAbility] activatedAbilities:', activatedAbilities);
+
+		if (activatedAbilities.length === 0) {
+			// Check if it's a land with mana ability - give hint
+			const hasManaAbility = card.availableActions?.some(
+				(a) => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY ||
+				       String(a.actionType) === 'CARD_ACTION_ACTIVATE_MANA_ABILITY' ||
+				       a.actionType === 4
+			);
+			if (hasManaAbility) {
+				addLogEntry('Click on the land to tap it for mana');
+				toast.info('Click on the land to tap it for mana');
+			} else {
+				addLogEntry(`${card.name} has no activated abilities`);
+				toast.info('No activated abilities');
+			}
+			return;
+		}
+
+		// Show the abilities panel
+		console.log('[handleActivateAbility] Showing abilities panel for card:', cardId);
+		abilitiesPanelCardId = cardId;
+		showAbilitiesPanel = true;
+		console.log('[handleActivateAbility] Panel state set:', { showAbilitiesPanel, abilitiesPanelCardId });
+	}
+
+	/**
+	 * Handle ability activation from the panel
+	 */
+	async function handleAbilityActivate(abilityId: string) {
+		console.log('[handleAbilityActivate] Called with abilityId:', abilityId);
+		if (!gameId || !abilitiesPanelCardId) {
+			console.log('[handleAbilityActivate] Missing gameId or cardId:', { gameId, abilitiesPanelCardId });
+			return;
+		}
+
+		const card = battlefieldCards.find((c) => c.id === abilitiesPanelCardId);
+		const cardName = card?.name || 'permanent';
+
+		console.log('[handleAbilityActivate] Activating ability:', {
+			gameId,
+			cardId: abilitiesPanelCardId,
+			abilityId,
+			cardName
+		});
+
+		showAbilitiesPanel = false;
+		isActionLoading = true;
+
+		try {
+			console.log('[handleAbilityActivate] Calling activateAbility API...');
+			await activateAbility(gameId, abilitiesPanelCardId, abilityId);
+			console.log('[handleAbilityActivate] API call successful');
+			addLogEntry(`Activated ability of ${cardName}`);
+			toast.success(`Activated ability of ${cardName}`);
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Failed to activate ability';
+			console.error('[handleAbilityActivate] API call failed:', err);
+			toast.error(message);
+			addLogEntry(`Failed to activate ability: ${message}`);
+		} finally {
+			isActionLoading = false;
+			abilitiesPanelCardId = null;
+		}
+	}
+
+	/**
+	 * Close abilities panel
+	 */
+	function closeAbilitiesPanel() {
+		showAbilitiesPanel = false;
+		abilitiesPanelCardId = null;
 	}
 
 	/**
@@ -1136,6 +1270,36 @@
 			/>
 		{/if}
 
+		<!-- Abilities Panel -->
+		{@const _debugPanelRender = (() => { 
+			if (showAbilitiesPanel || abilitiesPanelCardId) {
+				console.log('[RENDER] AbilitiesPanel condition check:', { 
+					showAbilitiesPanel, 
+					abilitiesPanelCardId,
+					battlefieldCardsCount: battlefieldCards.length,
+					cardFound: battlefieldCards.find(c => c.id === abilitiesPanelCardId)?.name
+				});
+			}
+			return null;
+		})()}
+		{#if showAbilitiesPanel && abilitiesPanelCardId}
+			{@const selectedCard = battlefieldCards.find(c => c.id === abilitiesPanelCardId)}
+			{@const _debugCardFound = console.log('[RENDER] Inside panel block, selectedCard:', selectedCard?.name)}
+			{#if selectedCard}
+				<AbilitiesPanel
+					cardId={abilitiesPanelCardId}
+					cardName={selectedCard.name}
+					abilities={selectedCard.availableActions?.filter(
+						a => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY ||
+						     String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' ||
+						     a.actionType === 3
+					) || []}
+					onActivate={handleAbilityActivate}
+					onClose={closeAbilitiesPanel}
+				/>
+			{/if}
+		{/if}
+
 		<!-- Prompt Overlay (non-target, non-mana prompts) -->
 		{#if prompt && !['target', 'mana', 'xmana'].includes(prompt.type)}
 			<div class="prompt-overlay">
@@ -1205,6 +1369,7 @@
 									isTargetingActive={isTargeting}
 									isValidTarget={validTargets.has(card.id)}
 									isTargetSelected={selectedTargets.includes(card.id)}
+									hasActivatedAbilities={card.availableActions?.some(a => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY || String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' || a.actionType === 3)}
 								/>
 							{/each}
 						</div>
@@ -1231,6 +1396,7 @@
 								isTargetingActive={isTargeting}
 								isValidTarget={validTargets.has(card.id)}
 								isTargetSelected={selectedTargets.includes(card.id)}
+								hasActivatedAbilities={card.availableActions?.some(a => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY || String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' || a.actionType === 3)}
 							/>
 						{/each}
 						{#if getPlayerBattlefieldCards(localPlayerId).length === 0}

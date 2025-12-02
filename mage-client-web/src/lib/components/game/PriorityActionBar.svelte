@@ -83,7 +83,12 @@
 	 * Handle activate ability
 	 */
 	function handleActivateAbility(): void {
-		if (!hasPriority || isLoading) return;
+		console.log('[PriorityActionBar.handleActivateAbility] Called', { hasPriority, isLoading });
+		if (!hasPriority || isLoading) {
+			console.log('[PriorityActionBar.handleActivateAbility] Blocked');
+			return;
+		}
+		console.log('[PriorityActionBar.handleActivateAbility] Calling onActivateAbility callback');
 		onActivateAbility();
 	}
 

@@ -3,6 +3,7 @@ package game
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
@@ -206,6 +207,38 @@ func (gc *GameContext) DrawCards(playerID uuid.UUID, amount int) error {
 	gc.logger.Info("player drew cards",
 		zap.String("player", playerID.String()),
 		zap.Int("amount", amount))
+
+	return nil
+}
+
+// GainLife has a player gain life.
+func (gc *GameContext) GainLife(playerID uuid.UUID, amount int) error {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return fmt.Errorf("game %s not found", gc.gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	player, ok := gameState.players[playerID.String()]
+	if !ok {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	oldLife := player.Life
+	player.Life += amount
+
+	gc.logger.Info("player gained life",
+		zap.String("player", playerID.String()),
+		zap.Int("amount", amount),
+		zap.Int("old_life", oldLife),
+		zap.Int("new_life", player.Life))
+
+	gameState.addMessage(fmt.Sprintf("%s gains %d life (now %d)", playerID, amount, player.Life), "life")
 
 	return nil
 }
@@ -539,6 +572,108 @@ func (gc *GameContext) GetPermanentsControlledByPlayer(playerID uuid.UUID) ([]in
 	}
 
 	return permanents, nil
+}
+
+// GetControllerID returns the controller ID of a permanent/card.
+func (gc *GameContext) GetControllerID(objectID uuid.UUID) (uuid.UUID, error) {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return uuid.Nil, fmt.Errorf("game %s not found", gc.gameID)
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	// Check battlefield
+	for _, permanent := range gameState.battlefield {
+		if permanent.ID == objectID.String() {
+			controllerUUID, err := uuid.Parse(permanent.ControllerID)
+			if err != nil {
+				return uuid.Nil, fmt.Errorf("invalid controller ID: %w", err)
+			}
+			return controllerUUID, nil
+		}
+	}
+
+	// Check stack
+	for _, item := range gameState.stack.List() {
+		if item.SourceID == objectID.String() {
+			controllerUUID, err := uuid.Parse(item.Controller)
+			if err != nil {
+				return uuid.Nil, fmt.Errorf("invalid controller ID: %w", err)
+			}
+			return controllerUUID, nil
+		}
+	}
+
+	return uuid.Nil, fmt.Errorf("object %s not found", objectID)
+}
+
+// GetCardColors returns the colors of a card (e.g., ["W", "U"]).
+func (gc *GameContext) GetCardColors(cardID uuid.UUID) ([]string, error) {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return nil, fmt.Errorf("game %s not found", gc.gameID)
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	// Find the card in any zone
+	cardIDStr := cardID.String()
+
+	// Check battlefield
+	for _, card := range gameState.battlefield {
+		if card.ID == cardIDStr {
+			return parseCardColors(card.Color), nil
+		}
+	}
+
+	// Check player zones
+	for _, player := range gameState.players {
+		for _, card := range player.Hand {
+			if card.ID == cardIDStr {
+				return parseCardColors(card.Color), nil
+			}
+		}
+		for _, card := range player.Graveyard {
+			if card.ID == cardIDStr {
+				return parseCardColors(card.Color), nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("card %s not found", cardID)
+}
+
+// parseCardColors converts a color string to a slice of color codes.
+func parseCardColors(colorStr string) []string {
+	var colors []string
+	colorStr = strings.ToLower(colorStr)
+
+	if strings.Contains(colorStr, "white") || strings.Contains(colorStr, "w") {
+		colors = append(colors, "W")
+	}
+	if strings.Contains(colorStr, "blue") || strings.Contains(colorStr, "u") {
+		colors = append(colors, "U")
+	}
+	if strings.Contains(colorStr, "black") || strings.Contains(colorStr, "b") {
+		colors = append(colors, "B")
+	}
+	if strings.Contains(colorStr, "red") || strings.Contains(colorStr, "r") {
+		colors = append(colors, "R")
+	}
+	if strings.Contains(colorStr, "green") || strings.Contains(colorStr, "g") {
+		colors = append(colors, "G")
+	}
+
+	return colors
 }
 
 // ==============================================================================

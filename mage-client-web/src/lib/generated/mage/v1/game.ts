@@ -269,6 +269,23 @@ export interface SendSpecialActionResponse {
   error: string;
 }
 
+/** Activate an activated ability on a permanent */
+export interface ActivateAbilityRequest {
+  sessionId: string;
+  gameId: string;
+  /** Permanent with the ability */
+  cardId: string;
+  /** Specific ability to activate */
+  abilityId: string;
+  /** Target UUIDs if required */
+  targets: string[];
+}
+
+export interface ActivateAbilityResponse {
+  success: boolean;
+  error: string;
+}
+
 export interface MatchStartRequest {
   sessionId: string;
   tableId: string;
@@ -2186,6 +2203,206 @@ export const SendSpecialActionResponse: MessageFns<SendSpecialActionResponse> = 
   },
   fromPartial(object: DeepPartial<SendSpecialActionResponse>): SendSpecialActionResponse {
     const message = createBaseSendSpecialActionResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? "";
+    return message;
+  },
+};
+
+function createBaseActivateAbilityRequest(): ActivateAbilityRequest {
+  return { sessionId: "", gameId: "", cardId: "", abilityId: "", targets: [] };
+}
+
+export const ActivateAbilityRequest: MessageFns<ActivateAbilityRequest> = {
+  encode(message: ActivateAbilityRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== "") {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== "") {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.cardId !== "") {
+      writer.uint32(26).string(message.cardId);
+    }
+    if (message.abilityId !== "") {
+      writer.uint32(34).string(message.abilityId);
+    }
+    for (const v of message.targets) {
+      writer.uint32(42).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ActivateAbilityRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseActivateAbilityRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.cardId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.abilityId = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.targets.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ActivateAbilityRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : "",
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "",
+      cardId: isSet(object.cardId) ? globalThis.String(object.cardId) : "",
+      abilityId: isSet(object.abilityId) ? globalThis.String(object.abilityId) : "",
+      targets: globalThis.Array.isArray(object?.targets) ? object.targets.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
+
+  toJSON(message: ActivateAbilityRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== "") {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== "") {
+      obj.gameId = message.gameId;
+    }
+    if (message.cardId !== "") {
+      obj.cardId = message.cardId;
+    }
+    if (message.abilityId !== "") {
+      obj.abilityId = message.abilityId;
+    }
+    if (message.targets?.length) {
+      obj.targets = message.targets;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ActivateAbilityRequest>): ActivateAbilityRequest {
+    return ActivateAbilityRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ActivateAbilityRequest>): ActivateAbilityRequest {
+    const message = createBaseActivateAbilityRequest();
+    message.sessionId = object.sessionId ?? "";
+    message.gameId = object.gameId ?? "";
+    message.cardId = object.cardId ?? "";
+    message.abilityId = object.abilityId ?? "";
+    message.targets = object.targets?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseActivateAbilityResponse(): ActivateAbilityResponse {
+  return { success: false, error: "" };
+}
+
+export const ActivateAbilityResponse: MessageFns<ActivateAbilityResponse> = {
+  encode(message: ActivateAbilityResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== "") {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ActivateAbilityResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseActivateAbilityResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ActivateAbilityResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+    };
+  },
+
+  toJSON(message: ActivateAbilityResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ActivateAbilityResponse>): ActivateAbilityResponse {
+    return ActivateAbilityResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ActivateAbilityResponse>): ActivateAbilityResponse {
+    const message = createBaseActivateAbilityResponse();
     message.success = object.success ?? false;
     message.error = object.error ?? "";
     return message;

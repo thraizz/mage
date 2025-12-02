@@ -60,6 +60,7 @@ const (
 	MageServer_SendPlayerManaType_FullMethodName         = "/mage.v1.MageServer/SendPlayerManaType"
 	MageServer_SendPlayerAction_FullMethodName           = "/mage.v1.MageServer/SendPlayerAction"
 	MageServer_SendSpecialAction_FullMethodName          = "/mage.v1.MageServer/SendSpecialAction"
+	MageServer_ActivateAbility_FullMethodName            = "/mage.v1.MageServer/ActivateAbility"
 	MageServer_MatchStart_FullMethodName                 = "/mage.v1.MageServer/MatchStart"
 	MageServer_MatchQuit_FullMethodName                  = "/mage.v1.MageServer/MatchQuit"
 	MageServer_GetMyActiveGames_FullMethodName           = "/mage.v1.MageServer/GetMyActiveGames"
@@ -189,6 +190,8 @@ type MageServerClient interface {
 	SendPlayerAction(ctx context.Context, in *SendPlayerActionRequest, opts ...grpc.CallOption) (*SendPlayerActionResponse, error)
 	// Send special action (play land, foretell, etc.)
 	SendSpecialAction(ctx context.Context, in *SendSpecialActionRequest, opts ...grpc.CallOption) (*SendSpecialActionResponse, error)
+	// Activate an activated ability on a permanent
+	ActivateAbility(ctx context.Context, in *ActivateAbilityRequest, opts ...grpc.CallOption) (*ActivateAbilityResponse, error)
 	// Start a match
 	MatchStart(ctx context.Context, in *MatchStartRequest, opts ...grpc.CallOption) (*MatchStartResponse, error)
 	// Quit a match
@@ -685,6 +688,16 @@ func (c *mageServerClient) SendSpecialAction(ctx context.Context, in *SendSpecia
 	return out, nil
 }
 
+func (c *mageServerClient) ActivateAbility(ctx context.Context, in *ActivateAbilityRequest, opts ...grpc.CallOption) (*ActivateAbilityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ActivateAbilityResponse)
+	err := c.cc.Invoke(ctx, MageServer_ActivateAbility_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *mageServerClient) MatchStart(ctx context.Context, in *MatchStartRequest, opts ...grpc.CallOption) (*MatchStartResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MatchStartResponse)
@@ -1154,6 +1167,8 @@ type MageServerServer interface {
 	SendPlayerAction(context.Context, *SendPlayerActionRequest) (*SendPlayerActionResponse, error)
 	// Send special action (play land, foretell, etc.)
 	SendSpecialAction(context.Context, *SendSpecialActionRequest) (*SendSpecialActionResponse, error)
+	// Activate an activated ability on a permanent
+	ActivateAbility(context.Context, *ActivateAbilityRequest) (*ActivateAbilityResponse, error)
 	// Start a match
 	MatchStart(context.Context, *MatchStartRequest) (*MatchStartResponse, error)
 	// Quit a match
@@ -1362,6 +1377,9 @@ func (UnimplementedMageServerServer) SendPlayerAction(context.Context, *SendPlay
 }
 func (UnimplementedMageServerServer) SendSpecialAction(context.Context, *SendSpecialActionRequest) (*SendSpecialActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendSpecialAction not implemented")
+}
+func (UnimplementedMageServerServer) ActivateAbility(context.Context, *ActivateAbilityRequest) (*ActivateAbilityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ActivateAbility not implemented")
 }
 func (UnimplementedMageServerServer) MatchStart(context.Context, *MatchStartRequest) (*MatchStartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MatchStart not implemented")
@@ -2236,6 +2254,24 @@ func _MageServer_SendSpecialAction_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MageServer_ActivateAbility_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ActivateAbilityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MageServerServer).ActivateAbility(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MageServer_ActivateAbility_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MageServerServer).ActivateAbility(ctx, req.(*ActivateAbilityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MageServer_MatchStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MatchStartRequest)
 	if err := dec(in); err != nil {
@@ -3090,6 +3126,10 @@ var MageServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendSpecialAction",
 			Handler:    _MageServer_SendSpecialAction_Handler,
+		},
+		{
+			MethodName: "ActivateAbility",
+			Handler:    _MageServer_ActivateAbility_Handler,
 		},
 		{
 			MethodName: "MatchStart",

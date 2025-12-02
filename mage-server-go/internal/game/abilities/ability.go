@@ -109,11 +109,20 @@ type GameContext interface {
 	// DiscardCard discards a card from a player's hand
 	DiscardCard(playerID uuid.UUID, cardID uuid.UUID) error
 
+	// GainLife has a player gain life
+	GainLife(playerID uuid.UUID, amount int) error
+
 	// GetPlayerHand returns the cards in a player's hand
 	GetPlayerHand(playerID uuid.UUID) ([]interface{}, error)
 
 	// GetPermanentsControlledByPlayer returns all permanents controlled by a player
 	GetPermanentsControlledByPlayer(playerID uuid.UUID) ([]interface{}, error)
+
+	// GetControllerID returns the controller ID of a permanent/card
+	GetControllerID(objectID uuid.UUID) (uuid.UUID, error)
+
+	// GetCardColors returns the colors of a card (e.g., ["W", "U"])
+	GetCardColors(cardID uuid.UUID) ([]string, error)
 
 	// CDA support methods
 	// GetAllCardsInZone returns all cards in a specific zone (for Tarmogoyf, Lord of Extinction, etc.)

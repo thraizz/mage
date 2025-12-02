@@ -28,7 +28,9 @@
 		// Drag and play animation props
 		isDragging = false,
 		isBeingPlayed = false,
-		isPending = false
+		isPending = false,
+		// Ability indicator
+		hasActivatedAbilities = false
 	}: {
 		cardId?: string;
 		cardName: string;
@@ -53,6 +55,8 @@
 		isDragging?: boolean;
 		isBeingPlayed?: boolean;
 		isPending?: boolean;
+		// Ability indicator
+		hasActivatedAbilities?: boolean;
 	} = $props();
 
 	// Track tap state changes for animation
@@ -321,6 +325,13 @@
 						{counter.count > 0 ? `+${counter.count}` : counter.count}
 					</div>
 				{/each}
+			</div>
+		{/if}
+
+		<!-- Activated Abilities Badge -->
+		{#if hasActivatedAbilities}
+			<div class="ability-badge" title="Has activated abilities (press A)">
+				<span class="ability-icon">⚡</span>
 			</div>
 		{/if}
 
@@ -791,6 +802,27 @@
 		font-weight: 700;
 		color: white;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+	}
+
+	/* Ability Badge */
+	.ability-badge {
+		position: absolute;
+		top: 0.25rem;
+		left: 0.25rem;
+		width: 1.125rem;
+		height: 1.125rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(251, 191, 36, 0.85);
+		border-radius: 50%;
+		z-index: 2;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	}
+
+	.ability-icon {
+		font-size: 0.6875rem;
+		line-height: 1;
 	}
 
 	/* Loading Spinner */

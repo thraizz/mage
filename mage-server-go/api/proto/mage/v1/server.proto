@@ -151,6 +151,9 @@ service MageServer {
   // Send special action (play land, foretell, etc.)
   rpc SendSpecialAction(SendSpecialActionRequest) returns (SendSpecialActionResponse);
 
+  // Activate an activated ability on a permanent
+  rpc ActivateAbility(ActivateAbilityRequest) returns (ActivateAbilityResponse);
+
   // Start a match
   rpc MatchStart(MatchStartRequest) returns (MatchStartResponse);
 

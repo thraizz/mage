@@ -1554,31 +1554,38 @@ Implement action to play a card from hand to battlefield.
 **Dependencies:** T057, T059
 
 **Description:**  
-Implement UI for activating non-mana card abilities using a selection-first pattern consistent with casting spells. When a permanent with activatable abilities is selected, display available abilities in an action panel for easy discovery.
+Implement UI for activating non-mana card abilities. Uses the existing "Activate (A)" button in `PriorityActionBar.svelte` combined with card selection. The flow mirrors casting spells: select a permanent, then press A (or click Activate) to see its abilities.
 
 **UX Flow:**
 
 1. Player clicks a permanent on the battlefield to select it
-2. If the permanent has activatable abilities (non-mana), show an **Abilities Panel** near the card or in the action bar area
-3. Panel lists each ability with its cost and effect text
-4. Player clicks an ability to activate it
-5. If ability requires targets → enter targeting mode (T059)
-6. If ability requires mana payment → show mana payment UI (T066)
-7. Server processes activation → game state updates
+2. Player presses **A** or clicks the existing **"Activate"** button in the action bar
+3. An **Abilities Panel** appears showing the selected permanent's activatable abilities
+4. Panel lists each ability with its cost and effect text
+5. Player clicks an ability to activate it
+6. If ability requires targets → enter targeting mode (T059)
+7. If ability requires mana payment → show mana payment UI (T066)
+8. Server processes activation → game state updates
+
+**Edge Cases:**
+
+- If no permanent selected when pressing A → show toast: "Select a permanent first"
+- If selected permanent has no abilities → show toast: "No abilities to activate"
+- Mana abilities continue to work via direct click on lands (existing behavior unchanged)
 
 **Acceptance Criteria:**
 
-- [ ] Select permanent to reveal its activatable abilities
+- [ ] Pressing A / clicking "Activate" opens AbilitiesPanel for selected permanent
 - [ ] `AbilitiesPanel.svelte` component displays available abilities for selected card
-- [ ] Each ability shows: cost (mana/tap symbol), effect text, enabled/disabled state
+- [ ] Each ability shows: cost (mana/tap symbols), effect text, enabled/disabled state
 - [ ] Disabled abilities show reason (e.g., "Already tapped", "Not enough mana")
-- [ ] Click ability to activate (sends `activateAbility` API call)
+- [ ] Click ability row to activate (sends `activateAbility` API call)
 - [ ] Integrates with targeting mode if ability requires targets
 - [ ] Integrates with mana payment UI if ability has mana cost
-- [ ] Panel dismisses when clicking elsewhere or pressing ESC
-- [ ] Keyboard navigation: arrow keys to select ability, Enter to activate
+- [ ] Panel dismisses when clicking elsewhere, pressing ESC, or after activation
+- [ ] Keyboard navigation within panel: arrow keys to highlight, Enter to activate
 - [ ] Visual indicator on cards that have activatable abilities (subtle ⚡ badge)
-- [ ] Works on mobile (no right-click dependency)
+- [ ] Toast feedback for edge cases (no selection, no abilities)
 - [ ] Mana abilities continue to work via direct click (existing behavior)
 
 **Files to Create:**
@@ -1588,10 +1595,152 @@ Implement UI for activating non-mana card abilities using a selection-first patt
 
 **Files to Modify:**
 
-- `src/lib/components/game/Card.svelte` - Add ability indicator badge
-- `src/routes/(protected)/game/[id]/+page.svelte` - Show AbilitiesPanel when permanent selected
+- `src/lib/components/game/Card.svelte` - Add ability indicator badge for cards with activatable abilities
+- `src/routes/(protected)/game/[id]/+page.svelte` - Wire up `handleActivateAbility()` to show AbilitiesPanel
 - `src/lib/api/game.ts` - Add `activateAbility(gameId, cardId, abilityId)` API call
-- `src/lib/stores/game.ts` - Track which card's abilities are being shown
+- `src/lib/stores/game.ts` - Track `showAbilitiesPanel` and `abilitiesPanelCardId` state
+
+---
+
+## T062a: Go Card Registry Integration
+
+**Priority:** P1  
+**Dependencies:** T062
+
+**Description:**  
+Integrate the Go card registry (`cards.Registry`) with the game engine's card creation system. Currently, manually implemented cards (like Martyr of Sands) with proper Go ability implementations aren't used because `createStarterCard()` creates cards from JSON repository data instead of the Go registry.
+
+**Acceptance Criteria:**
+
+- [ ] Modify `createStarterCard()` to check Go card registry first
+- [ ] If card has registered Go implementation, use it instead of JSON fallback
+- [ ] Go card abilities automatically registered with `abilityRegistry`
+- [ ] Proper ability UUIDs generated for registered abilities
+- [ ] Fallback to JSON/rules-text parsing if no Go implementation exists
+- [ ] Test with Llanowar Elves, Prodigal Pyromancer, Martyr of Sands
+
+**Files to Modify:**
+
+- `mage-server-go/internal/game/mage_engine.go` - Update `createStarterCard()` to use registry
+- `mage-server-go/internal/game/ability_registry.go` - Auto-register abilities from Go cards
+
+---
+
+## T062b: Variable X Value Selection for Abilities
+
+**Priority:** P1  
+**Dependencies:** T062, T068
+
+**Description:**  
+Implement UI for selecting X values in abilities that have variable costs or effects (e.g., "Reveal X white cards"). Currently, Martyr of Sands automatically uses all white cards; players should choose how many to reveal.
+
+**Acceptance Criteria:**
+
+- [ ] Server detects abilities with X variable in cost or effect
+- [ ] Server sends `GAME_PROMPT` with type `xvalue` and constraints (min, max)
+- [ ] Client shows X value selector (slider or number input)
+- [ ] Player submits X value before ability continues
+- [ ] X value passed to ability resolution
+- [ ] Works with mana X costs (e.g., Fireball) and non-mana X (e.g., Martyr)
+
+**Files to Create:**
+
+- `src/lib/components/game/XValueSelector.svelte` - X value selection UI
+
+**Files to Modify:**
+
+- `mage-server-go/internal/game/mage_engine.go` - Detect X in abilities, send prompt
+- `src/routes/(protected)/game/[id]/+page.svelte` - Handle `xvalue` prompt type
+
+---
+
+## T062c: Card Reveal Mechanism
+
+**Priority:** P2  
+**Dependencies:** T062b
+
+**Description:**  
+Implement proper card reveal mechanics for abilities that reveal cards from hand (e.g., Martyr of Sands "Reveal X white cards"). Currently, cards are counted but not visually revealed to opponents.
+
+**Acceptance Criteria:**
+
+- [ ] When ability requires revealing cards, show card selection UI
+- [ ] Player selects which cards to reveal (filtered by requirement)
+- [ ] Revealed cards shown to all players temporarily
+- [ ] Reveal animation/overlay displays revealed cards
+- [ ] Game log records which cards were revealed
+- [ ] Opponent sees revealed cards in their game view
+
+**Files to Create:**
+
+- `src/lib/components/game/RevealCardsModal.svelte` - Card reveal selection and display
+- `mage-server-go/internal/game/abilities/costs.go` - `RevealCardsCost` implementation
+
+**Files to Modify:**
+
+- `mage-server-go/internal/game/mage_engine.go` - Handle reveal cost payment
+- `src/routes/(protected)/game/[id]/+page.svelte` - Display revealed cards
+
+---
+
+## T062d: Rules-Text Ability Effect Parser Improvements
+
+**Priority:** P1  
+**Dependencies:** T062
+
+**Description:**  
+Enhance the rules-text ability effect parser to handle more common ability patterns. Current implementation handles basic life gain, damage, and draw effects but needs expansion.
+
+**Current Implementation:**
+
+- ✅ Life gain ("gain N life", "gain three times X life")
+- ✅ Card draw ("draw a card", "draw N cards")
+- ✅ Sacrifice cost payment
+- ✅ Mana cost payment
+- ✅ Tap cost payment
+
+**Acceptance Criteria:**
+
+- [ ] Damage effects ("deals N damage to target/player")
+- [ ] Destroy effects ("destroy target creature/permanent")
+- [ ] Bounce effects ("return target to owner's hand")
+- [ ] Counter effects ("counter target spell")
+- [ ] Token creation ("create a N/N token")
+- [ ] +1/+1 counter effects ("put N +1/+1 counters on")
+- [ ] Discard effects ("discard a card")
+- [ ] Mill effects ("mill N cards")
+
+**Files to Modify:**
+
+- `mage-server-go/internal/game/mage_engine.go` - Expand `executeRulesTextAbilityEffect()`
+
+---
+
+## T062e: Ability Mana Payment Flow
+
+**Priority:** P1  
+**Dependencies:** T062, T066
+
+**Description:**  
+When activating abilities with mana costs via the AbilitiesPanel, integrate with the existing mana payment UI (T066) instead of auto-paying from pool.
+
+**Current Behavior:** Mana is auto-paid from pool if available, fails silently if not enough.
+
+**Desired Behavior:** Show mana payment UI, let player choose which mana to spend.
+
+**Acceptance Criteria:**
+
+- [ ] When ability has mana cost, check if player has enough mana
+- [ ] If mana available, show ManaPayment component for selection
+- [ ] Player confirms mana payment before ability activates
+- [ ] If not enough mana, show clear error message
+- [ ] Cancel ability activation if player cancels mana payment
+- [ ] Works with generic mana (player chooses color) and specific mana
+
+**Files to Modify:**
+
+- `src/routes/(protected)/game/[id]/+page.svelte` - Integrate mana payment with ability activation
+- `mage-server-go/internal/game/mage_engine.go` - Send mana prompt before ability activation
 
 ---
 

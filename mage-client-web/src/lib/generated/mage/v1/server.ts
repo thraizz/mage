@@ -80,6 +80,8 @@ import {
   SendDraftCardPickResponse,
 } from "./draft";
 import {
+  ActivateAbilityRequest,
+  ActivateAbilityResponse,
   GameGetViewRequest,
   GameGetViewResponse,
   GameJoinRequest,
@@ -555,6 +557,15 @@ export const MageServerDefinition = {
       requestType: SendSpecialActionRequest,
       requestStream: false,
       responseType: SendSpecialActionResponse,
+      responseStream: false,
+      options: {},
+    },
+    /** Activate an activated ability on a permanent */
+    activateAbility: {
+      name: "ActivateAbility",
+      requestType: ActivateAbilityRequest,
+      requestStream: false,
+      responseType: ActivateAbilityResponse,
       responseStream: false,
       options: {},
     },

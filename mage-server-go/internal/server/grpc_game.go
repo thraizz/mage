@@ -601,6 +601,36 @@ func (s *mageServer) SendSpecialAction(ctx context.Context, req *pb.SendSpecialA
 	return &pb.SendSpecialActionResponse{Success: true}, nil
 }
 
+// ActivateAbility activates an activated ability on a permanent
+func (s *mageServer) ActivateAbility(ctx context.Context, req *pb.ActivateAbilityRequest) (*pb.ActivateAbilityResponse, error) {
+	player, gameInstance, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
+	if errMsg != "" {
+		return &pb.ActivateAbilityResponse{Success: false, Error: errMsg}, nil
+	}
+
+	cardID := req.GetCardId()
+	if cardID == "" {
+		return &pb.ActivateAbilityResponse{Success: false, Error: "card_id is required"}, nil
+	}
+
+	abilityID := req.GetAbilityId()
+	if abilityID == "" {
+		return &pb.ActivateAbilityResponse{Success: false, Error: "ability_id is required"}, nil
+	}
+
+	payload := map[string]interface{}{
+		"card_id":    cardID,
+		"ability_id": abilityID,
+		"targets":    req.GetTargets(),
+	}
+
+	if err := s.gameMgr.SendPlayerAction(gameInstance.ID, player, "ACTIVATE_ABILITY", payload); err != nil {
+		return &pb.ActivateAbilityResponse{Success: false, Error: err.Error()}, nil
+	}
+
+	return &pb.ActivateAbilityResponse{Success: true}, nil
+}
+
 // helper to resolve session/game/player for action RPCs
 func (s *mageServer) resolveGamePlayer(sessionID, gameID string) (string, *game.Game, string) {
 	sess, gameInstance, err := s.resolveGameAccess(sessionID, gameID, false)

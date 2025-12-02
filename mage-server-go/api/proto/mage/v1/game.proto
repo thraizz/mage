@@ -150,6 +150,20 @@ message SendSpecialActionResponse {
   string error = 2;
 }
 
+// Activate an activated ability on a permanent
+message ActivateAbilityRequest {
+  string session_id = 1;
+  string game_id = 2;
+  string card_id = 3;      // Permanent with the ability
+  string ability_id = 4;   // Specific ability to activate
+  repeated string targets = 5;  // Target UUIDs if required
+}
+
+message ActivateAbilityResponse {
+  bool success = 1;
+  string error = 2;
+}
+
 message MatchStartRequest {
   string session_id = 1;
   string table_id = 2;

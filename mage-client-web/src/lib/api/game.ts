@@ -23,6 +23,8 @@ import type {
 	SendPlayerManaTypeResponse,
 	SendSpecialActionRequest,
 	SendSpecialActionResponse,
+	ActivateAbilityRequest,
+	ActivateAbilityResponse,
 	MatchQuitRequest,
 	MatchQuitResponse,
 	PlayerAction
@@ -393,4 +395,39 @@ export async function advancePhase(gameId: string): Promise<void> {
  */
 export async function activateManaAbility(gameId: string, permanentId: string): Promise<void> {
 	return sendSpecialAction(gameId, SpecialActionType.ACTIVATE_MANA_ABILITY, permanentId);
+}
+
+/**
+ * Activate an activated ability on a permanent (non-mana abilities)
+ * Per MTG Rule 602: Activated abilities use the stack
+ */
+export async function activateAbility(
+	gameId: string,
+	cardId: string,
+	abilityId: string,
+	targets: string[] = []
+): Promise<void> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	const request: ActivateAbilityRequest = {
+		sessionId,
+		gameId,
+		cardId,
+		abilityId,
+		targets
+	};
+
+	const response = await client.call<ActivateAbilityRequest, ActivateAbilityResponse>(
+		'ActivateAbility',
+		request
+	);
+
+	if (!response.success) {
+		throw new Error(response.error || 'Failed to activate ability');
+	}
 }

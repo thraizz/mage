@@ -170,6 +170,8 @@ func (h *HTTPJSONHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleMatchQuit(ctx, w, r)
 	case "SendSpecialAction":
 		h.handleSendSpecialAction(ctx, w, r)
+	case "ActivateAbility":
+		h.handleActivateAbility(ctx, w, r)
 	case "GetMyActiveGames":
 		h.handleGetMyActiveGames(ctx, w, r)
 
@@ -1172,6 +1174,23 @@ func (h *HTTPJSONHandler) handleSendSpecialAction(ctx context.Context, w http.Re
 	}
 
 	resp, err := h.mageServer.SendSpecialAction(ctx, &req)
+	if err != nil {
+		h.writeErrorResponse(w, err)
+		return
+	}
+
+	h.writeSuccessResponse(w, resp)
+}
+
+// handleActivateAbility handles the ActivateAbility method for activating abilities on permanents
+func (h *HTTPJSONHandler) handleActivateAbility(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	var req pb.ActivateAbilityRequest
+	if err := h.unmarshalRequest(r, &req); err != nil {
+		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.mageServer.ActivateAbility(ctx, &req)
 	if err != nil {
 		h.writeErrorResponse(w, err)
 		return
