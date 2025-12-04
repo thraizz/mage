@@ -22,7 +22,7 @@ func NewNightmaresThirst(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainLifeEffect(1)).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

@@ -21,8 +21,8 @@ func NewTendrilsOfCorruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(xValue)).
-		AddEffect(abilities.NewGainLifeEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: GainLifeEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

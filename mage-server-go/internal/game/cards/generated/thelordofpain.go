@@ -27,7 +27,7 @@ func NewTheLordOfPain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewDamageEffect(TheLordOfPainValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

@@ -26,7 +26,7 @@ func NewWaxmaneBaku(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
-		AddEffect(abilities.NewTapEffect("tap X target creatures")).
+		// TODO: TapTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

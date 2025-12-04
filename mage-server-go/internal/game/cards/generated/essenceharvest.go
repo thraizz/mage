@@ -21,8 +21,8 @@ func NewEssenceHarvest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES)).
-		AddEffect(abilities.NewLoseLifeEffect(GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES)).
+		// TODO: GainLifeEffect with complex parameters
+		// TODO: LoseLifeTargetEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

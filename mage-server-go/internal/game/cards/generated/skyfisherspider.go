@@ -26,7 +26,7 @@ func NewSkyfisherSpider(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewDiesTrigger(card.ID)).
-		AddEffect(abilities.NewGainLifeEffect(xValue)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)

@@ -23,7 +23,7 @@ func NewHealersHeaddress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(0, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainAbility, AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

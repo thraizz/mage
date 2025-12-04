@@ -28,7 +28,7 @@ func NewBranchOfBoseiju(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(LandsYouControlCount.instance, LandsYouControlCount.instance)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

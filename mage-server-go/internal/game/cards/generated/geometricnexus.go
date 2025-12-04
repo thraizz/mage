@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -27,7 +26,7 @@ func NewGeometricNexus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeCharge.CreateInstance(0), GeometricNexusMVValue.instance, false)).
+		// TODO: AddCountersSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

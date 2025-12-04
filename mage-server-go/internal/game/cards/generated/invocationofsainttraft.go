@@ -37,7 +37,7 @@ func NewInvocationOfSaintTraft(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

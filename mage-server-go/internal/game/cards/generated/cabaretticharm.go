@@ -27,7 +27,7 @@ func NewCabarettiCharm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(CreaturesYouControlCount.PLURAL)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(1, 1)).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).

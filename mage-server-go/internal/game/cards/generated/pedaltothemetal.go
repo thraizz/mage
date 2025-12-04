@@ -22,7 +22,7 @@ func NewPedalToTheMetal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

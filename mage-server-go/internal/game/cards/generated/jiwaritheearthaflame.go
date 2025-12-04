@@ -26,7 +26,7 @@ func NewJiwariTheEarthAflame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

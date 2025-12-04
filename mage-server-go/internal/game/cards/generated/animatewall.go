@@ -24,7 +24,7 @@ func NewAnimateWall(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(canAttackAbility, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		Build()
 	if err != nil {

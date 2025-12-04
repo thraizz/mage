@@ -28,7 +28,7 @@ func NewHonoredDreyleader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(0), xValue)).
+		// TODO: AddCountersSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

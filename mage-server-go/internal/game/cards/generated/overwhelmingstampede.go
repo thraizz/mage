@@ -22,7 +22,7 @@ func NewOverwhelmingStampede(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES, GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES, false)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {

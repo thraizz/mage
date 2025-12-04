@@ -6,7 +6,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
 	"github.com/magefree/mage-server-go/internal/game/counters"
-	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -26,7 +25,7 @@ func NewTheAetherspark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeLoyalty.CreateInstance(0), SavedDamageValue.MANY)).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeLoyalty.CreateInstance(0), abilities.SavedDamageValueInstance)).
 		// TODO: GainAbilitySourceEffect with complex parameters
 		Build()
 	if err != nil {

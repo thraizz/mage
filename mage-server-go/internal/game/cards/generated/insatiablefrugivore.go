@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -25,7 +24,7 @@ func NewInsatiableFrugivore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
+		// TODO: BoostControlledEffect with complex parameters
 		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)

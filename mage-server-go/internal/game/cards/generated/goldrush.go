@@ -26,7 +26,7 @@ func NewGoldRush(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
 		Build()

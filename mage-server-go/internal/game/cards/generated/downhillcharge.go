@@ -21,7 +21,7 @@ func NewDownhillCharge(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, StaticValue.get(0))).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

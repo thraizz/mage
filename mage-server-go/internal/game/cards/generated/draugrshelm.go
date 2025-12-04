@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -24,7 +23,7 @@ func NewDraugrsHelm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(2, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

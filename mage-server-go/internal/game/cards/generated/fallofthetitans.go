@@ -21,7 +21,7 @@ func NewFallOfTheTitans(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance, true)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTargets(0, 2, abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

@@ -26,7 +26,7 @@ func NewQalaAjanisPridemate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(CountersSourceCount.ANY, StaticValue.get(0), true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

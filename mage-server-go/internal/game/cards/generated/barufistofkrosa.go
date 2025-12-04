@@ -25,11 +25,11 @@ func NewBaruFistOfKrosa(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewBoostEffect(1, 1, greenCreatureFilter)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, greenCreatureFilter)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

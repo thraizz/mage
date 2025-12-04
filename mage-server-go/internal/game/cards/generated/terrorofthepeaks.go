@@ -26,7 +26,7 @@ func NewTerrorOfThePeaks(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(TerrorOfThePeaksValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

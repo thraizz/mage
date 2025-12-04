@@ -22,8 +22,8 @@ func NewVeteransArmaments(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.EQUIPMENT)).
+		// TODO: BoostSourceEffect with complex parameters
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

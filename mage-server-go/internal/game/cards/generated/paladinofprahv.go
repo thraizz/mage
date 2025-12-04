@@ -30,7 +30,7 @@ func NewPaladinOfPrahv(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewGainLifeEffect(abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

@@ -22,11 +22,11 @@ func NewArenaOfTheAncients(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewTapEffect(legendaryFilter)).
+		// TODO: TapAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect(legendaryFilter)).
+		// TODO: TapAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

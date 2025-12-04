@@ -47,7 +47,7 @@ func NewRollingHamsphere(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

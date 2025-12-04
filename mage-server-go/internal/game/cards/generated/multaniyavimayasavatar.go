@@ -33,7 +33,7 @@ func NewMultaniYavimayasAvatar(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	//   - ReturnSourceFromGraveyardToHandEffect()
 	// card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(powerToughnessValue, powerToughnessValue)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

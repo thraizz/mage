@@ -22,7 +22,7 @@ func NewBerserk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(TargetPermanentPowerCount.instance, StaticValue.get(0))).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

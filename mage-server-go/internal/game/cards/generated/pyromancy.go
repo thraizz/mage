@@ -21,7 +21,7 @@ func NewPyromancy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(DiscardCostCardManaValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

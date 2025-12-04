@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -22,8 +21,8 @@ func NewRepulsiveMutation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect(GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES)).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1), GetXValue.instance)).
+		// TODO: CounterUnlessPaysEffect with complex parameters
+		// TODO: AddCountersTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

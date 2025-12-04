@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -40,7 +39,7 @@ func NewFelineSovereign(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filterCat, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		// TODO: GainAbilityAllEffect with complex parameters
 		Build()
 	if err != nil {

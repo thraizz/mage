@@ -23,7 +23,7 @@ func NewFistsOfFlame(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewBoostEffect(CardsDrawnThisTurnDynamicValue.instance, StaticValue.get(0))).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

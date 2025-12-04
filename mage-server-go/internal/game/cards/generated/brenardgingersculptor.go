@@ -26,7 +26,7 @@ func NewBrenardGingerSculptor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 2, foodOrGolemCreature)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {

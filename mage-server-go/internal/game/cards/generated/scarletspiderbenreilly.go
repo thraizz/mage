@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -29,7 +28,7 @@ func NewScarletSpiderBenReilly(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), ScarletSpiderBenReillyValue.instance, false)).
+		// TODO: AddCountersSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

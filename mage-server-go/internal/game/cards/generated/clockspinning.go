@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -22,7 +21,7 @@ func NewClockspinning(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(counter)).
+		// TODO: AddCountersTargetEffect with complex parameters
 		AddEffect(abilities.NewRemoveCounterTargetEffect()).
 		Build()
 	if err != nil {

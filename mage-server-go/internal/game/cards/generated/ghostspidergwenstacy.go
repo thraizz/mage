@@ -28,7 +28,7 @@ func NewGhostSpiderGwenStacy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordMenace)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

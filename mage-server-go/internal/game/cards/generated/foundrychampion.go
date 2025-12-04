@@ -25,12 +25,12 @@ func NewFoundryChampion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(CreaturesYouControlCount.PLURAL)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(CreaturesYouControlCount.PLURAL)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

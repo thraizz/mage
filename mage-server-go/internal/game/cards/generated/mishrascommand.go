@@ -25,8 +25,8 @@ func NewMishrasCommand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).

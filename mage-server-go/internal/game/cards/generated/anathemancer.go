@@ -25,7 +25,7 @@ func NewAnathemancer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(AnathemancerCount.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

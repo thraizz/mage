@@ -25,7 +25,7 @@ func NewBlastZone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeCharge.CreateInstance(1), GetXValue.instance, true)).
+		// TODO: AddCountersSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).

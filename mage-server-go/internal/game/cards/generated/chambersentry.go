@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -26,7 +25,7 @@ func NewChamberSentry(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

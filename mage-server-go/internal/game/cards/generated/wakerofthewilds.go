@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -25,7 +24,7 @@ func NewWakerOfTheWilds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(0), GetXValue.instance)).
+		// TODO: AddCountersTargetEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

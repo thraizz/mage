@@ -23,7 +23,7 @@ func NewManaCannons(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewDamageEffect(ManaCannonsSpellValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

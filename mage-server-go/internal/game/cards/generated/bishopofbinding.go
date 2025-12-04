@@ -30,7 +30,7 @@ func NewBishopOfBinding(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(BishopOfBindingValue.instance, BishopOfBindingValue.instance)).
+		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

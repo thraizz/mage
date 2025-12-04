@@ -23,12 +23,12 @@ func NewTheRollercrusherRide(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

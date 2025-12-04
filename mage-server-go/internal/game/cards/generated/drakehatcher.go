@@ -28,7 +28,7 @@ func NewDrakeHatcher(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("incubation", 1), SavedDamageValue.MANY, false)).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.NewCounter("incubation", 1), abilities.SavedDamageValueInstance, false)).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)

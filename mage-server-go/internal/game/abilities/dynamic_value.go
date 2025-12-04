@@ -2,6 +2,7 @@ package abilities
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -39,7 +40,7 @@ func (v *StaticValue) Calculate(ctx context.Context, game GameContext, source uu
 }
 
 func (v *StaticValue) GetMessage() string {
-	return ""
+	return fmt.Sprintf("%d", v.value)
 }
 
 func (v *StaticValue) Copy() DynamicValue {
@@ -48,6 +49,25 @@ func (v *StaticValue) Copy() DynamicValue {
 
 func (v *StaticValue) GetValue() int {
 	return v.value
+}
+
+// toDynamicValue converts various types to DynamicValue.
+// - If v is already a DynamicValue, returns it as-is.
+// - If v is an int, wraps it in a StaticValue.
+// - If v is nil, returns a StaticValue of 0.
+func toDynamicValue(v interface{}) DynamicValue {
+	if v == nil {
+		return NewStaticValue(0)
+	}
+	switch val := v.(type) {
+	case int:
+		return NewStaticValue(val)
+	case DynamicValue:
+		// This also handles *StaticValue since it implements DynamicValue
+		return val
+	default:
+		return NewStaticValue(0)
+	}
 }
 
 // ========================================

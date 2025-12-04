@@ -21,7 +21,7 @@ func NewExplosiveWelcome(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(StaticValue.get(5), true, true)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

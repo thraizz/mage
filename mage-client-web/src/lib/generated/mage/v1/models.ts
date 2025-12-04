@@ -317,6 +317,8 @@ export interface CardView {
   ownerId: string;
   counters: CounterView[];
   attachedTo: string[];
+  /** Creature has summoning sickness (can't attack/tap) */
+  summoningSickness: boolean;
   /** Available actions for this card (context-aware, server source of truth) */
   availableActions: CardAction[];
 }
@@ -2267,6 +2269,7 @@ function createBaseCardView(): CardView {
     ownerId: "",
     counters: [],
     attachedTo: [],
+    summoningSickness: false,
     availableActions: [],
   };
 }
@@ -2347,6 +2350,9 @@ export const CardView: MessageFns<CardView> = {
     }
     for (const v of message.attachedTo) {
       writer.uint32(202).string(v!);
+    }
+    if (message.summoningSickness !== false) {
+      writer.uint32(208).bool(message.summoningSickness);
     }
     for (const v of message.availableActions) {
       CardAction.encode(v!, writer.uint32(242).fork()).join();
@@ -2561,6 +2567,14 @@ export const CardView: MessageFns<CardView> = {
           message.attachedTo.push(reader.string());
           continue;
         }
+        case 26: {
+          if (tag !== 208) {
+            break;
+          }
+
+          message.summoningSickness = reader.bool();
+          continue;
+        }
         case 30: {
           if (tag !== 242) {
             break;
@@ -2611,6 +2625,7 @@ export const CardView: MessageFns<CardView> = {
       attachedTo: globalThis.Array.isArray(object?.attachedTo)
         ? object.attachedTo.map((e: any) => globalThis.String(e))
         : [],
+      summoningSickness: isSet(object.summoningSickness) ? globalThis.Boolean(object.summoningSickness) : false,
       availableActions: globalThis.Array.isArray(object?.availableActions)
         ? object.availableActions.map((e: any) => CardAction.fromJSON(e))
         : [],
@@ -2694,6 +2709,9 @@ export const CardView: MessageFns<CardView> = {
     if (message.attachedTo?.length) {
       obj.attachedTo = message.attachedTo;
     }
+    if (message.summoningSickness !== false) {
+      obj.summoningSickness = message.summoningSickness;
+    }
     if (message.availableActions?.length) {
       obj.availableActions = message.availableActions.map((e) => CardAction.toJSON(e));
     }
@@ -2730,6 +2748,7 @@ export const CardView: MessageFns<CardView> = {
     message.ownerId = object.ownerId ?? "";
     message.counters = object.counters?.map((e) => CounterView.fromPartial(e)) || [];
     message.attachedTo = object.attachedTo?.map((e) => e) || [];
+    message.summoningSickness = object.summoningSickness ?? false;
     message.availableActions = object.availableActions?.map((e) => CardAction.fromPartial(e)) || [];
     return message;
   },

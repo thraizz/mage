@@ -31,7 +31,7 @@ func NewKembaKhaEnduring(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter2)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

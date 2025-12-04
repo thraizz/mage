@@ -25,7 +25,7 @@ func NewFearsomeTemper(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(2, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(grantedAbility, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		Build()
 	if err != nil {

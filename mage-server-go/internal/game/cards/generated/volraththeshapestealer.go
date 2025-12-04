@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -28,7 +27,7 @@ func NewVolrathTheShapestealer(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1), Outcome.Detriment)).
+		// TODO: AddCountersTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()

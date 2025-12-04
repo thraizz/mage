@@ -22,7 +22,7 @@ func NewMonumentalCorruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewLoseLifeEffect(ArtifactYouControlCount.instance)).
+		// TODO: LoseLifeTargetEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	if err != nil {

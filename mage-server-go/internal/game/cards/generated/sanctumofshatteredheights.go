@@ -23,7 +23,7 @@ func NewSanctumOfShatteredHeights(ownerID uuid.UUID, info *cards.CardInfo) (*gam
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

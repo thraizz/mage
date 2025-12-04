@@ -30,7 +30,7 @@ func NewHeroOfTheDunes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - ReturnFromGraveyardToBattlefieldTargetEffect()
 	// card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 0, filter2, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

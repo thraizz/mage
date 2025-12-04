@@ -31,7 +31,7 @@ func NewRustHarvester(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		AddManaCost("{2}").
 		AddTapCost().
 		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1))).
-		AddEffect(abilities.NewDamageEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)

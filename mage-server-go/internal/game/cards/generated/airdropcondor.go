@@ -27,7 +27,7 @@ func NewAirdropCondor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(SacrificeCostCreaturesPower.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)

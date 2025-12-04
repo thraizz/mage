@@ -22,7 +22,7 @@ func NewVampiricFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 0, vampires)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("FirstStrikeAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {

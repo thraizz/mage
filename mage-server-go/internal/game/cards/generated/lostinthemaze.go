@@ -24,14 +24,14 @@ func NewLostInTheMaze(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewTapEffect("tap X target creatures")).
+		// TODO: TapTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect("tap X target creatures")).
+		// TODO: TapTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

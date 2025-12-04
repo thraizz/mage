@@ -20,10 +20,21 @@ type AddCountersSourceEffect struct {
 }
 
 // NewAddCountersSourceEffect creates an effect that adds counters to the source permanent.
-func NewAddCountersSourceEffect(counter *counters.Counter) *AddCountersSourceEffect {
+// Additional parameters are optional and can be: bool (informPlayers), DynamicValue (amount), etc.
+// Java: new AddCountersSourceEffect(counter) or new AddCountersSourceEffect(counter, true) or
+//
+//	new AddCountersSourceEffect(counter, dynamicValue)
+func NewAddCountersSourceEffect(counter *counters.Counter, extra ...interface{}) *AddCountersSourceEffect {
+	inform := false
+	for _, arg := range extra {
+		if b, ok := arg.(bool); ok {
+			inform = b
+		}
+		// Dynamic value and other parameters are ignored for now
+	}
 	return &AddCountersSourceEffect{
 		counter:       counter.Copy(),
-		informPlayers: false,
+		informPlayers: inform,
 	}
 }
 
@@ -89,7 +100,9 @@ type AddCountersTargetEffect struct {
 }
 
 // NewAddCountersTargetEffect creates an effect that adds counters to target permanent(s) or player(s).
-func NewAddCountersTargetEffect(counter *counters.Counter) *AddCountersTargetEffect {
+// Optional extra parameters are ignored (for compatibility with generated code that passes dynamic values)
+func NewAddCountersTargetEffect(counter *counters.Counter, extra ...interface{}) *AddCountersTargetEffect {
+	_ = extra // Ignore extra parameters for now
 	return &AddCountersTargetEffect{
 		counter: counter.Copy(),
 	}
@@ -250,6 +263,41 @@ func (e *AddCountersAllEffect) GetDescription() string {
 		return fmt.Sprintf("put a %s counter on %s", e.counter.Name, targetDesc)
 	}
 	return fmt.Sprintf("put %d %s counters on %s", e.counter.Count, e.counter.Name, targetDesc)
+}
+
+// ========================================
+// Remove Counter Effect
+// ========================================
+
+// RemoveCounterTargetEffect removes counters from target permanents or players.
+type RemoveCounterTargetEffect struct {
+	counter *counters.Counter
+}
+
+// NewRemoveCounterTargetEffect creates an effect that removes counters from a target.
+// Optional parameters are ignored (for transpiler compatibility).
+// Can be called with no arguments for placeholder effect.
+func NewRemoveCounterTargetEffect(args ...interface{}) *RemoveCounterTargetEffect {
+	effect := &RemoveCounterTargetEffect{}
+	for _, arg := range args {
+		if c, ok := arg.(*counters.Counter); ok && c != nil {
+			effect.counter = c.Copy()
+			break
+		}
+	}
+	return effect
+}
+
+func (e *RemoveCounterTargetEffect) Apply(ctx context.Context, game GameContext, source uuid.UUID, targets []uuid.UUID) error {
+	// TODO: Implement counter removal
+	return fmt.Errorf("remove counter target effect not yet implemented")
+}
+
+func (e *RemoveCounterTargetEffect) GetDescription() string {
+	if e.counter == nil {
+		return "remove counters"
+	}
+	return fmt.Sprintf("remove %d %s counter(s)", e.counter.Count, e.counter.Name)
 }
 
 // ========================================

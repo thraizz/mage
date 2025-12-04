@@ -36,14 +36,14 @@ func NewTidalInfluence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(-2, -0, filterBlue, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 0, filterBlue, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

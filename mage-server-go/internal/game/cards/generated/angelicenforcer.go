@@ -30,7 +30,7 @@ func NewAngelicEnforcer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHexproof)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(ControllerLifeCount.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

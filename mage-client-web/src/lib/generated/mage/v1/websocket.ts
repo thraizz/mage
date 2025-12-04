@@ -60,6 +60,8 @@ export enum CallbackMethod {
   GAME_GET_MULTI_AMOUNT = 85,
   GAME_OVER = 86,
   END_GAME_INFO = 87,
+  /** GAME_ASSIGN_DAMAGE - Combat damage assignment prompt */
+  GAME_ASSIGN_DAMAGE = 88,
   /** REPLAY_GAME - Replay Events */
   REPLAY_GAME = 90,
   REPLAY_INIT = 91,
@@ -193,6 +195,9 @@ export function callbackMethodFromJSON(object: any): CallbackMethod {
     case 87:
     case "END_GAME_INFO":
       return CallbackMethod.END_GAME_INFO;
+    case 88:
+    case "GAME_ASSIGN_DAMAGE":
+      return CallbackMethod.GAME_ASSIGN_DAMAGE;
     case 90:
     case "REPLAY_GAME":
       return CallbackMethod.REPLAY_GAME;
@@ -296,6 +301,8 @@ export function callbackMethodToJSON(object: CallbackMethod): string {
       return "GAME_OVER";
     case CallbackMethod.END_GAME_INFO:
       return "END_GAME_INFO";
+    case CallbackMethod.GAME_ASSIGN_DAMAGE:
+      return "GAME_ASSIGN_DAMAGE";
     case CallbackMethod.REPLAY_GAME:
       return "REPLAY_GAME";
     case CallbackMethod.REPLAY_INIT:
@@ -539,6 +546,32 @@ export interface ReplayUpdateData {
 
 export interface ReplayDoneData {
   gameId: string;
+}
+
+/**
+ * Combat damage assignment prompt data
+ * Sent when a player needs to manually assign combat damage (multiple blockers, trample)
+ */
+export interface GameAssignDamageData {
+  message: string;
+  attackerId: string;
+  attackerName: string;
+  attackerPower: number;
+  blockers: DamageTarget[];
+  hasTrample: boolean;
+  defendingPlayerId: string;
+  defendingPlayerName: string;
+}
+
+/** Target for damage assignment */
+export interface DamageTarget {
+  id: string;
+  name: string;
+  toughness: number;
+  /** Damage already marked on this creature */
+  markedDamage: number;
+  /** Damage assignment order (0 = first to receive lethal) */
+  order: number;
 }
 
 function createBaseServerEvent(): ServerEvent {
@@ -3993,6 +4026,313 @@ export const ReplayDoneData: MessageFns<ReplayDoneData> = {
   fromPartial(object: DeepPartial<ReplayDoneData>): ReplayDoneData {
     const message = createBaseReplayDoneData();
     message.gameId = object.gameId ?? "";
+    return message;
+  },
+};
+
+function createBaseGameAssignDamageData(): GameAssignDamageData {
+  return {
+    message: "",
+    attackerId: "",
+    attackerName: "",
+    attackerPower: 0,
+    blockers: [],
+    hasTrample: false,
+    defendingPlayerId: "",
+    defendingPlayerName: "",
+  };
+}
+
+export const GameAssignDamageData: MessageFns<GameAssignDamageData> = {
+  encode(message: GameAssignDamageData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    if (message.attackerId !== "") {
+      writer.uint32(18).string(message.attackerId);
+    }
+    if (message.attackerName !== "") {
+      writer.uint32(26).string(message.attackerName);
+    }
+    if (message.attackerPower !== 0) {
+      writer.uint32(32).int32(message.attackerPower);
+    }
+    for (const v of message.blockers) {
+      DamageTarget.encode(v!, writer.uint32(42).fork()).join();
+    }
+    if (message.hasTrample !== false) {
+      writer.uint32(48).bool(message.hasTrample);
+    }
+    if (message.defendingPlayerId !== "") {
+      writer.uint32(58).string(message.defendingPlayerId);
+    }
+    if (message.defendingPlayerName !== "") {
+      writer.uint32(66).string(message.defendingPlayerName);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GameAssignDamageData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameAssignDamageData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.attackerId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.attackerName = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.attackerPower = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.blockers.push(DamageTarget.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.hasTrample = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.defendingPlayerId = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.defendingPlayerName = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GameAssignDamageData {
+    return {
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      attackerId: isSet(object.attackerId) ? globalThis.String(object.attackerId) : "",
+      attackerName: isSet(object.attackerName) ? globalThis.String(object.attackerName) : "",
+      attackerPower: isSet(object.attackerPower) ? globalThis.Number(object.attackerPower) : 0,
+      blockers: globalThis.Array.isArray(object?.blockers)
+        ? object.blockers.map((e: any) => DamageTarget.fromJSON(e))
+        : [],
+      hasTrample: isSet(object.hasTrample) ? globalThis.Boolean(object.hasTrample) : false,
+      defendingPlayerId: isSet(object.defendingPlayerId) ? globalThis.String(object.defendingPlayerId) : "",
+      defendingPlayerName: isSet(object.defendingPlayerName) ? globalThis.String(object.defendingPlayerName) : "",
+    };
+  },
+
+  toJSON(message: GameAssignDamageData): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.attackerId !== "") {
+      obj.attackerId = message.attackerId;
+    }
+    if (message.attackerName !== "") {
+      obj.attackerName = message.attackerName;
+    }
+    if (message.attackerPower !== 0) {
+      obj.attackerPower = Math.round(message.attackerPower);
+    }
+    if (message.blockers?.length) {
+      obj.blockers = message.blockers.map((e) => DamageTarget.toJSON(e));
+    }
+    if (message.hasTrample !== false) {
+      obj.hasTrample = message.hasTrample;
+    }
+    if (message.defendingPlayerId !== "") {
+      obj.defendingPlayerId = message.defendingPlayerId;
+    }
+    if (message.defendingPlayerName !== "") {
+      obj.defendingPlayerName = message.defendingPlayerName;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GameAssignDamageData>): GameAssignDamageData {
+    return GameAssignDamageData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameAssignDamageData>): GameAssignDamageData {
+    const message = createBaseGameAssignDamageData();
+    message.message = object.message ?? "";
+    message.attackerId = object.attackerId ?? "";
+    message.attackerName = object.attackerName ?? "";
+    message.attackerPower = object.attackerPower ?? 0;
+    message.blockers = object.blockers?.map((e) => DamageTarget.fromPartial(e)) || [];
+    message.hasTrample = object.hasTrample ?? false;
+    message.defendingPlayerId = object.defendingPlayerId ?? "";
+    message.defendingPlayerName = object.defendingPlayerName ?? "";
+    return message;
+  },
+};
+
+function createBaseDamageTarget(): DamageTarget {
+  return { id: "", name: "", toughness: 0, markedDamage: 0, order: 0 };
+}
+
+export const DamageTarget: MessageFns<DamageTarget> = {
+  encode(message: DamageTarget, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.toughness !== 0) {
+      writer.uint32(24).int32(message.toughness);
+    }
+    if (message.markedDamage !== 0) {
+      writer.uint32(32).int32(message.markedDamage);
+    }
+    if (message.order !== 0) {
+      writer.uint32(40).int32(message.order);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DamageTarget {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDamageTarget();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.toughness = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.markedDamage = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.order = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DamageTarget {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      toughness: isSet(object.toughness) ? globalThis.Number(object.toughness) : 0,
+      markedDamage: isSet(object.markedDamage) ? globalThis.Number(object.markedDamage) : 0,
+      order: isSet(object.order) ? globalThis.Number(object.order) : 0,
+    };
+  },
+
+  toJSON(message: DamageTarget): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.toughness !== 0) {
+      obj.toughness = Math.round(message.toughness);
+    }
+    if (message.markedDamage !== 0) {
+      obj.markedDamage = Math.round(message.markedDamage);
+    }
+    if (message.order !== 0) {
+      obj.order = Math.round(message.order);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DamageTarget>): DamageTarget {
+    return DamageTarget.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DamageTarget>): DamageTarget {
+    const message = createBaseDamageTarget();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    message.toughness = object.toughness ?? 0;
+    message.markedDamage = object.markedDamage ?? 0;
+    message.order = object.order ?? 0;
     return message;
   },
 };

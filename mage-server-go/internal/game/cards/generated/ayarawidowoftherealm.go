@@ -26,8 +26,8 @@ func NewAyaraWidowOfTheRealm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDamageEffect(xValue)).
-		AddEffect(abilities.NewGainLifeEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: GainLifeEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

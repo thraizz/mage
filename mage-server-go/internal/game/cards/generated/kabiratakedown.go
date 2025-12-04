@@ -23,7 +23,7 @@ func NewKabiraTakedown(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "W")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

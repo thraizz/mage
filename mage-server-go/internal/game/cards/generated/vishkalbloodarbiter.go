@@ -30,7 +30,7 @@ func NewVishKalBloodArbiter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability1)
 	ability2 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(VishKalBloodArbiterDynamicValue.instance, VishKalBloodArbiterDynamicValue.instance)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability2)

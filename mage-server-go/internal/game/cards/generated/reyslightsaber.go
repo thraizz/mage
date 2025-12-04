@@ -44,14 +44,14 @@ func NewReysLightsaber(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability3)
 	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ProtectionAbility.from(ObjectColor.RED), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability4)
 	ability5, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(dealsCombatDamageToAPlayerTriggeredAbility, AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

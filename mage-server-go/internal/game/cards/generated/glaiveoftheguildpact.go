@@ -27,7 +27,7 @@ func NewGlaiveOfTheGuildpact(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(GateYouControlCount.instance, StaticValue.get(0))).
+		// TODO: BoostEquippedEffect with complex parameters
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordMenace), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
 		Build()

@@ -31,7 +31,7 @@ func NewImskirIronEater(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(SacrificeCostManaValue.ARTIFACT)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability1)

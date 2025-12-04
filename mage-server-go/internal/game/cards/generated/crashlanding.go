@@ -24,7 +24,7 @@ func NewCrashLanding(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(amount)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	if err != nil {

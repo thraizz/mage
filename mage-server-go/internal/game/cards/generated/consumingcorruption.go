@@ -21,8 +21,8 @@ func NewConsumingCorruption(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(xValue)).
-		AddEffect(abilities.NewGainLifeEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -35,7 +35,7 @@ func NewAlacrianArmory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(0, 1, creatureFilter)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {

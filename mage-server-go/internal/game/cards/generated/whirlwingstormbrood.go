@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -30,7 +29,7 @@ func NewWhirlwingStormbrood(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(3), StaticValue.get(3))).
+		// TODO: AddCountersTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

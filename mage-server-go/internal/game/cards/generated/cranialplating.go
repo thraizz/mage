@@ -26,7 +26,7 @@ func NewCranialPlating(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(ArtifactYouControlCount.instance, StaticValue.get(0))).
+		// TODO: BoostEquippedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

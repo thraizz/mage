@@ -31,7 +31,7 @@ func NewSnowblind(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(SnowblindValue.instanceX, SnowblindValue.instanceY)).
+		// TODO: BoostEnchantedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

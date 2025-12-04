@@ -35,7 +35,7 @@ func NewLichLordOfUnx(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewLoseLifeEffect(xValue)).
+		// TODO: LoseLifeTargetEffect with complex parameters
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

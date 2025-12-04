@@ -27,7 +27,7 @@ func NewAsajjVentress(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDoubleStrike)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(BlockingCreatureCount.SOURCE, BlockingCreatureCount.SOURCE)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

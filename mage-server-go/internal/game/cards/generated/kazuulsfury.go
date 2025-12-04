@@ -23,7 +23,7 @@ func NewKazuulsFury(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.BuildSimpleManaAbility(card.ID, "R")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(SacrificeCostCreaturesPower.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

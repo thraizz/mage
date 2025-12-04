@@ -25,7 +25,7 @@ func NewMengHuoBarbarianKing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filterGreen, true)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

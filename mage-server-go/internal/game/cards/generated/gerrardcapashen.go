@@ -27,13 +27,13 @@ func NewGerrardCapashen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewGainLifeEffect(CardsInTargetHandCount.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(CardsInTargetHandCount.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

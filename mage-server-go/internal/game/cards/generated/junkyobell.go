@@ -23,7 +23,7 @@ func NewJunkyoBell(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewBoostEffect(CreaturesYouControlCount.PLURAL, CreaturesYouControlCount.PLURAL)).
+		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement spell ability with unmapped effects

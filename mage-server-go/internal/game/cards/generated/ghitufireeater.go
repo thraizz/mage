@@ -26,7 +26,7 @@ func NewGhituFireEater(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDamageEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

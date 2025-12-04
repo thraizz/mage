@@ -25,7 +25,7 @@ func NewOrcGeneral(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewBoostEffect(1, 1, filterOrc, true)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

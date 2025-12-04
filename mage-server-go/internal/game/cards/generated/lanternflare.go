@@ -23,12 +23,12 @@ func NewLanternFlare(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(CreaturesYouControlCount.PLURAL)).
-		AddEffect(abilities.NewGainLifeEffect(CreaturesYouControlCount.PLURAL)).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

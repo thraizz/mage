@@ -75,6 +75,7 @@ const (
 	CallbackMethod_GAME_GET_MULTI_AMOUNT  CallbackMethod = 85
 	CallbackMethod_GAME_OVER              CallbackMethod = 86
 	CallbackMethod_END_GAME_INFO          CallbackMethod = 87
+	CallbackMethod_GAME_ASSIGN_DAMAGE     CallbackMethod = 88 // Combat damage assignment prompt
 	// Replay Events
 	CallbackMethod_REPLAY_GAME   CallbackMethod = 90
 	CallbackMethod_REPLAY_INIT   CallbackMethod = 91
@@ -126,6 +127,7 @@ var (
 		85: "GAME_GET_MULTI_AMOUNT",
 		86: "GAME_OVER",
 		87: "END_GAME_INFO",
+		88: "GAME_ASSIGN_DAMAGE",
 		90: "REPLAY_GAME",
 		91: "REPLAY_INIT",
 		92: "REPLAY_UPDATE",
@@ -173,6 +175,7 @@ var (
 		"GAME_GET_MULTI_AMOUNT":       85,
 		"GAME_OVER":                   86,
 		"END_GAME_INFO":               87,
+		"GAME_ASSIGN_DAMAGE":          88,
 		"REPLAY_GAME":                 90,
 		"REPLAY_INIT":                 91,
 		"REPLAY_UPDATE":               92,
@@ -2445,6 +2448,185 @@ func (x *ReplayDoneData) GetGameId() string {
 	return ""
 }
 
+// Combat damage assignment prompt data
+// Sent when a player needs to manually assign combat damage (multiple blockers, trample)
+type GameAssignDamageData struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Message             string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	AttackerId          string                 `protobuf:"bytes,2,opt,name=attacker_id,json=attackerId,proto3" json:"attacker_id,omitempty"`
+	AttackerName        string                 `protobuf:"bytes,3,opt,name=attacker_name,json=attackerName,proto3" json:"attacker_name,omitempty"`
+	AttackerPower       int32                  `protobuf:"varint,4,opt,name=attacker_power,json=attackerPower,proto3" json:"attacker_power,omitempty"`
+	Blockers            []*DamageTarget        `protobuf:"bytes,5,rep,name=blockers,proto3" json:"blockers,omitempty"`
+	HasTrample          bool                   `protobuf:"varint,6,opt,name=has_trample,json=hasTrample,proto3" json:"has_trample,omitempty"`
+	DefendingPlayerId   string                 `protobuf:"bytes,7,opt,name=defending_player_id,json=defendingPlayerId,proto3" json:"defending_player_id,omitempty"`
+	DefendingPlayerName string                 `protobuf:"bytes,8,opt,name=defending_player_name,json=defendingPlayerName,proto3" json:"defending_player_name,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *GameAssignDamageData) Reset() {
+	*x = GameAssignDamageData{}
+	mi := &file_mage_v1_websocket_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GameAssignDamageData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GameAssignDamageData) ProtoMessage() {}
+
+func (x *GameAssignDamageData) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_websocket_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GameAssignDamageData.ProtoReflect.Descriptor instead.
+func (*GameAssignDamageData) Descriptor() ([]byte, []int) {
+	return file_mage_v1_websocket_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *GameAssignDamageData) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GameAssignDamageData) GetAttackerId() string {
+	if x != nil {
+		return x.AttackerId
+	}
+	return ""
+}
+
+func (x *GameAssignDamageData) GetAttackerName() string {
+	if x != nil {
+		return x.AttackerName
+	}
+	return ""
+}
+
+func (x *GameAssignDamageData) GetAttackerPower() int32 {
+	if x != nil {
+		return x.AttackerPower
+	}
+	return 0
+}
+
+func (x *GameAssignDamageData) GetBlockers() []*DamageTarget {
+	if x != nil {
+		return x.Blockers
+	}
+	return nil
+}
+
+func (x *GameAssignDamageData) GetHasTrample() bool {
+	if x != nil {
+		return x.HasTrample
+	}
+	return false
+}
+
+func (x *GameAssignDamageData) GetDefendingPlayerId() string {
+	if x != nil {
+		return x.DefendingPlayerId
+	}
+	return ""
+}
+
+func (x *GameAssignDamageData) GetDefendingPlayerName() string {
+	if x != nil {
+		return x.DefendingPlayerName
+	}
+	return ""
+}
+
+// Target for damage assignment
+type DamageTarget struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Toughness     int32                  `protobuf:"varint,3,opt,name=toughness,proto3" json:"toughness,omitempty"`
+	MarkedDamage  int32                  `protobuf:"varint,4,opt,name=marked_damage,json=markedDamage,proto3" json:"marked_damage,omitempty"` // Damage already marked on this creature
+	Order         int32                  `protobuf:"varint,5,opt,name=order,proto3" json:"order,omitempty"`                                   // Damage assignment order (0 = first to receive lethal)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DamageTarget) Reset() {
+	*x = DamageTarget{}
+	mi := &file_mage_v1_websocket_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DamageTarget) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DamageTarget) ProtoMessage() {}
+
+func (x *DamageTarget) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_websocket_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DamageTarget.ProtoReflect.Descriptor instead.
+func (*DamageTarget) Descriptor() ([]byte, []int) {
+	return file_mage_v1_websocket_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *DamageTarget) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DamageTarget) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DamageTarget) GetToughness() int32 {
+	if x != nil {
+		return x.Toughness
+	}
+	return 0
+}
+
+func (x *DamageTarget) GetMarkedDamage() int32 {
+	if x != nil {
+		return x.MarkedDamage
+	}
+	return 0
+}
+
+func (x *DamageTarget) GetOrder() int32 {
+	if x != nil {
+		return x.Order
+	}
+	return 0
+}
+
 var File_mage_v1_websocket_proto protoreflect.FileDescriptor
 
 const file_mage_v1_websocket_proto_rawDesc = "" +
@@ -2599,7 +2781,24 @@ const file_mage_v1_websocket_proto_rawDesc = "" +
 	"\x10ReplayUpdateData\x12%\n" +
 	"\x04game\x18\x01 \x01(\v2\x11.mage.v1.GameViewR\x04game\")\n" +
 	"\x0eReplayDoneData\x12\x17\n" +
-	"\agame_id\x18\x01 \x01(\tR\x06gameId*\x84\a\n" +
+	"\agame_id\x18\x01 \x01(\tR\x06gameId\"\xd5\x02\n" +
+	"\x14GameAssignDamageData\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\x12\x1f\n" +
+	"\vattacker_id\x18\x02 \x01(\tR\n" +
+	"attackerId\x12#\n" +
+	"\rattacker_name\x18\x03 \x01(\tR\fattackerName\x12%\n" +
+	"\x0eattacker_power\x18\x04 \x01(\x05R\rattackerPower\x121\n" +
+	"\bblockers\x18\x05 \x03(\v2\x15.mage.v1.DamageTargetR\bblockers\x12\x1f\n" +
+	"\vhas_trample\x18\x06 \x01(\bR\n" +
+	"hasTrample\x12.\n" +
+	"\x13defending_player_id\x18\a \x01(\tR\x11defendingPlayerId\x122\n" +
+	"\x15defending_player_name\x18\b \x01(\tR\x13defendingPlayerName\"\x8b\x01\n" +
+	"\fDamageTarget\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
+	"\ttoughness\x18\x03 \x01(\x05R\ttoughness\x12#\n" +
+	"\rmarked_damage\x18\x04 \x01(\x05R\fmarkedDamage\x12\x14\n" +
+	"\x05order\x18\x05 \x01(\x05R\x05order*\x9c\a\n" +
 	"\x0eCallbackMethod\x12\x1f\n" +
 	"\x1bCALLBACK_METHOD_UNSPECIFIED\x10\x00\x12\x0f\n" +
 	"\vCHATMESSAGE\x10\x01\x12\x14\n" +
@@ -2647,7 +2846,8 @@ const file_mage_v1_websocket_proto_rawDesc = "" +
 	"\x0fGAME_GET_AMOUNT\x10T\x12\x19\n" +
 	"\x15GAME_GET_MULTI_AMOUNT\x10U\x12\r\n" +
 	"\tGAME_OVER\x10V\x12\x11\n" +
-	"\rEND_GAME_INFO\x10W\x12\x0f\n" +
+	"\rEND_GAME_INFO\x10W\x12\x16\n" +
+	"\x12GAME_ASSIGN_DAMAGE\x10X\x12\x0f\n" +
 	"\vREPLAY_GAME\x10Z\x12\x0f\n" +
 	"\vREPLAY_INIT\x10[\x12\x11\n" +
 	"\rREPLAY_UPDATE\x10\\\x12\x0f\n" +
@@ -2666,7 +2866,7 @@ func file_mage_v1_websocket_proto_rawDescGZIP() []byte {
 }
 
 var file_mage_v1_websocket_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_mage_v1_websocket_proto_msgTypes = make([]protoimpl.MessageInfo, 45)
+var file_mage_v1_websocket_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
 var file_mage_v1_websocket_proto_goTypes = []any{
 	(CallbackMethod)(0),             // 0: mage.v1.CallbackMethod
 	(*ServerEvent)(nil),             // 1: mage.v1.ServerEvent
@@ -2712,51 +2912,54 @@ var file_mage_v1_websocket_proto_goTypes = []any{
 	(*ReplayInitData)(nil),          // 41: mage.v1.ReplayInitData
 	(*ReplayUpdateData)(nil),        // 42: mage.v1.ReplayUpdateData
 	(*ReplayDoneData)(nil),          // 43: mage.v1.ReplayDoneData
-	nil,                             // 44: mage.v1.GameTargetData.OptionsEntry
-	nil,                             // 45: mage.v1.GameSelectData.OptionsEntry
-	(*anypb.Any)(nil),               // 46: google.protobuf.Any
-	(*ChatMessage)(nil),             // 47: mage.v1.ChatMessage
-	(*TournamentView)(nil),          // 48: mage.v1.TournamentView
-	(*DraftPickView)(nil),           // 49: mage.v1.DraftPickView
-	(*CardView)(nil),                // 50: mage.v1.CardView
-	(*GameView)(nil),                // 51: mage.v1.GameView
-	(*AbilityView)(nil),             // 52: mage.v1.AbilityView
+	(*GameAssignDamageData)(nil),    // 44: mage.v1.GameAssignDamageData
+	(*DamageTarget)(nil),            // 45: mage.v1.DamageTarget
+	nil,                             // 46: mage.v1.GameTargetData.OptionsEntry
+	nil,                             // 47: mage.v1.GameSelectData.OptionsEntry
+	(*anypb.Any)(nil),               // 48: google.protobuf.Any
+	(*ChatMessage)(nil),             // 49: mage.v1.ChatMessage
+	(*TournamentView)(nil),          // 50: mage.v1.TournamentView
+	(*DraftPickView)(nil),           // 51: mage.v1.DraftPickView
+	(*CardView)(nil),                // 52: mage.v1.CardView
+	(*GameView)(nil),                // 53: mage.v1.GameView
+	(*AbilityView)(nil),             // 54: mage.v1.AbilityView
 }
 var file_mage_v1_websocket_proto_depIdxs = []int32{
 	0,  // 0: mage.v1.ServerEvent.method:type_name -> mage.v1.CallbackMethod
-	46, // 1: mage.v1.ServerEvent.data:type_name -> google.protobuf.Any
-	47, // 2: mage.v1.ChatMessageData.message:type_name -> mage.v1.ChatMessage
-	48, // 3: mage.v1.TournamentInitData.tournament:type_name -> mage.v1.TournamentView
-	48, // 4: mage.v1.TournamentUpdateData.tournament:type_name -> mage.v1.TournamentView
-	48, // 5: mage.v1.TournamentOverData.tournament:type_name -> mage.v1.TournamentView
-	49, // 6: mage.v1.DraftInitData.draft_pick:type_name -> mage.v1.DraftPickView
-	49, // 7: mage.v1.DraftPickData.draft_pick:type_name -> mage.v1.DraftPickView
-	49, // 8: mage.v1.DraftUpdateData.draft_pick:type_name -> mage.v1.DraftPickView
-	50, // 9: mage.v1.SideboardData.deck:type_name -> mage.v1.CardView
-	50, // 10: mage.v1.SideboardData.sideboard:type_name -> mage.v1.CardView
-	50, // 11: mage.v1.ConstructData.cards:type_name -> mage.v1.CardView
-	50, // 12: mage.v1.ViewLimitedDeckData.deck:type_name -> mage.v1.CardView
-	50, // 13: mage.v1.ViewLimitedDeckData.sideboard:type_name -> mage.v1.CardView
-	51, // 14: mage.v1.GameInitData.game:type_name -> mage.v1.GameView
-	51, // 15: mage.v1.GameUpdateData.game:type_name -> mage.v1.GameView
-	51, // 16: mage.v1.GameUpdateAndInformData.game:type_name -> mage.v1.GameView
-	50, // 17: mage.v1.GameTargetData.targets:type_name -> mage.v1.CardView
-	44, // 18: mage.v1.GameTargetData.options:type_name -> mage.v1.GameTargetData.OptionsEntry
-	52, // 19: mage.v1.GameChooseAbilityData.abilities:type_name -> mage.v1.AbilityView
+	48, // 1: mage.v1.ServerEvent.data:type_name -> google.protobuf.Any
+	49, // 2: mage.v1.ChatMessageData.message:type_name -> mage.v1.ChatMessage
+	50, // 3: mage.v1.TournamentInitData.tournament:type_name -> mage.v1.TournamentView
+	50, // 4: mage.v1.TournamentUpdateData.tournament:type_name -> mage.v1.TournamentView
+	50, // 5: mage.v1.TournamentOverData.tournament:type_name -> mage.v1.TournamentView
+	51, // 6: mage.v1.DraftInitData.draft_pick:type_name -> mage.v1.DraftPickView
+	51, // 7: mage.v1.DraftPickData.draft_pick:type_name -> mage.v1.DraftPickView
+	51, // 8: mage.v1.DraftUpdateData.draft_pick:type_name -> mage.v1.DraftPickView
+	52, // 9: mage.v1.SideboardData.deck:type_name -> mage.v1.CardView
+	52, // 10: mage.v1.SideboardData.sideboard:type_name -> mage.v1.CardView
+	52, // 11: mage.v1.ConstructData.cards:type_name -> mage.v1.CardView
+	52, // 12: mage.v1.ViewLimitedDeckData.deck:type_name -> mage.v1.CardView
+	52, // 13: mage.v1.ViewLimitedDeckData.sideboard:type_name -> mage.v1.CardView
+	53, // 14: mage.v1.GameInitData.game:type_name -> mage.v1.GameView
+	53, // 15: mage.v1.GameUpdateData.game:type_name -> mage.v1.GameView
+	53, // 16: mage.v1.GameUpdateAndInformData.game:type_name -> mage.v1.GameView
+	52, // 17: mage.v1.GameTargetData.targets:type_name -> mage.v1.CardView
+	46, // 18: mage.v1.GameTargetData.options:type_name -> mage.v1.GameTargetData.OptionsEntry
+	54, // 19: mage.v1.GameChooseAbilityData.abilities:type_name -> mage.v1.AbilityView
 	28, // 20: mage.v1.GameChoosePileData.piles:type_name -> mage.v1.PileView
-	50, // 21: mage.v1.PileView.cards:type_name -> mage.v1.CardView
-	45, // 22: mage.v1.GameSelectData.options:type_name -> mage.v1.GameSelectData.OptionsEntry
+	52, // 21: mage.v1.PileView.cards:type_name -> mage.v1.CardView
+	47, // 22: mage.v1.GameSelectData.options:type_name -> mage.v1.GameSelectData.OptionsEntry
 	33, // 23: mage.v1.GamePlayManaData.mana_options:type_name -> mage.v1.ManaOption
 	37, // 24: mage.v1.GameGetMultiAmountData.amounts:type_name -> mage.v1.AmountRange
 	39, // 25: mage.v1.GameOverData.results:type_name -> mage.v1.PlayerResult
 	39, // 26: mage.v1.EndGameInfoData.results:type_name -> mage.v1.PlayerResult
-	51, // 27: mage.v1.ReplayInitData.game:type_name -> mage.v1.GameView
-	51, // 28: mage.v1.ReplayUpdateData.game:type_name -> mage.v1.GameView
-	29, // [29:29] is the sub-list for method output_type
-	29, // [29:29] is the sub-list for method input_type
-	29, // [29:29] is the sub-list for extension type_name
-	29, // [29:29] is the sub-list for extension extendee
-	0,  // [0:29] is the sub-list for field type_name
+	53, // 27: mage.v1.ReplayInitData.game:type_name -> mage.v1.GameView
+	53, // 28: mage.v1.ReplayUpdateData.game:type_name -> mage.v1.GameView
+	45, // 29: mage.v1.GameAssignDamageData.blockers:type_name -> mage.v1.DamageTarget
+	30, // [30:30] is the sub-list for method output_type
+	30, // [30:30] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_websocket_proto_init() }
@@ -2771,7 +2974,7 @@ func file_mage_v1_websocket_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_websocket_proto_rawDesc), len(file_mage_v1_websocket_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   45,
+			NumMessages:   47,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -25,7 +25,7 @@ func NewBlightBreathCatoblepas(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

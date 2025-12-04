@@ -25,7 +25,7 @@ func NewAuriokBladewarden(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewBoostEffect(SourcePermanentPowerValue.NOT_NEGATIVE, SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

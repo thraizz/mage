@@ -26,7 +26,7 @@ func NewKagemaroFirstToSuffer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewBoostEffect(xMinusValue, xMinusValue, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

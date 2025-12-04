@@ -25,7 +25,7 @@ func NewTuyaBearclaw(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GreatestAmongPermanentsValue.POWER_OTHER_CONTROLLED_CREATURES, GreatestAmongPermanentsValue.POWER_OTHER_CONTROLLED_CREATURES)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

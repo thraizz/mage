@@ -27,7 +27,7 @@ func NewOmnathLocusOfTheRoil(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()

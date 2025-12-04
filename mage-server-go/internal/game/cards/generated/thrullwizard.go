@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -25,7 +24,7 @@ func NewThrullWizard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewCounterSpellEffect(cost)).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

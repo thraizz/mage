@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
@@ -27,7 +26,7 @@ func NewAzlaskTheSwellingScourge(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(SourceControllerCountersCount.EXPERIENCE, SourceControllerCountersCount.EXPERIENCE)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("IndestructibleAbility", effects.DurationEndOfTurn)).
 		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()

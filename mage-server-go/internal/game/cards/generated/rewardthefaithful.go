@@ -21,7 +21,7 @@ func NewRewardTheFaithful(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(GreatestAmongPermanentsValue.MANAVALUE_CONTROLLED_PERMANENTS)).
+		// TODO: GainLifeTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

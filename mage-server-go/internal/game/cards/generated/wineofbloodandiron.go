@@ -22,7 +22,7 @@ func NewWineOfBloodAndIron(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{4}").
-		AddEffect(abilities.NewBoostEffect(TargetPermanentPowerCount.instance, StaticValue.get(0))).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

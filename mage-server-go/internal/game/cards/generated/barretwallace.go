@@ -28,7 +28,7 @@ func NewBarretWallace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(xValue, true, true)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

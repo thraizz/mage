@@ -307,6 +307,69 @@ func (f *EnchantmentTargetFilter) GetDescription() string {
 }
 
 // ========================================
+// Artifact or Enchantment Target
+// ========================================
+
+// ArtifactOrEnchantmentTargetFilter matches artifacts or enchantments
+// Java: FilterPermanent with ArtifactOrEnchantmentPredicate
+type ArtifactOrEnchantmentTargetFilter struct{}
+
+func NewArtifactOrEnchantmentTargetFilter() *ArtifactOrEnchantmentTargetFilter {
+	return &ArtifactOrEnchantmentTargetFilter{}
+}
+
+func (f *ArtifactOrEnchantmentTargetFilter) Matches(targetID uuid.UUID, game GameContext) bool {
+	// TODO: Check if target is an artifact or enchantment
+	return true
+}
+
+func (f *ArtifactOrEnchantmentTargetFilter) GetDescription() string {
+	return "target artifact or enchantment"
+}
+
+// ========================================
+// Creature or Planeswalker Target
+// ========================================
+
+// CreatureOrPlaneswalkerTargetFilter matches creatures or planeswalkers
+// Java: FilterCreatureOrPlaneswalkerPermanent
+type CreatureOrPlaneswalkerTargetFilter struct{}
+
+func NewCreatureOrPlaneswalkerTargetFilter() *CreatureOrPlaneswalkerTargetFilter {
+	return &CreatureOrPlaneswalkerTargetFilter{}
+}
+
+func (f *CreatureOrPlaneswalkerTargetFilter) Matches(targetID uuid.UUID, game GameContext) bool {
+	// TODO: Check if target is a creature or planeswalker
+	return true
+}
+
+func (f *CreatureOrPlaneswalkerTargetFilter) GetDescription() string {
+	return "target creature or planeswalker"
+}
+
+// ========================================
+// Nonland Permanent Target
+// ========================================
+
+// NonlandPermanentTargetFilter matches permanents that aren't lands
+// Java: FilterNonlandPermanent
+type NonlandPermanentTargetFilter struct{}
+
+func NewNonlandPermanentTargetFilter() *NonlandPermanentTargetFilter {
+	return &NonlandPermanentTargetFilter{}
+}
+
+func (f *NonlandPermanentTargetFilter) Matches(targetID uuid.UUID, game GameContext) bool {
+	// TODO: Check if target is a nonland permanent
+	return true
+}
+
+func (f *NonlandPermanentTargetFilter) GetDescription() string {
+	return "target nonland permanent"
+}
+
+// ========================================
 // Land Target
 // ========================================
 

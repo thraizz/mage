@@ -41,7 +41,7 @@ func NewHuatliDinosaurKnight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(4, 4, filter2)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

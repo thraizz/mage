@@ -1460,32 +1460,38 @@ class GoCodeGenerator:
 
     def generate(self) -> str:
         """Generate complete Go file"""
-        lines = []
-        lines.append(self._generate_header())
-        lines.append(self._generate_function())
-        return '\n'.join(lines)
+        # Generate function first so we can scan for imports
+        func_code = self._generate_function()
+        # Generate header with correct imports based on function code
+        header = self._generate_header(func_code)
+        return header + func_code
 
-    def _generate_header(self) -> str:
-        """Generate package and imports"""
-        # Determine which imports are needed
-        needs_counters = self._needs_counters_import()
-        needs_token = self._needs_token_import()
-        needs_effects = self._needs_effects_import()
-
+    def _generate_header(self, func_code: str) -> str:
+        """Generate package and imports based on what's used in the function code"""
         imports = [
             '"github.com/google/uuid"',
             '"github.com/magefree/mage-server-go/internal/game"',
-            '"github.com/magefree/mage-server-go/internal/game/abilities"',
             '"github.com/magefree/mage-server-go/internal/game/cards"',
         ]
 
-        if needs_counters:
+        # Remove comments from code before checking imports
+        # This ensures we only import packages that are actually used
+        code_without_comments = '\n'.join(
+            line for line in func_code.split('\n')
+            if not line.strip().startswith('//')
+        )
+
+        # Check actual usage in generated code (excluding comments)
+        if 'abilities.' in code_without_comments:
+            imports.append('"github.com/magefree/mage-server-go/internal/game/abilities"')
+
+        if 'counters.' in code_without_comments:
             imports.append('"github.com/magefree/mage-server-go/internal/game/counters"')
 
-        if needs_token:
+        if 'token.' in code_without_comments:
             imports.append('"github.com/magefree/mage-server-go/internal/game/token"')
 
-        if needs_effects:
+        if 'effects.' in code_without_comments:
             imports.append('"github.com/magefree/mage-server-go/internal/game/effects"')
 
         imports_str = '\n\t'.join(imports)
@@ -1500,30 +1506,6 @@ func init() {{
 \tcards.Register("{self.card.name}", New{self.card.java_class})
 }}
 """
-
-    def _needs_counters_import(self) -> bool:
-        """Check if card needs counters import"""
-        for ability in self.card.abilities:
-            for effect_str in ability.effects:
-                if 'Counter' in effect_str:
-                    return True
-        return False
-
-    def _needs_token_import(self) -> bool:
-        """Check if card needs token import"""
-        for ability in self.card.abilities:
-            for effect_str in ability.effects:
-                if 'Token' in effect_str and 'CreateToken' in effect_str:
-                    return True
-        return False
-
-    def _needs_effects_import(self) -> bool:
-        """Check if card needs effects import"""
-        for ability in self.card.abilities:
-            for effect_str in ability.effects:
-                if 'GrantAbilityEffect' in effect_str:
-                    return True
-        return False
 
     def _generate_function(self) -> str:
         """Generate card constructor function"""
@@ -2340,31 +2322,40 @@ func init() {{
 
         # Special handling for GainAbilityAttachedEffect: extract ability and AttachmentType
         if effect_class == 'GainAbilityAttachedEffect':
-            # Extract ability name
+            # Extract AttachmentType (e.g., "AttachmentType.AURA" → "abilities.AttachmentTypeAura")
+            attachment_match = re.search(r'AttachmentType\.(\w+)', params)
+            if not attachment_match:
+                # Can't properly handle without attachment type - generate TODO
+                return 'nil, abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "" /* TODO: fix GainAbilityAttachedEffect params */'
+            
+            attachment_type = attachment_match.group(1)
+            attachment_const = f'abilities.AttachmentType{attachment_type.capitalize()}'
+
+            # Extract Duration (default to WhileOnBattlefield)
+            duration_match = re.search(r'Duration\.(\w+)', params)
+            if duration_match:
+                duration_name = duration_match.group(1)
+                duration_const = AbilityMapper.DURATION_MAP.get(duration_name, 'abilities.DurationWhileOnBattlefield')
+            else:
+                duration_const = 'abilities.DurationWhileOnBattlefield'
+
+            # Try to extract ability name from getInstance() or new XAbility()
             ability_match = re.search(r'(\w+Ability)\.getInstance\(\)|new (\w+Ability)\(\)', params)
             if ability_match:
                 ability_name = ability_match.group(1) or ability_match.group(2)
-
-                # Extract AttachmentType (e.g., "AttachmentType.AURA" → "abilities.AttachmentTypeAura")
-                attachment_match = re.search(r'AttachmentType\.(\w+)', params)
-                if attachment_match:
-                    attachment_type = attachment_match.group(1)
-                    # Convert AURA/EQUIPMENT to AttachmentTypeAura/AttachmentTypeEquipment
-                    attachment_const = f'abilities.AttachmentType{attachment_type.capitalize()}'
-
-                    # Extract Duration (default to WhileOnBattlefield)
-                    duration_match = re.search(r'Duration\.(\w+)', params)
-                    if duration_match:
-                        duration_name = duration_match.group(1)
-                        duration_const = AbilityMapper.DURATION_MAP.get(duration_name, 'abilities.DurationWhileOnBattlefield')
-                    else:
-                        duration_const = 'abilities.DurationWhileOnBattlefield'
-
-                    # Create keyword ability constructor call
-                    ability_call = f'abilities.NewKeywordAbility(card.ID, abilities.Keyword{ability_name.replace("Ability", "")})'
-
-                    # Return with all 4 parameters
-                    return f'{ability_call}, {attachment_const}, {duration_const}, ""'
+                # Create keyword ability constructor call
+                ability_call = f'abilities.NewKeywordAbility(card.ID, abilities.Keyword{ability_name.replace("Ability", "")})'
+                return f'{ability_call}, {attachment_const}, {duration_const}, ""'
+            
+            # Check for variable reference (e.g., "gainedAbility", "effect")
+            # This happens when a complex ability is constructed earlier and passed as a variable
+            var_match = re.search(r'^([a-z]\w*)\s*,', params)
+            if var_match:
+                # Complex ability stored in variable - can't easily convert, use nil with TODO
+                return f'nil /* TODO: complex ability from variable */, {attachment_const}, {duration_const}, ""'
+            
+            # Fallback for any other patterns
+            return f'nil /* TODO: parse GainAbilityAttachedEffect ability */, {attachment_const}, {duration_const}, ""'
 
         # Special handling for GrantAbilityEffect: extract ability and duration
         if effect_class == 'GainAbilityTargetEffect' or 'GainAbility' in effect_class:
@@ -2403,6 +2394,23 @@ func init() {{
             params
         )
 
+        # Convert Java dynamic values to Go (e.g., SourcePermanentPowerValue.NOT_NEGATIVE -> abilities.SourcePermanentPowerValue.NOT_NEGATIVE)
+        dynamic_value_patterns = [
+            (r'SourcePermanentPowerValue\.(\w+)', r'abilities.SourcePermanentPowerValue.\1'),
+            (r'SourcePermanentToughnessValue\.(\w+)', r'abilities.SourcePermanentToughnessValue.\1'),
+            (r'GreatestAmongPermanentsValue\.(\w+)', r'abilities.GreatestAmongPermanentsValue.\1'),
+            (r'SavedDamageValue\.(\w+)', r'abilities.SavedDamageValueInstance'),
+            (r'GetXValue\.instance', r'abilities.GetXValue'),
+            (r'\bxValue\b', r'abilities.GetXValue'),
+            (r'StaticValue\.get\((\d+)\)', r'abilities.NewStaticValue(\1)'),
+            (r'AttachmentType\.(\w+)', lambda m: f'abilities.AttachmentType{m.group(1).capitalize()}'),
+        ]
+        for pattern, replacement in dynamic_value_patterns:
+            params = re.sub(pattern, replacement, params)
+
+        # Replace Java null with Go nil
+        params = re.sub(r'\bnull\b', 'nil', params)
+
         # Parse ability constructor expressions (replace new XAbility() with "XAbility")
         params = re.sub(
             r'new (\w+Ability)\(\)',
@@ -2426,7 +2434,7 @@ func init() {{
             'PutIntoGraveFromBattlefieldAllTriggeredAbility',
             'BandsWithOtherAbility',
             '\\w+Token\\d+',  # Token variants like CatToken3, PegasusToken2, AvatarToken2
-            '\\w+Value',  # Dynamic value objects like ArcheryTrainingValue, xValue, count
+            # Note: \w+Value is handled by dynamic value conversion above
             'MenaceAbility',  # Keyword abilities that should use keyword system
             'RenownAbility',
             'SimpleActivatedAbility',  # Nested ability definitions
@@ -2453,6 +2461,53 @@ func init() {{
         # Clean up ability variable references like "this" or bare variable names
         params = re.sub(r'\bthis\b', '', params)
         params = re.sub(r'\bability\b(?!\w)', '', params)
+
+        # Replace undefined Java variable references with Go placeholder
+        # These are typically class-level static DynamicValue or Filter variables
+        # Pattern: camelCase variables that don't start with "abilities." or other Go prefixes
+        common_dynamic_value_vars = [
+            'artifactYouControlCount', 'creatureYouControlCount', 'enchantmentCount',
+            'landCount', 'planeswalkerCount', 'spellCount', 'countEnchantments',
+            'filterNonSpirit', 'filterRed', 'filterBlue', 'filterGreen', 'filterWhite', 'filterBlack',
+            'filterNonBlack', 'filterNonRed', 'filterNonBlue', 'filterNonGreen', 'filterNonWhite',
+            'filterBlackCreature', 'filterRedCreature', 'filterBlueCreature', 'filterGreenCreature', 'filterWhiteCreature',
+            'filterCreature', 'filterArtifact', 'filterEnchantment', 'filterLand', 'filterPlaneswalker',
+            'creatureFilter', 'artifactFilter', 'enchantmentFilter', 'landFilter',
+            'legendaryFilter', 'soldiersOrKnights', 'filter1', 'filter2', 'filter3', 'filterCreatures',
+            'greenCreatureFilter', 'blueCreatureFilter', 'redCreatureFilter', 'whiteCreatureFilter', 'blackCreatureFilter',
+            'SavedGainedLifeValue', 'SavedDamageValue', 'SavedManaValue',
+            'TargetPermanentPowerCount', 'TargetPermanentToughnessCount',
+            'SacrificeCostCreaturesPower', 'SacrificeCostPower', 'SacrificeCostCreaturesToughness',
+            'dynamicValue', 'count', 'value', 'amount', 'pow', 'tou', 'x',
+            'swamps', 'forests', 'islands', 'mountains', 'plains',
+            'numberCounters', 'chargeCountersCount', 'morphX', 'mv', 'manaValue',
+            'numberOfColors', 'foodOrGolemCreature', 'capitaloffensecount',
+            'totalAmount', 'xval', 'counter', 'unboost', 'numberToPayed', 'landCards',
+            'Outcome', 'boostValue', 'oilCounters', 'elfFilter', 'filterCat',
+            'xPos', 'xNeg', 'filterGoblin', 'boostFilter', 'result',
+            'filterBlocked', 'filterBlocking', 'attackingCreatures', 'cmcBoost',
+            'xValue1', 'xValue2', 'xMinusValue', 'spiritFilter', 'xSum',
+            'attackingValue', 'blockingValue', 'filterBoosted', 'filterBoost', 'rule',
+            'powerToughnessValue', 'costs', 'filterNoAbilities', 'wizardFilter', 'graveCreatures',
+            'chosenPlayerHand', 'originalManaValue', 'filterOrc', 'negativePermanentsCount',
+            'X', 'nonLandCount', 'totalPoison', 'filterStarship', 'otherCats',
+            'controlledLands', 'amountOfWolves', 'landsCount', 'boost', 'dogCount', 'catCount',
+            'controlledKoboldsFilter', 'costX', 'snakeFilter', 'lifeToGainAmount', 'damage',
+            'manaX', 'filterTapped', 'filterUntapped', 'negativeElfCount', 'cost',
+            'filterTreefolk', 'filterAttackingCreatures', 'vampires', 'unboostValue',
+            'GetScryAmount', 'SweepNumber', 'ExileFromHandCostCardConvertedMana',
+            'InstantAndSorceryCastThisTurn', 'TwiceDevouredGoblins',
+        ]
+        for var in common_dynamic_value_vars:
+            params = re.sub(rf'\b{var}\b', 'abilities.NewStaticValue(0) /* TODO: ' + var + ' */', params)
+        
+        # Replace card-specific dynamic values (e.g., AetherfluxReservoirDynamicValue, AjaniValue)
+        # Pattern: Pascal case ending in Value, DynamicValue, or Count
+        params = re.sub(
+            r'\b([A-Z][a-zA-Z]*(?:Dynamic)?(?:Value|Count))\b',
+            r'abilities.NewStaticValue(0) /* TODO: \1 */',
+            params
+        )
 
         # Clean up multiple commas and leading/trailing commas
         params = re.sub(r',\s*,', ',', params)

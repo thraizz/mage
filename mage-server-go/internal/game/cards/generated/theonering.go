@@ -32,7 +32,7 @@ func NewTheOneRing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 		Build()
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(xValue)).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -22,7 +21,7 @@ func NewLogicKnot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect(GetXValue.instance)).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	if err != nil {

@@ -25,7 +25,7 @@ func NewRuinationRioter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewDiesTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -29,7 +28,7 @@ func NewMausoleumWanderer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewCounterSpellEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability1)

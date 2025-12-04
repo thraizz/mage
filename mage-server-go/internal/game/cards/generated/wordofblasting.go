@@ -21,7 +21,7 @@ func NewWordOfBlasting(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(TargetManaValue.instance)).
+		// TODO: DamageTargetControllerEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect()).
 		Build()
 	if err != nil {

@@ -28,7 +28,7 @@ func NewTalonsOfFalkenrath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		Build()
 	if err != nil {
@@ -37,7 +37,7 @@ func NewTalonsOfFalkenrath(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(2, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

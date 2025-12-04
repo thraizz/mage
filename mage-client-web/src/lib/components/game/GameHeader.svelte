@@ -70,9 +70,21 @@
 	function isActive(phaseKey: string): boolean {
 		return phaseKey === currentPhase;
 	}
+
+	// Check if we're in a combat step
+	const isInCombatStep = $derived(
+		['COMBAT', 'DECLARE_ATTACKERS', 'DECLARE_BLOCKERS', 'COMBAT_DAMAGE', 'END_OF_COMBAT'].includes(currentPhase)
+	);
+
+	// Get specific combat step for styling
+	const combatStepClass = $derived(
+		currentPhase === 'DECLARE_ATTACKERS' ? 'attackers' :
+		currentPhase === 'DECLARE_BLOCKERS' ? 'blockers' :
+		currentPhase === 'COMBAT_DAMAGE' ? 'damage' : ''
+	);
 </script>
 
-<header class="game-header" class:has-priority={hasPriority}>
+<header class="game-header" class:has-priority={hasPriority} class:in-combat={isInCombatStep} class:attackers={combatStepClass === 'attackers'} class:blockers={combatStepClass === 'blockers'} class:damage={combatStepClass === 'damage'}>
 	<!-- Left section: Log button and turn info -->
 	<div class="header-left">
 		<button class="log-btn" onclick={onLogClick} title="View game log">
@@ -83,6 +95,21 @@
 			<span class="turn-number">Turn {turn}</span>
 			<span class="turn-player" class:your-turn={isYourTurn}>{turnDisplay}</span>
 		</div>
+		
+		<!-- Combat Phase Badge -->
+		{#if isInCombatStep}
+			<div class="combat-badge" class:attackers={combatStepClass === 'attackers'} class:blockers={combatStepClass === 'blockers'} class:damage={combatStepClass === 'damage'}>
+				{#if combatStepClass === 'attackers'}
+					⚔️ Declare Attackers
+				{:else if combatStepClass === 'blockers'}
+					🛡️ Declare Blockers
+				{:else if combatStepClass === 'damage'}
+					💥 Combat Damage
+				{:else}
+					⚔️ Combat
+				{/if}
+			</div>
+		{/if}
 	</div>
 
 	<!-- Right section: Priority indicator -->
@@ -173,6 +200,107 @@
 	.turn-player.your-turn {
 		color: #f0b429;
 		font-weight: 600;
+	}
+
+	/* Combat Badge */
+	.combat-badge {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.375rem 0.75rem;
+		background: rgba(248, 81, 73, 0.15);
+		border: 1px solid rgba(248, 81, 73, 0.4);
+		border-radius: 9999px;
+		color: #f85149;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		animation: combat-pulse 2s ease-in-out infinite;
+	}
+
+	.combat-badge.attackers {
+		background: rgba(239, 68, 68, 0.15);
+		border-color: rgba(239, 68, 68, 0.5);
+		color: #ef4444;
+	}
+
+	.combat-badge.blockers {
+		background: rgba(59, 130, 246, 0.15);
+		border-color: rgba(59, 130, 246, 0.5);
+		color: #3b82f6;
+	}
+
+	.combat-badge.damage {
+		background: rgba(245, 158, 11, 0.15);
+		border-color: rgba(245, 158, 11, 0.5);
+		color: #f59e0b;
+	}
+
+	@keyframes combat-pulse {
+		0%, 100% {
+			box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.4);
+		}
+		50% {
+			box-shadow: 0 0 0 4px rgba(248, 81, 73, 0);
+		}
+	}
+
+	.combat-badge.attackers {
+		animation-name: combat-pulse-red;
+	}
+
+	@keyframes combat-pulse-red {
+		0%, 100% {
+			box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+		}
+		50% {
+			box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+		}
+	}
+
+	.combat-badge.blockers {
+		animation-name: combat-pulse-blue;
+	}
+
+	@keyframes combat-pulse-blue {
+		0%, 100% {
+			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+		}
+		50% {
+			box-shadow: 0 0 0 4px rgba(59, 130, 246, 0);
+		}
+	}
+
+	.combat-badge.damage {
+		animation-name: combat-pulse-orange;
+	}
+
+	@keyframes combat-pulse-orange {
+		0%, 100% {
+			box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+		}
+		50% {
+			box-shadow: 0 0 0 4px rgba(245, 158, 11, 0);
+		}
+	}
+
+	/* Header combat state styling */
+	.game-header.in-combat {
+		border-bottom-color: rgba(248, 81, 73, 0.4);
+	}
+
+	.game-header.in-combat.attackers {
+		border-bottom-color: rgba(239, 68, 68, 0.5);
+		background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, #0d1117 100%);
+	}
+
+	.game-header.in-combat.blockers {
+		border-bottom-color: rgba(59, 130, 246, 0.5);
+		background: linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, #0d1117 100%);
+	}
+
+	.game-header.in-combat.damage {
+		border-bottom-color: rgba(245, 158, 11, 0.5);
+		background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, #0d1117 100%);
 	}
 
 	/* Right section */

@@ -21,7 +21,7 @@ func NewCunningStrike(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(StaticValue.get(2), true, true)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewAnyTargetFilter()).

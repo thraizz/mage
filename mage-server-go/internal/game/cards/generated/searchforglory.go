@@ -22,7 +22,7 @@ func NewSearchForGlory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(SnowManaSpentValue.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		// TODO: SearchLibraryPutInHandEffect with complex parameters
 		Build()
 	if err != nil {

@@ -21,7 +21,7 @@ func NewMobJustice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(CreaturesYouControlCount.PLURAL)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

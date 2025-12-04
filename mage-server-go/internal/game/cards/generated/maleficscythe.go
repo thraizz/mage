@@ -35,7 +35,7 @@ func NewMaleficScythe(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(xValue, xValue)).
+		// TODO: BoostEquippedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

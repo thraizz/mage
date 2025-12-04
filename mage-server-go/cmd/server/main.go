@@ -16,6 +16,10 @@ import (
 	"github.com/magefree/mage-server-go/internal/config"
 	"github.com/magefree/mage-server-go/internal/draft"
 	"github.com/magefree/mage-server-go/internal/game"
+	"github.com/magefree/mage-server-go/internal/game/cards"
+
+	_ "github.com/magefree/mage-server-go/internal/game/cards/generated" // 30,600 auto-generated cards
+	_ "github.com/magefree/mage-server-go/internal/game/cards/manual"    // Manual card implementations (~8 cards)
 	"github.com/magefree/mage-server-go/internal/mail"
 	_ "github.com/magefree/mage-server-go/internal/plugin" // Import to register game types
 	"github.com/magefree/mage-server-go/internal/repository"
@@ -137,7 +141,8 @@ func main() {
 
 	// Initialize game engine adapter
 	mageEngine := game.NewMageEngine(logger)
-	mageEngine.SetCardRepository(cardRepo) // Enable card metadata lookup
+	mageEngine.SetCardRepository(cardRepo)     // Enable card metadata lookup
+	mageEngine.SetCardBuilder(cards.BuildCard) // Enable Go-implemented cards
 
 	// Set up persistence for crash recovery
 	persistenceAdapter := game.NewPersistenceAdapter(activeGameRepo)

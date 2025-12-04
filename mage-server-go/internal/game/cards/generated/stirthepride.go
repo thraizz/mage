@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -22,7 +21,7 @@ func NewStirThePride(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewGainLifeEffect(abilities.SavedDamageValueInstance)).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		// TODO: GainAbilityControlledEffect with complex parameters
 		Build()

@@ -21,7 +21,7 @@ func NewExpansionExplosion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(StaticValue.get(xValue), true, true)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

@@ -38,7 +38,7 @@ func NewDancersChakrams(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(2, 2)).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(commanderAbility, AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

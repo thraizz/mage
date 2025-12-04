@@ -31,7 +31,7 @@ func NewMetropolisReformer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHexproof)
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewGainLifeEffect(abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

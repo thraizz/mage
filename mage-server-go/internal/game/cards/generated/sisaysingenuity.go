@@ -25,7 +25,7 @@ func NewSisaysIngenuity(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

@@ -27,12 +27,12 @@ func NewTezzeretTheSchemer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue2)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue2)).
+		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

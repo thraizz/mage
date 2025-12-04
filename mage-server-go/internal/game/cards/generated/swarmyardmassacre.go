@@ -26,7 +26,7 @@ func NewSwarmyardMassacre(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue, notSwarmyardFilter, false)).
+		// TODO: BoostAllEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
 		Build()
 	if err != nil {

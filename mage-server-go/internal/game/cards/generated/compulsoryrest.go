@@ -36,7 +36,7 @@ func NewCompulsoryRest(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(grantedAbility, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

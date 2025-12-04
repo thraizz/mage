@@ -24,7 +24,7 @@ func NewCaduceusStaffOfHermes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordIndestructible), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

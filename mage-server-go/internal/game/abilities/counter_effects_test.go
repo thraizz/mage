@@ -172,6 +172,42 @@ func (m *mockCounterGameContext) GetCountersOnPermanent(ctx context.Context, per
 	return 0
 }
 
+func (m *mockCounterGameContext) GetAllCountersOnPermanent(ctx context.Context, permanentID uuid.UUID) map[string]int {
+	return nil
+}
+
+func (m *mockCounterGameContext) RemoveCountersFromPermanent(ctx context.Context, permanentID uuid.UUID, counterName string, amount int) error {
+	return nil
+}
+
+func (m *mockCounterGameContext) GetMultiAmountChoice(ctx context.Context, playerID uuid.UUID, choices []MultiAmountChoice, totalMin, totalMax int, choiceType MultiAmountType) ([]int, error) {
+	return nil, nil
+}
+
+func (m *mockCounterGameContext) IsPermanentTapped(permanentID uuid.UUID) bool {
+	return false
+}
+
+func (m *mockCounterGameContext) GetControllerID(objectID uuid.UUID) (uuid.UUID, error) {
+	return uuid.Nil, nil
+}
+
+func (m *mockCounterGameContext) GetCardColors(cardID uuid.UUID) ([]string, error) {
+	return nil, nil
+}
+
+func (m *mockCounterGameContext) GainLife(playerID uuid.UUID, amount int) error {
+	return nil
+}
+
+func (m *mockCounterGameContext) GetPermanentPower(ctx context.Context, permanentID uuid.UUID) int {
+	return 0
+}
+
+func (m *mockCounterGameContext) GetPermanentToughness(ctx context.Context, permanentID uuid.UUID) int {
+	return 0
+}
+
 // ========================================
 // Tests for AddCountersSourceEffect
 // ========================================

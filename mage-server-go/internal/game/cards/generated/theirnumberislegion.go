@@ -26,7 +26,7 @@ func NewTheirNumberIsLegion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(ArtifactYouControlCount.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffectAttacking(token0_0, 1, true, false)).
 		Build()
 	if err != nil {

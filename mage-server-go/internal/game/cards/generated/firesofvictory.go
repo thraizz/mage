@@ -23,7 +23,7 @@ func NewFiresOfVictory(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewKickerAbility(card.ID, "{2}{U}")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(CardsInControllerHandCount.ANY)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddEffect(abilities.NewConditionalEffect(abilities.NewDrawCardsEffect(1), "kicked")).
 		Build()
 	if err != nil {

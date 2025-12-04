@@ -27,13 +27,13 @@ func NewGraverobberSpider(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordReach)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

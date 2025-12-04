@@ -38,7 +38,7 @@ func NewSongOfStupefaction(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(xValue, StaticValue.get(0))).
+		// TODO: BoostEnchantedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

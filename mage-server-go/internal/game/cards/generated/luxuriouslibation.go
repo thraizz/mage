@@ -26,7 +26,7 @@ func NewLuxuriousLibation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 		return nil, err
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, GetXValue.instance)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewCreateTokenEffect(token0_0)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

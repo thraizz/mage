@@ -31,7 +31,7 @@ func NewDinosaursOnASpaceship(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filterCreature, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationPermanent)).
 		Build()
 	if err != nil {

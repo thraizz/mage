@@ -25,7 +25,7 @@ func NewRaffinesSilencer(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewDiesTrigger(card.ID)).
-		AddEffect(abilities.NewBoostEffect(RaffinesSilencerValue.instance, RaffinesSilencerValue.instance)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

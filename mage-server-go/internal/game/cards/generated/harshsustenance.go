@@ -21,8 +21,8 @@ func NewHarshSustenance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(CreaturesYouControlCount.PLURAL)).
-		AddEffect(abilities.NewGainLifeEffect(CreaturesYouControlCount.PLURAL)).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: GainLifeEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

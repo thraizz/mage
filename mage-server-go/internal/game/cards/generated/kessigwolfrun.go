@@ -26,7 +26,7 @@ func NewKessigWolfRun(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)

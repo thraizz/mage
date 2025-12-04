@@ -27,7 +27,7 @@ func NewGlintRaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GreatestAmongPermanentsValue.MANAVALUE_CONTROLLED_ARTIFACTS, StaticValue.get(0))).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

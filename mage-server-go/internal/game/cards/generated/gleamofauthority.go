@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -45,7 +44,7 @@ func NewGleamOfAuthority(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	//   - AddTapCost()
 	// card.AddAbility(ability3)
 	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(CountersOnControlledCount.instance, CountersOnControlledCount.instance)).
+		// TODO: BoostEnchantedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

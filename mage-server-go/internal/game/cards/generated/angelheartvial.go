@@ -29,7 +29,7 @@ func NewAngelheartVial(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeCharge.CreateInstance(1), SavedDamageValue.MANY)).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeCharge.CreateInstance(1), abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

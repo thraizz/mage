@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -25,7 +24,7 @@ func NewEndlessScream(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(StaticValue.get(0))).
+		// TODO: BoostEnchantedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		Build()
 	if err != nil {
@@ -33,7 +32,7 @@ func NewEndlessScream(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(StaticValue.get(0))).
+		// TODO: BoostEnchantedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

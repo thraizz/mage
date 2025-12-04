@@ -28,7 +28,7 @@ func NewBrionStoutarm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDamageEffect(SacrificeCostCreaturesPower.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)

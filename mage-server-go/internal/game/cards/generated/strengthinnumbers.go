@@ -22,7 +22,7 @@ func NewStrengthInNumbers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

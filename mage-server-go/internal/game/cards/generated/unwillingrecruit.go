@@ -22,7 +22,7 @@ func NewUnwillingRecruit(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewUntapEffect()).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGainControlTargetEffect(abilities.DurationEndOfTurn)).

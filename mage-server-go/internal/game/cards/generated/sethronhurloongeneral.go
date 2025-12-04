@@ -27,7 +27,7 @@ func NewSethronHurloonGeneral(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(1, 0, filter2)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("MenaceAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("HasteAbility", effects.DurationEndOfTurn)).
 		Build()

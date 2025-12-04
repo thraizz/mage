@@ -26,7 +26,7 @@ func NewFoulPresence(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(-1, -1)).
 		AddEffect(abilities.NewBoostEnchantedEffect(-1, -1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBenefit)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

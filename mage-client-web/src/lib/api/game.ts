@@ -431,3 +431,119 @@ export async function activateAbility(
 		throw new Error(response.error || 'Failed to activate ability');
 	}
 }
+
+// ============================================================================
+// Combat Phase API Functions
+// These functions handle declare attackers, blockers, and damage assignment
+// ============================================================================
+
+/**
+ * Declare a creature as an attacker targeting a specific defender
+ * Per MTG Rule 508: Declaring attackers
+ * @param gameId - The game ID
+ * @param cardId - The attacking creature's ID
+ * @param defenderId - The defender (player or planeswalker) being attacked
+ */
+export async function declareAttacker(
+	gameId: string,
+	cardId: string,
+	defenderId: string
+): Promise<void> {
+	return sendPlayerString(gameId, `ATTACK:${cardId}:${defenderId}`);
+}
+
+/**
+ * Finish declaring attackers and move to the next step
+ * Per MTG Rule 508.1: All attackers are declared simultaneously
+ */
+export async function finishDeclaringAttackers(gameId: string): Promise<void> {
+	return sendPlayerString(gameId, 'DONE_ATTACKING');
+}
+
+/**
+ * Declare multiple attackers at once
+ * Convenience function to declare all attackers in sequence
+ * @param gameId - The game ID
+ * @param attackers - Array of attacker declarations
+ */
+export async function declareAttackers(
+	gameId: string,
+	attackers: Array<{ cardId: string; defenderId: string }>
+): Promise<void> {
+	for (const attacker of attackers) {
+		await declareAttacker(gameId, attacker.cardId, attacker.defenderId);
+	}
+	await finishDeclaringAttackers(gameId);
+}
+
+/**
+ * Declare a creature as a blocker of a specific attacker
+ * Per MTG Rule 509: Declaring blockers
+ * @param gameId - The game ID
+ * @param blockerId - The blocking creature's ID
+ * @param attackerId - The attacking creature being blocked
+ */
+export async function declareBlocker(
+	gameId: string,
+	blockerId: string,
+	attackerId: string
+): Promise<void> {
+	return sendPlayerString(gameId, `BLOCK:${blockerId}:${attackerId}`);
+}
+
+/**
+ * Finish declaring blockers and move to the next step
+ * Per MTG Rule 509.1: All blockers are declared simultaneously
+ */
+export async function finishDeclaringBlockers(gameId: string): Promise<void> {
+	return sendPlayerString(gameId, 'DONE_BLOCKING');
+}
+
+/**
+ * Declare multiple blockers at once
+ * Convenience function to declare all blockers in sequence
+ * @param gameId - The game ID
+ * @param blockers - Array of blocker assignments
+ */
+export async function declareBlockers(
+	gameId: string,
+	blockers: Array<{ blockerId: string; attackerId: string }>
+): Promise<void> {
+	for (const blocker of blockers) {
+		await declareBlocker(gameId, blocker.blockerId, blocker.attackerId);
+	}
+	await finishDeclaringBlockers(gameId);
+}
+
+/**
+ * Assign combat damage from an attacker to its blockers and/or defending player
+ * Per MTG Rule 510: Combat damage step
+ * @param gameId - The game ID
+ * @param assignments - Array of damage assignments (targetId + damage amount)
+ */
+export async function assignCombatDamage(
+	gameId: string,
+	assignments: Array<{ targetId: string; damage: number }>
+): Promise<void> {
+	// Format: DAMAGE:targetId:amount for each assignment
+	for (const assignment of assignments) {
+		await sendPlayerString(gameId, `DAMAGE:${assignment.targetId}:${assignment.damage}`);
+	}
+	await sendPlayerString(gameId, 'DONE_DAMAGE');
+}
+
+/**
+ * Skip combat - declare no attackers
+ * Convenience function to immediately finish declaring attackers with none selected
+ */
+export async function skipCombat(gameId: string): Promise<void> {
+	return finishDeclaringAttackers(gameId);
+}
+
+/**
+ * Decline to block - finish declaring blockers with none assigned
+ * Convenience function to immediately finish declaring blockers with none selected
+ */
+export async function declineToBlock(gameId: string): Promise<void> {
+	return finishDeclaringBlockers(gameId);
+}

@@ -23,8 +23,8 @@ func NewIlluminate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0 := abilities.NewKickerAbility(card.ID, "{2}{R}")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
-		AddEffect(abilities.NewConditionalEffect(abilities.NewDamageEffect(GetXValue.instance), "unknown")).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

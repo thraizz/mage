@@ -28,8 +28,8 @@ func NewDranaKalastriaBloodchief(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(StaticValue.get(0))).
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
+		// TODO: BoostTargetEffect with complex parameters
+		// TODO: BoostSourceEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability1)

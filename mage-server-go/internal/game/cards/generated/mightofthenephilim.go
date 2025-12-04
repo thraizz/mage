@@ -21,7 +21,7 @@ func NewMightOfTheNephilim(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(MightOfTheNephilimValue.instance, MightOfTheNephilimValue.instance)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

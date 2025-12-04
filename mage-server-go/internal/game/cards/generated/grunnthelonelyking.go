@@ -27,7 +27,7 @@ func NewGrunnTheLonelyKing(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability0 := abilities.NewKickerAbility(card.ID, "{3}")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(SourcePermanentPowerValue.ALLOW_NEGATIVE, SourcePermanentToughnessValue.instance)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

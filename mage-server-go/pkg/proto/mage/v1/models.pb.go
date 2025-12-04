@@ -1120,32 +1120,33 @@ func (x *PlayerView) GetHasAvailableActions() bool {
 
 // CardView represents a card
 type CardView struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name             string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	DisplayName      string                 `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
-	ManaCost         string                 `protobuf:"bytes,4,opt,name=mana_cost,json=manaCost,proto3" json:"mana_cost,omitempty"`
-	Type             string                 `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
-	SubTypes         string                 `protobuf:"bytes,6,opt,name=sub_types,json=subTypes,proto3" json:"sub_types,omitempty"`
-	SuperTypes       string                 `protobuf:"bytes,7,opt,name=super_types,json=superTypes,proto3" json:"super_types,omitempty"`
-	Color            string                 `protobuf:"bytes,8,opt,name=color,proto3" json:"color,omitempty"`
-	Power            string                 `protobuf:"bytes,9,opt,name=power,proto3" json:"power,omitempty"`
-	Toughness        string                 `protobuf:"bytes,10,opt,name=toughness,proto3" json:"toughness,omitempty"`
-	Loyalty          string                 `protobuf:"bytes,11,opt,name=loyalty,proto3" json:"loyalty,omitempty"`
-	CardNumber       int32                  `protobuf:"varint,12,opt,name=card_number,json=cardNumber,proto3" json:"card_number,omitempty"`
-	ExpansionSetCode string                 `protobuf:"bytes,13,opt,name=expansion_set_code,json=expansionSetCode,proto3" json:"expansion_set_code,omitempty"`
-	Rarity           string                 `protobuf:"bytes,14,opt,name=rarity,proto3" json:"rarity,omitempty"`
-	RulesText        string                 `protobuf:"bytes,15,opt,name=rules_text,json=rulesText,proto3" json:"rules_text,omitempty"`
-	Abilities        []*AbilityView         `protobuf:"bytes,16,rep,name=abilities,proto3" json:"abilities,omitempty"`
-	Tapped           bool                   `protobuf:"varint,17,opt,name=tapped,proto3" json:"tapped,omitempty"`
-	Flipped          bool                   `protobuf:"varint,18,opt,name=flipped,proto3" json:"flipped,omitempty"`
-	Transformed      bool                   `protobuf:"varint,19,opt,name=transformed,proto3" json:"transformed,omitempty"`
-	FaceDown         bool                   `protobuf:"varint,20,opt,name=face_down,json=faceDown,proto3" json:"face_down,omitempty"`
-	Zone             int32                  `protobuf:"varint,21,opt,name=zone,proto3" json:"zone,omitempty"`
-	ControllerId     string                 `protobuf:"bytes,22,opt,name=controller_id,json=controllerId,proto3" json:"controller_id,omitempty"`
-	OwnerId          string                 `protobuf:"bytes,23,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
-	Counters         []*CounterView         `protobuf:"bytes,24,rep,name=counters,proto3" json:"counters,omitempty"`
-	AttachedTo       []string               `protobuf:"bytes,25,rep,name=attached_to,json=attachedTo,proto3" json:"attached_to,omitempty"`
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name              string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	DisplayName       string                 `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	ManaCost          string                 `protobuf:"bytes,4,opt,name=mana_cost,json=manaCost,proto3" json:"mana_cost,omitempty"`
+	Type              string                 `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
+	SubTypes          string                 `protobuf:"bytes,6,opt,name=sub_types,json=subTypes,proto3" json:"sub_types,omitempty"`
+	SuperTypes        string                 `protobuf:"bytes,7,opt,name=super_types,json=superTypes,proto3" json:"super_types,omitempty"`
+	Color             string                 `protobuf:"bytes,8,opt,name=color,proto3" json:"color,omitempty"`
+	Power             string                 `protobuf:"bytes,9,opt,name=power,proto3" json:"power,omitempty"`
+	Toughness         string                 `protobuf:"bytes,10,opt,name=toughness,proto3" json:"toughness,omitempty"`
+	Loyalty           string                 `protobuf:"bytes,11,opt,name=loyalty,proto3" json:"loyalty,omitempty"`
+	CardNumber        int32                  `protobuf:"varint,12,opt,name=card_number,json=cardNumber,proto3" json:"card_number,omitempty"`
+	ExpansionSetCode  string                 `protobuf:"bytes,13,opt,name=expansion_set_code,json=expansionSetCode,proto3" json:"expansion_set_code,omitempty"`
+	Rarity            string                 `protobuf:"bytes,14,opt,name=rarity,proto3" json:"rarity,omitempty"`
+	RulesText         string                 `protobuf:"bytes,15,opt,name=rules_text,json=rulesText,proto3" json:"rules_text,omitempty"`
+	Abilities         []*AbilityView         `protobuf:"bytes,16,rep,name=abilities,proto3" json:"abilities,omitempty"`
+	Tapped            bool                   `protobuf:"varint,17,opt,name=tapped,proto3" json:"tapped,omitempty"`
+	Flipped           bool                   `protobuf:"varint,18,opt,name=flipped,proto3" json:"flipped,omitempty"`
+	Transformed       bool                   `protobuf:"varint,19,opt,name=transformed,proto3" json:"transformed,omitempty"`
+	FaceDown          bool                   `protobuf:"varint,20,opt,name=face_down,json=faceDown,proto3" json:"face_down,omitempty"`
+	Zone              int32                  `protobuf:"varint,21,opt,name=zone,proto3" json:"zone,omitempty"`
+	ControllerId      string                 `protobuf:"bytes,22,opt,name=controller_id,json=controllerId,proto3" json:"controller_id,omitempty"`
+	OwnerId           string                 `protobuf:"bytes,23,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	Counters          []*CounterView         `protobuf:"bytes,24,rep,name=counters,proto3" json:"counters,omitempty"`
+	AttachedTo        []string               `protobuf:"bytes,25,rep,name=attached_to,json=attachedTo,proto3" json:"attached_to,omitempty"`
+	SummoningSickness bool                   `protobuf:"varint,26,opt,name=summoning_sickness,json=summoningSickness,proto3" json:"summoning_sickness,omitempty"` // Creature has summoning sickness (can't attack/tap)
 	// Available actions for this card (context-aware, server source of truth)
 	AvailableActions []*CardAction `protobuf:"bytes,30,rep,name=available_actions,json=availableActions,proto3" json:"available_actions,omitempty"`
 	unknownFields    protoimpl.UnknownFields
@@ -1355,6 +1356,13 @@ func (x *CardView) GetAttachedTo() []string {
 		return x.AttachedTo
 	}
 	return nil
+}
+
+func (x *CardView) GetSummoningSickness() bool {
+	if x != nil {
+		return x.SummoningSickness
+	}
+	return false
 }
 
 func (x *CardView) GetAvailableActions() []*CardAction {
@@ -2916,7 +2924,7 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\x04left\x18\x0f \x01(\bR\x04left\x12\x12\n" +
 	"\x04wins\x18\x10 \x01(\x05R\x04wins\x12\x1b\n" +
 	"\tkept_hand\x18\x11 \x01(\bR\bkeptHand\x122\n" +
-	"\x15has_available_actions\x18\x12 \x01(\bR\x13hasAvailableActions\"\xb8\x06\n" +
+	"\x15has_available_actions\x18\x12 \x01(\bR\x13hasAvailableActions\"\xe7\x06\n" +
 	"\bCardView\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
@@ -2947,7 +2955,8 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\bowner_id\x18\x17 \x01(\tR\aownerId\x120\n" +
 	"\bcounters\x18\x18 \x03(\v2\x14.mage.v1.CounterViewR\bcounters\x12\x1f\n" +
 	"\vattached_to\x18\x19 \x03(\tR\n" +
-	"attachedTo\x12@\n" +
+	"attachedTo\x12-\n" +
+	"\x12summoning_sickness\x18\x1a \x01(\bR\x11summoningSickness\x12@\n" +
 	"\x11available_actions\x18\x1e \x03(\v2\x13.mage.v1.CardActionR\x10availableActions\"E\n" +
 	"\vAbilityView\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +

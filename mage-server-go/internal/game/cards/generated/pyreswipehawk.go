@@ -36,7 +36,7 @@ func NewPyreswipeHawk(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GreatestAmongPermanentsValue.MANAVALUE_CONTROLLED_ARTIFACTS, StaticValue.get(0))).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

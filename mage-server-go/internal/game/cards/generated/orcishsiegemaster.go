@@ -35,7 +35,7 @@ func NewOrcishSiegemaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES, StaticValue.get(0))).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

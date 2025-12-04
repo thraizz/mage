@@ -31,7 +31,7 @@ func NewVerdantEmbrace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(3, 3)).
 		AddEffect(abilities.NewCreateTokenEffect(token1_0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(grantedAbility, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		Build()
 	if err != nil {

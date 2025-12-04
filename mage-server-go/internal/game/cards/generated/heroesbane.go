@@ -25,7 +25,7 @@ func NewHeroesBane(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(0), SourcePermanentPowerValue.NOT_NEGATIVE, true)).
+		// TODO: AddCountersSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

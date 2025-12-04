@@ -27,7 +27,7 @@ func NewNazgulBattleMace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
 		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()

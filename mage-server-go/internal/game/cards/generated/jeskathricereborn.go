@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -32,14 +31,14 @@ func NewJeskaThriceReborn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewAnyTargetFilter())
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeLoyalty.CreateInstance(0), JeskaThriceRebornValue.instance, false)).
+		// TODO: AddCountersSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

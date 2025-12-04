@@ -5,8 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
-	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {
@@ -25,7 +23,7 @@ func NewProtectTheNegotiators(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability0 := abilities.NewKickerAbility(card.ID, "{W}")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewCounterSpellEffect(CreaturesYouControlCount.PLURAL)).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()

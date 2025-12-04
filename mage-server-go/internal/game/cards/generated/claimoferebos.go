@@ -25,7 +25,7 @@ func NewClaimOfErebos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewLoseLifeEffect(2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(grantedAbility, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
@@ -40,7 +40,7 @@ func NewClaimOfErebos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(grantedAbility, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

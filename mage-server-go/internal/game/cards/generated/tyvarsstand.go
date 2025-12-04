@@ -22,7 +22,7 @@ func NewTyvarsStand(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, GetXValue.instance)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("HexproofAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {

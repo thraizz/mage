@@ -24,8 +24,8 @@ func NewEidolonOfCountlessBattles(ownerID uuid.UUID, info *cards.CardInfo) (*gam
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(amount, amount)).
-		AddEffect(abilities.NewBoostEnchantedEffect(amount, amount)).
+		// TODO: BoostSourceEffect with complex parameters
+		// TODO: BoostEnchantedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

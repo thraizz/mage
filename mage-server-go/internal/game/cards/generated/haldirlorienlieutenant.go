@@ -30,7 +30,7 @@ func NewHaldirLorienLieutenant(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue, filter2, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

@@ -24,7 +24,7 @@ func NewFreelanceMuscle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(GreatestAmongPermanentsValue.POWER_OR_TOUGHNESS_OTHER_CONTROLLED_CREATURES, GreatestAmongPermanentsValue.POWER_OR_TOUGHNESS_OTHER_CONTROLLED_CREATURES)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

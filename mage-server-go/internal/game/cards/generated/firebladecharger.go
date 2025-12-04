@@ -26,7 +26,7 @@ func NewFirebladeCharger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewDiesTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

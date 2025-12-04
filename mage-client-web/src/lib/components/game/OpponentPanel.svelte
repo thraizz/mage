@@ -142,6 +142,7 @@
 									isTargetingActive={isTargeting}
 									isValidTarget={validTargets.has(card.id)}
 									isTargetSelected={selectedTargets.includes(card.id)}
+									summoningSickness={card.summoningSickness}
 								/>
 							</div>
 						{/each}

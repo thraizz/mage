@@ -21,7 +21,7 @@ func NewCoordinatedManeuver(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(CreaturesYouControlCount.PLURAL)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect()).
 		AddTarget(abilities.NewEnchantmentTargetFilter()).
 		Build()

@@ -28,7 +28,7 @@ func NewConclaveSledgeCaptain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), SavedDamageValue.MANY, false)).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), abilities.SavedDamageValueInstance, false)).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)

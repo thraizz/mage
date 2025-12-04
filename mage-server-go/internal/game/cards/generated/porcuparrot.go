@@ -25,7 +25,7 @@ func NewPorcuparrot(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDamageEffect(SourceMutatedCount.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

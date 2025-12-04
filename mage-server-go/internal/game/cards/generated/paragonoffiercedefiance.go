@@ -31,7 +31,7 @@ func NewParagonOfFierceDefiance(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filterCreatures, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

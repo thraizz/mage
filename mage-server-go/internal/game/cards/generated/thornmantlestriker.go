@@ -29,7 +29,7 @@ func NewThornmantleStriker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewPermanentTargetFilter())
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(negativeElfCount, negativeElfCount)).
+		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

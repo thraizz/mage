@@ -26,7 +26,7 @@ func NewSwordOfForgeAndFrontier(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(2, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ProtectionAbility.from(ObjectColor.GREEN, ObjectColor.RED), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -34,7 +34,7 @@ func NewDisturbingConversion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(DisturbingConversionValue.instance, StaticValue.get(0))).
+		// TODO: BoostEnchantedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

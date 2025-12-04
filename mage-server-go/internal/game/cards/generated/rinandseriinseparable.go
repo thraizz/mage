@@ -26,8 +26,8 @@ func NewRinAndSeriInseparable(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(dogCount)).
-		AddEffect(abilities.NewGainLifeEffect(catCount)).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

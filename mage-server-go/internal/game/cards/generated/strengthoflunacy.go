@@ -25,7 +25,7 @@ func NewStrengthOfLunacy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(2, 1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ProtectionAbility.from(ObjectColor.WHITE), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		Build()
 	if err != nil {
@@ -34,7 +34,7 @@ func NewStrengthOfLunacy(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(2, 1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ProtectionAbility.from(ObjectColor.WHITE), AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

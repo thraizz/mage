@@ -21,7 +21,7 @@ func NewMaliciousAdvice(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(GetXValue.instance)).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		AddEffect(abilities.NewTapEffect()).
 		Build()
 	if err != nil {

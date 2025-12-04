@@ -27,7 +27,7 @@ func NewRampagingRaptor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewDamageEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewDamageEffect(abilities.SavedDamageValueInstance)).
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
@@ -36,7 +36,7 @@ func NewRampagingRaptor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewDamageEffect(abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

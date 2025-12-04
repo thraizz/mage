@@ -29,7 +29,7 @@ func NewMerfolkSovereign(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	//   - AddTapCost()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter1, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -21,8 +21,8 @@ func NewRealitySpasm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewTapEffect("tap X target permanents")).
-		AddEffect(abilities.NewUntapEffect("untap X target permanents")).
+		// TODO: TapTargetEffect with complex parameters
+		// TODO: UntapTargetEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()

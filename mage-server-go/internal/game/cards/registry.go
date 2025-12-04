@@ -93,3 +93,16 @@ func (r *cardRegistry) Clear() {
 
 	r.builders = make(map[string]CardBuilder)
 }
+
+// BuildCard creates a Card from the registry by card name
+// This function is designed to be passed to MageEngine.SetCardBuilder
+// to avoid import cycles (game cannot import cards, but cards imports game)
+// Returns (nil, nil) if card is not implemented in registry (not an error)
+func BuildCard(cardName string, ownerID uuid.UUID) (*game.Card, error) {
+	builder, ok := Registry.Get(cardName)
+	if !ok {
+		// Card not in registry - this is not an error, just not implemented
+		return nil, nil
+	}
+	return builder(ownerID, nil)
+}

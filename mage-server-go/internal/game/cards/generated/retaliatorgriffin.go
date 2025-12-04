@@ -28,7 +28,7 @@ func NewRetaliatorGriffin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), SavedDamageValue.MANY, true)).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeP1P1.CreateInstance(1), abilities.SavedDamageValueInstance, true)).
 		Build()
 	if err != nil {
 		return nil, err

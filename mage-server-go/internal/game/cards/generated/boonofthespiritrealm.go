@@ -29,7 +29,7 @@ func NewBoonOfTheSpiritRealm(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

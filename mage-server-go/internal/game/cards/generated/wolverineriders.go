@@ -36,7 +36,7 @@ func NewWolverineRiders(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(WolverineRidersValue.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -21,7 +21,7 @@ func NewTorrentOfFire(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GreatestAmongPermanentsValue.MANAVALUE_CONTROLLED_PERMANENTS)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

@@ -31,14 +31,14 @@ func NewBeastmastersMagemark(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filterCreatures, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(BlockingCreatureCount.TARGET, BlockingCreatureCount.TARGET)).
+		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

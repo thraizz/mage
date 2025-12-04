@@ -26,13 +26,13 @@ func NewTezzeretMasterOfMetal(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewLoseLifeEffect(ArtifactYouControlCount.instance)).
+		// TODO: LoseLifeTargetEffect with complex parameters
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(ArtifactYouControlCount.instance)).
+		// TODO: LoseLifeTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

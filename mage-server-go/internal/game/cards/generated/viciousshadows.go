@@ -22,12 +22,12 @@ func NewViciousShadows(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewDiesTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(CardsInTargetHandCount.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(CardsInTargetHandCount.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

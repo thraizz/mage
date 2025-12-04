@@ -29,14 +29,19 @@ type CreateTokenEffect struct {
 }
 
 // NewCreateTokenEffect creates an effect that creates one token.
-func NewCreateTokenEffect(tok *token.Token) *CreateTokenEffect {
-	return &CreateTokenEffect{
-		token:        tok.Copy(),
+// If no token is provided, creates a placeholder effect (for transpiler compatibility).
+func NewCreateTokenEffect(tok ...*token.Token) *CreateTokenEffect {
+	effect := &CreateTokenEffect{
 		amount:       1,
 		tapped:       false,
 		attacking:    false,
 		lastAddedIDs: make([]uuid.UUID, 0),
 	}
+	if len(tok) > 0 && tok[0] != nil {
+		effect.token = tok[0].Copy()
+	}
+	// token may be nil - Apply will need to handle this
+	return effect
 }
 
 // NewCreateTokenEffectAmount creates an effect that creates the specified number of tokens.

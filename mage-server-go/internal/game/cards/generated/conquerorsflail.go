@@ -22,7 +22,7 @@ func NewConquerorsFlail(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(ConquerorsFlailColorCount.instance, ConquerorsFlailColorCount.instance)).
+		// TODO: BoostEquippedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

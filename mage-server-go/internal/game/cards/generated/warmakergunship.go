@@ -24,14 +24,14 @@ func NewWarmakerGunship(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(ArtifactYouControlCount.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(ArtifactYouControlCount.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -786,6 +786,9 @@ func engineCardsToProto(cards []game.EngineCardView) []*pb.CardView {
 			cardView.Counters = counters
 		}
 
+		// Add summoning sickness status
+		cardView.SummoningSickness = card.SummoningSickness
+
 		// Add available actions (server source of truth)
 		if len(card.AvailableActions) > 0 {
 			cardView.AvailableActions = engineCardActionsToProto(card.AvailableActions)

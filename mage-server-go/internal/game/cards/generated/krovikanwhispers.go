@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -32,7 +31,7 @@ func NewKrovikanWhispers(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect()).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

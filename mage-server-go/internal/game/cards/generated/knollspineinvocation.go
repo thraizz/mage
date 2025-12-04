@@ -21,7 +21,7 @@ func NewKnollspineInvocation(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.Rarity = "common"
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance, true)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

@@ -32,7 +32,7 @@ func NewAlienSymbiosis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(1, 1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect("MenaceAbility", null)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

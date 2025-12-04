@@ -30,14 +30,14 @@ func NewKangeeSkyWarden(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 0, filter1, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(0, 2, filter2, false)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

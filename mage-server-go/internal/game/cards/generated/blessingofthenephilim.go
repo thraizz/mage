@@ -24,7 +24,7 @@ func NewBlessingOfTheNephilim(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEnchantedEffect(numberOfColors, numberOfColors)).
+		// TODO: BoostEnchantedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeBoostCreature)).
 		Build()
 	if err != nil {

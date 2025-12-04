@@ -21,7 +21,7 @@ func NewPsychicDrain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(GetXValue.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		AddEffect(abilities.NewMillCardsTargetEffect(1)).
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()

@@ -25,7 +25,7 @@ func NewBladecoilSerpent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewBoostEffect(EachTwoManaSpentToCastValue.RED, StaticValue.get(0))).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).

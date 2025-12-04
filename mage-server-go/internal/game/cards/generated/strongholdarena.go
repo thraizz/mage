@@ -23,7 +23,7 @@ func NewStrongholdArena(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability0 := abilities.NewKickerAbility(card.ID, "{G}")
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(xValue)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

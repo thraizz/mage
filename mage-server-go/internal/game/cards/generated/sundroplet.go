@@ -22,7 +22,7 @@ func NewSunDroplet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeCharge.CreateInstance(1), SavedDamageValue.MANY)).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeCharge.CreateInstance(1), abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

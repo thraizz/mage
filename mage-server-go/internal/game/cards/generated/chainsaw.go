@@ -48,7 +48,7 @@ func NewChainsaw(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	}
 	card.AddAbility(ability3)
 	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(xValue, StaticValue.get(0))).
+		// TODO: BoostEquippedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

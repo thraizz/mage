@@ -36,7 +36,7 @@ func NewUnderworldConnections(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		Build()
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, AttachmentType.AURA, rule)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

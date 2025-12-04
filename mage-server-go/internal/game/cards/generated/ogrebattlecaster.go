@@ -30,7 +30,7 @@ func NewOgreBattlecaster(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(originalManaValue, 0)).
+		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

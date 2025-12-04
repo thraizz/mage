@@ -27,7 +27,7 @@ func NewRampantFrogantua(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(RampantFrogantuaValue.instance, RampantFrogantuaValue.instance)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -25,7 +25,7 @@ func NewAjaniStrengthOfThePride(ownerID uuid.UUID, info *cards.CardInfo) (*game.
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(AjaniStrengthOfThePrideValue.instance + "the number of creatures you control plus the number of planeswalkers you control.")).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

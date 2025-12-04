@@ -37,7 +37,7 @@ func NewSyrGingerTheMealEnder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		AddManaCost("{2}").
 		AddTapCost().
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewGainLifeEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

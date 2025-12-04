@@ -22,7 +22,7 @@ func NewGetALegUp(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(CreaturesYouControlCount.PLURAL, CreaturesYouControlCount.PLURAL)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("ReachAbility", effects.DurationEndOfTurn)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

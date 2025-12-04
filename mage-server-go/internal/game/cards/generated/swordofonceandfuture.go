@@ -28,7 +28,7 @@ func NewSwordOfOnceAndFuture(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(2, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ProtectionAbility.from(ObjectColor.BLUE, ObjectColor.BLACK), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

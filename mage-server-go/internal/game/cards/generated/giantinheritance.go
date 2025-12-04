@@ -32,7 +32,7 @@ func NewGiantInheritance(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(5, 5)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(triggeredAbility, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

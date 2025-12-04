@@ -32,7 +32,7 @@ func NewArahboRoarOfTheWorld(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(pow, pow)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		Build()
 	if err != nil {

@@ -25,7 +25,7 @@ func NewVolrathTheFallen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(DiscardCostCardManaValue.instance, DiscardCostCardManaValue.instance)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -25,7 +25,7 @@ func NewMartyrOfSpores(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewBoostEffect(RevealTargetFromHandCostCount.instance, RevealTargetFromHandCostCount.instance)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

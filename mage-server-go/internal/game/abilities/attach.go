@@ -167,11 +167,14 @@ type BoostEnchantedEffect struct {
 }
 
 // NewBoostEnchantedEffect creates a new boost enchanted effect
-func NewBoostEnchantedEffect(power, toughness int) *BoostEnchantedEffect {
-	return &BoostEnchantedEffect{
-		power:     power,
-		toughness: toughness,
+// Can be called with no arguments (placeholder) or with power and toughness
+func NewBoostEnchantedEffect(args ...int) *BoostEnchantedEffect {
+	effect := &BoostEnchantedEffect{}
+	if len(args) >= 2 {
+		effect.power = args[0]
+		effect.toughness = args[1]
 	}
+	return effect
 }
 
 // Apply applies the boost effect
@@ -200,11 +203,19 @@ type BoostEquippedEffect struct {
 }
 
 // NewBoostEquippedEffect creates a new boost equipped effect
-func NewBoostEquippedEffect(power, toughness int) *BoostEquippedEffect {
-	return &BoostEquippedEffect{
-		power:     power,
-		toughness: toughness,
+// NewBoostEquippedEffect creates a new boost equipped effect.
+// Can be called with no arguments (placeholder) or with power/toughness values.
+func NewBoostEquippedEffect(args ...interface{}) *BoostEquippedEffect {
+	effect := &BoostEquippedEffect{}
+	if len(args) >= 2 {
+		if p, ok := args[0].(int); ok {
+			effect.power = p
+		}
+		if t, ok := args[1].(int); ok {
+			effect.toughness = t
+		}
 	}
+	return effect
 }
 
 // Apply applies the boost effect
@@ -232,6 +243,16 @@ const (
 	AttachmentTypeAura      AttachmentType = "AURA"
 	AttachmentTypeEquipment AttachmentType = "EQUIPMENT"
 )
+
+// attachmentTypeEnum provides Java-style enum access to AttachmentType constants
+// Usage: AttachmentType.AURA, AttachmentType.EQUIPMENT
+var AttachmentTypeEnum = struct {
+	AURA      AttachmentType
+	EQUIPMENT AttachmentType
+}{
+	AURA:      AttachmentTypeAura,
+	EQUIPMENT: AttachmentTypeEquipment,
+}
 
 // GainAbilityAttachedEffect grants an ability to the attached permanent
 // Java: mage.abilities.effects.common.continuous.GainAbilityAttachedEffect

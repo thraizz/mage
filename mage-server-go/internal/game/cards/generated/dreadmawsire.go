@@ -22,7 +22,7 @@ func NewDreadmawsIre(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddEffect(abilities.NewDestroyEffect()).
 		AddEffect(abilities.NewBoostEffect(2, 2)).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).

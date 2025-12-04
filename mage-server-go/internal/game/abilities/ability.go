@@ -143,6 +143,14 @@ type GameContext interface {
 	// Used by effects like Resourceful Defense that need to move all counter types
 	GetAllCountersOnPermanent(ctx context.Context, permanentID uuid.UUID) map[string]int
 
+	// GetPermanentPower returns the power of a permanent (creature)
+	// Returns 0 for non-creatures
+	GetPermanentPower(ctx context.Context, permanentID uuid.UUID) int
+
+	// GetPermanentToughness returns the toughness of a permanent (creature)
+	// Returns 0 for non-creatures
+	GetPermanentToughness(ctx context.Context, permanentID uuid.UUID) int
+
 	// RemoveCountersFromPermanent removes counters from a permanent
 	// Java: permanent.removeCounters(counterName, amount, source, game)
 	// Returns error if the permanent doesn't exist

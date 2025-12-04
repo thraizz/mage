@@ -21,7 +21,7 @@ func NewRepercussion(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewDamageEffect(abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

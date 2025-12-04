@@ -25,7 +25,7 @@ func NewAerieOuphes(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDamageEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

@@ -1396,6 +1396,60 @@ func (gc *GameContext) RemoveCountersFromPermanent(ctx context.Context, permanen
 	return fmt.Errorf("permanent %s not found", permanentID)
 }
 
+// GetPermanentPower returns the power of a permanent (creature)
+// Returns 0 for non-creatures or if permanent not found
+func (gc *GameContext) GetPermanentPower(ctx context.Context, permanentID uuid.UUID) int {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return 0
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	permanentIDStr := permanentID.String()
+
+	// Search battlefield for the permanent
+	for _, card := range gameState.battlefield {
+		if card.ID == permanentIDStr {
+			power, _ := parseIntOrZero(card.Power)
+			return power
+		}
+	}
+
+	return 0
+}
+
+// GetPermanentToughness returns the toughness of a permanent (creature)
+// Returns 0 for non-creatures or if permanent not found
+func (gc *GameContext) GetPermanentToughness(ctx context.Context, permanentID uuid.UUID) int {
+	gc.engine.mu.RLock()
+	gameState, ok := gc.engine.games[gc.gameID.String()]
+	gc.engine.mu.RUnlock()
+
+	if !ok {
+		return 0
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	permanentIDStr := permanentID.String()
+
+	// Search battlefield for the permanent
+	for _, card := range gameState.battlefield {
+		if card.ID == permanentIDStr {
+			toughness, _ := parseIntOrZero(card.Toughness)
+			return toughness
+		}
+	}
+
+	return 0
+}
+
 // GetMultiAmountChoice asks the player to distribute amounts among multiple options
 // Java: player.getMultiAmountWithIndividualConstraints()
 // This is a stub implementation that returns default values for testing/AI

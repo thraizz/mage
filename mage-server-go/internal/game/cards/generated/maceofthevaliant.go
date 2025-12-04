@@ -23,7 +23,7 @@ func NewMaceOfTheValiant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(xValue, xValue)).
+		// TODO: BoostEquippedEffect with complex parameters
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordVigilance), abilities.AttachmentTypeEquipment, abilities.DurationWhileOnBattlefield, "")).
 		Build()
 	if err != nil {

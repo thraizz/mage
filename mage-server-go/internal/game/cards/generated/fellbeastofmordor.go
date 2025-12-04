@@ -26,7 +26,7 @@ func NewFellBeastOfMordor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewLoseLifeEffect(xValue)).
+		// TODO: LoseLifeTargetEffect with complex parameters
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

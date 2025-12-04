@@ -21,7 +21,7 @@ func NewLich(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(ControllerLifeCount.instance)).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -29,7 +29,7 @@ func NewBloodthirstyConqueror(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(SavedLifeLossValue.MUCH)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

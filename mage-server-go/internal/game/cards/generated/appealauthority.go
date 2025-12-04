@@ -22,7 +22,7 @@ func NewAppealAuthority(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(CreaturesYouControlCount.PLURAL, CreaturesYouControlCount.PLURAL)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddEffect(abilities.NewTapEffect()).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		AddEffect(abilities.NewGrantAbilityEffect("VigilanceAbility", effects.DurationEndOfTurn)).

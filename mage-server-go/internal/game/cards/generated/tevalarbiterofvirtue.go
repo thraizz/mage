@@ -30,7 +30,7 @@ func NewTevalArbiterOfVirtue(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(TevalArbiterOfVirtueValue.instance)).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

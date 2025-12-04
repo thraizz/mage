@@ -31,7 +31,7 @@ func NewParagonOfEternalWilds(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filterGreen, true)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

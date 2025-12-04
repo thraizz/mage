@@ -28,7 +28,7 @@ func NewDemonicLore(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(xValue)).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

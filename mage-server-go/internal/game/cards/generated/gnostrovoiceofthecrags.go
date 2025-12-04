@@ -25,7 +25,7 @@ func NewGnostroVoiceOfTheCrags(ownerID uuid.UUID, info *cards.CardInfo) (*game.C
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(GnostroVoiceOfTheCragsValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

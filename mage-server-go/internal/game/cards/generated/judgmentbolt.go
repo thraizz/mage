@@ -22,7 +22,7 @@ func NewJudgmentBolt(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(5)).
-		AddEffect(abilities.NewDamageEffect(xValue)).
+		// TODO: DamageTargetControllerEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

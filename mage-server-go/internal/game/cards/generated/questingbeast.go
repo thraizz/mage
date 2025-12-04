@@ -28,7 +28,7 @@ func NewQuestingBeast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewDamageEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewDamageEffect(abilities.SavedDamageValueInstance)).
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
@@ -39,7 +39,7 @@ func NewQuestingBeast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability3)
 	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewDamageEffect(abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

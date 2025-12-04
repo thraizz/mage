@@ -32,7 +32,7 @@ func NewMoltenManInfernoIncarnate(ownerID uuid.UUID, info *cards.CardInfo) (*gam
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(value, value)).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

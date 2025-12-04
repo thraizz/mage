@@ -30,7 +30,7 @@ func NewThuridMareOfDestiny(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter2, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

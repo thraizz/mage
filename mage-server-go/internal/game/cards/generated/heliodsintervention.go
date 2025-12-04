@@ -22,7 +22,7 @@ func NewHeliodsIntervention(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewGainLifeEffect(xValue)).
+		// TODO: GainLifeTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

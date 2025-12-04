@@ -25,7 +25,7 @@ func NewPainKami(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDamageEffect(GetXValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

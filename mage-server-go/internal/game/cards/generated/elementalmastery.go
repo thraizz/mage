@@ -43,7 +43,7 @@ func NewElementalMastery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	//   - AddTapCost()
 	// card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ability2, AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

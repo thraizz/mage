@@ -25,7 +25,7 @@ func NewCoramTheUndertaker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(CoramTheUndertakerValue.instance, StaticValue.get(0))).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

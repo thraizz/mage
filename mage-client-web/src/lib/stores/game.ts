@@ -24,7 +24,8 @@ import type {
 	GameGetAmountData,
 	GameGetMultiAmountData,
 	GameOverData,
-	StartGameData
+	StartGameData,
+	GameAssignDamageData
 } from '$lib/generated/mage/v1/websocket';
 import type {
 	GameView,
@@ -57,7 +58,8 @@ export type PromptType =
 	| 'mana'
 	| 'xmana'
 	| 'amount'
-	| 'multiAmount';
+	| 'multiAmount'
+	| 'assignDamage';
 
 export interface GamePrompt {
 	type: PromptType;
@@ -433,6 +435,36 @@ function createGameStore() {
 						type: 'multiAmount',
 						message: multiAmountData.message,
 						data: multiAmountData
+					}
+				}));
+			})
+		);
+
+		// GAME_ASSIGN_DAMAGE - Combat damage assignment
+		unsubscribers.push(
+			websocketStore.on(CallbackMethod.GAME_ASSIGN_DAMAGE, (data) => {
+				const assignDamageData = data as GameAssignDamageData;
+				console.log('[GameStore] GAME_ASSIGN_DAMAGE:', assignDamageData);
+				update((s) => ({
+					...s,
+					pendingPrompt: {
+						type: 'assignDamage',
+						message: assignDamageData.message,
+						data: {
+							attackerId: assignDamageData.attackerId,
+							attackerName: assignDamageData.attackerName,
+							attackerPower: assignDamageData.attackerPower,
+							blockers: assignDamageData.blockers.map((b, i) => ({
+								id: b.id,
+								name: b.name,
+								toughness: b.toughness,
+								damage: b.markedDamage,
+								order: b.order ?? i
+							})),
+							hasTrample: assignDamageData.hasTrample,
+							defendingPlayerId: assignDamageData.defendingPlayerId,
+							defendingPlayerName: assignDamageData.defendingPlayerName
+						}
 					}
 				}));
 			})

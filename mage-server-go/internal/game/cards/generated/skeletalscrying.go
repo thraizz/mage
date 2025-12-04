@@ -22,7 +22,7 @@ func NewSkeletalScrying(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewLoseLifeEffect(GetXValue.instance)).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

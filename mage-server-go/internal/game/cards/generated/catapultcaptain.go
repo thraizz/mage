@@ -25,7 +25,7 @@ func NewCatapultCaptain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewLoseLifeEffect(SacrificeCostCreaturesToughness.instance)).
+		// TODO: LoseLifeTargetEffect with complex parameters
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

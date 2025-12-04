@@ -92,6 +92,7 @@ const (
 	abilityMenace                   = "MenaceAbility"
 	abilityUnblockable              = "CantBeBlockedSourceAbility"
 	abilityBanding                  = "BandingAbility"
+	abilityHaste                    = "HasteAbility"
 )
 
 // PassUntilType represents different auto-pass modes
@@ -159,32 +160,33 @@ type EnginePlayerView struct {
 
 // EngineCardView represents a card in any zone
 type EngineCardView struct {
-	ID               string
-	Name             string
-	DisplayName      string
-	ManaCost         string
-	Type             string
-	SubTypes         []string
-	SuperTypes       []string
-	Color            string
-	Power            string
-	Toughness        string
-	Loyalty          string
-	CardNumber       int
-	ExpansionSet     string
-	Rarity           string
-	RulesText        string
-	Tapped           bool
-	Flipped          bool
-	Transformed      bool
-	FaceDown         bool
-	Zone             int
-	ControllerID     string
-	OwnerID          string
-	AttachedToCard   []string
-	Abilities        []EngineAbilityView
-	Counters         []EngineCounterView
-	AvailableActions []EngineCardAction // Server-computed available actions
+	ID                string
+	Name              string
+	DisplayName       string
+	ManaCost          string
+	Type              string
+	SubTypes          []string
+	SuperTypes        []string
+	Color             string
+	Power             string
+	Toughness         string
+	Loyalty           string
+	CardNumber        int
+	ExpansionSet      string
+	Rarity            string
+	RulesText         string
+	Tapped            bool
+	Flipped           bool
+	Transformed       bool
+	FaceDown          bool
+	Zone              int
+	ControllerID      string
+	OwnerID           string
+	AttachedToCard    []string
+	Abilities         []EngineAbilityView
+	Counters          []EngineCounterView
+	AvailableActions  []EngineCardAction // Server-computed available actions
+	SummoningSickness bool               // Creature has summoning sickness
 }
 
 // EngineCardAction represents an available action for a card
@@ -337,6 +339,29 @@ type EnginePrompt struct {
 	Text      string
 	Options   []string
 	Timestamp time.Time
+}
+
+// PendingXValueRequest represents an active X value selection request
+// The game engine waits for the player to respond via SEND_INTEGER
+type PendingXValueRequest struct {
+	// PlayerID is the player who needs to select the X value
+	PlayerID string
+	// SourceID is the ID of the card/ability requiring X
+	SourceID string
+	// SourceName is the human-readable name of the source
+	SourceName string
+	// Message is a human-readable description shown to the player
+	Message string
+	// MinValue is the minimum allowed X value
+	MinValue int
+	// MaxValue is the maximum allowed X value
+	MaxValue int
+	// Timestamp when the request was created
+	Timestamp time.Time
+	// OnComplete is called when X value selection is complete
+	OnComplete func(xValue int) error
+	// OnCancel is called when the player cancels (if allowed)
+	OnCancel func() error
 }
 
 // PendingTargetRequest represents an active target selection request
@@ -581,6 +606,11 @@ type engineGameState struct {
 	// When a spell/ability needs targets, we store the pending request here
 	// and wait for the player to respond via SEND_UUID
 	pendingTargetRequest *PendingTargetRequest
+
+	// X value selection system
+	// When a spell/ability needs X value input, we store the pending request here
+	// and wait for the player to respond via SEND_INTEGER
+	pendingXValueRequest *PendingXValueRequest
 	// Last Known Information (LKI) system
 	// Java: GameImpl.lki (Map<Zone, Map<UUID, MageObject>>)
 	// Stores permanent state when it leaves the battlefield for triggered abilities
@@ -639,6 +669,10 @@ type PersistenceRepository interface {
 	DeleteActiveGame(ctx context.Context, gameID string) error
 }
 
+// CardBuilderFunc is a function type for building cards from the registry
+// This allows the cards package to inject card builders without import cycles
+type CardBuilderFunc func(cardName string, ownerID uuid.UUID) (*Card, error)
+
 // MageEngine is the main game engine implementation
 type MageEngine struct {
 	logger              *zap.Logger
@@ -647,6 +681,7 @@ type MageEngine struct {
 	notificationHandler atomic.Value            // Stores NotificationHandler; uses atomic to avoid deadlock with gameState.mu
 	cardRepo            CardRepositoryInterface // Optional card repository for looking up card metadata
 	persistenceRepo     PersistenceRepository   // Optional persistence repository for crash recovery
+	cardBuilder         CardBuilderFunc         // Optional card builder for Go-implemented cards
 
 	// State bookmarking for rollback/undo
 	// Maps gameID -> list of bookmarked states
@@ -711,6 +746,14 @@ func (e *MageEngine) SetPersistenceRepository(repo PersistenceRepository) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.persistenceRepo = repo
+}
+
+// SetCardBuilder sets the card builder function for creating Go-implemented cards
+// This allows the cards package to inject its registry without import cycles
+func (e *MageEngine) SetCardBuilder(builder CardBuilderFunc) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.cardBuilder = builder
 }
 
 // emitNotification sends a notification to the registered handler
@@ -788,6 +831,21 @@ func (e *MageEngine) notifyPhaseChange(gameID string, data map[string]interface{
 	})
 }
 
+// notifyChoicePrompt notifies that a player needs to make a choice
+// This is used for combat declarations, mode choices, and other player selections
+func (e *MageEngine) notifyChoicePrompt(gameID, playerID, message string, choices []string) {
+	e.emitNotification(GameNotification{
+		Type:      "GAME_CHOOSE_CHOICE",
+		GameID:    gameID,
+		PlayerID:  playerID,
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"message": message,
+			"choices": choices,
+		},
+	})
+}
+
 // notifyGameError notifies a specific player about an error
 func (e *MageEngine) notifyGameError(gameID, playerID string, errorMsg string) {
 	e.emitNotification(GameNotification{
@@ -833,6 +891,74 @@ func (e *MageEngine) notifyTargetRequest(gameID, playerID string, data map[strin
 		Timestamp: time.Now(),
 		Data:      data,
 	})
+}
+
+// notifyXValueRequest notifies a player that they need to select an X value
+// This sends a GAME_XMANA notification to the UI
+func (e *MageEngine) notifyXValueRequest(gameID, playerID string, data map[string]interface{}) {
+	e.emitNotification(GameNotification{
+		Type:      "GAME_XMANA",
+		GameID:    gameID,
+		PlayerID:  playerID, // Send only to the player who needs to select
+		Timestamp: time.Now(),
+		Data:      data,
+	})
+}
+
+// RequestXValueSelection initiates X value selection for a spell or ability.
+// This sets up the pending X value request and notifies the player via GAME_XMANA.
+// The game engine will wait for SEND_INTEGER response from the player.
+func (e *MageEngine) RequestXValueSelection(
+	gameState *engineGameState,
+	gameID, playerID, sourceID, sourceName string,
+	message string,
+	minValue, maxValue int,
+	onComplete func(xValue int) error,
+	onCancel func() error,
+) error {
+	// Validate player exists
+	_, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Check if there's already a pending X value request
+	if gameState.pendingXValueRequest != nil {
+		return fmt.Errorf("X value selection already in progress for player %s", gameState.pendingXValueRequest.PlayerID)
+	}
+
+	// Create the pending request
+	gameState.pendingXValueRequest = &PendingXValueRequest{
+		PlayerID:   playerID,
+		SourceID:   sourceID,
+		SourceName: sourceName,
+		Message:    message,
+		MinValue:   minValue,
+		MaxValue:   maxValue,
+		Timestamp:  time.Now(),
+		OnComplete: onComplete,
+		OnCancel:   onCancel,
+	}
+
+	if e.logger != nil {
+		e.logger.Info("requesting X value selection",
+			zap.String("player", playerID),
+			zap.String("source", sourceName),
+			zap.Int("min", minValue),
+			zap.Int("max", maxValue),
+			zap.String("message", message))
+	}
+
+	// Notify the player via WebSocket
+	e.notifyXValueRequest(gameID, playerID, map[string]interface{}{
+		"message":   message,
+		"available": maxValue,
+		"min":       minValue,
+		"max":       maxValue,
+		"source_id": sourceID,
+	})
+
+	return nil
 }
 
 // RequestTargetSelection initiates target selection for a spell or ability.
@@ -1427,13 +1553,38 @@ func (e *MageEngine) shuffleLibrary(player *internalPlayer) {
 }
 
 // createStarterCard creates a simple starter card for testing
-// If cardRepo is available, it looks up the actual card metadata from the database
+// Priority: 1) Go card registry (properly implemented cards)
+//  2. JSON repository lookup (fallback for unimplemented cards)
+//  3. Default values (last resort)
 func (e *MageEngine) createStarterCard(id, ownerID, cardName string) *internalCard {
 	if cardName == "" {
 		cardName = "Lightning Bolt"
 	}
 
-	// Default values (fallback if repository lookup fails)
+	// 1. Check if card has a Go implementation via the injected card builder
+	if e.cardBuilder != nil {
+		ownerUUID, err := uuid.Parse(ownerID)
+		if err == nil {
+			gameCard, err := e.cardBuilder(cardName, ownerUUID)
+			if err == nil && gameCard != nil {
+				// Convert to internal card format
+				internal := gameCard.ToInternal()
+				internal.ID = id // Use the provided ID
+				internal.Metadata = make(map[string]string)
+
+				if e.logger != nil {
+					e.logger.Info("created card from Go registry",
+						zap.String("card_name", cardName),
+						zap.String("id", id),
+						zap.Int("ability_count", len(gameCard.Abilities)))
+				}
+
+				return internal
+			}
+		}
+	}
+
+	// 2. Default values (fallback if repository lookup fails)
 	manaCost := "{R}"
 	cardType := "Instant"
 	subTypes := []string{}
@@ -1447,7 +1598,7 @@ func (e *MageEngine) createStarterCard(id, ownerID, cardName string) *internalCa
 	rarity := "Common"
 	rulesText := fmt.Sprintf("%s deals damage.", cardName)
 
-	// Try to look up card metadata from repository if available
+	// 3. Try to look up card metadata from repository if available
 	if e.cardRepo != nil {
 		ctx := context.Background()
 		cards, err := e.cardRepo.GetByName(ctx, cardName)
@@ -2662,6 +2813,44 @@ func (e *MageEngine) handleIntegerAction(gameState *engineGameState, action Play
 	}
 
 	playerID := action.PlayerID
+
+	// Check if there's a pending X value request
+	if gameState.pendingXValueRequest != nil {
+		req := gameState.pendingXValueRequest
+		if req.PlayerID != playerID {
+			return fmt.Errorf("X value request is for player %s, not %s", req.PlayerID, playerID)
+		}
+
+		// Validate X value is within bounds
+		if value < req.MinValue {
+			return fmt.Errorf("X value %d is below minimum %d", value, req.MinValue)
+		}
+		if value > req.MaxValue {
+			return fmt.Errorf("X value %d is above maximum %d", value, req.MaxValue)
+		}
+
+		if e.logger != nil {
+			e.logger.Info("received X value selection",
+				zap.String("player", playerID),
+				zap.String("source", req.SourceName),
+				zap.Int("value", value))
+		}
+
+		// Clear the pending request before calling OnComplete
+		onComplete := req.OnComplete
+		gameState.pendingXValueRequest = nil
+
+		// Execute the callback with the chosen value
+		if onComplete != nil {
+			if err := onComplete(value); err != nil {
+				return fmt.Errorf("failed to complete X value selection: %w", err)
+			}
+		}
+
+		return nil
+	}
+
+	// No pending X value request - legacy behavior (for testing/compatibility)
 	player, exists := gameState.players[playerID]
 	if !exists {
 		return fmt.Errorf("player %s not found", playerID)
@@ -3260,6 +3449,98 @@ func (e *MageEngine) handleActivateAbility(gameState *engineGameState, player *i
 		hasTapCost = parsedAbility.HasTapCost
 		isSorcerySpeed = parsedAbility.IsSorcerySpeed
 
+		// Check if ability needs X value selection
+		if parsedAbility.HasXValue {
+			// Determine max X based on ability type
+			maxX := 0
+			if parsedAbility.XValueType == "reveal_white" {
+				// Count white cards in hand for Martyr of Sands
+				for _, c := range player.Hand {
+					if isCardWhite(c) {
+						maxX++
+					}
+				}
+			} else {
+				// Default max based on available mana
+				if player.ManaPool != nil {
+					maxX = player.ManaPool.GetTotalMana()
+				}
+			}
+
+			if maxX > 0 {
+				// Check if we're waiting for X value
+				if gameState.pendingXValueRequest != nil && gameState.pendingXValueRequest.PlayerID == player.PlayerID {
+					// Already waiting for this player - they shouldn't be activating again
+					return fmt.Errorf("already waiting for X value selection")
+				}
+
+				// Create ability activation context for callback
+				capturedCard := card
+				capturedPlayer := player
+				capturedAbility := parsedAbility
+				capturedGameState := gameState
+
+				// Store X value when player chooses it
+				var chosenX int
+
+				// Create the pending X value request
+				message := fmt.Sprintf("Choose X value for %s", card.Name)
+				if parsedAbility.XValueType == "reveal_white" {
+					message = fmt.Sprintf("How many white cards to reveal? (0-%d)", maxX)
+				}
+
+				gameState.pendingXValueRequest = &PendingXValueRequest{
+					PlayerID:   player.PlayerID,
+					SourceID:   cardID,
+					SourceName: card.Name,
+					Message:    message,
+					MinValue:   0,
+					MaxValue:   maxX,
+					Timestamp:  time.Now(),
+					OnComplete: func(xValue int) error {
+						chosenX = xValue
+						if e.logger != nil {
+							e.logger.Info("X value chosen, completing ability activation",
+								zap.String("card", capturedCard.Name),
+								zap.Int("x_value", chosenX))
+						}
+
+						// Store X value in the ability for later use during resolution
+						capturedAbility.chosenXValue = chosenX
+
+						// Continue with ability activation - pay costs and push to stack
+						return e.completeAbilityActivation(capturedGameState, capturedPlayer, capturedCard, capturedAbility, abilityIDStr)
+					},
+					OnCancel: func() error {
+						if e.logger != nil {
+							e.logger.Info("X value selection cancelled",
+								zap.String("card", capturedCard.Name))
+						}
+						return nil
+					},
+				}
+
+				if e.logger != nil {
+					e.logger.Info("requesting X value selection",
+						zap.String("card", card.Name),
+						zap.String("type", parsedAbility.XValueType),
+						zap.Int("max_x", maxX))
+				}
+
+				// Send prompt to client
+				e.notifyXValueRequest(gameState.gameID, player.PlayerID, map[string]interface{}{
+					"message":   message,
+					"available": maxX,
+					"min":       0,
+					"max":       maxX,
+					"source_id": cardID,
+				})
+
+				// Return nil - activation is pending, waiting for X value
+				return nil
+			}
+		}
+
 		// Pay mana cost if present
 		// NOTE: We work directly with player.ManaPool here instead of using GameContext
 		// because we already hold gameState.mu.Lock() and GameContext methods try to acquire
@@ -3459,6 +3740,117 @@ func (e *MageEngine) handleActivateAbility(gameState *engineGameState, player *i
 	return nil
 }
 
+// completeAbilityActivation finishes ability activation after X value is chosen
+// This is called from the X value selection callback
+func (e *MageEngine) completeAbilityActivation(
+	gameState *engineGameState,
+	player *internalPlayer,
+	card *internalCard,
+	parsedAbility ParsedActivatedAbility,
+	abilityIDStr string,
+) error {
+	if e.logger != nil {
+		e.logger.Info("completing ability activation after X selection",
+			zap.String("card", card.Name),
+			zap.Int("x_value", parsedAbility.chosenXValue))
+	}
+
+	// Pay mana cost if present
+	if parsedAbility.ManaCostString != "" {
+		manaCost, err := abilities.ParseManaCost(parsedAbility.ManaCostString)
+		if err == nil && manaCost != nil && manaCost.Mana != nil {
+			if !canPayManaCostDirect(player.ManaPool, manaCost.Mana) {
+				return fmt.Errorf("not enough mana to pay cost %s", parsedAbility.ManaCostString)
+			}
+			if err := payManaCostDirect(player.ManaPool, manaCost.Mana); err != nil {
+				return fmt.Errorf("failed to pay mana cost: %w", err)
+			}
+			if e.logger != nil {
+				e.logger.Info("paid mana cost for ability",
+					zap.String("card", card.Name),
+					zap.String("cost", parsedAbility.ManaCostString))
+			}
+		}
+	}
+
+	// Handle sacrifice cost
+	if parsedAbility.HasSacrificeCost {
+		if err := e.sacrificePermanent(gameState, card); err != nil {
+			return fmt.Errorf("failed to sacrifice permanent: %w", err)
+		}
+		if e.logger != nil {
+			e.logger.Info("sacrificed permanent for ability cost",
+				zap.String("card", card.Name))
+		}
+	}
+
+	// Handle tap cost
+	if parsedAbility.HasTapCost {
+		if card.Tapped {
+			return fmt.Errorf("permanent is already tapped")
+		}
+		card.Tapped = true
+	}
+
+	// Create resolve function
+	capturedCard := card
+	capturedPlayer := player
+	capturedAbility := parsedAbility
+	resolveFunc := func() error {
+		if e.logger != nil {
+			e.logger.Info("resolving activated ability from rules text",
+				zap.String("card", capturedCard.Name),
+				zap.String("ability", capturedAbility.FullText),
+				zap.Int("x_value", capturedAbility.chosenXValue))
+		}
+		return e.executeRulesTextAbilityEffect(gameState, capturedCard, capturedPlayer, capturedAbility)
+	}
+
+	// Create stack item for the ability
+	stackItemID := uuid.New().String()
+	stackItem := rules.StackItem{
+		ID:          stackItemID,
+		Controller:  player.PlayerID,
+		Description: fmt.Sprintf("%s: %s (X=%d)", card.Name, parsedAbility.FullText, parsedAbility.chosenXValue),
+		Kind:        rules.StackItemKindActivated,
+		SourceID:    card.ID,
+		Metadata: map[string]string{
+			"ability_id": abilityIDStr,
+			"card_name":  card.Name,
+			"x_value":    fmt.Sprintf("%d", parsedAbility.chosenXValue),
+		},
+		Resolve: resolveFunc,
+	}
+
+	// Push ability to stack
+	gameState.stack.Push(stackItem)
+	gameState.trackStackItem()
+	gameState.trackStackDepth()
+	gameState.trackAction()
+
+	if e.logger != nil {
+		e.logger.Info("activated ability added to stack after X selection",
+			zap.String("player", player.PlayerID),
+			zap.String("card", card.Name),
+			zap.Int("x_value", parsedAbility.chosenXValue))
+	}
+
+	// Add to game log
+	gameState.addMessage(fmt.Sprintf("%s activates ability of %s (X=%d)", player.PlayerID, card.Name, parsedAbility.chosenXValue), "action")
+
+	// Notify stack update
+	e.notifyStackUpdate(gameState.gameID, map[string]interface{}{
+		"action":     "ability_activated",
+		"player_id":  player.PlayerID,
+		"ability_id": abilityIDStr,
+		"card_id":    card.ID,
+		"card_name":  card.Name,
+		"x_value":    parsedAbility.chosenXValue,
+	})
+
+	return nil
+}
+
 // executeRulesTextAbilityEffect executes the effect of a rules-text-parsed ability
 // This handles common patterns like life gain, damage, etc.
 func (e *MageEngine) executeRulesTextAbilityEffect(
@@ -3481,19 +3873,31 @@ func (e *MageEngine) executeRulesTextAbilityEffect(
 
 		// Check for "three times X" pattern (Martyr of Sands)
 		if strings.Contains(effectText, "three times x") || strings.Contains(effectText, "3x") {
-			// Count white cards in the player's hand
-			whiteCardCount := 0
-			for _, c := range player.Hand {
-				if isCardWhite(c) {
-					whiteCardCount++
-				}
-			}
-			lifeGain = whiteCardCount * 3
+			// Use the chosen X value if ability has X, otherwise fallback to auto-count
+			if ability.HasXValue && ability.chosenXValue >= 0 {
+				// Use the player's chosen X value
+				lifeGain = ability.chosenXValue * 3
 
-			if e.logger != nil {
-				e.logger.Info("Martyr of Sands effect: counting white cards",
-					zap.Int("white_cards", whiteCardCount),
-					zap.Int("life_gain", lifeGain))
+				if e.logger != nil {
+					e.logger.Info("Martyr of Sands effect: using chosen X value",
+						zap.Int("x_value", ability.chosenXValue),
+						zap.Int("life_gain", lifeGain))
+				}
+			} else {
+				// Fallback: Count white cards in the player's hand (legacy behavior)
+				whiteCardCount := 0
+				for _, c := range player.Hand {
+					if isCardWhite(c) {
+						whiteCardCount++
+					}
+				}
+				lifeGain = whiteCardCount * 3
+
+				if e.logger != nil {
+					e.logger.Info("Martyr of Sands effect: auto-counting white cards",
+						zap.Int("white_cards", whiteCardCount),
+						zap.Int("life_gain", lifeGain))
+				}
 			}
 		} else {
 			// Try to parse fixed life gain amount from effect text
@@ -4204,7 +4608,8 @@ func (e *MageEngine) buildPlayerViews(gameState *engineGameState, requestingPlay
 				Green:     player.ManaPool.GetTotal(mana.ManaGreen),
 				Colorless: player.ManaPool.GetTotal(mana.ManaColorless),
 			},
-			HasPriority:  player.HasPriority,
+			// Derive HasPriority from turn manager to ensure consistency
+			HasPriority:  gameState.turnManager.PriorityPlayer() == playerID,
 			Passed:       player.Passed,
 			StateOrdinal: player.StateOrdinal,
 			Lost:         player.Lost,
@@ -4269,7 +4674,8 @@ func (e *MageEngine) buildPlayerViewsWithActions(gameState *engineGameState, req
 				Green:     player.ManaPool.GetTotal(mana.ManaGreen),
 				Colorless: player.ManaPool.GetTotal(mana.ManaColorless),
 			},
-			HasPriority:  player.HasPriority,
+			// Derive HasPriority from turn manager to ensure consistency
+			HasPriority:  gameState.turnManager.PriorityPlayer() == playerID,
 			Passed:       player.Passed,
 			StateOrdinal: player.StateOrdinal,
 			Lost:         player.Lost,
@@ -4800,6 +5206,9 @@ type ParsedActivatedAbility struct {
 	ManaCostString   string // The mana cost portion (e.g., "{1}", "{2}{B}")
 	IsSorcerySpeed   bool   // Whether the ability can only be activated at sorcery speed
 	AbilityIndex     int    // The index of this ability in the card's rules text
+	HasXValue        bool   // Whether the ability uses X in cost or effect
+	XValueType       string // What X represents: "reveal_white", "mana", "cards", etc.
+	chosenXValue     int    // The X value chosen by the player (only valid after selection)
 }
 
 // parseActivatedAbilitiesFromText parses activated abilities from a card's rules text
@@ -4873,6 +5282,31 @@ func parseActivatedAbilitiesFromText(rulesText string) []ParsedActivatedAbility 
 		isSorcerySpeed := strings.Contains(strings.ToLower(effectPart), "only as a sorcery") ||
 			strings.Contains(strings.ToLower(effectPart), "activate only as a sorcery")
 
+		// Check for X value in cost or effect
+		hasXValue := false
+		xValueType := ""
+		lowerCost := strings.ToLower(costPart)
+		lowerEffect := strings.ToLower(effectPart)
+
+		// Check for X in cost (e.g., "Reveal X white cards")
+		if strings.Contains(lowerCost, " x ") || strings.Contains(lowerCost, "reveal x") {
+			hasXValue = true
+			if strings.Contains(lowerCost, "white card") {
+				xValueType = "reveal_white"
+			} else if strings.Contains(lowerCost, "card") {
+				xValueType = "reveal_cards"
+			}
+		}
+		// Check for X in effect referencing cost (e.g., "three times X life")
+		if strings.Contains(lowerEffect, "times x") || strings.Contains(lowerEffect, " x ") {
+			hasXValue = true
+		}
+		// Check for mana X (e.g., "{X}")
+		if strings.Contains(costPart, "{X}") {
+			hasXValue = true
+			xValueType = "mana"
+		}
+
 		abilities = append(abilities, ParsedActivatedAbility{
 			FullText:         line,
 			CostText:         costPart,
@@ -4882,6 +5316,8 @@ func parseActivatedAbilitiesFromText(rulesText string) []ParsedActivatedAbility 
 			ManaCostString:   manaCost,
 			IsSorcerySpeed:   isSorcerySpeed,
 			AbilityIndex:     i,
+			HasXValue:        hasXValue,
+			XValueType:       xValueType,
 		})
 	}
 
@@ -4978,32 +5414,33 @@ func (e *MageEngine) buildCardViewsWithActions(gameState *engineGameState, cards
 			continue
 		}
 		views = append(views, EngineCardView{
-			ID:               card.ID,
-			Name:             card.Name,
-			DisplayName:      card.DisplayName,
-			ManaCost:         card.ManaCost,
-			Type:             card.Type,
-			SubTypes:         append([]string(nil), card.SubTypes...),
-			SuperTypes:       append([]string(nil), card.SuperTypes...),
-			Color:            card.Color,
-			Power:            card.Power,
-			Toughness:        card.Toughness,
-			Loyalty:          card.Loyalty,
-			CardNumber:       card.CardNumber,
-			ExpansionSet:     card.ExpansionSet,
-			Rarity:           card.Rarity,
-			RulesText:        card.RulesText,
-			Tapped:           card.Tapped,
-			Flipped:          card.Flipped,
-			Transformed:      card.Transformed,
-			FaceDown:         card.FaceDown,
-			Zone:             card.Zone,
-			ControllerID:     card.ControllerID,
-			OwnerID:          card.OwnerID,
-			AttachedToCard:   append([]string(nil), card.AttachedToCard...),
-			Abilities:        append([]EngineAbilityView(nil), card.Abilities...),
-			Counters:         e.buildCounterViews(card.Counters),
-			AvailableActions: e.getAvailableActionsForCard(gameState, card, playerID),
+			ID:                card.ID,
+			Name:              card.Name,
+			DisplayName:       card.DisplayName,
+			ManaCost:          card.ManaCost,
+			Type:              card.Type,
+			SubTypes:          append([]string(nil), card.SubTypes...),
+			SuperTypes:        append([]string(nil), card.SuperTypes...),
+			Color:             card.Color,
+			Power:             card.Power,
+			Toughness:         card.Toughness,
+			Loyalty:           card.Loyalty,
+			CardNumber:        card.CardNumber,
+			ExpansionSet:      card.ExpansionSet,
+			Rarity:            card.Rarity,
+			RulesText:         card.RulesText,
+			Tapped:            card.Tapped,
+			Flipped:           card.Flipped,
+			Transformed:       card.Transformed,
+			FaceDown:          card.FaceDown,
+			Zone:              card.Zone,
+			ControllerID:      card.ControllerID,
+			OwnerID:           card.OwnerID,
+			AttachedToCard:    append([]string(nil), card.AttachedToCard...),
+			Abilities:         append([]EngineAbilityView(nil), card.Abilities...),
+			Counters:          e.buildCounterViews(card.Counters),
+			AvailableActions:  e.getAvailableActionsForCard(gameState, card, playerID),
+			SummoningSickness: card.SummoningSickness,
 		})
 	}
 	return views
@@ -5060,6 +5497,23 @@ func (e *MageEngine) getAvailableActionsForCard(gameState *engineGameState, card
 			canCast = false
 			reason = "You don't have priority"
 		}
+
+		// Check if spell requires targets and if valid targets exist
+		if canCast {
+			targetRequirements := targeting.ParseTargetRequirements(card.Type, card.RulesText)
+			for _, req := range targetRequirements {
+				// Only check non-optional targets (e.g., "target creature" not "up to X targets")
+				if !req.Optional && req.MinTargets > 0 {
+					validTargets := e.findValidTargets(gameState, req)
+					if len(validTargets) < req.MinTargets {
+						canCast = false
+						reason = "No valid targets"
+						break
+					}
+				}
+			}
+		}
+
 		// TODO: Add mana cost checking, timing restrictions (sorcery vs instant), etc.
 
 		actions = append(actions, EngineCardAction{
@@ -5083,32 +5537,33 @@ func (e *MageEngine) buildBattlefieldViewsWithActions(gameState *engineGameState
 			continue
 		}
 		views = append(views, EngineCardView{
-			ID:               card.ID,
-			Name:             card.Name,
-			DisplayName:      card.DisplayName,
-			ManaCost:         card.ManaCost,
-			Type:             card.Type,
-			SubTypes:         append([]string(nil), card.SubTypes...),
-			SuperTypes:       append([]string(nil), card.SuperTypes...),
-			Color:            card.Color,
-			Power:            card.Power,
-			Toughness:        card.Toughness,
-			Loyalty:          card.Loyalty,
-			CardNumber:       card.CardNumber,
-			ExpansionSet:     card.ExpansionSet,
-			Rarity:           card.Rarity,
-			RulesText:        card.RulesText,
-			Tapped:           card.Tapped,
-			Flipped:          card.Flipped,
-			Transformed:      card.Transformed,
-			FaceDown:         card.FaceDown,
-			Zone:             card.Zone,
-			ControllerID:     card.ControllerID,
-			OwnerID:          card.OwnerID,
-			AttachedToCard:   append([]string(nil), card.AttachedToCard...),
-			Abilities:        append([]EngineAbilityView(nil), card.Abilities...),
-			Counters:         e.buildCounterViews(card.Counters),
-			AvailableActions: e.getAvailableActionsForPermanent(gameState, card, playerID),
+			ID:                card.ID,
+			Name:              card.Name,
+			DisplayName:       card.DisplayName,
+			ManaCost:          card.ManaCost,
+			Type:              card.Type,
+			SubTypes:          append([]string(nil), card.SubTypes...),
+			SuperTypes:        append([]string(nil), card.SuperTypes...),
+			Color:             card.Color,
+			Power:             card.Power,
+			Toughness:         card.Toughness,
+			Loyalty:           card.Loyalty,
+			CardNumber:        card.CardNumber,
+			ExpansionSet:      card.ExpansionSet,
+			Rarity:            card.Rarity,
+			RulesText:         card.RulesText,
+			Tapped:            card.Tapped,
+			Flipped:           card.Flipped,
+			Transformed:       card.Transformed,
+			FaceDown:          card.FaceDown,
+			Zone:              card.Zone,
+			ControllerID:      card.ControllerID,
+			OwnerID:           card.OwnerID,
+			AttachedToCard:    append([]string(nil), card.AttachedToCard...),
+			Abilities:         append([]EngineAbilityView(nil), card.Abilities...),
+			Counters:          e.buildCounterViews(card.Counters),
+			AvailableActions:  e.getAvailableActionsForPermanent(gameState, card, playerID),
+			SummoningSickness: card.SummoningSickness,
 		})
 	}
 	return views
@@ -5122,31 +5577,32 @@ func (e *MageEngine) buildCardViews(cards []*internalCard) []EngineCardView {
 			continue
 		}
 		views = append(views, EngineCardView{
-			ID:             card.ID,
-			Name:           card.Name,
-			DisplayName:    card.DisplayName,
-			ManaCost:       card.ManaCost,
-			Type:           card.Type,
-			SubTypes:       append([]string(nil), card.SubTypes...),
-			SuperTypes:     append([]string(nil), card.SuperTypes...),
-			Color:          card.Color,
-			Power:          card.Power,
-			Toughness:      card.Toughness,
-			Loyalty:        card.Loyalty,
-			CardNumber:     card.CardNumber,
-			ExpansionSet:   card.ExpansionSet,
-			Rarity:         card.Rarity,
-			RulesText:      card.RulesText,
-			Tapped:         card.Tapped,
-			Flipped:        card.Flipped,
-			Transformed:    card.Transformed,
-			FaceDown:       card.FaceDown,
-			Zone:           card.Zone,
-			ControllerID:   card.ControllerID,
-			OwnerID:        card.OwnerID,
-			AttachedToCard: append([]string(nil), card.AttachedToCard...),
-			Abilities:      append([]EngineAbilityView(nil), card.Abilities...),
-			Counters:       e.buildCounterViews(card.Counters),
+			ID:                card.ID,
+			Name:              card.Name,
+			DisplayName:       card.DisplayName,
+			ManaCost:          card.ManaCost,
+			Type:              card.Type,
+			SubTypes:          append([]string(nil), card.SubTypes...),
+			SuperTypes:        append([]string(nil), card.SuperTypes...),
+			Color:             card.Color,
+			Power:             card.Power,
+			Toughness:         card.Toughness,
+			Loyalty:           card.Loyalty,
+			CardNumber:        card.CardNumber,
+			ExpansionSet:      card.ExpansionSet,
+			Rarity:            card.Rarity,
+			RulesText:         card.RulesText,
+			Tapped:            card.Tapped,
+			Flipped:           card.Flipped,
+			Transformed:       card.Transformed,
+			FaceDown:          card.FaceDown,
+			Zone:              card.Zone,
+			ControllerID:      card.ControllerID,
+			OwnerID:           card.OwnerID,
+			AttachedToCard:    append([]string(nil), card.AttachedToCard...),
+			Abilities:         append([]EngineAbilityView(nil), card.Abilities...),
+			Counters:          e.buildCounterViews(card.Counters),
+			SummoningSickness: card.SummoningSickness,
 		})
 	}
 	return views
@@ -6337,6 +6793,15 @@ func (e *MageEngine) moveCard(gameState *engineGameState, card *internalCard, ta
 	case zoneBattlefield:
 		gameState.battlefield = append(gameState.battlefield, card)
 
+		// Set summoning sickness for creatures entering the battlefield (unless they have haste)
+		// Per MTG Rule 302.6: A creature can't attack unless it has been under its controller's
+		// control continuously since the start of their most recent turn
+		if e.isCreature(card) {
+			if !e.hasAbility(card, abilityHaste) {
+				card.SummoningSickness = true
+			}
+		}
+
 		// Emit enters battlefield event
 		gameState.eventBus.Publish(rules.Event{
 			Type:        rules.EventEntersTheBattlefield,
@@ -6519,15 +6984,14 @@ func (e *MageEngine) buildAttackerPromptOptions(gameState *engineGameState) []st
 			continue
 		}
 
-		// Check if creature can attack
-		canAttack, _ := e.CanAttack(gameState.gameID, card.ID)
-		if !canAttack {
+		// Check if creature can attack (use internal version since lock is already held)
+		if !e.canAttackInternal(gameState, card) {
 			continue
 		}
 
-		// For each valid defender, add an option
+		// For each valid defender, add an option (use internal version since lock is already held)
 		for defenderID := range gameState.combat.defenders {
-			canAttackDefender, _ := e.CanAttackDefender(gameState.gameID, card.ID, defenderID)
+			canAttackDefender, _ := e.canAttackDefenderInternal(gameState, card, defenderID)
 			if canAttackDefender {
 				option := fmt.Sprintf("ATTACK:%s:%s", card.ID, defenderID)
 				options = append(options, option)
@@ -6881,32 +7345,35 @@ func (e *MageEngine) copyCard(card *internalCard) *internalCard {
 	}
 
 	return &internalCard{
-		ID:             card.ID,
-		Name:           card.Name,
-		DisplayName:    card.DisplayName,
-		ManaCost:       card.ManaCost,
-		Type:           card.Type,
-		SubTypes:       append([]string(nil), card.SubTypes...),
-		SuperTypes:     append([]string(nil), card.SuperTypes...),
-		Color:          card.Color,
-		Power:          card.Power,
-		Toughness:      card.Toughness,
-		Loyalty:        card.Loyalty,
-		CardNumber:     card.CardNumber,
-		ExpansionSet:   card.ExpansionSet,
-		Rarity:         card.Rarity,
-		RulesText:      card.RulesText,
-		Tapped:         card.Tapped,
-		Flipped:        card.Flipped,
-		Transformed:    card.Transformed,
-		FaceDown:       card.FaceDown,
-		Zone:           card.Zone,
-		ControllerID:   card.ControllerID,
-		OwnerID:        card.OwnerID,
-		AttachedToCard: append([]string(nil), card.AttachedToCard...),
-		Abilities:      append([]EngineAbilityView(nil), card.Abilities...),
-		Counters:       card.Counters.Copy(),
-		Metadata:       copyMetadata(card.Metadata),
+		ID:                card.ID,
+		Name:              card.Name,
+		DisplayName:       card.DisplayName,
+		ManaCost:          card.ManaCost,
+		Type:              card.Type,
+		SubTypes:          append([]string(nil), card.SubTypes...),
+		SuperTypes:        append([]string(nil), card.SuperTypes...),
+		Color:             card.Color,
+		Power:             card.Power,
+		Toughness:         card.Toughness,
+		Loyalty:           card.Loyalty,
+		CardNumber:        card.CardNumber,
+		ExpansionSet:      card.ExpansionSet,
+		Rarity:            card.Rarity,
+		RulesText:         card.RulesText,
+		Tapped:            card.Tapped,
+		Flipped:           card.Flipped,
+		Transformed:       card.Transformed,
+		FaceDown:          card.FaceDown,
+		Zone:              card.Zone,
+		ControllerID:      card.ControllerID,
+		OwnerID:           card.OwnerID,
+		AttachedToCard:    append([]string(nil), card.AttachedToCard...),
+		Abilities:         append([]EngineAbilityView(nil), card.Abilities...),
+		Counters:          card.Counters.Copy(),
+		Metadata:          copyMetadata(card.Metadata),
+		SummoningSickness: card.SummoningSickness,
+		IsToken:           card.IsToken,
+		IsCommander:       card.IsCommander,
 	}
 }
 
@@ -8257,14 +8724,25 @@ func (e *MageEngine) performUntapStep(gameState *engineGameState, activePlayerID
 	}
 
 	untappedCount := 0
+	summoningSicknessCleared := 0
 	for _, card := range gameState.battlefield {
 		if card == nil {
 			continue
 		}
-		if card.ControllerID == activePlayerID && card.Tapped {
-			// TODO: Check for "doesn't untap" effects
-			card.Tapped = false
-			untappedCount++
+		if card.ControllerID == activePlayerID {
+			// Untap tapped permanents
+			if card.Tapped {
+				// TODO: Check for "doesn't untap" effects
+				card.Tapped = false
+				untappedCount++
+			}
+			// Clear summoning sickness for creatures controlled by the active player
+			// Per MTG Rule 302.6: A creature can attack/tap if it has been under its controller's
+			// control continuously since the start of their most recent turn
+			if card.SummoningSickness {
+				card.SummoningSickness = false
+				summoningSicknessCleared++
+			}
 		}
 	}
 
@@ -8278,6 +8756,7 @@ func (e *MageEngine) performUntapStep(gameState *engineGameState, activePlayerID
 		e.logger.Debug("untap step performed",
 			zap.String("player", activePlayerID),
 			zap.Int("untapped", untappedCount),
+			zap.Int("summoning_sickness_cleared", summoningSicknessCleared),
 		)
 	}
 }
@@ -8480,11 +8959,18 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 
 		// Generate prompt for attacking player to declare attackers
 		options := e.buildAttackerPromptOptions(gameState)
+		var promptMessage string
 		if len(options) > 1 { // More than just "DONE_ATTACKING"
-			gameState.addPrompt(activePlayerID, "Declare attackers (select creatures to attack)", options)
+			promptMessage = "Declare attackers (select creatures to attack)"
+			gameState.addPrompt(activePlayerID, promptMessage, options)
 		} else {
-			gameState.addPrompt(activePlayerID, "No creatures can attack", []string{"DONE_ATTACKING"})
+			promptMessage = "No creatures can attack"
+			options = []string{"DONE_ATTACKING"}
+			gameState.addPrompt(activePlayerID, promptMessage, options)
 		}
+
+		// Send choice prompt notification to client
+		e.notifyChoicePrompt(gameState.gameID, activePlayerID, promptMessage, options)
 
 		if e.logger != nil {
 			e.logger.Debug("declare attackers step initialized",
@@ -8534,11 +9020,17 @@ func (e *MageEngine) handleCombatStepBegin(gameState *engineGameState, step rule
 		for playerID := range gameState.players {
 			if playerID != activePlayerID {
 				options := e.buildBlockerPromptOptions(gameState, playerID)
+				var promptMessage string
 				if len(options) > 1 { // More than just "DONE_BLOCKING"
-					gameState.addPrompt(playerID, "Declare blockers (select creatures to block)", options)
+					promptMessage = "Declare blockers (select creatures to block)"
+					gameState.addPrompt(playerID, promptMessage, options)
 				} else {
-					gameState.addPrompt(playerID, "No creatures can block or no attackers", []string{"DONE_BLOCKING"})
+					promptMessage = "No creatures can block or no attackers"
+					options = []string{"DONE_BLOCKING"}
+					gameState.addPrompt(playerID, promptMessage, options)
 				}
+				// Send choice prompt notification to client
+				e.notifyChoicePrompt(gameState.gameID, playerID, promptMessage, options)
 			}
 		}
 
@@ -11056,14 +11548,14 @@ func (e *MageEngine) isCreature(card *internalCard) bool {
 	if card == nil {
 		return false
 	}
-	return strings.Contains(card.Type, "Creature")
+	return strings.Contains(strings.ToLower(card.Type), "creature")
 }
 
 func (e *MageEngine) isPlaneswalker(card *internalCard) bool {
 	if card == nil {
 		return false
 	}
-	return strings.Contains(card.Type, "Planeswalker")
+	return strings.Contains(strings.ToLower(card.Type), "planeswalker")
 }
 
 // hasBanding checks if a creature has the banding ability

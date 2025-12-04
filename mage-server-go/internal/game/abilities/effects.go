@@ -22,16 +22,41 @@ type Effect interface {
 
 // DamageEffect deals damage to targets
 type DamageEffect struct {
-	Amount int
+	Amount       DynamicValue
+	CombatDamage bool // true if this is combat damage (for lifelink, deathtouch, etc.)
 }
 
-func NewDamageEffect(amount int) *DamageEffect {
-	return &DamageEffect{Amount: amount}
+// NewDamageEffect creates a damage effect with optional combat damage flag
+// Java signature: new DamageTargetEffect(amount) or new DamageTargetEffect(amount, true) for combat damage
+// amount can be int, DynamicValue, or any value that implements DynamicValue
+// Can be called with no arguments for placeholder (transpiler compatibility)
+func NewDamageEffect(args ...interface{}) *DamageEffect {
+	effect := &DamageEffect{
+		Amount:       NewStaticValue(0), // Default placeholder
+		CombatDamage: false,
+	}
+	for i, arg := range args {
+		switch v := arg.(type) {
+		case int, DynamicValue:
+			if i == 0 {
+				effect.Amount = toDynamicValue(v)
+			}
+		case bool:
+			effect.CombatDamage = v
+		}
+	}
+	return effect
+}
+
+// NewCombatDamageEffect creates a damage effect that counts as combat damage
+func NewCombatDamageEffect(amount interface{}) *DamageEffect {
+	return &DamageEffect{Amount: toDynamicValue(amount), CombatDamage: true}
 }
 
 func (e *DamageEffect) Apply(ctx context.Context, game GameContext, source uuid.UUID, targets []uuid.UUID) error {
+	amount := e.Amount.Calculate(ctx, game, source)
 	for _, target := range targets {
-		if err := game.DealDamage(source, target, e.Amount); err != nil {
+		if err := game.DealDamage(source, target, amount); err != nil {
 			return fmt.Errorf("failed to deal damage: %w", err)
 		}
 	}
@@ -39,7 +64,10 @@ func (e *DamageEffect) Apply(ctx context.Context, game GameContext, source uuid.
 }
 
 func (e *DamageEffect) GetDescription() string {
-	return fmt.Sprintf("deals %d damage", e.Amount)
+	if e.CombatDamage {
+		return fmt.Sprintf("deals %s combat damage", e.Amount.GetMessage())
+	}
+	return fmt.Sprintf("deals %s damage", e.Amount.GetMessage())
 }
 
 // ========================================
@@ -116,11 +144,16 @@ func (e *DestroyEffect) GetDescription() string {
 
 // GainLifeEffect has a player gain life
 type GainLifeEffect struct {
-	Amount int
+	Amount DynamicValue
 }
 
-func NewGainLifeEffect(amount int) *GainLifeEffect {
-	return &GainLifeEffect{Amount: amount}
+// NewGainLifeEffect creates a gain life effect.
+// Can be called with no arguments (returns placeholder), an int, or a DynamicValue.
+func NewGainLifeEffect(amount ...interface{}) *GainLifeEffect {
+	if len(amount) == 0 {
+		return &GainLifeEffect{Amount: NewStaticValue(0)} // Placeholder
+	}
+	return &GainLifeEffect{Amount: toDynamicValue(amount[0])}
 }
 
 func (e *GainLifeEffect) Apply(ctx context.Context, game GameContext, source uuid.UUID, targets []uuid.UUID) error {
@@ -130,20 +163,26 @@ func (e *GainLifeEffect) Apply(ctx context.Context, game GameContext, source uui
 		return fmt.Errorf("failed to get controller: %w", err)
 	}
 
-	return game.GainLife(controllerID, e.Amount)
+	amount := e.Amount.Calculate(ctx, game, source)
+	return game.GainLife(controllerID, amount)
 }
 
 func (e *GainLifeEffect) GetDescription() string {
-	return fmt.Sprintf("gain %d life", e.Amount)
+	return fmt.Sprintf("gain %s life", e.Amount.GetMessage())
 }
 
 // LoseLifeEffect has a player lose life
 type LoseLifeEffect struct {
-	Amount int
+	Amount DynamicValue
 }
 
-func NewLoseLifeEffect(amount int) *LoseLifeEffect {
-	return &LoseLifeEffect{Amount: amount}
+// NewLoseLifeEffect creates a lose life effect.
+// Can be called with no arguments (returns placeholder), an int, or a DynamicValue.
+func NewLoseLifeEffect(amount ...interface{}) *LoseLifeEffect {
+	if len(amount) == 0 {
+		return &LoseLifeEffect{Amount: NewStaticValue(0)} // Placeholder
+	}
+	return &LoseLifeEffect{Amount: toDynamicValue(amount[0])}
 }
 
 func (e *LoseLifeEffect) Apply(ctx context.Context, game GameContext, source uuid.UUID, targets []uuid.UUID) error {
@@ -152,7 +191,7 @@ func (e *LoseLifeEffect) Apply(ctx context.Context, game GameContext, source uui
 }
 
 func (e *LoseLifeEffect) GetDescription() string {
-	return fmt.Sprintf("lose %d life", e.Amount)
+	return fmt.Sprintf("lose %s life", e.Amount.GetMessage())
 }
 
 // ========================================
@@ -160,10 +199,13 @@ func (e *LoseLifeEffect) GetDescription() string {
 // ========================================
 
 // BoostEffect modifies power/toughness
+// Supports both static int values and dynamic values
 type BoostEffect struct {
-	Power     int
-	Toughness int
-	Duration  Duration
+	Power          int
+	Toughness      int
+	PowerValue     DynamicValue // Alternative to static Power
+	ToughnessValue DynamicValue // Alternative to static Toughness
+	Duration       Duration
 }
 
 // Duration specifies how long a continuous effect lasts
@@ -204,13 +246,58 @@ const (
 
 	// DurationCustom for special durations
 	DurationCustom
+
+	// DurationWhileControlled lasts while controlled
+	DurationWhileControlled
+
+	// DurationWhileSourceCosts applies while source card costs something
+	DurationWhileSourceCosts
+
+	// DurationEndOfGame lasts until end of game
+	DurationEndOfGame
+
+	// DurationUntilSourceLeavesBattlefield lasts until source leaves battlefield
+	DurationUntilSourceLeavesBattlefield
 )
 
-func NewBoostEffect(power, toughness int) *BoostEffect {
+// NewBoostEffect creates a boost effect with static values
+// Java: new BoostSourceEffect(power, toughness, Duration.EndOfTurn)
+// Can be called with no arguments (placeholder) or with power/toughness values
+// Additional optional params are ignored (for compatibility with generated code)
+func NewBoostEffect(args ...interface{}) *BoostEffect {
+	effect := &BoostEffect{
+		Duration: DurationUntilEndOfTurn,
+	}
+
+	// Handle variadic args: power, toughness, and optional extras
+	if len(args) >= 2 {
+		// Handle power - can be int or DynamicValue
+		switch p := args[0].(type) {
+		case int:
+			effect.Power = p
+		case DynamicValue:
+			effect.PowerValue = p
+		}
+
+		// Handle toughness - can be int or DynamicValue
+		switch t := args[1].(type) {
+		case int:
+			effect.Toughness = t
+		case DynamicValue:
+			effect.ToughnessValue = t
+		}
+	}
+	// Other args (duration, condition, etc.) ignored for now
+
+	return effect
+}
+
+// NewBoostEffectWithDuration creates a boost effect with explicit duration
+func NewBoostEffectWithDuration(power, toughness int, duration Duration) *BoostEffect {
 	return &BoostEffect{
 		Power:     power,
 		Toughness: toughness,
-		Duration:  DurationUntilEndOfTurn,
+		Duration:  duration,
 	}
 }
 
@@ -220,6 +307,10 @@ func (e *BoostEffect) Apply(ctx context.Context, game GameContext, source uuid.U
 }
 
 func (e *BoostEffect) GetDescription() string {
+	// If using dynamic values, show a descriptive message
+	if e.PowerValue != nil || e.ToughnessValue != nil {
+		return "gets power/toughness boost based on dynamic values"
+	}
 	powerStr := formatBoost(e.Power)
 	toughnessStr := formatBoost(e.Toughness)
 	return fmt.Sprintf("gets %s/%s", powerStr, toughnessStr)
@@ -237,14 +328,28 @@ func formatBoost(value int) string {
 // ========================================
 
 // TapEffect taps target permanents
-type TapEffect struct{}
+type TapEffect struct {
+	filter TargetFilter // Optional filter for targets
+}
 
-func NewTapEffect() *TapEffect {
-	return &TapEffect{}
+// NewTapEffect creates a new tap effect with optional filter.
+// Java: new TapAllEffect(filter) or TapTargetEffect()
+// Accepts TargetFilter or string (string values are ignored for compatibility)
+func NewTapEffect(args ...interface{}) *TapEffect {
+	e := &TapEffect{}
+	for _, arg := range args {
+		if f, ok := arg.(TargetFilter); ok {
+			e.filter = f
+			break
+		}
+		// Ignore string arguments - these are text descriptions from transpiler
+	}
+	return e
 }
 
 func (e *TapEffect) Apply(ctx context.Context, game GameContext, source uuid.UUID, targets []uuid.UUID) error {
 	for _, target := range targets {
+		// TODO: Apply filter if present
 		if err := game.TapPermanent(target); err != nil {
 			return fmt.Errorf("failed to tap permanent: %w", err)
 		}
@@ -253,14 +358,29 @@ func (e *TapEffect) Apply(ctx context.Context, game GameContext, source uuid.UUI
 }
 
 func (e *TapEffect) GetDescription() string {
+	if e.filter != nil {
+		return fmt.Sprintf("tap each %s", e.filter.GetDescription())
+	}
 	return "tap target"
 }
 
 // UntapEffect untaps target permanents
-type UntapEffect struct{}
+type UntapEffect struct {
+	text string
+}
 
-func NewUntapEffect() *UntapEffect {
-	return &UntapEffect{}
+// NewUntapEffect creates a new untap effect with optional text description.
+// Java: new UntapTargetEffect() or new UntapTargetEffect("untap it")
+// Accepts any type but only uses string values for text
+func NewUntapEffect(args ...interface{}) *UntapEffect {
+	e := &UntapEffect{}
+	for _, arg := range args {
+		if s, ok := arg.(string); ok && s != "" {
+			e.text = s
+			break
+		}
+	}
+	return e
 }
 
 func (e *UntapEffect) Apply(ctx context.Context, game GameContext, source uuid.UUID, targets []uuid.UUID) error {
@@ -273,6 +393,9 @@ func (e *UntapEffect) Apply(ctx context.Context, game GameContext, source uuid.U
 }
 
 func (e *UntapEffect) GetDescription() string {
+	if e.text != "" {
+		return e.text
+	}
 	return "untap target"
 }
 
@@ -315,7 +438,10 @@ func (e *AddManaEffect) GetDescription() string {
 // CounterSpellEffect counters a spell
 type CounterSpellEffect struct{}
 
-func NewCounterSpellEffect() *CounterSpellEffect {
+// NewCounterSpellEffect creates a counter spell effect.
+// Optional args are ignored (for transpiler compatibility).
+func NewCounterSpellEffect(args ...interface{}) *CounterSpellEffect {
+	_ = args
 	return &CounterSpellEffect{}
 }
 

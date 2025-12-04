@@ -25,12 +25,12 @@ func NewMortisDogs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewDiesTrigger(card.ID)).
-		AddEffect(abilities.NewLoseLifeEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: LoseLifeTargetEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewLoseLifeEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: LoseLifeTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

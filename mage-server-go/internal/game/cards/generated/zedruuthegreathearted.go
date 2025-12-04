@@ -25,7 +25,7 @@ func NewZedruuTheGreathearted(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGainLifeEffect(PermanentsYouOwnThatOpponentsControlCount.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

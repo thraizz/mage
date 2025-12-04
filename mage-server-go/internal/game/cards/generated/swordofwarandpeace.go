@@ -23,7 +23,7 @@ func NewSwordOfWarAndPeace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(2, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(ProtectionAbility.from(ObjectColor.RED, ObjectColor.WHITE), AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

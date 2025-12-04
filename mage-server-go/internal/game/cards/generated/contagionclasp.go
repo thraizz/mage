@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -23,7 +22,7 @@ func NewContagionClasp(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeM1M1.CreateInstance(1), Outcome.UnboostCreature)).
+		// TODO: AddCountersTargetEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	// TODO: Implement activated ability with unmapped effects

@@ -27,7 +27,7 @@ func NewSoulsOfTheFaultless(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewGainLifeEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewGainLifeEffect(abilities.SavedDamageValueInstance)).
 		Build()
 	card.AddAbility(ability0)
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDefender)

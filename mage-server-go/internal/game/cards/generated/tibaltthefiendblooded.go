@@ -31,7 +31,7 @@ func NewTibaltTheFiendBlooded(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 		Build()
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(CardsInTargetHandCount.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		Build()
 	if err != nil {

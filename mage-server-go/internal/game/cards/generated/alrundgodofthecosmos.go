@@ -34,7 +34,7 @@ func NewAlrundGodOfTheCosmos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying)
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(AlrundGodOfTheCosmosValue.instance, AlrundGodOfTheCosmosValue.instance)).
+		// TODO: BoostSourceEffect with complex parameters
 		AddEffect(abilities.NewReturnToHandSourceEffect()).
 		Build()
 	if err != nil {

@@ -22,7 +22,7 @@ func NewPowerArmor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewBoostEffect(DomainValue.REGULAR, DomainValue.REGULAR)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

@@ -28,7 +28,7 @@ func NewKyloRen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewBoostEffect(value, StaticValue.get(0))).
+		// TODO: BoostSourceEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)
@@ -37,7 +37,7 @@ func NewKyloRen(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFirstStrike)
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(value, StaticValue.get(0))).
+		// TODO: BoostSourceEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

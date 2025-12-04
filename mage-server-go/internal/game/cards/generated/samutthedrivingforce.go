@@ -32,7 +32,7 @@ func NewSamutTheDrivingForce(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability2 := abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste)
 	card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(ControllerSpeedCount.instance, StaticValue.get(0), true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -35,7 +35,7 @@ func NewBiorganicCarapace(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(2, 2)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(gainedAbility, null)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

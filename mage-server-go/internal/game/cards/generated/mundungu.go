@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -26,7 +25,7 @@ func NewMundungu(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewCounterSpellEffect(costs)).
+		// TODO: CounterUnlessPaysEffect with complex parameters
 		AddTarget(abilities.NewSpellTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

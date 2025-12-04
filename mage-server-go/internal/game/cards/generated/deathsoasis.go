@@ -23,7 +23,7 @@ func NewDeathsOasis(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewGainLifeEffect(GreatestAmongPermanentsValue.MANAVALUE_CONTROLLED_CREATURES)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

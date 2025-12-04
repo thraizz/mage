@@ -1,0 +1,182 @@
+{
+  "timestamp": "2025-12-02T14:36:12.763863",
+  "summary": {
+    "total": 30600,
+    "successful": 30600,
+    "failed": 0,
+    "has_todo": 8803,
+    "fully_implemented": 21797,
+    "success_rate": "100.00%",
+    "todo_rate": "28.77%",
+    "complete_rate": "71.23%"
+  },
+  "todo_analysis": {
+    "total": 8803,
+    "cards_with_todos": [
+      "aangairbendingmaster",
+      "aangmasterofelements",
+      "aangsiceberg",
+      "aangsjourney",
+      "aangthelastairbender",
+      "aat1",
+      "abandonattachments",
+      "aberrant",
+      "abhorrentoverlord",
+      "abidinggrace",
+      "abnormalendurance",
+      "abolisherofbloodlines",
+      "absolutegrace",
+      "absolutelaw",
+      "absolverthrull",
+      "abstergoentertainment",
+      "abstrusearchaic",
+      "abueloancestralecho",
+      "abujafar",
+      "abunaacolyte",
+      "abundantgrowth",
+      "abundantmaw",
+      "abyssalgatekeeper",
+      "abyssalgorestalker",
+      "abyssalharvester",
+      "abyssalhorror",
+      "abyssalhunter",
+      "abyssalnightstalker",
+      "abyssalspecter",
+      "abzanmonument",
+      "academyelite",
+      "academyraider",
+      "academyrector",
+      "academyruins",
+      "acceleratedmutation",
+      "accesstunnel",
+      "acclaimedcontender",
+      "accursedcentaur",
+      "accursedduneyard",
+      "accursedmarauder",
+      "accursedwitch",
+      "achillesdavenport",
+      "acidicdagger",
+      "acidicsliver",
+      "acidrain",
+      "acklayofthearena",
+      "acolyteofaclazotz",
+      "acolyteofbahamut",
+      "acrobaticcheerleader",
+      "adaptiveautomaton",
+      "adaptiveomnitool",
+      "adarkarvalkyrie",
+      "adarkarwindform",
+      "adelbertsteiner",
+      "adelizthecinderwind",
+      "adewalebreakerofchains",
+      "admiralackbar",
+      "admiralbeckettbrass",
+      "admonitionangel",
+      "adricmathematicalgenius",
+      "advancedstitchwing",
+      "adventureawaits",
+      "adventurersguildhouse",
+      "adventurousimpulse",
+      "advicefromthefae",
+      "advocateofthebeast",
+      "aegissculptor",
+      "aeonengine",
+      "aerialassault",
+      "aerialextortionist",
+      "aerialguide",
+      "aerialsurveyor",
+      "aerieouphes",
+      "aerieworshippers",
+      "aetherbladeagent",
+      "aetherchaser",
+      "aetherfluxreservoir",
+      "aetherherder",
+      "aethericamplifier",
+      "aetherinspector",
+      "aetherjacket",
+      "aethermagestouch",
+      "aetherplasm",
+      "aetherpoisoner",
+      "aetherrefinery",
+      "aetherrift",
+      "aethershieldartificer",
+      "aethershockwave",
+      "aetherstorm",
+      "aetherstormroc",
+      "aetherstreamleopard",
+      "aetherswooper",
+      "aetherworksmarvel",
+      "affectionateindrik",
+      "afiyagrove",
+      "afterlifefromtheloam",
+      "afterlifeinsurance",
+      "aftermathanalyst",
+      "agadeemoccultist",
+      "agadeemsawakening"
+    ],
+    "sample_details": {
+      "hexplatewallbreaker": {
+        "count": 1,
+        "messages": [
+          "TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)"
+        ]
+      },
+      "galewaterdeepprodigy": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement triggered ability: SpellCastControllerTriggeredAbility"
+        ]
+      },
+      "teferisimp": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement spell ability with unmapped effects"
+        ]
+      },
+      "bristlybillspinesower": {
+        "count": 1,
+        "messages": [
+          "TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)"
+        ]
+      },
+      "coralhelmchronicler": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement spell ability with unmapped effects"
+        ]
+      },
+      "communewithdinosaurs": {
+        "count": 1,
+        "messages": [
+          "TODO: Implement spell ability with unmapped effects"
+        ]
+      },
+      "rootwisesurvivor": {
+        "count": 1,
+        "messages": [
+          "TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)"
+        ]
+      },
+      "mageringresponder": {
+        "count": 1,
+        "messages": [
+          "TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)"
+        ]
+      },
+      "sawbackmanticore": {
+        "count": 1,
+        "messages": [
+          "TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)"
+        ]
+      },
+      "angeliccaptain": {
+        "count": 1,
+        "messages": [
+          "TODO: BoostSourceEffect with complex parameters"
+        ]
+      }
+    }
+  },
+  "error_categories": {},
+  "failed_cards": []
+}

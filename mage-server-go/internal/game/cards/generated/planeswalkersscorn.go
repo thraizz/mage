@@ -24,7 +24,7 @@ func NewPlaneswalkersScorn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	//   - Effect: PlaneswalkersScornEffect()
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(boostValue, boostValue)).
+		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

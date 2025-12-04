@@ -21,7 +21,7 @@ func NewPyrrhicBlast(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(SacrificeCostCreaturesPower.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()

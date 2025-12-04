@@ -34,7 +34,7 @@ func NewKatildasRisingDawn(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordLifelink), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
 		// TODO: GainAbilityAttachedEffect with complex parameters
-		AddEffect(abilities.NewBoostEquippedEffect(xValue, xValue)).
+		// TODO: BoostEquippedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

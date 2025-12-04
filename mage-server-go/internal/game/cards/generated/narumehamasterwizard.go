@@ -33,7 +33,7 @@ func NewNaruMehaMasterWizard(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability1 := abilities.NewKeywordAbility(card.ID, abilities.KeywordFlash)
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(1, 1, wizardFilter, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

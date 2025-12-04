@@ -22,7 +22,7 @@ func NewSeveredStrands(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDestroyEffect()).
-		AddEffect(abilities.NewGainLifeEffect(SacrificeCostCreaturesToughness.instance + "sacrificed creature's toughness.")).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

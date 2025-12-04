@@ -212,6 +212,14 @@ func (c *ManaCost) Pay(ctx context.Context, game GameContext, playerID uuid.UUID
 	return nil
 }
 
+// ConvertedManaCost returns the total mana value (CMC)
+func (c *ManaCost) ConvertedManaCost() int {
+	if c.Mana == nil {
+		return 0
+	}
+	return c.Mana.Total()
+}
+
 func (c *ManaCost) String() string {
 	parts := []string{}
 

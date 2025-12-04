@@ -27,7 +27,7 @@ func NewGoreclawTerrorOfQalSisma(ownerID uuid.UUID, info *cards.CardInfo) (*game
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewBoostEffect(1, 1, filter2)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	card.AddAbility(ability0)
 	return card, nil

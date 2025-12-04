@@ -29,7 +29,7 @@ func NewAvelineDeGrandpre(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	ability0 := abilities.NewKeywordAbility(card.ID, abilities.KeywordDeathtouch)
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1), SavedDamageValue.MANY)).
+		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1), abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

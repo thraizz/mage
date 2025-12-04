@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
@@ -35,7 +34,7 @@ func NewChitterspitter(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	//   - DoIfCostPaid(                         new AddCountersSourceEffe...)
 	// card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(counterValue, counterValue, filter2, false)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

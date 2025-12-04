@@ -177,6 +177,23 @@ func (s *mageServer) handleGameNotification(notification game.GameNotification) 
 		return
 	}
 
+	// Handle GAME_XMANA notifications - send X value selection prompt to specific player
+	if notification.Type == "GAME_XMANA" {
+		if notification.PlayerID != "" {
+			s.handleXManaNotification(gameID, notification.PlayerID, notification.Data)
+		}
+		return
+	}
+
+	// Handle GAME_CHOOSE_CHOICE notifications - send choice prompt to specific player
+	// Used for combat declarations (declare attackers, declare blockers) and other choices
+	if notification.Type == "GAME_CHOOSE_CHOICE" {
+		if notification.PlayerID != "" {
+			s.handleChoiceNotification(gameID, notification.PlayerID, notification.Data)
+		}
+		return
+	}
+
 	// Send game update to all players
 	for _, playerName := range gameInstance.Players {
 		s.logger.Info("sending GAME_UPDATE to player",
@@ -459,6 +476,164 @@ func (s *mageServer) handleTargetNotification(gameID, playerName string, data ma
 
 	// Send to the player
 	s.sendGameTargetToPlayer(gameID, playerName, targetData)
+}
+
+// handleXManaNotification processes a GAME_XMANA notification and sends to the player
+func (s *mageServer) handleXManaNotification(gameID, playerName string, data map[string]interface{}) {
+	// Extract X mana data from the notification
+	message, _ := data["message"].(string)
+	available := 0
+	if avail, ok := data["available"].(int); ok {
+		available = avail
+	}
+
+	// Create the X mana data
+	xManaData := &pb.GamePlayXManaData{
+		Message:   message,
+		Available: int32(available),
+	}
+
+	// Send to the player
+	s.sendGameXManaToPlayer(gameID, playerName, xManaData)
+}
+
+// sendGameXManaToPlayer sends a GAME_PLAY_XMANA event to a specific player
+func (s *mageServer) sendGameXManaToPlayer(gameID, playerName string, xManaData *pb.GamePlayXManaData) {
+	// Create the GAME_PLAY_XMANA event
+	event := &pb.ServerEvent{
+		ObjectId: gameID,
+		Method:   pb.CallbackMethod_GAME_PLAY_XMANA,
+	}
+
+	// Marshal the X mana data into the Any field
+	anyData, err := anypb.New(xManaData)
+	if err != nil {
+		s.logger.Error("failed to marshal X mana data",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+			zap.Error(err),
+		)
+		return
+	}
+	event.Data = anyData
+
+	// Send to all sessions for this player
+	sessions := s.sessionMgr.GetSessionsByUser(playerName)
+	if len(sessions) == 0 {
+		s.logger.Warn("no sessions found for player to send X value request",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+		)
+		return
+	}
+
+	s.logger.Info("sending GAME_PLAY_XMANA via WebSocket",
+		zap.String("game_id", gameID),
+		zap.String("player", playerName),
+		zap.Int("session_count", len(sessions)),
+		zap.String("message", xManaData.Message),
+		zap.Int32("available", xManaData.Available),
+	)
+
+	for _, sess := range sessions {
+		if !sess.SendCallback(event) {
+			s.logger.Warn("failed to send GAME_PLAY_XMANA to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		} else {
+			s.logger.Info("successfully sent GAME_PLAY_XMANA to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		}
+	}
+}
+
+// handleChoiceNotification processes a GAME_CHOOSE_CHOICE notification and sends to the player
+// This is used for combat declarations (attackers, blockers) and other player choices
+func (s *mageServer) handleChoiceNotification(gameID, playerName string, data map[string]interface{}) {
+	// Extract choice data from the notification
+	message, _ := data["message"].(string)
+
+	// Extract choices array
+	var choices []string
+	if choicesData, ok := data["choices"].([]string); ok {
+		choices = choicesData
+	} else if choicesInterface, ok := data["choices"].([]interface{}); ok {
+		// Handle case where choices come through as []interface{}
+		for _, c := range choicesInterface {
+			if str, ok := c.(string); ok {
+				choices = append(choices, str)
+			}
+		}
+	}
+
+	// Create the choice data
+	choiceData := &pb.GameChoiceData{
+		Message: message,
+		Choices: choices,
+	}
+
+	// Send to the player
+	s.sendGameChoiceToPlayer(gameID, playerName, choiceData)
+}
+
+// sendGameChoiceToPlayer sends a GAME_CHOOSE_CHOICE event to a specific player
+func (s *mageServer) sendGameChoiceToPlayer(gameID, playerName string, choiceData *pb.GameChoiceData) {
+	// Create the GAME_CHOOSE_CHOICE event
+	event := &pb.ServerEvent{
+		ObjectId: gameID,
+		Method:   pb.CallbackMethod_GAME_CHOOSE_CHOICE,
+	}
+
+	// Marshal the choice data into the Any field
+	anyData, err := anypb.New(choiceData)
+	if err != nil {
+		s.logger.Error("failed to marshal choice data",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+			zap.Error(err),
+		)
+		return
+	}
+	event.Data = anyData
+
+	// Send to all sessions for this player
+	sessions := s.sessionMgr.GetSessionsByUser(playerName)
+	if len(sessions) == 0 {
+		s.logger.Warn("no sessions found for player to send choice prompt",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+		)
+		return
+	}
+
+	s.logger.Info("sending GAME_CHOOSE_CHOICE via WebSocket",
+		zap.String("game_id", gameID),
+		zap.String("player", playerName),
+		zap.Int("session_count", len(sessions)),
+		zap.String("message", choiceData.Message),
+		zap.Int("choice_count", len(choiceData.Choices)),
+	)
+
+	for _, sess := range sessions {
+		if !sess.SendCallback(event) {
+			s.logger.Warn("failed to send GAME_CHOOSE_CHOICE to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		} else {
+			s.logger.Info("successfully sent GAME_CHOOSE_CHOICE to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		}
+	}
 }
 
 // engineViewToProto converts an engine view to protobuf GameView

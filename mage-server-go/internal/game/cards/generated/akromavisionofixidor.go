@@ -34,7 +34,7 @@ func NewAkromaVisionOfIxidor(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability3 := abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample)
 	card.AddAbility(ability3)
 	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(count, count)).
+		// TODO: BoostTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

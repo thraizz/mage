@@ -31,7 +31,7 @@ func NewSpiritLink(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewGainLifeEffect(abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

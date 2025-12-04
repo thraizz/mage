@@ -22,7 +22,7 @@ func NewEmpyrialPlate(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(CardsInControllerHandCount.ANY_SINGULAR, CardsInControllerHandCount.ANY_SINGULAR)).
+		// TODO: BoostEquippedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

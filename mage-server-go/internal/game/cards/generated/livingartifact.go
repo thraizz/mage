@@ -32,7 +32,7 @@ func NewLivingArtifact(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	}
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeVitality.CreateInstance(1), SavedDamageValue.MANY)).
+		AddEffect(abilities.NewAddCountersSourceEffect(counters.CounterTypeVitality.CreateInstance(1), abilities.SavedDamageValueInstance)).
 		Build()
 	if err != nil {
 		return nil, err

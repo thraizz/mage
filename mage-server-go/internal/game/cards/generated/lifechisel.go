@@ -21,7 +21,7 @@ func NewLifeChisel(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(SacrificeCostCreaturesToughness.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -22,7 +22,7 @@ func NewCranialRam(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEquippedEffect(ArtifactYouControlCount.instance, StaticValue.get(1))).
+		// TODO: BoostEquippedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

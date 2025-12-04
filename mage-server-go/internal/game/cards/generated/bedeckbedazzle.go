@@ -21,7 +21,7 @@ func NewBedeckBedazzle(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(StaticValue.get(2), true, true)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddEffect(abilities.NewBoostEffect(3, -3)).
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		AddTarget(abilities.NewLandTargetFilter()).

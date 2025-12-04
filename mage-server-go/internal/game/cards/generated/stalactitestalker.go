@@ -26,7 +26,7 @@ func NewStalactiteStalker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewBoostEffect(xValue, xValue)).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

@@ -23,8 +23,8 @@ func NewBloodChinFanatic(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(SacrificeCostCreaturesPower.instance)).
-		AddEffect(abilities.NewLoseLifeEffect(SacrificeCostCreaturesPower.instance)).
+		// TODO: GainLifeEffect with complex parameters
+		// TODO: LoseLifeTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -22,7 +22,7 @@ func NewReckonersBargain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewGainLifeEffect(ReckonersBargainValue.instance + "equal to the sacrificed permanent's mana value")).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

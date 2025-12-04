@@ -24,7 +24,7 @@ func NewHuatliTheSunsHeart(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card,
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(GreatestAmongPermanentsValue.TOUGHNESS_CONTROLLED_CREATURES)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

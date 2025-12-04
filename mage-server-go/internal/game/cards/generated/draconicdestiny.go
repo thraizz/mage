@@ -35,7 +35,7 @@ func NewDraconicDestiny(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordFlying), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordHaste), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
 		AddEffect(abilities.NewBoostEffect(1, 0)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

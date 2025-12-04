@@ -24,7 +24,7 @@ func NewTributeToUrborg(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEffect(-2, -2)).
-		AddEffect(abilities.NewConditionalEffect(abilities.NewBoostEffect(xValue, xValue), "kicked")).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

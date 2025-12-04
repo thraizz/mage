@@ -148,6 +148,7 @@ message CardView {
   string owner_id = 23;
   repeated CounterView counters = 24;
   repeated string attached_to = 25;
+  bool summoning_sickness = 26;  // Creature has summoning sickness (can't attack/tap)
 
   // Available actions for this card (context-aware, server source of truth)
   repeated CardAction available_actions = 30;

@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/effects"
 )
 
 func init() {
@@ -24,7 +23,7 @@ func NewFoodFight(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDamageEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

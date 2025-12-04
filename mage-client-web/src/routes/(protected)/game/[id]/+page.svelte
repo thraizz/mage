@@ -74,7 +74,14 @@
 	import ManaPayment from '$lib/components/game/ManaPayment.svelte';
 	import XManaSelector from '$lib/components/game/XManaSelector.svelte';
 	import AbilitiesPanel from '$lib/components/game/AbilitiesPanel.svelte';
-	import type { GamePlayManaData, GamePlayXManaData } from '$lib/generated/mage/v1/websocket';
+	import type { GamePlayManaData, GamePlayXManaData, GameAssignDamageData } from '$lib/generated/mage/v1/websocket';
+	
+	// Combat components
+	import DeclareAttackers from '$lib/components/game/DeclareAttackers.svelte';
+	import DeclareBlockers from '$lib/components/game/DeclareBlockers.svelte';
+	import AssignDamage from '$lib/components/game/AssignDamage.svelte';
+	import { combatStore, isInCombat, canAttackCardIds, declaredAttackerIds, canBlockCardIds, assignedBlockerIds } from '$lib/stores/combat';
+	import { parseCombatOptions, type DeclaredAttacker, type DefenderTarget, type DamageAssignmentPrompt, type ParsedCombatOptions } from '$lib/types/combat';
 
 	// Targeting store
 	import {
@@ -107,6 +114,42 @@
 	const isTargeting = $derived($isTargetingActive);
 	const validTargets = $derived($validTargetIds);
 	const selectedTargets = $derived($selectedTargetIds);
+
+	// Combat state (from store)
+	const inCombat = $derived($isInCombat);
+	const canAttackIds = $derived($canAttackCardIds);
+	const attackingIds = $derived($declaredAttackerIds);
+	const canBlockIds = $derived($canBlockCardIds);
+	const blockingIds = $derived($assignedBlockerIds);
+
+	// Combat phase detection from prompts
+	const combatPromptOptions = $derived<ParsedCombatOptions | null>(() => {
+		if (!prompt) return null;
+		if (prompt.type !== 'choice') return null;
+		const data = prompt.data as { choices?: string[] };
+		if (!data?.choices) return null;
+		const parsed = parseCombatOptions(data.choices);
+		if (parsed.type === 'none') return null;
+		return parsed;
+	});
+
+	const isDeclaringAttackersPhase = $derived(
+		step === 'DECLARE_ATTACKERS' && combatPromptOptions()?.type === 'attack'
+	);
+
+	const isDeclaringBlockersPhase = $derived(
+		step === 'DECLARE_BLOCKERS' && combatPromptOptions()?.type === 'block'
+	);
+
+	// Damage assignment from special prompt (GAME_ASSIGN_DAMAGE)
+	const damageAssignmentPrompt = $derived<DamageAssignmentPrompt | null>(() => {
+		if (!prompt) return null;
+		// Check if this is a damage assignment prompt (sent as 'assignDamage' type)
+		if ((prompt as {type: string}).type === 'assignDamage') {
+			return prompt.data as DamageAssignmentPrompt;
+		}
+		return null;
+	});
 
 	// Drag-drop state (from store)
 	const isDragging = $derived($isDraggingStore);
@@ -999,6 +1042,74 @@
 	}
 
 	/**
+	 * Handle combat phase completion
+	 */
+	function handleCombatComplete() {
+		// Clear any pending prompt after combat action
+		gameStore.clearPrompt();
+		addLogEntry('Combat action completed');
+	}
+
+	/**
+	 * Get defender targets for declare attackers phase
+	 */
+	function getDefenderTargets(): DefenderTarget[] {
+		const defenders: DefenderTarget[] = [];
+		
+		// Add opponents as defenders
+		for (const opponent of otherPlayers) {
+			defenders.push({
+				id: opponent.playerId,
+				name: opponent.name,
+				type: 'player',
+				life: opponent.life
+			});
+		}
+		
+		// Add planeswalkers controlled by opponents
+		for (const card of battlefieldCards) {
+			if (card.type?.toLowerCase().includes('planeswalker') && 
+			    card.controllerId !== localPlayerId) {
+				defenders.push({
+					id: card.id,
+					name: card.name,
+					type: 'planeswalker',
+					loyalty: parseInt(card.loyalty || '0', 10)
+				});
+			}
+		}
+		
+		return defenders;
+	}
+
+	/**
+	 * Get attacking creatures info for blockers phase
+	 */
+	function getAttackingCreatures(): DeclaredAttacker[] {
+		const attackers: DeclaredAttacker[] = [];
+		
+		// Get combat info from game view if available
+		const combatView = gameState.gameView?.combat;
+		if (combatView?.groups) {
+			for (const group of combatView.groups) {
+				for (const attackerId of group.attackers || []) {
+					const card = battlefieldCards.find(c => c.id === attackerId);
+					if (card) {
+						attackers.push({
+							cardId: attackerId,
+							cardName: card.name,
+							defenderId: group.defendingPlayerId || '',
+							defenderName: playerNames.get(group.defendingPlayerId || '') || 'Unknown'
+						});
+					}
+				}
+			}
+		}
+		
+		return attackers;
+	}
+
+	/**
 	 * Toggle stack overlay
 	 */
 	function toggleStack() {
@@ -1270,6 +1381,37 @@
 			/>
 		{/if}
 
+		<!-- Combat: Declare Attackers -->
+		{#if isDeclaringAttackersPhase && combatPromptOptions() && gameId}
+			<DeclareAttackers
+				{gameId}
+				options={combatPromptOptions()!}
+				battlefieldCards={getPlayerBattlefieldCards(localPlayerId)}
+				defenders={getDefenderTargets()}
+				onComplete={handleCombatComplete}
+			/>
+		{/if}
+
+		<!-- Combat: Declare Blockers -->
+		{#if isDeclaringBlockersPhase && combatPromptOptions() && gameId}
+			<DeclareBlockers
+				{gameId}
+				options={combatPromptOptions()!}
+				{battlefieldCards}
+				attackingCreatures={getAttackingCreatures()}
+				onComplete={handleCombatComplete}
+			/>
+		{/if}
+
+		<!-- Combat: Assign Damage -->
+		{#if damageAssignmentPrompt() && gameId}
+			<AssignDamage
+				{gameId}
+				prompt={damageAssignmentPrompt()!}
+				onComplete={handleCombatComplete}
+			/>
+		{/if}
+
 		<!-- Abilities Panel -->
 		{@const _debugPanelRender = (() => { 
 			if (showAbilitiesPanel || abilitiesPanelCardId) {
@@ -1370,6 +1512,7 @@
 									isValidTarget={validTargets.has(card.id)}
 									isTargetSelected={selectedTargets.includes(card.id)}
 									hasActivatedAbilities={card.availableActions?.some(a => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY || String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' || a.actionType === 3)}
+									summoningSickness={card.summoningSickness}
 								/>
 							{/each}
 						</div>
@@ -1397,6 +1540,11 @@
 								isValidTarget={validTargets.has(card.id)}
 								isTargetSelected={selectedTargets.includes(card.id)}
 								hasActivatedAbilities={card.availableActions?.some(a => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY || String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' || a.actionType === 3)}
+								canAttack={canAttackIds.has(card.id)}
+								isAttacking={attackingIds.has(card.id)}
+								canBlock={canBlockIds.has(card.id)}
+								isBlocking={blockingIds.has(card.id)}
+								summoningSickness={card.summoningSickness}
 							/>
 						{/each}
 						{#if getPlayerBattlefieldCards(localPlayerId).length === 0}

@@ -29,7 +29,7 @@ func NewEzuriRenegadeLeader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card
 	//   - RegenerateTargetEffect()
 	// card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
-		AddEffect(abilities.NewBoostEffect(3, 3, elfFilter, false)).
+		// TODO: BoostControlledEffect with complex parameters
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
 		Build()
 	card.AddAbility(ability1)

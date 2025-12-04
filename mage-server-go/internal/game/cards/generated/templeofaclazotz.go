@@ -25,7 +25,7 @@ func NewTempleOfAclazotz(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewGainLifeEffect(SacrificeCostCreaturesToughness.instance)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

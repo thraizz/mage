@@ -1,0 +1,5 @@
+---
+alwaysApply: false
+---
+
+Always use go fmt. Never format indenting manually.

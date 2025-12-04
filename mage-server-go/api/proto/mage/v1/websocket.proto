@@ -77,6 +77,7 @@ enum CallbackMethod {
   GAME_GET_MULTI_AMOUNT = 85;
   GAME_OVER = 86;
   END_GAME_INFO = 87;
+  GAME_ASSIGN_DAMAGE = 88;  // Combat damage assignment prompt
 
   // Replay Events
   REPLAY_GAME = 90;
@@ -291,4 +292,26 @@ message ReplayUpdateData {
 
 message ReplayDoneData {
   string game_id = 1;
+}
+
+// Combat damage assignment prompt data
+// Sent when a player needs to manually assign combat damage (multiple blockers, trample)
+message GameAssignDamageData {
+  string message = 1;
+  string attacker_id = 2;
+  string attacker_name = 3;
+  int32 attacker_power = 4;
+  repeated DamageTarget blockers = 5;
+  bool has_trample = 6;
+  string defending_player_id = 7;
+  string defending_player_name = 8;
+}
+
+// Target for damage assignment
+message DamageTarget {
+  string id = 1;
+  string name = 2;
+  int32 toughness = 3;
+  int32 marked_damage = 4;  // Damage already marked on this creature
+  int32 order = 5;  // Damage assignment order (0 = first to receive lethal)
 }

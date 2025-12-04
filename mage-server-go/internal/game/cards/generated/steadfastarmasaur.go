@@ -28,7 +28,7 @@ func NewSteadfastArmasaur(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
-		AddEffect(abilities.NewDamageEffect(SourcePermanentToughnessValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability1)

@@ -21,8 +21,8 @@ func NewZenithFlare(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(xValue)).
-		AddEffect(abilities.NewGainLifeEffect(xValue)).
+		// TODO: DamageTargetEffect with complex parameters
+		// TODO: GainLifeEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	if err != nil {

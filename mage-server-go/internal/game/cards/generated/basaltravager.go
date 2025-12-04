@@ -25,7 +25,7 @@ func NewBasaltRavager(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewEntersBattlefieldTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(GreatestSharedCreatureTypeCount.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

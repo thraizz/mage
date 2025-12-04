@@ -32,7 +32,7 @@ func NewDemonicRuckus(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, erro
 	card.AddAbility(ability1)
 	ability2, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEnchantedEffect(1, 1)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(AttachmentType.AURA)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewGainAbilityAttachedEffect(abilities.NewKeywordAbility(card.ID, abilities.KeywordTrample), abilities.AttachmentTypeAura, abilities.DurationWhileOnBattlefield, "")).
 		Build()
 	if err != nil {

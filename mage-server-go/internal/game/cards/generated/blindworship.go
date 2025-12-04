@@ -24,8 +24,8 @@ func NewBlindWorship(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error
 	ability0 := abilities.NewEnchantAbility(card.ID, abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter()))
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(SourcePermanentPowerValue.NOT_NEGATIVE, SourcePermanentPowerValue.NOT_NEGATIVE, true)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(attachedAbility, AttachmentType.AURA)).
+		// TODO: BoostControlledEffect with complex parameters
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		AddEffect(abilities.NewAttachEffect(abilities.OutcomeAddAbility)).
 		Build()
 	if err != nil {

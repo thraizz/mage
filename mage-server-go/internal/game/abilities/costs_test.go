@@ -178,6 +178,42 @@ func (m *mockCostGameContext) GetCountersOnPermanent(ctx context.Context, perman
 	return 0
 }
 
+func (m *mockCostGameContext) GetAllCountersOnPermanent(ctx context.Context, permanentID uuid.UUID) map[string]int {
+	return nil
+}
+
+func (m *mockCostGameContext) RemoveCountersFromPermanent(ctx context.Context, permanentID uuid.UUID, counterName string, amount int) error {
+	return nil
+}
+
+func (m *mockCostGameContext) GetMultiAmountChoice(ctx context.Context, playerID uuid.UUID, choices []MultiAmountChoice, totalMin, totalMax int, choiceType MultiAmountType) ([]int, error) {
+	return nil, nil
+}
+
+func (m *mockCostGameContext) IsPermanentTapped(permanentID uuid.UUID) bool {
+	return false
+}
+
+func (m *mockCostGameContext) GetControllerID(objectID uuid.UUID) (uuid.UUID, error) {
+	return uuid.Nil, nil
+}
+
+func (m *mockCostGameContext) GetCardColors(cardID uuid.UUID) ([]string, error) {
+	return nil, nil
+}
+
+func (m *mockCostGameContext) GainLife(playerID uuid.UUID, amount int) error {
+	return nil
+}
+
+func (m *mockCostGameContext) GetPermanentPower(ctx context.Context, permanentID uuid.UUID) int {
+	return 0
+}
+
+func (m *mockCostGameContext) GetPermanentToughness(ctx context.Context, permanentID uuid.UUID) int {
+	return 0
+}
+
 // ========================================
 // SacrificeCost Tests
 // ========================================

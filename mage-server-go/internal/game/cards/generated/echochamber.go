@@ -3,9 +3,7 @@ package generated
 import (
 	"github.com/google/uuid"
 	"github.com/magefree/mage-server-go/internal/game"
-	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/token"
 )
 
 func init() {

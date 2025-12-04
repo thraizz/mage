@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -37,7 +36,7 @@ func NewFeralDeathgorger(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, e
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
 		AddEffect(abilities.NewExileTargetEffect()).
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeP1P1.CreateInstance(1), StaticValue.get(1))).
+		// TODO: AddCountersTargetEffect with complex parameters
 		AddTargets(0, 1, abilities.NewCreatureTargetFilter()).
 		Build()
 	if err != nil {

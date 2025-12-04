@@ -22,7 +22,7 @@ func NewCollapsingBorders(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDamageEffect(3)).
-		AddEffect(abilities.NewGainLifeEffect(DomainValue.TARGET)).
+		// TODO: GainLifeTargetEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

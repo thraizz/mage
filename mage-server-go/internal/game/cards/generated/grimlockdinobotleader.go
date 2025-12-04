@@ -32,7 +32,7 @@ func NewGrimlockDinobotLeader(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	}
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(2, 0, filter2, true)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

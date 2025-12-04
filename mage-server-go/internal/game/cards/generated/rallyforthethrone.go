@@ -27,7 +27,7 @@ func NewRallyForTheThrone(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	}
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewCreateTokenEffectAmount(token0_0, 2)).
-		AddEffect(abilities.NewConditionalEffect(abilities.NewGainLifeEffect(xValue), "unknown")).
+		// TODO: ConditionalOneShotEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

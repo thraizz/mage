@@ -31,7 +31,7 @@ func NewHuatliWarriorPoet(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	//   - abilities.NewTargetRequirement(1, 1, abilities.NewCreatureTargetFilter())
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewGainLifeEffect(GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES)).
+		// TODO: GainLifeEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

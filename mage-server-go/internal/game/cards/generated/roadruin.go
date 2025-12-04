@@ -21,7 +21,7 @@ func NewRoadRuin(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
 	card.Rarity = "common"
 
 	ability0, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewDamageEffect(LandsYouControlCount.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		// TODO: SearchLibraryPutInPlayEffect with complex parameters
 		AddTarget(abilities.NewCreatureTargetFilter()).
 		Build()

@@ -27,7 +27,7 @@ func NewTovolarTheMidnightScourge(ownerID uuid.UUID, info *cards.CardInfo) (*gam
 
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddEffect(abilities.NewGrantAbilityEffect("TrampleAbility", effects.DurationEndOfTurn)).
-		AddEffect(abilities.NewBoostEffect(GetXValue.instance, StaticValue.get(0))).
+		// TODO: BoostTargetEffect with complex parameters
 		AddTarget(abilities.NewPermanentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

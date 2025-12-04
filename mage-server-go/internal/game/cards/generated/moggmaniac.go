@@ -26,7 +26,7 @@ func NewMoggManiac(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		// TODO: Set trigger for LeavesBattlefieldAll (when any permanent you control leaves the battlefield)
 		// SetTrigger(abilities.NewLeavesBattlefieldAllTrigger(card.ID, abilities.NewControlledPermanentFilter())).
-		AddEffect(abilities.NewDamageEffect(SavedDamageValue.MUCH)).
+		AddEffect(abilities.NewDamageEffect(abilities.SavedDamageValueInstance)).
 		AddTarget(abilities.NewOpponentTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

@@ -38,14 +38,14 @@ func NewPlarggDeanOfChaos(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, 
 	//   - AddTapCost()
 	// card.AddAbility(ability2)
 	ability3, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(StaticValue.get(1), StaticValue.get(0), tappedFilter, true)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err
 	}
 	card.AddAbility(ability3)
 	ability4, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
-		AddEffect(abilities.NewBoostEffect(StaticValue.get(0), StaticValue.get(1), untappedFilter, true)).
+		// TODO: BoostAllEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

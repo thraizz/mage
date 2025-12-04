@@ -26,7 +26,7 @@ func NewMoonveilRegent(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 
 	ability0 := abilities.NewTriggeredAbilityBuilder(card.ID).
 		SetTrigger(abilities.NewDiesTrigger(card.ID)).
-		AddEffect(abilities.NewDamageEffect(MoonveilRegentColorValue.instance)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

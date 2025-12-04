@@ -1,59 +1,98 @@
-# Broken Cards
+# Card Status
 
-This document lists all cards that fail to transpile from Java to Go.
+**30,600 cards compile & registered** | 93MB binary | Updated: 2025-12-02
 
-## Summary
+## TODO Summary by Category
 
-- **Total broken cards**: 0
-- **Last updated**: Fixed - all previously broken cards now transpile successfully
+### Unmapped Abilities (3,424)
 
-## Previously Broken Cards (Now Fixed)
+| Type                | Count |
+| ------------------- | ----- |
+| Spell abilities     | 1,876 |
+| Activated abilities | 1,548 |
 
-The following 55 cards previously failed to transpile due to missing base class support.
-This was fixed by updating the transpiler to recognize additional card base classes.
+### Missing Triggers (1,442)
 
-### Issue 1: Double Space in Class Declaration (3 cards)
+| Trigger              | Count |
+| -------------------- | ----- |
+| LeavesBattlefieldAll | 1,442 |
 
-Cards with extra whitespace between class name and `extends`:
+### Triggered Abilities (1,200+)
 
-- BerserkersOfBloodRidge, BloodScrivener, LaviniaOfTheTenth
+| Ability                                          | Count |
+| ------------------------------------------------ | ----- |
+| EntersBattlefieldTriggeredAbility                | 548   |
+| ActivateAsSorceryActivatedAbility                | 136   |
+| LoyaltyAbility                                   | 116   |
+| AttacksTriggeredAbility                          | 112   |
+| BeginningOfUpkeepTriggeredAbility                | 91    |
+| ActivateIfConditionActivatedAbility              | 68    |
+| DiesSourceTriggeredAbility                       | 66    |
+| SpellCastControllerTriggeredAbility              | 46    |
+| BeginningOfCombatTriggeredAbility                | 46    |
+| BeginningOfEndStepTriggeredAbility               | 44    |
+| DealsCombatDamageToAPlayerTriggeredAbility       | 41    |
+| SimpleManaAbility                                | 32    |
+| EntersBattlefieldOrAttacksSourceTriggeredAbility | 24    |
+| LeavesBattlefieldTriggeredAbility                | 19    |
+| TurnedFaceUpSourceTriggeredAbility               | 18    |
+| DiesCreatureTriggeredAbility                     | 15    |
+| CastSourceTriggeredAbility                       | 14    |
+| AsEntersBattlefieldAbility                       | 14    |
+| EntersBattlefieldThisOrAnotherTriggeredAbility   | 12    |
+| SpellCastAllTriggeredAbility                     | 11    |
+| LandfallAbility                                  | 10    |
+| AttacksAttachedTriggeredAbility                  | 10    |
+| Other triggers                                   | ~100  |
 
-**Fix**: Updated regex to use `\s+` for flexible whitespace matching.
+### Complex Effect Parameters (3,800+)
 
-### Issue 2: Missing Base Class Support (52 cards)
+| Effect                          | Count |
+| ------------------------------- | ----- |
+| BoostControlledEffect           | 282   |
+| DamageTargetEffect              | 270   |
+| GainAbilityAttachedEffect       | 267   |
+| ConditionalOneShotEffect        | 244   |
+| SearchLibraryPutInHandEffect    | 232   |
+| SearchLibraryPutInPlayEffect    | 230   |
+| BoostAllEffect                  | 206   |
+| BoostSourceEffect               | 192   |
+| BoostTargetEffect               | 176   |
+| DestroyAllEffect                | 163   |
+| GainAbilityControlledEffect     | 137   |
+| GainLifeEffect                  | 128   |
+| GainAbilityAllEffect            | 103   |
+| AddCountersSourceEffect         | 101   |
+| GainAbilityTargetEffect         | 75    |
+| GainAbilitySourceEffect         | 57    |
+| BoostEquippedEffect             | 42    |
+| BoostEnchantedEffect            | 41    |
+| SearchLibraryPutOnLibraryEffect | 40    |
+| AddCountersTargetEffect         | 38    |
+| CounterUnlessPaysEffect         | 34    |
+| LoseLifeTargetEffect            | 32    |
+| ExileAllEffect                  | 26    |
+| TapAllEffect                    | 16    |
+| LoseLifeSourceControllerEffect  | 14    |
+| UntapAllEffect                  | 13    |
+| UntapAllControllerEffect        | 12    |
+| TapTargetEffect                 | 12    |
+| GainControlAllEffect            | 9     |
+| GainLifeTargetEffect            | 7     |
 
-Cards extending non-standard base classes:
+### Token Issues (57)
 
-**LevelerCard** (25 cards - Level Up mechanic):
-BeastbreakerOfBalaGed, BrimstoneMage, CaravanEscort, CoralhelmCommander, EchoMage,
-EnclaveCryptologist, GuulDrazAssassin, HadaSpyPatrol, HalimarWavewatch, HedronFieldPurists,
-Hexdrinker, IkiralOutrider, JoragaTreespeaker, KabiraVindicator, KarganDragonlord,
-KazanduTuskcaller, KnightOfCliffhaven, LighthouseChronologist, LordOfShatterskullPass,
-NirkanaCutthroat, NullChampion, SkywatcherAdept, StudentOfWarfare, TranscendentMaster,
-ZulaportEnforcer
+- Token extraction failures
 
-**MeldCard** (7 cards - Meld mechanic):
-BriselaVoiceOfNightmares, ChitteringHost, HanweirTheWrithingTownship, MishraLostToPhyrexia,
-RagnarokDivineDeliverance, TitaniaGaeaIncarnate, UrzaPlaneswalker
-
-**OmenCard** (13 cards - Omen mechanic):
-BloomvineRegent, DirgurIslandDragon, DisruptiveStormbrood, FeralDeathgorger, MarangRiverRegent,
-PurgingStormbrood, RilingDawnbreaker, RunescaleStormbrood, SaguWildling, ScavengerRegent,
-StormshriekFeral, TwinmawStormbrood, WhirlwingStormbrood
-
-**RoomCard** (7 cards - Room mechanic):
-BottomlessPoolLockerRoom, DazzlingTheaterPropRoom, DollmakersShopPorcelainGallery,
-FuneralRoomAwakeningHall, SurgicalSuiteHospitalRoom, UnholyAnnexRitualChamber,
-WalkInClosetForgottenCellar
-
-**Fix**: Added support for `LevelerCard`, `MeldCard`, `OmenCard`, and `RoomCard` base classes.
-
-## Generating This List
-
-This list can be regenerated by running:
+## Commands
 
 ```bash
-python3 scripts/test_transpile_coverage.py --output=internal/game/cards/generated_test --json=test_results.json
-```
+# Verify compilation
+go build ./internal/game/cards/generated/...
 
-Then extract the failed cards from the JSON output.
+# Count TODOs
+find internal/game/cards/generated -name "*.go" -exec grep -h "TODO:" {} \; | wc -l
+
+# List TODO types
+find internal/game/cards/generated -name "*.go" -exec grep -h "TODO:" {} \; | sed 's/.*TODO: //' | sort | uniq -c | sort -rn
+```

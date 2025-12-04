@@ -5,7 +5,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/game/abilities"
 	"github.com/magefree/mage-server-go/internal/game/cards"
-	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
 func init() {
@@ -24,7 +23,7 @@ func NewMoxiteRefinery(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, err
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{2}").
 		AddTapCost().
-		AddEffect(abilities.NewAddCountersTargetEffect(counters.CounterTypeCharge.CreateInstance(1), GetXValue.instance)).
+		// TODO: AddCountersTargetEffect with complex parameters
 		AddTarget(abilities.NewArtifactTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

@@ -26,7 +26,7 @@ func NewVoldarenThrillseeker(ownerID uuid.UUID, info *cards.CardInfo) (*game.Car
 	ability0 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddManaCost("{1}").
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewDamageEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: DamageTargetEffect with complex parameters
 		AddTarget(abilities.NewAnyTargetFilter()).
 		Build()
 	card.AddAbility(ability0)

@@ -25,7 +25,7 @@ func NewCastleLocthwain(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddTapCost().
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewLoseLifeEffect(CardsInControllerHandCount.ANY)).
+		// TODO: LoseLifeSourceControllerEffect with complex parameters
 		Build()
 	card.AddAbility(ability1)
 	return card, nil

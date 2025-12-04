@@ -29,7 +29,7 @@ func NewPhabineBosssConfidant(ownerID uuid.UUID, info *cards.CardInfo) (*game.Ca
 	// card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewDrawCardsEffect(1)).
-		AddEffect(abilities.NewBoostEffect(nonLandCount, nonLandCount)).
+		// TODO: BoostControlledEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

@@ -28,7 +28,7 @@ func NewScreamingShield(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, er
 	card.AddAbility(ability0)
 	ability1, err := abilities.NewSpellAbilityBuilder(card.ID, card.ManaCost).
 		AddEffect(abilities.NewBoostEquippedEffect(0, 3)).
-		AddEffect(abilities.NewGainAbilityAttachedEffect(toAdd, AttachmentType.EQUIPMENT)).
+		// TODO: GainAbilityAttachedEffect with complex parameters
 		Build()
 	if err != nil {
 		return nil, err

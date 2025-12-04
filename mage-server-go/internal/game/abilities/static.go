@@ -171,6 +171,9 @@ const (
 
 	// LayerPowerToughnessEffects - Layer 7: Power/toughness effects
 	LayerPowerToughnessEffects
+
+	// LayerOther - Used for effects that don't fit standard layers
+	LayerOther
 )
 
 func (l Layer) String() string {

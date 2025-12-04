@@ -29,7 +29,7 @@ func NewWallOfLimbs(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error)
 	card.AddAbility(ability0)
 	ability1 := abilities.NewActivatedAbilityBuilder(card.ID).
 		AddSacrificeSourceCost().
-		AddEffect(abilities.NewLoseLifeEffect(SourcePermanentPowerValue.NOT_NEGATIVE)).
+		// TODO: LoseLifeTargetEffect with complex parameters
 		AddTarget(abilities.NewPlayerTargetFilter()).
 		Build()
 	card.AddAbility(ability1)

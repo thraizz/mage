@@ -30,7 +30,16 @@
 		isBeingPlayed = false,
 		isPending = false,
 		// Ability indicator
-		hasActivatedAbilities = false
+		hasActivatedAbilities = false,
+		// Combat mode props
+		isAttacking = false,
+		canAttack = false,
+		attackTarget = '',
+		isBlocking = false,
+		canBlock = false,
+		blockingWhat = [] as string[],
+		// Summoning sickness
+		summoningSickness = false
 	}: {
 		cardId?: string;
 		cardName: string;
@@ -57,6 +66,15 @@
 		isPending?: boolean;
 		// Ability indicator
 		hasActivatedAbilities?: boolean;
+		// Combat mode props
+		isAttacking?: boolean;
+		canAttack?: boolean;
+		attackTarget?: string;
+		isBlocking?: boolean;
+		canBlock?: boolean;
+		blockingWhat?: string[];
+		// Summoning sickness
+		summoningSickness?: boolean;
 	} = $props();
 
 	// Track tap state changes for animation
@@ -253,7 +271,7 @@
 	bind:this={cardElement}
 	class="card {sizeClasses()} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack
 		? 'card-back'
-		: ''} {isTargetingActive ? 'targeting-mode' : ''} {isValidTarget ? 'valid-target' : ''} {isTargetSelected ? 'target-selected' : ''} {isTargetingActive && !isValidTarget ? 'invalid-target' : ''} {isAnimatingTap ? 'tap-animating' : ''} {isDragging ? 'dragging' : ''} {isBeingPlayed ? 'being-played' : ''} {isPending ? 'pending' : ''}"
+		: ''} {isTargetingActive ? 'targeting-mode' : ''} {isValidTarget ? 'valid-target' : ''} {isTargetSelected ? 'target-selected' : ''} {isTargetingActive && !isValidTarget ? 'invalid-target' : ''} {isAnimatingTap ? 'tap-animating' : ''} {isDragging ? 'dragging' : ''} {isBeingPlayed ? 'being-played' : ''} {isPending ? 'pending' : ''} {isAttacking ? 'attacking' : ''} {canAttack ? 'can-attack' : ''} {isBlocking ? 'blocking' : ''} {canBlock ? 'can-block' : ''} {summoningSickness ? 'summoning-sick' : ''}"
 	role="button"
 	tabindex="0"
 	draggable="false"
@@ -335,10 +353,58 @@
 			</div>
 		{/if}
 
+		<!-- Combat: Attacking Badge -->
+		{#if isAttacking}
+			<div class="combat-badge attacking-badge" title="Attacking{attackTarget ? ` ${attackTarget}` : ''}">
+				<span class="combat-icon">⚔️</span>
+			</div>
+			{#if attackTarget}
+				<div class="attack-target-label">
+					→ {attackTarget}
+				</div>
+			{/if}
+		{/if}
+
+		<!-- Combat: Can Attack Indicator -->
+		{#if canAttack && !isAttacking}
+			<div class="can-attack-indicator" title="Click to declare as attacker">
+				<span class="attack-hint">⚔️</span>
+			</div>
+		{/if}
+
+		<!-- Combat: Blocking Badge -->
+		{#if isBlocking}
+			<div class="combat-badge blocking-badge" title="Blocking{blockingWhat.length > 0 ? `: ${blockingWhat.join(', ')}` : ''}">
+				<span class="combat-icon">🛡️</span>
+			</div>
+			{#if blockingWhat.length > 0}
+				<div class="blocking-label">
+					↔ {blockingWhat.join(', ')}
+				</div>
+			{/if}
+		{/if}
+
+		<!-- Combat: Can Block Indicator -->
+		{#if canBlock && !isBlocking}
+			<div class="can-block-indicator" title="Click to select as blocker">
+				<span class="block-hint">🛡️</span>
+			</div>
+		{/if}
+
 		<!-- Pending Play Overlay -->
 		{#if isPending}
 			<div class="pending-overlay">
 				<div class="pending-spinner"></div>
+			</div>
+		{/if}
+
+		<!-- Summoning Sickness Smoke Overlay -->
+		{#if summoningSickness}
+			<div class="summoning-sickness-overlay" title="Summoning Sickness - Cannot attack or use tap abilities this turn">
+				<div class="smoke-layer smoke-1"></div>
+				<div class="smoke-layer smoke-2"></div>
+				<div class="smoke-layer smoke-3"></div>
+				<div class="zzz-indicator">💤</div>
 			</div>
 		{/if}
 	{/if}
@@ -889,5 +955,349 @@
 		height: 100%;
 		object-fit: cover;
 		border-radius: 9px;
+	}
+
+	/* ============================================
+	   COMBAT STATES
+	   ============================================ */
+
+	/* Attacking State - Red theme with elevation */
+	.card.attacking {
+		border-color: #ef4444;
+		box-shadow:
+			0 0 0 3px rgba(239, 68, 68, 0.4),
+			0 8px 20px rgba(239, 68, 68, 0.5),
+			0 0 40px rgba(239, 68, 68, 0.2);
+		transform: translateY(-12px);
+		z-index: 5;
+		animation: attacking-pulse 1.5s ease-in-out infinite;
+	}
+
+	@keyframes attacking-pulse {
+		0%, 100% {
+			box-shadow:
+				0 0 0 3px rgba(239, 68, 68, 0.4),
+				0 8px 20px rgba(239, 68, 68, 0.5),
+				0 0 40px rgba(239, 68, 68, 0.2);
+		}
+		50% {
+			box-shadow:
+				0 0 0 4px rgba(239, 68, 68, 0.6),
+				0 10px 25px rgba(239, 68, 68, 0.6),
+				0 0 50px rgba(239, 68, 68, 0.3);
+		}
+	}
+
+	.card.attacking:hover {
+		transform: translateY(-18px) scale(1.05);
+	}
+
+	.card.attacking.tapped {
+		transform: rotate(90deg) translateY(-12px);
+	}
+
+	.card.attacking.tapped:hover {
+		transform: rotate(90deg) translateY(-18px) scale(1.05);
+	}
+
+	/* Can Attack State - Green dashed outline */
+	.card.can-attack {
+		border-style: dashed;
+		border-color: #22c55e;
+		box-shadow:
+			0 0 0 2px rgba(34, 197, 94, 0.3),
+			0 0 15px rgba(34, 197, 94, 0.2);
+		animation: can-attack-shimmer 2s ease-in-out infinite;
+	}
+
+	@keyframes can-attack-shimmer {
+		0%, 100% {
+			box-shadow:
+				0 0 0 2px rgba(34, 197, 94, 0.3),
+				0 0 15px rgba(34, 197, 94, 0.2);
+		}
+		50% {
+			box-shadow:
+				0 0 0 3px rgba(34, 197, 94, 0.5),
+				0 0 25px rgba(34, 197, 94, 0.3);
+		}
+	}
+
+	.card.can-attack:hover {
+		border-color: #16a34a;
+		transform: translateY(-20px) scale(1.08);
+		box-shadow:
+			0 0 0 3px rgba(34, 197, 94, 0.6),
+			0 10px 20px rgba(34, 197, 94, 0.4);
+	}
+
+	/* Blocking State - Blue theme */
+	.card.blocking {
+		border-color: #3b82f6;
+		box-shadow:
+			0 0 0 3px rgba(59, 130, 246, 0.4),
+			0 8px 20px rgba(59, 130, 246, 0.5),
+			0 0 40px rgba(59, 130, 246, 0.2);
+		z-index: 5;
+		animation: blocking-pulse 1.5s ease-in-out infinite;
+	}
+
+	@keyframes blocking-pulse {
+		0%, 100% {
+			box-shadow:
+				0 0 0 3px rgba(59, 130, 246, 0.4),
+				0 8px 20px rgba(59, 130, 246, 0.5),
+				0 0 40px rgba(59, 130, 246, 0.2);
+		}
+		50% {
+			box-shadow:
+				0 0 0 4px rgba(59, 130, 246, 0.6),
+				0 10px 25px rgba(59, 130, 246, 0.6),
+				0 0 50px rgba(59, 130, 246, 0.3);
+		}
+	}
+
+	.card.blocking:hover {
+		transform: translateY(-15px) scale(1.05);
+	}
+
+	/* Can Block State - Blue dashed outline */
+	.card.can-block {
+		border-style: dashed;
+		border-color: #3b82f6;
+		box-shadow:
+			0 0 0 2px rgba(59, 130, 246, 0.3),
+			0 0 15px rgba(59, 130, 246, 0.2);
+		animation: can-block-shimmer 2s ease-in-out infinite;
+	}
+
+	@keyframes can-block-shimmer {
+		0%, 100% {
+			box-shadow:
+				0 0 0 2px rgba(59, 130, 246, 0.3),
+				0 0 15px rgba(59, 130, 246, 0.2);
+		}
+		50% {
+			box-shadow:
+				0 0 0 3px rgba(59, 130, 246, 0.5),
+				0 0 25px rgba(59, 130, 246, 0.3);
+		}
+	}
+
+	.card.can-block:hover {
+		border-color: #2563eb;
+		transform: translateY(-20px) scale(1.08);
+		box-shadow:
+			0 0 0 3px rgba(59, 130, 246, 0.6),
+			0 10px 20px rgba(59, 130, 246, 0.4);
+	}
+
+	/* Combat Badges */
+	.combat-badge {
+		position: absolute;
+		top: -0.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 0.25rem 0.5rem;
+		border-radius: 9999px;
+		font-size: 0.875rem;
+		font-weight: 700;
+		z-index: 10;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+		white-space: nowrap;
+	}
+
+	.attacking-badge {
+		background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+		color: white;
+		border: 2px solid #fca5a5;
+	}
+
+	.blocking-badge {
+		background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+		color: white;
+		border: 2px solid #93c5fd;
+	}
+
+	.combat-icon {
+		font-size: 0.75rem;
+	}
+
+	/* Attack Target Label */
+	.attack-target-label {
+		position: absolute;
+		bottom: -1.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 0.125rem 0.5rem;
+		background: rgba(239, 68, 68, 0.9);
+		color: white;
+		font-size: 0.625rem;
+		font-weight: 600;
+		border-radius: 4px;
+		white-space: nowrap;
+		z-index: 10;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	}
+
+	/* Blocking Label */
+	.blocking-label {
+		position: absolute;
+		bottom: -1.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 0.125rem 0.5rem;
+		background: rgba(59, 130, 246, 0.9);
+		color: white;
+		font-size: 0.625rem;
+		font-weight: 600;
+		border-radius: 4px;
+		white-space: nowrap;
+		z-index: 10;
+		max-width: 150px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	}
+
+	/* Can Attack/Block Indicators */
+	.can-attack-indicator,
+	.can-block-indicator {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 2.5rem;
+		height: 2.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		opacity: 0;
+		transition: opacity 0.2s;
+		z-index: 8;
+		pointer-events: none;
+	}
+
+	.can-attack-indicator {
+		background: rgba(34, 197, 94, 0.8);
+		border: 2px solid rgba(255, 255, 255, 0.5);
+	}
+
+	.can-block-indicator {
+		background: rgba(59, 130, 246, 0.8);
+		border: 2px solid rgba(255, 255, 255, 0.5);
+	}
+
+	.card.can-attack:hover .can-attack-indicator,
+	.card.can-block:hover .can-block-indicator {
+		opacity: 1;
+	}
+
+	.attack-hint,
+	.block-hint {
+		font-size: 1.25rem;
+	}
+
+	/* ===== Summoning Sickness Styles ===== */
+	.card.summoning-sick {
+		/* Subtle desaturation to indicate can't attack */
+		filter: saturate(0.7) brightness(0.85);
+	}
+
+	.summoning-sickness-overlay {
+		position: absolute;
+		inset: 0;
+		border-radius: 6px;
+		overflow: hidden;
+		pointer-events: none;
+		z-index: 15;
+	}
+
+	/* Smoke layers - creates a misty/foggy effect */
+	.smoke-layer {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(
+			ellipse at center,
+			rgba(100, 116, 139, 0.4) 0%,
+			rgba(71, 85, 105, 0.2) 40%,
+			transparent 70%
+		);
+		animation: smoke-drift 4s ease-in-out infinite;
+	}
+
+	.smoke-1 {
+		animation-delay: 0s;
+		transform-origin: 30% 70%;
+	}
+
+	.smoke-2 {
+		animation-delay: -1.3s;
+		transform-origin: 70% 30%;
+		background: radial-gradient(
+			ellipse at center,
+			rgba(148, 163, 184, 0.35) 0%,
+			rgba(100, 116, 139, 0.15) 50%,
+			transparent 70%
+		);
+	}
+
+	.smoke-3 {
+		animation-delay: -2.6s;
+		transform-origin: 50% 50%;
+		background: radial-gradient(
+			ellipse at center,
+			rgba(71, 85, 105, 0.3) 0%,
+			rgba(51, 65, 85, 0.1) 45%,
+			transparent 65%
+		);
+	}
+
+	@keyframes smoke-drift {
+		0%, 100% {
+			transform: scale(1) translate(0, 0);
+			opacity: 0.8;
+		}
+		25% {
+			transform: scale(1.1) translate(5%, -5%);
+			opacity: 0.6;
+		}
+		50% {
+			transform: scale(0.95) translate(-3%, 3%);
+			opacity: 0.9;
+		}
+		75% {
+			transform: scale(1.05) translate(2%, -2%);
+			opacity: 0.7;
+		}
+	}
+
+	/* ZZZ sleeping indicator */
+	.zzz-indicator {
+		position: absolute;
+		top: 0.25rem;
+		right: 0.25rem;
+		font-size: 1rem;
+		animation: zzz-float 2s ease-in-out infinite;
+		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+		z-index: 20;
+	}
+
+	@keyframes zzz-float {
+		0%, 100% {
+			transform: translateY(0) scale(1);
+			opacity: 1;
+		}
+		50% {
+			transform: translateY(-4px) scale(1.1);
+			opacity: 0.7;
+		}
+	}
+
+	/* Hide summoning sickness for card backs and placeholders */
+	.card-back .summoning-sickness-overlay,
+	.card-placeholder .summoning-sickness-overlay {
+		display: none;
 	}
 </style>
