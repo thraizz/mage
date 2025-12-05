@@ -6,14 +6,14 @@
 import { writable, derived, get } from 'svelte/store';
 
 /**
- * Valid zones for card drops
+ * Valid zones for card drops (supports all MTG zones for rules-light mode)
  */
-export type DropZone = 'battlefield' | 'graveyard' | 'exile' | 'hand' | 'none';
+export type DropZone = 'battlefield' | 'graveyard' | 'exile' | 'hand' | 'library' | 'command' | 'stack' | 'none';
 
 /**
- * Source zones where cards can be dragged from
+ * Source zones where cards can be dragged from (all zones in rules-light mode)
  */
-export type SourceZone = 'hand' | 'battlefield';
+export type SourceZone = 'hand' | 'battlefield' | 'graveyard' | 'exile' | 'library' | 'command' | 'stack';
 
 /**
  * Drag state interface
@@ -291,6 +291,23 @@ export function getValidDropZonesForCard(
 	// Spells can be cast whenever player has priority (with mana)
 	// The actual validation happens server-side
 	return ['battlefield'];
+}
+
+/**
+ * Get all valid drop zones for rules-light mode
+ * In rules-light mode, players can move cards to any zone
+ */
+export function getAllValidDropZones(sourceZone: SourceZone): DropZone[] {
+	// All zones except the source zone (and 'none')
+	const allZones: DropZone[] = ['battlefield', 'graveyard', 'exile', 'hand', 'library', 'command', 'stack'];
+	return allZones.filter(zone => zone !== sourceZone);
+}
+
+/**
+ * Convert zone string to API zone format
+ */
+export function zoneToApiFormat(zone: DropZone | SourceZone): string {
+	return zone.toUpperCase();
 }
 
 /**

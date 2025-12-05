@@ -1,39 +1,55 @@
 <script lang="ts">
 	/**
-	 * PriorityActionBar - Unified priority indicator + action buttons
-	 * Docked at the bottom of the screen for clear, accessible game actions
+	 * PriorityActionBar - Unified game control bar
+	 * Contains: Status | Player Stats | Game Actions | Direct Controls | Settings
 	 */
+	import { modifyLife, setPlayerCounter, drawCards, shuffleLibrary, nextTurn, clearCombat } from '$lib/api/direct-actions';
+	import { toast } from '$lib/stores/toast';
 
 	// Props
 	let {
+		gameId = '',
 		hasPriority = false,
 		activePlayerId = '',
 		localPlayerId = '',
 		activePlayerName = 'Player',
+		currentPhase = '',
 		canPassPriority = true,
 		isLoading = false,
+		// Player stats
+		playerLife = 20,
+		playerPoison = 0,
+		libraryCount = 0,
+		// Callbacks
 		onPassPriority = () => {},
 		onPassUntilEOT = () => {},
 		onCastSpell = () => {},
 		onActivateAbility = () => {},
 		onAdvancePhase = () => {},
+		onCreateToken = () => {},
 		// Auto-pass settings
 		autoPassSettings = $bindable({
 			noActions: false,
 			opponentTurn: false
 		})
 	}: {
+		gameId?: string;
 		hasPriority?: boolean;
 		activePlayerId?: string;
 		localPlayerId?: string;
 		activePlayerName?: string;
+		currentPhase?: string;
 		canPassPriority?: boolean;
 		isLoading?: boolean;
+		playerLife?: number;
+		playerPoison?: number;
+		libraryCount?: number;
 		onPassPriority?: () => void;
 		onPassUntilEOT?: () => void;
 		onCastSpell?: () => void;
 		onActivateAbility?: () => void;
 		onAdvancePhase?: () => void;
+		onCreateToken?: () => void;
 		autoPassSettings?: {
 			noActions: boolean;
 			opponentTurn: boolean;
@@ -42,76 +58,100 @@
 
 	// State
 	let showSettings = $state(false);
+	let showLifeMenu = $state(false);
 
 	// Derived values
 	const isYourTurn = $derived(activePlayerId === localPlayerId);
+	const isInCombat = $derived(currentPhase === 'COMBAT');
 
-	/**
-	 * Handle pass priority
-	 */
+	// Life/counter helpers
+	async function handleLifeChange(delta: number): Promise<void> {
+		if (!gameId) return;
+		try {
+			await modifyLife(gameId, localPlayerId, delta);
+		} catch (error) {
+			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+		}
+	}
+
+	async function handlePoisonChange(delta: number): Promise<void> {
+		if (!gameId) return;
+		const newValue = Math.max(0, playerPoison + delta);
+		try {
+			await setPlayerCounter(gameId, localPlayerId, 'poison', newValue);
+		} catch (error) {
+			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+		}
+	}
+
+	async function handleDraw(count: number): Promise<void> {
+		if (!gameId) return;
+		try {
+			await drawCards(gameId, count);
+			showLifeMenu = false;
+		} catch (error) {
+			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+		}
+	}
+
+	async function handleShuffle(): Promise<void> {
+		if (!gameId) return;
+		try {
+			await shuffleLibrary(gameId);
+			toast.success('Shuffled');
+			showLifeMenu = false;
+		} catch (error) {
+			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+		}
+	}
+
+	// Game action handlers
 	function handlePassPriority(): void {
 		if (!hasPriority || !canPassPriority || isLoading) return;
 		onPassPriority();
 	}
 
-	/**
-	 * Handle pass turn - pass through remaining phases until next turn begins
-	 */
 	function handlePassUntilEOT(): void {
 		if (!hasPriority || isLoading) return;
 		onPassUntilEOT();
 	}
 
-	/**
-	 * Handle cast spell
-	 */
 	function handleCastSpell(): void {
-		console.log('[PriorityActionBar.handleCastSpell] Called', { hasPriority, isLoading });
-		if (!hasPriority) {
-			console.log('[PriorityActionBar.handleCastSpell] No priority, returning');
-			return;
-		}
-		if (isLoading) {
-			console.log('[PriorityActionBar.handleCastSpell] Loading, returning');
-			return;
-		}
-		console.log('[PriorityActionBar.handleCastSpell] Calling onCastSpell callback');
+		if (!hasPriority || isLoading) return;
 		onCastSpell();
 	}
 
-	/**
-	 * Handle activate ability
-	 */
 	function handleActivateAbility(): void {
-		console.log('[PriorityActionBar.handleActivateAbility] Called', { hasPriority, isLoading });
-		if (!hasPriority || isLoading) {
-			console.log('[PriorityActionBar.handleActivateAbility] Blocked');
-			return;
-		}
-		console.log('[PriorityActionBar.handleActivateAbility] Calling onActivateAbility callback');
+		if (!hasPriority || isLoading) return;
 		onActivateAbility();
 	}
 
-	/**
-	 * Handle advance phase
-	 */
 	function handleAdvancePhase(): void {
 		if (!hasPriority || isLoading) return;
 		onAdvancePhase();
 	}
 
-	/**
-	 * Toggle settings panel
-	 */
-	function toggleSettings(): void {
-		showSettings = !showSettings;
+	async function handleNextTurn(): Promise<void> {
+		if (!gameId) return;
+		try {
+			await nextTurn(gameId);
+		} catch (error) {
+			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+		}
 	}
 
-	/**
-	 * Handle keyboard shortcuts
-	 */
+	async function handleClearCombat(): Promise<void> {
+		if (!gameId) return;
+		try {
+			await clearCombat(gameId);
+			toast.success('Combat cleared');
+		} catch (error) {
+			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+		}
+	}
+
+	// Keyboard shortcuts
 	function handleKeydown(event: KeyboardEvent): void {
-		// Don't trigger if user is typing in an input
 		if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
 			return;
 		}
@@ -131,327 +171,572 @@
 		} else if (event.key === 'F6') {
 			event.preventDefault();
 			handlePassUntilEOT();
+		} else if (event.key === 't' || event.key === 'T') {
+			event.preventDefault();
+			onCreateToken();
 		}
 	}
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="priority-action-bar" class:has-priority={hasPriority}>
+<div class="action-bar" class:has-priority={hasPriority}>
 	<!-- Priority Status -->
-	<div class="priority-status">
+	<div class="status-section">
 		{#if hasPriority}
-			<div class="status-indicator active">
+			<div class="status-badge active">
 				<span class="status-icon">⚡</span>
-				<span class="status-text">Your Priority</span>
+				<span class="status-text">Priority</span>
 			</div>
 		{:else if isYourTurn}
-			<div class="status-indicator your-turn">
+			<div class="status-badge waiting">
 				<span class="status-icon">⏳</span>
-				<span class="status-text">Waiting...</span>
+				<span class="status-text">Wait</span>
 			</div>
 		{:else}
-			<div class="status-indicator waiting">
-				<span class="status-icon">⏸️</span>
-				<span class="status-text">{activePlayerName}'s turn</span>
+			<div class="status-badge opponent">
+				<span class="status-icon">⏸</span>
+				<span class="status-text">{activePlayerName}</span>
 			</div>
 		{/if}
 	</div>
 
-	<!-- Action Buttons -->
-	<div class="action-buttons">
+	<div class="divider"></div>
+
+	<!-- Player Stats (Life, Poison, Library) -->
+	<div class="player-stats-section">
+		<div class="life-group">
+			<button class="stat-btn life-btn" onclick={() => handleLifeChange(-1)} title="Lose 1 life">−</button>
+			<button 
+				class="stat-display life" 
+				onclick={() => showLifeMenu = !showLifeMenu}
+				title="Click for more options"
+			>
+				<span class="stat-icon">❤️</span>
+				<span class="stat-value">{playerLife}</span>
+			</button>
+			<button class="stat-btn life-btn" onclick={() => handleLifeChange(1)} title="Gain 1 life">+</button>
+		</div>
+
+		{#if playerPoison > 0}
+			<div class="stat-display poison" title="Poison counters">
+				<span class="stat-icon">☠️</span>
+				<span class="stat-value">{playerPoison}</span>
+			</div>
+		{/if}
+
+		<div class="stat-display library" title="Cards in library">
+			<span class="stat-icon">📚</span>
+			<span class="stat-value">{libraryCount}</span>
+		</div>
+
+		<!-- Life/Library Quick Menu -->
+		{#if showLifeMenu}
+			<div class="quick-menu">
+				<div class="menu-section">
+					<span class="menu-label">Life</span>
+					<div class="menu-row">
+						<button onclick={() => handleLifeChange(-5)}>−5</button>
+						<button onclick={() => handleLifeChange(-1)}>−1</button>
+						<button onclick={() => handleLifeChange(1)}>+1</button>
+						<button onclick={() => handleLifeChange(5)}>+5</button>
+					</div>
+				</div>
+				<div class="menu-section">
+					<span class="menu-label">Poison</span>
+					<div class="menu-row">
+						<button onclick={() => handlePoisonChange(-1)}>−1</button>
+						<span class="menu-value">{playerPoison}</span>
+						<button onclick={() => handlePoisonChange(1)}>+1</button>
+					</div>
+				</div>
+				<div class="menu-section">
+					<span class="menu-label">Library</span>
+					<div class="menu-row">
+						<button onclick={() => handleDraw(1)}>Draw 1</button>
+						<button onclick={() => handleDraw(7)}>Draw 7</button>
+						<button onclick={handleShuffle}>Shuffle</button>
+					</div>
+				</div>
+			</div>
+		{/if}
+	</div>
+
+	<div class="divider"></div>
+
+	<!-- Game Actions -->
+	<div class="actions-group">
 		<button
-			class="action-btn primary"
+			class="action-btn pass"
 			class:pulse={hasPriority}
 			disabled={!hasPriority || !canPassPriority || isLoading}
 			onclick={handlePassPriority}
 			title="Pass priority (Spacebar)"
 		>
 			{#if isLoading}
-				<span class="loading-spinner"></span>
+				<span class="spinner"></span>
 			{:else}
 				<span class="btn-icon">→</span>
 			{/if}
-			<span class="btn-label">Pass Priority</span>
-			<kbd class="shortcut">Space</kbd>
+			<span class="btn-text">Pass</span>
+			<kbd>Space</kbd>
 		</button>
 
 		<button
-			class="action-btn secondary"
+			class="action-btn"
 			disabled={!hasPriority || isLoading}
 			onclick={handleCastSpell}
-			title="Cast spell from hand (C)"
+			title="Cast spell (C)"
 		>
 			<span class="btn-icon">🎴</span>
-			<span class="btn-label">Cast</span>
-			<kbd class="shortcut">C</kbd>
+			<span class="btn-text">Cast</span>
+			<kbd>C</kbd>
 		</button>
 
 		<button
-			class="action-btn secondary"
+			class="action-btn"
 			disabled={!hasPriority || isLoading}
 			onclick={handleActivateAbility}
 			title="Activate ability (A)"
 		>
 			<span class="btn-icon">⚡</span>
-			<span class="btn-label">Activate</span>
-			<kbd class="shortcut">A</kbd>
+			<span class="btn-text">Activate</span>
+			<kbd>A</kbd>
 		</button>
 
 		<button
-			class="action-btn next-phase"
+			class="action-btn phase"
 			disabled={!hasPriority || isLoading}
 			onclick={handleAdvancePhase}
-			title="Advance to next phase (N)"
+			title="Next phase (N)"
 		>
 			<span class="btn-icon">⏩</span>
-			<span class="btn-label">Next Phase</span>
-			<kbd class="shortcut">N</kbd>
+			<span class="btn-text">Phase</span>
+			<kbd>N</kbd>
 		</button>
+	</div>
 
-		<div class="divider"></div>
+	<div class="divider"></div>
+
+	<!-- Direct Controls -->
+	<div class="actions-group">
+		{#if isInCombat}
+			<button
+				class="action-btn danger"
+				onclick={handleClearCombat}
+				title="Clear combat"
+			>
+				<span class="btn-icon">🛑</span>
+			</button>
+		{/if}
 
 		<button
-			class="action-btn f6"
+			class="action-btn"
+			onclick={handleNextTurn}
+			title="End turn"
+		>
+			<span class="btn-icon">⏭</span>
+			<span class="btn-text">End Turn</span>
+		</button>
+
+		<button
+			class="action-btn accent"
+			onclick={onCreateToken}
+			title="Create token (T)"
+		>
+			<span class="btn-icon">✨</span>
+			<span class="btn-text">Token</span>
+			<kbd>T</kbd>
+		</button>
+
+		<button
+			class="action-btn muted"
 			disabled={!hasPriority || isLoading}
 			onclick={handlePassUntilEOT}
-			title="Pass through remaining phases until next turn begins (F6)"
+			title="Pass turn (F6)"
 		>
 			<span class="btn-icon">⏭️</span>
-			<span class="btn-label">Pass Turn</span>
-			<kbd class="shortcut">F6</kbd>
+			<kbd>F6</kbd>
 		</button>
 	</div>
 
-	<!-- Auto-pass Settings Toggle -->
-	<div class="settings-section">
-		<button
-			class="settings-toggle"
-			class:active={showSettings}
-			onclick={toggleSettings}
-			title="Auto-pass settings"
-		>
-			<span class="settings-icon">⚙️</span>
-		</button>
+	<!-- Settings -->
+	<button
+		class="settings-btn"
+		class:active={showSettings}
+		onclick={() => showSettings = !showSettings}
+		title="Settings"
+	>
+		⚙️
+	</button>
 
-		{#if showSettings}
-			<div class="settings-panel">
-				<div class="settings-title">Auto-Pass Settings</div>
-				<label class="setting-option">
-					<input
-						type="checkbox"
-						bind:checked={autoPassSettings.noActions}
-					/>
-					<span>Auto-pass when no actions available</span>
-				</label>
-				<label class="setting-option">
-					<input
-						type="checkbox"
-						bind:checked={autoPassSettings.opponentTurn}
-					/>
-					<span>Auto-pass on opponent's turn</span>
-				</label>
-			</div>
-		{/if}
-	</div>
+	{#if showSettings}
+		<div class="settings-dropdown">
+			<div class="settings-title">Auto-Pass</div>
+			<label class="setting-row">
+				<input type="checkbox" bind:checked={autoPassSettings.noActions} />
+				<span>When no actions</span>
+			</label>
+			<label class="setting-row">
+				<input type="checkbox" bind:checked={autoPassSettings.opponentTurn} />
+				<span>Opponent's turn</span>
+			</label>
+		</div>
+	{/if}
 </div>
 
 <style>
-	.priority-action-bar {
+	.action-bar {
 		position: fixed;
 		bottom: 0;
 		left: 50%;
 		transform: translateX(-50%);
 		display: flex;
 		align-items: center;
-		gap: 1.5rem;
-		padding: 0.75rem 1.5rem;
-		background: linear-gradient(to top, rgba(15, 20, 25, 0.98), rgba(26, 31, 46, 0.95));
-		border: 1px solid #2a3441;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		background: rgba(18, 20, 26, 0.98);
+		border: 1px solid rgba(63, 63, 70, 0.5);
 		border-bottom: none;
 		border-radius: 12px 12px 0 0;
 		backdrop-filter: blur(12px);
-		box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+		box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
 		z-index: 100;
-		transition: all 0.3s ease;
 	}
 
-	.priority-action-bar.has-priority {
-		border-color: rgba(251, 191, 36, 0.5);
+	.action-bar.has-priority {
+		border-color: rgba(201, 162, 39, 0.5);
 		box-shadow: 
-			0 -4px 24px rgba(0, 0, 0, 0.4),
-			0 0 40px rgba(251, 191, 36, 0.15);
+			0 -4px 24px rgba(0, 0, 0, 0.5),
+			0 0 30px rgba(201, 162, 39, 0.1);
 	}
 
-	/* Priority Status */
-	.priority-status {
-		min-width: 160px;
+	/* Status */
+	.status-section {
+		min-width: 90px;
 	}
 
-	.status-indicator {
+	.status-badge {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		padding: 0.5rem 1rem;
-		border-radius: 8px;
-		background: #1a1f2e;
-		border: 1px solid #2a3441;
+		gap: 0.375rem;
+		padding: 0.375rem 0.625rem;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-weight: 600;
 	}
 
-	.status-indicator.active {
-		background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1));
-		border-color: rgba(251, 191, 36, 0.4);
-		animation: status-glow 2s ease-in-out infinite;
+	.status-badge.active {
+		background: rgba(201, 162, 39, 0.15);
+		color: #c9a227;
+		animation: status-pulse 2s ease-in-out infinite;
 	}
 
-	.status-indicator.your-turn {
-		background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.1));
-		border-color: rgba(102, 126, 234, 0.4);
+	.status-badge.waiting {
+		background: rgba(59, 130, 246, 0.15);
+		color: #3b82f6;
 	}
 
-	.status-indicator.waiting {
-		opacity: 0.7;
+	.status-badge.opponent {
+		background: rgba(113, 113, 122, 0.15);
+		color: #a1a1aa;
 	}
 
-	@keyframes status-glow {
-		0%, 100% { box-shadow: 0 0 8px rgba(251, 191, 36, 0.2); }
-		50% { box-shadow: 0 0 16px rgba(251, 191, 36, 0.4); }
+	@keyframes status-pulse {
+		0%, 100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.3); }
+		50% { box-shadow: 0 0 0 6px rgba(201, 162, 39, 0); }
 	}
 
 	.status-icon {
-		font-size: 1.25rem;
+		font-size: 0.875rem;
 	}
 
 	.status-text {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #fff;
 		white-space: nowrap;
+		max-width: 80px;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
-	.status-indicator.active .status-text {
-		color: #fbbf24;
+	/* Divider */
+	.divider {
+		width: 1px;
+		height: 28px;
+		background: rgba(63, 63, 70, 0.5);
 	}
 
-	.status-indicator.waiting .status-text {
-		color: #9ca3af;
-	}
-
-	/* Action Buttons */
-	.action-buttons {
+	/* Player Stats */
+	.player-stats-section {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+		position: relative;
 	}
 
+	.life-group {
+		display: flex;
+		align-items: center;
+		gap: 0.125rem;
+	}
+
+	.stat-btn {
+		width: 24px;
+		height: 24px;
+		border: 1px solid rgba(63, 63, 70, 0.4);
+		border-radius: 4px;
+		background: rgba(36, 40, 51, 0.6);
+		color: #a1a1aa;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.15s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.stat-btn:hover {
+		background: rgba(63, 63, 70, 0.6);
+		color: #f4f4f5;
+	}
+
+	.stat-btn.life-btn:first-child:hover {
+		background: rgba(239, 68, 68, 0.3);
+		color: #ef4444;
+	}
+
+	.stat-btn.life-btn:last-child:hover {
+		background: rgba(34, 197, 94, 0.3);
+		color: #22c55e;
+	}
+
+	.stat-display {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		transition: background 0.15s ease;
+	}
+
+	.stat-display:hover {
+		background: rgba(63, 63, 70, 0.3);
+	}
+
+	.stat-display.life {
+		color: #f4f4f5;
+	}
+
+	.stat-display.poison {
+		color: #a855f7;
+	}
+
+	.stat-display.library {
+		color: #a1a1aa;
+	}
+
+	.stat-icon {
+		font-size: 0.75rem;
+	}
+
+	.stat-value {
+		font-family: 'JetBrains Mono', monospace;
+		min-width: 20px;
+		text-align: center;
+	}
+
+	/* Quick Menu */
+	.quick-menu {
+		position: absolute;
+		bottom: calc(100% + 8px);
+		left: 0;
+		min-width: 200px;
+		background: rgba(18, 20, 26, 0.98);
+		border: 1px solid rgba(63, 63, 70, 0.6);
+		border-radius: 8px;
+		padding: 0.75rem;
+		box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+		display: flex;
+		flex-direction: column;
+		gap: 0.625rem;
+	}
+
+	.menu-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.menu-label {
+		font-size: 0.625rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #71717a;
+	}
+
+	.menu-row {
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+	}
+
+	.menu-row button {
+		padding: 0.375rem 0.5rem;
+		border: 1px solid rgba(63, 63, 70, 0.5);
+		border-radius: 4px;
+		background: rgba(36, 40, 51, 0.8);
+		color: #a1a1aa;
+		font-size: 0.75rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+
+	.menu-row button:hover {
+		background: rgba(201, 162, 39, 0.2);
+		border-color: rgba(201, 162, 39, 0.4);
+		color: #f4f4f5;
+	}
+
+	.menu-value {
+		min-width: 24px;
+		text-align: center;
+		font-weight: 600;
+		color: #f4f4f5;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	/* Actions Group */
+	.actions-group {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	/* Action Button */
 	.action-btn {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.625rem 1rem;
-		background: #2a3441;
-		border: 1px solid #374151;
-		border-radius: 8px;
-		color: #fff;
-		font-size: 0.875rem;
-		font-weight: 600;
+		gap: 0.25rem;
+		padding: 0.4rem 0.625rem;
+		border: 1px solid rgba(63, 63, 70, 0.5);
+		border-radius: 6px;
+		background: rgba(36, 40, 51, 0.8);
+		color: #a1a1aa;
+		font-size: 0.75rem;
+		font-weight: 500;
 		cursor: pointer;
-		transition: all 0.2s ease;
+		transition: all 0.15s ease;
 		white-space: nowrap;
 	}
 
 	.action-btn:hover:not(:disabled) {
-		background: #374151;
-		border-color: #4b5563;
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-	}
-
-	.action-btn:active:not(:disabled) {
-		transform: translateY(0);
+		background: rgba(63, 63, 70, 0.6);
+		color: #f4f4f5;
+		transform: translateY(-1px);
 	}
 
 	.action-btn:disabled {
-		opacity: 0.4;
+		opacity: 0.35;
 		cursor: not-allowed;
 	}
 
-	.action-btn.primary {
-		background: linear-gradient(135deg, #10b981, #059669);
-		border-color: #10b981;
-		padding: 0.75rem 1.25rem;
+	.action-btn.pass {
+		background: rgba(34, 197, 94, 0.2);
+		border-color: rgba(34, 197, 94, 0.4);
+		color: #22c55e;
 	}
 
-	.action-btn.primary:hover:not(:disabled) {
-		background: linear-gradient(135deg, #059669, #047857);
-		border-color: #059669;
+	.action-btn.pass:hover:not(:disabled) {
+		background: rgba(34, 197, 94, 0.3);
 	}
 
-	.action-btn.primary.pulse:not(:disabled) {
-		animation: pulse-btn 2s ease-in-out infinite;
+	.action-btn.pass.pulse:not(:disabled) {
+		animation: pass-pulse 2s ease-in-out infinite;
 	}
 
-	@keyframes pulse-btn {
-		0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-		50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+	@keyframes pass-pulse {
+		0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+		50% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
 	}
 
-	.action-btn.f6 {
-		background: #374151;
-		border-color: #4b5563;
+	.action-btn.phase {
+		background: rgba(59, 130, 246, 0.2);
+		border-color: rgba(59, 130, 246, 0.4);
+		color: #3b82f6;
 	}
 
-	.action-btn.f6:hover:not(:disabled) {
-		background: #4b5563;
-		border-color: #6b7280;
+	.action-btn.phase:hover:not(:disabled) {
+		background: rgba(59, 130, 246, 0.3);
 	}
 
-	.action-btn.next-phase {
-		background: linear-gradient(135deg, #3b82f6, #2563eb);
-		border-color: #3b82f6;
+	.action-btn.accent {
+		background: rgba(201, 162, 39, 0.15);
+		border-color: rgba(201, 162, 39, 0.3);
+		color: #c9a227;
 	}
 
-	.action-btn.next-phase:hover:not(:disabled) {
-		background: linear-gradient(135deg, #2563eb, #1d4ed8);
-		border-color: #2563eb;
+	.action-btn.accent:hover:not(:disabled) {
+		background: rgba(201, 162, 39, 0.25);
+		color: #e4b82a;
+	}
+
+	.action-btn.danger {
+		background: rgba(239, 68, 68, 0.15);
+		border-color: rgba(239, 68, 68, 0.3);
+		color: #ef4444;
+	}
+
+	.action-btn.danger:hover:not(:disabled) {
+		background: rgba(239, 68, 68, 0.25);
+	}
+
+	.action-btn.muted {
+		background: rgba(63, 63, 70, 0.3);
+		color: #71717a;
+	}
+
+	.action-btn.muted:hover:not(:disabled) {
+		background: rgba(63, 63, 70, 0.5);
+		color: #a1a1aa;
 	}
 
 	.btn-icon {
-		font-size: 1.125rem;
+		font-size: 0.875rem;
 	}
 
-	.btn-label {
+	.btn-text {
 		font-weight: 600;
 	}
 
-	.shortcut {
-		padding: 0.125rem 0.375rem;
+	kbd {
+		padding: 0.0625rem 0.25rem;
 		background: rgba(0, 0, 0, 0.3);
-		border-radius: 4px;
-		font-size: 0.625rem;
+		border-radius: 3px;
+		font-size: 0.5625rem;
 		font-weight: 700;
-		color: #9ca3af;
-		font-family: inherit;
-		border: none;
+		color: #71717a;
+		font-family: 'JetBrains Mono', monospace;
 	}
 
-	.action-btn.primary .shortcut {
-		background: rgba(0, 0, 0, 0.2);
-		color: rgba(255, 255, 255, 0.8);
+	.action-btn.pass kbd,
+	.action-btn.phase kbd,
+	.action-btn.accent kbd {
+		color: rgba(255, 255, 255, 0.6);
 	}
 
-	.divider {
-		width: 1px;
-		height: 32px;
-		background: #374151;
-		margin: 0 0.5rem;
-	}
-
-	.loading-spinner {
-		width: 16px;
-		height: 16px;
-		border: 2px solid rgba(255, 255, 255, 0.3);
-		border-top-color: #fff;
+	/* Spinner */
+	.spinner {
+		width: 12px;
+		height: 12px;
+		border: 2px solid rgba(255, 255, 255, 0.2);
+		border-top-color: currentColor;
 		border-radius: 50%;
 		animation: spin 0.6s linear infinite;
 	}
@@ -460,128 +745,110 @@
 		to { transform: rotate(360deg); }
 	}
 
-	/* Settings Section */
-	.settings-section {
-		position: relative;
-	}
-
-	.settings-toggle {
-		width: 40px;
-		height: 40px;
+	/* Settings */
+	.settings-btn {
+		width: 32px;
+		height: 32px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #1a1f2e;
-		border: 1px solid #2a3441;
-		border-radius: 8px;
+		background: rgba(36, 40, 51, 0.8);
+		border: 1px solid rgba(63, 63, 70, 0.5);
+		border-radius: 6px;
+		font-size: 0.875rem;
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all 0.15s ease;
 	}
 
-	.settings-toggle:hover,
-	.settings-toggle.active {
-		background: #2a3441;
-		border-color: #374151;
+	.settings-btn:hover,
+	.settings-btn.active {
+		background: rgba(63, 63, 70, 0.5);
 	}
 
-	.settings-icon {
-		font-size: 1.25rem;
-		transition: transform 0.3s;
-	}
-
-	.settings-toggle.active .settings-icon {
-		transform: rotate(90deg);
-	}
-
-	.settings-panel {
+	.settings-dropdown {
 		position: absolute;
-		bottom: calc(100% + 0.75rem);
-		right: 0;
-		width: 280px;
-		padding: 1rem;
-		background: #1a1f2e;
-		border: 1px solid #2a3441;
+		bottom: calc(100% + 8px);
+		right: 0.75rem;
+		width: 180px;
+		padding: 0.625rem;
+		background: rgba(18, 20, 26, 0.98);
+		border: 1px solid rgba(63, 63, 70, 0.6);
 		border-radius: 8px;
-		box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
+		box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
 	}
 
 	.settings-title {
-		font-size: 0.875rem;
+		font-size: 0.625rem;
 		font-weight: 700;
-		color: #9ca3af;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		margin-bottom: 0.75rem;
-		padding-bottom: 0.5rem;
-		border-bottom: 1px solid #2a3441;
+		letter-spacing: 0.05em;
+		color: #71717a;
+		margin-bottom: 0.375rem;
+		padding-bottom: 0.25rem;
+		border-bottom: 1px solid rgba(63, 63, 70, 0.5);
 	}
 
-	.setting-option {
+	.setting-row {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		padding: 0.5rem 0;
+		gap: 0.5rem;
+		padding: 0.25rem 0;
+		font-size: 0.75rem;
+		color: #a1a1aa;
 		cursor: pointer;
-		font-size: 0.875rem;
-		color: #d1d5db;
-		transition: color 0.2s;
 	}
 
-	.setting-option:hover {
-		color: #fff;
+	.setting-row:hover {
+		color: #f4f4f5;
 	}
 
-	.setting-option input[type="checkbox"] {
-		width: 16px;
-		height: 16px;
-		accent-color: #10b981;
+	.setting-row input[type="checkbox"] {
+		width: 12px;
+		height: 12px;
+		accent-color: #c9a227;
 		cursor: pointer;
 	}
 
 	/* Responsive */
-	@media (max-width: 900px) {
-		.priority-action-bar {
-			left: 0;
-			right: 0;
-			transform: none;
-			border-radius: 0;
-			padding: 0.5rem 1rem;
-			gap: 0.75rem;
-		}
-
-		.btn-label {
+	@media (max-width: 1024px) {
+		.btn-text {
 			display: none;
-		}
-
-		.action-btn {
-			padding: 0.625rem;
-		}
-
-		.action-btn.primary {
-			padding: 0.75rem;
-		}
-
-		.priority-status {
-			min-width: auto;
 		}
 
 		.status-text {
 			display: none;
 		}
+
+		.status-section {
+			min-width: auto;
+		}
 	}
 
-	@media (max-width: 600px) {
-		.shortcut {
+	@media (max-width: 768px) {
+		kbd {
 			display: none;
+		}
+
+		.action-bar {
+			gap: 0.375rem;
+			padding: 0.375rem 0.5rem;
 		}
 
 		.divider {
 			display: none;
 		}
+	}
 
-		.action-buttons {
-			gap: 0.25rem;
+	@media (max-width: 600px) {
+		.action-bar {
+			left: 0;
+			right: 0;
+			transform: none;
+			border-radius: 0;
+		}
+
+		.stat-display.library {
+			display: none;
 		}
 	}
 </style>
-

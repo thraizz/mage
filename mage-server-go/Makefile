@@ -95,6 +95,11 @@ migrate-create: ## Create new migration (usage: make migrate-create NAME=create_
 	@echo "Creating migration: $(NAME)"
 	migrate create -ext sql -dir migrations -seq $(NAME)
 
+wipe-sessions: ## Wipe all active game sessions from the database
+	@echo "Wiping active game sessions..."
+	PAGER=cat psql "postgresql://mage:mage@localhost:5432/mage?sslmode=disable" -c "TRUNCATE TABLE active_games;"
+	@echo "Game sessions wiped"
+
 
 transpile-cards: ## Transpile cards
 	@echo "Transpiling cards..."

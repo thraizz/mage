@@ -20,6 +20,7 @@
 		isCardBack = false,
 		onclick = () => {},
 		onhover = () => {},
+		oncontextmenu = undefined as ((e: MouseEvent) => void) | undefined,
 		size = 'normal',
 		// Targeting mode props
 		isValidTarget = false,
@@ -55,6 +56,7 @@
 		isCardBack?: boolean;
 		onclick?: () => void;
 		onhover?: () => void;
+		oncontextmenu?: (e: MouseEvent) => void;
 		size?: 'small' | 'normal' | 'large';
 		// Targeting mode props
 		isValidTarget?: boolean;
@@ -280,6 +282,7 @@
 	onmouseleave={handleMouseLeave}
 	onmousemove={handleMouseMove}
 	onkeydown={(e) => e.key === 'Enter' && handleClick()}
+	oncontextmenu={(e) => oncontextmenu?.(e)}
 >
 	{#if isCardBack}
 		<!-- Card Back -->

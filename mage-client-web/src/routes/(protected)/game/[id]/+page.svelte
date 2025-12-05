@@ -80,6 +80,10 @@
 	import DeclareAttackers from '$lib/components/game/DeclareAttackers.svelte';
 	import DeclareBlockers from '$lib/components/game/DeclareBlockers.svelte';
 	import AssignDamage from '$lib/components/game/AssignDamage.svelte';
+	
+	// Direct player control components
+	import CardContextMenu from '$lib/components/game/CardContextMenu.svelte';
+	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import { combatStore, isInCombat, canAttackCardIds, declaredAttackerIds, canBlockCardIds, assignedBlockerIds } from '$lib/stores/combat';
 	import { parseCombatOptions, type DeclaredAttacker, type DefenderTarget, type DamageAssignmentPrompt, type ParsedCombatOptions } from '$lib/types/combat';
 
@@ -102,6 +106,11 @@
 	let showActionLog = $state(false);
 	let showChat = $state(false);
 	let showDebugOverlay = $state(false);
+	let showTokenCreator = $state(false);
+	
+	// Context menu state
+	let contextMenuCard = $state<typeof battlefieldCards[0] | null>(null);
+	let contextMenuPosition = $state({ x: 0, y: 0 });
 	let actionLogRef = $state<ActionLogOverlay | undefined>(undefined);
 	let gameChatRef = $state<GameChatOverlay | undefined>(undefined);
 	let isActionLoading = $state(false);
@@ -922,6 +931,22 @@
 	}
 
 	/**
+	 * Handle right-click context menu on battlefield cards
+	 */
+	function handleCardContextMenu(event: MouseEvent, card: typeof battlefieldCards[0]) {
+		event.preventDefault();
+		contextMenuCard = card;
+		contextMenuPosition = { x: event.clientX, y: event.clientY };
+	}
+
+	/**
+	 * Close context menu
+	 */
+	function closeContextMenu() {
+		contextMenuCard = null;
+	}
+
+	/**
 	 * Handle target selection confirmation
 	 * Sends selected target UUID(s) to the server
 	 * 
@@ -1536,6 +1561,7 @@
 								isSelected={gameState.selectedCardIds.includes(card.id)}
 								size="normal"
 								onclick={() => handleBattlefieldCardClick(card.id)}
+								oncontextmenu={(e) => handleCardContextMenu(e, card)}
 								isTargetingActive={isTargeting}
 								isValidTarget={validTargets.has(card.id)}
 								isTargetSelected={selectedTargets.includes(card.id)}
@@ -1583,13 +1609,6 @@
 								<span class="priority-dot"></span>
 							{/if}
 						</span>
-						<div class="player-stats">
-							<span class="life" title="Life">❤️ {formatLife(me.life)}</span>
-							{#if me.poison > 0}
-								<span class="poison" title="Poison">☠️ {me.poison}</span>
-							{/if}
-							<span class="library" title="Library">📚 {me.libraryCount}</span>
-						</div>
 					</div>
 					<div class="player-zones">
 						<Graveyard
@@ -1644,19 +1663,26 @@
 		<ActionLogOverlay bind:this={actionLogRef} bind:open={showActionLog} />
 		<GameChatOverlay bind:this={gameChatRef} gameId={gameId || ''} bind:open={showChat} />
 
+
 		<!-- Priority Action Bar (Docked at bottom) -->
 		<PriorityActionBar
+			{gameId}
 			hasPriority={havePriority}
 			activePlayerId={gameState.gameView?.activePlayerId || ''}
 			{localPlayerId}
 			activePlayerName={activePlayerName}
+			currentPhase={phase}
 			canPassPriority={havePriority}
 			isLoading={isActionLoading}
+			playerLife={me?.life ?? 20}
+			playerPoison={me?.poison ?? 0}
+			libraryCount={me?.libraryCount ?? 0}
 			onPassPriority={handlePassPriority}
 			onPassUntilEOT={handlePassUntilEOT}
 			onCastSpell={handleCastSpell}
 			onActivateAbility={handleActivateAbility}
 			onAdvancePhase={handleAdvancePhase}
+			onCreateToken={() => showTokenCreator = true}
 			bind:autoPassSettings
 		/>
 
@@ -1691,6 +1717,29 @@
 			{error}
 			onClose={() => showDebugOverlay = false}
 		/>
+
+		<!-- Card Context Menu -->
+		{#if contextMenuCard && gameId}
+			<CardContextMenu
+				{gameId}
+				cardId={contextMenuCard.id}
+				cardName={contextMenuCard.name}
+				isTapped={contextMenuCard.tapped}
+				isFaceDown={contextMenuCard.faceDown ?? false}
+				isToken={contextMenuCard.isToken ?? false}
+				currentZone="BATTLEFIELD"
+				position={contextMenuPosition}
+				onClose={closeContextMenu}
+			/>
+		{/if}
+
+		<!-- Token Creator Dialog -->
+		{#if showTokenCreator && gameId}
+			<TokenCreator
+				{gameId}
+				onClose={() => showTokenCreator = false}
+			/>
+		{/if}
 
 		<!-- Drag Ghost - Card following the cursor during drag -->
 		{#if isDragging && dragCardName}
@@ -2212,6 +2261,7 @@
 		max-width: 500px;
 		max-height: 80vh;
 	}
+
 
 	/* Responsive */
 	@media (max-width: 900px) {
