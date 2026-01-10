@@ -63,8 +63,18 @@ type Permanent struct {
 }
 
 // Check performs all state-based action checks and returns actions to execute
-// MTG Rules: 704.3 - These checks are performed in order
+// RULES-LIGHT: Returns empty - players handle SBAs manually
+// The original checks are kept below for reference/UI hints
 func (sba *StateBasedActions) Check(state GameStateReader) []Action {
+	// RULES-LIGHT: No automatic state-based actions
+	// Players are trusted to handle lethal damage, 0-toughness creatures, etc. manually
+	_ = state // Keep parameter for interface compatibility
+	return []Action{}
+}
+
+// CheckAdvisory performs SBA checks and returns advisory hints (not enforced)
+// This can be used by UI to show warnings like "Creature has lethal damage"
+func (sba *StateBasedActions) CheckAdvisory(state GameStateReader) []Action {
 	actions := []Action{}
 
 	// 704.5a: Player with 0 or less life loses
@@ -111,6 +121,8 @@ func (sba *StateBasedActions) Check(state GameStateReader) []Action {
 
 	return actions
 }
+
+// checkPlayerLife checks Rule 704.5a
 
 // checkPlayerLife checks Rule 704.5a
 func (sba *StateBasedActions) checkPlayerLife(state GameStateReader) []Action {

@@ -855,9 +855,11 @@ func engineMessagesToProto(messages []game.EngineMessage, startID int32) []*pb.G
 	nextID := startID
 	for _, message := range messages {
 		msg := &pb.GameMessage{
-			Id:    nextID,
-			Text:  message.Text,
-			Color: engineColorToString(message.Color),
+			Id:                nextID,
+			Text:              message.Text,
+			Color:             engineColorToString(message.Color),
+			BookmarkId:        int32(message.BookmarkID),
+			RollbackAvailable: message.RollbackAvailable,
 		}
 		if !message.Timestamp.IsZero() {
 			msg.Time = timestamppb.New(message.Timestamp)
@@ -1083,4 +1085,114 @@ func (s *mageServer) GetMyActiveGames(ctx context.Context, req *pb.GetMyActiveGa
 	)
 
 	return &pb.GetMyActiveGamesResponse{Games: games}, nil
+}
+
+// ==================== Rollback Methods ====================
+
+// RequestRollback initiates a rollback request to a specific message in the game log.
+// This requires opponent consent in multiplayer games.
+func (s *mageServer) RequestRollback(ctx context.Context, req *pb.RequestRollbackRequest) (*pb.RequestRollbackResponse, error) {
+	player, gameInstance, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
+	if errMsg != "" {
+		return &pb.RequestRollbackResponse{Success: false, Error: errMsg}, nil
+	}
+
+	messageID := req.GetMessageId()
+	if messageID <= 0 {
+		return &pb.RequestRollbackResponse{Success: false, Error: "message_id is required"}, nil
+	}
+
+	// Get the underlying MageEngine from the adapter
+	mageEngine := s.gameAdapter.GetMageEngine()
+	if mageEngine == nil {
+		return &pb.RequestRollbackResponse{Success: false, Error: "game engine not available"}, nil
+	}
+
+	requestID, err := mageEngine.RequestRollback(gameInstance.ID, player, int(messageID))
+	if err != nil {
+		s.logger.Warn("rollback request failed",
+			zap.String("game_id", gameInstance.ID),
+			zap.String("player", player),
+			zap.Int32("message_id", messageID),
+			zap.Error(err),
+		)
+		return &pb.RequestRollbackResponse{Success: false, Error: err.Error()}, nil
+	}
+
+	s.logger.Info("rollback request initiated",
+		zap.String("game_id", gameInstance.ID),
+		zap.String("player", player),
+		zap.Int32("message_id", messageID),
+		zap.String("request_id", requestID),
+	)
+
+	return &pb.RequestRollbackResponse{
+		Success:   true,
+		RequestId: requestID,
+	}, nil
+}
+
+// RespondToRollback handles a player's response to a pending rollback request.
+func (s *mageServer) RespondToRollback(ctx context.Context, req *pb.RespondToRollbackRequest) (*pb.RespondToRollbackResponse, error) {
+	player, gameInstance, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
+	if errMsg != "" {
+		return &pb.RespondToRollbackResponse{Success: false, Error: errMsg}, nil
+	}
+
+	requestID := req.GetRequestId()
+	if requestID == "" {
+		return &pb.RespondToRollbackResponse{Success: false, Error: "request_id is required"}, nil
+	}
+
+	// Get the underlying MageEngine from the adapter
+	mageEngine := s.gameAdapter.GetMageEngine()
+	if mageEngine == nil {
+		return &pb.RespondToRollbackResponse{Success: false, Error: "game engine not available"}, nil
+	}
+
+	err := mageEngine.RespondToRollback(gameInstance.ID, player, requestID, req.GetApproved())
+	if err != nil {
+		s.logger.Warn("rollback response failed",
+			zap.String("game_id", gameInstance.ID),
+			zap.String("player", player),
+			zap.String("request_id", requestID),
+			zap.Bool("approved", req.GetApproved()),
+			zap.Error(err),
+		)
+		return &pb.RespondToRollbackResponse{Success: false, Error: err.Error()}, nil
+	}
+
+	s.logger.Info("rollback response processed",
+		zap.String("game_id", gameInstance.ID),
+		zap.String("player", player),
+		zap.String("request_id", requestID),
+		zap.Bool("approved", req.GetApproved()),
+	)
+
+	return &pb.RespondToRollbackResponse{Success: true}, nil
+}
+
+// CancelRollback cancels a pending rollback request.
+func (s *mageServer) CancelRollback(ctx context.Context, req *pb.CancelRollbackRequest) (*pb.CancelRollbackResponse, error) {
+	_, gameInstance, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
+	if errMsg != "" {
+		return &pb.CancelRollbackResponse{Success: false, Error: errMsg}, nil
+	}
+
+	// Get the underlying MageEngine from the adapter
+	mageEngine := s.gameAdapter.GetMageEngine()
+	if mageEngine == nil {
+		return &pb.CancelRollbackResponse{Success: false, Error: "game engine not available"}, nil
+	}
+
+	err := mageEngine.CancelRollbackRequest(gameInstance.ID)
+	if err != nil {
+		return &pb.CancelRollbackResponse{Success: false, Error: err.Error()}, nil
+	}
+
+	s.logger.Info("rollback request cancelled",
+		zap.String("game_id", gameInstance.ID),
+	)
+
+	return &pb.CancelRollbackResponse{Success: true}, nil
 }

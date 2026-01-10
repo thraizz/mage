@@ -1,25 +1,49 @@
 <script lang="ts">
 	import Card from './Card.svelte';
 	import type { GameCard } from '$lib/types/game';
+	import {
+		dragDropStore,
+		isDragging as isDraggingStore,
+		draggedCardId,
+		getAllValidDropZones,
+		type SourceZone
+	} from '$lib/utils/drag-drop';
 
 	// Props
 	let {
 		cards = [],
 		playerName = 'Player',
 		isOpponent = false,
+		canDrag = false,
 		// eslint-disable-next-line no-unused-vars
-		onCardClick = (cardId: string) => {}
+		onCardClick = (cardId: string) => {},
+		// eslint-disable-next-line no-unused-vars
+		onCardDragStart = (cardId: string) => {},
+		// eslint-disable-next-line no-unused-vars
+		onCardDragEnd = (cardId: string, dropped: boolean) => {}
 	}: {
 		cards?: GameCard[];
 		playerName?: string;
 		isOpponent?: boolean;
+		canDrag?: boolean;
 		// eslint-disable-next-line no-unused-vars
 		onCardClick?: (cardId: string) => void;
+		// eslint-disable-next-line no-unused-vars
+		onCardDragStart?: (cardId: string) => void;
+		// eslint-disable-next-line no-unused-vars
+		onCardDragEnd?: (cardId: string, dropped: boolean) => void;
 	} = $props();
 
 	// State
 	let showModal = $state(false);
 	let selectedCardId = $state<string | null>(null);
+	let dragStartPosition = $state<{ x: number; y: number } | null>(null);
+	let isDragPending = $state(false);
+	const DRAG_THRESHOLD = 5;
+
+	// Drag state from store
+	const isDraggingGlobal = $derived($isDraggingStore);
+	const draggedId = $derived($draggedCardId);
 
 	/**
 	 * Toggle graveyard modal
@@ -52,6 +76,70 @@
 		if (event.target === event.currentTarget) {
 			closeModal();
 		}
+	}
+
+	/**
+	 * Handle mouse down - start drag tracking
+	 */
+	function handleMouseDown(cardId: string, cardName: string, event: MouseEvent): void {
+		if (event.button !== 0) return; // Only left click
+		if (!canDrag || isOpponent) return;
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		dragStartPosition = { x: event.clientX, y: event.clientY };
+		isDragPending = true;
+
+		const handleMouseMove = (moveEvent: MouseEvent) => {
+			if (!dragStartPosition || !isDragPending) return;
+
+			const dx = moveEvent.clientX - dragStartPosition.x;
+			const dy = moveEvent.clientY - dragStartPosition.y;
+			const distance = Math.sqrt(dx * dx + dy * dy);
+
+			if (distance >= DRAG_THRESHOLD) {
+				isDragPending = false;
+				const validZones = getAllValidDropZones('graveyard' as SourceZone);
+				dragDropStore.startDrag(
+					cardId,
+					cardName,
+					'graveyard' as SourceZone,
+					moveEvent.clientX,
+					moveEvent.clientY,
+					validZones
+				);
+				onCardDragStart(cardId);
+				closeModal(); // Close modal when starting drag
+
+				document.removeEventListener('mousemove', handleMouseMove);
+				document.removeEventListener('mouseup', handleMouseUp);
+			}
+		};
+
+		const handleMouseUp = () => {
+			isDragPending = false;
+			dragStartPosition = null;
+			document.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('mouseup', handleMouseUp);
+		};
+
+		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('mouseup', handleMouseUp);
+	}
+
+	/**
+	 * Prevent native drag events
+	 */
+	function handleDragStart(event: DragEvent): void {
+		event.preventDefault();
+	}
+
+	/**
+	 * Check if a card is being dragged
+	 */
+	function isCardDragging(cardId: string): boolean {
+		return isDraggingGlobal && draggedId === cardId;
 	}
 
 	// Derived values
@@ -92,7 +180,14 @@
 				{:else}
 					<div class="card-grid">
 						{#each cards as card (card.id)}
-							<div class="card-grid-item">
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<div
+								class="card-grid-item"
+								class:draggable={canDrag && !isOpponent}
+								class:is-dragging={isCardDragging(card.id)}
+								onmousedown={(e) => handleMouseDown(card.id, card.name, e)}
+								ondragstart={handleDragStart}
+							>
 								<Card
 									cardId={card.id}
 									cardName={card.name}
@@ -104,6 +199,7 @@
 									isSelected={selectedCardId === card.id}
 									size="normal"
 									onclick={() => handleCardClick(card.id)}
+									isDragging={isCardDragging(card.id)}
 								/>
 							</div>
 						{/each}
@@ -294,6 +390,22 @@
 	.card-grid-item {
 		display: flex;
 		justify-content: center;
+		user-select: none;
+		-webkit-user-select: none;
+		transition: transform 0.2s ease, opacity 0.2s ease;
+	}
+
+	.card-grid-item.draggable {
+		cursor: grab;
+	}
+
+	.card-grid-item.draggable:active {
+		cursor: grabbing;
+	}
+
+	.card-grid-item.is-dragging {
+		opacity: 0.4;
+		transform: scale(0.95);
 	}
 
 	/* Scrollbar Styling */

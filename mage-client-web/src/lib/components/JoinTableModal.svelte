@@ -12,7 +12,7 @@
 	let {
 		open = $bindable(false),
 		table,
-		// eslint-disable-next-line no-unused-vars
+		 
 		onSuccess
 	}: {
 		open: boolean;

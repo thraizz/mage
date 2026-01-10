@@ -547,3 +547,123 @@ export async function skipCombat(gameId: string): Promise<void> {
 export async function declineToBlock(gameId: string): Promise<void> {
 	return finishDeclaringBlockers(gameId);
 }
+
+// ============================================================================
+// Rollback API Functions
+// These functions handle game state rollback requests and responses
+// ============================================================================
+
+import type {
+	RequestRollbackRequest,
+	RequestRollbackResponse,
+	RespondToRollbackRequest,
+	RespondToRollbackResponse,
+	CancelRollbackRequest,
+	CancelRollbackResponse
+} from '$lib/generated/mage/v1/game';
+
+/**
+ * Request a rollback to a specific game log message
+ * In multiplayer games, this sends a request to opponents for consent
+ * @param gameId - The game ID
+ * @param messageId - The message ID to rollback to
+ * @returns Object containing success status, requestId (for multiplayer), and whether consent is required
+ */
+export async function requestRollback(
+	gameId: string,
+	messageId: number
+): Promise<{ success: boolean; requestId: string; requiresConsent: boolean; error?: string }> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	const request: RequestRollbackRequest = {
+		sessionId,
+		gameId,
+		messageId
+	};
+
+	const response = await client.call<RequestRollbackRequest, RequestRollbackResponse>(
+		'RequestRollback',
+		request
+	);
+
+	return {
+		success: response.success,
+		requestId: response.requestId,
+		requiresConsent: response.requiresConsent,
+		error: response.error
+	};
+}
+
+/**
+ * Respond to a rollback request from another player
+ * @param gameId - The game ID
+ * @param requestId - The rollback request ID
+ * @param approved - Whether to approve or deny the rollback
+ */
+export async function respondToRollback(
+	gameId: string,
+	requestId: string,
+	approved: boolean
+): Promise<{ success: boolean; error?: string }> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	const request: RespondToRollbackRequest = {
+		sessionId,
+		gameId,
+		requestId,
+		approved
+	};
+
+	const response = await client.call<RespondToRollbackRequest, RespondToRollbackResponse>(
+		'RespondToRollback',
+		request
+	);
+
+	return {
+		success: response.success,
+		error: response.error
+	};
+}
+
+/**
+ * Cancel a pending rollback request
+ * @param gameId - The game ID
+ * @param requestId - The rollback request ID to cancel
+ */
+export async function cancelRollback(
+	gameId: string,
+	requestId: string
+): Promise<{ success: boolean; error?: string }> {
+	const client = getMageClient();
+	const sessionId = await client.ensureSessionId();
+
+	if (!sessionId) {
+		throw new Error('No active session - please login first');
+	}
+
+	const request: CancelRollbackRequest = {
+		sessionId,
+		gameId,
+		requestId
+	};
+
+	const response = await client.call<CancelRollbackRequest, CancelRollbackResponse>(
+		'CancelRollback',
+		request
+	);
+
+	return {
+		success: response.success,
+		error: response.error
+	};
+}

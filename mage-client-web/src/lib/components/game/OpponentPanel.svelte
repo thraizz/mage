@@ -7,12 +7,6 @@
 	import Card from './Card.svelte';
 	import Graveyard from './Graveyard.svelte';
 	import type { GameCard } from '$lib/types/game';
-	import {
-		isTargetingActive,
-		validTargetIds,
-		selectedTargetIds,
-		targetingStore
-	} from '$lib/stores/game-targeting';
 
 	// Props
 	let {
@@ -32,20 +26,10 @@
 		onCardClick?: (cardId: string) => void;
 	} = $props();
 
-	// Targeting state from store
-	const isTargeting = $derived($isTargetingActive);
-	const validTargets = $derived($validTargetIds);
-	const selectedTargets = $derived($selectedTargetIds);
-
 	/**
-	 * Handle card click - supports both normal selection and targeting mode
+	 * Handle card click
 	 */
 	function handleCardClick(id: string): void {
-		// Handle targeting mode
-		if (isTargeting) {
-			targetingStore.toggleTarget(id);
-		}
-		// Always call the parent handler
 		onCardClick(id);
 	}
 
@@ -139,9 +123,6 @@
 									isSelected={selectedCardIds.includes(card.id)}
 									size="small"
 									onclick={() => handleCardClick(card.id)}
-									isTargetingActive={isTargeting}
-									isValidTarget={validTargets.has(card.id)}
-									isTargetSelected={selectedTargets.includes(card.id)}
 									summoningSickness={card.summoningSickness}
 								/>
 							</div>

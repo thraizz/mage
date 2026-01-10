@@ -21,6 +21,7 @@
 	import OnlinePlayersList from '$lib/components/OnlinePlayersList.svelte';
 	import LobbyChat from '$lib/components/LobbyChat.svelte';
 	import ServerDebugPanel from '$lib/components/ServerDebugPanel.svelte';
+	import PlaytestModal from '$lib/components/PlaytestModal.svelte';
 
 	// State
 	let tables = $state<Table[]>([]);
@@ -43,6 +44,7 @@
 	let showCreateModal = $state(false);
 	let showJoinModal = $state(false);
 	let joiningTable = $state<Table | null>(null);
+	let showPlaytestModal = $state(false);
 
 	// Debug panel state
 	let showDebugPanel = $state(false);
@@ -429,23 +431,40 @@
 					<span>Refresh</span>
 				</button>
 
-				<button class="create-button" onclick={openCreateModal} title="Create new table">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<line x1="12" y1="5" x2="12" y2="19"></line>
-						<line x1="5" y1="12" x2="19" y2="12"></line>
-					</svg>
-					<span>Create Table</span>
-				</button>
+			<button class="create-button" onclick={openCreateModal} title="Create new table">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<line x1="12" y1="5" x2="12" y2="19"></line>
+					<line x1="5" y1="12" x2="19" y2="12"></line>
+				</svg>
+				<span>Create Table</span>
+			</button>
+
+			<button class="playtest-button ghost-btn" onclick={() => showPlaytestModal = true} title="Test decks locally">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+				</svg>
+				<span>+ Playtest Decks</span>
+			</button>
 			</div>
 		</div>
 
@@ -639,6 +658,12 @@
 <!-- Join Table Modal -->
 <JoinTableModal bind:open={showJoinModal} table={joiningTable} onSuccess={handleTableJoined} />
 
+<!-- Playtest Modal -->
+<PlaytestModal
+	bind:open={showPlaytestModal}
+	onClose={() => showPlaytestModal = false}
+/>
+
 <style>
 	.lobby-page {
 		display: flex;
@@ -815,6 +840,29 @@
 		color: var(--ci-scroll-parchment);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 		transform: translateY(-1px);
+	}
+
+	/* Ghost button for playtest */
+	.ghost-btn {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-5);
+		border-radius: var(--radius-md);
+		font-weight: var(--weight-semibold);
+		font-size: var(--text-sm);
+		cursor: pointer;
+		transition: all var(--transition-fast);
+		background: transparent;
+		border: 1px dashed rgba(102, 126, 234, 0.4);
+		color: rgba(102, 126, 234, 0.8);
+	}
+
+	.ghost-btn:hover {
+		border-color: rgba(102, 126, 234, 0.6);
+		border-style: solid;
+		color: rgba(102, 126, 234, 1);
+		background: rgba(102, 126, 234, 0.05);
 	}
 
 	.refresh-icon {
@@ -1158,6 +1206,7 @@
 		border: 1px solid var(--ci-jace-cloak);
 		border-radius: var(--radius-lg);
 		padding: var(--space-6);
+		overflow: hidden;
 	}
 
 	.section-header {
@@ -1211,6 +1260,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: var(--space-4);
 		background: var(--bg-obsidian);
 		border: 1px solid var(--border-default);
 		border-radius: var(--radius-md);
@@ -1227,6 +1277,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
+		min-width: 0;
+		flex: 1;
 	}
 
 	.game-header {
@@ -1292,6 +1344,8 @@
 		cursor: pointer;
 		transition: all var(--transition-fast);
 		box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+		flex-shrink: 0;
+		white-space: nowrap;
 	}
 
 	.rejoin-button:hover {

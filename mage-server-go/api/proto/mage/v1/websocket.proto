@@ -84,6 +84,11 @@ enum CallbackMethod {
   REPLAY_INIT = 91;
   REPLAY_UPDATE = 92;
   REPLAY_DONE = 93;
+
+  // Rollback Events
+  GAME_ROLLBACK_REQUEST = 100;   // Sent to opponent asking for consent
+  GAME_ROLLBACK_RESPONSE = 101;  // Response to rollback request
+  GAME_ROLLBACK_COMPLETE = 102;  // Rollback was performed
 }
 
 // Specific callback data payloads
@@ -314,4 +319,28 @@ message DamageTarget {
   int32 toughness = 3;
   int32 marked_damage = 4;  // Damage already marked on this creature
   int32 order = 5;  // Damage assignment order (0 = first to receive lethal)
+}
+
+// Rollback request sent to opponent asking for consent
+message GameRollbackRequestData {
+  string requesting_player_id = 1;
+  string requesting_player_name = 2;
+  int32 target_message_id = 3;
+  string target_message_text = 4;
+  string request_id = 5;  // UUID for tracking the request
+}
+
+// Response to a rollback request
+message GameRollbackResponseData {
+  string request_id = 1;
+  bool approved = 2;
+  string responding_player_id = 3;
+  string responding_player_name = 4;
+}
+
+// Notification that rollback was completed
+message GameRollbackCompleteData {
+  int32 target_message_id = 1;
+  string initiated_by = 2;
+  string initiated_by_name = 3;
 }

@@ -1,9 +1,9 @@
 <script lang="ts">
 	/**
 	 * PriorityActionBar - Unified game control bar
-	 * Contains: Status | Player Stats | Game Actions | Direct Controls | Settings
+	 * Contains: Status | Game Actions | Direct Controls | Settings
 	 */
-	import { modifyLife, setPlayerCounter, drawCards, shuffleLibrary, nextTurn, clearCombat } from '$lib/api/direct-actions';
+	import { nextTurn, clearCombat } from '$lib/api/direct-actions';
 	import { toast } from '$lib/stores/toast';
 
 	// Props
@@ -16,22 +16,14 @@
 		currentPhase = '',
 		canPassPriority = true,
 		isLoading = false,
-		// Player stats
-		playerLife = 20,
-		playerPoison = 0,
-		libraryCount = 0,
 		// Callbacks
 		onPassPriority = () => {},
 		onPassUntilEOT = () => {},
 		onCastSpell = () => {},
-		onActivateAbility = () => {},
 		onAdvancePhase = () => {},
 		onCreateToken = () => {},
-		// Auto-pass settings
-		autoPassSettings = $bindable({
-			noActions: false,
-			opponentTurn: false
-		})
+		// Auto-pass setting (passes when it's opponent's turn)
+		autoPass = $bindable(false)
 	}: {
 		gameId?: string;
 		hasPriority?: boolean;
@@ -41,69 +33,17 @@
 		currentPhase?: string;
 		canPassPriority?: boolean;
 		isLoading?: boolean;
-		playerLife?: number;
-		playerPoison?: number;
-		libraryCount?: number;
 		onPassPriority?: () => void;
 		onPassUntilEOT?: () => void;
 		onCastSpell?: () => void;
-		onActivateAbility?: () => void;
 		onAdvancePhase?: () => void;
 		onCreateToken?: () => void;
-		autoPassSettings?: {
-			noActions: boolean;
-			opponentTurn: boolean;
-		};
+		autoPass?: boolean;
 	} = $props();
-
-	// State
-	let showSettings = $state(false);
-	let showLifeMenu = $state(false);
 
 	// Derived values
 	const isYourTurn = $derived(activePlayerId === localPlayerId);
 	const isInCombat = $derived(currentPhase === 'COMBAT');
-
-	// Life/counter helpers
-	async function handleLifeChange(delta: number): Promise<void> {
-		if (!gameId) return;
-		try {
-			await modifyLife(gameId, localPlayerId, delta);
-		} catch (error) {
-			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-		}
-	}
-
-	async function handlePoisonChange(delta: number): Promise<void> {
-		if (!gameId) return;
-		const newValue = Math.max(0, playerPoison + delta);
-		try {
-			await setPlayerCounter(gameId, localPlayerId, 'poison', newValue);
-		} catch (error) {
-			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-		}
-	}
-
-	async function handleDraw(count: number): Promise<void> {
-		if (!gameId) return;
-		try {
-			await drawCards(gameId, count);
-			showLifeMenu = false;
-		} catch (error) {
-			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-		}
-	}
-
-	async function handleShuffle(): Promise<void> {
-		if (!gameId) return;
-		try {
-			await shuffleLibrary(gameId);
-			toast.success('Shuffled');
-			showLifeMenu = false;
-		} catch (error) {
-			toast.error(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-		}
-	}
 
 	// Game action handlers
 	function handlePassPriority(): void {
@@ -121,10 +61,6 @@
 		onCastSpell();
 	}
 
-	function handleActivateAbility(): void {
-		if (!hasPriority || isLoading) return;
-		onActivateAbility();
-	}
 
 	function handleAdvancePhase(): void {
 		if (!hasPriority || isLoading) return;
@@ -162,9 +98,6 @@
 		} else if (event.key === 'c' || event.key === 'C') {
 			event.preventDefault();
 			handleCastSpell();
-		} else if (event.key === 'a' || event.key === 'A') {
-			event.preventDefault();
-			handleActivateAbility();
 		} else if (event.key === 'n' || event.key === 'N') {
 			event.preventDefault();
 			handleAdvancePhase();
@@ -201,69 +134,6 @@
 		{/if}
 	</div>
 
-	<div class="divider"></div>
-
-	<!-- Player Stats (Life, Poison, Library) -->
-	<div class="player-stats-section">
-		<div class="life-group">
-			<button class="stat-btn life-btn" onclick={() => handleLifeChange(-1)} title="Lose 1 life">−</button>
-			<button 
-				class="stat-display life" 
-				onclick={() => showLifeMenu = !showLifeMenu}
-				title="Click for more options"
-			>
-				<span class="stat-icon">❤️</span>
-				<span class="stat-value">{playerLife}</span>
-			</button>
-			<button class="stat-btn life-btn" onclick={() => handleLifeChange(1)} title="Gain 1 life">+</button>
-		</div>
-
-		{#if playerPoison > 0}
-			<div class="stat-display poison" title="Poison counters">
-				<span class="stat-icon">☠️</span>
-				<span class="stat-value">{playerPoison}</span>
-			</div>
-		{/if}
-
-		<div class="stat-display library" title="Cards in library">
-			<span class="stat-icon">📚</span>
-			<span class="stat-value">{libraryCount}</span>
-		</div>
-
-		<!-- Life/Library Quick Menu -->
-		{#if showLifeMenu}
-			<div class="quick-menu">
-				<div class="menu-section">
-					<span class="menu-label">Life</span>
-					<div class="menu-row">
-						<button onclick={() => handleLifeChange(-5)}>−5</button>
-						<button onclick={() => handleLifeChange(-1)}>−1</button>
-						<button onclick={() => handleLifeChange(1)}>+1</button>
-						<button onclick={() => handleLifeChange(5)}>+5</button>
-					</div>
-				</div>
-				<div class="menu-section">
-					<span class="menu-label">Poison</span>
-					<div class="menu-row">
-						<button onclick={() => handlePoisonChange(-1)}>−1</button>
-						<span class="menu-value">{playerPoison}</span>
-						<button onclick={() => handlePoisonChange(1)}>+1</button>
-					</div>
-				</div>
-				<div class="menu-section">
-					<span class="menu-label">Library</span>
-					<div class="menu-row">
-						<button onclick={() => handleDraw(1)}>Draw 1</button>
-						<button onclick={() => handleDraw(7)}>Draw 7</button>
-						<button onclick={handleShuffle}>Shuffle</button>
-					</div>
-				</div>
-			</div>
-		{/if}
-	</div>
-
-	<div class="divider"></div>
-
 	<!-- Game Actions -->
 	<div class="actions-group">
 		<button
@@ -293,16 +163,6 @@
 			<kbd>C</kbd>
 		</button>
 
-		<button
-			class="action-btn"
-			disabled={!hasPriority || isLoading}
-			onclick={handleActivateAbility}
-			title="Activate ability (A)"
-		>
-			<span class="btn-icon">⚡</span>
-			<span class="btn-text">Activate</span>
-			<kbd>A</kbd>
-		</button>
 
 		<button
 			class="action-btn phase"
@@ -360,29 +220,20 @@
 		</button>
 	</div>
 
-	<!-- Settings -->
-	<button
-		class="settings-btn"
-		class:active={showSettings}
-		onclick={() => showSettings = !showSettings}
-		title="Settings"
+	<!-- Auto-Pass Toggle -->
+	<button 
+		class="auto-pass-toggle" 
+		class:active={autoPass}
+		onclick={() => autoPass = !autoPass}
+		role="switch"
+		aria-checked={autoPass}
+		title="Auto-pass on opponent's turn"
 	>
-		⚙️
+		<span class="toggle-label">PASS</span>
+		<span class="toggle-track">
+			<span class="toggle-knob"></span>
+		</span>
 	</button>
-
-	{#if showSettings}
-		<div class="settings-dropdown">
-			<div class="settings-title">Auto-Pass</div>
-			<label class="setting-row">
-				<input type="checkbox" bind:checked={autoPassSettings.noActions} />
-				<span>When no actions</span>
-			</label>
-			<label class="setting-row">
-				<input type="checkbox" bind:checked={autoPassSettings.opponentTurn} />
-				<span>Opponent's turn</span>
-			</label>
-		</div>
-	{/if}
 </div>
 
 <style>
@@ -463,153 +314,6 @@
 		width: 1px;
 		height: 28px;
 		background: rgba(63, 63, 70, 0.5);
-	}
-
-	/* Player Stats */
-	.player-stats-section {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		position: relative;
-	}
-
-	.life-group {
-		display: flex;
-		align-items: center;
-		gap: 0.125rem;
-	}
-
-	.stat-btn {
-		width: 24px;
-		height: 24px;
-		border: 1px solid rgba(63, 63, 70, 0.4);
-		border-radius: 4px;
-		background: rgba(36, 40, 51, 0.6);
-		color: #a1a1aa;
-		font-size: 14px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.15s ease;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.stat-btn:hover {
-		background: rgba(63, 63, 70, 0.6);
-		color: #f4f4f5;
-	}
-
-	.stat-btn.life-btn:first-child:hover {
-		background: rgba(239, 68, 68, 0.3);
-		color: #ef4444;
-	}
-
-	.stat-btn.life-btn:last-child:hover {
-		background: rgba(34, 197, 94, 0.3);
-		color: #22c55e;
-	}
-
-	.stat-display {
-		display: flex;
-		align-items: center;
-		gap: 0.25rem;
-		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		background: transparent;
-		border: none;
-		cursor: pointer;
-		transition: background 0.15s ease;
-	}
-
-	.stat-display:hover {
-		background: rgba(63, 63, 70, 0.3);
-	}
-
-	.stat-display.life {
-		color: #f4f4f5;
-	}
-
-	.stat-display.poison {
-		color: #a855f7;
-	}
-
-	.stat-display.library {
-		color: #a1a1aa;
-	}
-
-	.stat-icon {
-		font-size: 0.75rem;
-	}
-
-	.stat-value {
-		font-family: 'JetBrains Mono', monospace;
-		min-width: 20px;
-		text-align: center;
-	}
-
-	/* Quick Menu */
-	.quick-menu {
-		position: absolute;
-		bottom: calc(100% + 8px);
-		left: 0;
-		min-width: 200px;
-		background: rgba(18, 20, 26, 0.98);
-		border: 1px solid rgba(63, 63, 70, 0.6);
-		border-radius: 8px;
-		padding: 0.75rem;
-		box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
-		display: flex;
-		flex-direction: column;
-		gap: 0.625rem;
-	}
-
-	.menu-section {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
-
-	.menu-label {
-		font-size: 0.625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: #71717a;
-	}
-
-	.menu-row {
-		display: flex;
-		gap: 0.25rem;
-		align-items: center;
-	}
-
-	.menu-row button {
-		padding: 0.375rem 0.5rem;
-		border: 1px solid rgba(63, 63, 70, 0.5);
-		border-radius: 4px;
-		background: rgba(36, 40, 51, 0.8);
-		color: #a1a1aa;
-		font-size: 0.75rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.15s ease;
-	}
-
-	.menu-row button:hover {
-		background: rgba(201, 162, 39, 0.2);
-		border-color: rgba(201, 162, 39, 0.4);
-		color: #f4f4f5;
-	}
-
-	.menu-value {
-		min-width: 24px;
-		text-align: center;
-		font-weight: 600;
-		color: #f4f4f5;
-		font-family: 'JetBrains Mono', monospace;
 	}
 
 	/* Actions Group */
@@ -745,68 +449,67 @@
 		to { transform: rotate(360deg); }
 	}
 
-	/* Settings */
-	.settings-btn {
-		width: 32px;
-		height: 32px;
+	/* Auto-Pass Toggle */
+	.auto-pass-toggle {
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		gap: 0.375rem;
+		padding: 0.25rem 0.5rem;
 		background: rgba(36, 40, 51, 0.8);
 		border: 1px solid rgba(63, 63, 70, 0.5);
 		border-radius: 6px;
-		font-size: 0.875rem;
 		cursor: pointer;
 		transition: all 0.15s ease;
 	}
 
-	.settings-btn:hover,
-	.settings-btn.active {
+	.auto-pass-toggle:hover {
 		background: rgba(63, 63, 70, 0.5);
 	}
 
-	.settings-dropdown {
-		position: absolute;
-		bottom: calc(100% + 8px);
-		right: 0.75rem;
-		width: 180px;
-		padding: 0.625rem;
-		background: rgba(18, 20, 26, 0.98);
-		border: 1px solid rgba(63, 63, 70, 0.6);
-		border-radius: 8px;
-		box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+	.auto-pass-toggle.active {
+		background: rgba(201, 162, 39, 0.15);
+		border-color: rgba(201, 162, 39, 0.4);
 	}
 
-	.settings-title {
-		font-size: 0.625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
+	.toggle-label {
+		font-size: 0.6875rem;
+		font-weight: 600;
 		color: #71717a;
-		margin-bottom: 0.375rem;
-		padding-bottom: 0.25rem;
-		border-bottom: 1px solid rgba(63, 63, 70, 0.5);
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
 	}
 
-	.setting-row {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.25rem 0;
-		font-size: 0.75rem;
-		color: #a1a1aa;
-		cursor: pointer;
+	.auto-pass-toggle.active .toggle-label {
+		color: #c9a227;
 	}
 
-	.setting-row:hover {
-		color: #f4f4f5;
+	.toggle-track {
+		position: relative;
+		width: 28px;
+		height: 16px;
+		background: rgba(63, 63, 70, 0.6);
+		border-radius: 8px;
+		transition: all 0.2s ease;
 	}
 
-	.setting-row input[type="checkbox"] {
+	.auto-pass-toggle.active .toggle-track {
+		background: rgba(201, 162, 39, 0.4);
+	}
+
+	.toggle-knob {
+		position: absolute;
+		top: 2px;
+		left: 2px;
 		width: 12px;
 		height: 12px;
-		accent-color: #c9a227;
-		cursor: pointer;
+		background: #71717a;
+		border-radius: 50%;
+		transition: all 0.2s ease;
+	}
+
+	.auto-pass-toggle.active .toggle-knob {
+		left: 14px;
+		background: #c9a227;
 	}
 
 	/* Responsive */
@@ -845,10 +548,6 @@
 			right: 0;
 			transform: none;
 			border-radius: 0;
-		}
-
-		.stat-display.library {
-			display: none;
 		}
 	}
 </style>

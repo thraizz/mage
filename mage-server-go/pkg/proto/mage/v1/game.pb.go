@@ -2534,6 +2534,354 @@ func (x *GetMyActiveGamesResponse) GetGames() []*ActiveGameInfo {
 	return nil
 }
 
+// Request a rollback to a specific message in the game log
+// Requires opponent consent in multiplayer games
+type RequestRollbackRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	GameId        string                 `protobuf:"bytes,2,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	MessageId     int32                  `protobuf:"varint,3,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"` // ID of the message to rollback to
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RequestRollbackRequest) Reset() {
+	*x = RequestRollbackRequest{}
+	mi := &file_mage_v1_game_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestRollbackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestRollbackRequest) ProtoMessage() {}
+
+func (x *RequestRollbackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestRollbackRequest.ProtoReflect.Descriptor instead.
+func (*RequestRollbackRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *RequestRollbackRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *RequestRollbackRequest) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *RequestRollbackRequest) GetMessageId() int32 {
+	if x != nil {
+		return x.MessageId
+	}
+	return 0
+}
+
+type RequestRollbackResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	RequestId     string                 `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"` // UUID to track the request
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RequestRollbackResponse) Reset() {
+	*x = RequestRollbackResponse{}
+	mi := &file_mage_v1_game_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestRollbackResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestRollbackResponse) ProtoMessage() {}
+
+func (x *RequestRollbackResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestRollbackResponse.ProtoReflect.Descriptor instead.
+func (*RequestRollbackResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *RequestRollbackResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *RequestRollbackResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *RequestRollbackResponse) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+// Respond to a pending rollback request
+type RespondToRollbackRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	GameId        string                 `protobuf:"bytes,2,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	RequestId     string                 `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"` // The request ID from RequestRollbackResponse
+	Approved      bool                   `protobuf:"varint,4,opt,name=approved,proto3" json:"approved,omitempty"`                   // Whether to approve the rollback
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RespondToRollbackRequest) Reset() {
+	*x = RespondToRollbackRequest{}
+	mi := &file_mage_v1_game_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RespondToRollbackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RespondToRollbackRequest) ProtoMessage() {}
+
+func (x *RespondToRollbackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RespondToRollbackRequest.ProtoReflect.Descriptor instead.
+func (*RespondToRollbackRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *RespondToRollbackRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *RespondToRollbackRequest) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *RespondToRollbackRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *RespondToRollbackRequest) GetApproved() bool {
+	if x != nil {
+		return x.Approved
+	}
+	return false
+}
+
+type RespondToRollbackResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RespondToRollbackResponse) Reset() {
+	*x = RespondToRollbackResponse{}
+	mi := &file_mage_v1_game_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RespondToRollbackResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RespondToRollbackResponse) ProtoMessage() {}
+
+func (x *RespondToRollbackResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RespondToRollbackResponse.ProtoReflect.Descriptor instead.
+func (*RespondToRollbackResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *RespondToRollbackResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *RespondToRollbackResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+// Cancel a pending rollback request (only the requester can cancel)
+type CancelRollbackRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	GameId        string                 `protobuf:"bytes,2,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancelRollbackRequest) Reset() {
+	*x = CancelRollbackRequest{}
+	mi := &file_mage_v1_game_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelRollbackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelRollbackRequest) ProtoMessage() {}
+
+func (x *CancelRollbackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelRollbackRequest.ProtoReflect.Descriptor instead.
+func (*CancelRollbackRequest) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *CancelRollbackRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *CancelRollbackRequest) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+type CancelRollbackResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancelRollbackResponse) Reset() {
+	*x = CancelRollbackResponse{}
+	mi := &file_mage_v1_game_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelRollbackResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelRollbackResponse) ProtoMessage() {}
+
+func (x *CancelRollbackResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_game_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelRollbackResponse.ProtoReflect.Descriptor instead.
+func (*CancelRollbackResponse) Descriptor() ([]byte, []int) {
+	return file_mage_v1_game_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *CancelRollbackResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *CancelRollbackResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
 var File_mage_v1_game_proto protoreflect.FileDescriptor
 
 const file_mage_v1_game_proto_rawDesc = "" +
@@ -2711,7 +3059,35 @@ const file_mage_v1_game_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\b \x01(\tR\tupdatedAt\"I\n" +
 	"\x18GetMyActiveGamesResponse\x12-\n" +
-	"\x05games\x18\x01 \x03(\v2\x17.mage.v1.ActiveGameInfoR\x05games*\xcf\x01\n" +
+	"\x05games\x18\x01 \x03(\v2\x17.mage.v1.ActiveGameInfoR\x05games\"o\n" +
+	"\x16RequestRollbackRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
+	"\agame_id\x18\x02 \x01(\tR\x06gameId\x12\x1d\n" +
+	"\n" +
+	"message_id\x18\x03 \x01(\x05R\tmessageId\"h\n" +
+	"\x17RequestRollbackResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x03 \x01(\tR\trequestId\"\x8d\x01\n" +
+	"\x18RespondToRollbackRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
+	"\agame_id\x18\x02 \x01(\tR\x06gameId\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x03 \x01(\tR\trequestId\x12\x1a\n" +
+	"\bapproved\x18\x04 \x01(\bR\bapproved\"K\n" +
+	"\x19RespondToRollbackResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"O\n" +
+	"\x15CancelRollbackRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
+	"\agame_id\x18\x02 \x01(\tR\x06gameId\"H\n" +
+	"\x16CancelRollbackResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error*\xcf\x01\n" +
 	"\fPlayerAction\x12\x1d\n" +
 	"\x19PLAYER_ACTION_UNSPECIFIED\x10\x00\x12\b\n" +
 	"\x04PASS\x10\x01\x12\r\n" +
@@ -2744,7 +3120,7 @@ func file_mage_v1_game_proto_rawDescGZIP() []byte {
 }
 
 var file_mage_v1_game_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_mage_v1_game_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
+var file_mage_v1_game_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
 var file_mage_v1_game_proto_goTypes = []any{
 	(PlayerAction)(0),                  // 0: mage.v1.PlayerAction
 	(SpecialActionType)(0),             // 1: mage.v1.SpecialActionType
@@ -2791,10 +3167,16 @@ var file_mage_v1_game_proto_goTypes = []any{
 	(*GetMyActiveGamesRequest)(nil),    // 42: mage.v1.GetMyActiveGamesRequest
 	(*ActiveGameInfo)(nil),             // 43: mage.v1.ActiveGameInfo
 	(*GetMyActiveGamesResponse)(nil),   // 44: mage.v1.GetMyActiveGamesResponse
-	(*GameView)(nil),                   // 45: mage.v1.GameView
+	(*RequestRollbackRequest)(nil),     // 45: mage.v1.RequestRollbackRequest
+	(*RequestRollbackResponse)(nil),    // 46: mage.v1.RequestRollbackResponse
+	(*RespondToRollbackRequest)(nil),   // 47: mage.v1.RespondToRollbackRequest
+	(*RespondToRollbackResponse)(nil),  // 48: mage.v1.RespondToRollbackResponse
+	(*CancelRollbackRequest)(nil),      // 49: mage.v1.CancelRollbackRequest
+	(*CancelRollbackResponse)(nil),     // 50: mage.v1.CancelRollbackResponse
+	(*GameView)(nil),                   // 51: mage.v1.GameView
 }
 var file_mage_v1_game_proto_depIdxs = []int32{
-	45, // 0: mage.v1.GameGetViewResponse.game:type_name -> mage.v1.GameView
+	51, // 0: mage.v1.GameGetViewResponse.game:type_name -> mage.v1.GameView
 	0,  // 1: mage.v1.SendPlayerActionRequest.action:type_name -> mage.v1.PlayerAction
 	1,  // 2: mage.v1.SendSpecialActionRequest.action_type:type_name -> mage.v1.SpecialActionType
 	43, // 3: mage.v1.GetMyActiveGamesResponse.games:type_name -> mage.v1.ActiveGameInfo
@@ -2817,7 +3199,7 @@ func file_mage_v1_game_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_game_proto_rawDesc), len(file_mage_v1_game_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   43,
+			NumMessages:   49,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

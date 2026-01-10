@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { get } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { auth } from '$lib/stores/auth';
 	import { websocketStore } from '$lib/stores/websocket';
@@ -16,6 +17,7 @@
 		battlefield,
 		stack,
 		command,
+		exile,
 		myHand,
 		myGraveyard,
 		myManaPool,
@@ -32,17 +34,31 @@
 		passPriority,
 		passUntilNextTurn,
 		concedeGame,
-		sendPlayerUUID,
 		sendPlayerBoolean,
 		sendPlayerString,
 		keepHand,
 		mulligan,
 		playLand,
 		advancePhase,
-		activateManaAbility,
-		activateAbility
+		activateManaAbility
 	} from '$lib/api/game';
 	import { CardActionType, type CardView } from '$lib/generated/mage/v1/models';
+	import {
+	tapUntap,
+	untapAll,
+	flipCard,
+	transformCard,
+	moveCard as moveCardToZone,
+	modifyCardCounter,
+	drawCards,
+	shuffleLibrary,
+	nextTurn,
+	searchLibrary,
+	addToStack,
+	removeFromStack,
+	modifyLife,
+	setPlayerCounter
+} from '$lib/api/direct-actions';
 	import type { GameCard, GamePhase } from '$lib/types/game';
 	import {
 		dragDropStore,
@@ -51,8 +67,12 @@
 		draggedCardName,
 		dragPosition,
 		isOverValidDropZone,
-		currentDropZone
+		currentDropZone,
+		getAllValidDropZones,
+		type SourceZone,
+		type DropZone
 	} from '$lib/utils/drag-drop';
+	import { moveCard } from '$lib/api/direct-actions';
 	import { toast } from '$lib/stores/toast';
 	import { getScryfallImageUrl } from '$lib/utils/scryfall';
 
@@ -60,11 +80,11 @@
 	import Card from '$lib/components/game/Card.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
 	import Graveyard from '$lib/components/game/Graveyard.svelte';
+	import ExileZone from '$lib/components/game/ExileZone.svelte';
+	import LibraryZone from '$lib/components/game/LibraryZone.svelte';
 	import ManaPool from '$lib/components/game/ManaPool.svelte';
 	import GameHeader from '$lib/components/game/GameHeader.svelte';
-	import Stack from '$lib/components/game/Stack.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
-	import TargetingMode from '$lib/components/game/TargetingMode.svelte';
 	
 	import PriorityActionBar from '$lib/components/game/PriorityActionBar.svelte';
 	import ActionLogOverlay from '$lib/components/game/ActionLogOverlay.svelte';
@@ -73,7 +93,7 @@
 	import DebugOverlay from '$lib/components/game/DebugOverlay.svelte';
 	import ManaPayment from '$lib/components/game/ManaPayment.svelte';
 	import XManaSelector from '$lib/components/game/XManaSelector.svelte';
-	import AbilitiesPanel from '$lib/components/game/AbilitiesPanel.svelte';
+	import LibrarySearch from '$lib/components/game/LibrarySearch.svelte';
 	import type { GamePlayManaData, GamePlayXManaData, GameAssignDamageData } from '$lib/generated/mage/v1/websocket';
 	
 	// Combat components
@@ -84,17 +104,12 @@
 	// Direct player control components
 	import CardContextMenu from '$lib/components/game/CardContextMenu.svelte';
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
+	import VisualStack from '$lib/components/game/VisualStack.svelte';
+	import RollbackConsentDialog from '$lib/components/game/RollbackConsentDialog.svelte';
+	import { requestRollback, respondToRollback } from '$lib/api/game';
 	import { combatStore, isInCombat, canAttackCardIds, declaredAttackerIds, canBlockCardIds, assignedBlockerIds } from '$lib/stores/combat';
+	import { visualStackStore, visualStackIsOpen, visualStackCount } from '$lib/stores/visual-stack';
 	import { parseCombatOptions, type DeclaredAttacker, type DefenderTarget, type DamageAssignmentPrompt, type ParsedCombatOptions } from '$lib/types/combat';
-
-	// Targeting store
-	import {
-		targetingStore,
-		isTargetingActive,
-		validTargetIds,
-		selectedTargetIds,
-		syncWithGamePrompt
-	} from '$lib/stores/game-targeting';
 
 	// Page data from load function
 	const { data } = $props();
@@ -107,22 +122,19 @@
 	let showChat = $state(false);
 	let showDebugOverlay = $state(false);
 	let showTokenCreator = $state(false);
+	let showLifeMenu = $state(false);
+	let lifeMenuEl: HTMLDivElement | null = $state(null);
 	
 	// Context menu state
 	let contextMenuCard = $state<typeof battlefieldCards[0] | null>(null);
 	let contextMenuPosition = $state({ x: 0, y: 0 });
 	let actionLogRef = $state<ActionLogOverlay | undefined>(undefined);
+	
+	// Hovered card tracking for keyboard shortcuts
+	let hoveredCardId = $state<string | null>(null);
 	let gameChatRef = $state<GameChatOverlay | undefined>(undefined);
 	let isActionLoading = $state(false);
-	let showStackOverlay = $state(false);
-	let showAbilitiesPanel = $state(false);
-	let abilitiesPanelCardId = $state<string | null>(null);
 	let initialized = $state(false);
-
-	// Targeting state (from store)
-	const isTargeting = $derived($isTargetingActive);
-	const validTargets = $derived($validTargetIds);
-	const selectedTargets = $derived($selectedTargetIds);
 
 	// Combat state (from store)
 	const inCombat = $derived($isInCombat);
@@ -162,28 +174,35 @@
 
 	// Drag-drop state (from store)
 	const isDragging = $derived($isDraggingStore);
-	// eslint-disable-next-line no-unused-vars
+	 
 	const dragCardId = $derived($draggedCardId);
 	const dragCardName = $derived($draggedCardName);
 	const dragPos = $derived($dragPosition);
 	const isOverValidDrop = $derived($isOverValidDropZone);
 	const dropZone = $derived($currentDropZone);
 
-	// Track targeting sync unsubscriber
-	let targetingSyncUnsub: (() => void) | null = null;
-
-	// Battlefield drop zone element reference
+	// Drop zone element references
 	let battlefieldDropZoneEl: HTMLDivElement | null = $state(null);
+	let graveyardDropZoneEl: HTMLElement | null = $state(null);
+	let exileDropZoneEl: HTMLElement | null = $state(null);
+	let handDropZoneEl: HTMLElement | null = $state(null);
+	let visualStackDropZoneEl: HTMLElement | null = $state(null);
 	let dropZoneUnregister: (() => void) | null = null;
+	let graveyardDropZoneUnregister: (() => void) | null = null;
+	let exileDropZoneUnregister: (() => void) | null = null;
+	let handDropZoneUnregister: (() => void) | null = null;
+	let visualStackDropZoneUnregister: (() => void) | null = null;
+	
+	// Battlefield drag state
+	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
+	let battlefieldIsDragPending = $state(false);
+	const DRAG_THRESHOLD = 5;
 
 	// Opponent panel states (for collapsing)
 	let opponentExpanded = $state<Record<string, boolean>>({});
 
-	// Auto-pass settings
-	let autoPassSettings = $state({
-		noActions: false,
-		opponentTurn: false
-	});
+	// Auto-pass setting (passes when it's opponent's turn)
+	let autoPass = $state(false);
 
 	// Mulligan state
 	let mulliganCount = $state(0);
@@ -200,14 +219,27 @@
 	const allPlayers = $derived($players);
 	const me = $derived($localPlayer);
 	const otherPlayers = $derived($opponents);
+	
+	// Ensure opponentExpanded has entries for all opponents (fixes bind:expanded with undefined)
+	$effect(() => {
+		for (const p of otherPlayers) {
+			if (!(p.playerId in opponentExpanded)) {
+				opponentExpanded[p.playerId] = true;
+			}
+		}
+	});
+	
 	const myCards = $derived($myHand);
 	const myGrave = $derived($myGraveyard);
+	const myExile = $derived($exile);
 	const myMana = $derived($myManaPool);
 	const havePriority = $derived($hasPriority);
 	const phase = $derived($currentPhase);
 	const step = $derived($currentStep);
 	const turn = $derived($currentTurn);
 	const battlefieldCards = $derived($battlefield);
+	// Hovered card (for keyboard shortcuts) - derived after battlefieldCards is defined
+	const hoveredCard = $derived(hoveredCardId ? battlefieldCards.find(c => c.id === hoveredCardId) : null);
 	const stackCards = $derived($stack);
 	const commandCards = $derived($command);
 	const prompt = $derived($pendingPrompt);
@@ -215,6 +247,13 @@
 	const gameWinner = $derived($winner);
 	const error = $derived($gameError);
 	const loading = $derived($isLoading);
+	
+	// Visual stack state (client-side only)
+	const showVisualStack = $derived($visualStackIsOpen);
+	const visualStackItemCount = $derived($visualStackCount);
+
+	// Rollback request state
+	const pendingRollbackRequest = $derived(gameState.pendingRollbackRequest);
 
 	// Player name map for display
 	const playerNames = $derived(
@@ -584,145 +623,6 @@
 		}
 	}
 
-	/**
-	 * Handle activate ability button
-	 * Shows the abilities panel for the selected permanent
-	 * For mana abilities, click directly on the land to tap it
-	 */
-	function handleActivateAbility() {
-		console.log('[handleActivateAbility] Called', { havePriority, isActionLoading });
-		if (!havePriority || isActionLoading) {
-			console.log('[handleActivateAbility] Blocked - no priority or loading');
-			return;
-		}
-
-		const gameState = $gameStore;
-		const selectedIds = gameState.selectedCardIds;
-		console.log('[handleActivateAbility] Selected IDs:', selectedIds);
-
-		// Check if a permanent is selected
-		if (selectedIds.length === 0) {
-			addLogEntry('Select a permanent first, then press A to activate abilities');
-			toast.info('Select a permanent first');
-			return;
-		}
-
-		if (selectedIds.length > 1) {
-			addLogEntry('Select only one permanent to activate abilities');
-			toast.info('Select only one permanent');
-			return;
-		}
-
-		const cardId = selectedIds[0];
-		console.log('[handleActivateAbility] Looking for card:', cardId);
-		console.log('[handleActivateAbility] battlefieldCards:', battlefieldCards.map(c => ({ id: c.id, name: c.name })));
-		
-		const card = battlefieldCards.find((c) => c.id === cardId);
-
-		if (!card) {
-			console.log('[handleActivateAbility] Card not found on battlefield');
-			addLogEntry('Selected card not found on battlefield');
-			toast.error('Card not found');
-			return;
-		}
-
-		console.log('[handleActivateAbility] Found card:', { 
-			id: card.id, 
-			name: card.name, 
-			availableActions: card.availableActions,
-			availableActionsCount: card.availableActions?.length 
-		});
-
-		// Filter for non-mana activated abilities
-		// Note: actionType can be either a number (enum) or string (JSON serialized)
-		const activatedAbilities = card.availableActions?.filter(
-			(a) => {
-				const isMatch = a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY || 
-				                String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' ||
-				                a.actionType === 3; // Enum value for CARD_ACTION_ACTIVATE_ABILITY
-				console.log('[handleActivateAbility] Checking action:', { 
-					actionType: a.actionType, 
-					actionTypeString: String(a.actionType),
-					expected: CardActionType.CARD_ACTION_ACTIVATE_ABILITY,
-					isMatch 
-				});
-				return isMatch;
-			}
-		) || [];
-
-		console.log('[handleActivateAbility] activatedAbilities:', activatedAbilities);
-
-		if (activatedAbilities.length === 0) {
-			// Check if it's a land with mana ability - give hint
-			const hasManaAbility = card.availableActions?.some(
-				(a) => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY ||
-				       String(a.actionType) === 'CARD_ACTION_ACTIVATE_MANA_ABILITY' ||
-				       a.actionType === 4
-			);
-			if (hasManaAbility) {
-				addLogEntry('Click on the land to tap it for mana');
-				toast.info('Click on the land to tap it for mana');
-			} else {
-				addLogEntry(`${card.name} has no activated abilities`);
-				toast.info('No activated abilities');
-			}
-			return;
-		}
-
-		// Show the abilities panel
-		console.log('[handleActivateAbility] Showing abilities panel for card:', cardId);
-		abilitiesPanelCardId = cardId;
-		showAbilitiesPanel = true;
-		console.log('[handleActivateAbility] Panel state set:', { showAbilitiesPanel, abilitiesPanelCardId });
-	}
-
-	/**
-	 * Handle ability activation from the panel
-	 */
-	async function handleAbilityActivate(abilityId: string) {
-		console.log('[handleAbilityActivate] Called with abilityId:', abilityId);
-		if (!gameId || !abilitiesPanelCardId) {
-			console.log('[handleAbilityActivate] Missing gameId or cardId:', { gameId, abilitiesPanelCardId });
-			return;
-		}
-
-		const card = battlefieldCards.find((c) => c.id === abilitiesPanelCardId);
-		const cardName = card?.name || 'permanent';
-
-		console.log('[handleAbilityActivate] Activating ability:', {
-			gameId,
-			cardId: abilitiesPanelCardId,
-			abilityId,
-			cardName
-		});
-
-		showAbilitiesPanel = false;
-		isActionLoading = true;
-
-		try {
-			console.log('[handleAbilityActivate] Calling activateAbility API...');
-			await activateAbility(gameId, abilitiesPanelCardId, abilityId);
-			console.log('[handleAbilityActivate] API call successful');
-			addLogEntry(`Activated ability of ${cardName}`);
-			toast.success(`Activated ability of ${cardName}`);
-		} catch (err) {
-			const message = err instanceof Error ? err.message : 'Failed to activate ability';
-			console.error('[handleAbilityActivate] API call failed:', err);
-			toast.error(message);
-			addLogEntry(`Failed to activate ability: ${message}`);
-		} finally {
-			isActionLoading = false;
-			abilitiesPanelCardId = null;
-		}
-	}
-
-	/**
-	 * Close abilities panel
-	 */
-	function closeAbilitiesPanel() {
-		showAbilitiesPanel = false;
-		abilitiesPanelCardId = null;
-	}
 
 	/**
 	 * Play a card with optimistic UI update (used by drag-drop)
@@ -778,7 +678,157 @@
 	 */
 	function handleBattlefieldDrop(cardId: string): void {
 		console.log('[handleBattlefieldDrop] Card dropped:', cardId);
-		playCardOptimistic(cardId);
+		// Get the source zone from drag state
+		const dragState = get(dragDropStore);
+		const sourceZone = dragState.sourceZone;
+		
+		if (sourceZone === 'hand') {
+			// Playing from hand - use existing play logic
+			playCardOptimistic(cardId);
+		} else if (sourceZone && sourceZone !== 'battlefield') {
+			// Moving from another zone (graveyard, exile, etc.) - use direct move
+			handleZoneDrop(cardId, 'battlefield');
+		}
+	}
+
+	/**
+	 * Handle card drop on graveyard
+	 */
+	function handleGraveyardDrop(cardId: string): void {
+		console.log('[handleGraveyardDrop] Card dropped:', cardId);
+		handleZoneDrop(cardId, 'graveyard');
+	}
+
+	/**
+	 * Handle card drop on exile
+	 */
+	function handleExileDrop(cardId: string): void {
+		console.log('[handleExileDrop] Card dropped:', cardId);
+		handleZoneDrop(cardId, 'exile');
+	}
+
+	/**
+	 * Handle card drop on hand
+	 */
+	function handleHandDrop(cardId: string): void {
+		console.log('[handleHandDrop] Card dropped:', cardId);
+		handleZoneDrop(cardId, 'hand');
+	}
+
+	/**
+	 * Handle card drop on stack - adds to visual stack without moving the card.
+	 * The card stays in its current zone but appears on the stack for all players.
+	 */
+	async function handleVisualStackDrop(cardId: string): Promise<void> {
+		console.log('[handleVisualStackDrop] Card dropped:', cardId);
+		if (!gameId) return;
+		
+		const card = getCardById(cardId);
+		try {
+			await addToStack(gameId, cardId);
+			addLogEntry(`Added ${card?.name || cardId} to stack`);
+		} catch (err) {
+			console.error('[handleVisualStackDrop] Failed to add to stack:', err);
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			toast.error(`Failed to add to stack: ${errorMessage}`);
+		}
+	}
+
+	/**
+	 * Handle stack item resolve/remove - sends to server to remove from stack
+	 */
+	async function handleStackItemRemove(itemId: string): Promise<void> {
+		console.log('[handleStackItemRemove] Removing stack item:', itemId);
+		if (!gameId) return;
+		
+		try {
+			await removeFromStack(gameId, itemId);
+			addLogEntry('Resolved stack item');
+		} catch (err) {
+			console.error('[handleStackItemRemove] Failed to remove from stack:', err);
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			toast.error(`Failed to remove from stack: ${errorMessage}`);
+		}
+	}
+
+	/**
+	 * Handle card drop on any zone - uses moveCard API
+	 */
+	async function handleZoneDrop(cardId: string, targetZone: DropZone): Promise<void> {
+		if (!gameId) return;
+		
+		console.log(`[handleZoneDrop] Moving card ${cardId} to ${targetZone}`);
+		try {
+			await moveCard(gameId, cardId, targetZone.toUpperCase());
+			addLogEntry(`Moved card to ${targetZone}`);
+		} catch (err) {
+			console.error('[handleZoneDrop] Failed to move card:', err);
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			toast.error(`Failed to move card: ${errorMessage}`);
+		}
+	}
+
+	/**
+	 * Handle mouse down on battlefield card - start drag tracking
+	 * Note: No priority check - players can always drag battlefield cards
+	 * to manage game state (e.g., moving destroyed creatures to graveyard)
+	 */
+	function handleBattlefieldCardMouseDown(cardId: string, cardName: string, event: MouseEvent): void {
+		if (event.button !== 0) return; // Only left click
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		battlefieldDragStartPosition = { x: event.clientX, y: event.clientY };
+		battlefieldIsDragPending = true;
+
+		const handleMouseMove = (moveEvent: MouseEvent) => {
+			if (!battlefieldDragStartPosition || !battlefieldIsDragPending) return;
+
+			const dx = moveEvent.clientX - battlefieldDragStartPosition.x;
+			const dy = moveEvent.clientY - battlefieldDragStartPosition.y;
+			const distance = Math.sqrt(dx * dx + dy * dy);
+
+			if (distance >= DRAG_THRESHOLD) {
+				battlefieldIsDragPending = false;
+				const validZones = getAllValidDropZones('battlefield' as SourceZone);
+				dragDropStore.startDrag(
+					cardId,
+					cardName,
+					'battlefield' as SourceZone,
+					moveEvent.clientX,
+					moveEvent.clientY,
+					validZones
+				);
+
+				document.removeEventListener('mousemove', handleMouseMove);
+				document.removeEventListener('mouseup', handleMouseUp);
+			}
+		};
+
+		const handleMouseUp = () => {
+			battlefieldIsDragPending = false;
+			battlefieldDragStartPosition = null;
+			document.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('mouseup', handleMouseUp);
+		};
+
+		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('mouseup', handleMouseUp);
+	}
+
+	/**
+	 * Prevent native drag events on battlefield cards
+	 */
+	function handleBattlefieldDragStart(event: DragEvent): void {
+		event.preventDefault();
+	}
+
+	/**
+	 * Check if a battlefield card is being dragged
+	 */
+	function isBattlefieldCardDragging(cardId: string): boolean {
+		return isDragging && dragCardId === cardId;
 	}
 
 	/**
@@ -795,6 +845,339 @@
 			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
 			console.error('Failed to advance phase:', err);
 			addLogEntry(`Failed to advance phase: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Handle untap all permanents (X key shortcut)
+	 */
+	async function handleUntapAll() {
+		if (isActionLoading || !gameId) return;
+
+		isActionLoading = true;
+		try {
+			await untapAll(gameId);
+			addLogEntry('Untapped all permanents');
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to untap all:', err);
+			addLogEntry(`Failed to untap all: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Handle global keyboard shortcuts
+	 * Based on untap.in shortcuts
+	 */
+	function handleGlobalKeydown(event: KeyboardEvent) {
+		// Ignore if typing in an input
+		if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+			return;
+		}
+
+		const key = event.key.toLowerCase();
+
+		// === GLOBAL HOTKEYS (no card needed) ===
+		switch (key) {
+			case 'x':
+				// X - Untap all permanents
+				handleUntapAll();
+				event.preventDefault();
+				return;
+			
+			case 'c':
+				// C - Draw a card from deck
+				handleDrawCard();
+				event.preventDefault();
+				return;
+			
+			case 'v':
+				// V - Shuffle your deck
+				handleShuffleLibrary();
+				event.preventDefault();
+				return;
+			
+			case 'm':
+				// M - Mulligan hand (only in mulligan phase)
+				if (isMulliganPhase && !hasKeptHand) {
+					handleMulligan();
+					event.preventDefault();
+				}
+				return;
+			
+			case 'b':
+				// B - Focus chat input
+				showChat = true;
+				// Focus will happen when chat opens
+				event.preventDefault();
+				return;
+			
+			case 'n':
+				// N - Next phase of turn
+				handleAdvancePhase();
+				event.preventDefault();
+				return;
+			
+			case 'e':
+				// E - End Turn (pass until next turn)
+				handleEndTurn();
+				event.preventDefault();
+				return;
+			
+			case 'w':
+				// W - Insert token or card (show token creator)
+				showTokenCreator = true;
+				event.preventDefault();
+				return;
+			
+			case 'f':
+				// F - Find a card in your main deck (search library)
+				handleSearchLibrary();
+				event.preventDefault();
+				return;
+		}
+
+		// === HOVER CARD HOTKEYS (need a hovered card) ===
+		if (hoveredCard && gameId) {
+			switch (key) {
+				case 'j':
+					// J - Face Down/Up
+					handleFlipCard(hoveredCard.id, hoveredCard.faceDown ?? false);
+					event.preventDefault();
+					return;
+				
+				case 'l':
+					// L - Alt/Default Face (Transform)
+					handleTransformCard(hoveredCard.id);
+					event.preventDefault();
+					return;
+				
+				case 'd':
+					// D - Send card to Graveyard
+					handleMoveCard(hoveredCard.id, 'GRAVEYARD');
+					event.preventDefault();
+					return;
+				
+				case 's':
+					// S - Send card to Exile
+					handleMoveCard(hoveredCard.id, 'EXILE');
+					event.preventDefault();
+					return;
+				
+				case 'r':
+					// R - Send card to hand
+					handleMoveCard(hoveredCard.id, 'HAND');
+					event.preventDefault();
+					return;
+				
+				case 't':
+					// T - Send card to top of Deck
+					handleMoveCard(hoveredCard.id, 'LIBRARY');
+					event.preventDefault();
+					return;
+				
+				case '.':
+					// . - Send card to bottom of Deck
+					handleMoveCard(hoveredCard.id, 'LIBRARY_BOTTOM');
+					event.preventDefault();
+					return;
+				
+				case 'u':
+					// U - Add +1/+1 counter
+					handleAddCounter(hoveredCard.id);
+					event.preventDefault();
+					return;
+			}
+		}
+	}
+
+	/**
+	 * Handle life change (+ / - buttons)
+	 */
+	async function handleLifeChange(delta: number) {
+		if (!gameId || !localPlayerId) return;
+		try {
+			await modifyLife(gameId, localPlayerId, delta);
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			toast.error(`Failed: ${errorMessage}`);
+		}
+	}
+
+	/**
+	 * Handle poison counter change
+	 */
+	async function handlePoisonChange(delta: number) {
+		if (!gameId || !localPlayerId) return;
+		const currentPoison = me?.poison ?? 0;
+		const newValue = Math.max(0, currentPoison + delta);
+		try {
+			await setPlayerCounter(gameId, localPlayerId, 'poison', newValue);
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			toast.error(`Failed: ${errorMessage}`);
+		}
+	}
+
+	/**
+	 * Draw a card from deck (C key)
+	 */
+	async function handleDrawCard() {
+		if (isActionLoading || !gameId || !localPlayerId) return;
+		
+		isActionLoading = true;
+		try {
+			await drawCards(gameId, localPlayerId, 1);
+			addLogEntry('Drew a card');
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to draw card:', err);
+			addLogEntry(`Failed to draw: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Shuffle library (V key)
+	 */
+	async function handleShuffleLibrary() {
+		if (isActionLoading || !gameId) return;
+		
+		isActionLoading = true;
+		try {
+			await shuffleLibrary(gameId, localPlayerId);
+			addLogEntry('Shuffled library');
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to shuffle:', err);
+			addLogEntry(`Failed to shuffle: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * End turn (E key)
+	 */
+	async function handleEndTurn() {
+		if (isActionLoading || !gameId) return;
+		
+		isActionLoading = true;
+		try {
+			await nextTurn(gameId);
+			addLogEntry('Ended turn');
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to end turn:', err);
+			addLogEntry(`Failed to end turn: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Search library (F key)
+	 */
+	async function handleSearchLibrary() {
+		if (isActionLoading || !gameId) return;
+		
+		isActionLoading = true;
+		try {
+			await searchLibrary(gameId, 'hand', true);
+			addLogEntry('Searching library...');
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to search library:', err);
+			addLogEntry(`Failed to search: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Flip card face up/down (J key)
+	 */
+	async function handleFlipCard(cardId: string, currentlyFaceDown: boolean) {
+		if (isActionLoading || !gameId) return;
+		
+		isActionLoading = true;
+		try {
+			await flipCard(gameId, cardId, !currentlyFaceDown);
+			addLogEntry(currentlyFaceDown ? 'Turned card face up' : 'Turned card face down');
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to flip card:', err);
+			addLogEntry(`Failed to flip: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Transform card (L key)
+	 */
+	async function handleTransformCard(cardId: string) {
+		if (isActionLoading || !gameId) return;
+		
+		isActionLoading = true;
+		try {
+			await transformCard(gameId, cardId);
+			addLogEntry('Transformed card');
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to transform card:', err);
+			addLogEntry(`Failed to transform: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Move card to zone (D/S/R/T/. keys)
+	 */
+	async function handleMoveCard(cardId: string, zone: string) {
+		if (isActionLoading || !gameId) return;
+		
+		const zoneNames: Record<string, string> = {
+			'GRAVEYARD': 'graveyard',
+			'EXILE': 'exile',
+			'HAND': 'hand',
+			'LIBRARY': 'top of library',
+			'LIBRARY_BOTTOM': 'bottom of library'
+		};
+		
+		isActionLoading = true;
+		try {
+			await moveCardToZone(gameId, cardId, zone);
+			addLogEntry(`Moved card to ${zoneNames[zone] || zone}`);
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to move card:', err);
+			addLogEntry(`Failed to move: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
+	 * Add +1/+1 counter to card (U key)
+	 */
+	async function handleAddCounter(cardId: string) {
+		if (isActionLoading || !gameId) return;
+		
+		isActionLoading = true;
+		try {
+			await modifyCardCounter(gameId, cardId, '+1/+1', 1);
+			addLogEntry('Added +1/+1 counter');
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to add counter:', err);
+			addLogEntry(`Failed to add counter: ${errorMessage}`);
 		} finally {
 			isActionLoading = false;
 		}
@@ -821,23 +1204,11 @@
 	}
 
 	/**
-	 * Handle card click (for selection/targeting)
+	 * Handle card click (for selection)
 	 * Note: PlayerHand already handles selection toggle via gameStore.toggleCardSelection
-	 * This handler is for additional logic (target prompts, logging)
+	 * This handler is for additional logic (logging)
 	 */
 	function handleCardClick(cardId: string) {
-		// Handle targeting mode - toggle target selection
-		if (isTargeting) {
-			const toggled = targetingStore.toggleTarget(cardId);
-			if (toggled) {
-				const card = myCards.find((c) => c.id === cardId);
-				if (card) {
-					addLogEntry(`Target: ${card.name}`);
-				}
-			}
-			return;
-		}
-
 		const card = myCards.find((c) => c.id === cardId);
 		if (card) {
 			addLogEntry(`Selected: ${card.name}`);
@@ -848,13 +1219,32 @@
 	 * Handle battlefield card click
 	 */
 	async function handleBattlefieldCardClick(cardId: string) {
-		// Handle targeting mode - toggle target selection
-		if (isTargeting) {
-			const toggled = targetingStore.toggleTarget(cardId);
-			if (toggled) {
-				const card = battlefieldCards.find((c) => c.id === cardId);
-				if (card) {
-					addLogEntry(`Target: ${card.name}`);
+		// Handle declare attackers phase - toggle attacker on click
+		if (isDeclaringAttackersPhase && combatPromptOptions()) {
+			const card = battlefieldCards.find((c) => c.id === cardId);
+			if (!card) return;
+			
+			// Check if this card can attack
+			const canAttack = canAttackIds.has(cardId);
+			if (canAttack) {
+				// Get defenders for this attacker
+				const options = combatPromptOptions()!;
+				const validDefenders = options.attackOptions
+					.filter((opt) => opt.cardId === cardId)
+					.map((opt) => opt.defenderId);
+				
+				if (validDefenders.length > 0) {
+					const isCurrentlyAttacking = attackingIds.has(cardId);
+					combatStore.toggleAttacker(cardId, validDefenders[0]);
+					
+					if (isCurrentlyAttacking) {
+						addLogEntry(`${card.name} will not attack`);
+					} else {
+						// Get defender name for log
+						const defenders = getDefenderTargets();
+						const defenderName = defenders.find(d => d.id === validDefenders[0])?.name || 'opponent';
+						addLogEntry(`${card.name} attacks ${defenderName}`);
+					}
 				}
 			}
 			return;
@@ -926,8 +1316,17 @@
 			}
 		}
 
-		// Default behavior: toggle selection
-		gameStore.toggleCardSelection(cardId);
+		// Default behavior: tap/untap the permanent
+		if (gameId) {
+			try {
+				await tapUntap(gameId, cardId, !card.tapped);
+				addLogEntry(`${card.tapped ? 'Untapped' : 'Tapped'} ${card.name}`);
+			} catch (err) {
+				const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+				console.error('Failed to tap/untap:', err);
+				addLogEntry(`Failed to tap/untap: ${errorMessage}`);
+			}
+		}
 	}
 
 	/**
@@ -944,56 +1343,6 @@
 	 */
 	function closeContextMenu() {
 		contextMenuCard = null;
-	}
-
-	/**
-	 * Handle target selection confirmation
-	 * Sends selected target UUID(s) to the server
-	 * 
-	 * Note: The server typically handles multi-target by:
-	 * 1. Sending separate GAME_TARGET events for each target slot
-	 * 2. Or accepting targets sequentially via SendPlayerUUID
-	 * 
-	 * Current implementation sends targets one at a time.
-	 * If server expects all targets at once, use SendPlayerUUIDs API instead.
-	 */
-	async function handleTargetConfirm(targetIds: string[]) {
-		if (!gameId || targetIds.length === 0) return;
-
-		isActionLoading = true;
-		try {
-			// Send each target to the server
-			// For most MTG implementations, the server expects one target per call
-			// and will send another GAME_TARGET if more targets are needed
-			for (const targetId of targetIds) {
-				await sendPlayerUUID(gameId, targetId);
-			}
-			gameStore.clearPrompt();
-			addLogEntry(`Confirmed ${targetIds.length} target(s)`);
-		} catch (err) {
-			console.error('Failed to confirm target:', err);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Handle target selection cancellation
-	 */
-	async function handleTargetCancel() {
-		if (!gameId) return;
-
-		isActionLoading = true;
-		try {
-			// Send empty UUID to cancel targeting
-			await sendPlayerUUID(gameId, '');
-			gameStore.clearPrompt();
-			addLogEntry('Cancelled target selection');
-		} catch (err) {
-			console.error('Failed to cancel targeting:', err);
-		} finally {
-			isActionLoading = false;
-		}
 	}
 
 	/**
@@ -1067,6 +1416,68 @@
 	}
 
 	/**
+	 * Handle rollback request from action log
+	 */
+	async function handleRequestRollback(messageId: number) {
+		if (!gameId) return;
+		
+		try {
+			const result = await requestRollback(gameId, messageId);
+			if (result.success) {
+				if (result.requiresConsent) {
+					addLogEntry('Rollback request sent to opponent(s)');
+				} else {
+					addLogEntry('Rollback performed');
+				}
+			} else {
+				gameStore.setError(result.error || 'Failed to request rollback');
+			}
+		} catch (err) {
+			console.error('Failed to request rollback:', err);
+			gameStore.setError(err instanceof Error ? err.message : 'Failed to request rollback');
+		}
+	}
+
+	/**
+	 * Handle rollback consent response (approve)
+	 */
+	async function handleApproveRollback() {
+		if (!gameId || !pendingRollbackRequest) return;
+		
+		try {
+			const result = await respondToRollback(gameId, pendingRollbackRequest.requestId, true);
+			if (!result.success) {
+				gameStore.setError(result.error || 'Failed to approve rollback');
+			}
+			// Clear the pending request - server will send GAME_ROLLBACK_COMPLETE
+			gameStore.update((s) => ({ ...s, pendingRollbackRequest: null }));
+		} catch (err) {
+			console.error('Failed to approve rollback:', err);
+			gameStore.setError(err instanceof Error ? err.message : 'Failed to approve rollback');
+		}
+	}
+
+	/**
+	 * Handle rollback consent response (deny)
+	 */
+	async function handleDenyRollback() {
+		if (!gameId || !pendingRollbackRequest) return;
+		
+		try {
+			const result = await respondToRollback(gameId, pendingRollbackRequest.requestId, false);
+			if (!result.success) {
+				gameStore.setError(result.error || 'Failed to deny rollback');
+			}
+			// Clear the pending request
+			gameStore.update((s) => ({ ...s, pendingRollbackRequest: null }));
+			addLogEntry('Rollback request denied');
+		} catch (err) {
+			console.error('Failed to deny rollback:', err);
+			gameStore.setError(err instanceof Error ? err.message : 'Failed to deny rollback');
+		}
+	}
+
+	/**
 	 * Handle combat phase completion
 	 */
 	function handleCombatComplete() {
@@ -1135,13 +1546,6 @@
 	}
 
 	/**
-	 * Toggle stack overlay
-	 */
-	function toggleStack() {
-		showStackOverlay = !showStackOverlay;
-	}
-
-	/**
 	 * Get cards controlled by a specific player on battlefield
 	 */
 	function getPlayerBattlefieldCards(playerId: string): CardView[] {
@@ -1173,15 +1577,10 @@
 	let isAutoPassPending = $state(false);
 
 	/**
-	 * Auto-pass effect - triggers when auto-pass conditions are met
-	 * Conditions checked:
-	 * 1. Player has priority
-	 * 2. Not in mulligan phase
-	 * 3. Not already loading an action
-	 * 4. Game is initialized
-	 * 5. Either:
-	 *    - "Auto-pass on opponent's turn" is enabled AND it's not your turn
-	 *    - "Auto-pass when no actions" is enabled AND server says no available actions
+	 * Auto-pass effect - passes priority on opponent's turn
+	 * 
+	 * This is a rules-light auto-pass: it only checks whose turn it is,
+	 * not what actions are available (which would require rules enforcement).
 	 */
 	$effect(() => {
 		// Skip if not ready for auto-pass
@@ -1194,24 +1593,9 @@
 			return;
 		}
 
-		// Check auto-pass conditions
-		let shouldAutoPass = false;
-		let reason = '';
-
-		// Condition 1: Auto-pass on opponent's turn
-		if (autoPassSettings.opponentTurn && !isYourTurn) {
-			shouldAutoPass = true;
-			reason = "opponent's turn";
-		}
-
-		// Condition 2: Auto-pass when no available actions (server-computed)
-		if (autoPassSettings.noActions && !myHasAvailableActions) {
-			shouldAutoPass = true;
-			reason = 'no available actions';
-		}
-
-		if (shouldAutoPass) {
-			console.log(`[AutoPass] Triggering auto-pass: ${reason}`);
+		// Auto-pass on opponent's turn
+		if (autoPass && !isYourTurn) {
+			console.log('[AutoPass] Triggering auto-pass: opponent\'s turn');
 			isAutoPassPending = true;
 
 			// Capture gameId in local scope for the async callback
@@ -1222,7 +1606,7 @@
 				try {
 					if (currentGameId) {
 						await passPriority(currentGameId);
-						addLogEntry(`Auto-passed (${reason})`);
+						addLogEntry('Auto-passed');
 					}
 				} catch (err) {
 					console.error('[AutoPass] Failed to auto-pass:', err);
@@ -1231,6 +1615,27 @@
 				}
 			}, 50); // Small delay for smoother UX
 		}
+	});
+
+	// Click outside handler for life menu
+	$effect(() => {
+		if (!showLifeMenu) return;
+		
+		const handleClickOutside = (event: MouseEvent) => {
+			if (lifeMenuEl && !lifeMenuEl.contains(event.target as Node)) {
+				showLifeMenu = false;
+			}
+		};
+		
+		// Delay to prevent immediate close from the click that opened it
+		const timeoutId = setTimeout(() => {
+			document.addEventListener('click', handleClickOutside);
+		}, 10);
+		
+		return () => {
+			clearTimeout(timeoutId);
+			document.removeEventListener('click', handleClickOutside);
+		};
 	});
 
 	// Register battlefield drop zone when element is available
@@ -1242,8 +1647,8 @@
 				type: 'battlefield',
 				element: battlefieldDropZoneEl,
 				accepts: (_cardId, sourceZone) => {
-					// Accept cards from hand when player has priority
-					return sourceZone === 'hand' && havePriority;
+					// Accept cards from any zone except battlefield when player has priority
+					return sourceZone !== 'battlefield' && havePriority;
 				},
 				onDrop: handleBattlefieldDrop
 			});
@@ -1256,6 +1661,158 @@
 			}
 		};
 	});
+
+	// Register graveyard drop zone
+	$effect(() => {
+		if (graveyardDropZoneEl && !graveyardDropZoneUnregister) {
+			console.log('[GamePage] Registering graveyard drop zone', { 
+				element: graveyardDropZoneEl,
+				rect: graveyardDropZoneEl.getBoundingClientRect()
+			});
+			graveyardDropZoneUnregister = dragDropStore.registerDropZone({
+				id: 'graveyard',
+				type: 'graveyard',
+				element: graveyardDropZoneEl,
+				accepts: (_cardId, sourceZone) => {
+					// Accept cards from any zone except graveyard when player has priority
+					// Use get() to read current store value at call time
+					const hasPrio = get(hasPriority);
+					console.log('[Graveyard accepts]', { sourceZone, hasPrio, result: sourceZone !== 'graveyard' && hasPrio });
+					return sourceZone !== 'graveyard' && hasPrio;
+				},
+				onDrop: handleGraveyardDrop
+			});
+		}
+
+		return () => {
+			if (graveyardDropZoneUnregister) {
+				graveyardDropZoneUnregister();
+				graveyardDropZoneUnregister = null;
+			}
+		};
+	});
+
+	// Register exile drop zone
+	$effect(() => {
+		if (exileDropZoneEl && !exileDropZoneUnregister) {
+			console.log('[GamePage] Registering exile drop zone', {
+				element: exileDropZoneEl,
+				rect: exileDropZoneEl.getBoundingClientRect()
+			});
+			exileDropZoneUnregister = dragDropStore.registerDropZone({
+				id: 'exile',
+				type: 'exile',
+				element: exileDropZoneEl,
+				accepts: (_cardId, sourceZone) => {
+					// Accept cards from any zone except exile when player has priority
+					// Use get() to read current store value at call time
+					const hasPrio = get(hasPriority);
+					console.log('[Exile accepts]', { sourceZone, hasPrio, result: sourceZone !== 'exile' && hasPrio });
+					return sourceZone !== 'exile' && hasPrio;
+				},
+				onDrop: handleExileDrop
+			});
+		}
+
+		return () => {
+			if (exileDropZoneUnregister) {
+				exileDropZoneUnregister();
+				exileDropZoneUnregister = null;
+			}
+		};
+	});
+
+	// Register hand drop zone
+	$effect(() => {
+		if (handDropZoneEl && !handDropZoneUnregister) {
+			console.log('[GamePage] Registering hand drop zone');
+			handDropZoneUnregister = dragDropStore.registerDropZone({
+				id: 'hand',
+				type: 'hand',
+				element: handDropZoneEl,
+				accepts: (_cardId, sourceZone) => {
+					// Accept cards from any zone except hand when player has priority
+					return sourceZone !== 'hand' && havePriority;
+				},
+				onDrop: handleHandDrop
+			});
+		}
+
+		return () => {
+			if (handDropZoneUnregister) {
+				handDropZoneUnregister();
+				handDropZoneUnregister = null;
+			}
+		};
+	});
+
+	// Register visual stack drop zone
+	$effect(() => {
+		if (visualStackDropZoneEl && !visualStackDropZoneUnregister) {
+			console.log('[GamePage] Registering visual stack drop zone');
+			visualStackDropZoneUnregister = dragDropStore.registerDropZone({
+				id: 'visual-stack',
+				type: 'stack',
+				element: visualStackDropZoneEl,
+				accepts: (_cardId, sourceZone) => {
+					// Accept cards from any zone except stack when player has priority
+					return sourceZone !== 'stack' && havePriority;
+				},
+				onDrop: handleVisualStackDrop
+			});
+		}
+
+		return () => {
+			if (visualStackDropZoneUnregister) {
+				visualStackDropZoneUnregister();
+				visualStackDropZoneUnregister = null;
+			}
+		};
+	});
+
+	// Track which server stack item IDs have been synced to visual stack
+	let lastSyncedStackIds = new Set<string>();
+	let stackUnsubscribe: (() => void) | null = null;
+
+	// Sync server stack cards to visual stack - using store subscription for reliability
+	function syncServerStackToVisualStack(currentStack: typeof stackCards) {
+		console.log('[GamePage] Server stack sync running, cards:', currentStack.length, currentStack.map(c => ({ id: c.id, name: c.name })));
+		console.log('[GamePage] Already synced IDs:', [...lastSyncedStackIds]);
+		
+		const serverIds = new Set(currentStack.map(c => c.id));
+		
+		// Add new server stack items to visual stack
+		for (const card of currentStack) {
+			if (!lastSyncedStackIds.has(card.id)) {
+				console.log('[GamePage] Syncing server stack item to visual stack:', card.name, card.id);
+				visualStackStore.addItem(
+					card.id,
+					card.name,
+					'stack',
+					{
+						imageUrl: card.imageUrl || getScryfallImageUrl(card.name),
+						controllerId: card.controllerId,
+						note: 'Spell',
+						// Use server's stack item ID as localId for sync
+						localId: card.id
+					}
+				);
+				lastSyncedStackIds.add(card.id);
+				
+				// Auto-open visual stack when items are added
+				visualStackStore.setOpen(true);
+			}
+		}
+		
+		// Remove items from visual stack that are no longer on server stack
+		for (const id of lastSyncedStackIds) {
+			if (!serverIds.has(id)) {
+				console.log('[GamePage] Removing resolved stack item from visual stack:', id);
+				visualStackStore.removeItem(id);
+				lastSyncedStackIds.delete(id);
+			}
+		}
+	}
 
 	// Initialize on mount
 	onMount(() => {
@@ -1272,25 +1829,28 @@
 			return;
 		}
 
-		// Sync targeting store with game prompts
-		targetingSyncUnsub = syncWithGamePrompt();
-
 		// Initialize game - gameId should always be available from load function
 		initializeGame();
+		
+		// Subscribe to stack changes to sync with visual stack
+		console.log('[GamePage] Setting up stack subscription');
+		stackUnsubscribe = stack.subscribe((currentStack) => {
+			console.log('[GamePage] Stack subscription triggered, stack length:', currentStack.length);
+			syncServerStackToVisualStack(currentStack);
+		});
 	});
 
 	// Cleanup on destroy
 	onDestroy(() => {
-		// Cleanup targeting sync
-		if (targetingSyncUnsub) {
-			targetingSyncUnsub();
-			targetingSyncUnsub = null;
-		}
-		// Reset targeting state
-		targetingStore.exitTargetingMode();
 		gameStore.reset();
+		if (stackUnsubscribe) {
+			stackUnsubscribe();
+			stackUnsubscribe = null;
+		}
 	});
 </script>
+
+<svelte:window onkeydown={handleGlobalKeydown} />
 
 <svelte:head>
 	<title>{gameId ? `Game ${gameId}` : 'Loading Game'} - MAGE</title>
@@ -1370,21 +1930,18 @@
 
 		<!-- Floating action buttons -->
 		<div class="floating-actions">
-			{#if stackCards.length > 0}
-				<button class="floating-btn stack-btn" onclick={toggleStack} title="View Stack">
-					📚 <span class="badge">{stackCards.length}</span>
-				</button>
-			{/if}
+			<button 
+				class="floating-btn stack-btn" 
+				class:has-items={visualStackItemCount > 0 || stackCards.length > 0}
+				onclick={() => visualStackStore.toggleOpen()} 
+				title="Stack ({visualStackItemCount} items)"
+			>
+				📚 {#if visualStackItemCount > 0 || stackCards.length > 0}<span class="badge">{visualStackItemCount || stackCards.length}</span>{/if}
+			</button>
 			<button class="floating-btn" onclick={() => showChat = true} title="Game Chat">
 				💬
 			</button>
 		</div>
-
-		<!-- Target Selection Mode Overlay -->
-		<TargetingMode
-			onConfirm={handleTargetConfirm}
-			onCancel={handleTargetCancel}
-		/>
 
 		<!-- Mana Payment Modal -->
 		{#if prompt && prompt.type === 'mana' && gameId}
@@ -1401,6 +1958,16 @@
 			<XManaSelector
 				{gameId}
 				xManaData={prompt.data as GamePlayXManaData}
+				onComplete={() => gameStore.clearPrompt()}
+				onCancel={() => gameStore.clearPrompt()}
+			/>
+		{/if}
+
+		<!-- Library Search Modal -->
+		{#if prompt && prompt.type === 'librarySearch' && gameId}
+			<LibrarySearch
+				{gameId}
+				librarySearchData={prompt.data as import('$lib/generated/mage/v1/models').LibrarySearchView}
 				onComplete={() => gameStore.clearPrompt()}
 				onCancel={() => gameStore.clearPrompt()}
 			/>
@@ -1437,38 +2004,8 @@
 			/>
 		{/if}
 
-		<!-- Abilities Panel -->
-		{@const _debugPanelRender = (() => { 
-			if (showAbilitiesPanel || abilitiesPanelCardId) {
-				console.log('[RENDER] AbilitiesPanel condition check:', { 
-					showAbilitiesPanel, 
-					abilitiesPanelCardId,
-					battlefieldCardsCount: battlefieldCards.length,
-					cardFound: battlefieldCards.find(c => c.id === abilitiesPanelCardId)?.name
-				});
-			}
-			return null;
-		})()}
-		{#if showAbilitiesPanel && abilitiesPanelCardId}
-			{@const selectedCard = battlefieldCards.find(c => c.id === abilitiesPanelCardId)}
-			{@const _debugCardFound = console.log('[RENDER] Inside panel block, selectedCard:', selectedCard?.name)}
-			{#if selectedCard}
-				<AbilitiesPanel
-					cardId={abilitiesPanelCardId}
-					cardName={selectedCard.name}
-					abilities={selectedCard.availableActions?.filter(
-						a => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY ||
-						     String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' ||
-						     a.actionType === 3
-					) || []}
-					onActivate={handleAbilityActivate}
-					onClose={closeAbilitiesPanel}
-				/>
-			{/if}
-		{/if}
-
-		<!-- Prompt Overlay (non-target, non-mana prompts) -->
-		{#if prompt && !['target', 'mana', 'xmana'].includes(prompt.type)}
+		<!-- Prompt Overlay (non-mana prompts) -->
+		{#if prompt && !['mana', 'xmana'].includes(prompt.type)}
 			<div class="prompt-overlay">
 				<div class="prompt-content">
 					<p class="prompt-message">{prompt.message}</p>
@@ -1491,7 +2028,8 @@
 			</div>
 		{/if}
 
-		<!-- Main Game Layout - Full Width -->
+		<!-- Main Game Area with Sidebar -->
+		<div class="game-area-wrapper">
 		<main class="game-layout" class:four-player={otherPlayers.length >= 3}>
 			<!-- Opponents Row -->
 			<div class="opponents-row">
@@ -1533,9 +2071,6 @@
 									isSelected={gameState.selectedCardIds.includes(card.id)}
 									size="small"
 									onclick={() => handleBattlefieldCardClick(card.id)}
-									isTargetingActive={isTargeting}
-									isValidTarget={validTargets.has(card.id)}
-									isTargetSelected={selectedTargets.includes(card.id)}
 									hasActivatedAbilities={card.availableActions?.some(a => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY || String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' || a.actionType === 3)}
 									summoningSickness={card.summoningSickness}
 								/>
@@ -1549,29 +2084,38 @@
 					<span class="zone-label">Your Battlefield</span>
 					<div class="battlefield-cards">
 						{#each getPlayerBattlefieldCards(localPlayerId) as card (card.id)}
-							<Card
-								cardId={card.id}
-								cardName={card.name}
-								manaCost={card.manaCost}
-								cardType={card.type}
-								power={card.power}
-								toughness={card.toughness}
-								imageUrl=""
-								isTapped={card.tapped}
-								isSelected={gameState.selectedCardIds.includes(card.id)}
-								size="normal"
-								onclick={() => handleBattlefieldCardClick(card.id)}
-								oncontextmenu={(e) => handleCardContextMenu(e, card)}
-								isTargetingActive={isTargeting}
-								isValidTarget={validTargets.has(card.id)}
-								isTargetSelected={selectedTargets.includes(card.id)}
-								hasActivatedAbilities={card.availableActions?.some(a => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY || String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' || a.actionType === 3)}
-								canAttack={canAttackIds.has(card.id)}
-								isAttacking={attackingIds.has(card.id)}
-								canBlock={canBlockIds.has(card.id)}
-								isBlocking={blockingIds.has(card.id)}
-								summoningSickness={card.summoningSickness}
-							/>
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<div
+								class="battlefield-card-wrapper"
+								class:draggable={true}
+								class:is-dragging={isBattlefieldCardDragging(card.id)}
+								class:is-hovered={hoveredCardId === card.id}
+								onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
+								ondragstart={handleBattlefieldDragStart}
+								onmouseenter={() => hoveredCardId = card.id}
+								onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
+							>
+								<Card
+									cardId={card.id}
+									cardName={card.name}
+									manaCost={card.manaCost}
+									cardType={card.type}
+									power={card.power}
+									toughness={card.toughness}
+									imageUrl=""
+									isTapped={card.tapped}
+									isSelected={gameState.selectedCardIds.includes(card.id)}
+									size="normal"
+									onclick={() => handleBattlefieldCardClick(card.id)}
+									oncontextmenu={(e) => handleCardContextMenu(e, card)}
+									canAttack={canAttackIds.has(card.id)}
+									isAttacking={attackingIds.has(card.id)}
+									canBlock={canBlockIds.has(card.id)}
+									isBlocking={blockingIds.has(card.id)}
+									summoningSickness={card.summoningSickness}
+									isDragging={isBattlefieldCardDragging(card.id)}
+								/>
+							</div>
 						{/each}
 						{#if getPlayerBattlefieldCards(localPlayerId).length === 0}
 							<div class="empty-battlefield">
@@ -1599,28 +2143,119 @@
 				{/if}
 			</div>
 
-			<!-- Player Info & Zones Row -->
-			<div class="player-info-row">
-				{#if me}
-					<div class="player-identity">
-						<span class="player-name" class:has-priority={havePriority}>
-							You
-							{#if havePriority}
-								<span class="priority-dot"></span>
-							{/if}
-						</span>
+		<!-- Player Info & Zones Row (Compact) -->
+		<div class="player-info-row compact">
+			{#if me}
+				<div class="player-identity">
+					<span class="player-name" class:has-priority={havePriority}>
+						You
+						{#if havePriority}
+							<span class="priority-dot"></span>
+						{/if}
+					</span>
+				</div>
+				
+				<!-- Player Stats (Life, Poison, Library) -->
+				<div class="player-stats-inline">
+					<div class="life-group">
+						<button class="stat-btn life-btn minus" onclick={() => handleLifeChange(-1)} title="Lose 1 life">−</button>
+						<button 
+							class="stat-display life" 
+							onclick={() => showLifeMenu = !showLifeMenu}
+							title="Click for more options"
+						>
+							<span class="stat-icon">❤️</span>
+							<span class="stat-value">{me.life}</span>
+						</button>
+						<button class="stat-btn life-btn plus" onclick={() => handleLifeChange(1)} title="Gain 1 life">+</button>
 					</div>
-					<div class="player-zones">
-						<Graveyard
-							cards={myGrave.map(toGameCard)}
-							playerName="You"
-							isOpponent={false}
-							onCardClick={handleCardClick}
-						/>
+
+					{#if (me.poison ?? 0) > 0}
+						<div class="stat-display poison" title="Poison counters">
+							<span class="stat-icon">☠️</span>
+							<span class="stat-value">{me.poison}</span>
+						</div>
+					{/if}
+
+					<LibraryZone
+						libraryCount={me.libraryCount ?? 0}
+						playerName="You"
+						onSearch={handleSearchLibrary}
+					/>
+
+					<!-- Life/Library Quick Menu -->
+					{#if showLifeMenu}
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<div bind:this={lifeMenuEl} class="quick-menu" onclick={(e) => e.stopPropagation()}>
+							<div class="menu-section">
+								<span class="menu-label">Life</span>
+								<div class="menu-row">
+									<button onclick={() => handleLifeChange(-5)}>−5</button>
+									<button onclick={() => handleLifeChange(-1)}>−1</button>
+									<button onclick={() => handleLifeChange(1)}>+1</button>
+									<button onclick={() => handleLifeChange(5)}>+5</button>
+								</div>
+							</div>
+							<div class="menu-section">
+								<span class="menu-label">Poison</span>
+								<div class="menu-row">
+									<button onclick={() => handlePoisonChange(-1)}>−1</button>
+									<span class="menu-value">{me.poison ?? 0}</span>
+									<button onclick={() => handlePoisonChange(1)}>+1</button>
+								</div>
+							</div>
+							<div class="menu-section">
+								<span class="menu-label">Library</span>
+								<div class="menu-row">
+									<button onclick={() => { handleDrawCard(); showLifeMenu = false; }}>Draw 1</button>
+									<button onclick={() => { handleShuffleLibrary(); showLifeMenu = false; }}>Shuffle</button>
+								</div>
+								<div class="menu-row" style="margin-top: 0.25rem;">
+									<button onclick={() => { handleSearchLibrary(); showLifeMenu = false; }} class="search-btn">🔍 Search</button>
+								</div>
+							</div>
+							<button class="menu-close" onclick={() => showLifeMenu = false}>✕</button>
+						</div>
+					{/if}
+				</div>
+
+				<div class="player-zones">
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div
+							bind:this={graveyardDropZoneEl}
+							class="graveyard-drop-zone"
+							class:drag-active={isDragging}
+							class:drag-valid={isDragging && isOverValidDrop && dropZone === 'graveyard'}
+						>
+							<Graveyard
+								cards={myGrave.map(toGameCard)}
+								playerName="You"
+								isOpponent={false}
+								canDrag={havePriority}
+								onCardClick={handleCardClick}
+							/>
+						</div>
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div
+							bind:this={exileDropZoneEl}
+							class="exile-drop-zone"
+							class:drag-active={isDragging}
+							class:drag-valid={isDragging && isOverValidDrop && dropZone === 'exile'}
+						>
+							<ExileZone
+								cards={myExile.map(toGameCard)}
+								playerName="You"
+								isOpponent={false}
+								canDrag={havePriority}
+								onCardClick={handleCardClick}
+								compact={true}
+							/>
+						</div>
 						<ManaPool
 							mana={myMana}
 							showEmpty={false}
-							size="normal"
+							size="small"
 							onManaClick={() => {}}
 						/>
 					</div>
@@ -1628,39 +2263,38 @@
 			</div>
 
 			<!-- Player Hand -->
-			<div class="hand-area">
+			<div 
+				bind:this={handDropZoneEl}
+				class="hand-area"
+				class:drag-active={isDragging}
+				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
+			>
 				<PlayerHand
 					onCardClick={handleCardClick}
 					size="normal"
 					currentPhase={step || phase}
-					canDrag={havePriority && !isTargeting}
+					canDrag={havePriority}
 				/>
 			</div>
 		</main>
 
-		<!-- Stack Overlay -->
-		{#if showStackOverlay && stackCards.length > 0}
-			<div class="stack-overlay" onclick={toggleStack} role="button" tabindex="0" onkeydown={(e) => e.key === 'Escape' && toggleStack()}>
-				<div class="stack-panel" onclick={(e) => e.stopPropagation()} role="presentation">
-					<Stack
-						stackObjects={stackCards.map((c) => ({
-							id: c.id,
-							type: 'SPELL' as const,
-							name: c.name,
-							controllerId: c.controllerId,
-							sourceCardId: c.id
-						}))}
-						{playerNames}
-						onStackObjectClick={(stackId) => {
-							gameStore.toggleCardSelection(stackId);
-						}}
-					/>
-				</div>
-			</div>
-		{/if}
+		<!-- Visual Stack Sidebar (inline, not overlay) -->
+		<div 
+			bind:this={visualStackDropZoneEl}
+			class="visual-stack-sidebar-container"
+			class:drag-active={isDragging}
+			class:drag-valid={isDragging && isOverValidDrop && dropZone === 'stack'}
+		>
+			<VisualStack 
+			isOpen={showVisualStack}
+			onResolve={handleStackItemRemove}
+			onRemove={handleStackItemRemove}
+		/>
+		</div>
+		</div><!-- End game-area-wrapper -->
 
 		<!-- Overlay Panels -->
-		<ActionLogOverlay bind:this={actionLogRef} bind:open={showActionLog} />
+		<ActionLogOverlay bind:this={actionLogRef} bind:open={showActionLog} onRequestRollback={handleRequestRollback} />
 		<GameChatOverlay bind:this={gameChatRef} gameId={gameId || ''} bind:open={showChat} />
 
 
@@ -1674,16 +2308,12 @@
 			currentPhase={phase}
 			canPassPriority={havePriority}
 			isLoading={isActionLoading}
-			playerLife={me?.life ?? 20}
-			playerPoison={me?.poison ?? 0}
-			libraryCount={me?.libraryCount ?? 0}
 			onPassPriority={handlePassPriority}
 			onPassUntilEOT={handlePassUntilEOT}
 			onCastSpell={handleCastSpell}
-			onActivateAbility={handleActivateAbility}
 			onAdvancePhase={handleAdvancePhase}
 			onCreateToken={() => showTokenCreator = true}
-			bind:autoPassSettings
+			bind:autoPass
 		/>
 
 		<!-- Floating Debug Button -->
@@ -1738,6 +2368,15 @@
 			<TokenCreator
 				{gameId}
 				onClose={() => showTokenCreator = false}
+			/>
+		{/if}
+
+		<!-- Rollback Consent Dialog -->
+		{#if pendingRollbackRequest}
+			<RollbackConsentDialog
+				request={pendingRollbackRequest}
+				onApprove={handleApproveRollback}
+				onDeny={handleDenyRollback}
 			/>
 		{/if}
 
@@ -1940,13 +2579,23 @@
 	}
 
 	.floating-btn.stack-btn {
-		background: rgba(251, 191, 36, 0.15);
-		border-color: rgba(251, 191, 36, 0.3);
+		background: rgba(102, 126, 234, 0.15);
+		border-color: rgba(102, 126, 234, 0.3);
 	}
 
 	.floating-btn.stack-btn:hover {
-		background: rgba(251, 191, 36, 0.25);
-		border-color: rgba(251, 191, 36, 0.5);
+		background: rgba(102, 126, 234, 0.25);
+		border-color: rgba(102, 126, 234, 0.5);
+	}
+
+	.floating-btn.stack-btn.has-items {
+		background: rgba(251, 191, 36, 0.2);
+		border-color: rgba(251, 191, 36, 0.4);
+	}
+
+	.floating-btn.stack-btn.has-items:hover {
+		background: rgba(251, 191, 36, 0.3);
+		border-color: rgba(251, 191, 36, 0.6);
 	}
 
 	.btn-primary {
@@ -2038,6 +2687,13 @@
 
 	.btn-choice:hover { background: #4b5563; }
 
+	/* Game Area Wrapper - contains game layout + sidebar */
+	.game-area-wrapper {
+		flex: 1;
+		display: flex;
+		overflow: hidden;
+	}
+
 	/* Main Game Layout - Full Width */
 	.game-layout {
 		flex: 1;
@@ -2047,6 +2703,21 @@
 		padding-bottom: 80px; /* Space for action bar */
 		gap: 0.75rem;
 		overflow: hidden;
+		min-width: 0; /* Allow shrinking */
+	}
+
+	/* Visual Stack Sidebar Container */
+	.visual-stack-sidebar-container {
+		height: 100%;
+		transition: all 0.2s ease-out;
+	}
+
+	.visual-stack-sidebar-container.drag-active {
+		background: rgba(102, 126, 234, 0.05);
+	}
+
+	.visual-stack-sidebar-container.drag-valid {
+		background: rgba(102, 126, 234, 0.15);
 	}
 
 	/* Opponents Row */
@@ -2168,6 +2839,30 @@
 		align-content: flex-start;
 	}
 
+	.battlefield-card-wrapper {
+		user-select: none;
+		-webkit-user-select: none;
+		transition: transform 0.2s ease, opacity 0.2s ease;
+	}
+
+	.battlefield-card-wrapper.draggable {
+		cursor: grab;
+	}
+
+	.battlefield-card-wrapper.draggable:active {
+		cursor: grabbing;
+	}
+
+	.battlefield-card-wrapper.is-dragging {
+		opacity: 0.4;
+		transform: scale(0.95);
+	}
+
+	.battlefield-card-wrapper.is-hovered {
+		/* Subtle glow to indicate keyboard shortcuts are active */
+		filter: drop-shadow(0 0 4px rgba(100, 200, 255, 0.5));
+	}
+
 	.my-battlefield {
 		flex: 1;
 	}
@@ -2192,10 +2887,22 @@
 		border: 1px solid #2a3441;
 	}
 
+	/* Compact Player Info Row */
+	.player-info-row.compact {
+		padding: 0.25rem 0.5rem;
+		gap: 0.5rem;
+		min-height: 36px;
+		background: rgba(26, 31, 46, 0.9);
+	}
+
 	.player-identity {
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
+	}
+
+	.player-info-row.compact .player-identity {
+		gap: 0.5rem;
 	}
 
 	.player-name {
@@ -2205,6 +2912,10 @@
 		align-items: center;
 		gap: 0.375rem;
 		white-space: nowrap;
+	}
+
+	.player-info-row.compact .player-name {
+		font-size: 0.8125rem;
 	}
 
 	.player-name.has-priority {
@@ -2219,20 +2930,15 @@
 		animation: pulse 1.5s infinite;
 	}
 
+	.player-info-row.compact .priority-dot {
+		width: 6px;
+		height: 6px;
+	}
+
 	@keyframes pulse {
 		0%, 100% { opacity: 1; transform: scale(1); }
 		50% { opacity: 0.6; transform: scale(1.2); }
 	}
-
-	.player-stats {
-		display: flex;
-		gap: 0.75rem;
-		font-size: 0.8125rem;
-	}
-
-	.player-stats .life { color: #ef4444; font-weight: 700; }
-	.player-stats .poison { color: #a855f7; }
-	.player-stats .library { color: #3b82f6; }
 
 	.player-zones {
 		display: flex;
@@ -2240,28 +2946,254 @@
 		align-items: center;
 	}
 
-	/* Hand Area */
-	.hand-area {
-		flex-shrink: 0;
+	.player-info-row.compact .player-zones {
+		gap: 0.375rem;
 	}
 
-	/* Stack Overlay */
-	.stack-overlay {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.8);
+	/* Player Stats Inline (Life, Poison, Library) */
+	.player-stats-inline {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		position: relative;
+		margin-left: auto;
+		margin-right: 0.5rem;
+	}
+
+	.life-group {
+		display: flex;
+		align-items: center;
+		gap: 0.125rem;
+	}
+
+	.stat-btn {
+		width: 24px;
+		height: 24px;
+		border: 1px solid rgba(63, 63, 70, 0.4);
+		border-radius: 4px;
+		background: rgba(36, 40, 51, 0.6);
+		color: #a1a1aa;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.15s ease;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.stat-btn:hover {
+		background: rgba(63, 63, 70, 0.6);
+		color: #f4f4f5;
+	}
+
+	.stat-btn.life-btn.minus:hover {
+		background: rgba(239, 68, 68, 0.3);
+		color: #ef4444;
+	}
+
+	.stat-btn.life-btn.plus:hover {
+		background: rgba(34, 197, 94, 0.3);
+		color: #22c55e;
+	}
+
+	.stat-display {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		transition: background 0.15s ease;
+	}
+
+	.stat-display:hover {
+		background: rgba(63, 63, 70, 0.3);
+	}
+
+	.stat-display.life {
+		color: #f4f4f5;
+	}
+
+	.stat-display.poison {
+		color: #a855f7;
+	}
+
+	.stat-icon {
+		font-size: 0.75rem;
+	}
+
+	.stat-value {
+		font-family: 'JetBrains Mono', monospace;
+		min-width: 20px;
+		text-align: center;
+	}
+
+	/* Quick Menu */
+	.quick-menu {
+		position: absolute;
+		bottom: calc(100% + 8px);
+		left: 50%;
+		transform: translateX(-50%);
+		min-width: 200px;
+		background: rgba(18, 20, 26, 0.98);
+		border: 1px solid rgba(63, 63, 70, 0.6);
+		border-radius: 8px;
+		padding: 0.75rem;
+		box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+		display: flex;
+		flex-direction: column;
+		gap: 0.625rem;
 		z-index: 100;
 	}
 
-	.stack-panel {
-		width: 90%;
-		max-width: 500px;
-		max-height: 80vh;
+	.menu-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
 	}
 
+	.menu-label {
+		font-size: 0.625rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #71717a;
+	}
+
+	.menu-row {
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+	}
+
+	.menu-row button {
+		padding: 0.375rem 0.5rem;
+		border: 1px solid rgba(63, 63, 70, 0.5);
+		border-radius: 4px;
+		background: rgba(36, 40, 51, 0.8);
+		color: #a1a1aa;
+		font-size: 0.75rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+
+	.menu-row button:hover {
+		background: rgba(201, 162, 39, 0.2);
+		border-color: rgba(201, 162, 39, 0.4);
+		color: #f4f4f5;
+	}
+
+	.menu-row button.search-btn {
+		flex: 1;
+		background: rgba(139, 92, 246, 0.2);
+		border-color: rgba(139, 92, 246, 0.4);
+		color: #a78bfa;
+	}
+
+	.menu-row button.search-btn:hover {
+		background: rgba(139, 92, 246, 0.3);
+		border-color: rgba(139, 92, 246, 0.5);
+		color: #c4b5fd;
+	}
+
+	.menu-value {
+		min-width: 24px;
+		text-align: center;
+		font-weight: 600;
+		color: #f4f4f5;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.menu-close {
+		position: absolute;
+		top: 0.375rem;
+		right: 0.375rem;
+		width: 20px;
+		height: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		border: none;
+		color: #71717a;
+		font-size: 0.75rem;
+		cursor: pointer;
+		border-radius: 4px;
+		transition: all 0.15s ease;
+	}
+
+	.menu-close:hover {
+		background: rgba(63, 63, 70, 0.5);
+		color: #f4f4f5;
+	}
+
+	/* Ensure drop zone wrappers are positioned correctly for hit testing */
+	.player-zones > div {
+		position: relative;
+	}
+
+	/* Graveyard Drop Zone */
+	.graveyard-drop-zone {
+		transition: all 0.2s ease;
+		border-radius: 6px;
+		/* Ensure minimum drop target size for drag-drop detection */
+		min-width: 70px;
+		min-height: 32px;
+		/* Ensure element receives pointer events for drop detection */
+		position: relative;
+	}
+
+	.graveyard-drop-zone.drag-active {
+		outline: 2px dashed #6b7280;
+		outline-offset: 2px;
+	}
+
+	.graveyard-drop-zone.drag-valid {
+		outline-color: #22c55e;
+		background: rgba(34, 197, 94, 0.1);
+	}
+
+	/* Exile Drop Zone */
+	.exile-drop-zone {
+		transition: all 0.2s ease;
+		border-radius: 6px;
+		/* Ensure minimum drop target size for drag-drop detection */
+		min-width: 70px;
+		min-height: 32px;
+	}
+
+	.exile-drop-zone.drag-active {
+		outline: 2px dashed #6b7280;
+		outline-offset: 2px;
+	}
+
+	.exile-drop-zone.drag-valid {
+		outline-color: #a78bfa;
+		background: rgba(167, 139, 250, 0.1);
+	}
+
+	/* Hand Area */
+	.hand-area {
+		flex-shrink: 0;
+		transition: all 0.2s ease;
+		border-radius: 8px;
+	}
+
+	.hand-area.drag-active {
+		outline: 2px dashed #6b7280;
+		outline-offset: 2px;
+	}
+
+	.hand-area.drag-valid {
+		outline-color: #22c55e;
+		background: rgba(34, 197, 94, 0.1);
+	}
 
 	/* Responsive */
 	@media (max-width: 900px) {

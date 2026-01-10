@@ -1,25 +1,51 @@
 <script lang="ts">
 	import Card from './Card.svelte';
 	import type { GameCard } from '$lib/types/game';
+	import {
+		dragDropStore,
+		isDragging as isDraggingStore,
+		draggedCardId,
+		getAllValidDropZones,
+		type SourceZone
+	} from '$lib/utils/drag-drop';
 
 	// Props
 	let {
 		cards = [],
 		playerName = 'Player',
 		isOpponent = false,
+		canDrag = false,
+		compact = false,
 		// eslint-disable-next-line no-unused-vars
-		onCardClick = (cardId: string) => {}
+		onCardClick = (cardId: string) => {},
+		// eslint-disable-next-line no-unused-vars
+		onCardDragStart = (cardId: string) => {},
+		// eslint-disable-next-line no-unused-vars
+		onCardDragEnd = (cardId: string, dropped: boolean) => {}
 	}: {
 		cards?: GameCard[];
 		playerName?: string;
 		isOpponent?: boolean;
+		canDrag?: boolean;
+		compact?: boolean;
 		// eslint-disable-next-line no-unused-vars
 		onCardClick?: (cardId: string) => void;
+		// eslint-disable-next-line no-unused-vars
+		onCardDragStart?: (cardId: string) => void;
+		// eslint-disable-next-line no-unused-vars
+		onCardDragEnd?: (cardId: string, dropped: boolean) => void;
 	} = $props();
 
 	// State
 	let showModal = $state(false);
 	let selectedCardId = $state<string | null>(null);
+	let dragStartPosition = $state<{ x: number; y: number } | null>(null);
+	let isDragPending = $state(false);
+	const DRAG_THRESHOLD = 5;
+
+	// Drag state from store
+	const isDraggingGlobal = $derived($isDraggingStore);
+	const draggedId = $derived($draggedCardId);
 
 	/**
 	 * Toggle exile modal
@@ -52,34 +78,114 @@
 		}
 	}
 
+	/**
+	 * Handle mouse down - start drag tracking
+	 */
+	function handleMouseDown(cardId: string, cardName: string, event: MouseEvent): void {
+		if (event.button !== 0) return; // Only left click
+		if (!canDrag || isOpponent) return;
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		dragStartPosition = { x: event.clientX, y: event.clientY };
+		isDragPending = true;
+
+		const handleMouseMove = (moveEvent: MouseEvent) => {
+			if (!dragStartPosition || !isDragPending) return;
+
+			const dx = moveEvent.clientX - dragStartPosition.x;
+			const dy = moveEvent.clientY - dragStartPosition.y;
+			const distance = Math.sqrt(dx * dx + dy * dy);
+
+			if (distance >= DRAG_THRESHOLD) {
+				isDragPending = false;
+				const validZones = getAllValidDropZones('exile' as SourceZone);
+				dragDropStore.startDrag(
+					cardId,
+					cardName,
+					'exile' as SourceZone,
+					moveEvent.clientX,
+					moveEvent.clientY,
+					validZones
+				);
+				onCardDragStart(cardId);
+				closeModal(); // Close modal when starting drag
+
+				document.removeEventListener('mousemove', handleMouseMove);
+				document.removeEventListener('mouseup', handleMouseUp);
+			}
+		};
+
+		const handleMouseUp = () => {
+			isDragPending = false;
+			dragStartPosition = null;
+			document.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('mouseup', handleMouseUp);
+		};
+
+		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('mouseup', handleMouseUp);
+	}
+
+	/**
+	 * Prevent native drag events
+	 */
+	function handleDragStart(event: DragEvent): void {
+		event.preventDefault();
+	}
+
+	/**
+	 * Check if a card is being dragged
+	 */
+	function isCardDragging(cardId: string): boolean {
+		return isDraggingGlobal && draggedId === cardId;
+	}
+
 	// Derived values
 	const cardCount = $derived(cards.length);
 	const isEmpty = $derived(cardCount === 0);
 </script>
 
-<div class="exile-zone" class:opponent={isOpponent}>
+{#if compact}
+	<!-- Compact badge mode -->
 	<button
-		class="exile-button"
-		class:empty={isEmpty}
+		class="exile-compact"
+		class:has-cards={!isEmpty}
+		class:opponent={isOpponent}
 		onclick={toggleModal}
-		disabled={isEmpty}
-		title="{playerName}'s Exile ({cardCount} cards)"
+		title="{playerName}'s Exile ({cardCount} cards){isEmpty ? '' : ' - Click to view'}"
 	>
-		<div class="exile-icon">
-			{#if isEmpty}
-				<span class="icon-empty">🌌</span>
-			{:else}
-				<span class="icon-filled">✨</span>
-			{/if}
-		</div>
-
-		<div class="card-count-badge" class:zero={cardCount === 0}>
-			{cardCount}
-		</div>
+		<span class="exile-icon-compact">{isEmpty ? '🌌' : '✨'}</span>
+		<span class="exile-label-compact">Exile</span>
+		<span class="card-count-compact" class:zero={isEmpty}>{cardCount}</span>
 	</button>
+{:else}
+	<!-- Full card-shaped mode -->
+	<div class="exile-zone" class:opponent={isOpponent}>
+		<button
+			class="exile-button"
+			class:empty={isEmpty}
+			onclick={toggleModal}
+			disabled={isEmpty}
+			title="{playerName}'s Exile ({cardCount} cards)"
+		>
+			<div class="exile-icon">
+				{#if isEmpty}
+					<span class="icon-empty">🌌</span>
+				{:else}
+					<span class="icon-filled">✨</span>
+				{/if}
+			</div>
 
-	<div class="exile-label">Exile</div>
-</div>
+			<div class="card-count-badge" class:zero={cardCount === 0}>
+				{cardCount}
+			</div>
+		</button>
+
+		<div class="exile-label">Exile</div>
+	</div>
+{/if}
 
 <!-- Exile Modal -->
 {#if showModal}
@@ -101,7 +207,14 @@
 				{:else}
 					<div class="card-grid">
 						{#each cards as card (card.id)}
-							<div class="card-grid-item">
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<div
+								class="card-grid-item"
+								class:draggable={canDrag && !isOpponent}
+								class:is-dragging={isCardDragging(card.id)}
+								onmousedown={(e) => handleMouseDown(card.id, card.name, e)}
+								ondragstart={handleDragStart}
+							>
 								<Card
 									cardId={card.id}
 									cardName={card.name}
@@ -113,6 +226,7 @@
 									isSelected={selectedCardId === card.id}
 									size="normal"
 									onclick={() => handleCardClick(card.id)}
+									isDragging={isCardDragging(card.id)}
 								/>
 							</div>
 						{/each}
@@ -340,6 +454,22 @@
 	.card-grid-item {
 		display: flex;
 		justify-content: center;
+		user-select: none;
+		-webkit-user-select: none;
+		transition: transform 0.2s ease, opacity 0.2s ease;
+	}
+
+	.card-grid-item.draggable {
+		cursor: grab;
+	}
+
+	.card-grid-item.draggable:active {
+		cursor: grabbing;
+	}
+
+	.card-grid-item.is-dragging {
+		opacity: 0.4;
+		transform: scale(0.95);
 	}
 
 	/* Scrollbar Styling */
@@ -379,5 +509,66 @@
 			grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
 			gap: 0.75rem;
 		}
+	}
+
+	/* Compact Badge Mode */
+	.exile-compact {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.375rem 0.625rem;
+		background: rgba(26, 31, 46, 0.6);
+		border: 1px solid rgba(124, 58, 237, 0.3);
+		border-radius: 6px;
+		min-height: 32px;
+		cursor: default;
+		transition: all 0.15s;
+		color: inherit;
+		/* Allow parent drop zone to receive drag events */
+		pointer-events: auto;
+	}
+
+	.exile-compact.has-cards {
+		cursor: pointer;
+		background: rgba(26, 31, 46, 0.9);
+		border-color: rgba(124, 58, 237, 0.4);
+	}
+
+	.exile-compact.has-cards:hover {
+		background: rgba(42, 52, 65, 0.9);
+		border-color: rgba(167, 139, 250, 0.5);
+	}
+
+	.exile-icon-compact {
+		font-size: 0.875rem;
+		opacity: 0.7;
+	}
+
+	.exile-compact.has-cards .exile-icon-compact {
+		opacity: 1;
+	}
+
+	.exile-label-compact {
+		font-size: 0.6875rem;
+		color: #a78bfa;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.card-count-compact {
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: #a78bfa;
+		background: rgba(124, 58, 237, 0.2);
+		padding: 0.125rem 0.375rem;
+		border-radius: 4px;
+		min-width: 1.25rem;
+		text-align: center;
+	}
+
+	.card-count-compact.zero {
+		color: #4b5563;
+		background: transparent;
 	}
 </style>

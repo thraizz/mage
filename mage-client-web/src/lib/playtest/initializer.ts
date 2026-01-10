@@ -1,0 +1,192 @@
+/**
+ * Playtest Initializer
+ * 
+ * Handles initialization of playtest games from deck lists
+ */
+
+import type { Deck } from '$lib/types/deck';
+import type { CardView } from '$lib/generated/mage/v1/models';
+import type { PlaytestPlayer } from '$lib/stores/playtest-game';
+import { getDeckDetails } from '$lib/api/decks';
+
+/**
+ * Initialize a playtest session from deck IDs
+ */
+export async function initializePlaytest(deckIds: string[]): Promise<PlaytestPlayer[]> {
+	if (deckIds.length < 2 || deckIds.length > 4) {
+		throw new Error('Playtest requires 2-4 decks');
+	}
+
+	console.log('[PlaytestInit] Fetching deck details for:', deckIds);
+
+	// Fetch all deck details in parallel
+	const deckPromises = deckIds.map(deckId => getDeckDetails(deckId));
+	const decks = await Promise.all(deckPromises);
+
+	console.log('[PlaytestInit] Decks loaded:', decks.map(d => d.name));
+
+	// Create players from decks
+	const players: PlaytestPlayer[] = decks.map((deck, index) => 
+		createPlayerFromDeck(deck, index + 1)
+	);
+
+	// Shuffle each player's library
+	players.forEach(player => {
+		shuffleArray(player.library);
+	});
+
+	// Draw opening hands (7 cards each)
+	players.forEach(player => {
+		const hand = player.library.splice(0, 7);
+		hand.forEach(card => {
+			card.zone = 1; // HAND
+			card.faceDown = false;
+		});
+		player.hand = hand;
+		player.handCount = hand.length;
+		player.libraryCount = player.library.length;
+	});
+
+	console.log('[PlaytestInit] Players initialized with opening hands');
+
+	return players;
+}
+
+/**
+ * Create a player from a deck
+ */
+function createPlayerFromDeck(deck: Deck, playerNumber: number): PlaytestPlayer {
+	const playerId = `player${playerNumber}`;
+	
+	// Create card objects from deck list
+	const library: CardView[] = [];
+	let cardIndex = 0;
+
+	// Add main deck cards
+	for (const deckCard of deck.mainDeck) {
+		for (let i = 0; i < deckCard.quantity; i++) {
+			library.push(createCardView(
+				playerId,
+				deckCard.cardName,
+				deckCard,
+				cardIndex++
+			));
+		}
+	}
+
+	// Commanders go to command zone (handled separately in game)
+	const commanders: CardView[] = [];
+	if (deck.commanders && deck.commanders.length > 0) {
+		for (const deckCard of deck.commanders) {
+			for (let i = 0; i < deckCard.quantity; i++) {
+				commanders.push(createCardView(
+					playerId,
+					deckCard.cardName,
+					deckCard,
+					cardIndex++
+				));
+			}
+		}
+	}
+
+	// Determine starting life based on format
+	const startingLife = getStartingLife(deck.format);
+
+	return {
+		playerId,
+		name: `${deck.name} (P${playerNumber})`,
+		life: startingLife,
+		poison: 0,
+		energy: 0,
+		libraryCount: library.length,
+		handCount: 0,
+		hand: [],
+		library,
+		graveyard: [],
+		manaPool: {
+			white: 0,
+			blue: 0,
+			black: 0,
+			red: 0,
+			green: 0,
+			colorless: 0
+		},
+		keptHand: false
+	};
+}
+
+/**
+ * Create a CardView from deck card data
+ */
+function createCardView(
+	ownerId: string,
+	cardName: string,
+	deckCard: { 
+		manaCost?: string;
+		cardType?: string;
+		power?: string;
+		toughness?: string;
+		colors?: string[];
+	},
+	index: number
+): CardView {
+	return {
+		id: `${ownerId}-card-${index}`,
+		name: cardName,
+		manaCost: deckCard.manaCost || '',
+		type: deckCard.cardType || '',
+		power: deckCard.power || '',
+		toughness: deckCard.toughness || '',
+		zone: 0, // LIBRARY
+		ownerId,
+		controllerId: ownerId,
+		tapped: false,
+		faceDown: true,
+		isToken: false,
+		colors: deckCard.colors || []
+	};
+}
+
+/**
+ * Get starting life total based on format
+ */
+function getStartingLife(format: string): number {
+	const normalizedFormat = format.toLowerCase();
+	
+	if (normalizedFormat.includes('commander') || normalizedFormat.includes('edh')) {
+		return 40;
+	}
+	
+	// Standard, Modern, Legacy, Vintage, etc.
+	return 20;
+}
+
+/**
+ * Fisher-Yates shuffle algorithm
+ */
+function shuffleArray<T>(array: T[]): void {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[array[i], array[j]] = [array[j], array[i]];
+	}
+}
+
+/**
+ * Validate deck IDs from URL params
+ */
+export function validateDeckIds(searchParams: URLSearchParams): string[] {
+	const deckIds: string[] = [];
+	
+	for (let i = 1; i <= 4; i++) {
+		const deckId = searchParams.get(`d${i}`);
+		if (deckId) {
+			deckIds.push(deckId);
+		}
+	}
+
+	if (deckIds.length < 2) {
+		throw new Error('At least 2 decks are required for playtest mode');
+	}
+
+	return deckIds;
+}

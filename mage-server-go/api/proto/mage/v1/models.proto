@@ -97,6 +97,18 @@ message GameView {
   bool is_mulligan_phase = 23;
   int32 lands_played_this_turn = 24;
   int32 lands_allowed_this_turn = 25;
+
+  // Pending library search (if any) - only visible to the searching player
+  LibrarySearchView pending_library_search = 30;
+}
+
+// LibrarySearchView represents a pending library search interaction
+message LibrarySearchView {
+  string player_id = 1;
+  string message = 2;
+  string destination = 3;  // "hand", "battlefield", "top", "graveyard"
+  repeated CardView cards = 4;
+  bool can_cancel = 5;
 }
 
 // PlayerView represents a player's state
@@ -201,6 +213,8 @@ message GameMessage {
   string text = 2;
   string color = 3;
   google.protobuf.Timestamp time = 4;
+  int32 bookmark_id = 5;           // Snapshot ID for this point in time (0 = no snapshot)
+  bool rollback_available = 6;     // Whether rollback is allowed to this point
 }
 
 // CombatView represents combat state

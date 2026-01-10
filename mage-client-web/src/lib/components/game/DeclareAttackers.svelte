@@ -284,16 +284,15 @@
 </div>
 
 <style>
-	/* Overlay */
+	/* Overlay - pointer-events: none to allow battlefield clicks */
 	.declare-attackers-overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
 		z-index: 100;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		pointer-events: auto;
+		pointer-events: none;
 	}
 
 	/* Top Banner */
@@ -302,9 +301,10 @@
 		align-items: center;
 		gap: 1rem;
 		padding: 1rem 1.5rem;
-		background: linear-gradient(180deg, rgba(239, 68, 68, 0.2) 0%, transparent 100%);
+		background: linear-gradient(180deg, rgba(239, 68, 68, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%);
 		border-bottom: 2px solid rgba(239, 68, 68, 0.5);
 		animation: banner-slide-in 0.2s ease-out;
+		pointer-events: auto;
 	}
 
 	@keyframes banner-slide-in {
@@ -368,9 +368,10 @@
 	/* Attackers List */
 	.attackers-list {
 		padding: 1rem 1.5rem;
-		background: rgba(0, 0, 0, 0.4);
+		background: rgba(0, 0, 0, 0.8);
 		max-height: 200px;
 		overflow-y: auto;
+		pointer-events: auto;
 	}
 
 	.list-title {
@@ -458,6 +459,7 @@
 		border-radius: 6px;
 		color: #fca5a5;
 		font-size: 0.875rem;
+		pointer-events: auto;
 	}
 
 	/* Bottom Action Bar */
@@ -466,7 +468,9 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 1rem 1.5rem;
-		background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+		padding-bottom: 100px !important;
+		background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 50%, transparent 100%);
+		pointer-events: auto;
 	}
 
 	.action-hints {

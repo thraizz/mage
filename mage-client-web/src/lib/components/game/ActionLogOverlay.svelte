@@ -10,10 +10,12 @@
 
 	let {
 		open = $bindable(false),
-		maxEntries = 500
+		maxEntries = 500,
+		onRequestRollback
 	}: {
 		open?: boolean;
 		maxEntries?: number;
+		onRequestRollback?: (_messageId: number) => void;
 	} = $props();
 
 	// Action log entries
@@ -44,6 +46,8 @@
 			cardName?: string;
 			cardId?: string;
 			type?: 'player' | 'system';
+			bookmarkId?: number;
+			rollbackAvailable?: boolean;
 		} = {}
 	): void {
 		const entry: ActionLogEntry = {
@@ -55,7 +59,9 @@
 			actionType,
 			text,
 			cardName: options.cardName,
-			cardId: options.cardId
+			cardId: options.cardId,
+			bookmarkId: options.bookmarkId,
+			rollbackAvailable: options.rollbackAvailable
 		};
 
 		entries.push(entry);
@@ -199,7 +205,7 @@
 			</div>
 		{:else}
 			{#each entries as entry (entry.id)}
-				<ActionLogItem action={entry} playerColor={getPlayerColor(entry.playerId)} />
+				<ActionLogItem action={entry} playerColor={getPlayerColor(entry.playerId)} {onRequestRollback} />
 			{/each}
 		{/if}
 	</div>

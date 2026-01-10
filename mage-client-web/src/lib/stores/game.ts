@@ -25,7 +25,9 @@ import type {
 	GameGetMultiAmountData,
 	GameOverData,
 	StartGameData,
-	GameAssignDamageData
+	GameAssignDamageData,
+	GameRollbackRequestData,
+	GameRollbackCompleteData
 } from '$lib/generated/mage/v1/websocket';
 import type {
 	GameView,
@@ -59,12 +61,24 @@ export type PromptType =
 	| 'xmana'
 	| 'amount'
 	| 'multiAmount'
-	| 'assignDamage';
+	| 'assignDamage'
+	| 'librarySearch';
 
 export interface GamePrompt {
 	type: PromptType;
 	message: string;
 	data: unknown;
+}
+
+/**
+ * Pending rollback request awaiting consent
+ */
+export interface PendingRollbackRequest {
+	requestId: string;
+	requestingPlayerId: string;
+	requestingPlayerName: string;
+	targetMessageId: number;
+	targetMessageText: string;
 }
 
 /**
@@ -96,6 +110,9 @@ export interface GameStoreState {
 	// Optimistic UI state
 	pendingCardPlays: Map<string, PendingCardPlay>;
 	cardsBeingPlayed: string[]; // Card IDs currently animating out
+
+	// Rollback state
+	pendingRollbackRequest: PendingRollbackRequest | null;
 }
 
 const initialState: GameStoreState = {
@@ -112,7 +129,8 @@ const initialState: GameStoreState = {
 	selectedCardIds: [],
 	showStack: false,
 	pendingCardPlays: new Map(),
-	cardsBeingPlayed: []
+	cardsBeingPlayed: [],
+	pendingRollbackRequest: null
 };
 
 /**
@@ -173,7 +191,9 @@ function createGameStore() {
 					state: updateData.game?.state,
 					turn: updateData.game?.turn,
 					phase: updateData.game?.phase,
-					playerCount: updateData.game?.players?.length
+					playerCount: updateData.game?.players?.length,
+					stackCount: updateData.game?.stack?.length || 0,
+					stackCards: updateData.game?.stack?.map(c => ({ id: c.id, name: c.name })) || []
 				});
 				if (updateData.game) {
 					// Log each player's hand
@@ -207,12 +227,27 @@ function createGameStore() {
 							}
 						}
 
+						// Check for pending library search from server
+						let newPrompt = s.pendingPrompt;
+						if (normalized.pendingLibrarySearch) {
+							console.log('[GameStore] Library search detected:', normalized.pendingLibrarySearch);
+							newPrompt = {
+								type: 'librarySearch',
+								message: normalized.pendingLibrarySearch.message || 'Search your library',
+								data: normalized.pendingLibrarySearch
+							};
+						} else if (s.pendingPrompt?.type === 'librarySearch') {
+							// Clear library search prompt if it's no longer pending
+							newPrompt = null;
+						}
+
 						return {
 							...s,
 							gameView: normalized,
 							error: null,
 							pendingCardPlays: newPending,
-							cardsBeingPlayed: newPlaying
+							cardsBeingPlayed: newPlaying,
+							pendingPrompt: newPrompt
 						};
 					});
 				}
@@ -484,7 +519,39 @@ function createGameStore() {
 				}));
 			})
 		);
-		
+
+		// GAME_ROLLBACK_REQUEST - Opponent requesting rollback consent
+		unsubscribers.push(
+			websocketStore.on(CallbackMethod.GAME_ROLLBACK_REQUEST, (data) => {
+				const rollbackData = data as GameRollbackRequestData;
+				console.log('[GameStore] GAME_ROLLBACK_REQUEST:', rollbackData);
+				update((s) => ({
+					...s,
+					pendingRollbackRequest: {
+						requestId: rollbackData.requestId,
+						requestingPlayerId: rollbackData.requestingPlayerId,
+						requestingPlayerName: rollbackData.requestingPlayerName,
+						targetMessageId: rollbackData.targetMessageId,
+						targetMessageText: rollbackData.targetMessageText
+					}
+				}));
+				toast.info(`${rollbackData.requestingPlayerName} wants to rollback to: "${rollbackData.targetMessageText}"`);
+			})
+		);
+
+		// GAME_ROLLBACK_COMPLETE - Rollback was performed
+		unsubscribers.push(
+			websocketStore.on(CallbackMethod.GAME_ROLLBACK_COMPLETE, (data) => {
+				const completeData = data as GameRollbackCompleteData;
+				console.log('[GameStore] GAME_ROLLBACK_COMPLETE:', completeData);
+				update((s) => ({
+					...s,
+					pendingRollbackRequest: null
+				}));
+				toast.success(`Game rolled back by ${completeData.initiatedByName}`);
+			})
+		);
+
 		console.log(`[GameStore] Subscribed to ${unsubscribers.length} game event types`);
 	}
 

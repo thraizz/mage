@@ -58,8 +58,16 @@ func NewLegalityChecker(gameState GameStateAccessor) *LegalityChecker {
 }
 
 // CheckStackItemLegality validates a stack item before resolution.
-// Returns true if the item is legal to resolve, false otherwise.
+// RULES-LIGHT: Always returns legal - players control resolution manually
 func (lc *LegalityChecker) CheckStackItemLegality(item StackItem) LegalityResult {
+	// RULES-LIGHT: All stack items are considered legal
+	// Players are trusted to handle fizzling and illegal targets manually
+	return LegalityResult{
+		Legal:  true,
+		Reason: "Rules-light mode: all actions permitted",
+	}
+
+	/* ORIGINAL VALIDATION CODE - kept for reference
 	if lc == nil || lc.gameState == nil {
 		return LegalityResult{
 			Legal:  true, // Default to legal if checker not initialized
@@ -141,6 +149,7 @@ func (lc *LegalityChecker) CheckStackItemLegality(item StackItem) LegalityResult
 		Legal:  true,
 		Reason: "All legality checks passed",
 	}
+	END OF ORIGINAL VALIDATION CODE */
 }
 
 // Zone constants (matching mage_engine.go)

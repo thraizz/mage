@@ -145,9 +145,12 @@ function createDragDropStore() {
 			if (!validZones.includes(zone.type)) continue;
 
 			const rect = zone.element.getBoundingClientRect();
-			if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+			const isInside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+			
+			if (isInside) {
 				const state = get({ subscribe });
-				if (state.cardId && state.sourceZone && zone.accepts(state.cardId, state.sourceZone)) {
+				const accepted = state.cardId && state.sourceZone && zone.accepts(state.cardId, state.sourceZone);
+				if (accepted) {
 					return zone.type;
 				}
 			}

@@ -427,10 +427,6 @@
 			padding: 0.5rem 0.75rem;
 		}
 
-		.turn-player {
-			display: none;
-		}
-
 		.phase-track-container {
 			padding: 0.5rem 0.5rem 0.75rem;
 			overflow-x: auto;

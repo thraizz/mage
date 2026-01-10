@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -134,6 +135,18 @@ type EngineGameView struct {
 	IsMulliganPhase      bool
 	LandsPlayedThisTurn  int
 	LandsAllowedThisTurn int
+
+	// Pending library search (if any) - only visible to the searching player
+	PendingLibrarySearch *EngineLibrarySearchView
+}
+
+// EngineLibrarySearchView represents a pending library search for the UI
+type EngineLibrarySearchView struct {
+	PlayerID    string           // Player who is searching
+	Message     string           // Description of what to search for
+	Destination string           // Where selected card goes: "hand", "battlefield", "top", "graveyard"
+	Cards       []EngineCardView // Cards in the library to choose from
+	CanCancel   bool             // Whether the player can cancel the search
 }
 
 // EnginePlayerView represents a player's view in the game
@@ -328,9 +341,11 @@ func newCombatGroup(defenderID string, defenderIsPermanent bool, defendingPlayer
 
 // EngineMessage represents a game log message
 type EngineMessage struct {
-	Text      string
-	Color     string
-	Timestamp time.Time
+	Text              string
+	Color             string
+	Timestamp         time.Time
+	BookmarkID        int  // Snapshot ID taken before this message was added (0 = no snapshot)
+	RollbackAvailable bool // Whether this state can be rolled back to
 }
 
 // EnginePrompt represents a prompt for player input
@@ -387,6 +402,27 @@ type PendingTargetRequest struct {
 	OnComplete func(selectedTargets []string) error
 	// OnCancel is called when the player cancels target selection (if allowed)
 	OnCancel func() error
+}
+
+// PendingLibrarySearchRequest represents an active library search request
+// The game engine shows the player their library and waits for card selection
+type PendingLibrarySearchRequest struct {
+	// PlayerID is the player searching their library
+	PlayerID string
+	// SearchingPlayerID is whose library is being searched (usually same as PlayerID)
+	SearchingPlayerID string
+	// Message describes what the player is searching for
+	Message string
+	// Destination is where the selected card goes: "hand", "battlefield", "top", "graveyard"
+	Destination string
+	// CardFilter optional filter description (e.g., "creature", "land", "any")
+	CardFilter string
+	// Shuffle indicates if library should be shuffled after search
+	Shuffle bool
+	// Required indicates if the player MUST select a card (can't cancel without selecting)
+	Required bool
+	// Timestamp when the request was created
+	Timestamp time.Time
 }
 
 // internalCard represents a card in the game state
@@ -611,12 +647,39 @@ type engineGameState struct {
 	// When a spell/ability needs X value input, we store the pending request here
 	// and wait for the player to respond via SEND_INTEGER
 	pendingXValueRequest *PendingXValueRequest
+
+	// Library search system
+	// When a player searches their library, we store the pending request here
+	// and wait for the player to respond via SEND_UUID with the selected card
+	pendingLibrarySearch *PendingLibrarySearchRequest
+
 	// Last Known Information (LKI) system
 	// Java: GameImpl.lki (Map<Zone, Map<UUID, MageObject>>)
 	// Stores permanent state when it leaves the battlefield for triggered abilities
 	lki            map[string]*LastKnownInfo // permanentID -> LKI snapshot
 	lkiZoneCounter map[string]int            // permanentID -> zone change counter
-	mu             sync.RWMutex
+
+	// Message-level rollback system
+	// Tracks pending rollback requests awaiting opponent consent
+	pendingRollbackRequest *PendingRollbackRequest
+	// Maps message index to bookmark ID for rollback
+	messageBookmarks map[int]int
+	// Counter for unique message IDs
+	nextMessageID int
+	// Current action bookmark ID - set when processing an action, messages use this for rollback
+	currentActionBookmark int
+
+	mu sync.RWMutex
+}
+
+// PendingRollbackRequest represents an active rollback request awaiting opponent consent
+type PendingRollbackRequest struct {
+	RequestID         string    // UUID for tracking the request
+	RequestingPlayer  string    // Player ID who requested the rollback
+	TargetMessageID   int       // Message ID to rollback to
+	TargetBookmarkID  int       // Bookmark ID associated with that message
+	TargetMessageText string    // Text of the target message for display
+	Timestamp         time.Time // When the request was made
 }
 
 // GameNotification represents a notification that can be sent to UI/websocket clients
@@ -693,6 +756,7 @@ type MageEngine struct {
 	turnSnapshots    map[string]map[int]*gameStateSnapshot
 	rollbackTurnsMax int  // Maximum turns to keep for rollback (default 4)
 	rollbackAllowed  bool // Whether turn rollback is enabled (default true)
+	bookmarksMax     int  // Maximum bookmarks per game to prevent memory growth (default 100)
 
 	// Replay recording system
 	// Records step-by-step game state for replay and spectator synchronization
@@ -721,6 +785,7 @@ func NewMageEngine(logger *zap.Logger) *MageEngine {
 		turnSnapshots:      make(map[string]map[int]*gameStateSnapshot),
 		rollbackTurnsMax:   4,                                            // Keep last 4 turns
 		rollbackAllowed:    true,                                         // Enable turn rollback by default
+		bookmarksMax:       100,                                          // Keep last 100 bookmarks per game
 		replayRecorder:     NewReplayRecorder(logger, "replays"),         // Default replay directory
 		replacementEffects: make(map[string]*effects.ReplacementManager), // Per-game replacement effects
 	}
@@ -1332,9 +1397,11 @@ func (e *MageEngine) StartGameWithDecks(gameID string, players []string, gameTyp
 			turnStartTimes: make(map[int]time.Time),
 			gameStartTime:  time.Now(),
 		},
-		messages:  make([]EngineMessage, 0),
-		prompts:   make([]EnginePrompt, 0),
-		startedAt: time.Now(),
+		messages:         make([]EngineMessage, 0),
+		prompts:          make([]EnginePrompt, 0),
+		startedAt:        time.Now(),
+		messageBookmarks: make(map[int]int),
+		nextMessageID:    1,
 	}
 
 	// Initialize supporting systems
@@ -1829,6 +1896,9 @@ func (e *MageEngine) ProcessAction(gameID string, action PlayerAction) (err erro
 				gameState.mu.Lock() // Re-acquire lock
 			}
 		}
+
+		// Clear current action bookmark after action completes
+		gameState.currentActionBookmark = 0
 	}()
 
 	// Route action by type
@@ -2148,10 +2218,8 @@ func (e *MageEngine) handlePass(gameState *engineGameState, playerID string) err
 		return fmt.Errorf("player %s not found", playerID)
 	}
 
-	// Check if player has priority
-	if gameState.turnManager.PriorityPlayer() != playerID {
-		return fmt.Errorf("player %s does not have priority", playerID)
-	}
+	// RULES-LIGHT: Priority check removed - any player can pass at any time
+	// The UI guides turn flow, but players control when to advance
 
 	// Check for concessions before priority
 	e.checkConcede(gameState)
@@ -2358,10 +2426,7 @@ func (e *MageEngine) handlePassUntil(gameState *engineGameState, playerID string
 		return fmt.Errorf("player %s not found", playerID)
 	}
 
-	// Check if player has priority
-	if gameState.turnManager.PriorityPlayer() != playerID {
-		return fmt.Errorf("player %s does not have priority", playerID)
-	}
+	// RULES-LIGHT: Priority check removed - players can set auto-pass at any time
 
 	// Set up pass-until mode
 	player.PassUntil = passType
@@ -2522,19 +2587,169 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 		return e.handlePass(gameState, action.PlayerID)
 	}
 
+	// RULES-LIGHT: Handle direct manipulation commands
+	// These allow players to directly manipulate game state
+	if strings.HasPrefix(spellNameUpper, "TAP:") {
+		cardID := strings.TrimPrefix(spellName, "TAP:")
+		cardID = strings.TrimPrefix(cardID, "tap:")
+		return e.handleDirectTap(gameState, cardID, true)
+	}
+	if strings.HasPrefix(spellNameUpper, "UNTAP:") {
+		cardID := strings.TrimPrefix(spellName, "UNTAP:")
+		cardID = strings.TrimPrefix(cardID, "untap:")
+		return e.handleDirectTap(gameState, cardID, false)
+	}
+	if spellNameUpper == "UNTAP_ALL" {
+		return e.handleDirectUntapAll(gameState, action.PlayerID)
+	}
+	if strings.HasPrefix(spellNameUpper, "FLIP:") {
+		parts := strings.SplitN(spellName[5:], ":", 2)
+		if len(parts) < 1 {
+			return fmt.Errorf("FLIP requires cardId")
+		}
+		faceDown := len(parts) < 2 || parts[1] == "true"
+		return e.handleDirectFlip(gameState, parts[0], faceDown)
+	}
+	if strings.HasPrefix(spellNameUpper, "TRANSFORM:") {
+		cardID := strings.TrimPrefix(spellName, "TRANSFORM:")
+		cardID = strings.TrimPrefix(cardID, "transform:")
+		return e.handleDirectTransform(gameState, cardID)
+	}
+	if strings.HasPrefix(spellNameUpper, "MOVE:") {
+		parts := strings.SplitN(spellName[5:], ":", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("MOVE requires cardId:zone")
+		}
+		return e.handleDirectMove(gameState, action.PlayerID, parts[0], parts[1])
+	}
+	if strings.HasPrefix(spellNameUpper, "SET_COUNTER:") {
+		parts := strings.SplitN(spellName[12:], ":", 3)
+		if len(parts) != 3 {
+			return fmt.Errorf("SET_COUNTER requires cardId:type:amount")
+		}
+		amount := 0
+		fmt.Sscanf(parts[2], "%d", &amount)
+		return e.handleDirectSetCounter(gameState, parts[0], parts[1], amount)
+	}
+	if strings.HasPrefix(spellNameUpper, "MODIFY_COUNTER:") {
+		parts := strings.SplitN(spellName[15:], ":", 3)
+		if len(parts) != 3 {
+			return fmt.Errorf("MODIFY_COUNTER requires cardId:type:delta")
+		}
+		delta := 0
+		fmt.Sscanf(parts[2], "%d", &delta)
+		return e.handleDirectModifyCounter(gameState, parts[0], parts[1], delta)
+	}
+	if strings.HasPrefix(spellNameUpper, "CREATE_TOKEN:") {
+		// Format: CREATE_TOKEN:name:types:power:toughness:color:abilities(comma-sep)
+		parts := strings.SplitN(spellName[13:], ":", 6)
+		if len(parts) < 5 {
+			return fmt.Errorf("CREATE_TOKEN requires name:types:power:toughness:color[:abilities]")
+		}
+		abilities := []string{}
+		if len(parts) >= 6 && parts[5] != "" {
+			abilities = strings.Split(parts[5], ",")
+		}
+		return e.handleDirectCreateToken(gameState, action.PlayerID, parts[0], parts[1], parts[2], parts[3], parts[4], abilities)
+	}
+	if strings.HasPrefix(spellNameUpper, "DESTROY_TOKEN:") {
+		cardID := strings.TrimPrefix(spellName, "DESTROY_TOKEN:")
+		cardID = strings.TrimPrefix(cardID, "destroy_token:")
+		return e.handleDirectDestroyToken(gameState, cardID)
+	}
+	if strings.HasPrefix(spellNameUpper, "SET_LIFE:") {
+		parts := strings.SplitN(spellName[9:], ":", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("SET_LIFE requires playerId:amount")
+		}
+		amount := 0
+		fmt.Sscanf(parts[1], "%d", &amount)
+		return e.handleDirectSetLife(gameState, parts[0], amount)
+	}
+	if strings.HasPrefix(spellNameUpper, "MODIFY_LIFE:") {
+		parts := strings.SplitN(spellName[12:], ":", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("MODIFY_LIFE requires playerId:delta")
+		}
+		delta := 0
+		fmt.Sscanf(parts[1], "%d", &delta)
+		return e.handleDirectModifyLife(gameState, parts[0], delta)
+	}
+	if strings.HasPrefix(spellNameUpper, "DRAW:") {
+		parts := strings.SplitN(spellName[5:], ":", 2)
+		count := 1
+		if len(parts) == 2 {
+			fmt.Sscanf(parts[1], "%d", &count)
+		}
+		playerID := action.PlayerID
+		if len(parts) >= 1 && parts[0] != "" {
+			playerID = parts[0]
+		}
+		return e.handleDirectDraw(gameState, playerID, count)
+	}
+
+	// RULES-LIGHT: Handle stack tracking (card stays in place, just added to visual stack)
+	if strings.HasPrefix(spellNameUpper, "STACK_ADD:") {
+		cardID := strings.TrimPrefix(spellName, "STACK_ADD:")
+		cardID = strings.TrimPrefix(cardID, "stack_add:")
+		return e.handleDirectStackAdd(gameState, action.PlayerID, cardID)
+	}
+	if strings.HasPrefix(spellNameUpper, "STACK_REMOVE:") {
+		itemID := strings.TrimPrefix(spellName, "STACK_REMOVE:")
+		itemID = strings.TrimPrefix(itemID, "stack_remove:")
+		return e.handleDirectStackRemove(gameState, action.PlayerID, itemID)
+	}
+
+	// RULES-LIGHT: Handle turn and phase control commands
+	if spellNameUpper == "NEXT_TURN" {
+		return e.handleDirectNextTurn(gameState, action.PlayerID)
+	}
+	if spellNameUpper == "CLEAR_COMBAT" {
+		return e.handleDirectClearCombat(gameState)
+	}
+	if spellNameUpper == "SHUFFLE" {
+		return e.handleDirectShuffle(gameState, action.PlayerID)
+	}
+	if strings.HasPrefix(spellNameUpper, "SHUFFLE:") {
+		playerID := strings.TrimPrefix(spellName, "SHUFFLE:")
+		playerID = strings.TrimPrefix(playerID, "shuffle:")
+		return e.handleDirectShuffle(gameState, playerID)
+	}
+	if strings.HasPrefix(spellNameUpper, "SET_PLAYER_COUNTER:") {
+		parts := strings.SplitN(spellName[19:], ":", 3)
+		if len(parts) != 3 {
+			return fmt.Errorf("SET_PLAYER_COUNTER requires playerId:type:amount")
+		}
+		amount := 0
+		fmt.Sscanf(parts[2], "%d", &amount)
+		return e.handleDirectSetPlayerCounter(gameState, parts[0], parts[1], amount)
+	}
+	if strings.HasPrefix(spellNameUpper, "SEARCH_LIBRARY:") {
+		parts := strings.SplitN(spellName[15:], ":", 3)
+		if len(parts) < 2 {
+			return fmt.Errorf("SEARCH_LIBRARY requires destination:shuffle[:message]")
+		}
+		shuffle := true
+		if len(parts) >= 2 && strings.ToLower(parts[1]) == "false" {
+			shuffle = false
+		}
+		message := ""
+		if len(parts) >= 3 {
+			message = parts[2]
+		}
+		return e.handleDirectSearchLibrary(gameState, action.PlayerID, parts[0], shuffle, message)
+	}
+
 	playerID := action.PlayerID
 	player, exists := gameState.players[playerID]
 	if !exists {
 		return fmt.Errorf("player %s not found", playerID)
 	}
 
-	// Check if player has priority
-	if gameState.turnManager.PriorityPlayer() != playerID {
-		return fmt.Errorf("player %s does not have priority", playerID)
-	}
+	// RULES-LIGHT: Priority check removed - any player can cast spells at any time
+	// Players are trusted to follow timing rules
 
-	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
-	// Repeat until stable (SBA → triggers → repeat)
+	// Check state-based actions (advisory - may provide UI hints)
 	e.checkStateAndTriggered(gameState)
 
 	// Find card in hand
@@ -2553,47 +2768,17 @@ func (e *MageEngine) handleStringAction(gameState *engineGameState, action Playe
 		return fmt.Errorf("card %s not found in hand", spellName)
 	}
 
-	// Check if spell requires targets
+	// Rules-light approach: We don't enforce targeting.
+	// Per MAGE_ENGINE_ARCHITECTURE.md: "Assist, don't enforce"
+	// Players communicate targets via chat and/or ping cards to indicate targets.
+	// Just inform them what the spell targets (for reference) and proceed with cast.
 	targetRequirements := targeting.ParseTargetRequirements(card.Type, card.RulesText)
 	if len(targetRequirements) > 0 {
-		// This spell requires targets - initiate target selection
-		req := targetRequirements[0] // Use first requirement for now
-		req.SourceID = card.ID
-		req.ControllerID = playerID
-
-		// Create callback for when targets are selected
-		onComplete := func(selectedTargets []string) error {
-			// Store targets in card metadata for resolution
-			card.Metadata["targets"] = targeting.FormatTargets(selectedTargets)
-
-			// Now proceed with casting the spell
-			return e.proceedWithSpellCast(gameState, playerID, card)
-		}
-
-		// Create callback for cancellation
-		onCancel := func() error {
-			// Return card to hand
-			card.Zone = zoneHand
-			player.Hand = append(player.Hand, card)
-			gameState.addMessage(fmt.Sprintf("%s cancelled casting %s", playerID, card.Name), "action")
-			return nil
-		}
-
-		// Request target selection
-		message := fmt.Sprintf("Choose target for %s: %s", card.Name, req.Description)
-		return e.RequestTargetSelection(
-			gameState.gameID,
-			playerID,
-			card.ID,
-			req,
-			message,
-			!req.Optional, // Required if not optional
-			onComplete,
-			onCancel,
-		)
+		req := targetRequirements[0]
+		gameState.addMessage(fmt.Sprintf("💡 %s targets: %s (communicate via chat)", card.Name, req.Description), "info")
 	}
 
-	// No targets required - proceed directly with casting
+	// Proceed directly with casting - players handle targeting themselves
 	return e.proceedWithSpellCast(gameState, playerID, card)
 }
 
@@ -2605,26 +2790,21 @@ func (e *MageEngine) proceedWithSpellCast(gameState *engineGameState, playerID s
 		return fmt.Errorf("player %s not found", playerID)
 	}
 
-	// Parse and check mana cost (Rule 601.2f-h)
+	// Parse and pay mana cost (best-effort, rules-light approach)
+	// Per MAGE_ENGINE_ARCHITECTURE.md: We don't enforce mana costs, just assist
 	if card.ManaCost != "" {
 		cost, err := mana.ParseCost(card.ManaCost)
 		if err != nil {
-			return fmt.Errorf("failed to parse mana cost %s: %w", card.ManaCost, err)
-		}
+			gameState.addMessage(fmt.Sprintf("⚠️ %s: Could not parse mana cost %s", card.Name, card.ManaCost), "warning")
+		} else {
+			// Notify players if mana is insufficient (but allow the cast)
+			if !cost.CanPay(player.ManaPool, 0) {
+				gameState.addMessage(fmt.Sprintf("⚠️ %s cast without paying full mana cost %s", card.Name, card.ManaCost), "warning")
+			}
 
-		// Check if player can pay the mana cost
-		if !cost.CanPay(player.ManaPool, 0) {
-			return fmt.Errorf("insufficient mana to cast %s (cost: %s)", card.Name, card.ManaCost)
+			// Pay whatever mana is available (best-effort)
+			_ = e.payManaCost(player.ManaPool, cost)
 		}
-
-		// Pay the mana cost
-		if err := e.payManaCost(player.ManaPool, cost); err != nil {
-			return fmt.Errorf("failed to pay mana cost for %s: %w", card.Name, err)
-		}
-
-		e.logger.Debug("mana cost paid",
-			zap.String("card", card.Name),
-			zap.String("cost", card.ManaCost))
 	}
 
 	// Move card from hand to stack
@@ -2719,39 +2899,28 @@ func (e *MageEngine) proceedWithSpellCast(gameState *engineGameState, playerID s
 	return nil
 }
 
-// payManaCost pays a mana cost from a player's mana pool
-// It pays colored mana first (exact match required), then generic mana from any available source
+// payManaCost pays a mana cost from a player's mana pool (best-effort)
+// Per MAGE_ENGINE_ARCHITECTURE.md: Rules-light approach - pay what's available, don't enforce
+// It pays colored mana first, then generic mana from any available source
 func (e *MageEngine) payManaCost(pool *mana.ManaPool, cost *mana.ManaCost) error {
-	// Pay colored mana first (these must be exact)
+	// Pay colored mana first - spend what's available (best-effort)
 	if cost.White > 0 {
-		if !pool.Spend(mana.ManaWhite, cost.White) {
-			return fmt.Errorf("insufficient white mana: need %d", cost.White)
-		}
+		pool.Spend(mana.ManaWhite, cost.White) // Best-effort, ignore if insufficient
 	}
 	if cost.Blue > 0 {
-		if !pool.Spend(mana.ManaBlue, cost.Blue) {
-			return fmt.Errorf("insufficient blue mana: need %d", cost.Blue)
-		}
+		pool.Spend(mana.ManaBlue, cost.Blue)
 	}
 	if cost.Black > 0 {
-		if !pool.Spend(mana.ManaBlack, cost.Black) {
-			return fmt.Errorf("insufficient black mana: need %d", cost.Black)
-		}
+		pool.Spend(mana.ManaBlack, cost.Black)
 	}
 	if cost.Red > 0 {
-		if !pool.Spend(mana.ManaRed, cost.Red) {
-			return fmt.Errorf("insufficient red mana: need %d", cost.Red)
-		}
+		pool.Spend(mana.ManaRed, cost.Red)
 	}
 	if cost.Green > 0 {
-		if !pool.Spend(mana.ManaGreen, cost.Green) {
-			return fmt.Errorf("insufficient green mana: need %d", cost.Green)
-		}
+		pool.Spend(mana.ManaGreen, cost.Green)
 	}
 	if cost.Colorless > 0 {
-		if !pool.Spend(mana.ManaColorless, cost.Colorless) {
-			return fmt.Errorf("insufficient colorless mana: need %d", cost.Colorless)
-		}
+		pool.Spend(mana.ManaColorless, cost.Colorless)
 	}
 
 	// Pay generic mana from any available source
@@ -2785,10 +2954,7 @@ func (e *MageEngine) payManaCost(pool *mana.ManaPool, cost *mana.ManaCost) error
 				genericRemaining -= spend
 			}
 		}
-
-		if genericRemaining > 0 {
-			return fmt.Errorf("insufficient mana for generic cost: need %d more", genericRemaining)
-		}
+		// Rules-light: Don't error if generic cost couldn't be fully paid
 	}
 
 	return nil
@@ -2907,9 +3073,14 @@ func (e *MageEngine) handleUUIDAction(gameState *engineGameState, action PlayerA
 		return e.handleTargetSelection(gameState, playerID, uuidStr)
 	}
 
-	// Check if player has priority
+	// Check if there's a pending library search for this player
+	if gameState.pendingLibrarySearch != nil && gameState.pendingLibrarySearch.PlayerID == playerID {
+		return e.handleLibrarySearchSelection(gameState, player, uuidStr)
+	}
+
+	// Per MAGE_ENGINE_ARCHITECTURE.md: Rules-light - don't enforce priority
 	if gameState.turnManager.PriorityPlayer() != playerID {
-		return fmt.Errorf("player %s does not have priority", playerID)
+		gameState.addMessage(fmt.Sprintf("⚠️ %s acts without priority", playerID), "warning")
 	}
 
 	// Per rule 117.5 and 603.3: Check state-based actions and triggered abilities before priority
@@ -3161,129 +3332,55 @@ func (e *MageEngine) ConfirmTargetSelection(gameID, playerID string) error {
 
 // resolveStack resolves all items on the stack
 func (e *MageEngine) resolveStack(gameState *engineGameState) error {
-	gameState.addMessage("Resolving stack", "action")
+	// RULES-LIGHT: Resolve only the top item, not all items
+	// This gives players control over resolution order and timing
 
-	// Log stack state before resolution
-	stackItems := gameState.stack.List()
-	if e.logger != nil {
-		e.logger.Debug("stack before resolution",
-			zap.Int("stack_size", len(stackItems)),
-		)
-		for i, item := range stackItems {
-			e.logger.Debug("stack item",
-				zap.Int("index", i),
-				zap.String("item_id", item.ID),
-				zap.String("source_id", item.SourceID),
-				zap.String("description", item.Description),
-				zap.String("kind", string(item.Kind)),
-			)
-		}
+	if gameState.stack.IsEmpty() {
+		return nil
 	}
 
-	// Resolve items in LIFO order (top to bottom)
-	for !gameState.stack.IsEmpty() {
-		item, err := gameState.stack.Pop()
-		if err != nil {
-			return fmt.Errorf("failed to pop from stack: %w", err)
-		}
+	item, err := gameState.stack.Pop()
+	if err != nil {
+		return fmt.Errorf("failed to pop from stack: %w", err)
+	}
 
-		if e.logger != nil {
-			e.logger.Debug("popped from stack",
-				zap.String("item_id", item.ID),
-				zap.String("source_id", item.SourceID),
-				zap.String("description", item.Description),
-				zap.Int("remaining_items", len(gameState.stack.List())),
-			)
-		}
+	if e.logger != nil {
+		e.logger.Debug("resolving top stack item (rules-light mode)",
+			zap.String("item_id", item.ID),
+			zap.String("source_id", item.SourceID),
+			zap.String("description", item.Description),
+			zap.Int("remaining_items", len(gameState.stack.List())),
+		)
+	}
 
-		// Check legality before resolution
-		result := gameState.legality.CheckStackItemLegality(item)
-		if e.logger != nil {
-			e.logger.Debug("legality check",
-				zap.String("item_id", item.ID),
-				zap.Bool("legal", result.Legal),
-				zap.String("reason", result.Reason),
-			)
-		}
-		if !result.Legal {
-			gameState.addMessage(fmt.Sprintf("%s is no longer legal: %s", item.Description, result.Reason), "action")
+	// RULES-LIGHT: Skip legality check - players handle fizzling manually
+	// Resolve the item
+	gameState.addMessage(fmt.Sprintf("%s resolves", item.Description), "action")
+
+	if item.Resolve != nil {
+		if err := item.Resolve(); err != nil {
+			gameState.addMessage(fmt.Sprintf("Error resolving %s: %v", item.Description, err), "action")
 			if e.logger != nil {
-				e.logger.Warn("stack item is illegal",
+				e.logger.Error("failed to resolve stack item",
 					zap.String("item_id", item.ID),
-					zap.String("reason", result.Reason),
+					zap.Error(err),
 				)
-			}
-			// Remove illegal item from game state if it's a card
-			if card, found := gameState.cards[item.SourceID]; found && card.Zone == zoneStack {
-				// Move to graveyard (or appropriate zone)
-				card.Zone = zoneGraveyard
-				if player, exists := gameState.players[item.Controller]; exists {
-					player.Graveyard = append(player.Graveyard, card)
-				}
-			}
-			continue
-		}
-
-		// Resolve the item
-		gameState.addMessage(fmt.Sprintf("%s resolves", item.Description), "action")
-		if e.logger != nil {
-			e.logger.Debug("resolving stack item",
-				zap.String("item_id", item.ID),
-				zap.String("source_id", item.SourceID),
-				zap.String("description", item.Description),
-				zap.String("kind", string(item.Kind)),
-				zap.Bool("has_resolve", item.Resolve != nil),
-			)
-		}
-
-		if item.Resolve != nil {
-			if err := item.Resolve(); err != nil {
-				gameState.addMessage(fmt.Sprintf("Error resolving %s: %v", item.Description, err), "action")
-				if e.logger != nil {
-					e.logger.Error("failed to resolve stack item",
-						zap.String("item_id", item.ID),
-						zap.String("source_id", item.SourceID),
-						zap.String("description", item.Description),
-						zap.Error(err),
-					)
-				}
-				// Continue resolving other items even if one fails
-			} else {
-				gameState.addMessage(fmt.Sprintf("%s resolved successfully", item.Description), "action")
-				if e.logger != nil {
-					e.logger.Debug("resolved stack item successfully",
-						zap.String("item_id", item.ID),
-						zap.String("source_id", item.SourceID),
-						zap.String("description", item.Description),
-					)
-				}
 			}
 		} else {
-			gameState.addMessage(fmt.Sprintf("%s has no resolve function", item.Description), "action")
-			if e.logger != nil {
-				e.logger.Warn("stack item has no resolve function",
-					zap.String("item_id", item.ID),
-					zap.String("description", item.Description),
-				)
-			}
+			gameState.addMessage(fmt.Sprintf("%s resolved successfully", item.Description), "action")
 		}
-
-		// Emit stack resolution event
-		gameState.eventBus.Publish(rules.Event{
-			Type:        rules.EventStackItemResolved,
-			ID:          uuid.New().String(),
-			TargetID:    item.ID,
-			SourceID:    item.SourceID,
-			Controller:  item.Controller,
-			Timestamp:   time.Now(),
-			Description: fmt.Sprintf("%s resolved", item.Description),
-		})
-
-		// Per rule 117.5 and 603.3: After each stack item resolves, check state-based actions
-		// and process triggered abilities before resolving the next item.
-		// This ensures that SBAs and triggers are handled immediately after each resolution.
-		e.checkStateAndTriggeredAfterResolution(gameState)
 	}
+
+	// Emit stack resolution event
+	gameState.eventBus.Publish(rules.Event{
+		Type:        rules.EventStackItemResolved,
+		ID:          uuid.New().String(),
+		TargetID:    item.ID,
+		SourceID:    item.SourceID,
+		Controller:  item.Controller,
+		Timestamp:   time.Now(),
+		Description: fmt.Sprintf("%s resolved", item.Description),
+	})
 
 	// Reset pass flags after stack resolution (preserves lost/left player state)
 	gameState.resetPassed()
@@ -3330,24 +3427,42 @@ func (e *MageEngine) handleSpecialAction(gameState *engineGameState, action Play
 		return fmt.Errorf("action_type is required")
 	}
 
-	sourceID, ok := payload["source_id"].(string)
-	if !ok {
-		return fmt.Errorf("source_id is required")
-	}
-
 	playerID := action.PlayerID
 	player, exists := gameState.players[playerID]
 	if !exists {
 		return fmt.Errorf("player %s not found", playerID)
 	}
 
+	// sourceID is optional for some actions (like SEARCH_LIBRARY)
+	sourceID, _ := payload["source_id"].(string)
+
 	switch actionType {
 	case "PLAY_LAND":
+		if sourceID == "" {
+			return fmt.Errorf("source_id is required for PLAY_LAND")
+		}
 		return e.handlePlayLand(gameState, player, sourceID)
 	case "ADVANCE_PHASE":
 		return e.handleAdvancePhase(gameState, player)
 	case "ACTIVATE_MANA_ABILITY":
+		if sourceID == "" {
+			return fmt.Errorf("source_id is required for ACTIVATE_MANA_ABILITY")
+		}
 		return e.handleActivateManaAbility(gameState, player, sourceID)
+	case "SEARCH_LIBRARY":
+		destination, _ := payload["destination"].(string)
+		if destination == "" {
+			destination = "hand" // Default to searching to hand
+		}
+		shuffle := true // Default to shuffling after search
+		if shuffleVal, ok := payload["shuffle"].(bool); ok {
+			shuffle = shuffleVal
+		}
+		message, _ := payload["message"].(string)
+		if message == "" {
+			message = "Search your library for a card"
+		}
+		return e.handleSearchLibrary(gameState, player, destination, shuffle, message)
 	default:
 		return fmt.Errorf("unknown special action: %s", actionType)
 	}
@@ -3398,10 +3513,8 @@ func (e *MageEngine) handleActivateAbilityAction(gameState *engineGameState, act
 // Per MTG Rule 602: The full activation sequence
 // Supports both registered abilities (UUID IDs) and rules-text-parsed abilities (cardID-ability-N format)
 func (e *MageEngine) handleActivateAbility(gameState *engineGameState, player *internalPlayer, cardID, abilityIDStr string, targets []string) error {
-	// Check if player has priority
-	if gameState.turnManager.PriorityPlayer() != player.PlayerID {
-		return fmt.Errorf("player %s does not have priority", player.PlayerID)
-	}
+	// RULES-LIGHT: Priority and controller checks removed - any player can activate abilities
+	// Players are trusted to follow the rules
 
 	// Find the card/permanent on battlefield
 	var card *internalCard
@@ -3413,11 +3526,6 @@ func (e *MageEngine) handleActivateAbility(gameState *engineGameState, player *i
 	}
 	if card == nil {
 		return fmt.Errorf("permanent %s not found on battlefield", cardID)
-	}
-
-	// Verify controller
-	if card.ControllerID != player.PlayerID {
-		return fmt.Errorf("player does not control permanent %s", cardID)
 	}
 
 	// Check if this is a synthetic ability ID from rules text parsing (format: cardID-ability-N)
@@ -3545,19 +3653,14 @@ func (e *MageEngine) handleActivateAbility(gameState *engineGameState, player *i
 		// NOTE: We work directly with player.ManaPool here instead of using GameContext
 		// because we already hold gameState.mu.Lock() and GameContext methods try to acquire
 		// locks, causing a deadlock.
+		// Per MAGE_ENGINE_ARCHITECTURE.md: Rules-light - pay what's available, don't enforce
 		if parsedAbility.ManaCostString != "" {
 			manaCost, err := abilities.ParseManaCost(parsedAbility.ManaCostString)
 			if err == nil && manaCost != nil && manaCost.Mana != nil {
-				// Check if player can pay directly (no lock acquisition)
-				if !canPayManaCostDirect(player.ManaPool, manaCost.Mana) {
-					return fmt.Errorf("not enough mana to pay cost %s", parsedAbility.ManaCostString)
-				}
-				// Pay the cost directly
-				if err := payManaCostDirect(player.ManaPool, manaCost.Mana); err != nil {
-					return fmt.Errorf("failed to pay mana cost: %w", err)
-				}
+				// Best-effort payment (rules-light: don't block if insufficient)
+				_ = payManaCostDirect(player.ManaPool, manaCost.Mana)
 				if e.logger != nil {
-					e.logger.Info("paid mana cost for ability",
+					e.logger.Info("attempted mana cost payment for ability",
 						zap.String("card", card.Name),
 						zap.String("cost", parsedAbility.ManaCostString))
 				}
@@ -3644,18 +3747,14 @@ func (e *MageEngine) handleActivateAbility(gameState *engineGameState, player *i
 		// Pay non-tap costs for registered abilities
 		// NOTE: For registered abilities, we need to handle costs directly to avoid deadlock
 		// The lock is already held, so GameContext methods would deadlock
+		// Per MAGE_ENGINE_ARCHITECTURE.md: Rules-light - pay what's available, don't enforce
 		for _, cost := range activatedAbility.GetCosts() {
 			if _, isTapCost := cost.(*abilities.TapCost); isTapCost {
 				continue // Handle tap cost separately below
 			}
-			// Handle mana cost directly
+			// Handle mana cost directly (best-effort)
 			if manaCost, isManaCost := cost.(*abilities.ManaCost); isManaCost && manaCost.Mana != nil {
-				if !canPayManaCostDirect(player.ManaPool, manaCost.Mana) {
-					return fmt.Errorf("not enough mana to pay cost")
-				}
-				if err := payManaCostDirect(player.ManaPool, manaCost.Mana); err != nil {
-					return fmt.Errorf("failed to pay mana cost: %w", err)
-				}
+				_ = payManaCostDirect(player.ManaPool, manaCost.Mana)
 			}
 			// TODO: Handle other cost types (sacrifice, discard) directly
 		}
@@ -3671,16 +3770,16 @@ func (e *MageEngine) handleActivateAbility(gameState *engineGameState, player *i
 		}
 	}
 
-	// Check timing restrictions for sorcery-speed abilities
+	// Per MAGE_ENGINE_ARCHITECTURE.md: Rules-light - log timing info but don't enforce
 	if isSorcerySpeed {
 		currentStep := gameState.turnManager.CurrentStep()
 		activePlayer := gameState.turnManager.ActivePlayer()
 
 		if currentStep != rules.StepMain1 && currentStep != rules.StepMain2 {
-			return fmt.Errorf("can only activate during main phase")
+			gameState.addMessage(fmt.Sprintf("⚠️ %s ability activated outside main phase", card.Name), "warning")
 		}
 		if activePlayer != player.PlayerID {
-			return fmt.Errorf("can only activate during your turn")
+			gameState.addMessage(fmt.Sprintf("⚠️ %s ability activated during opponent's turn", card.Name), "warning")
 		}
 	}
 
@@ -3692,9 +3791,6 @@ func (e *MageEngine) handleActivateAbility(gameState *engineGameState, player *i
 		// Pay the tap cost
 		card.Tapped = true
 	}
-
-	// TODO: Check if targets are required and none provided - send GAME_TARGET event
-	// TODO: Check if mana payment is required - trigger mana payment prompt
 
 	// Create stack item for the ability
 	stackItemID := uuid.New().String()
@@ -3755,18 +3851,14 @@ func (e *MageEngine) completeAbilityActivation(
 			zap.Int("x_value", parsedAbility.chosenXValue))
 	}
 
-	// Pay mana cost if present
+	// Pay mana cost if present (best-effort, rules-light)
+	// Per MAGE_ENGINE_ARCHITECTURE.md: Don't enforce mana costs
 	if parsedAbility.ManaCostString != "" {
 		manaCost, err := abilities.ParseManaCost(parsedAbility.ManaCostString)
 		if err == nil && manaCost != nil && manaCost.Mana != nil {
-			if !canPayManaCostDirect(player.ManaPool, manaCost.Mana) {
-				return fmt.Errorf("not enough mana to pay cost %s", parsedAbility.ManaCostString)
-			}
-			if err := payManaCostDirect(player.ManaPool, manaCost.Mana); err != nil {
-				return fmt.Errorf("failed to pay mana cost: %w", err)
-			}
+			_ = payManaCostDirect(player.ManaPool, manaCost.Mana)
 			if e.logger != nil {
-				e.logger.Info("paid mana cost for ability",
+				e.logger.Info("attempted mana cost payment for ability",
 					zap.String("card", card.Name),
 					zap.String("cost", parsedAbility.ManaCostString))
 			}
@@ -4048,27 +4140,52 @@ func canPayManaCostDirect(pool *mana.ManaPool, manaCost *abilities.Mana) bool {
 // payManaCostDirect pays a mana cost from a mana pool
 // This function does NOT acquire any locks - caller must hold appropriate locks
 // Used to avoid deadlock when we already hold gameState.mu.Lock()
+// payManaCostDirect pays a mana cost from a mana pool (best-effort, rules-light)
+// Per MAGE_ENGINE_ARCHITECTURE.md: Don't enforce mana costs, pay what's available
+// This function does NOT acquire any locks - caller must hold appropriate locks
 func payManaCostDirect(pool *mana.ManaPool, manaCost *abilities.Mana) error {
-	if pool == nil {
-		return fmt.Errorf("mana pool is nil")
-	}
-	if manaCost == nil {
-		return nil // No cost
+	if pool == nil || manaCost == nil {
+		return nil // No pool or no cost - nothing to do
 	}
 
-	// First check if we can pay
-	if !canPayManaCostDirect(pool, manaCost) {
-		return fmt.Errorf("insufficient mana")
+	// Pay colored mana (best-effort - pay what's available, don't go negative)
+	if manaCost.White > 0 && pool.White > 0 {
+		pay := manaCost.White
+		if pool.White < pay {
+			pay = pool.White
+		}
+		pool.White -= pay
+	}
+	if manaCost.Blue > 0 && pool.Blue > 0 {
+		pay := manaCost.Blue
+		if pool.Blue < pay {
+			pay = pool.Blue
+		}
+		pool.Blue -= pay
+	}
+	if manaCost.Black > 0 && pool.Black > 0 {
+		pay := manaCost.Black
+		if pool.Black < pay {
+			pay = pool.Black
+		}
+		pool.Black -= pay
+	}
+	if manaCost.Red > 0 && pool.Red > 0 {
+		pay := manaCost.Red
+		if pool.Red < pay {
+			pay = pool.Red
+		}
+		pool.Red -= pay
+	}
+	if manaCost.Green > 0 && pool.Green > 0 {
+		pay := manaCost.Green
+		if pool.Green < pay {
+			pay = pool.Green
+		}
+		pool.Green -= pay
 	}
 
-	// Pay colored mana
-	pool.White -= manaCost.White
-	pool.Blue -= manaCost.Blue
-	pool.Black -= manaCost.Black
-	pool.Red -= manaCost.Red
-	pool.Green -= manaCost.Green
-
-	// Pay generic mana from colorless first, then from excess colored
+	// Pay generic/colorless mana from colorless first, then from excess colored
 	remaining := manaCost.Colorless
 	if remaining > 0 {
 		if pool.Colorless >= remaining {
@@ -4095,6 +4212,7 @@ func payManaCostDirect(pool *mana.ManaPool, manaCost *abilities.Mana) error {
 			remaining -= take
 		}
 	}
+	// Rules-light: Don't error if cost couldn't be fully paid
 
 	return nil
 }
@@ -4103,26 +4221,9 @@ func payManaCostDirect(pool *mana.ManaPool, manaCost *abilities.Mana) error {
 // Per MTG Rule 116.2a: Playing a land is a special action (doesn't use stack)
 // Per MTG Rule 305.1: Can only play during main phase, with empty stack, once per turn
 func (e *MageEngine) handlePlayLand(gameState *engineGameState, player *internalPlayer, cardID string) error {
-	// Check if player has priority
-	if gameState.turnManager.PriorityPlayer() != player.PlayerID {
-		return fmt.Errorf("player %s does not have priority", player.PlayerID)
-	}
-
-	// Check if it's a main phase (precombat or postcombat)
-	currentPhase := gameState.turnManager.CurrentPhase()
-	if currentPhase != rules.PhasePrecombatMain && currentPhase != rules.PhasePostcombatMain {
-		return fmt.Errorf("can only play lands during main phase")
-	}
-
-	// Check if stack is empty
-	if !gameState.stack.IsEmpty() {
-		return fmt.Errorf("cannot play land with spells on stack")
-	}
-
-	// Check if player has already played their land for the turn
-	if player.LandsPlayedThisTurn >= player.LandsPerTurn {
-		return fmt.Errorf("already played %d land(s) this turn", player.LandsPlayedThisTurn)
-	}
+	// RULES-LIGHT: Priority, timing, and land-per-turn checks removed
+	// Players control when lands are played - the UI provides guidance
+	_ = gameState.turnManager.CurrentPhase() // Keep for potential UI hints
 
 	// Find card in hand by ID
 	var card *internalCard
@@ -4186,10 +4287,9 @@ func (e *MageEngine) handlePlayLand(gameState *engineGameState, player *internal
 // handleActivateManaAbility activates a mana ability on a permanent
 // Per MTG Rule 605: Mana abilities don't use the stack and resolve immediately
 func (e *MageEngine) handleActivateManaAbility(gameState *engineGameState, player *internalPlayer, permanentID string) error {
-	// Check if player has priority
-	if gameState.turnManager.PriorityPlayer() != player.PlayerID {
-		return fmt.Errorf("player %s does not have priority", player.PlayerID)
-	}
+	// Per MAGE_ENGINE_ARCHITECTURE.md: Rules-light - don't enforce priority
+	// Mana abilities can technically be activated during mana payment anyway
+	// (No warning needed - mana abilities are commonly activated without priority)
 
 	// Find permanent on battlefield
 	var permanent *internalCard
@@ -4303,9 +4403,9 @@ func (e *MageEngine) handleActivateManaAbility(gameState *engineGameState, playe
 // handleAdvancePhase manually advances to the next phase/step
 // This is a debug/development feature to allow manual turn progression
 func (e *MageEngine) handleAdvancePhase(gameState *engineGameState, player *internalPlayer) error {
-	// Check if player has priority (only priority player can advance)
+	// Per MAGE_ENGINE_ARCHITECTURE.md: Rules-light - don't enforce priority
 	if gameState.turnManager.PriorityPlayer() != player.PlayerID {
-		return fmt.Errorf("player %s does not have priority", player.PlayerID)
+		gameState.addMessage(fmt.Sprintf("⚠️ %s advances phase without priority", player.Name), "warning")
 	}
 
 	// Get next player in turn order for turn transitions
@@ -4350,6 +4450,208 @@ func (e *MageEngine) handleAdvancePhase(gameState *engineGameState, player *inte
 			zap.String("new_step", newStep.String()),
 		)
 	}
+
+	return nil
+}
+
+// handleSearchLibrary initiates a library search for a player
+// This shows the library contents to the player and waits for them to select a card
+func (e *MageEngine) handleSearchLibrary(gameState *engineGameState, player *internalPlayer, destination string, shuffle bool, message string) error {
+	// Check if there's already a pending library search
+	if gameState.pendingLibrarySearch != nil {
+		return fmt.Errorf("there is already a pending library search")
+	}
+
+	// Log the search initiation
+	gameState.addMessage(fmt.Sprintf("%s searches their library", player.Name), "action")
+
+	// Create the pending library search request
+	gameState.pendingLibrarySearch = &PendingLibrarySearchRequest{
+		PlayerID:          player.PlayerID,
+		SearchingPlayerID: player.PlayerID,
+		Message:           message,
+		Destination:       destination,
+		Shuffle:           shuffle,
+		Required:          false, // Player can cancel by selecting nothing
+		Timestamp:         time.Now(),
+	}
+
+	// Build library card views for the UI
+	libraryViews := make([]map[string]interface{}, 0, len(player.Library))
+	for _, card := range player.Library {
+		if card == nil {
+			continue
+		}
+		libraryViews = append(libraryViews, map[string]interface{}{
+			"id":        card.ID,
+			"name":      card.Name,
+			"type":      card.Type,
+			"mana_cost": card.ManaCost,
+			"rules":     card.RulesText,
+		})
+	}
+
+	// Notify the player to select a card from their library
+	e.emitNotification(GameNotification{
+		Type:     "LIBRARY_SEARCH",
+		GameID:   gameState.gameID,
+		PlayerID: player.PlayerID,
+		Data: map[string]interface{}{
+			"message":     message,
+			"destination": destination,
+			"cards":       libraryViews,
+			"can_cancel":  true,
+		},
+	})
+
+	if e.logger != nil {
+		e.logger.Info("library search initiated",
+			zap.String("game_id", gameState.gameID),
+			zap.String("player", player.PlayerID),
+			zap.String("destination", destination),
+			zap.Int("library_size", len(player.Library)),
+		)
+	}
+
+	return nil
+}
+
+// handleLibrarySearchSelection processes a card selection from a library search
+func (e *MageEngine) handleLibrarySearchSelection(gameState *engineGameState, player *internalPlayer, cardID string) error {
+	req := gameState.pendingLibrarySearch
+	if req == nil {
+		return fmt.Errorf("no pending library search")
+	}
+
+	if req.PlayerID != player.PlayerID {
+		return fmt.Errorf("library search is for player %s, not %s", req.PlayerID, player.PlayerID)
+	}
+
+	// Handle cancellation (empty cardID or "CANCEL")
+	if cardID == "" || strings.ToUpper(cardID) == "CANCEL" {
+		gameState.pendingLibrarySearch = nil
+		gameState.addMessage(fmt.Sprintf("%s finishes searching (found nothing)", player.Name), "action")
+
+		// Still shuffle if required
+		if req.Shuffle {
+			e.shuffleLibrary(player)
+			gameState.addMessage(fmt.Sprintf("%s shuffles their library", player.Name), "action")
+		}
+		return nil
+	}
+
+	// Find the card in the library
+	var selectedCard *internalCard
+	var cardIndex int = -1
+	for i, card := range player.Library {
+		if card != nil && card.ID == cardID {
+			selectedCard = card
+			cardIndex = i
+			break
+		}
+	}
+
+	if selectedCard == nil {
+		return fmt.Errorf("card %s not found in library", cardID)
+	}
+
+	// Remove card from library
+	player.Library = append(player.Library[:cardIndex], player.Library[cardIndex+1:]...)
+
+	// Move card to destination
+	switch req.Destination {
+	case "hand":
+		selectedCard.Zone = zoneHand
+		player.Hand = append(player.Hand, selectedCard)
+		gameState.addMessage(fmt.Sprintf("%s finds %s and puts it into their hand", player.Name, selectedCard.Name), "action")
+
+	case "battlefield":
+		selectedCard.Zone = zoneBattlefield
+		selectedCard.ControllerID = player.PlayerID
+		gameState.battlefield = append(gameState.battlefield, selectedCard)
+		gameState.addMessage(fmt.Sprintf("%s finds %s and puts it onto the battlefield", player.Name, selectedCard.Name), "action")
+
+	case "top":
+		selectedCard.Zone = zoneLibrary
+		// Put on top of library (end of slice since we draw from end)
+		player.Library = append(player.Library, selectedCard)
+		gameState.addMessage(fmt.Sprintf("%s finds %s and puts it on top of their library", player.Name, selectedCard.Name), "action")
+
+	case "graveyard":
+		selectedCard.Zone = zoneGraveyard
+		player.Graveyard = append(player.Graveyard, selectedCard)
+		gameState.addMessage(fmt.Sprintf("%s finds %s and puts it into their graveyard", player.Name, selectedCard.Name), "action")
+
+	default:
+		// Default to hand
+		selectedCard.Zone = zoneHand
+		player.Hand = append(player.Hand, selectedCard)
+		gameState.addMessage(fmt.Sprintf("%s finds %s and puts it into their hand", player.Name, selectedCard.Name), "action")
+	}
+
+	// Shuffle library if required
+	if req.Shuffle {
+		e.shuffleLibrary(player)
+		gameState.addMessage(fmt.Sprintf("%s shuffles their library", player.Name), "action")
+	}
+
+	// Clear the pending request
+	gameState.pendingLibrarySearch = nil
+
+	// Notify state change
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+		"player":      player.PlayerID,
+		"action":      "library_search_complete",
+		"card":        selectedCard.Name,
+		"destination": req.Destination,
+	})
+
+	if e.logger != nil {
+		e.logger.Info("library search completed",
+			zap.String("game_id", gameState.gameID),
+			zap.String("player", player.PlayerID),
+			zap.String("card", selectedCard.Name),
+			zap.String("destination", req.Destination),
+		)
+	}
+
+	return nil
+}
+
+// CancelLibrarySearch cancels an ongoing library search
+func (e *MageEngine) CancelLibrarySearch(gameID, playerID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	if gameState.pendingLibrarySearch == nil {
+		return fmt.Errorf("no pending library search")
+	}
+
+	if gameState.pendingLibrarySearch.PlayerID != playerID {
+		return fmt.Errorf("library search is for player %s, not %s", gameState.pendingLibrarySearch.PlayerID, playerID)
+	}
+
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Shuffle if required
+	if gameState.pendingLibrarySearch.Shuffle {
+		e.shuffleLibrary(player)
+		gameState.addMessage(fmt.Sprintf("%s shuffles their library", player.Name), "action")
+	}
+
+	gameState.addMessage(fmt.Sprintf("%s finishes searching (found nothing)", player.Name), "action")
+	gameState.pendingLibrarySearch = nil
 
 	return nil
 }
@@ -4571,6 +4873,21 @@ func (e *MageEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 
 	copy(view.Messages, gameState.messages)
 	copy(view.Prompts, gameState.prompts)
+
+	// Add pending library search if it's for this player
+	if gameState.pendingLibrarySearch != nil && gameState.pendingLibrarySearch.PlayerID == playerID {
+		req := gameState.pendingLibrarySearch
+		searchingPlayer := gameState.players[req.SearchingPlayerID]
+		if searchingPlayer != nil {
+			view.PendingLibrarySearch = &EngineLibrarySearchView{
+				PlayerID:    req.PlayerID,
+				Message:     req.Message,
+				Destination: req.Destination,
+				Cards:       e.buildCardViews(searchingPlayer.Library),
+				CanCancel:   !req.Required,
+			}
+		}
+	}
 
 	return view, nil
 }
@@ -5610,6 +5927,8 @@ func (e *MageEngine) buildCardViews(cards []*internalCard) []EngineCardView {
 
 // buildStackViews builds stack item views
 // Stack.List() returns items bottom-to-top (topmost last), so last item is top of stack
+// IMPORTANT: All stack views use item.ID (stack item ID) as their ID, not the source card ID.
+// This allows clients to reference stack items for removal via STACK_REMOVE.
 func (e *MageEngine) buildStackViews(gameState *engineGameState) []EngineCardView {
 	items := gameState.stack.List()
 	views := make([]EngineCardView, 0, len(items))
@@ -5627,7 +5946,7 @@ func (e *MageEngine) buildStackViews(gameState *engineGameState) []EngineCardVie
 				ControllerID: item.Controller,
 			})
 		} else {
-			// This is a spell - use the card view
+			// This is a spell - use the card view but with stack item ID
 			card, found := gameState.cards[item.SourceID]
 			if !found {
 				// Create a placeholder view if card not found
@@ -5640,6 +5959,8 @@ func (e *MageEngine) buildStackViews(gameState *engineGameState) []EngineCardVie
 				})
 			} else {
 				cardView := e.buildCardViews([]*internalCard{card})[0]
+				// Use stack item ID, not card ID, so clients can reference for STACK_REMOVE
+				cardView.ID = item.ID
 				cardView.Zone = zoneStack
 				views = append(views, cardView)
 			}
@@ -6920,14 +7241,46 @@ func (e *MageEngine) sacrificePermanent(gameState *engineGameState, card *intern
 // Helper methods for engineGameState
 
 func (s *engineGameState) addMessage(text, color string) {
-	s.messages = append(s.messages, EngineMessage{
-		Text:      text,
-		Color:     color,
-		Timestamp: time.Now(),
-	})
+	// If there's a current action bookmark, use it for rollback
+	if s.currentActionBookmark > 0 {
+		s.addMessageWithBookmark(text, color, s.currentActionBookmark, true)
+	} else {
+		s.addMessageWithBookmark(text, color, 0, false)
+	}
+}
+
+// addMessageWithBookmark adds a message with an associated bookmark for rollback
+func (s *engineGameState) addMessageWithBookmark(text, color string, bookmarkID int, rollbackAvailable bool) {
+	messageID := s.nextMessageID
+	s.nextMessageID++
+
+	msg := EngineMessage{
+		Text:              text,
+		Color:             color,
+		Timestamp:         time.Now(),
+		BookmarkID:        bookmarkID,
+		RollbackAvailable: rollbackAvailable,
+	}
+	s.messages = append(s.messages, msg)
+
+	// Track message-to-bookmark mapping if bookmark was provided
+	if bookmarkID > 0 {
+		if s.messageBookmarks == nil {
+			s.messageBookmarks = make(map[int]int)
+		}
+		s.messageBookmarks[messageID] = bookmarkID
+	}
+
 	// Keep only last 1000 messages
 	if len(s.messages) > 1000 {
-		s.messages = s.messages[len(s.messages)-1000:]
+		// Calculate how many messages we're removing
+		removeCount := len(s.messages) - 1000
+		// Clean up bookmark mappings for removed messages
+		for i := 0; i < removeCount; i++ {
+			oldMsgID := s.nextMessageID - len(s.messages) + i
+			delete(s.messageBookmarks, oldMsgID)
+		}
+		s.messages = s.messages[removeCount:]
 	}
 }
 
@@ -6938,6 +7291,43 @@ func (s *engineGameState) addPrompt(playerID, text string, options []string) {
 		Options:   options,
 		Timestamp: time.Now(),
 	})
+}
+
+// AddMessageWithRollback adds a game message with an associated rollback bookmark.
+// This creates a snapshot of the game state BEFORE adding the message, allowing
+// rollback to the state just before this action occurred.
+// NOTE: This method temporarily releases gameState.mu to call BookmarkState,
+// so callers must be prepared for state changes.
+func (e *MageEngine) AddMessageWithRollback(gameState *engineGameState, text, color string) {
+	// Create bookmark of current state (before the message/action)
+	// We need to release the lock temporarily since BookmarkState acquires e.mu
+	gameState.mu.Unlock()
+	bookmarkID, err := e.BookmarkState(gameState.gameID)
+	gameState.mu.Lock()
+
+	if err != nil {
+		if e.logger != nil {
+			e.logger.Warn("failed to create message bookmark",
+				zap.String("game_id", gameState.gameID),
+				zap.String("message", text),
+				zap.Error(err),
+			)
+		}
+		// Fall back to message without bookmark
+		gameState.addMessage(text, color)
+		return
+	}
+
+	// Add message with the bookmark
+	gameState.addMessageWithBookmark(text, color, bookmarkID, true)
+
+	if e.logger != nil {
+		e.logger.Debug("added message with rollback bookmark",
+			zap.String("game_id", gameState.gameID),
+			zap.Int("bookmark_id", bookmarkID),
+			zap.String("message", text),
+		)
+	}
 }
 
 // hasCommanderBehavior returns true if this game has a CommanderBehavior attached.
@@ -7438,11 +7828,41 @@ func (e *MageEngine) BookmarkState(gameID string) (int, error) {
 	e.bookmarks[gameID] = append(e.bookmarks[gameID], snapshot)
 	bookmarkID := len(e.bookmarks[gameID])
 
+	// Cleanup old bookmarks if we exceed the max
+	// When we trim, we also need to update messageBookmarks to reflect new IDs
+	if len(e.bookmarks[gameID]) > e.bookmarksMax {
+		trimCount := len(e.bookmarks[gameID]) - e.bookmarksMax
+		e.bookmarks[gameID] = e.bookmarks[gameID][trimCount:]
+
+		// Update messageBookmarks to reflect trimmed bookmark IDs
+		// Bookmarks were removed from the front, so subtract trimCount from all bookmark IDs
+		gameState.mu.Lock()
+		for msgID, oldBookmarkID := range gameState.messageBookmarks {
+			newBookmarkID := oldBookmarkID - trimCount
+			if newBookmarkID > 0 {
+				gameState.messageBookmarks[msgID] = newBookmarkID
+			} else {
+				// This bookmark was trimmed, remove the mapping
+				delete(gameState.messageBookmarks, msgID)
+			}
+		}
+		gameState.mu.Unlock()
+
+		if e.logger != nil {
+			e.logger.Debug("trimmed old bookmarks",
+				zap.String("game_id", gameID),
+				zap.Int("trimmed", trimCount),
+				zap.Int("remaining", len(e.bookmarks[gameID])),
+			)
+		}
+	}
+
 	if e.logger != nil {
 		e.logger.Debug("bookmarked game state",
 			zap.String("game_id", gameID),
 			zap.Int("bookmark_id", bookmarkID),
 			zap.Int("turn", snapshot.TurnNumber),
+			zap.Int("total_bookmarks", len(e.bookmarks[gameID])),
 		)
 	}
 
@@ -7725,6 +8145,265 @@ func (e *MageEngine) Undo(gameID, playerID string) error {
 	return nil
 }
 
+// RequestRollback initiates a rollback request to a specific message.
+// This requires opponent consent in multiplayer games.
+// Returns the request ID that can be used to track the response.
+func (e *MageEngine) RequestRollback(gameID, playerID string, messageID int) (string, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return "", fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	// Check if there's already a pending rollback request
+	if gameState.pendingRollbackRequest != nil {
+		return "", fmt.Errorf("a rollback request is already pending")
+	}
+
+	// Find the message and its bookmark
+	if messageID < 1 || messageID > len(gameState.messages) {
+		return "", fmt.Errorf("message %d not found", messageID)
+	}
+
+	message := gameState.messages[messageID-1]
+	if !message.RollbackAvailable {
+		return "", fmt.Errorf("rollback not available for message %d", messageID)
+	}
+
+	bookmarkID := message.BookmarkID
+	if bookmarkID <= 0 {
+		return "", fmt.Errorf("no bookmark available for message %d", messageID)
+	}
+
+	// Generate a unique request ID
+	requestID := uuid.New().String()
+
+	// Get requesting player's name
+	requestingPlayerName := playerID
+	if player, exists := gameState.players[playerID]; exists {
+		requestingPlayerName = player.Name
+	}
+
+	// Create the pending request
+	gameState.pendingRollbackRequest = &PendingRollbackRequest{
+		RequestID:         requestID,
+		RequestingPlayer:  playerID,
+		TargetMessageID:   messageID,
+		TargetBookmarkID:  bookmarkID,
+		TargetMessageText: message.Text,
+		Timestamp:         time.Now(),
+	}
+
+	if e.logger != nil {
+		e.logger.Info("rollback request created",
+			zap.String("game_id", gameID),
+			zap.String("request_id", requestID),
+			zap.String("player_id", playerID),
+			zap.Int("message_id", messageID),
+			zap.Int("bookmark_id", bookmarkID),
+		)
+	}
+
+	// Notify all other players about the rollback request
+	e.emitNotification(GameNotification{
+		Type:      "ROLLBACK_REQUEST",
+		GameID:    gameID,
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"request_id":             requestID,
+			"requesting_player_id":   playerID,
+			"requesting_player_name": requestingPlayerName,
+			"target_message_id":      messageID,
+			"target_message_text":    message.Text,
+		},
+	})
+
+	return requestID, nil
+}
+
+// RespondToRollback handles a player's response to a rollback request.
+// If approved by all opponents, the rollback is performed.
+func (e *MageEngine) RespondToRollback(gameID, playerID string, requestID string, approved bool) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+
+	// Verify the pending request exists and matches
+	if gameState.pendingRollbackRequest == nil {
+		gameState.mu.Unlock()
+		return fmt.Errorf("no pending rollback request")
+	}
+
+	if gameState.pendingRollbackRequest.RequestID != requestID {
+		gameState.mu.Unlock()
+		return fmt.Errorf("rollback request ID mismatch")
+	}
+
+	// Don't allow the requesting player to respond to their own request
+	if gameState.pendingRollbackRequest.RequestingPlayer == playerID {
+		gameState.mu.Unlock()
+		return fmt.Errorf("cannot respond to your own rollback request")
+	}
+
+	request := gameState.pendingRollbackRequest
+	respondingPlayerName := playerID
+	if player, exists := gameState.players[playerID]; exists {
+		respondingPlayerName = player.Name
+	}
+
+	// Clear the pending request
+	gameState.pendingRollbackRequest = nil
+	gameState.mu.Unlock()
+
+	if e.logger != nil {
+		e.logger.Info("rollback response received",
+			zap.String("game_id", gameID),
+			zap.String("request_id", requestID),
+			zap.String("responding_player", playerID),
+			zap.Bool("approved", approved),
+		)
+	}
+
+	if !approved {
+		// Notify all players that the rollback was denied
+		e.emitNotification(GameNotification{
+			Type:      "ROLLBACK_DENIED",
+			GameID:    gameID,
+			Timestamp: time.Now(),
+			Data: map[string]interface{}{
+				"request_id":             requestID,
+				"responding_player_id":   playerID,
+				"responding_player_name": respondingPlayerName,
+			},
+		})
+		return nil
+	}
+
+	// Rollback approved - perform the rollback
+	return e.RollbackToMessage(gameID, request.TargetMessageID, request.RequestingPlayer)
+}
+
+// RollbackToMessage performs a rollback to the state before a specific message was added.
+// This uses the bookmark associated with the message.
+func (e *MageEngine) RollbackToMessage(gameID string, messageID int, initiatedBy string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+
+	// Find the message and its bookmark
+	if messageID < 1 || messageID > len(gameState.messages) {
+		gameState.mu.Unlock()
+		return fmt.Errorf("message %d not found", messageID)
+	}
+
+	message := gameState.messages[messageID-1]
+	bookmarkID := message.BookmarkID
+
+	if bookmarkID <= 0 {
+		gameState.mu.Unlock()
+		return fmt.Errorf("no bookmark available for message %d", messageID)
+	}
+
+	initiatedByName := initiatedBy
+	if player, exists := gameState.players[initiatedBy]; exists {
+		initiatedByName = player.Name
+	}
+
+	gameState.mu.Unlock()
+
+	// Perform the rollback using the existing RestoreState mechanism
+	context := fmt.Sprintf("rollback to message %d by %s", messageID, initiatedByName)
+	if err := e.RestoreState(gameID, bookmarkID, context); err != nil {
+		return fmt.Errorf("failed to rollback to message %d: %w", messageID, err)
+	}
+
+	if e.logger != nil {
+		e.logger.Info("rollback to message completed",
+			zap.String("game_id", gameID),
+			zap.Int("message_id", messageID),
+			zap.Int("bookmark_id", bookmarkID),
+			zap.String("initiated_by", initiatedBy),
+		)
+	}
+
+	// Notify all players about the completed rollback
+	e.emitNotification(GameNotification{
+		Type:      "ROLLBACK_COMPLETE",
+		GameID:    gameID,
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"target_message_id": messageID,
+			"initiated_by":      initiatedBy,
+			"initiated_by_name": initiatedByName,
+		},
+	})
+
+	return nil
+}
+
+// CancelRollbackRequest cancels any pending rollback request for a game
+func (e *MageEngine) CancelRollbackRequest(gameID string) error {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.Lock()
+	defer gameState.mu.Unlock()
+
+	if gameState.pendingRollbackRequest == nil {
+		return nil // No pending request to cancel
+	}
+
+	requestID := gameState.pendingRollbackRequest.RequestID
+	gameState.pendingRollbackRequest = nil
+
+	if e.logger != nil {
+		e.logger.Info("rollback request cancelled",
+			zap.String("game_id", gameID),
+			zap.String("request_id", requestID),
+		)
+	}
+
+	return nil
+}
+
+// GetPendingRollbackRequest returns the pending rollback request for a game, if any
+func (e *MageEngine) GetPendingRollbackRequest(gameID string) (*PendingRollbackRequest, error) {
+	e.mu.RLock()
+	gameState, exists := e.games[gameID]
+	e.mu.RUnlock()
+
+	if !exists {
+		return nil, fmt.Errorf("game %s not found", gameID)
+	}
+
+	gameState.mu.RLock()
+	defer gameState.mu.RUnlock()
+
+	return gameState.pendingRollbackRequest, nil
+}
+
 // SaveTurnSnapshot saves a snapshot at the start of a turn for turn rollback
 // Per Java GameImpl.saveRollBackGameState(): keeps last N turns for rollback
 func (e *MageEngine) SaveTurnSnapshot(gameID string, turnNumber int) error {
@@ -7996,11 +8675,13 @@ func (e *MageEngine) LoadGameFromSnapshot(gameID, tableID, gameType string, play
 			turnStartTimes: make(map[int]time.Time),
 			gameStartTime:  time.Now(),
 		},
-		messages:       make([]EngineMessage, 0),
-		prompts:        make([]EnginePrompt, 0),
-		startedAt:      time.Now(), // Use current time for restored game
-		lki:            make(map[string]*LastKnownInfo),
-		lkiZoneCounter: make(map[string]int),
+		messages:         make([]EngineMessage, 0),
+		prompts:          make([]EnginePrompt, 0),
+		startedAt:        time.Now(), // Use current time for restored game
+		lki:              make(map[string]*LastKnownInfo),
+		lkiZoneCounter:   make(map[string]int),
+		messageBookmarks: make(map[int]int),
+		nextMessageID:    1,
 	}
 
 	// Restore player order
@@ -9383,111 +10064,50 @@ func (e *MageEngine) CanAttackDefender(gameID, creatureID, defenderID string) (b
 // This is an internal helper for use when gameState.mu is already held
 // Per Java Permanent.canAttack(null, game) and canAttackInPrinciple(null, game)
 func (e *MageEngine) canAttackInternal(gameState *engineGameState, creature *internalCard) bool {
-	// Basic checks (Java: Permanent.canAttack line 1485)
-	if creature.Tapped {
-		return false
-	}
-
-	// Check if can attack in principle (Java: canAttackInPrinciple line 1504)
-	// Check summoning sickness
-	// TODO: Implement AsThoughEffectType.ATTACK_AS_HASTE for haste effects
-	if creature.SummoningSickness {
-		return false
-	}
-
-	// Check defender ability (Java: line 1527)
-	// TODO: Implement AsThoughEffectType.ATTACK for effects that allow defender to attack
-	if e.hasAbility(creature, abilityDefender) {
-		return false
-	}
-
-	// Check for continuous effects that prevent attacking
-	// Per Java: RestrictionEffect.applies() and canAttack() checks
-	if e.hasCantAttackEffect(gameState, creature.ID) {
-		return false
-	}
-
-	// Check if can attack at least one defender (Java: line 1516-1522)
-	for defenderID := range gameState.combat.defenders {
-		if canAttack, _ := e.canAttackDefenderInternal(gameState, creature, defenderID); canAttack {
-			return true
-		}
-	}
-
-	return false
+	// RULES-LIGHT: All creatures can attack - players handle restrictions manually
+	// Original checks (tapped, summoning sickness, defender, cant-attack effects) are removed
+	// The UI can still show hints about these conditions
+	_ = gameState // Keep parameter for interface compatibility
+	return creature != nil && creature.Zone == zoneBattlefield
 }
 
 // canAttackDefenderInternal checks if a creature can attack a specific defender (internal helper)
 // Per Java Permanent.canAttackInPrinciple(defenderId, game)
 func (e *MageEngine) canAttackDefenderInternal(gameState *engineGameState, creature *internalCard, defenderID string) (bool, error) {
-	// Check summoning sickness
-	// TODO: Implement AsThoughEffectType.ATTACK_AS_HASTE for haste effects
-	if creature.SummoningSickness {
-		return false, nil
-	}
-
-	// Check defender ability (Java: line 1527)
-	// TODO: Implement AsThoughEffectType.ATTACK for effects that allow defender to attack
-	if e.hasAbility(creature, abilityDefender) {
-		return false, nil
-	}
-
-	// Check if defender is valid
-	if !gameState.combat.defenders[defenderID] {
-		return false, fmt.Errorf("defender %s is not a valid defender", defenderID)
-	}
-
-	// TODO: Implement restriction effects (Java: canAttackCheckRestrictionEffects line 1531)
-	// This requires the continuous effects system to check:
-	// - RestrictionEffect.canAttack(game, true)
-	// - RestrictionEffect.canAttack(creature, defenderId, ability, game, true)
-	// Examples: "can't attack", "can only attack if X", "can't attack player Y"
-
+	// RULES-LIGHT: Any creature can attack any defender - players handle restrictions
+	// Original checks (summoning sickness, defender ability, restriction effects) are removed
+	_ = creature   // Keep parameter for interface compatibility
+	_ = defenderID // Keep parameter for interface compatibility
+	_ = gameState  // Keep parameter for interface compatibility
 	return true, nil
 }
 
 // declareAttackerInternal declares a creature as an attacker without acquiring locks
 // This is an internal helper for use when gameState.mu is already held
-// Per Java Combat.declareAttacker()
+// RULES-LIGHT: Validation removed - players control what attacks what
 func (e *MageEngine) declareAttackerInternal(gameState *engineGameState, creatureID, defenderID, playerID string) error {
-	// Validate player
-	if playerID != gameState.combat.attackingPlayerID {
-		return fmt.Errorf("player %s is not the attacking player", playerID)
-	}
-
-	// Validate creature exists and is controlled by player
+	// Basic existence check only
 	creature, exists := gameState.cards[creatureID]
 	if !exists {
 		return fmt.Errorf("creature %s not found", creatureID)
 	}
 
-	if creature.ControllerID != playerID {
-		return fmt.Errorf("creature %s is not controlled by player %s", creatureID, playerID)
-	}
-
-	// Validate creature is on battlefield
-	if creature.Zone != zoneBattlefield {
-		return fmt.Errorf("creature %s is not on battlefield", creatureID)
-	}
-
-	// Validate creature can attack (not tapped, not summoning sick)
-	if creature.Tapped {
-		return fmt.Errorf("creature %s is tapped", creatureID)
-	}
-
-	// Check for defender ability
-	if e.hasAbility(creature, abilityDefender) {
-		return fmt.Errorf("creature %s has defender and cannot attack", creatureID)
-	}
+	// RULES-LIGHT: Removed validation for:
+	// - Player being the attacking player
+	// - Controller matching player
+	// - Zone being battlefield
+	// - Tapped status
+	// - Defender ability
 
 	// Fire declare attackers step pre event (before first attacker)
 	if len(gameState.combat.attackers) == 0 {
 		gameState.eventBus.Publish(rules.NewEvent(rules.EventDeclareAttackersStepPre, "", "", playerID))
 	}
 
-	// Validate defender exists
+	// RULES-LIGHT: Accept any defender - no validation
 	if !gameState.combat.defenders[defenderID] {
-		return fmt.Errorf("invalid defender %s", defenderID)
+		// Add it as a valid defender on the fly
+		gameState.combat.defenders[defenderID] = true
 	}
 
 	// Determine if defender is a permanent (planeswalker/battle) or player
@@ -9970,76 +10590,21 @@ func (e *MageEngine) DeclareBlocker(gameID, blockerID, attackerID, playerID stri
 }
 
 // canBlockInternal is an internal version of CanBlock that works with locked state
+// RULES-LIGHT: All blocking is allowed - players handle restrictions manually
 func (e *MageEngine) canBlockInternal(gameState *engineGameState, blockerID, attackerID string) (bool, error) {
-	// Get blocker
-	blocker, exists := gameState.cards[blockerID]
-	if !exists {
+	// Basic existence checks only
+	_, blockerExists := gameState.cards[blockerID]
+	if !blockerExists {
 		return false, fmt.Errorf("blocker %s not found", blockerID)
 	}
 
-	// Get attacker
-	_, exists = gameState.cards[attackerID]
-	if !exists {
+	_, attackerExists := gameState.cards[attackerID]
+	if !attackerExists {
 		return false, fmt.Errorf("attacker %s not found", attackerID)
 	}
 
-	// Basic checks (same as CanBlock)
-	if blocker.Tapped {
-		return false, nil
-	}
-
-	if !strings.Contains(blocker.Type, "Creature") {
-		return false, nil
-	}
-
-	if blocker.Zone != zoneBattlefield {
-		return false, nil
-	}
-
-	if !gameState.combat.attackers[attackerID] {
-		return false, nil
-	}
-
-	// Find defending player
-	var defendingPlayerID string
-	for _, group := range gameState.combat.groups {
-		for _, aid := range group.attackers {
-			if aid == attackerID {
-				defendingPlayerID = group.defendingPlayerID
-				break
-			}
-		}
-		if defendingPlayerID != "" {
-			break
-		}
-	}
-
-	if defendingPlayerID == "" {
-		return false, fmt.Errorf("attacker %s not found in any combat group", attackerID)
-	}
-
-	if blocker.ControllerID != defendingPlayerID {
-		return false, nil
-	}
-
-	// Get attacker for evasion checks
-	attacker := gameState.cards[attackerID]
-
-	// Unblockable check: If attacker has "can't be blocked" ability, it cannot be blocked by any creature
-	// Per Rule 509.1b and Java CantBeBlockedSourceEffect.canBeBlocked() which returns false
-	if e.hasAbility(attacker, abilityUnblockable) {
-		return false, nil
-	}
-
-	// Flying restriction: creatures with flying can only be blocked by creatures with flying or reach
-	// Exception: Dragons can be blocked by non-flying creatures with special abilities (AsThoughEffectType.BLOCK_DRAGON)
-	if e.hasAbility(attacker, abilityFlying) {
-		if !e.hasAbility(blocker, abilityFlying) && !e.hasAbility(blocker, abilityReach) {
-			// TODO: Check for AsThoughEffectType.BLOCK_DRAGON and attacker.hasSubtype(SubType.DRAGON)
-			return false, nil
-		}
-	}
-
+	// RULES-LIGHT: All other restrictions (tapped, flying/reach, unblockable) are removed
+	// Players are trusted to follow blocking rules manually
 	return true, nil
 }
 
@@ -12542,6 +13107,626 @@ func parseColors(colorStr string) []string {
 		}
 	}
 	return colors
+}
+
+// ====================================
+// Direct Manipulation Handlers (Rules-Light)
+// ====================================
+
+// handleDirectTap directly taps or untaps a card
+func (e *MageEngine) handleDirectTap(gameState *engineGameState, cardID string, tapped bool) error {
+	card, exists := gameState.cards[cardID]
+	if !exists {
+		return fmt.Errorf("card %s not found", cardID)
+	}
+
+	card.Tapped = tapped
+	action := "tapped"
+	if !tapped {
+		action = "untapped"
+	}
+	gameState.addMessage(fmt.Sprintf("%s was %s", card.Name, action), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": action, "card_id": cardID})
+	return nil
+}
+
+// handleDirectUntapAll untaps all permanents controlled by a player
+func (e *MageEngine) handleDirectUntapAll(gameState *engineGameState, playerID string) error {
+	untappedCount := 0
+	for _, card := range gameState.battlefield {
+		if card == nil {
+			continue
+		}
+		if card.ControllerID == playerID && card.Tapped {
+			card.Tapped = false
+			untappedCount++
+		}
+	}
+
+	if untappedCount > 0 {
+		gameState.addMessage(fmt.Sprintf("%s untapped all permanents (%d)", playerID, untappedCount), "action")
+		e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "untap_all", "player_id": playerID, "count": untappedCount})
+	}
+	return nil
+}
+
+// handleDirectFlip directly flips a card face-up or face-down
+func (e *MageEngine) handleDirectFlip(gameState *engineGameState, cardID string, faceDown bool) error {
+	card, exists := gameState.cards[cardID]
+	if !exists {
+		return fmt.Errorf("card %s not found", cardID)
+	}
+
+	card.FaceDown = faceDown
+	action := "turned face-down"
+	if !faceDown {
+		action = "turned face-up"
+	}
+	gameState.addMessage(fmt.Sprintf("%s was %s", card.Name, action), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "flip", "card_id": cardID})
+	return nil
+}
+
+// handleDirectTransform directly transforms a double-faced card
+func (e *MageEngine) handleDirectTransform(gameState *engineGameState, cardID string) error {
+	card, exists := gameState.cards[cardID]
+	if !exists {
+		return fmt.Errorf("card %s not found", cardID)
+	}
+
+	card.Transformed = !card.Transformed
+	gameState.addMessage(fmt.Sprintf("%s transformed", card.Name), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "transform", "card_id": cardID})
+	return nil
+}
+
+// handleDirectMove directly moves a card to a new zone
+func (e *MageEngine) handleDirectMove(gameState *engineGameState, playerID, cardID, zoneName string) error {
+	card, exists := gameState.cards[cardID]
+	if !exists {
+		return fmt.Errorf("card %s not found", cardID)
+	}
+
+	// Parse target zone
+	targetZone := directParseZone(strings.ToUpper(zoneName))
+	if targetZone == -1 {
+		return fmt.Errorf("invalid zone: %s", zoneName)
+	}
+
+	oldZone := card.Zone
+
+	// Remove from old zone
+	e.directRemoveCardFromZone(gameState, card)
+
+	// Move to new zone
+	card.Zone = targetZone
+
+	// Add to new zone
+	player, exists := gameState.players[card.OwnerID]
+	if !exists {
+		player = gameState.players[playerID]
+	}
+	switch targetZone {
+	case zoneHand:
+		if player != nil {
+			player.Hand = append(player.Hand, card)
+		}
+	case zoneGraveyard:
+		if player != nil {
+			player.Graveyard = append(player.Graveyard, card)
+		}
+	case zoneLibrary:
+		if player != nil {
+			// Top of library (prepend)
+			player.Library = append([]*internalCard{card}, player.Library...)
+		}
+		card.Zone = zoneLibrary // Set actual zone
+	case zoneLibraryBottom:
+		if player != nil {
+			// Bottom of library (append)
+			player.Library = append(player.Library, card)
+		}
+		card.Zone = zoneLibrary // Set actual zone (library, just positioned at bottom)
+	case zoneBattlefield:
+		gameState.battlefield = append(gameState.battlefield, card)
+	case zoneExile:
+		gameState.exile = append(gameState.exile, card)
+	case zoneCommand:
+		gameState.command = append(gameState.command, card)
+	}
+
+	displayZoneName := zoneName
+	if targetZone == zoneLibraryBottom {
+		displayZoneName = "bottom of library"
+	}
+	gameState.addMessage(fmt.Sprintf("%s moved from %s to %s", card.Name, zoneToString(oldZone), displayZoneName), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "move", "card_id": cardID, "zone": zoneName})
+	return nil
+}
+
+// handleDirectStackAdd adds a card to the visual stack WITHOUT moving it from its current zone.
+// This is for rules-light manual tracking - the card stays on battlefield/hand/etc but appears in the stack.
+// Per rules-light design: players manually track what's "on the stack" for communication purposes.
+func (e *MageEngine) handleDirectStackAdd(gameState *engineGameState, playerID, cardID string) error {
+	card, exists := gameState.cards[cardID]
+	if !exists {
+		return fmt.Errorf("card %s not found", cardID)
+	}
+
+	// Create a stack item for visual tracking (card stays in its current zone)
+	stackItemID := uuid.New().String()
+	stackItem := rules.StackItem{
+		ID:          stackItemID,
+		Controller:  playerID,
+		Description: fmt.Sprintf("%s puts %s on stack", playerID, card.Name),
+		Kind:        rules.StackItemKindSpell, // Use spell kind for visual display
+		SourceID:    cardID,
+		Metadata:    make(map[string]string),
+	}
+	stackItem.Metadata["manual_add"] = "true"
+	stackItem.Metadata["source_zone"] = zoneToString(card.Zone)
+
+	gameState.stack.Push(stackItem)
+
+	gameState.addMessage(fmt.Sprintf("%s adds %s to the stack", playerID, card.Name), "action")
+	e.notifyStackUpdate(gameState.gameID, map[string]interface{}{
+		"action":      "stack_add",
+		"player_id":   playerID,
+		"card_id":     cardID,
+		"card_name":   card.Name,
+		"stack_depth": len(gameState.stack.List()),
+	})
+	return nil
+}
+
+// handleDirectStackRemove removes an item from the stack (for manual resolution tracking)
+func (e *MageEngine) handleDirectStackRemove(gameState *engineGameState, playerID, itemID string) error {
+	removedItem, found := gameState.stack.Remove(itemID)
+	if !found {
+		return fmt.Errorf("stack item %s not found", itemID)
+	}
+
+	gameState.addMessage(fmt.Sprintf("%s removes %s from the stack", playerID, removedItem.Description), "action")
+	e.notifyStackUpdate(gameState.gameID, map[string]interface{}{
+		"action":      "stack_remove",
+		"player_id":   playerID,
+		"item_id":     itemID,
+		"stack_depth": len(gameState.stack.List()),
+	})
+	return nil
+}
+
+// handleDirectSetCounter sets a counter on a card to a specific value
+func (e *MageEngine) handleDirectSetCounter(gameState *engineGameState, cardID, counterType string, amount int) error {
+	card, exists := gameState.cards[cardID]
+	if !exists {
+		return fmt.Errorf("card %s not found", cardID)
+	}
+
+	if card.Counters == nil {
+		card.Counters = counters.NewCounters()
+	}
+
+	// Remove existing counters of this type first
+	card.Counters.RemoveCounter(counterType, card.Counters.GetCount(counterType))
+
+	// Add new amount if positive
+	if amount > 0 {
+		card.Counters.AddCounter(counters.NewCounter(counterType, amount))
+	}
+
+	gameState.addMessage(fmt.Sprintf("Set %d %s counters on %s", amount, counterType, card.Name), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "set_counter", "card_id": cardID})
+	return nil
+}
+
+// handleDirectModifyCounter adds or removes counters from a card
+func (e *MageEngine) handleDirectModifyCounter(gameState *engineGameState, cardID, counterType string, delta int) error {
+	card, exists := gameState.cards[cardID]
+	if !exists {
+		return fmt.Errorf("card %s not found", cardID)
+	}
+
+	if card.Counters == nil {
+		card.Counters = counters.NewCounters()
+	}
+
+	oldAmount := card.Counters.GetCount(counterType)
+	newAmount := oldAmount + delta
+	if newAmount < 0 {
+		newAmount = 0
+	}
+
+	if delta > 0 {
+		card.Counters.AddCounter(counters.NewCounter(counterType, delta))
+	} else if delta < 0 {
+		card.Counters.RemoveCounter(counterType, -delta)
+	}
+
+	action := "added"
+	absDelta := delta
+	if delta < 0 {
+		action = "removed"
+		absDelta = -delta
+	}
+	gameState.addMessage(fmt.Sprintf("%s %d %s counters on %s (now %d)", action, absDelta, counterType, card.Name, newAmount), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "modify_counter", "card_id": cardID})
+	return nil
+}
+
+// handleDirectCreateToken creates a new token on the battlefield
+func (e *MageEngine) handleDirectCreateToken(gameState *engineGameState, playerID, name, types, power, toughness, color string, abilities []string) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	tokenID := uuid.New().String()
+	token := &internalCard{
+		ID:           tokenID,
+		Name:         name,
+		DisplayName:  name + " Token",
+		Type:         types,
+		Power:        power,
+		Toughness:    toughness,
+		Color:        color,
+		Zone:         zoneBattlefield,
+		ControllerID: playerID,
+		OwnerID:      playerID,
+		IsToken:      true,
+		Counters:     counters.NewCounters(),
+		Metadata:     make(map[string]string),
+	}
+
+	// Parse abilities into the card
+	for _, ability := range abilities {
+		ability = strings.TrimSpace(ability)
+		if ability != "" {
+			token.RulesText += ability + "\n"
+		}
+	}
+
+	gameState.cards[tokenID] = token
+	gameState.battlefield = append(gameState.battlefield, token)
+
+	gameState.addMessage(fmt.Sprintf("%s created a %s token", player.Name, name), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "create_token", "token_id": tokenID})
+	return nil
+}
+
+// handleDirectDestroyToken removes a token from the game
+func (e *MageEngine) handleDirectDestroyToken(gameState *engineGameState, cardID string) error {
+	card, exists := gameState.cards[cardID]
+	if !exists {
+		return fmt.Errorf("card %s not found", cardID)
+	}
+
+	if !card.IsToken {
+		return fmt.Errorf("%s is not a token", card.Name)
+	}
+
+	name := card.Name
+	e.directRemoveCardFromZone(gameState, card)
+	delete(gameState.cards, cardID)
+
+	gameState.addMessage(fmt.Sprintf("%s token was destroyed", name), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "destroy_token", "card_id": cardID})
+	return nil
+}
+
+// handleDirectSetLife sets a player's life total directly
+func (e *MageEngine) handleDirectSetLife(gameState *engineGameState, playerID string, amount int) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	oldLife := player.Life
+	player.Life = amount
+
+	gameState.addMessage(fmt.Sprintf("%s's life changed from %d to %d", player.Name, oldLife, amount), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "set_life", "player_id": playerID})
+	return nil
+}
+
+// handleDirectModifyLife adds or removes life from a player
+func (e *MageEngine) handleDirectModifyLife(gameState *engineGameState, playerID string, delta int) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	player.Life += delta
+	action := "gained"
+	absDelta := delta
+	if delta < 0 {
+		action = "lost"
+		absDelta = -delta
+	}
+
+	gameState.addMessage(fmt.Sprintf("%s %s %d life (now %d)", player.Name, action, absDelta, player.Life), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "modify_life", "player_id": playerID})
+	return nil
+}
+
+// handleDirectDraw draws cards for a player
+func (e *MageEngine) handleDirectDraw(gameState *engineGameState, playerID string, count int) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	drawn := 0
+	for i := 0; i < count && len(player.Library) > 0; i++ {
+		card := player.Library[0]
+		player.Library = player.Library[1:]
+		card.Zone = zoneHand
+		player.Hand = append(player.Hand, card)
+		drawn++
+	}
+
+	gameState.addMessage(fmt.Sprintf("%s drew %d card(s)", player.Name, drawn), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "draw", "player_id": playerID, "count": drawn})
+	return nil
+}
+
+// handleDirectNextTurn advances to the next turn
+// RULES-LIGHT: This allows players to manually advance turns without going through each phase
+func (e *MageEngine) handleDirectNextTurn(gameState *engineGameState, requestingPlayerID string) error {
+	// Clear combat state first
+	e.handleDirectClearCombat(gameState)
+
+	// Get current turn number for logging
+	oldTurn := gameState.turnManager.TurnNumber()
+	oldActivePlayer := gameState.turnManager.ActivePlayer()
+
+	// Determine next active player (rotate in player order)
+	playerIDs := make([]string, 0, len(gameState.players))
+	for pid := range gameState.players {
+		playerIDs = append(playerIDs, pid)
+	}
+	// Sort to ensure consistent order
+	sort.Strings(playerIDs)
+
+	nextPlayerIndex := 0
+	for i, pid := range playerIDs {
+		if pid == oldActivePlayer {
+			nextPlayerIndex = (i + 1) % len(playerIDs)
+			break
+		}
+	}
+	nextActivePlayer := playerIDs[nextPlayerIndex]
+
+	// Advance the turn manager to the beginning of a new turn
+	// We'll advance step by step until we reach the cleanup step and wrap to a new turn
+	for {
+		phase, step := gameState.turnManager.AdvanceStep(nextActivePlayer)
+		if phase == rules.PhaseBeginning && step == rules.StepUntap {
+			// We've wrapped to a new turn
+			break
+		}
+	}
+
+	newTurn := gameState.turnManager.TurnNumber()
+	newActivePlayer := gameState.turnManager.ActivePlayer()
+
+	// Reset lands played for the new active player
+	if player, exists := gameState.players[newActivePlayer]; exists {
+		player.LandsPlayedThisTurn = 0
+	}
+
+	// Perform untap step for the new active player
+	e.performUntapStep(gameState, newActivePlayer)
+
+	// Set priority to the new active player
+	gameState.turnManager.SetPriority(newActivePlayer)
+	if player, exists := gameState.players[newActivePlayer]; exists {
+		player.HasPriority = true
+	}
+
+	// Reset priority for old active player
+	if oldActivePlayer != newActivePlayer {
+		if oldPlayer, exists := gameState.players[oldActivePlayer]; exists {
+			oldPlayer.HasPriority = false
+		}
+	}
+
+	// Clear any auto-pass settings that are turn-based
+	for _, player := range gameState.players {
+		if player.PassUntil == PassUntilNextTurn {
+			player.PassUntil = PassUntilNone
+		}
+		// Check PassUntilMyNextTurn
+		if player.PassUntil == PassUntilMyNextTurn && player.PlayerID == newActivePlayer {
+			player.PassUntil = PassUntilNone
+		}
+	}
+
+	gameState.addMessage(fmt.Sprintf("Turn %d → Turn %d (%s's turn)", oldTurn, newTurn, newActivePlayer), "turn")
+
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+		"action":        "next_turn",
+		"old_turn":      oldTurn,
+		"new_turn":      newTurn,
+		"active_player": newActivePlayer,
+		"requested_by":  requestingPlayerID,
+	})
+
+	return nil
+}
+
+// handleDirectClearCombat clears all combat state
+// RULES-LIGHT: This allows players to manually clear combat
+func (e *MageEngine) handleDirectClearCombat(gameState *engineGameState) error {
+	// Clear attacking/blocking status from all creatures
+	for _, card := range gameState.battlefield {
+		if card.Attacking {
+			card.Attacking = false
+			card.AttackingWhat = ""
+		}
+		if card.Blocking {
+			card.Blocking = false
+			card.BlockingWhat = nil
+		}
+	}
+
+	// Reset combat state
+	gameState.combat = newCombatState()
+
+	gameState.addMessage("Combat cleared", "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "clear_combat"})
+	return nil
+}
+
+// handleDirectShuffle shuffles a player's library
+func (e *MageEngine) handleDirectShuffle(gameState *engineGameState, playerID string) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Use existing shuffleLibrary which uses crypto/rand
+	e.shuffleLibrary(player)
+
+	gameState.addMessage(fmt.Sprintf("%s shuffles their library", player.Name), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{"action": "shuffle", "player_id": playerID})
+	return nil
+}
+
+// handleDirectSetPlayerCounter sets a counter on a player (poison, energy, etc.)
+func (e *MageEngine) handleDirectSetPlayerCounter(gameState *engineGameState, playerID, counterType string, amount int) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	// Handle common counter types
+	switch strings.ToLower(counterType) {
+	case "poison":
+		player.Poison = amount
+	case "energy":
+		player.Energy = amount
+	default:
+		// For other counter types, just log but don't store (struct doesn't support generic counters)
+		gameState.addMessage(fmt.Sprintf("%s set %s counters to %d (advisory only)", player.Name, counterType, amount), "action")
+		e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+			"action":       "set_player_counter",
+			"player_id":    playerID,
+			"counter_type": counterType,
+			"amount":       amount,
+		})
+		return nil
+	}
+
+	gameState.addMessage(fmt.Sprintf("%s now has %d %s counters", player.Name, amount, counterType), "action")
+	e.notifyGameStateChange(gameState.gameID, map[string]interface{}{
+		"action":       "set_player_counter",
+		"player_id":    playerID,
+		"counter_type": counterType,
+		"amount":       amount,
+	})
+	return nil
+}
+
+// handleDirectSearchLibrary initiates a library search for a player
+// RULES-LIGHT: This reveals the library contents to the player so they can use MOVE commands
+func (e *MageEngine) handleDirectSearchLibrary(gameState *engineGameState, playerID, destination string, shuffle bool, message string) error {
+	player, exists := gameState.players[playerID]
+	if !exists {
+		return fmt.Errorf("player %s not found", playerID)
+	}
+
+	if len(player.Library) == 0 {
+		gameState.addMessage(fmt.Sprintf("%s's library is empty", player.Name), "action")
+		return nil
+	}
+
+	// Check if there's already a pending library search
+	if gameState.pendingLibrarySearch != nil {
+		return fmt.Errorf("there is already a pending library search")
+	}
+
+	promptMsg := "Search your library"
+	if message != "" {
+		promptMsg = fmt.Sprintf("Search your library for %s", message)
+	}
+
+	gameState.addMessage(fmt.Sprintf("%s searches their library", player.Name), "action")
+
+	// Create the pending library search request - this populates GameView.PendingLibrarySearch
+	gameState.pendingLibrarySearch = &PendingLibrarySearchRequest{
+		PlayerID:          playerID,
+		SearchingPlayerID: playerID,
+		Message:           promptMsg,
+		Destination:       destination,
+		Shuffle:           shuffle,
+		Required:          false, // Player can cancel
+		Timestamp:         time.Now(),
+	}
+
+	return nil
+}
+
+// directParseZone converts a zone name string to zone constant
+// Special zone constant for bottom of library (not a real zone, but used for move logic)
+const zoneLibraryBottom = 100
+
+func directParseZone(zoneName string) int {
+	switch strings.ToUpper(zoneName) {
+	case "HAND":
+		return zoneHand
+	case "LIBRARY", "DECK":
+		return zoneLibrary
+	case "LIBRARY_BOTTOM", "DECK_BOTTOM", "BOTTOM":
+		return zoneLibraryBottom
+	case "GRAVEYARD", "GRAVE":
+		return zoneGraveyard
+	case "BATTLEFIELD", "PLAY":
+		return zoneBattlefield
+	case "STACK":
+		return zoneStack
+	case "EXILE", "EXILED":
+		return zoneExile
+	case "COMMAND", "COMMAND_ZONE":
+		return zoneCommand
+	default:
+		return -1
+	}
+}
+
+// directRemoveCardFromZone removes a card from its current zone
+func (e *MageEngine) directRemoveCardFromZone(gameState *engineGameState, card *internalCard) {
+	// Remove from player zones
+	for _, player := range gameState.players {
+		switch card.Zone {
+		case zoneHand:
+			player.Hand = directRemoveCard(player.Hand, card.ID)
+		case zoneLibrary:
+			player.Library = directRemoveCard(player.Library, card.ID)
+		case zoneGraveyard:
+			player.Graveyard = directRemoveCard(player.Graveyard, card.ID)
+		}
+	}
+	// Remove from game-level zones
+	switch card.Zone {
+	case zoneBattlefield:
+		gameState.battlefield = directRemoveCard(gameState.battlefield, card.ID)
+	case zoneExile:
+		gameState.exile = directRemoveCard(gameState.exile, card.ID)
+	case zoneCommand:
+		gameState.command = directRemoveCard(gameState.command, card.ID)
+	}
+}
+
+// directRemoveCard removes a card by ID from a slice
+func directRemoveCard(cards []*internalCard, cardID string) []*internalCard {
+	result := make([]*internalCard, 0, len(cards))
+	for _, c := range cards {
+		if c.ID != cardID {
+			result = append(result, c)
+		}
+	}
+	return result
 }
 
 // ====================================

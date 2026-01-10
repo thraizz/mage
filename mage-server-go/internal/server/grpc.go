@@ -679,6 +679,17 @@ func (s *mageServer) engineViewToProto(engineView interface{}, playerID string) 
 		view.StartTime = timestamppb.New(data.StartedAt)
 	}
 
+	// Include pending library search if present
+	if data.PendingLibrarySearch != nil {
+		view.PendingLibrarySearch = &pb.LibrarySearchView{
+			PlayerId:    data.PendingLibrarySearch.PlayerID,
+			Message:     data.PendingLibrarySearch.Message,
+			Destination: data.PendingLibrarySearch.Destination,
+			Cards:       engineCardsToProto(data.PendingLibrarySearch.Cards),
+			CanCancel:   data.PendingLibrarySearch.CanCancel,
+		}
+	}
+
 	return view
 }
 

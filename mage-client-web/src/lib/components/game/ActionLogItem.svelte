@@ -9,11 +9,23 @@
 
 	let {
 		action,
-		playerColor = '#667eea'
+		playerColor = '#667eea',
+		onRequestRollback
 	}: {
 		action: ActionLogEntry;
 		playerColor?: string;
+		onRequestRollback?: (_messageId: number) => void;
 	} = $props();
+
+	/**
+	 * Handle rollback button click
+	 */
+	function handleRollbackClick(e: MouseEvent): void {
+		e.stopPropagation();
+		if (action.bookmarkId && onRequestRollback) {
+			onRequestRollback(action.bookmarkId);
+		}
+	}
 
 	/**
 	 * Get icon for action type
@@ -63,7 +75,7 @@
 	}
 </script>
 
-<div class="action-log-item" class:is-system={action.type === 'system'}>
+<div class="action-log-item" class:is-system={action.type === 'system'} class:has-rollback={action.rollbackAvailable}>
 	<div class="action-time">{formatTime(action.timestamp)}</div>
 
 	<div class="action-content">
@@ -83,6 +95,16 @@
 			{/if}
 		</div>
 	</div>
+
+	{#if action.rollbackAvailable && onRequestRollback}
+		<button
+			class="rollback-btn"
+			onclick={handleRollbackClick}
+			title="Rollback to this point"
+		>
+			Rollback
+		</button>
+	{/if}
 </div>
 
 <style>
@@ -160,5 +182,36 @@
 
 	.is-system .action-player {
 		display: none;
+	}
+
+	/* Rollback button styles */
+	.rollback-btn {
+		opacity: 0;
+		padding: 0.25rem 0.5rem;
+		font-size: 0.7rem;
+		font-weight: 600;
+		color: #f59e0b;
+		background: rgba(245, 158, 11, 0.1);
+		border: 1px solid rgba(245, 158, 11, 0.3);
+		border-radius: 4px;
+		cursor: pointer;
+		transition: all 0.15s;
+		flex-shrink: 0;
+		align-self: center;
+	}
+
+	.action-log-item.has-rollback:hover .rollback-btn {
+		opacity: 1;
+	}
+
+	.rollback-btn:hover {
+		background: rgba(245, 158, 11, 0.2);
+		border-color: rgba(245, 158, 11, 0.5);
+		color: #fbbf24;
+	}
+
+	.rollback-btn:active {
+		background: rgba(245, 158, 11, 0.3);
+		transform: scale(0.95);
 	}
 </style>

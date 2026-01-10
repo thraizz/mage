@@ -423,3 +423,16 @@ func (ea *EngineAdapter) GetGameView(gameID, playerID string) (interface{}, erro
 	}
 	return ea.engine.GetGameView(gameID, playerID)
 }
+
+// GetMageEngine returns the underlying MageEngine if available.
+// This is used for advanced operations like rollback that require
+// direct access to the MageEngine's methods.
+func (ea *EngineAdapter) GetMageEngine() *MageEngine {
+	if ea == nil || ea.engine == nil {
+		return nil
+	}
+	if mageEngine, ok := ea.engine.(*MageEngine); ok {
+		return mageEngine
+	}
+	return nil
+}

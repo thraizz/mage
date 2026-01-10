@@ -735,6 +735,8 @@ type GameView struct {
 	IsMulliganPhase      bool   `protobuf:"varint,23,opt,name=is_mulligan_phase,json=isMulliganPhase,proto3" json:"is_mulligan_phase,omitempty"`
 	LandsPlayedThisTurn  int32  `protobuf:"varint,24,opt,name=lands_played_this_turn,json=landsPlayedThisTurn,proto3" json:"lands_played_this_turn,omitempty"`
 	LandsAllowedThisTurn int32  `protobuf:"varint,25,opt,name=lands_allowed_this_turn,json=landsAllowedThisTurn,proto3" json:"lands_allowed_this_turn,omitempty"`
+	// Pending library search (if any) - only visible to the searching player
+	PendingLibrarySearch *LibrarySearchView `protobuf:"bytes,30,opt,name=pending_library_search,json=pendingLibrarySearch,proto3" json:"pending_library_search,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -937,6 +939,90 @@ func (x *GameView) GetLandsAllowedThisTurn() int32 {
 	return 0
 }
 
+func (x *GameView) GetPendingLibrarySearch() *LibrarySearchView {
+	if x != nil {
+		return x.PendingLibrarySearch
+	}
+	return nil
+}
+
+// LibrarySearchView represents a pending library search interaction
+type LibrarySearchView struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerId      string                 `protobuf:"bytes,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Destination   string                 `protobuf:"bytes,3,opt,name=destination,proto3" json:"destination,omitempty"` // "hand", "battlefield", "top", "graveyard"
+	Cards         []*CardView            `protobuf:"bytes,4,rep,name=cards,proto3" json:"cards,omitempty"`
+	CanCancel     bool                   `protobuf:"varint,5,opt,name=can_cancel,json=canCancel,proto3" json:"can_cancel,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LibrarySearchView) Reset() {
+	*x = LibrarySearchView{}
+	mi := &file_mage_v1_models_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LibrarySearchView) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LibrarySearchView) ProtoMessage() {}
+
+func (x *LibrarySearchView) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_models_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LibrarySearchView.ProtoReflect.Descriptor instead.
+func (*LibrarySearchView) Descriptor() ([]byte, []int) {
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *LibrarySearchView) GetPlayerId() string {
+	if x != nil {
+		return x.PlayerId
+	}
+	return ""
+}
+
+func (x *LibrarySearchView) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *LibrarySearchView) GetDestination() string {
+	if x != nil {
+		return x.Destination
+	}
+	return ""
+}
+
+func (x *LibrarySearchView) GetCards() []*CardView {
+	if x != nil {
+		return x.Cards
+	}
+	return nil
+}
+
+func (x *LibrarySearchView) GetCanCancel() bool {
+	if x != nil {
+		return x.CanCancel
+	}
+	return false
+}
+
 // PlayerView represents a player's state
 type PlayerView struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
@@ -964,7 +1050,7 @@ type PlayerView struct {
 
 func (x *PlayerView) Reset() {
 	*x = PlayerView{}
-	mi := &file_mage_v1_models_proto_msgTypes[6]
+	mi := &file_mage_v1_models_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -976,7 +1062,7 @@ func (x *PlayerView) String() string {
 func (*PlayerView) ProtoMessage() {}
 
 func (x *PlayerView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[6]
+	mi := &file_mage_v1_models_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -989,7 +1075,7 @@ func (x *PlayerView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayerView.ProtoReflect.Descriptor instead.
 func (*PlayerView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{6}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *PlayerView) GetPlayerId() string {
@@ -1155,7 +1241,7 @@ type CardView struct {
 
 func (x *CardView) Reset() {
 	*x = CardView{}
-	mi := &file_mage_v1_models_proto_msgTypes[7]
+	mi := &file_mage_v1_models_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1167,7 +1253,7 @@ func (x *CardView) String() string {
 func (*CardView) ProtoMessage() {}
 
 func (x *CardView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[7]
+	mi := &file_mage_v1_models_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1180,7 +1266,7 @@ func (x *CardView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardView.ProtoReflect.Descriptor instead.
 func (*CardView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{7}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CardView) GetId() string {
@@ -1384,7 +1470,7 @@ type AbilityView struct {
 
 func (x *AbilityView) Reset() {
 	*x = AbilityView{}
-	mi := &file_mage_v1_models_proto_msgTypes[8]
+	mi := &file_mage_v1_models_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1396,7 +1482,7 @@ func (x *AbilityView) String() string {
 func (*AbilityView) ProtoMessage() {}
 
 func (x *AbilityView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[8]
+	mi := &file_mage_v1_models_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1409,7 +1495,7 @@ func (x *AbilityView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AbilityView.ProtoReflect.Descriptor instead.
 func (*AbilityView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{8}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *AbilityView) GetId() string {
@@ -1447,7 +1533,7 @@ type CardAction struct {
 
 func (x *CardAction) Reset() {
 	*x = CardAction{}
-	mi := &file_mage_v1_models_proto_msgTypes[9]
+	mi := &file_mage_v1_models_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1459,7 +1545,7 @@ func (x *CardAction) String() string {
 func (*CardAction) ProtoMessage() {}
 
 func (x *CardAction) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[9]
+	mi := &file_mage_v1_models_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1472,7 +1558,7 @@ func (x *CardAction) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardAction.ProtoReflect.Descriptor instead.
 func (*CardAction) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{9}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *CardAction) GetActionType() CardActionType {
@@ -1521,7 +1607,7 @@ type CounterView struct {
 
 func (x *CounterView) Reset() {
 	*x = CounterView{}
-	mi := &file_mage_v1_models_proto_msgTypes[10]
+	mi := &file_mage_v1_models_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1533,7 +1619,7 @@ func (x *CounterView) String() string {
 func (*CounterView) ProtoMessage() {}
 
 func (x *CounterView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[10]
+	mi := &file_mage_v1_models_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1546,7 +1632,7 @@ func (x *CounterView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CounterView.ProtoReflect.Descriptor instead.
 func (*CounterView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{10}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *CounterView) GetName() string {
@@ -1578,7 +1664,7 @@ type ManaPoolView struct {
 
 func (x *ManaPoolView) Reset() {
 	*x = ManaPoolView{}
-	mi := &file_mage_v1_models_proto_msgTypes[11]
+	mi := &file_mage_v1_models_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1590,7 +1676,7 @@ func (x *ManaPoolView) String() string {
 func (*ManaPoolView) ProtoMessage() {}
 
 func (x *ManaPoolView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[11]
+	mi := &file_mage_v1_models_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1603,7 +1689,7 @@ func (x *ManaPoolView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ManaPoolView.ProtoReflect.Descriptor instead.
 func (*ManaPoolView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{11}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ManaPoolView) GetWhite() int32 {
@@ -1650,18 +1736,20 @@ func (x *ManaPoolView) GetColorless() int32 {
 
 // GameMessage represents a message in the game log
 type GameMessage struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Text          string                 `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
-	Color         string                 `protobuf:"bytes,3,opt,name=color,proto3" json:"color,omitempty"`
-	Time          *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=time,proto3" json:"time,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Text              string                 `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
+	Color             string                 `protobuf:"bytes,3,opt,name=color,proto3" json:"color,omitempty"`
+	Time              *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=time,proto3" json:"time,omitempty"`
+	BookmarkId        int32                  `protobuf:"varint,5,opt,name=bookmark_id,json=bookmarkId,proto3" json:"bookmark_id,omitempty"`                      // Snapshot ID for this point in time (0 = no snapshot)
+	RollbackAvailable bool                   `protobuf:"varint,6,opt,name=rollback_available,json=rollbackAvailable,proto3" json:"rollback_available,omitempty"` // Whether rollback is allowed to this point
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *GameMessage) Reset() {
 	*x = GameMessage{}
-	mi := &file_mage_v1_models_proto_msgTypes[12]
+	mi := &file_mage_v1_models_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1673,7 +1761,7 @@ func (x *GameMessage) String() string {
 func (*GameMessage) ProtoMessage() {}
 
 func (x *GameMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[12]
+	mi := &file_mage_v1_models_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1686,7 +1774,7 @@ func (x *GameMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameMessage.ProtoReflect.Descriptor instead.
 func (*GameMessage) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{12}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GameMessage) GetId() int32 {
@@ -1717,6 +1805,20 @@ func (x *GameMessage) GetTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *GameMessage) GetBookmarkId() int32 {
+	if x != nil {
+		return x.BookmarkId
+	}
+	return 0
+}
+
+func (x *GameMessage) GetRollbackAvailable() bool {
+	if x != nil {
+		return x.RollbackAvailable
+	}
+	return false
+}
+
 // CombatView represents combat state
 type CombatView struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
@@ -1728,7 +1830,7 @@ type CombatView struct {
 
 func (x *CombatView) Reset() {
 	*x = CombatView{}
-	mi := &file_mage_v1_models_proto_msgTypes[13]
+	mi := &file_mage_v1_models_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1740,7 +1842,7 @@ func (x *CombatView) String() string {
 func (*CombatView) ProtoMessage() {}
 
 func (x *CombatView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[13]
+	mi := &file_mage_v1_models_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1753,7 +1855,7 @@ func (x *CombatView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CombatView.ProtoReflect.Descriptor instead.
 func (*CombatView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{13}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *CombatView) GetAttackingPlayerId() string {
@@ -1782,7 +1884,7 @@ type CombatGroupView struct {
 
 func (x *CombatGroupView) Reset() {
 	*x = CombatGroupView{}
-	mi := &file_mage_v1_models_proto_msgTypes[14]
+	mi := &file_mage_v1_models_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1794,7 +1896,7 @@ func (x *CombatGroupView) String() string {
 func (*CombatGroupView) ProtoMessage() {}
 
 func (x *CombatGroupView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[14]
+	mi := &file_mage_v1_models_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1807,7 +1909,7 @@ func (x *CombatGroupView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CombatGroupView.ProtoReflect.Descriptor instead.
 func (*CombatGroupView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{14}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *CombatGroupView) GetAttackers() []string {
@@ -1842,7 +1944,7 @@ type RevealedView struct {
 
 func (x *RevealedView) Reset() {
 	*x = RevealedView{}
-	mi := &file_mage_v1_models_proto_msgTypes[15]
+	mi := &file_mage_v1_models_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1854,7 +1956,7 @@ func (x *RevealedView) String() string {
 func (*RevealedView) ProtoMessage() {}
 
 func (x *RevealedView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[15]
+	mi := &file_mage_v1_models_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1867,7 +1969,7 @@ func (x *RevealedView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevealedView.ProtoReflect.Descriptor instead.
 func (*RevealedView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{15}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *RevealedView) GetName() string {
@@ -1895,7 +1997,7 @@ type LookedAtView struct {
 
 func (x *LookedAtView) Reset() {
 	*x = LookedAtView{}
-	mi := &file_mage_v1_models_proto_msgTypes[16]
+	mi := &file_mage_v1_models_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1907,7 +2009,7 @@ func (x *LookedAtView) String() string {
 func (*LookedAtView) ProtoMessage() {}
 
 func (x *LookedAtView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[16]
+	mi := &file_mage_v1_models_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1920,7 +2022,7 @@ func (x *LookedAtView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LookedAtView.ProtoReflect.Descriptor instead.
 func (*LookedAtView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{16}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *LookedAtView) GetName() string {
@@ -1957,7 +2059,7 @@ type TournamentView struct {
 
 func (x *TournamentView) Reset() {
 	*x = TournamentView{}
-	mi := &file_mage_v1_models_proto_msgTypes[17]
+	mi := &file_mage_v1_models_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1969,7 +2071,7 @@ func (x *TournamentView) String() string {
 func (*TournamentView) ProtoMessage() {}
 
 func (x *TournamentView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[17]
+	mi := &file_mage_v1_models_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1982,7 +2084,7 @@ func (x *TournamentView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TournamentView.ProtoReflect.Descriptor instead.
 func (*TournamentView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{17}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *TournamentView) GetTournamentId() string {
@@ -2079,7 +2181,7 @@ type TournamentPlayerView struct {
 
 func (x *TournamentPlayerView) Reset() {
 	*x = TournamentPlayerView{}
-	mi := &file_mage_v1_models_proto_msgTypes[18]
+	mi := &file_mage_v1_models_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2091,7 +2193,7 @@ func (x *TournamentPlayerView) String() string {
 func (*TournamentPlayerView) ProtoMessage() {}
 
 func (x *TournamentPlayerView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[18]
+	mi := &file_mage_v1_models_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2104,7 +2206,7 @@ func (x *TournamentPlayerView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TournamentPlayerView.ProtoReflect.Descriptor instead.
 func (*TournamentPlayerView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{18}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *TournamentPlayerView) GetPlayerName() string {
@@ -2175,7 +2277,7 @@ type RoundView struct {
 
 func (x *RoundView) Reset() {
 	*x = RoundView{}
-	mi := &file_mage_v1_models_proto_msgTypes[19]
+	mi := &file_mage_v1_models_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2187,7 +2289,7 @@ func (x *RoundView) String() string {
 func (*RoundView) ProtoMessage() {}
 
 func (x *RoundView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[19]
+	mi := &file_mage_v1_models_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2200,7 +2302,7 @@ func (x *RoundView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoundView.ProtoReflect.Descriptor instead.
 func (*RoundView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{19}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *RoundView) GetRoundNumber() int32 {
@@ -2238,7 +2340,7 @@ type PairingView struct {
 
 func (x *PairingView) Reset() {
 	*x = PairingView{}
-	mi := &file_mage_v1_models_proto_msgTypes[20]
+	mi := &file_mage_v1_models_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2250,7 +2352,7 @@ func (x *PairingView) String() string {
 func (*PairingView) ProtoMessage() {}
 
 func (x *PairingView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[20]
+	mi := &file_mage_v1_models_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2263,7 +2365,7 @@ func (x *PairingView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PairingView.ProtoReflect.Descriptor instead.
 func (*PairingView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{20}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *PairingView) GetPlayer1() string {
@@ -2316,7 +2418,7 @@ type DraftPickView struct {
 
 func (x *DraftPickView) Reset() {
 	*x = DraftPickView{}
-	mi := &file_mage_v1_models_proto_msgTypes[21]
+	mi := &file_mage_v1_models_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2328,7 +2430,7 @@ func (x *DraftPickView) String() string {
 func (*DraftPickView) ProtoMessage() {}
 
 func (x *DraftPickView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[21]
+	mi := &file_mage_v1_models_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2341,7 +2443,7 @@ func (x *DraftPickView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DraftPickView.ProtoReflect.Descriptor instead.
 func (*DraftPickView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{21}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *DraftPickView) GetDraftId() string {
@@ -2402,7 +2504,7 @@ type UserView struct {
 
 func (x *UserView) Reset() {
 	*x = UserView{}
-	mi := &file_mage_v1_models_proto_msgTypes[22]
+	mi := &file_mage_v1_models_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2414,7 +2516,7 @@ func (x *UserView) String() string {
 func (*UserView) ProtoMessage() {}
 
 func (x *UserView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[22]
+	mi := &file_mage_v1_models_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2427,7 +2529,7 @@ func (x *UserView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserView.ProtoReflect.Descriptor instead.
 func (*UserView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{22}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *UserView) GetUserName() string {
@@ -2496,7 +2598,7 @@ type UserStatsView struct {
 
 func (x *UserStatsView) Reset() {
 	*x = UserStatsView{}
-	mi := &file_mage_v1_models_proto_msgTypes[23]
+	mi := &file_mage_v1_models_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2508,7 +2610,7 @@ func (x *UserStatsView) String() string {
 func (*UserStatsView) ProtoMessage() {}
 
 func (x *UserStatsView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[23]
+	mi := &file_mage_v1_models_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2521,7 +2623,7 @@ func (x *UserStatsView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserStatsView.ProtoReflect.Descriptor instead.
 func (*UserStatsView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{23}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *UserStatsView) GetMatches() int32 {
@@ -2594,7 +2696,7 @@ type ChatMessage struct {
 
 func (x *ChatMessage) Reset() {
 	*x = ChatMessage{}
-	mi := &file_mage_v1_models_proto_msgTypes[24]
+	mi := &file_mage_v1_models_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2606,7 +2708,7 @@ func (x *ChatMessage) String() string {
 func (*ChatMessage) ProtoMessage() {}
 
 func (x *ChatMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[24]
+	mi := &file_mage_v1_models_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2619,7 +2721,7 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{24}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ChatMessage) GetUserName() string {
@@ -2673,7 +2775,7 @@ type ServerState struct {
 
 func (x *ServerState) Reset() {
 	*x = ServerState{}
-	mi := &file_mage_v1_models_proto_msgTypes[25]
+	mi := &file_mage_v1_models_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2685,7 +2787,7 @@ func (x *ServerState) String() string {
 func (*ServerState) ProtoMessage() {}
 
 func (x *ServerState) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[25]
+	mi := &file_mage_v1_models_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2698,7 +2800,7 @@ func (x *ServerState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerState.ProtoReflect.Descriptor instead.
 func (*ServerState) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{25}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ServerState) GetActivePlayers() int32 {
@@ -2762,7 +2864,7 @@ type MatchQueueView struct {
 
 func (x *MatchQueueView) Reset() {
 	*x = MatchQueueView{}
-	mi := &file_mage_v1_models_proto_msgTypes[26]
+	mi := &file_mage_v1_models_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2774,7 +2876,7 @@ func (x *MatchQueueView) String() string {
 func (*MatchQueueView) ProtoMessage() {}
 
 func (x *MatchQueueView) ProtoReflect() protoreflect.Message {
-	mi := &file_mage_v1_models_proto_msgTypes[26]
+	mi := &file_mage_v1_models_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2787,7 +2889,7 @@ func (x *MatchQueueView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MatchQueueView.ProtoReflect.Descriptor instead.
 func (*MatchQueueView) Descriptor() ([]byte, []int) {
-	return file_mage_v1_models_proto_rawDescGZIP(), []int{26}
+	return file_mage_v1_models_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *MatchQueueView) GetMatchName() string {
@@ -2874,7 +2976,7 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\n" +
 	"legal_sets\x18\x05 \x03(\tR\tlegalSets\x12!\n" +
 	"\fbanned_cards\x18\x06 \x03(\tR\vbannedCards\x12)\n" +
-	"\x10restricted_cards\x18\a \x03(\tR\x0frestrictedCards\"\xe6\a\n" +
+	"\x10restricted_cards\x18\a \x03(\tR\x0frestrictedCards\"\xb8\b\n" +
 	"\bGameView\x12\x17\n" +
 	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12\x14\n" +
 	"\x05state\x18\x02 \x01(\tR\x05state\x12-\n" +
@@ -2902,7 +3004,15 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"gameFormat\x12*\n" +
 	"\x11is_mulligan_phase\x18\x17 \x01(\bR\x0fisMulliganPhase\x123\n" +
 	"\x16lands_played_this_turn\x18\x18 \x01(\x05R\x13landsPlayedThisTurn\x125\n" +
-	"\x17lands_allowed_this_turn\x18\x19 \x01(\x05R\x14landsAllowedThisTurn\"\xbe\x04\n" +
+	"\x17lands_allowed_this_turn\x18\x19 \x01(\x05R\x14landsAllowedThisTurn\x12P\n" +
+	"\x16pending_library_search\x18\x1e \x01(\v2\x1a.mage.v1.LibrarySearchViewR\x14pendingLibrarySearch\"\xb4\x01\n" +
+	"\x11LibrarySearchView\x12\x1b\n" +
+	"\tplayer_id\x18\x01 \x01(\tR\bplayerId\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12 \n" +
+	"\vdestination\x18\x03 \x01(\tR\vdestination\x12'\n" +
+	"\x05cards\x18\x04 \x03(\v2\x11.mage.v1.CardViewR\x05cards\x12\x1d\n" +
+	"\n" +
+	"can_cancel\x18\x05 \x01(\bR\tcanCancel\"\xbe\x04\n" +
 	"\n" +
 	"PlayerView\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\tR\bplayerId\x12\x12\n" +
@@ -2980,12 +3090,15 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\x05black\x18\x03 \x01(\x05R\x05black\x12\x10\n" +
 	"\x03red\x18\x04 \x01(\x05R\x03red\x12\x14\n" +
 	"\x05green\x18\x05 \x01(\x05R\x05green\x12\x1c\n" +
-	"\tcolorless\x18\x06 \x01(\x05R\tcolorless\"w\n" +
+	"\tcolorless\x18\x06 \x01(\x05R\tcolorless\"\xc7\x01\n" +
 	"\vGameMessage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04text\x18\x02 \x01(\tR\x04text\x12\x14\n" +
 	"\x05color\x18\x03 \x01(\tR\x05color\x12.\n" +
-	"\x04time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x04time\"n\n" +
+	"\x04time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x04time\x12\x1f\n" +
+	"\vbookmark_id\x18\x05 \x01(\x05R\n" +
+	"bookmarkId\x12-\n" +
+	"\x12rollback_available\x18\x06 \x01(\bR\x11rollbackAvailable\"n\n" +
 	"\n" +
 	"CombatView\x12.\n" +
 	"\x13attacking_player_id\x18\x01 \x01(\tR\x11attackingPlayerId\x120\n" +
@@ -3121,7 +3234,7 @@ func file_mage_v1_models_proto_rawDescGZIP() []byte {
 }
 
 var file_mage_v1_models_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_mage_v1_models_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_mage_v1_models_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_mage_v1_models_proto_goTypes = []any{
 	(CardActionType)(0),           // 0: mage.v1.CardActionType
 	(MessageColor)(0),             // 1: mage.v1.MessageColor
@@ -3132,75 +3245,78 @@ var file_mage_v1_models_proto_goTypes = []any{
 	(*MatchTimeLimit)(nil),        // 6: mage.v1.MatchTimeLimit
 	(*DeckValidator)(nil),         // 7: mage.v1.DeckValidator
 	(*GameView)(nil),              // 8: mage.v1.GameView
-	(*PlayerView)(nil),            // 9: mage.v1.PlayerView
-	(*CardView)(nil),              // 10: mage.v1.CardView
-	(*AbilityView)(nil),           // 11: mage.v1.AbilityView
-	(*CardAction)(nil),            // 12: mage.v1.CardAction
-	(*CounterView)(nil),           // 13: mage.v1.CounterView
-	(*ManaPoolView)(nil),          // 14: mage.v1.ManaPoolView
-	(*GameMessage)(nil),           // 15: mage.v1.GameMessage
-	(*CombatView)(nil),            // 16: mage.v1.CombatView
-	(*CombatGroupView)(nil),       // 17: mage.v1.CombatGroupView
-	(*RevealedView)(nil),          // 18: mage.v1.RevealedView
-	(*LookedAtView)(nil),          // 19: mage.v1.LookedAtView
-	(*TournamentView)(nil),        // 20: mage.v1.TournamentView
-	(*TournamentPlayerView)(nil),  // 21: mage.v1.TournamentPlayerView
-	(*RoundView)(nil),             // 22: mage.v1.RoundView
-	(*PairingView)(nil),           // 23: mage.v1.PairingView
-	(*DraftPickView)(nil),         // 24: mage.v1.DraftPickView
-	(*UserView)(nil),              // 25: mage.v1.UserView
-	(*UserStatsView)(nil),         // 26: mage.v1.UserStatsView
-	(*ChatMessage)(nil),           // 27: mage.v1.ChatMessage
-	(*ServerState)(nil),           // 28: mage.v1.ServerState
-	(*MatchQueueView)(nil),        // 29: mage.v1.MatchQueueView
-	(*timestamppb.Timestamp)(nil), // 30: google.protobuf.Timestamp
+	(*LibrarySearchView)(nil),     // 9: mage.v1.LibrarySearchView
+	(*PlayerView)(nil),            // 10: mage.v1.PlayerView
+	(*CardView)(nil),              // 11: mage.v1.CardView
+	(*AbilityView)(nil),           // 12: mage.v1.AbilityView
+	(*CardAction)(nil),            // 13: mage.v1.CardAction
+	(*CounterView)(nil),           // 14: mage.v1.CounterView
+	(*ManaPoolView)(nil),          // 15: mage.v1.ManaPoolView
+	(*GameMessage)(nil),           // 16: mage.v1.GameMessage
+	(*CombatView)(nil),            // 17: mage.v1.CombatView
+	(*CombatGroupView)(nil),       // 18: mage.v1.CombatGroupView
+	(*RevealedView)(nil),          // 19: mage.v1.RevealedView
+	(*LookedAtView)(nil),          // 20: mage.v1.LookedAtView
+	(*TournamentView)(nil),        // 21: mage.v1.TournamentView
+	(*TournamentPlayerView)(nil),  // 22: mage.v1.TournamentPlayerView
+	(*RoundView)(nil),             // 23: mage.v1.RoundView
+	(*PairingView)(nil),           // 24: mage.v1.PairingView
+	(*DraftPickView)(nil),         // 25: mage.v1.DraftPickView
+	(*UserView)(nil),              // 26: mage.v1.UserView
+	(*UserStatsView)(nil),         // 27: mage.v1.UserStatsView
+	(*ChatMessage)(nil),           // 28: mage.v1.ChatMessage
+	(*ServerState)(nil),           // 29: mage.v1.ServerState
+	(*MatchQueueView)(nil),        // 30: mage.v1.MatchQueueView
+	(*timestamppb.Timestamp)(nil), // 31: google.protobuf.Timestamp
 }
 var file_mage_v1_models_proto_depIdxs = []int32{
 	4,  // 0: mage.v1.TableView.seats:type_name -> mage.v1.SeatView
 	5,  // 1: mage.v1.TableView.match_options:type_name -> mage.v1.MatchOptions
-	30, // 2: mage.v1.TableView.create_time:type_name -> google.protobuf.Timestamp
+	31, // 2: mage.v1.TableView.create_time:type_name -> google.protobuf.Timestamp
 	7,  // 3: mage.v1.TableView.deck_validator:type_name -> mage.v1.DeckValidator
 	6,  // 4: mage.v1.MatchOptions.time_limit:type_name -> mage.v1.MatchTimeLimit
-	9,  // 5: mage.v1.GameView.players:type_name -> mage.v1.PlayerView
-	15, // 6: mage.v1.GameView.messages:type_name -> mage.v1.GameMessage
-	10, // 7: mage.v1.GameView.battlefield:type_name -> mage.v1.CardView
-	10, // 8: mage.v1.GameView.stack:type_name -> mage.v1.CardView
-	10, // 9: mage.v1.GameView.exile:type_name -> mage.v1.CardView
-	10, // 10: mage.v1.GameView.command:type_name -> mage.v1.CardView
-	18, // 11: mage.v1.GameView.revealed:type_name -> mage.v1.RevealedView
-	19, // 12: mage.v1.GameView.looked_at:type_name -> mage.v1.LookedAtView
-	16, // 13: mage.v1.GameView.combat:type_name -> mage.v1.CombatView
-	30, // 14: mage.v1.GameView.start_time:type_name -> google.protobuf.Timestamp
-	10, // 15: mage.v1.PlayerView.hand:type_name -> mage.v1.CardView
-	10, // 16: mage.v1.PlayerView.graveyard:type_name -> mage.v1.CardView
-	14, // 17: mage.v1.PlayerView.mana_pool:type_name -> mage.v1.ManaPoolView
-	11, // 18: mage.v1.CardView.abilities:type_name -> mage.v1.AbilityView
-	13, // 19: mage.v1.CardView.counters:type_name -> mage.v1.CounterView
-	12, // 20: mage.v1.CardView.available_actions:type_name -> mage.v1.CardAction
-	0,  // 21: mage.v1.CardAction.action_type:type_name -> mage.v1.CardActionType
-	30, // 22: mage.v1.GameMessage.time:type_name -> google.protobuf.Timestamp
-	17, // 23: mage.v1.CombatView.groups:type_name -> mage.v1.CombatGroupView
-	10, // 24: mage.v1.RevealedView.cards:type_name -> mage.v1.CardView
-	10, // 25: mage.v1.LookedAtView.cards:type_name -> mage.v1.CardView
-	21, // 26: mage.v1.TournamentView.players:type_name -> mage.v1.TournamentPlayerView
-	22, // 27: mage.v1.TournamentView.rounds:type_name -> mage.v1.RoundView
-	30, // 28: mage.v1.TournamentView.start_time:type_name -> google.protobuf.Timestamp
-	30, // 29: mage.v1.TournamentView.end_time:type_name -> google.protobuf.Timestamp
-	23, // 30: mage.v1.RoundView.pairings:type_name -> mage.v1.PairingView
-	10, // 31: mage.v1.DraftPickView.booster:type_name -> mage.v1.CardView
-	10, // 32: mage.v1.DraftPickView.picks:type_name -> mage.v1.CardView
-	26, // 33: mage.v1.UserView.stats:type_name -> mage.v1.UserStatsView
-	30, // 34: mage.v1.UserView.connected_at:type_name -> google.protobuf.Timestamp
-	30, // 35: mage.v1.ChatMessage.time:type_name -> google.protobuf.Timestamp
-	1,  // 36: mage.v1.ChatMessage.color:type_name -> mage.v1.MessageColor
-	2,  // 37: mage.v1.ChatMessage.message_type:type_name -> mage.v1.MessageType
-	30, // 38: mage.v1.ServerState.server_time:type_name -> google.protobuf.Timestamp
-	5,  // 39: mage.v1.MatchQueueView.match_options:type_name -> mage.v1.MatchOptions
-	40, // [40:40] is the sub-list for method output_type
-	40, // [40:40] is the sub-list for method input_type
-	40, // [40:40] is the sub-list for extension type_name
-	40, // [40:40] is the sub-list for extension extendee
-	0,  // [0:40] is the sub-list for field type_name
+	10, // 5: mage.v1.GameView.players:type_name -> mage.v1.PlayerView
+	16, // 6: mage.v1.GameView.messages:type_name -> mage.v1.GameMessage
+	11, // 7: mage.v1.GameView.battlefield:type_name -> mage.v1.CardView
+	11, // 8: mage.v1.GameView.stack:type_name -> mage.v1.CardView
+	11, // 9: mage.v1.GameView.exile:type_name -> mage.v1.CardView
+	11, // 10: mage.v1.GameView.command:type_name -> mage.v1.CardView
+	19, // 11: mage.v1.GameView.revealed:type_name -> mage.v1.RevealedView
+	20, // 12: mage.v1.GameView.looked_at:type_name -> mage.v1.LookedAtView
+	17, // 13: mage.v1.GameView.combat:type_name -> mage.v1.CombatView
+	31, // 14: mage.v1.GameView.start_time:type_name -> google.protobuf.Timestamp
+	9,  // 15: mage.v1.GameView.pending_library_search:type_name -> mage.v1.LibrarySearchView
+	11, // 16: mage.v1.LibrarySearchView.cards:type_name -> mage.v1.CardView
+	11, // 17: mage.v1.PlayerView.hand:type_name -> mage.v1.CardView
+	11, // 18: mage.v1.PlayerView.graveyard:type_name -> mage.v1.CardView
+	15, // 19: mage.v1.PlayerView.mana_pool:type_name -> mage.v1.ManaPoolView
+	12, // 20: mage.v1.CardView.abilities:type_name -> mage.v1.AbilityView
+	14, // 21: mage.v1.CardView.counters:type_name -> mage.v1.CounterView
+	13, // 22: mage.v1.CardView.available_actions:type_name -> mage.v1.CardAction
+	0,  // 23: mage.v1.CardAction.action_type:type_name -> mage.v1.CardActionType
+	31, // 24: mage.v1.GameMessage.time:type_name -> google.protobuf.Timestamp
+	18, // 25: mage.v1.CombatView.groups:type_name -> mage.v1.CombatGroupView
+	11, // 26: mage.v1.RevealedView.cards:type_name -> mage.v1.CardView
+	11, // 27: mage.v1.LookedAtView.cards:type_name -> mage.v1.CardView
+	22, // 28: mage.v1.TournamentView.players:type_name -> mage.v1.TournamentPlayerView
+	23, // 29: mage.v1.TournamentView.rounds:type_name -> mage.v1.RoundView
+	31, // 30: mage.v1.TournamentView.start_time:type_name -> google.protobuf.Timestamp
+	31, // 31: mage.v1.TournamentView.end_time:type_name -> google.protobuf.Timestamp
+	24, // 32: mage.v1.RoundView.pairings:type_name -> mage.v1.PairingView
+	11, // 33: mage.v1.DraftPickView.booster:type_name -> mage.v1.CardView
+	11, // 34: mage.v1.DraftPickView.picks:type_name -> mage.v1.CardView
+	27, // 35: mage.v1.UserView.stats:type_name -> mage.v1.UserStatsView
+	31, // 36: mage.v1.UserView.connected_at:type_name -> google.protobuf.Timestamp
+	31, // 37: mage.v1.ChatMessage.time:type_name -> google.protobuf.Timestamp
+	1,  // 38: mage.v1.ChatMessage.color:type_name -> mage.v1.MessageColor
+	2,  // 39: mage.v1.ChatMessage.message_type:type_name -> mage.v1.MessageType
+	31, // 40: mage.v1.ServerState.server_time:type_name -> google.protobuf.Timestamp
+	5,  // 41: mage.v1.MatchQueueView.match_options:type_name -> mage.v1.MatchOptions
+	42, // [42:42] is the sub-list for method output_type
+	42, // [42:42] is the sub-list for method input_type
+	42, // [42:42] is the sub-list for extension type_name
+	42, // [42:42] is the sub-list for extension extendee
+	0,  // [0:42] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_models_proto_init() }
@@ -3214,7 +3330,7 @@ func file_mage_v1_models_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_models_proto_rawDesc), len(file_mage_v1_models_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   27,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

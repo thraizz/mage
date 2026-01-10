@@ -64,9 +64,9 @@
 				.map((a) => a.trim())
 				.filter((a) => a.length > 0);
 
-			const result = await createToken(gameId, name, types, power, toughness, color, abilities, 1);
+		await createToken(gameId, name, types, power, toughness, color, abilities, 1);
 
-			toast.success(`Created ${name} token`);
+		toast.success(`Created ${name} token`);
 			onClose();
 		} catch (error) {
 			toast.error(`Failed to create token: ${error instanceof Error ? error.message : 'Unknown error'}`);

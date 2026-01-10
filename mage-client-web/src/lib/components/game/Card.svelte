@@ -22,10 +22,6 @@
 		onhover = () => {},
 		oncontextmenu = undefined as ((e: MouseEvent) => void) | undefined,
 		size = 'normal',
-		// Targeting mode props
-		isValidTarget = false,
-		isTargetSelected = false,
-		isTargetingActive = false,
 		// Drag and play animation props
 		isDragging = false,
 		isBeingPlayed = false,
@@ -58,10 +54,6 @@
 		onhover?: () => void;
 		oncontextmenu?: (e: MouseEvent) => void;
 		size?: 'small' | 'normal' | 'large';
-		// Targeting mode props
-		isValidTarget?: boolean;
-		isTargetSelected?: boolean;
-		isTargetingActive?: boolean;
 		// Drag and play animation props
 		isDragging?: boolean;
 		isBeingPlayed?: boolean;
@@ -273,7 +265,7 @@
 	bind:this={cardElement}
 	class="card {sizeClasses()} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack
 		? 'card-back'
-		: ''} {isTargetingActive ? 'targeting-mode' : ''} {isValidTarget ? 'valid-target' : ''} {isTargetSelected ? 'target-selected' : ''} {isTargetingActive && !isValidTarget ? 'invalid-target' : ''} {isAnimatingTap ? 'tap-animating' : ''} {isDragging ? 'dragging' : ''} {isBeingPlayed ? 'being-played' : ''} {isPending ? 'pending' : ''} {isAttacking ? 'attacking' : ''} {canAttack ? 'can-attack' : ''} {isBlocking ? 'blocking' : ''} {canBlock ? 'can-block' : ''} {summoningSickness ? 'summoning-sick' : ''}"
+		: ''} {isAnimatingTap ? 'tap-animating' : ''} {isDragging ? 'dragging' : ''} {isBeingPlayed ? 'being-played' : ''} {isPending ? 'pending' : ''} {isAttacking ? 'attacking' : ''} {canAttack ? 'can-attack' : ''} {isBlocking ? 'blocking' : ''} {canBlock ? 'can-block' : ''} {summoningSickness ? 'summoning-sick' : ''}"
 	role="button"
 	tabindex="0"
 	draggable="false"
@@ -401,12 +393,9 @@
 			</div>
 		{/if}
 
-		<!-- Summoning Sickness Smoke Overlay -->
+		<!-- Summoning Sickness Overlay -->
 		{#if summoningSickness}
 			<div class="summoning-sickness-overlay" title="Summoning Sickness - Cannot attack or use tap abilities this turn">
-				<div class="smoke-layer smoke-1"></div>
-				<div class="smoke-layer smoke-2"></div>
-				<div class="smoke-layer smoke-3"></div>
 				<div class="zzz-indicator">💤</div>
 			</div>
 		{/if}
@@ -497,14 +486,19 @@
 	/* Tap Animation - Visual feedback during tap/untap */
 	.card.tap-animating {
 		animation: tap-glow 0.2s ease-out;
+		/* Disable transform transition during animation to prevent jump after animation ends */
+		transition:
+			box-shadow 0.2s ease-out,
+			filter 0.2s ease-out,
+			border-color 0.15s ease-out;
 	}
 
 	.card.tap-animating.tapped {
-		animation: tap-rotate-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+		animation: tap-rotate-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 	}
 
 	.card.tap-animating:not(.tapped) {
-		animation: tap-rotate-out 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+		animation: tap-rotate-out 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 	}
 
 	/* Tap animation keyframes - Clockwise rotation with slight overshoot */
@@ -615,107 +609,6 @@
 		border-top-color: #667eea;
 		border-radius: 50%;
 		animation: spin 0.8s linear infinite;
-	}
-
-	/* Targeting Mode States */
-	.card.targeting-mode {
-		cursor: crosshair;
-	}
-
-	.card.valid-target {
-		cursor: pointer;
-		border-color: #fbbf24;
-		box-shadow:
-			0 0 0 3px rgba(251, 191, 36, 0.4),
-			0 0 20px rgba(251, 191, 36, 0.6),
-			0 0 40px rgba(251, 191, 36, 0.3);
-		animation: target-pulse 1.5s ease-in-out infinite;
-	}
-
-	@keyframes target-pulse {
-		0%, 100% {
-			box-shadow:
-				0 0 0 3px rgba(251, 191, 36, 0.4),
-				0 0 20px rgba(251, 191, 36, 0.6),
-				0 0 40px rgba(251, 191, 36, 0.3);
-		}
-		50% {
-			box-shadow:
-				0 0 0 4px rgba(251, 191, 36, 0.6),
-				0 0 30px rgba(251, 191, 36, 0.8),
-				0 0 50px rgba(251, 191, 36, 0.5);
-		}
-	}
-
-	.card.valid-target:hover {
-		transform: translateY(-20px) scale(1.1);
-		border-color: #f59e0b;
-		box-shadow:
-			0 0 0 4px rgba(245, 158, 11, 0.6),
-			0 0 35px rgba(245, 158, 11, 0.8),
-			0 8px 16px rgba(0, 0, 0, 0.3);
-	}
-
-	.card.valid-target.tapped:hover {
-		transform: rotate(90deg) translateY(-20px) scale(1.1);
-	}
-
-	.card.invalid-target {
-		opacity: 0.4;
-		filter: grayscale(60%);
-		cursor: not-allowed;
-		pointer-events: none;
-	}
-
-	.card.invalid-target:hover {
-		transform: none;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-		border-color: #3a4451;
-	}
-
-	.card.target-selected {
-		border-color: #22c55e;
-		box-shadow:
-			0 0 0 4px rgba(34, 197, 94, 0.5),
-			0 0 25px rgba(34, 197, 94, 0.7),
-			inset 0 0 30px rgba(34, 197, 94, 0.15);
-		animation: target-selected-glow 1s ease-in-out infinite;
-	}
-
-	@keyframes target-selected-glow {
-		0%, 100% {
-			box-shadow:
-				0 0 0 4px rgba(34, 197, 94, 0.5),
-				0 0 25px rgba(34, 197, 94, 0.7),
-				inset 0 0 30px rgba(34, 197, 94, 0.15);
-		}
-		50% {
-			box-shadow:
-				0 0 0 5px rgba(34, 197, 94, 0.7),
-				0 0 35px rgba(34, 197, 94, 0.9),
-				inset 0 0 40px rgba(34, 197, 94, 0.2);
-		}
-	}
-
-	.card.target-selected::after {
-		content: '✓';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		font-size: 2rem;
-		color: #22c55e;
-		text-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
-		z-index: 10;
-		pointer-events: none;
-	}
-
-	.card.target-selected:hover {
-		transform: translateY(-15px) scale(1.05);
-	}
-
-	.card.target-selected.tapped:hover {
-		transform: rotate(90deg) translateY(-15px) scale(1.05);
 	}
 
 	/* Card Back */
@@ -1204,97 +1097,40 @@
 
 	/* ===== Summoning Sickness Styles ===== */
 	.card.summoning-sick {
-		/* Subtle desaturation to indicate can't attack */
-		filter: saturate(0.7) brightness(0.85);
+		/* Desaturation to indicate can't attack */
+		filter: saturate(0.5) brightness(0.75);
 	}
 
 	.summoning-sickness-overlay {
 		position: absolute;
 		inset: 0;
 		border-radius: 6px;
-		overflow: hidden;
 		pointer-events: none;
 		z-index: 15;
+		/* Simple semi-transparent purple overlay */
+		background: rgba(88, 28, 135, 0.35);
 	}
 
-	/* Smoke layers - creates a misty/foggy effect */
-	.smoke-layer {
-		position: absolute;
-		inset: 0;
-		background: radial-gradient(
-			ellipse at center,
-			rgba(100, 116, 139, 0.4) 0%,
-			rgba(71, 85, 105, 0.2) 40%,
-			transparent 70%
-		);
-		animation: smoke-drift 4s ease-in-out infinite;
-	}
-
-	.smoke-1 {
-		animation-delay: 0s;
-		transform-origin: 30% 70%;
-	}
-
-	.smoke-2 {
-		animation-delay: -1.3s;
-		transform-origin: 70% 30%;
-		background: radial-gradient(
-			ellipse at center,
-			rgba(148, 163, 184, 0.35) 0%,
-			rgba(100, 116, 139, 0.15) 50%,
-			transparent 70%
-		);
-	}
-
-	.smoke-3 {
-		animation-delay: -2.6s;
-		transform-origin: 50% 50%;
-		background: radial-gradient(
-			ellipse at center,
-			rgba(71, 85, 105, 0.3) 0%,
-			rgba(51, 65, 85, 0.1) 45%,
-			transparent 65%
-		);
-	}
-
-	@keyframes smoke-drift {
-		0%, 100% {
-			transform: scale(1) translate(0, 0);
-			opacity: 0.8;
-		}
-		25% {
-			transform: scale(1.1) translate(5%, -5%);
-			opacity: 0.6;
-		}
-		50% {
-			transform: scale(0.95) translate(-3%, 3%);
-			opacity: 0.9;
-		}
-		75% {
-			transform: scale(1.05) translate(2%, -2%);
-			opacity: 0.7;
-		}
-	}
-
-	/* ZZZ sleeping indicator */
+	/* ZZZ sleeping indicator - simple pulse animation */
 	.zzz-indicator {
 		position: absolute;
 		top: 0.25rem;
 		right: 0.25rem;
-		font-size: 1rem;
-		animation: zzz-float 2s ease-in-out infinite;
-		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-		z-index: 20;
+		font-size: 1.25rem;
+		animation: zzz-pulse 2s ease-in-out infinite;
+		/* Single lightweight shadow */
+		filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+		z-index: 25;
 	}
 
-	@keyframes zzz-float {
+	@keyframes zzz-pulse {
 		0%, 100% {
-			transform: translateY(0) scale(1);
-			opacity: 1;
+			opacity: 0.7;
+			transform: scale(1);
 		}
 		50% {
-			transform: translateY(-4px) scale(1.1);
-			opacity: 0.7;
+			opacity: 1;
+			transform: scale(1.1);
 		}
 	}
 

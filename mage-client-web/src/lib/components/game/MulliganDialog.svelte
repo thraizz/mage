@@ -9,9 +9,10 @@
 		onMulligan: () => void;
 		isLoading?: boolean;
 		hasKeptHand?: boolean;
+		playerName?: string;
 	}
 
-	let { cards, mulliganCount, onKeep, onMulligan, isLoading = false, hasKeptHand = false }: Props = $props();
+	let { cards, mulliganCount, onKeep, onMulligan, isLoading = false, hasKeptHand = false, playerName }: Props = $props();
 
 	// Calculate next hand size after mulligan
 	const nextHandSize = $derived(Math.max(0, 7 - (mulliganCount + 1)));
@@ -26,6 +27,9 @@
 <div class="mulligan-overlay">
 	<div class="mulligan-dialog">
 		<div class="dialog-header">
+			{#if playerName}
+				<p class="player-name-badge">{playerName}</p>
+			{/if}
 			<h2>
 				{#if isFirstDraw}
 					Opening Hand
@@ -139,6 +143,20 @@
 	.dialog-header {
 		text-align: center;
 		margin-bottom: 1.5rem;
+	}
+
+	.player-name-badge {
+		display: inline-block;
+		padding: 0.5rem 1rem;
+		background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(102, 126, 234, 0.3) 100%);
+		border: 1px solid rgba(102, 126, 234, 0.4);
+		border-radius: 8px;
+		color: #667eea;
+		font-weight: 700;
+		font-size: 1rem;
+		margin: 0 0 1rem;
+		text-transform: none;
+		letter-spacing: normal;
 	}
 
 	.dialog-header h2 {

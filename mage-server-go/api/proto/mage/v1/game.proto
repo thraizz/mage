@@ -271,3 +271,43 @@ message ActiveGameInfo {
 message GetMyActiveGamesResponse {
   repeated ActiveGameInfo games = 1;
 }
+
+// Rollback Messages
+
+// Request a rollback to a specific message in the game log
+// Requires opponent consent in multiplayer games
+message RequestRollbackRequest {
+  string session_id = 1;
+  string game_id = 2;
+  int32 message_id = 3;  // ID of the message to rollback to
+}
+
+message RequestRollbackResponse {
+  bool success = 1;
+  string error = 2;
+  string request_id = 3;  // UUID to track the request
+}
+
+// Respond to a pending rollback request
+message RespondToRollbackRequest {
+  string session_id = 1;
+  string game_id = 2;
+  string request_id = 3;  // The request ID from RequestRollbackResponse
+  bool approved = 4;      // Whether to approve the rollback
+}
+
+message RespondToRollbackResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+// Cancel a pending rollback request (only the requester can cancel)
+message CancelRollbackRequest {
+  string session_id = 1;
+  string game_id = 2;
+}
+
+message CancelRollbackResponse {
+  bool success = 1;
+  string error = 2;
+}

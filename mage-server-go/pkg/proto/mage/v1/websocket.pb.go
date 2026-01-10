@@ -81,57 +81,64 @@ const (
 	CallbackMethod_REPLAY_INIT   CallbackMethod = 91
 	CallbackMethod_REPLAY_UPDATE CallbackMethod = 92
 	CallbackMethod_REPLAY_DONE   CallbackMethod = 93
+	// Rollback Events
+	CallbackMethod_GAME_ROLLBACK_REQUEST  CallbackMethod = 100 // Sent to opponent asking for consent
+	CallbackMethod_GAME_ROLLBACK_RESPONSE CallbackMethod = 101 // Response to rollback request
+	CallbackMethod_GAME_ROLLBACK_COMPLETE CallbackMethod = 102 // Rollback was performed
 )
 
 // Enum value maps for CallbackMethod.
 var (
 	CallbackMethod_name = map[int32]string{
-		0:  "CALLBACK_METHOD_UNSPECIFIED",
-		1:  "CHATMESSAGE",
-		2:  "SHOW_USERMESSAGE",
-		3:  "SERVER_MESSAGE",
-		10: "JOINED_TABLE",
-		11: "TABLE_WAITING",
-		20: "START_TOURNAMENT",
-		21: "TOURNAMENT_INIT",
-		22: "TOURNAMENT_UPDATE",
-		23: "TOURNAMENT_OVER",
-		30: "START_DRAFT",
-		31: "SIDEBOARD",
-		32: "CONSTRUCT",
-		33: "DRAFT_OVER",
-		34: "DRAFT_INIT",
-		35: "DRAFT_PICK",
-		36: "DRAFT_UPDATE",
-		40: "SHOW_TOURNAMENT",
-		41: "WATCHGAME",
-		50: "VIEW_LIMITED_DECK",
-		51: "VIEW_SIDEBOARD",
-		60: "USER_REQUEST_DIALOG",
-		61: "GAME_REDRAW_GUI",
-		70: "START_GAME",
-		71: "GAME_INIT",
-		72: "GAME_UPDATE_AND_INFORM",
-		73: "GAME_INFORM_PERSONAL",
-		74: "GAME_ERROR",
-		75: "GAME_UPDATE",
-		76: "GAME_TARGET",
-		77: "GAME_CHOOSE_ABILITY",
-		78: "GAME_CHOOSE_PILE",
-		79: "GAME_CHOOSE_CHOICE",
-		80: "GAME_ASK",
-		81: "GAME_SELECT",
-		82: "GAME_PLAY_MANA",
-		83: "GAME_PLAY_XMANA",
-		84: "GAME_GET_AMOUNT",
-		85: "GAME_GET_MULTI_AMOUNT",
-		86: "GAME_OVER",
-		87: "END_GAME_INFO",
-		88: "GAME_ASSIGN_DAMAGE",
-		90: "REPLAY_GAME",
-		91: "REPLAY_INIT",
-		92: "REPLAY_UPDATE",
-		93: "REPLAY_DONE",
+		0:   "CALLBACK_METHOD_UNSPECIFIED",
+		1:   "CHATMESSAGE",
+		2:   "SHOW_USERMESSAGE",
+		3:   "SERVER_MESSAGE",
+		10:  "JOINED_TABLE",
+		11:  "TABLE_WAITING",
+		20:  "START_TOURNAMENT",
+		21:  "TOURNAMENT_INIT",
+		22:  "TOURNAMENT_UPDATE",
+		23:  "TOURNAMENT_OVER",
+		30:  "START_DRAFT",
+		31:  "SIDEBOARD",
+		32:  "CONSTRUCT",
+		33:  "DRAFT_OVER",
+		34:  "DRAFT_INIT",
+		35:  "DRAFT_PICK",
+		36:  "DRAFT_UPDATE",
+		40:  "SHOW_TOURNAMENT",
+		41:  "WATCHGAME",
+		50:  "VIEW_LIMITED_DECK",
+		51:  "VIEW_SIDEBOARD",
+		60:  "USER_REQUEST_DIALOG",
+		61:  "GAME_REDRAW_GUI",
+		70:  "START_GAME",
+		71:  "GAME_INIT",
+		72:  "GAME_UPDATE_AND_INFORM",
+		73:  "GAME_INFORM_PERSONAL",
+		74:  "GAME_ERROR",
+		75:  "GAME_UPDATE",
+		76:  "GAME_TARGET",
+		77:  "GAME_CHOOSE_ABILITY",
+		78:  "GAME_CHOOSE_PILE",
+		79:  "GAME_CHOOSE_CHOICE",
+		80:  "GAME_ASK",
+		81:  "GAME_SELECT",
+		82:  "GAME_PLAY_MANA",
+		83:  "GAME_PLAY_XMANA",
+		84:  "GAME_GET_AMOUNT",
+		85:  "GAME_GET_MULTI_AMOUNT",
+		86:  "GAME_OVER",
+		87:  "END_GAME_INFO",
+		88:  "GAME_ASSIGN_DAMAGE",
+		90:  "REPLAY_GAME",
+		91:  "REPLAY_INIT",
+		92:  "REPLAY_UPDATE",
+		93:  "REPLAY_DONE",
+		100: "GAME_ROLLBACK_REQUEST",
+		101: "GAME_ROLLBACK_RESPONSE",
+		102: "GAME_ROLLBACK_COMPLETE",
 	}
 	CallbackMethod_value = map[string]int32{
 		"CALLBACK_METHOD_UNSPECIFIED": 0,
@@ -180,6 +187,9 @@ var (
 		"REPLAY_INIT":                 91,
 		"REPLAY_UPDATE":               92,
 		"REPLAY_DONE":                 93,
+		"GAME_ROLLBACK_REQUEST":       100,
+		"GAME_ROLLBACK_RESPONSE":      101,
+		"GAME_ROLLBACK_COMPLETE":      102,
 	}
 )
 
@@ -2627,6 +2637,213 @@ func (x *DamageTarget) GetOrder() int32 {
 	return 0
 }
 
+// Rollback request sent to opponent asking for consent
+type GameRollbackRequestData struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	RequestingPlayerId   string                 `protobuf:"bytes,1,opt,name=requesting_player_id,json=requestingPlayerId,proto3" json:"requesting_player_id,omitempty"`
+	RequestingPlayerName string                 `protobuf:"bytes,2,opt,name=requesting_player_name,json=requestingPlayerName,proto3" json:"requesting_player_name,omitempty"`
+	TargetMessageId      int32                  `protobuf:"varint,3,opt,name=target_message_id,json=targetMessageId,proto3" json:"target_message_id,omitempty"`
+	TargetMessageText    string                 `protobuf:"bytes,4,opt,name=target_message_text,json=targetMessageText,proto3" json:"target_message_text,omitempty"`
+	RequestId            string                 `protobuf:"bytes,5,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"` // UUID for tracking the request
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *GameRollbackRequestData) Reset() {
+	*x = GameRollbackRequestData{}
+	mi := &file_mage_v1_websocket_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GameRollbackRequestData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GameRollbackRequestData) ProtoMessage() {}
+
+func (x *GameRollbackRequestData) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_websocket_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GameRollbackRequestData.ProtoReflect.Descriptor instead.
+func (*GameRollbackRequestData) Descriptor() ([]byte, []int) {
+	return file_mage_v1_websocket_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *GameRollbackRequestData) GetRequestingPlayerId() string {
+	if x != nil {
+		return x.RequestingPlayerId
+	}
+	return ""
+}
+
+func (x *GameRollbackRequestData) GetRequestingPlayerName() string {
+	if x != nil {
+		return x.RequestingPlayerName
+	}
+	return ""
+}
+
+func (x *GameRollbackRequestData) GetTargetMessageId() int32 {
+	if x != nil {
+		return x.TargetMessageId
+	}
+	return 0
+}
+
+func (x *GameRollbackRequestData) GetTargetMessageText() string {
+	if x != nil {
+		return x.TargetMessageText
+	}
+	return ""
+}
+
+func (x *GameRollbackRequestData) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+// Response to a rollback request
+type GameRollbackResponseData struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	RequestId            string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Approved             bool                   `protobuf:"varint,2,opt,name=approved,proto3" json:"approved,omitempty"`
+	RespondingPlayerId   string                 `protobuf:"bytes,3,opt,name=responding_player_id,json=respondingPlayerId,proto3" json:"responding_player_id,omitempty"`
+	RespondingPlayerName string                 `protobuf:"bytes,4,opt,name=responding_player_name,json=respondingPlayerName,proto3" json:"responding_player_name,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *GameRollbackResponseData) Reset() {
+	*x = GameRollbackResponseData{}
+	mi := &file_mage_v1_websocket_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GameRollbackResponseData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GameRollbackResponseData) ProtoMessage() {}
+
+func (x *GameRollbackResponseData) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_websocket_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GameRollbackResponseData.ProtoReflect.Descriptor instead.
+func (*GameRollbackResponseData) Descriptor() ([]byte, []int) {
+	return file_mage_v1_websocket_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *GameRollbackResponseData) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *GameRollbackResponseData) GetApproved() bool {
+	if x != nil {
+		return x.Approved
+	}
+	return false
+}
+
+func (x *GameRollbackResponseData) GetRespondingPlayerId() string {
+	if x != nil {
+		return x.RespondingPlayerId
+	}
+	return ""
+}
+
+func (x *GameRollbackResponseData) GetRespondingPlayerName() string {
+	if x != nil {
+		return x.RespondingPlayerName
+	}
+	return ""
+}
+
+// Notification that rollback was completed
+type GameRollbackCompleteData struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	TargetMessageId int32                  `protobuf:"varint,1,opt,name=target_message_id,json=targetMessageId,proto3" json:"target_message_id,omitempty"`
+	InitiatedBy     string                 `protobuf:"bytes,2,opt,name=initiated_by,json=initiatedBy,proto3" json:"initiated_by,omitempty"`
+	InitiatedByName string                 `protobuf:"bytes,3,opt,name=initiated_by_name,json=initiatedByName,proto3" json:"initiated_by_name,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *GameRollbackCompleteData) Reset() {
+	*x = GameRollbackCompleteData{}
+	mi := &file_mage_v1_websocket_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GameRollbackCompleteData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GameRollbackCompleteData) ProtoMessage() {}
+
+func (x *GameRollbackCompleteData) ProtoReflect() protoreflect.Message {
+	mi := &file_mage_v1_websocket_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GameRollbackCompleteData.ProtoReflect.Descriptor instead.
+func (*GameRollbackCompleteData) Descriptor() ([]byte, []int) {
+	return file_mage_v1_websocket_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *GameRollbackCompleteData) GetTargetMessageId() int32 {
+	if x != nil {
+		return x.TargetMessageId
+	}
+	return 0
+}
+
+func (x *GameRollbackCompleteData) GetInitiatedBy() string {
+	if x != nil {
+		return x.InitiatedBy
+	}
+	return ""
+}
+
+func (x *GameRollbackCompleteData) GetInitiatedByName() string {
+	if x != nil {
+		return x.InitiatedByName
+	}
+	return ""
+}
+
 var File_mage_v1_websocket_proto protoreflect.FileDescriptor
 
 const file_mage_v1_websocket_proto_rawDesc = "" +
@@ -2798,7 +3015,24 @@ const file_mage_v1_websocket_proto_rawDesc = "" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
 	"\ttoughness\x18\x03 \x01(\x05R\ttoughness\x12#\n" +
 	"\rmarked_damage\x18\x04 \x01(\x05R\fmarkedDamage\x12\x14\n" +
-	"\x05order\x18\x05 \x01(\x05R\x05order*\x9c\a\n" +
+	"\x05order\x18\x05 \x01(\x05R\x05order\"\xfc\x01\n" +
+	"\x17GameRollbackRequestData\x120\n" +
+	"\x14requesting_player_id\x18\x01 \x01(\tR\x12requestingPlayerId\x124\n" +
+	"\x16requesting_player_name\x18\x02 \x01(\tR\x14requestingPlayerName\x12*\n" +
+	"\x11target_message_id\x18\x03 \x01(\x05R\x0ftargetMessageId\x12.\n" +
+	"\x13target_message_text\x18\x04 \x01(\tR\x11targetMessageText\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x05 \x01(\tR\trequestId\"\xbd\x01\n" +
+	"\x18GameRollbackResponseData\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\x12\x1a\n" +
+	"\bapproved\x18\x02 \x01(\bR\bapproved\x120\n" +
+	"\x14responding_player_id\x18\x03 \x01(\tR\x12respondingPlayerId\x124\n" +
+	"\x16responding_player_name\x18\x04 \x01(\tR\x14respondingPlayerName\"\x95\x01\n" +
+	"\x18GameRollbackCompleteData\x12*\n" +
+	"\x11target_message_id\x18\x01 \x01(\x05R\x0ftargetMessageId\x12!\n" +
+	"\finitiated_by\x18\x02 \x01(\tR\vinitiatedBy\x12*\n" +
+	"\x11initiated_by_name\x18\x03 \x01(\tR\x0finitiatedByName*\xef\a\n" +
 	"\x0eCallbackMethod\x12\x1f\n" +
 	"\x1bCALLBACK_METHOD_UNSPECIFIED\x10\x00\x12\x0f\n" +
 	"\vCHATMESSAGE\x10\x01\x12\x14\n" +
@@ -2851,7 +3085,10 @@ const file_mage_v1_websocket_proto_rawDesc = "" +
 	"\vREPLAY_GAME\x10Z\x12\x0f\n" +
 	"\vREPLAY_INIT\x10[\x12\x11\n" +
 	"\rREPLAY_UPDATE\x10\\\x12\x0f\n" +
-	"\vREPLAY_DONE\x10]B6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
+	"\vREPLAY_DONE\x10]\x12\x19\n" +
+	"\x15GAME_ROLLBACK_REQUEST\x10d\x12\x1a\n" +
+	"\x16GAME_ROLLBACK_RESPONSE\x10e\x12\x1a\n" +
+	"\x16GAME_ROLLBACK_COMPLETE\x10fB6Z4github.com/magefree/mage-server-go/pkg/proto/mage/v1b\x06proto3"
 
 var (
 	file_mage_v1_websocket_proto_rawDescOnce sync.Once
@@ -2866,94 +3103,97 @@ func file_mage_v1_websocket_proto_rawDescGZIP() []byte {
 }
 
 var file_mage_v1_websocket_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_mage_v1_websocket_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
+var file_mage_v1_websocket_proto_msgTypes = make([]protoimpl.MessageInfo, 50)
 var file_mage_v1_websocket_proto_goTypes = []any{
-	(CallbackMethod)(0),             // 0: mage.v1.CallbackMethod
-	(*ServerEvent)(nil),             // 1: mage.v1.ServerEvent
-	(*ChatMessageData)(nil),         // 2: mage.v1.ChatMessageData
-	(*UserMessageData)(nil),         // 3: mage.v1.UserMessageData
-	(*ServerMessageData)(nil),       // 4: mage.v1.ServerMessageData
-	(*JoinedTableData)(nil),         // 5: mage.v1.JoinedTableData
-	(*TournamentInitData)(nil),      // 6: mage.v1.TournamentInitData
-	(*TournamentUpdateData)(nil),    // 7: mage.v1.TournamentUpdateData
-	(*TournamentOverData)(nil),      // 8: mage.v1.TournamentOverData
-	(*StartDraftData)(nil),          // 9: mage.v1.StartDraftData
-	(*DraftInitData)(nil),           // 10: mage.v1.DraftInitData
-	(*DraftPickData)(nil),           // 11: mage.v1.DraftPickData
-	(*DraftUpdateData)(nil),         // 12: mage.v1.DraftUpdateData
-	(*SideboardData)(nil),           // 13: mage.v1.SideboardData
-	(*ConstructData)(nil),           // 14: mage.v1.ConstructData
-	(*WatchGameData)(nil),           // 15: mage.v1.WatchGameData
-	(*ShowTournamentData)(nil),      // 16: mage.v1.ShowTournamentData
-	(*ViewLimitedDeckData)(nil),     // 17: mage.v1.ViewLimitedDeckData
-	(*UserRequestDialogData)(nil),   // 18: mage.v1.UserRequestDialogData
-	(*StartGameData)(nil),           // 19: mage.v1.StartGameData
-	(*GameInitData)(nil),            // 20: mage.v1.GameInitData
-	(*GameUpdateData)(nil),          // 21: mage.v1.GameUpdateData
-	(*GameUpdateAndInformData)(nil), // 22: mage.v1.GameUpdateAndInformData
-	(*GameInformPersonalData)(nil),  // 23: mage.v1.GameInformPersonalData
-	(*GameErrorData)(nil),           // 24: mage.v1.GameErrorData
-	(*GameTargetData)(nil),          // 25: mage.v1.GameTargetData
-	(*GameChooseAbilityData)(nil),   // 26: mage.v1.GameChooseAbilityData
-	(*GameChoosePileData)(nil),      // 27: mage.v1.GameChoosePileData
-	(*PileView)(nil),                // 28: mage.v1.PileView
-	(*GameChoiceData)(nil),          // 29: mage.v1.GameChoiceData
-	(*GameAskData)(nil),             // 30: mage.v1.GameAskData
-	(*GameSelectData)(nil),          // 31: mage.v1.GameSelectData
-	(*GamePlayManaData)(nil),        // 32: mage.v1.GamePlayManaData
-	(*ManaOption)(nil),              // 33: mage.v1.ManaOption
-	(*GamePlayXManaData)(nil),       // 34: mage.v1.GamePlayXManaData
-	(*GameGetAmountData)(nil),       // 35: mage.v1.GameGetAmountData
-	(*GameGetMultiAmountData)(nil),  // 36: mage.v1.GameGetMultiAmountData
-	(*AmountRange)(nil),             // 37: mage.v1.AmountRange
-	(*GameOverData)(nil),            // 38: mage.v1.GameOverData
-	(*PlayerResult)(nil),            // 39: mage.v1.PlayerResult
-	(*EndGameInfoData)(nil),         // 40: mage.v1.EndGameInfoData
-	(*ReplayInitData)(nil),          // 41: mage.v1.ReplayInitData
-	(*ReplayUpdateData)(nil),        // 42: mage.v1.ReplayUpdateData
-	(*ReplayDoneData)(nil),          // 43: mage.v1.ReplayDoneData
-	(*GameAssignDamageData)(nil),    // 44: mage.v1.GameAssignDamageData
-	(*DamageTarget)(nil),            // 45: mage.v1.DamageTarget
-	nil,                             // 46: mage.v1.GameTargetData.OptionsEntry
-	nil,                             // 47: mage.v1.GameSelectData.OptionsEntry
-	(*anypb.Any)(nil),               // 48: google.protobuf.Any
-	(*ChatMessage)(nil),             // 49: mage.v1.ChatMessage
-	(*TournamentView)(nil),          // 50: mage.v1.TournamentView
-	(*DraftPickView)(nil),           // 51: mage.v1.DraftPickView
-	(*CardView)(nil),                // 52: mage.v1.CardView
-	(*GameView)(nil),                // 53: mage.v1.GameView
-	(*AbilityView)(nil),             // 54: mage.v1.AbilityView
+	(CallbackMethod)(0),              // 0: mage.v1.CallbackMethod
+	(*ServerEvent)(nil),              // 1: mage.v1.ServerEvent
+	(*ChatMessageData)(nil),          // 2: mage.v1.ChatMessageData
+	(*UserMessageData)(nil),          // 3: mage.v1.UserMessageData
+	(*ServerMessageData)(nil),        // 4: mage.v1.ServerMessageData
+	(*JoinedTableData)(nil),          // 5: mage.v1.JoinedTableData
+	(*TournamentInitData)(nil),       // 6: mage.v1.TournamentInitData
+	(*TournamentUpdateData)(nil),     // 7: mage.v1.TournamentUpdateData
+	(*TournamentOverData)(nil),       // 8: mage.v1.TournamentOverData
+	(*StartDraftData)(nil),           // 9: mage.v1.StartDraftData
+	(*DraftInitData)(nil),            // 10: mage.v1.DraftInitData
+	(*DraftPickData)(nil),            // 11: mage.v1.DraftPickData
+	(*DraftUpdateData)(nil),          // 12: mage.v1.DraftUpdateData
+	(*SideboardData)(nil),            // 13: mage.v1.SideboardData
+	(*ConstructData)(nil),            // 14: mage.v1.ConstructData
+	(*WatchGameData)(nil),            // 15: mage.v1.WatchGameData
+	(*ShowTournamentData)(nil),       // 16: mage.v1.ShowTournamentData
+	(*ViewLimitedDeckData)(nil),      // 17: mage.v1.ViewLimitedDeckData
+	(*UserRequestDialogData)(nil),    // 18: mage.v1.UserRequestDialogData
+	(*StartGameData)(nil),            // 19: mage.v1.StartGameData
+	(*GameInitData)(nil),             // 20: mage.v1.GameInitData
+	(*GameUpdateData)(nil),           // 21: mage.v1.GameUpdateData
+	(*GameUpdateAndInformData)(nil),  // 22: mage.v1.GameUpdateAndInformData
+	(*GameInformPersonalData)(nil),   // 23: mage.v1.GameInformPersonalData
+	(*GameErrorData)(nil),            // 24: mage.v1.GameErrorData
+	(*GameTargetData)(nil),           // 25: mage.v1.GameTargetData
+	(*GameChooseAbilityData)(nil),    // 26: mage.v1.GameChooseAbilityData
+	(*GameChoosePileData)(nil),       // 27: mage.v1.GameChoosePileData
+	(*PileView)(nil),                 // 28: mage.v1.PileView
+	(*GameChoiceData)(nil),           // 29: mage.v1.GameChoiceData
+	(*GameAskData)(nil),              // 30: mage.v1.GameAskData
+	(*GameSelectData)(nil),           // 31: mage.v1.GameSelectData
+	(*GamePlayManaData)(nil),         // 32: mage.v1.GamePlayManaData
+	(*ManaOption)(nil),               // 33: mage.v1.ManaOption
+	(*GamePlayXManaData)(nil),        // 34: mage.v1.GamePlayXManaData
+	(*GameGetAmountData)(nil),        // 35: mage.v1.GameGetAmountData
+	(*GameGetMultiAmountData)(nil),   // 36: mage.v1.GameGetMultiAmountData
+	(*AmountRange)(nil),              // 37: mage.v1.AmountRange
+	(*GameOverData)(nil),             // 38: mage.v1.GameOverData
+	(*PlayerResult)(nil),             // 39: mage.v1.PlayerResult
+	(*EndGameInfoData)(nil),          // 40: mage.v1.EndGameInfoData
+	(*ReplayInitData)(nil),           // 41: mage.v1.ReplayInitData
+	(*ReplayUpdateData)(nil),         // 42: mage.v1.ReplayUpdateData
+	(*ReplayDoneData)(nil),           // 43: mage.v1.ReplayDoneData
+	(*GameAssignDamageData)(nil),     // 44: mage.v1.GameAssignDamageData
+	(*DamageTarget)(nil),             // 45: mage.v1.DamageTarget
+	(*GameRollbackRequestData)(nil),  // 46: mage.v1.GameRollbackRequestData
+	(*GameRollbackResponseData)(nil), // 47: mage.v1.GameRollbackResponseData
+	(*GameRollbackCompleteData)(nil), // 48: mage.v1.GameRollbackCompleteData
+	nil,                              // 49: mage.v1.GameTargetData.OptionsEntry
+	nil,                              // 50: mage.v1.GameSelectData.OptionsEntry
+	(*anypb.Any)(nil),                // 51: google.protobuf.Any
+	(*ChatMessage)(nil),              // 52: mage.v1.ChatMessage
+	(*TournamentView)(nil),           // 53: mage.v1.TournamentView
+	(*DraftPickView)(nil),            // 54: mage.v1.DraftPickView
+	(*CardView)(nil),                 // 55: mage.v1.CardView
+	(*GameView)(nil),                 // 56: mage.v1.GameView
+	(*AbilityView)(nil),              // 57: mage.v1.AbilityView
 }
 var file_mage_v1_websocket_proto_depIdxs = []int32{
 	0,  // 0: mage.v1.ServerEvent.method:type_name -> mage.v1.CallbackMethod
-	48, // 1: mage.v1.ServerEvent.data:type_name -> google.protobuf.Any
-	49, // 2: mage.v1.ChatMessageData.message:type_name -> mage.v1.ChatMessage
-	50, // 3: mage.v1.TournamentInitData.tournament:type_name -> mage.v1.TournamentView
-	50, // 4: mage.v1.TournamentUpdateData.tournament:type_name -> mage.v1.TournamentView
-	50, // 5: mage.v1.TournamentOverData.tournament:type_name -> mage.v1.TournamentView
-	51, // 6: mage.v1.DraftInitData.draft_pick:type_name -> mage.v1.DraftPickView
-	51, // 7: mage.v1.DraftPickData.draft_pick:type_name -> mage.v1.DraftPickView
-	51, // 8: mage.v1.DraftUpdateData.draft_pick:type_name -> mage.v1.DraftPickView
-	52, // 9: mage.v1.SideboardData.deck:type_name -> mage.v1.CardView
-	52, // 10: mage.v1.SideboardData.sideboard:type_name -> mage.v1.CardView
-	52, // 11: mage.v1.ConstructData.cards:type_name -> mage.v1.CardView
-	52, // 12: mage.v1.ViewLimitedDeckData.deck:type_name -> mage.v1.CardView
-	52, // 13: mage.v1.ViewLimitedDeckData.sideboard:type_name -> mage.v1.CardView
-	53, // 14: mage.v1.GameInitData.game:type_name -> mage.v1.GameView
-	53, // 15: mage.v1.GameUpdateData.game:type_name -> mage.v1.GameView
-	53, // 16: mage.v1.GameUpdateAndInformData.game:type_name -> mage.v1.GameView
-	52, // 17: mage.v1.GameTargetData.targets:type_name -> mage.v1.CardView
-	46, // 18: mage.v1.GameTargetData.options:type_name -> mage.v1.GameTargetData.OptionsEntry
-	54, // 19: mage.v1.GameChooseAbilityData.abilities:type_name -> mage.v1.AbilityView
+	51, // 1: mage.v1.ServerEvent.data:type_name -> google.protobuf.Any
+	52, // 2: mage.v1.ChatMessageData.message:type_name -> mage.v1.ChatMessage
+	53, // 3: mage.v1.TournamentInitData.tournament:type_name -> mage.v1.TournamentView
+	53, // 4: mage.v1.TournamentUpdateData.tournament:type_name -> mage.v1.TournamentView
+	53, // 5: mage.v1.TournamentOverData.tournament:type_name -> mage.v1.TournamentView
+	54, // 6: mage.v1.DraftInitData.draft_pick:type_name -> mage.v1.DraftPickView
+	54, // 7: mage.v1.DraftPickData.draft_pick:type_name -> mage.v1.DraftPickView
+	54, // 8: mage.v1.DraftUpdateData.draft_pick:type_name -> mage.v1.DraftPickView
+	55, // 9: mage.v1.SideboardData.deck:type_name -> mage.v1.CardView
+	55, // 10: mage.v1.SideboardData.sideboard:type_name -> mage.v1.CardView
+	55, // 11: mage.v1.ConstructData.cards:type_name -> mage.v1.CardView
+	55, // 12: mage.v1.ViewLimitedDeckData.deck:type_name -> mage.v1.CardView
+	55, // 13: mage.v1.ViewLimitedDeckData.sideboard:type_name -> mage.v1.CardView
+	56, // 14: mage.v1.GameInitData.game:type_name -> mage.v1.GameView
+	56, // 15: mage.v1.GameUpdateData.game:type_name -> mage.v1.GameView
+	56, // 16: mage.v1.GameUpdateAndInformData.game:type_name -> mage.v1.GameView
+	55, // 17: mage.v1.GameTargetData.targets:type_name -> mage.v1.CardView
+	49, // 18: mage.v1.GameTargetData.options:type_name -> mage.v1.GameTargetData.OptionsEntry
+	57, // 19: mage.v1.GameChooseAbilityData.abilities:type_name -> mage.v1.AbilityView
 	28, // 20: mage.v1.GameChoosePileData.piles:type_name -> mage.v1.PileView
-	52, // 21: mage.v1.PileView.cards:type_name -> mage.v1.CardView
-	47, // 22: mage.v1.GameSelectData.options:type_name -> mage.v1.GameSelectData.OptionsEntry
+	55, // 21: mage.v1.PileView.cards:type_name -> mage.v1.CardView
+	50, // 22: mage.v1.GameSelectData.options:type_name -> mage.v1.GameSelectData.OptionsEntry
 	33, // 23: mage.v1.GamePlayManaData.mana_options:type_name -> mage.v1.ManaOption
 	37, // 24: mage.v1.GameGetMultiAmountData.amounts:type_name -> mage.v1.AmountRange
 	39, // 25: mage.v1.GameOverData.results:type_name -> mage.v1.PlayerResult
 	39, // 26: mage.v1.EndGameInfoData.results:type_name -> mage.v1.PlayerResult
-	53, // 27: mage.v1.ReplayInitData.game:type_name -> mage.v1.GameView
-	53, // 28: mage.v1.ReplayUpdateData.game:type_name -> mage.v1.GameView
+	56, // 27: mage.v1.ReplayInitData.game:type_name -> mage.v1.GameView
+	56, // 28: mage.v1.ReplayUpdateData.game:type_name -> mage.v1.GameView
 	45, // 29: mage.v1.GameAssignDamageData.blockers:type_name -> mage.v1.DamageTarget
 	30, // [30:30] is the sub-list for method output_type
 	30, // [30:30] is the sub-list for method input_type
@@ -2974,7 +3214,7 @@ func file_mage_v1_websocket_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mage_v1_websocket_proto_rawDesc), len(file_mage_v1_websocket_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   47,
+			NumMessages:   50,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -4,12 +4,6 @@
 	import type { CardView } from '$lib/generated/mage/v1/models';
 	import { myHand, selectedCards, gameStore, cardsBeingPlayed, hasPriority } from '$lib/stores/game';
 	import {
-		isTargetingActive,
-		validTargetIds,
-		selectedTargetIds,
-		targetingStore
-	} from '$lib/stores/game-targeting';
-	import {
 		dragDropStore,
 		isDragging as isDraggingStore,
 		draggedCardId,
@@ -28,7 +22,8 @@
 		onCardDragEnd = (cardId: string, dropped: boolean) => {},
 		size = 'normal',
 		currentPhase = '',
-		canDrag = true
+		canDrag = true,
+		showHeader = false
 	}: {
 		// eslint-disable-next-line no-unused-vars
 		onCardClick?: (cardId: string) => void;
@@ -41,12 +36,8 @@
 		size?: 'small' | 'normal' | 'large';
 		currentPhase?: string;
 		canDrag?: boolean;
+		showHeader?: boolean;
 	} = $props();
-
-	// Targeting state from store
-	const isTargeting = $derived($isTargetingActive);
-	const validTargets = $derived($validTargetIds);
-	const selectedTargets = $derived($selectedTargetIds);
 
 	// Drag state from store
 	const isDraggingGlobal = $derived($isDraggingStore);
@@ -87,13 +78,6 @@
 	 * Handle card click
 	 */
 	function handleCardClick(cardId: string, event?: MouseEvent | KeyboardEvent): void {
-		// Handle targeting mode - toggle target selection
-		if (isTargeting) {
-			targetingStore.toggleTarget(cardId);
-			onCardClick(cardId);
-			return;
-		}
-
 		// Check for multi-select (Shift key)
 		if (event?.shiftKey) {
 			multiSelectMode = true;
@@ -152,7 +136,6 @@
 	function handleMouseDown(cardId: string, cardType: string, event: MouseEvent): void {
 		if (event.button !== 0) return; // Only left click
 		if (!canDragCard(cardType)) return;
-		if (isTargeting) return; // Don't drag during targeting mode
 
 		// Prevent native drag and text selection
 		event.preventDefault();
@@ -215,7 +198,6 @@
 	 */
 	function handleTouchStart(cardId: string, cardType: string, event: TouchEvent): void {
 		if (!canDragCard(cardType)) return;
-		if (isTargeting) return;
 		if (event.touches.length !== 1) return;
 
 		const touch = event.touches[0];
@@ -283,14 +265,16 @@
 	const isEmpty = $derived(handCount === 0);
 </script>
 
-<div class="player-hand">
-	<div class="hand-header">
-		<span class="hand-label">Your Hand</span>
-		<span class="hand-count">({handCount})</span>
-		{#if selectedCardIds.length > 0}
-			<span class="selected-count">{selectedCardIds.length} selected</span>
-		{/if}
-	</div>
+<div class="player-hand" class:no-header={!showHeader}>
+	{#if showHeader}
+		<div class="hand-header">
+			<span class="hand-label">Your Hand</span>
+			<span class="hand-count">({handCount})</span>
+			{#if selectedCardIds.length > 0}
+				<span class="selected-count">{selectedCardIds.length} selected</span>
+			{/if}
+		</div>
+	{/if}
 
 	{#if isEmpty}
 		<div class="empty-state">
@@ -304,7 +288,7 @@
 				{@const cardCanDrag = canDragCard(card.cardType || '')}
 				<div
 					class="card-wrapper"
-					class:draggable={cardCanDrag && !isTargeting}
+					class:draggable={cardCanDrag}
 					class:is-dragging={cardIsDragging}
 					class:is-playing={cardIsPlaying}
 					role="button"
@@ -332,9 +316,6 @@
 						{size}
 						onclick={() => {}}
 						onhover={() => {}}
-						isTargetingActive={isTargeting}
-						isValidTarget={validTargets.has(card.id)}
-						isTargetSelected={selectedTargets.includes(card.id)}
 						isDragging={cardIsDragging}
 						isBeingPlayed={cardIsPlaying}
 					/>
@@ -356,6 +337,11 @@
 		flex-direction: column;
 		height: 100%;
 		overflow: hidden;
+	}
+
+	/* When header is hidden, reduce top padding */
+	.player-hand.no-header .hand-cards {
+		padding-top: 0.5rem;
 	}
 
 	.hand-header {

@@ -159,6 +159,8 @@ export interface ActionLogEntry {
 	text: string;
 	cardName?: string;
 	cardId?: string;
+	bookmarkId?: number;         // Snapshot ID for rollback (0 = no rollback available)
+	rollbackAvailable?: boolean; // Whether rollback is available to this point
 }
 
 export type ActionType =
