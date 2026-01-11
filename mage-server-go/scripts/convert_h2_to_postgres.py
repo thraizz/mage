@@ -16,6 +16,36 @@ import sys
 from pathlib import Path
 
 
+def _decode_h2_stringdecode_arg(h2_sql_string_literal_contents: str) -> str:
+    """
+    Decode the contents of an H2 SQL string literal used inside STRINGDECODE('...').
+
+    H2 uses standard SQL single-quote escaping ('' -> ').
+    STRINGDECODE additionally interprets backslash escapes like:
+      - \\n, \\r, \\t
+      - \\uXXXX
+
+    We approximate H2's behavior closely enough for card text imports.
+    """
+    # SQL single-quote escaping
+    s = h2_sql_string_literal_contents.replace("''", "'")
+
+    # Interpret common backslash escapes (notably \\n and \\uXXXX).
+    # Python's unicode_escape handles these well for our inputs.
+    try:
+        s = bytes(s, "utf-8").decode("unicode_escape")
+    except Exception:
+        # Fall back to raw string if decoding fails
+        pass
+
+    return s
+
+
+def _to_pg_sql_literal(value: str) -> str:
+    """Return a PostgreSQL single-quoted string literal for value."""
+    return "'" + value.replace("'", "''") + "'"
+
+
 def convert_h2_to_postgres(input_file, output_file):
     """Main conversion function"""
     print(f"Converting {input_file} to PostgreSQL format...")
@@ -66,6 +96,22 @@ def convert_h2_to_postgres(input_file, output_file):
         
         # Convert VARCHAR_IGNORECASE to TEXT
         line = re.sub(r'VARCHAR_IGNORECASE(\(\d+\))?', 'TEXT', line, flags=re.IGNORECASE)
+
+        # Convert H2 STRINGDECODE('...') to a plain PostgreSQL string literal
+        # Example in H2 export:
+        #   CAST(STRINGDECODE('line1\\nline2') AS VARCHAR_IGNORECASE)
+        # PostgreSQL has no stringdecode() builtin.
+        def _stringdecode_repl(match: re.Match) -> str:
+            inner = match.group(1)
+            decoded = _decode_h2_stringdecode_arg(inner)
+            return _to_pg_sql_literal(decoded)
+
+        line = re.sub(
+            r"STRINGDECODE\('((?:[^']|'')*)'\)",
+            _stringdecode_repl,
+            line,
+            flags=re.IGNORECASE,
+        )
         
         # Convert CAST(... AS VARCHAR_IGNORECASE) to just the value
         # Handle: CAST('value' AS VARCHAR_IGNORECASE)

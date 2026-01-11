@@ -51,6 +51,8 @@
 	let lifeMenuEl: HTMLDivElement | null = $state(null);
 	let showDebugOverlay = $state(false);
 	let selectedOpponentId = $state<string | null>(null);
+	let showOpponentLifeMenu = $state(false);
+	let opponentLifeMenuEl: HTMLDivElement | null = $state(null);
 
 	// Mulligan state
 	let mulliganPlayerIndex = $state<number | null>(null);
@@ -270,18 +272,22 @@
 	/**
 	 * Handle life change
 	 */
-	function handleLifeChange(delta: number): void {
-		if (!me) return;
-		playtestGameStore.modifyLife(me.playerId, delta);
+	function handleLifeChange(delta: number, playerId?: string): void {
+		const targetPlayerId = playerId || me?.playerId;
+		if (!targetPlayerId) return;
+		playtestGameStore.modifyLife(targetPlayerId, delta);
 	}
 
 	/**
 	 * Handle poison counter change
 	 */
-	function handlePoisonChange(delta: number): void {
-		if (!me) return;
-		const newValue = Math.max(0, (me.poison || 0) + delta);
-		playtestGameStore.setPlayerCounter(me.playerId, 'poison', newValue);
+	function handlePoisonChange(delta: number, playerId?: string): void {
+		const targetPlayerId = playerId || me?.playerId;
+		if (!targetPlayerId) return;
+		const player = players.find(p => p.playerId === targetPlayerId);
+		if (!player) return;
+		const newValue = Math.max(0, (player.poison || 0) + delta);
+		playtestGameStore.setPlayerCounter(targetPlayerId, 'poison', newValue);
 	}
 
 	/**
@@ -678,11 +684,51 @@
 								<span class="opponent-name-label">{opponent.name}</span>
 							{/if}
 						</div>
-						<div class="opponent-stats">
-							<span class="opponent-life">❤️ {opponent.life}</span>
-							<span class="opponent-stat">Hand: {opponent.handCount}</span>
-							<span class="opponent-stat">Library: {opponent.libraryCount}</span>
-							<span class="opponent-stat">Graveyard: {opponent.graveyard.length}</span>
+						<div class="opponent-controls">
+							<div class="life-group">
+								<button class="stat-btn minus" onclick={() => handleLifeChange(-1, opponent.playerId)}>−</button>
+								<button class="stat-display life" onclick={() => showOpponentLifeMenu = !showOpponentLifeMenu}>
+									<span class="stat-icon">❤️</span>
+									<span class="stat-value">{opponent.life}</span>
+								</button>
+								<button class="stat-btn plus" onclick={() => handleLifeChange(1, opponent.playerId)}>+</button>
+							</div>
+
+							{#if opponent.poison > 0}
+								<div class="stat-display poison">
+									<span class="stat-icon">☠️</span>
+									<span class="stat-value">{opponent.poison}</span>
+								</div>
+							{/if}
+
+							{#if showOpponentLifeMenu}
+								<div bind:this={opponentLifeMenuEl} class="quick-menu opponent-menu" onclick={(e) => e.stopPropagation()}>
+									<div class="menu-section">
+										<span class="menu-label">Life</span>
+										<div class="menu-row">
+											<button onclick={() => handleLifeChange(-5, opponent.playerId)}>−5</button>
+											<button onclick={() => handleLifeChange(-1, opponent.playerId)}>−1</button>
+											<button onclick={() => handleLifeChange(1, opponent.playerId)}>+1</button>
+											<button onclick={() => handleLifeChange(5, opponent.playerId)}>+5</button>
+										</div>
+									</div>
+									<div class="menu-section">
+										<span class="menu-label">Poison</span>
+										<div class="menu-row">
+											<button onclick={() => handlePoisonChange(-1, opponent.playerId)}>−1</button>
+											<span class="menu-value">{opponent.poison}</span>
+											<button onclick={() => handlePoisonChange(1, opponent.playerId)}>+1</button>
+										</div>
+									</div>
+									<button class="menu-close" onclick={() => showOpponentLifeMenu = false}>✕</button>
+								</div>
+							{/if}
+
+							<div class="opponent-stats">
+								<span class="opponent-stat">Hand: {opponent.handCount}</span>
+								<span class="opponent-stat">Library: {opponent.libraryCount}</span>
+								<span class="opponent-stat">Graveyard: {opponent.graveyard.length}</span>
+							</div>
 						</div>
 					</div>
 
@@ -1213,12 +1259,22 @@
 		background: rgba(26, 31, 46, 0.8);
 		border: 1px solid #2a3441;
 		border-radius: 8px;
+		gap: 1rem;
 	}
 
 	.opponent-identity {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+
+	.opponent-controls {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		flex: 1;
+		position: relative;
 	}
 
 	.opponent-select {
@@ -1246,18 +1302,20 @@
 
 	.opponent-stats {
 		display: flex;
-		gap: 1rem;
+		gap: 0.75rem;
 		font-size: 0.875rem;
 		align-items: center;
-	}
-
-	.opponent-life {
-		color: #ef4444;
-		font-weight: 600;
+		margin-left: auto;
 	}
 
 	.opponent-stat {
 		color: #94a3b8;
+		white-space: nowrap;
+	}
+
+	.opponent-menu {
+		top: calc(100% + 8px);
+		bottom: auto;
 	}
 
 	.battlefield-area {

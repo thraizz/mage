@@ -44,7 +44,30 @@ interface WebSocketStore {
 	reconnectAttempts: number;
 }
 
-const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:17179/ws';
+// Determine WebSocket URL based on environment
+// In production (when VITE_GRPC_SERVER_URL is set), derive WS URL from it
+// In dev, use localhost
+function getWebSocketUrl(): string {
+	// Check for explicit WebSocket URL first
+	if (import.meta.env.VITE_WEBSOCKET_URL) {
+		return import.meta.env.VITE_WEBSOCKET_URL;
+	}
+	
+	// Derive from gRPC server URL if available
+	const grpcUrl = import.meta.env.VITE_GRPC_SERVER_URL;
+	if (grpcUrl) {
+		// Convert https://api.mage.aronschueler.de -> wss://api.mage.aronschueler.de/ws
+		// Convert http://api.mage.aronschueler.de -> ws://api.mage.aronschueler.de/ws
+		const url = new URL(grpcUrl);
+		const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+		return `${wsProtocol}//${url.host}/ws`;
+	}
+	
+	// Default to localhost for development
+	return 'ws://localhost:17179/ws';
+}
+
+const WEBSOCKET_URL = getWebSocketUrl();
 
 const MAX_RECONNECT_ATTEMPTS = 10;
 const BASE_RECONNECT_DELAY = 1000;

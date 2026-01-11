@@ -20,6 +20,11 @@
 	let passwordError = '';
 	let confirmPasswordError = '';
 
+	// Available background images
+	const backgroundImages = ['Boros.jpg', 'Golgari.jpg', 'Gruul.jpg', 'Izzet.jpg', 'Rakdos.jpg'];
+	// Randomly select a background image
+	let selectedBackground = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+
 	// Get return URL from query params
 	$: returnUrl = $page.url.searchParams.get('returnUrl') || '/lobby';
 
@@ -127,12 +132,12 @@
 			const registerResponse = await client.register(username, password);
 
 			if (!registerResponse.success) {
-				throw new Error(registerResponse.error || 'Registration failed');
+				throw new Error(registerResponse.error || 'Spark ignition failed');
 			}
 
 			// Show success message
-			successMessage = 'Account created successfully! Logging you in...';
-			toast.success('Account created successfully!');
+			successMessage = 'Spark Ignited! Drawing your destiny...';
+			toast.success('Spark Ignited! Welcome, Planeswalker.');
 
 			// Auto-login after successful registration
 			await new Promise((resolve) => setTimeout(resolve, 500));
@@ -141,13 +146,18 @@
 
 			if (!loginResponse.success) {
 				// Registration succeeded but login failed - redirect to login page
-				toast.warning('Please log in with your new account');
+				toast.warning('Please enter the Blind Eternities with your new account');
 				goto('/login');
 				return;
 			}
 
 			// Create a session-based token from server response
-			const token = createSessionToken(loginResponse.sessionId, loginResponse.userId, username);
+			const token = createSessionToken(
+				loginResponse.sessionId,
+				loginResponse.userId,
+				username,
+				`${username}@example.com`
+			);
 
 			// Store in auth store
 			auth.login(token, {
@@ -159,11 +169,11 @@
 			goto(returnUrl);
 		} catch (error) {
 			if (error instanceof Error) {
-				errorMessage = error.message;
-				toast.error(error.message);
+				errorMessage = `Spell Fizzled. ${error.message}`;
+				toast.error(`Spell Fizzled. ${error.message}`);
 			} else {
-				errorMessage = 'Registration failed. Please try again.';
-				toast.error('Registration failed. Please try again.');
+				errorMessage = 'Spell Fizzled. Unable to ignite your spark.';
+				toast.error('Spell Fizzled. Unable to ignite your spark.');
 			}
 		} finally {
 			isLoading = false;
@@ -172,13 +182,13 @@
 </script>
 
 <svelte:head>
-	<title>Register - MAGE</title>
+	<title>Ignite Your Spark - MAGE</title>
 </svelte:head>
 
-<div class="container">
+<div class="container" style="background-image: url('/images/{selectedBackground}')">
 	<div class="card">
-		<h1>Create Account</h1>
-		<p>Join MAGE and start playing Magic: The Gathering online</p>
+		<h1>Ignite Your Spark</h1>
+		<p class="flavor-text">Welcome, aspiring Planeswalker. Forge your identity and begin your journey.</p>
 
 		{#if errorMessage}
 			<div class="error-message" role="alert" aria-live="polite">
@@ -194,7 +204,7 @@
 
 		<form class="register-form" on:submit={handleRegister}>
 			<div class="form-group">
-				<label for="username">Username</label>
+				<label for="username">Choose Your Name</label>
 				<input
 					type="text"
 					id="username"
@@ -202,14 +212,14 @@
 					bind:value={username}
 					on:input={handleUsernameInput}
 					on:blur={handleUsernameBlur}
-					placeholder="Choose a username (3-20 characters)"
+					placeholder="Enter your planeswalker name"
 					disabled={isLoading}
 					aria-required="true"
 					aria-invalid={usernameError ? 'true' : 'false'}
 					aria-describedby={usernameError ? 'username-error' : 'username-help'}
 				/>
 				<span class="field-help" id="username-help"
-					>Alphanumeric characters and underscores only</span
+					>3-20 characters: letters, numbers, and underscores only</span
 				>
 				{#if usernameError}
 					<span class="field-error" id="username-error" role="alert">{usernameError}</span>
@@ -217,8 +227,7 @@
 			</div>
 
 			<div class="form-group">
-				<label for="password">Password</label>
-				<label for="password">Password</label>
+				<label for="password">Create Your Password</label>
 				<input
 					type="password"
 					id="password"
@@ -226,7 +235,7 @@
 					bind:value={password}
 					on:input={handlePasswordInput}
 					on:blur={handlePasswordBlur}
-					placeholder="Create a password (min 8 characters)"
+					placeholder="Minimum 8 characters"
 					disabled={isLoading}
 					aria-required="true"
 					aria-invalid={passwordError ? 'true' : 'false'}
@@ -239,7 +248,7 @@
 			</div>
 
 			<div class="form-group">
-				<label for="confirm-password">Confirm Password</label>
+				<label for="confirm-password">Confirm Your Password</label>
 				<input
 					type="password"
 					id="confirm-password"
@@ -247,7 +256,7 @@
 					bind:value={confirmPassword}
 					on:input={handleConfirmPasswordInput}
 					on:blur={handleConfirmPasswordBlur}
-					placeholder="Confirm your password"
+					placeholder="Re-enter your password"
 					disabled={isLoading}
 					aria-required="true"
 					aria-invalid={confirmPasswordError ? 'true' : 'false'}
@@ -263,15 +272,15 @@
 			<button type="submit" class="btn-primary" disabled={isLoading}>
 				{#if isLoading}
 					<span class="spinner" aria-hidden="true"></span>
-					Creating Account...
+					Igniting Spark...
 				{:else}
-					Create Account
+					Ignite My Spark
 				{/if}
 			</button>
 		</form>
 
 		<div class="links">
-			<a href="/login">Already have an account? Login</a>
+			<a href="/login">Spark already ignited? <strong>Enter the Blind Eternities</strong></a>
 		</div>
 	</div>
 </div>
@@ -283,45 +292,39 @@
 		align-items: center;
 		min-height: 100vh;
 		padding: 2rem;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		position: relative;
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	.container::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(11, 12, 16, 0.7);
+		z-index: 0;
 	}
 
 	.card {
-		background: white;
-		padding: 2rem;
-		border-radius: 8px;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		width: 100%;
-		max-width: 400px;
+		max-width: 420px;
+		position: relative;
+		z-index: 1;
 	}
 
 	h1 {
-		margin: 0 0 0.5rem 0;
-		font-size: 2rem;
-		color: #333;
+		font-size: 2.25rem;
+		text-align: center;
+		margin: 0 0 0.75rem 0;
 	}
 
-	p {
+	.flavor-text {
 		margin: 0 0 2rem 0;
-		color: #666;
-	}
-
-	.error-message {
-		background: #fee;
-		border: 1px solid #fcc;
-		color: #c33;
-		padding: 0.75rem;
-		border-radius: 4px;
-		margin-bottom: 1rem;
-	}
-
-	.success-message {
-		background: #efe;
-		border: 1px solid #cfc;
-		color: #3c3;
-		padding: 0.75rem;
-		border-radius: 4px;
-		margin-bottom: 1rem;
+		text-align: center;
 	}
 
 	.register-form {
@@ -336,95 +339,31 @@
 		gap: 0.5rem;
 	}
 
-	label {
-		font-weight: 500;
-		color: #333;
-	}
-
-	input {
-		padding: 0.75rem;
-		border: 1px solid #ddd;
-		border-radius: 4px;
-		font-size: 1rem;
-	}
-
-	input:focus {
-		outline: none;
-		border-color: #667eea;
-		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-	}
-
-	input[aria-invalid='true'] {
-		border-color: #c33;
-	}
-
-	input:disabled {
-		background: #f5f5f5;
-		cursor: not-allowed;
-	}
-
 	.field-help {
-		color: #666;
+		color: rgba(255, 255, 255, 0.6);
 		font-size: 0.875rem;
 	}
 
 	.field-error {
-		color: #c33;
+		color: #ff6b6b;
 		font-size: 0.875rem;
 	}
 
-	.btn-primary {
-		padding: 0.75rem 1.5rem;
-		background: #667eea;
-		color: white;
-		border: none;
+	.error-message {
+		background: rgba(255, 107, 107, 0.1);
+		border: 1px solid rgba(255, 107, 107, 0.3);
+		color: #ff6b6b;
+		padding: 0.75rem;
 		border-radius: 4px;
-		font-size: 1rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-		margin-top: 0.5rem;
+		margin-bottom: 1rem;
 	}
 
-	.btn-primary:hover:not(:disabled) {
-		background: #5568d3;
-	}
-
-	.btn-primary:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
-
-	.spinner {
-		width: 16px;
-		height: 16px;
-		border: 2px solid currentColor;
-		border-top-color: transparent;
-		border-radius: 50%;
-		animation: spin 0.6s linear infinite;
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	.links {
-		margin-top: 1rem;
-		text-align: center;
-	}
-
-	.links a {
-		color: #667eea;
-		text-decoration: none;
-	}
-
-	.links a:hover {
-		text-decoration: underline;
+	.success-message {
+		background: rgba(81, 207, 102, 0.1);
+		border: 1px solid rgba(81, 207, 102, 0.3);
+		color: #51cf66;
+		padding: 0.75rem;
+		border-radius: 4px;
+		margin-bottom: 1rem;
 	}
 </style>

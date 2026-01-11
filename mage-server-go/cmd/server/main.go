@@ -232,6 +232,12 @@ func main() {
 
 	// Create HTTP handler that supports both JSON and gRPC-Web
 	httpHandler := http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
+		// Handle simple status endpoint for HTTPS verification (before content type routing)
+		if req.URL.Path == "/status" && req.Method == http.MethodGet {
+			jsonHandler.ServeHTTP(resp, req)
+			return
+		}
+
 		contentType := req.Header.Get("Content-Type")
 
 		// Route based on content type

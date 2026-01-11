@@ -47,6 +47,12 @@ func (h *HTTPJSONHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Handle simple status endpoint for HTTPS verification
+	if r.URL.Path == "/status" && r.Method == http.MethodGet {
+		h.handleStatus(w, r)
+		return
+	}
+
 	// Only handle POST requests for RPC
 	if r.Method != http.MethodPost {
 		h.logger.Warn("non-POST request rejected", zap.String("method", r.Method))
@@ -1809,4 +1815,24 @@ func (h *HTTPJSONHandler) handleAdminGetServerDebugState(ctx context.Context, w 
 	}
 
 	h.writeSuccessResponse(w, resp)
+}
+
+// handleStatus handles the simple status endpoint for HTTPS verification
+func (h *HTTPJSONHandler) handleStatus(w http.ResponseWriter, r *http.Request) {
+	h.logger.Debug("status endpoint called",
+		zap.String("remote_addr", r.RemoteAddr),
+		zap.String("protocol", r.Proto),
+		zap.Bool("tls", r.TLS != nil),
+	)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	status := map[string]interface{}{
+		"status":  "ok",
+		"service": "mage-server",
+		"https":   r.TLS != nil,
+	}
+
+	json.NewEncoder(w).Encode(status)
 }

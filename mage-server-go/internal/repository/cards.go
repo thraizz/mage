@@ -55,10 +55,26 @@ func (r *CardRepository) GetByID(ctx context.Context, id int64) (*Card, error) {
 		return card, nil
 	}
 
+	// Many card fields are optional (e.g. lands have no mana cost, non-creatures have no power/toughness).
+	// We coalesce nullable text columns to empty strings to avoid scan errors into Go string fields.
 	query := `
-		SELECT id, card_number, set_code, name, card_type, mana_cost,
-		       power, toughness, rules_text, flavor_text, original_text,
-		       original_type, cn, card_name, rarity, card_class_name, created_at
+		SELECT id,
+		       COALESCE(card_number, ''),
+		       set_code,
+		       name,
+		       COALESCE(card_type, ''),
+		       COALESCE(mana_cost, ''),
+		       COALESCE(power, ''),
+		       COALESCE(toughness, ''),
+		       COALESCE(rules_text, ''),
+		       flavor_text,
+		       original_text,
+		       original_type,
+		       cn,
+		       card_name,
+		       COALESCE(rarity, ''),
+		       COALESCE(card_class_name, ''),
+		       created_at
 		FROM cards
 		WHERE id = $1
 	`
@@ -84,9 +100,23 @@ func (r *CardRepository) GetByID(ctx context.Context, id int64) (*Card, error) {
 // GetByName retrieves cards by name
 func (r *CardRepository) GetByName(ctx context.Context, name string) ([]*Card, error) {
 	query := `
-		SELECT id, card_number, set_code, name, card_type, mana_cost,
-		       power, toughness, rules_text, flavor_text, original_text,
-		       original_type, cn, card_name, rarity, card_class_name, created_at
+		SELECT id,
+		       COALESCE(card_number, ''),
+		       set_code,
+		       name,
+		       COALESCE(card_type, ''),
+		       COALESCE(mana_cost, ''),
+		       COALESCE(power, ''),
+		       COALESCE(toughness, ''),
+		       COALESCE(rules_text, ''),
+		       flavor_text,
+		       original_text,
+		       original_type,
+		       cn,
+		       card_name,
+		       COALESCE(rarity, ''),
+		       COALESCE(card_class_name, ''),
+		       created_at
 		FROM cards
 		WHERE name = $1
 		ORDER BY set_code, card_number
@@ -127,9 +157,23 @@ func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name stri
 	name = strings.ReplaceAll(name, "'", "'")
 
 	query := `
-		SELECT id, card_number, set_code, name, card_type, mana_cost,
-		       power, toughness, rules_text, flavor_text, original_text,
-		       original_type, cn, card_name, rarity, card_class_name, created_at
+		SELECT id,
+		       COALESCE(card_number, ''),
+		       set_code,
+		       name,
+		       COALESCE(card_type, ''),
+		       COALESCE(mana_cost, ''),
+		       COALESCE(power, ''),
+		       COALESCE(toughness, ''),
+		       COALESCE(rules_text, ''),
+		       flavor_text,
+		       original_text,
+		       original_type,
+		       cn,
+		       card_name,
+		       COALESCE(rarity, ''),
+		       COALESCE(card_class_name, ''),
+		       created_at
 		FROM cards
 		WHERE LOWER(TRIM(name)) = LOWER(TRIM($1))
 		ORDER BY set_code, card_number
@@ -162,9 +206,23 @@ func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name stri
 // SearchByName performs a full-text search on card names
 func (r *CardRepository) SearchByName(ctx context.Context, searchTerm string, limit int) ([]*Card, error) {
 	query := `
-		SELECT id, card_number, set_code, name, card_type, mana_cost,
-		       power, toughness, rules_text, flavor_text, original_text,
-		       original_type, cn, card_name, rarity, card_class_name, created_at
+		SELECT id,
+		       COALESCE(card_number, ''),
+		       set_code,
+		       name,
+		       COALESCE(card_type, ''),
+		       COALESCE(mana_cost, ''),
+		       COALESCE(power, ''),
+		       COALESCE(toughness, ''),
+		       COALESCE(rules_text, ''),
+		       flavor_text,
+		       original_text,
+		       original_type,
+		       cn,
+		       card_name,
+		       COALESCE(rarity, ''),
+		       COALESCE(card_class_name, ''),
+		       created_at
 		FROM cards
 		WHERE name ILIKE $1
 		ORDER BY name
@@ -198,9 +256,23 @@ func (r *CardRepository) SearchByName(ctx context.Context, searchTerm string, li
 // GetBySetCode retrieves all cards from a set
 func (r *CardRepository) GetBySetCode(ctx context.Context, setCode string) ([]*Card, error) {
 	query := `
-		SELECT id, card_number, set_code, name, card_type, mana_cost,
-		       power, toughness, rules_text, flavor_text, original_text,
-		       original_type, cn, card_name, rarity, card_class_name, created_at
+		SELECT id,
+		       COALESCE(card_number, ''),
+		       set_code,
+		       name,
+		       COALESCE(card_type, ''),
+		       COALESCE(mana_cost, ''),
+		       COALESCE(power, ''),
+		       COALESCE(toughness, ''),
+		       COALESCE(rules_text, ''),
+		       flavor_text,
+		       original_text,
+		       original_type,
+		       cn,
+		       card_name,
+		       COALESCE(rarity, ''),
+		       COALESCE(card_class_name, ''),
+		       created_at
 		FROM cards
 		WHERE set_code = $1
 		ORDER BY card_number
@@ -233,9 +305,23 @@ func (r *CardRepository) GetBySetCode(ctx context.Context, setCode string) ([]*C
 // GetByClassName retrieves a card by its Java class name
 func (r *CardRepository) GetByClassName(ctx context.Context, className string) (*Card, error) {
 	query := `
-		SELECT id, card_number, set_code, name, card_type, mana_cost,
-		       power, toughness, rules_text, flavor_text, original_text,
-		       original_type, cn, card_name, rarity, card_class_name, created_at
+		SELECT id,
+		       COALESCE(card_number, ''),
+		       set_code,
+		       name,
+		       COALESCE(card_type, ''),
+		       COALESCE(mana_cost, ''),
+		       COALESCE(power, ''),
+		       COALESCE(toughness, ''),
+		       COALESCE(rules_text, ''),
+		       flavor_text,
+		       original_text,
+		       original_type,
+		       cn,
+		       card_name,
+		       COALESCE(rarity, ''),
+		       COALESCE(card_class_name, ''),
+		       created_at
 		FROM cards
 		WHERE card_class_name = $1
 		LIMIT 1

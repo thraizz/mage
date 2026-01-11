@@ -7,6 +7,7 @@
         "@grpc/grpc-js": "^1.14.1",
         "@grpc/proto-loader": "^0.8.0",
         "google-protobuf": "^4.0.1",
+        "mana-font": "^1.18.0",
       },
       "devDependencies": {
         "@eslint/js": "^9.39.1",
@@ -569,6 +570,8 @@
     "magicast": ["magicast@0.5.1", "", { "dependencies": { "@babel/parser": "^7.28.5", "@babel/types": "^7.28.5", "source-map-js": "^1.2.1" } }, "sha512-xrHS24IxaLrvuo613F719wvOIv9xPHFWQHuvGUBmPnCA/3MQxKI3b+r7n1jAoDHmsbC5bRhTZYR77invLAxVnw=="],
 
     "make-dir": ["make-dir@4.0.0", "", { "dependencies": { "semver": "^7.5.3" } }, "sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw=="],
+
+    "mana-font": ["mana-font@1.18.0", "", {}, "sha512-PKCR5z/eeOBbox0Lu5b6A0QUWVUUa3A3LWXb9sw4N5ThIWXxRbCagXPSL4k6Cnh2Fre6Y4+2Xl819OrY7m1cUA=="],
 
     "mdn-data": ["mdn-data@2.12.2", "", {}, "sha512-IEn+pegP1aManZuckezWCO+XZQDplx1366JoVhTpMpBB1sPey/SbveZQUosKiKiGYjg1wH4pMlNgXbCiYgihQA=="],
 

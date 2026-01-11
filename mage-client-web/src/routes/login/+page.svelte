@@ -380,7 +380,7 @@
 				<span class="spinner" aria-hidden="true"></span>
 				Gathering Mana...
 			{:else}
-				Enter as Wanderer
+				Enter as Guest
 			{/if}
 		</button>
 
