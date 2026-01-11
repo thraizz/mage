@@ -3,7 +3,7 @@
 # Update the Go server's Postgres `cards` table from upstream magefree/mage.
 #
 # What this does:
-# - Clones https://github.com/magefree/mage (latest master by default)
+# - Uses the upstream XMage submodule at upstream/mage-upstream (no temp clone)
 # - Starts the upstream Java server once to generate Mage.Server/db/cards.h2.mv.db
 # - Exports that H2 DB to SQL (cards.sql)
 # - Imports into Postgres (Java tables: card/expansion/etc), then migrates into Go table: cards
@@ -17,7 +17,6 @@
 #   ./mage-server-go/scripts/update_cards_db_from_upstream.sh --direct
 #
 # Optional env:
-#   UPSTREAM_REF=master
 #   DOCKER_CONTAINER=mage-postgres
 #   DB_NAME=mage DB_USER=mage DB_PASSWORD=mage DB_HOST=localhost DB_PORT=5432
 #
@@ -32,12 +31,10 @@ elif [[ "${1:-}" == "--docker" ]]; then
   shift
 fi
 
-UPSTREAM_REF="${UPSTREAM_REF:-master}"
-UPSTREAM_REPO="${UPSTREAM_REPO:-https://github.com/magefree/mage.git}"
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$GO_ROOT/.." && pwd)"
+UP_DIR="$REPO_ROOT/upstream/mage-upstream"
 
 DB_NAME="${DB_NAME:-mage}"
 DB_USER="${DB_USER:-mage}"
@@ -62,7 +59,7 @@ if [[ "$MODE" == "docker" ]]; then
 fi
 
 echo "=== Update Cards DB From Upstream XMage ==="
-echo "Repo:   $UPSTREAM_REPO ($UPSTREAM_REF)"
+echo "Repo:   $UP_DIR"
 echo "Mode:   $MODE"
 echo "Target: postgres db=$DB_NAME user=$DB_USER"
 if [[ "$MODE" == "docker" ]]; then
@@ -72,17 +69,11 @@ else
 fi
 echo ""
 
-TMP_DIR="/Users/aron/dev/opensource/mage/tmp"
-cleanup() {
-  rm -rf "$TMP_DIR"
-}
-trap cleanup EXIT
-
-UP_DIR="$TMP_DIR/mage-upstream"
-echo "Cloning upstream into: $UP_DIR"
-git clone --depth=1 --branch "$UPSTREAM_REF" "$UPSTREAM_REPO" "$UP_DIR" >/dev/null
-echo "✓ Clone complete"
-echo ""
+if [[ ! -d "$UP_DIR" ]]; then
+  echo "ERROR: upstream submodule not found at: $UP_DIR" >&2
+  echo "Run: git submodule update --init --recursive" >&2
+  exit 1
+fi
 
 JAVA_SERVER_DIR="$UP_DIR/Mage.Server"
 JAVA_DB_BASE="$JAVA_SERVER_DIR/db/cards.h2"

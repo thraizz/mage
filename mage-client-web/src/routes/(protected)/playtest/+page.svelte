@@ -144,6 +144,10 @@
 	// Check if all players have kept hands
 	const allPlayersKept = $derived(players.every(p => p.keptHand));
 
+	// Command zone (Commander): show for currently controlled player
+	const commandCards = $derived($playtestGameStore.command || []);
+	const myCommandCards = $derived(commandCards.filter(c => (c.ownerId || c.controllerId) === activeControlSeat));
+
 	/**
 	 * Initialize playtest from URL params
 	 */
@@ -157,10 +161,12 @@
 
 			console.log('[Playtest] Initializing with deck IDs:', deckIds);
 
-			const initializedPlayers = await initializePlaytest(deckIds);
+			const init = await initializePlaytest(deckIds);
+			const initializedPlayers = init.players;
 			const gameId = `playtest-${Date.now()}`;
 			
 			playtestGameStore.initialize(gameId, initializedPlayers);
+			playtestGameStore.setCommand(init.command);
 
 			// Initialize the normal game store with playtest data so PlayerHand works
 			gameStore.initGame(gameId, initializedPlayers[0].playerId);
@@ -874,6 +880,32 @@
 				class:drag-active={isDragging}
 				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'battlefield'}
 			>
+				<!-- Command Zone (Commander) -->
+				{#if myCommandCards.length > 0}
+					<div class="command-zone">
+						<span class="zone-label">Command Zone</span>
+						<div class="command-cards">
+							{#each myCommandCards as card (card.id)}
+								<div class="command-card-wrapper" title={card.name}>
+									<Card
+										cardId={card.id}
+										cardName={card.name}
+										manaCost={card.manaCost}
+										cardType={card.type}
+										power={card.power}
+										toughness={card.toughness}
+										imageUrl=""
+										isTapped={card.tapped}
+										isSelected={false}
+										size="small"
+										onclick={() => {}}
+									/>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
 				<span class="zone-label">Your Battlefield</span>
 				<div class="battlefield-rows">
 					{#if myBattlefieldNonlands.length > 0}
@@ -1566,6 +1598,21 @@
 		margin-top: 0.25rem;
 		padding-top: 0.5rem;
 		border-top: 1px dashed rgba(148, 163, 184, 0.25);
+	}
+
+	/* Command zone (Commander) */
+	.command-zone {
+		margin-bottom: 0.75rem;
+	}
+
+	.command-cards {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.command-card-wrapper {
+		display: flex;
 	}
 
 	.battlefield-card-wrapper {

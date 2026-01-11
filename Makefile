@@ -31,3 +31,11 @@ package:
 .PHONY: install
 install: clean build package
 
+.PHONY: upstream-init
+upstream-init:
+	git submodule update --init --recursive
+
+.PHONY: cards-update
+cards-update: upstream-init
+	./mage-server-go/scripts/update_cards_db_from_upstream.sh --docker
+

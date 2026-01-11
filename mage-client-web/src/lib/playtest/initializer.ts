@@ -9,10 +9,15 @@ import type { CardView } from '$lib/generated/mage/v1/models';
 import type { PlaytestPlayer } from '$lib/stores/playtest-game';
 import { getDeckDetails } from '$lib/api/decks';
 
+export type PlaytestInitResult = {
+	players: PlaytestPlayer[];
+	command: CardView[];
+};
+
 /**
  * Initialize a playtest session from deck IDs
  */
-export async function initializePlaytest(deckIds: string[]): Promise<PlaytestPlayer[]> {
+export async function initializePlaytest(deckIds: string[]): Promise<PlaytestInitResult> {
 	if (deckIds.length < 2 || deckIds.length > 4) {
 		throw new Error('Playtest requires 2-4 decks');
 	}
@@ -37,9 +42,9 @@ export async function initializePlaytest(deckIds: string[]): Promise<PlaytestPla
 	})));
 
 	// Create players from decks
-	const players: PlaytestPlayer[] = decks.map((deck, index) => 
-		createPlayerFromDeck(deck, index + 1)
-	);
+	const perDeck = decks.map((deck, index) => createPlayerFromDeck(deck, index + 1));
+	const players: PlaytestPlayer[] = perDeck.map((x) => x.player);
+	const command: CardView[] = perDeck.flatMap((x) => x.commanders);
 
 	// Shuffle each player's library
 	players.forEach(player => {
@@ -60,13 +65,13 @@ export async function initializePlaytest(deckIds: string[]): Promise<PlaytestPla
 
 	console.log('[PlaytestInit] Players initialized with opening hands');
 
-	return players;
+	return { players, command };
 }
 
 /**
  * Create a player from a deck
  */
-function createPlayerFromDeck(deck: Deck, playerNumber: number): PlaytestPlayer {
+function createPlayerFromDeck(deck: Deck, playerNumber: number): { player: PlaytestPlayer; commanders: CardView[] } {
 	const playerId = `player${playerNumber}`;
 	
 	// Create card objects from deck list
@@ -90,12 +95,15 @@ function createPlayerFromDeck(deck: Deck, playerNumber: number): PlaytestPlayer 
 	if (deck.commanders && deck.commanders.length > 0) {
 		for (const deckCard of deck.commanders) {
 			for (let i = 0; i < deckCard.quantity; i++) {
-				commanders.push(createCardView(
+				const commander = createCardView(
 					playerId,
 					deckCard.cardName,
 					deckCard,
 					cardIndex++
-				));
+				);
+				commander.zone = 5; // COMMAND (client-side convention)
+				commander.faceDown = false;
+				commanders.push(commander);
 			}
 		}
 	}
@@ -103,7 +111,7 @@ function createPlayerFromDeck(deck: Deck, playerNumber: number): PlaytestPlayer 
 	// Determine starting life based on format
 	const startingLife = getStartingLife(deck.format);
 
-	return {
+	const player: PlaytestPlayer = {
 		playerId,
 		name: `${deck.name} (P${playerNumber})`,
 		life: startingLife,
@@ -124,6 +132,8 @@ function createPlayerFromDeck(deck: Deck, playerNumber: number): PlaytestPlayer 
 		},
 		keptHand: false
 	};
+
+	return { player, commanders };
 }
 
 /**

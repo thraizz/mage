@@ -152,6 +152,16 @@ function createPlaytestGameStore() {
 	}
 
 	/**
+	 * Set command zone cards (e.g. commanders) for the current playtest.
+	 */
+	function setCommand(cards: CardView[]): void {
+		update((state) => ({
+			...state,
+			command: cards || []
+		}));
+	}
+
+	/**
 	 * Switch active control seat (which player you're controlling)
 	 */
 	function switchControlSeat(playerId: string): void {
@@ -286,6 +296,15 @@ function createPlaytestGameStore() {
 				}
 			}
 
+			// Check command zone
+			if (!card) {
+				const cmdIndex = state.command.findIndex(c => c.id === cardId);
+				if (cmdIndex !== -1) {
+					card = state.command[cmdIndex];
+					sourceZone = 'command';
+				}
+			}
+
 			if (!card || !sourceZone) {
 				console.error('[PlaytestGame] Card not found:', cardId);
 				return state;
@@ -297,6 +316,8 @@ function createPlaytestGameStore() {
 				newState.battlefield = state.battlefield.filter(c => c.id !== cardId);
 			} else if (sourceZone === 'exile') {
 				newState.exile = state.exile.filter(c => c.id !== cardId);
+			} else if (sourceZone === 'command') {
+				newState.command = state.command.filter(c => c.id !== cardId);
 			} else if (sourceZone.startsWith('hand:')) {
 				const playerId = sourceZone.split(':')[1];
 				newState.players = state.players.map(p =>
@@ -346,6 +367,10 @@ function createPlaytestGameStore() {
 						? { ...p, hand: [...p.hand, card], handCount: p.hand.length + 1 }
 						: p
 				);
+			} else if (upperTargetZone === 'COMMAND') {
+				card.zone = 5;
+				card.faceDown = false;
+				newState.command = [...newState.command, card];
 			} else if (upperTargetZone === 'LIBRARY' || upperTargetZone === 'LIBRARY_TOP') {
 				card.zone = 0;
 				card.faceDown = true;
@@ -628,6 +653,7 @@ function createPlaytestGameStore() {
 	return {
 		subscribe,
 		initialize,
+		setCommand,
 		switchControlSeat,
 		drawCards,
 		playCard,
