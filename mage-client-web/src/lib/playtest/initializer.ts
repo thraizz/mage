@@ -133,17 +133,31 @@ function createCardView(
 	return {
 		id: `${ownerId}-card-${index}`,
 		name: cardName,
+		displayName: cardName,
 		manaCost: deckCard.manaCost || '',
 		type: deckCard.cardType || '',
+		subTypes: '',
+		superTypes: '',
+		color: (deckCard.colors || []).join(''),
 		power: deckCard.power || '',
 		toughness: deckCard.toughness || '',
+		loyalty: '',
+		cardNumber: 0,
+		expansionSetCode: '',
+		rarity: '',
+		rulesText: '',
+		abilities: [],
 		zone: 0, // LIBRARY
 		ownerId,
 		controllerId: ownerId,
 		tapped: false,
+		flipped: false,
+		transformed: false,
 		faceDown: true,
-		isToken: false,
-		colors: deckCard.colors || []
+		counters: [],
+		attachedTo: [],
+		summoningSickness: false,
+		availableActions: []
 	};
 }
 

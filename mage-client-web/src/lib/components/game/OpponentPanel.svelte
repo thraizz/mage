@@ -3,7 +3,7 @@
 	 * OpponentPanel - Collapsible panel for opponent's game state
 	 * Can be expanded/collapsed to save space in 4-player games
 	 */
-	import type { CardView, Player } from '$lib/generated/mage/v1/models';
+	import type { CardView, PlayerView } from '$lib/generated/mage/v1/models';
 	import Card from './Card.svelte';
 	import Graveyard from './Graveyard.svelte';
 	import type { GameCard } from '$lib/types/game';
@@ -17,7 +17,7 @@
 		position = 'top',
 		onCardClick = () => {}
 	}: {
-		opponent: Player;
+		opponent: PlayerView;
 		battlefieldCards?: CardView[];
 		selectedCardIds?: string[];
 		expanded?: boolean;
@@ -65,6 +65,13 @@
 	function formatLife(life: number): string {
 		return life.toString();
 	}
+
+	function isLandPermanent(cardType?: string | null): boolean {
+		return !!cardType && cardType.toLowerCase().includes('land');
+	}
+
+	const battlefieldNonlands = $derived(battlefieldCards.filter(c => !isLandPermanent(c.type)));
+	const battlefieldLands = $derived(battlefieldCards.filter(c => isLandPermanent(c.type)));
 </script>
 
 <div class="opponent-panel" class:expanded class:collapsed={!expanded} class:position-left={position === 'left'} class:position-right={position === 'right'} class:position-top={position === 'top'}>
@@ -108,25 +115,52 @@
 			{#if battlefieldCards.length > 0}
 				<div class="battlefield-section">
 					<div class="section-label">Battlefield ({battlefieldCards.length})</div>
-					<div class="battlefield-cards">
-						{#each battlefieldCards as card (card.id)}
-							<div class="card-wrapper">
-								<Card
-									cardId={card.id}
-									cardName={card.name}
-									manaCost={card.manaCost}
-									cardType={card.type}
-									power={card.power}
-									toughness={card.toughness}
-									imageUrl=""
-									isTapped={card.tapped}
-									isSelected={selectedCardIds.includes(card.id)}
-									size="small"
-									onclick={() => handleCardClick(card.id)}
-									summoningSickness={card.summoningSickness}
-								/>
+					<div class="battlefield-rows">
+						{#if battlefieldNonlands.length > 0}
+							<div class="battlefield-cards battlefield-row--nonlands">
+								{#each battlefieldNonlands as card (card.id)}
+									<div class="card-wrapper">
+										<Card
+											cardId={card.id}
+											cardName={card.name}
+											manaCost={card.manaCost}
+											cardType={card.type}
+											power={card.power}
+											toughness={card.toughness}
+											imageUrl=""
+											isTapped={card.tapped}
+											isSelected={selectedCardIds.includes(card.id)}
+											size="small"
+											onclick={() => handleCardClick(card.id)}
+											summoningSickness={card.summoningSickness}
+										/>
+									</div>
+								{/each}
 							</div>
-						{/each}
+						{/if}
+
+						{#if battlefieldLands.length > 0}
+							<div class="battlefield-cards battlefield-row--lands">
+								{#each battlefieldLands as card (card.id)}
+									<div class="card-wrapper">
+										<Card
+											cardId={card.id}
+											cardName={card.name}
+											manaCost={card.manaCost}
+											cardType={card.type}
+											power={card.power}
+											toughness={card.toughness}
+											imageUrl=""
+											isTapped={card.tapped}
+											isSelected={selectedCardIds.includes(card.id)}
+											size="small"
+											onclick={() => handleCardClick(card.id)}
+											summoningSickness={card.summoningSickness}
+										/>
+									</div>
+								{/each}
+							</div>
+						{/if}
 					</div>
 				</div>
 			{:else}
@@ -306,8 +340,21 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.25rem;
+	}
+
+	.battlefield-rows {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
 		max-height: 200px;
 		overflow-y: auto;
+		padding-right: 2px; /* space for scrollbar */
+	}
+
+	.battlefield-row--lands {
+		margin-top: 0.125rem;
+		padding-top: 0.25rem;
+		border-top: 1px dashed rgba(148, 163, 184, 0.25);
 	}
 
 	.card-wrapper {
@@ -332,15 +379,15 @@
 	}
 
 	/* Scrollbar */
-	.battlefield-cards::-webkit-scrollbar {
+	.battlefield-rows::-webkit-scrollbar {
 		width: 4px;
 	}
 
-	.battlefield-cards::-webkit-scrollbar-track {
+	.battlefield-rows::-webkit-scrollbar-track {
 		background: #0f1419;
 	}
 
-	.battlefield-cards::-webkit-scrollbar-thumb {
+	.battlefield-rows::-webkit-scrollbar-thumb {
 		background: #2a3441;
 		border-radius: 2px;
 	}

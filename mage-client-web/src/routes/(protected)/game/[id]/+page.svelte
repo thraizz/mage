@@ -1561,6 +1561,10 @@
 		return battlefieldCards.filter((c) => c.controllerId === playerId);
 	}
 
+	function isLandPermanent(cardType?: string | null): boolean {
+		return !!cardType && cardType.toLowerCase().includes('land');
+	}
+
 	/**
 	 * Format life total
 	 */
@@ -2099,41 +2103,85 @@
 				<!-- My Battlefield -->
 				<div class="my-battlefield">
 					<span class="zone-label">Your Battlefield</span>
-					<div class="battlefield-cards">
-						{#each getPlayerBattlefieldCards(localPlayerId) as card (card.id)}
-							<!-- svelte-ignore a11y_no_static_element_interactions -->
-							<div
-								class="battlefield-card-wrapper"
-								class:draggable={true}
-								class:is-dragging={isBattlefieldCardDragging(card.id)}
-								class:is-hovered={hoveredCardId === card.id}
-								onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-								ondragstart={handleBattlefieldDragStart}
-								onmouseenter={() => hoveredCardId = card.id}
-								onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
-							>
-								<Card
-									cardId={card.id}
-									cardName={card.name}
-									manaCost={card.manaCost}
-									cardType={card.type}
-									power={card.power}
-									toughness={card.toughness}
-									imageUrl=""
-									isTapped={card.tapped}
-									isSelected={gameState.selectedCardIds.includes(card.id)}
-									size="normal"
-									onclick={() => handleBattlefieldCardClick(card.id)}
-									oncontextmenu={(e) => handleCardContextMenu(e, card)}
-									canAttack={canAttackIds.has(card.id)}
-									isAttacking={attackingIds.has(card.id)}
-									canBlock={canBlockIds.has(card.id)}
-									isBlocking={blockingIds.has(card.id)}
-									summoningSickness={card.summoningSickness}
-									isDragging={isBattlefieldCardDragging(card.id)}
-								/>
+					<div class="battlefield-rows">
+						{#if getPlayerBattlefieldCards(localPlayerId).filter(c => !isLandPermanent(c.type)).length > 0}
+							<div class="battlefield-cards battlefield-row--nonlands">
+								{#each getPlayerBattlefieldCards(localPlayerId).filter(c => !isLandPermanent(c.type)) as card (card.id)}
+									<!-- svelte-ignore a11y_no_static_element_interactions -->
+									<div
+										class="battlefield-card-wrapper"
+										class:draggable={true}
+										class:is-dragging={isBattlefieldCardDragging(card.id)}
+										class:is-hovered={hoveredCardId === card.id}
+										onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
+										ondragstart={handleBattlefieldDragStart}
+										onmouseenter={() => hoveredCardId = card.id}
+										onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
+									>
+										<Card
+											cardId={card.id}
+											cardName={card.name}
+											manaCost={card.manaCost}
+											cardType={card.type}
+											power={card.power}
+											toughness={card.toughness}
+											imageUrl=""
+											isTapped={card.tapped}
+											isSelected={gameState.selectedCardIds.includes(card.id)}
+											size="normal"
+											onclick={() => handleBattlefieldCardClick(card.id)}
+											oncontextmenu={(e) => handleCardContextMenu(e, card)}
+											canAttack={canAttackIds.has(card.id)}
+											isAttacking={attackingIds.has(card.id)}
+											canBlock={canBlockIds.has(card.id)}
+											isBlocking={blockingIds.has(card.id)}
+											summoningSickness={card.summoningSickness}
+											isDragging={isBattlefieldCardDragging(card.id)}
+										/>
+									</div>
+								{/each}
 							</div>
-						{/each}
+						{/if}
+
+						{#if getPlayerBattlefieldCards(localPlayerId).filter(c => isLandPermanent(c.type)).length > 0}
+							<div class="battlefield-cards battlefield-row--lands">
+								{#each getPlayerBattlefieldCards(localPlayerId).filter(c => isLandPermanent(c.type)) as card (card.id)}
+									<!-- svelte-ignore a11y_no_static_element_interactions -->
+									<div
+										class="battlefield-card-wrapper"
+										class:draggable={true}
+										class:is-dragging={isBattlefieldCardDragging(card.id)}
+										class:is-hovered={hoveredCardId === card.id}
+										onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
+										ondragstart={handleBattlefieldDragStart}
+										onmouseenter={() => hoveredCardId = card.id}
+										onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
+									>
+										<Card
+											cardId={card.id}
+											cardName={card.name}
+											manaCost={card.manaCost}
+											cardType={card.type}
+											power={card.power}
+											toughness={card.toughness}
+											imageUrl=""
+											isTapped={card.tapped}
+											isSelected={gameState.selectedCardIds.includes(card.id)}
+											size="normal"
+											onclick={() => handleBattlefieldCardClick(card.id)}
+											oncontextmenu={(e) => handleCardContextMenu(e, card)}
+											canAttack={canAttackIds.has(card.id)}
+											isAttacking={attackingIds.has(card.id)}
+											canBlock={canBlockIds.has(card.id)}
+											isBlocking={blockingIds.has(card.id)}
+											summoningSickness={card.summoningSickness}
+											isDragging={isBattlefieldCardDragging(card.id)}
+										/>
+									</div>
+								{/each}
+							</div>
+						{/if}
+
 						{#if getPlayerBattlefieldCards(localPlayerId).length === 0}
 							<div class="empty-battlefield">
 								{#if isDragging}
@@ -2855,6 +2903,18 @@
 		flex-wrap: wrap;
 		gap: 0.5rem;
 		align-content: flex-start;
+	}
+
+	.battlefield-rows {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.battlefield-row--lands {
+		margin-top: 0.25rem;
+		padding-top: 0.5rem;
+		border-top: 1px dashed rgba(148, 163, 184, 0.25);
 	}
 
 	.battlefield-card-wrapper {

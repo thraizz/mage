@@ -146,7 +146,6 @@
 	// Derived values
 	const cardCount = $derived(cards.length);
 	const isEmpty = $derived(cardCount === 0);
-	const topCard = $derived(cards.length > 0 ? cards[cards.length - 1] : null);
 	const filteredCards = $derived(() => {
 		if (!searchQuery.trim()) return cards;
 		const q = searchQuery.toLowerCase();

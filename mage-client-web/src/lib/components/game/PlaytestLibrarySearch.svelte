@@ -12,7 +12,7 @@
 	}: {
 		cards: CardView[];
 		playerName?: string;
-		onMove: (cardId: string, zone: 'HAND' | 'BATTLEFIELD' | 'GRAVEYARD' | 'EXILE') => void;
+		onMove: (_cardId: string, _zone: 'HAND' | 'BATTLEFIELD' | 'GRAVEYARD' | 'EXILE') => void;
 		onShuffle?: () => void;
 		onClose: () => void;
 	} = $props();
@@ -46,6 +46,10 @@
 		return result;
 	});
 
+	function imageUrlFor(cardName: string): string {
+		return getScryfallImageUrl(cardName, 'small');
+	}
+
 	function handleKeydown(event: KeyboardEvent): void {
 		if (event.key === 'Escape') {
 			onClose();
@@ -71,7 +75,7 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="overlay" role="dialog" aria-modal="true" aria-label="Search library" onclick={handleBackdropClick}>
+<div class="overlay" role="dialog" aria-modal="true" aria-label="Search library" tabindex="-1" onclick={handleBackdropClick}>
 	<div class="modal">
 		<header class="header">
 			<div class="title">
@@ -126,9 +130,8 @@
 					{#each filteredCards() as card (card.id)}
 						<button class="row" type="button" onclick={() => sendCard(card.id)} title="Click to send">
 							<div class="thumb">
-								{@const img = getScryfallImageUrl(card.name, 'small')}
-								{#if img}
-									<img src={img} alt={card.name} draggable="false" />
+								{#if imageUrlFor(card.name)}
+									<img src={imageUrlFor(card.name)} alt={card.name} draggable="false" />
 								{:else}
 									<span class="placeholder">🃏</span>
 								{/if}

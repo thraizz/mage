@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
+	import { goto, beforeNavigate } from '$app/navigation';
 	import { gameStore } from '$lib/stores/game';
 	import {
 		playtestGameStore,
@@ -10,7 +10,6 @@
 		playtestOpponents,
 		playtestBattlefield,
 		playtestExile,
-		playtestStack,
 		playtestActiveControlSeat,
 		playtestIsInitialized
 	} from '$lib/stores/playtest-game';
@@ -23,23 +22,21 @@
 	import Graveyard from '$lib/components/game/Graveyard.svelte';
 	import ExileZone from '$lib/components/game/ExileZone.svelte';
 	import LibraryZone from '$lib/components/game/LibraryZone.svelte';
+	import PlaytestLibrarySearch from '$lib/components/game/PlaytestLibrarySearch.svelte';
 	import ManaPool from '$lib/components/game/ManaPool.svelte';
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
-	import { CardActionType } from '$lib/generated/mage/v1/models';
 	import {
 		dragDropStore,
 		isDragging as isDraggingStore,
-		draggedCardId,
 		draggedCardName,
 		dragPosition,
 		isOverValidDropZone,
 		currentDropZone,
 		getAllValidDropZones,
-		type SourceZone,
-		type DropZone
+		type SourceZone
 	} from '$lib/utils/drag-drop';
 	import { getScryfallImageUrl } from '$lib/utils/scryfall';
 
@@ -56,6 +53,7 @@
 	let selectedOpponentId = $state<string | null>(null);
 	let showOpponentLifeMenu = $state(false);
 	let opponentLifeMenuEl: HTMLDivElement | null = $state(null);
+	let showDeckSearch = $state(false);
 
 	// Mulligan state
 	let mulliganPlayerIndex = $state<number | null>(null);
@@ -63,7 +61,6 @@
 
 	// Drag-drop state
 	const isDragging = $derived($isDraggingStore);
-	const dragCardId = $derived($draggedCardId);
 	const dragCardName = $derived($draggedCardName);
 	const dragPos = $derived($dragPosition);
 	const isOverValidDrop = $derived($isOverValidDropZone);
@@ -90,7 +87,6 @@
 	const otherPlayers = $derived($playtestOpponents);
 	const battlefield = $derived($playtestBattlefield);
 	const exile = $derived($playtestExile);
-	const stack = $derived($playtestStack);
 	const activeControlSeat = $derived($playtestActiveControlSeat);
 	const isInitialized = $derived($playtestIsInitialized);
 
@@ -111,8 +107,18 @@
 		return opponent ? battlefield.filter(c => c.controllerId === opponent.playerId) : [];
 	});
 
+	function isLandPermanent(cardType?: string | null): boolean {
+		// Mage type strings are typically like: "Land", "Legendary Land", "Artifact Land", etc.
+		return !!cardType && /\bland\b/i.test(cardType);
+	}
+
+	// Split battlefield rows: nonlands (top) + lands (bottom)
+	const myBattlefieldNonlands = $derived(myBattlefield.filter(c => !isLandPermanent(c.type)));
+	const myBattlefieldLands = $derived(myBattlefield.filter(c => isLandPermanent(c.type)));
+	const opponentBattlefieldNonlands = $derived(() => opponentBattlefield().filter(c => !isLandPermanent(c.type)));
+	const opponentBattlefieldLands = $derived(() => opponentBattlefield().filter(c => isLandPermanent(c.type)));
+
 	// My cards (from controlling player perspective)
-	const myCards = $derived(me?.hand || []);
 	const myGrave = $derived(me?.graveyard || []);
 	const myMana = $derived(me?.manaPool || { white: 0, blue: 0, black: 0, red: 0, green: 0, colorless: 0 });
 
@@ -224,7 +230,7 @@
 	$effect(() => {
 		if (isInitialized) {
 			// React to any state changes by accessing the store
-			const _ = $playtestGameStore;
+			void $playtestGameStore;
 			syncPlaytestToGameStore();
 		}
 	});
@@ -416,22 +422,6 @@
 	}
 
 	/**
-	 * Handle token creation (intercept from TokenCreator component)
-	 */
-	function handleTokenCreate(event: CustomEvent<{
-		name: string;
-		types: string;
-		power: string;
-		toughness: string;
-		color: string;
-	}>): void {
-		const { name, types, power, toughness, color } = event.detail;
-		playtestGameStore.createToken(name, types, power, toughness, color);
-		toast.success(`Created ${name} token`);
-		showTokenCreator = false;
-	}
-
-	/**
 	 * Handle keyboard shortcuts
 	 */
 	function handleGlobalKeydown(event: KeyboardEvent): void {
@@ -444,6 +434,11 @@
 		switch (key) {
 			case '?':
 				showKeyboardShortcuts = !showKeyboardShortcuts;
+				event.preventDefault();
+				break;
+			case 'f':
+				// F - Search your deck
+				showDeckSearch = true;
 				event.preventDefault();
 				break;
 			case 'x':
@@ -568,11 +563,32 @@
 
 	// Initialize on mount
 	onMount(() => {
+		// Prefer restoring from persisted playtest state (refresh-safe).
+		// If no persisted state exists, fall back to URL-based initialization.
+		if ($playtestGameStore.isInitialized) {
+			loading = false;
+
+			// Restore mulligan phase based on first player who hasn't kept.
+			const idx = players.findIndex((p) => !p.keptHand);
+			mulliganPlayerIndex = idx === -1 ? null : idx;
+			mulliganCount = 0;
+
+			// Ensure the normal game store is initialized for shared components.
+			gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
+			syncPlaytestToGameStore();
+			return;
+		}
+
 		initializeFromUrl();
 	});
 
-	// Cleanup on destroy
-	onDestroy(() => {
+	// Cleanup ONLY when navigating away (client-side). This preserves state across refresh.
+	beforeNavigate(({ from, to }) => {
+		if (!from) return;
+		if (from.url.pathname !== '/playtest') return;
+		if (!to) return;
+		if (to.url.pathname === '/playtest') return;
+
 		playtestGameStore.reset();
 		gameStore.reset();
 	});
@@ -624,8 +640,8 @@
 			</div>
 			
 			<div class="playtest-controls">
-				<label>Controlling:</label>
-				<select class="player-select" value={activeControlSeat} onchange={(e) => switchPlayer(e.currentTarget.value)}>
+				<label for="playtest-controlling-select">Controlling:</label>
+				<select id="playtest-controlling-select" class="player-select" value={activeControlSeat} onchange={(e) => switchPlayer(e.currentTarget.value)}>
 					{#each players as player}
 						<option value={player.playerId}>{player.name}</option>
 					{/each}
@@ -680,7 +696,7 @@
 		<main class="game-layout">
 			<!-- Opponent Section -->
 			{#if selectedOpponent()}
-				{@const opponent = selectedOpponent()}
+				{@const opponent = selectedOpponent()!}
 				<div class="opponent-section">
 					<!-- Opponent Header -->
 					<div class="opponent-header-bar">
@@ -717,7 +733,7 @@
 							{/if}
 
 							{#if showOpponentLifeMenu}
-								<div bind:this={opponentLifeMenuEl} class="quick-menu opponent-menu" onclick={(e) => e.stopPropagation()}>
+								<div bind:this={opponentLifeMenuEl} class="quick-menu opponent-menu">
 									<div class="menu-section">
 										<span class="menu-label">Life</span>
 										<div class="menu-row">
@@ -750,28 +766,58 @@
 					<!-- Opponent Battlefield (Non-editable) -->
 					<div class="battlefield-area opponent-battlefield">
 						<span class="zone-label">{opponent.name}'s Battlefield</span>
-						<div class="battlefield-cards">
-							{#each opponentBattlefield() as card (card.id)}
-								<div
-									class="battlefield-card-wrapper readonly"
-									title="{card.name} (controlled by {opponent.name})"
-								>
-									<Card
-										cardId={card.id}
-										cardName={card.name}
-										manaCost={card.manaCost}
-										cardType={card.type}
-										power={card.power}
-										toughness={card.toughness}
-										imageUrl=""
-										isTapped={card.tapped}
-										isSelected={false}
-										size="normal"
-										onclick={() => {}}
-									/>
+						<div class="battlefield-rows">
+							{#if opponentBattlefieldNonlands().length > 0}
+								<div class="battlefield-row battlefield-row--nonlands">
+									{#each opponentBattlefieldNonlands() as card (card.id)}
+										<div
+											class="battlefield-card-wrapper readonly"
+											title="{card.name} (controlled by {opponent.name})"
+										>
+											<Card
+												cardId={card.id}
+												cardName={card.name}
+												manaCost={card.manaCost}
+												cardType={card.type}
+												power={card.power}
+												toughness={card.toughness}
+												imageUrl=""
+												isTapped={card.tapped}
+												isSelected={false}
+												size="normal"
+												onclick={() => {}}
+											/>
+										</div>
+									{/each}
 								</div>
-							{/each}
-							{#if opponentBattlefield().length === 0}
+							{/if}
+
+							{#if opponentBattlefieldLands().length > 0}
+								<div class="battlefield-row battlefield-row--lands">
+									{#each opponentBattlefieldLands() as card (card.id)}
+										<div
+											class="battlefield-card-wrapper readonly"
+											title="{card.name} (controlled by {opponent.name})"
+										>
+											<Card
+												cardId={card.id}
+												cardName={card.name}
+												manaCost={card.manaCost}
+												cardType={card.type}
+												power={card.power}
+												toughness={card.toughness}
+												imageUrl=""
+												isTapped={card.tapped}
+												isSelected={false}
+												size="normal"
+												onclick={() => {}}
+											/>
+										</div>
+									{/each}
+								</div>
+							{/if}
+
+							{#if opponentBattlefieldNonlands().length === 0 && opponentBattlefieldLands().length === 0}
 								<div class="empty-battlefield">
 									No permanents
 								</div>
@@ -789,30 +835,81 @@
 				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'battlefield'}
 			>
 				<span class="zone-label">Your Battlefield</span>
-				<div class="battlefield-cards">
-					{#each myBattlefield as card (card.id)}
-						<div
-							class="battlefield-card-wrapper"
-							class:is-hovered={hoveredCardId === card.id}
-							onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-							onmouseenter={() => hoveredCardId = card.id}
-							onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
-						>
-							<Card
-								cardId={card.id}
-								cardName={card.name}
-								manaCost={card.manaCost}
-								cardType={card.type}
-								power={card.power}
-								toughness={card.toughness}
-								imageUrl=""
-								isTapped={card.tapped}
-								isSelected={false}
-								size="normal"
-								onclick={() => handleBattlefieldCardClick(card.id)}
-							/>
+				<div class="battlefield-rows">
+					{#if myBattlefieldNonlands.length > 0}
+						<div class="battlefield-row battlefield-row--nonlands">
+							{#each myBattlefieldNonlands as card (card.id)}
+								<div
+									class="battlefield-card-wrapper"
+									class:is-hovered={hoveredCardId === card.id}
+									role="button"
+									tabindex="0"
+									aria-label={card.name}
+									onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
+									onkeydown={(e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											e.preventDefault();
+											handleBattlefieldCardClick(card.id);
+										}
+									}}
+									onmouseenter={() => hoveredCardId = card.id}
+									onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
+								>
+									<Card
+										cardId={card.id}
+										cardName={card.name}
+										manaCost={card.manaCost}
+										cardType={card.type}
+										power={card.power}
+										toughness={card.toughness}
+										imageUrl=""
+										isTapped={card.tapped}
+										isSelected={false}
+										size="normal"
+										onclick={() => handleBattlefieldCardClick(card.id)}
+									/>
+								</div>
+							{/each}
 						</div>
-					{/each}
+					{/if}
+
+					{#if myBattlefieldLands.length > 0}
+						<div class="battlefield-row battlefield-row--lands">
+							{#each myBattlefieldLands as card (card.id)}
+								<div
+									class="battlefield-card-wrapper"
+									class:is-hovered={hoveredCardId === card.id}
+									role="button"
+									tabindex="0"
+									aria-label={card.name}
+									onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
+									onkeydown={(e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											e.preventDefault();
+											handleBattlefieldCardClick(card.id);
+										}
+									}}
+									onmouseenter={() => hoveredCardId = card.id}
+									onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
+								>
+									<Card
+										cardId={card.id}
+										cardName={card.name}
+										manaCost={card.manaCost}
+										cardType={card.type}
+										power={card.power}
+										toughness={card.toughness}
+										imageUrl=""
+										isTapped={card.tapped}
+										isSelected={false}
+										size="normal"
+										onclick={() => handleBattlefieldCardClick(card.id)}
+									/>
+								</div>
+							{/each}
+						</div>
+					{/if}
+
 					{#if myBattlefield.length === 0}
 						<div class="empty-battlefield">
 							{#if isDragging}
@@ -852,11 +949,11 @@
 						<LibraryZone
 							libraryCount={me.libraryCount}
 							playerName="You"
-							onSearch={() => {}}
+							onSearch={() => { showDeckSearch = true; }}
 						/>
 
 						{#if showLifeMenu}
-							<div bind:this={lifeMenuEl} class="quick-menu" onclick={(e) => e.stopPropagation()}>
+							<div bind:this={lifeMenuEl} class="quick-menu">
 								<div class="menu-section">
 									<span class="menu-label">Life</span>
 									<div class="menu-row">
@@ -945,6 +1042,23 @@
 			<TokenCreator
 				gameId="playtest"
 				onClose={() => showTokenCreator = false}
+			/>
+		{/if}
+
+		<!-- Deck Search -->
+		{#if showDeckSearch && me}
+			<PlaytestLibrarySearch
+				cards={me.library}
+				playerName="You"
+				onMove={(cardId, zone) => {
+					playtestGameStore.moveCardToZone(cardId, zone);
+					syncPlaytestToGameStore();
+				}}
+				onShuffle={() => {
+					playtestGameStore.shuffleLibrary(me.playerId);
+					syncPlaytestToGameStore();
+				}}
+				onClose={() => showDeckSearch = false}
 			/>
 		{/if}
 
@@ -1375,10 +1489,22 @@
 		display: block;
 	}
 
-	.battlefield-cards {
+	.battlefield-rows {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.battlefield-row {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.5rem;
+	}
+
+	.battlefield-row--lands {
+		margin-top: 0.25rem;
+		padding-top: 0.5rem;
+		border-top: 1px dashed rgba(148, 163, 184, 0.25);
 	}
 
 	.battlefield-card-wrapper {

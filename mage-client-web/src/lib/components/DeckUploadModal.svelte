@@ -6,6 +6,15 @@
 	import type { DeckUploadRequest } from '$lib/types/deck';
 	import { toast } from '$lib/stores/toast';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
+	import Plus from '@lucide/svelte/icons/plus';
+	import X from '@lucide/svelte/icons/x';
+	import ArrowUp from '@lucide/svelte/icons/arrow-up';
+	import ArrowDown from '@lucide/svelte/icons/arrow-down';
+	import TextCursorInput from '@lucide/svelte/icons/text-cursor-input';
+	import Rows3 from '@lucide/svelte/icons/rows-3';
+	import BookOpen from '@lucide/svelte/icons/book-open';
+	import Eraser from '@lucide/svelte/icons/eraser';
+	import Save from '@lucide/svelte/icons/save';
 	import {
 		parseStructuredCards,
 		structuredCardsToText,
@@ -407,9 +416,16 @@ Sideboard:
 							on:click={() => (viewMode === 'text' ? switchToStructuredView() : switchToTextView())}
 							disabled={loading}
 						>
-							{viewMode === 'text' ? '📋 Structured View' : '📝 Text View'}
+							{#if viewMode === 'text'}
+								<Rows3 class="icon" size={14} aria-hidden="true" />
+								Structured
+							{:else}
+								<TextCursorInput class="icon" size={14} aria-hidden="true" />
+								Text
+							{/if}
 						</button>
 						<button type="button" class="example-link" on:click={loadExample} disabled={loading}>
+							<BookOpen class="icon" size={14} aria-hidden="true" />
 							Load Example
 						</button>
 					</div>
@@ -448,7 +464,8 @@ Sideboard:
 										on:click={() => addCard('commander')}
 										disabled={loading}
 									>
-										+ Add
+										<Plus class="icon" size={14} aria-hidden="true" />
+										Add
 									</button>
 								</div>
 								<div class="card-list">
@@ -476,7 +493,12 @@ Sideboard:
 												type="button"
 												class="btn-remove"
 												on:click={() => removeCard(globalIndex)}
-												disabled={loading}>×</button
+												disabled={loading}
+												aria-label="Remove card"
+												title="Remove"
+											>
+												<X class="icon" size={16} aria-hidden="true" />
+											</button
 											>
 										</div>
 									{/each}
@@ -497,7 +519,8 @@ Sideboard:
 									on:click={() => addCard('main')}
 									disabled={loading}
 								>
-									+ Add
+									<Plus class="icon" size={14} aria-hidden="true" />
+									Add
 								</button>
 							</div>
 							<div class="card-list">
@@ -527,7 +550,11 @@ Sideboard:
 												class="btn-move"
 												on:click={() => moveCard(globalIndex, 'commander')}
 												disabled={loading}
-												title="Move to Commander">↑</button
+												title="Move to Commander"
+												aria-label="Move to Commander"
+											>
+												<ArrowUp class="icon" size={16} aria-hidden="true" />
+											</button
 											>
 										{/if}
 										{#if selectedFormat !== 'Commander'}
@@ -536,14 +563,23 @@ Sideboard:
 												class="btn-move"
 												on:click={() => moveCard(globalIndex, 'sideboard')}
 												disabled={loading}
-												title="Move to Sideboard">↓</button
+												title="Move to Sideboard"
+												aria-label="Move to Sideboard"
+											>
+												<ArrowDown class="icon" size={16} aria-hidden="true" />
+											</button
 											>
 										{/if}
 										<button
 											type="button"
 											class="btn-remove"
 											on:click={() => removeCard(globalIndex)}
-											disabled={loading}>×</button
+											disabled={loading}
+											aria-label="Remove card"
+											title="Remove"
+										>
+											<X class="icon" size={16} aria-hidden="true" />
+										</button
 										>
 									</div>
 								{/each}
@@ -564,7 +600,8 @@ Sideboard:
 										on:click={() => addCard('sideboard')}
 										disabled={loading}
 									>
-										+ Add
+										<Plus class="icon" size={14} aria-hidden="true" />
+										Add
 									</button>
 								</div>
 								<div class="card-list">
@@ -593,13 +630,22 @@ Sideboard:
 												class="btn-move"
 												on:click={() => moveCard(globalIndex, 'main')}
 												disabled={loading}
-												title="Move to Main Deck">↑</button
+												title="Move to Main Deck"
+												aria-label="Move to Main Deck"
+											>
+												<ArrowUp class="icon" size={16} aria-hidden="true" />
+											</button
 											>
 											<button
 												type="button"
 												class="btn-remove"
 												on:click={() => removeCard(globalIndex)}
-												disabled={loading}>×</button
+												disabled={loading}
+												aria-label="Remove card"
+												title="Remove"
+											>
+												<X class="icon" size={16} aria-hidden="true" />
+											</button
 											>
 										</div>
 									{/each}
@@ -673,11 +719,13 @@ Sideboard:
 					on:click={handleClear}
 					disabled={loading || !deckList.trim()}
 				>
+					<Eraser class="icon" size={16} aria-hidden="true" />
 					Clear
 				</button>
 
 				<div class="actions-right">
 					<button type="button" class="btn-secondary" on:click={handleClose} disabled={loading}>
+						<X class="icon" size={16} aria-hidden="true" />
 						Cancel
 					</button>
 					<button
@@ -689,6 +737,7 @@ Sideboard:
 							<LoadingSpinner size="small" />
 							<span>Uploading...</span>
 						{:else}
+							<Save class="icon" size={16} aria-hidden="true" />
 							Save Deck
 						{/if}
 					</button>
@@ -700,7 +749,7 @@ Sideboard:
 
 <style>
 	.modal-content {
-		padding: 1.5rem;
+		padding: var(--space-6);
 	}
 
 	.modal-header {
@@ -709,27 +758,27 @@ Sideboard:
 
 	.modal-header h2 {
 		margin: 0 0 0.5rem 0;
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: #1f2937;
+		font-size: var(--text-2xl);
+		font-weight: var(--weight-bold);
+		color: var(--text-bright);
 	}
 
 	.subtitle {
 		margin: 0;
-		font-size: 0.875rem;
-		color: #6b7280;
+		font-size: var(--text-sm);
+		color: var(--text-muted);
 	}
 
 	form {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
+		gap: var(--space-6);
 	}
 
 	.form-group {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: var(--space-2);
 	}
 
 	.label-row {
@@ -740,43 +789,45 @@ Sideboard:
 
 	.label-row-actions {
 		display: flex;
-		gap: 0.75rem;
+		gap: var(--space-3);
 		align-items: center;
 	}
 
 	label {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #374151;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--text-muted);
 	}
 
 	.required {
-		color: #ef4444;
+		color: var(--status-error);
 	}
 
 	input,
 	select,
 	textarea {
-		padding: 0.5rem 0.75rem;
-		border: 1px solid #d1d5db;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-family: inherit;
-		transition: all 0.2s;
+		padding: var(--space-2) var(--space-3);
+		border: 1px solid var(--input-border);
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-family: var(--font-body);
+		color: var(--text-bright);
+		background: var(--input-bg);
+		transition: all var(--transition-fast);
 	}
 
 	input:focus,
 	select:focus,
 	textarea:focus {
 		outline: none;
-		border-color: #3b82f6;
-		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+		border-color: var(--input-focus-border);
+		box-shadow: 0 0 0 3px var(--input-focus-ring);
 	}
 
 	input:disabled,
 	select:disabled,
 	textarea:disabled {
-		background: #f3f4f6;
+		background: var(--bg-slate);
 		cursor: not-allowed;
 		opacity: 0.6;
 	}
@@ -789,37 +840,46 @@ Sideboard:
 	.example-link {
 		background: none;
 		border: none;
-		color: #3b82f6;
-		font-size: 0.75rem;
+		color: var(--accent-gold);
+		font-size: var(--text-xs);
 		cursor: pointer;
 		padding: 0;
 		text-decoration: underline;
 	}
 
+	.example-link :global(svg.icon) {
+		margin-right: var(--space-1);
+	}
+
 	.example-link:hover:not(:disabled) {
-		color: #2563eb;
+		color: var(--accent-gold-bright);
 	}
 
 	.example-link:disabled {
-		color: #9ca3af;
+		color: var(--text-ghost);
 		cursor: not-allowed;
 		text-decoration: none;
 	}
 
 	.view-toggle {
-		background: #f3f4f6;
-		border: 1px solid #d1d5db;
-		border-radius: 0.375rem;
-		color: #374151;
-		font-size: 0.75rem;
+		background: var(--bg-iron);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		color: var(--text-muted);
+		font-size: var(--text-xs);
 		cursor: pointer;
-		padding: 0.25rem 0.5rem;
-		transition: all 0.2s;
+		padding: var(--space-1) var(--space-2);
+		transition: all var(--transition-fast);
+	}
+
+	.view-toggle :global(svg.icon) {
+		color: currentColor;
 	}
 
 	.view-toggle:hover:not(:disabled) {
-		background: #e5e7eb;
-		border-color: #9ca3af;
+		background: var(--bg-steel);
+		border-color: var(--border-strong);
+		color: var(--text-bright);
 	}
 
 	.view-toggle:disabled {
@@ -828,15 +888,15 @@ Sideboard:
 	}
 
 	.structured-editor {
-		border: 1px solid #d1d5db;
-		border-radius: 0.375rem;
-		background: white;
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		background: var(--bg-obsidian);
 		max-height: 24rem;
 		overflow-y: auto;
 	}
 
 	.card-section {
-		border-bottom: 1px solid #e5e7eb;
+		border-bottom: 1px solid var(--border-subtle);
 	}
 
 	.card-section:last-child {
@@ -847,9 +907,9 @@ Sideboard:
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0.75rem 1rem;
-		background: #f9fafb;
-		border-bottom: 1px solid #e5e7eb;
+		padding: var(--space-3) var(--space-4);
+		background: var(--bg-slate);
+		border-bottom: 1px solid var(--border-subtle);
 		position: sticky;
 		top: 0;
 		z-index: 1;
@@ -857,24 +917,30 @@ Sideboard:
 
 	.section-header h4 {
 		margin: 0;
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #374151;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
 	}
 
 	.btn-add {
-		background: #3b82f6;
-		color: white;
+		background: var(--accent-gold);
+		color: var(--bg-void);
 		border: none;
-		border-radius: 0.25rem;
-		padding: 0.25rem 0.5rem;
-		font-size: 0.75rem;
+		border-radius: var(--radius-sm);
+		padding: var(--space-1) var(--space-2);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
-		transition: background 0.2s;
+		transition: all var(--transition-fast);
+	}
+
+	.btn-add :global(svg.icon) {
+		color: currentColor;
 	}
 
 	.btn-add:hover:not(:disabled) {
-		background: #2563eb;
+		background: var(--accent-gold-bright);
+		box-shadow: var(--shadow-glow);
 	}
 
 	.btn-add:disabled {
@@ -883,49 +949,51 @@ Sideboard:
 	}
 
 	.card-list {
-		padding: 0.5rem;
+		padding: var(--space-2);
 		display: flex;
 		flex-direction: column;
-		gap: 0.25rem;
+		gap: var(--space-1);
 	}
 
 	.card-item {
 		display: flex;
-		gap: 0.5rem;
+		gap: var(--space-2);
 		align-items: center;
-		padding: 0.5rem;
-		background: white;
-		border-radius: 0.25rem;
-		transition: background 0.2s;
+		padding: var(--space-2);
+		background: var(--bg-iron);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-sm);
+		transition: background var(--transition-fast), border-color var(--transition-fast);
 	}
 
 	.card-item:hover {
-		background: #f9fafb;
+		background: var(--bg-steel);
+		border-color: var(--border-default);
 	}
 
 	.card-quantity {
 		width: 3.5rem;
-		padding: 0.375rem;
-		border: 1px solid #d1d5db;
-		border-radius: 0.25rem;
-		font-size: 0.875rem;
+		padding: var(--space-2);
+		border: 1px solid var(--input-border);
+		border-radius: var(--radius-sm);
+		font-size: var(--text-sm);
 		text-align: center;
 	}
 
 	.card-name {
 		flex: 1;
-		padding: 0.375rem 0.5rem;
-		border: 1px solid #d1d5db;
-		border-radius: 0.25rem;
-		font-size: 0.875rem;
-		font-family: inherit;
+		padding: var(--space-2) var(--space-2);
+		border: 1px solid var(--input-border);
+		border-radius: var(--radius-sm);
+		font-size: var(--text-sm);
+		font-family: var(--font-body);
 	}
 
 	.card-name:focus,
 	.card-quantity:focus {
 		outline: none;
-		border-color: #3b82f6;
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+		border-color: var(--accent-gold);
+		box-shadow: 0 0 0 3px var(--accent-gold-glow);
 	}
 
 	.btn-move,
@@ -945,13 +1013,18 @@ Sideboard:
 		flex-shrink: 0;
 	}
 
+	.btn-move :global(svg.icon),
+	.btn-remove :global(svg.icon) {
+		color: currentColor;
+	}
+
 	.btn-move {
-		background: #6b7280;
-		font-size: 0.875rem;
+		background: var(--bg-steel);
+		font-size: var(--text-sm);
 	}
 
 	.btn-move:hover:not(:disabled) {
-		background: #4b5563;
+		background: var(--border-strong);
 	}
 
 	.btn-remove:hover:not(:disabled) {
@@ -966,37 +1039,38 @@ Sideboard:
 
 	.hint {
 		margin: 0;
-		font-size: 0.75rem;
-		color: #6b7280;
+		font-size: var(--text-xs);
+		color: var(--text-dim);
 	}
 
 	.hint code {
-		background: #f3f4f6;
-		padding: 0.125rem 0.25rem;
-		border-radius: 0.25rem;
+		background: var(--bg-iron);
+		color: var(--text-bright);
+		padding: 0.125rem var(--space-1);
+		border-radius: var(--radius-sm);
 		font-family: monospace;
-		font-size: 0.75rem;
+		font-size: var(--text-xs);
 	}
 
 	.stats-box {
-		background: #eff6ff;
-		border: 1px solid #bfdbfe;
-		border-radius: 0.5rem;
-		padding: 1rem;
+		background: var(--bg-obsidian);
+		border: 1px solid color-mix(in srgb, var(--status-info) 35%, var(--border-subtle));
+		border-radius: var(--radius-lg);
+		padding: var(--space-4);
 	}
 
 	.stats-box h3 {
 		margin: 0 0 0.75rem 0;
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #1e3a8a;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
+		color: var(--status-info);
 	}
 
 	.stats-grid {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		gap: 1rem;
-		font-size: 0.875rem;
+		gap: var(--space-4);
+		font-size: var(--text-sm);
 	}
 
 	@media (min-width: 640px) {
@@ -1007,23 +1081,23 @@ Sideboard:
 
 	.stat {
 		display: flex;
-		gap: 0.5rem;
+		gap: var(--space-2);
 	}
 
 	.stat-label {
-		color: #1e40af;
+		color: var(--text-muted);
 	}
 
 	.stat-value {
-		font-weight: 600;
-		color: #1e3a8a;
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
 	}
 
 	.error-box {
-		background: #fef2f2;
-		border: 1px solid #fecaca;
-		border-radius: 0.5rem;
-		padding: 1rem;
+		background: var(--status-error-dim);
+		border: 1px solid color-mix(in srgb, var(--status-error) 45%, var(--border-subtle));
+		border-radius: var(--radius-lg);
+		padding: var(--space-4);
 	}
 
 	.error-header {
@@ -1034,15 +1108,15 @@ Sideboard:
 	}
 
 	:global(svg.error-icon) {
-		color: #dc2626;
+		color: var(--status-error);
 		flex-shrink: 0;
 	}
 
 	.error-box h3 {
 		margin: 0;
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #7f1d1d;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
+		color: var(--status-error);
 	}
 
 	.error-list {
@@ -1054,19 +1128,19 @@ Sideboard:
 	}
 
 	.error-item {
-		padding: 0.5rem;
-		background: #fee2e2;
-		border-left: 3px solid #dc2626;
-		border-radius: 0.25rem;
-		font-size: 0.875rem;
-		color: #991b1b;
+		padding: var(--space-2);
+		background: color-mix(in srgb, var(--status-error) 12%, transparent);
+		border-left: 3px solid var(--status-error);
+		border-radius: var(--radius-sm);
+		font-size: var(--text-sm);
+		color: var(--text-bright);
 		font-family: 'Monaco', 'Courier New', monospace;
 	}
 
 	.error-hint {
 		margin: 0.75rem 0 0 0;
-		font-size: 0.75rem;
-		color: #b91c1c;
+		font-size: var(--text-xs);
+		color: var(--text-muted);
 		font-style: italic;
 	}
 
@@ -1075,7 +1149,7 @@ Sideboard:
 		justify-content: space-between;
 		align-items: center;
 		padding-top: 1rem;
-		border-top: 1px solid #e5e7eb;
+		border-top: 1px solid var(--border-subtle);
 	}
 
 	.actions-right {
@@ -1086,11 +1160,11 @@ Sideboard:
 	.btn-primary,
 	.btn-secondary {
 		padding: 0.5rem 1rem;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 500;
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all var(--transition-fast);
 		border: 1px solid;
 		display: inline-flex;
 		align-items: center;
@@ -1098,13 +1172,14 @@ Sideboard:
 	}
 
 	.btn-primary {
-		background: #3b82f6;
-		color: white;
-		border-color: transparent;
+		background: var(--accent-gold);
+		color: var(--bg-void);
+		border-color: var(--accent-gold);
 	}
 
 	.btn-primary:hover:not(:disabled) {
-		background: #2563eb;
+		background: var(--accent-gold-bright);
+		box-shadow: var(--shadow-glow);
 	}
 
 	.btn-primary:disabled {
@@ -1113,13 +1188,14 @@ Sideboard:
 	}
 
 	.btn-secondary {
-		background: white;
-		color: #374151;
-		border-color: #d1d5db;
+		background: var(--bg-iron);
+		color: var(--text-bright);
+		border-color: var(--border-default);
 	}
 
 	.btn-secondary:hover:not(:disabled) {
-		background: #f9fafb;
+		background: var(--bg-steel);
+		border-color: var(--border-strong);
 	}
 
 	.btn-secondary:disabled {

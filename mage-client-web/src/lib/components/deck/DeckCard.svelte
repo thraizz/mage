@@ -187,7 +187,7 @@
 		gap: var(--space-3);
 		padding: var(--space-3);
 		border-radius: var(--radius-md);
-		background: color-mix(in srgb, var(--bg-slate) 65%, transparent);
+		background: var(--bg-slate);
 		border: 1px solid var(--border-subtle);
 	}
 
@@ -207,7 +207,7 @@
 
 	.stat-label {
 		font-size: var(--text-xs);
-		color: var(--text-dim);
+		color: var(--text-muted);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
@@ -221,7 +221,7 @@
 
 	.modified-date {
 		font-size: var(--text-xs);
-		color: var(--text-ghost);
+		color: var(--text-dim);
 	}
 
 	.invalid-hint {

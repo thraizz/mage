@@ -6,6 +6,7 @@
  */
 
 import { writable, derived } from 'svelte/store';
+import { browser } from '$app/environment';
 import type { CardView, ManaPoolView } from '$lib/generated/mage/v1/models';
 
 /**
@@ -55,11 +56,75 @@ const initialState: PlaytestGameState = {
 	isInitialized: false
 };
 
+const PLAYTEST_STORAGE_KEY = 'mage.playtest.state.v1';
+const PLAYTEST_STORAGE_VERSION = 1;
+
+type PersistedPlaytestState = {
+	version: number;
+	savedAt: number;
+	state: PlaytestGameState;
+};
+
+function loadPersistedPlaytestState(): PlaytestGameState | null {
+	if (!browser) return null;
+
+	try {
+		const raw = localStorage.getItem(PLAYTEST_STORAGE_KEY);
+		if (!raw) return null;
+
+		const parsed = JSON.parse(raw) as PersistedPlaytestState;
+		if (!parsed || typeof parsed !== 'object') return null;
+		if (parsed.version !== PLAYTEST_STORAGE_VERSION) return null;
+		if (!parsed.state || typeof parsed.state !== 'object') return null;
+
+		// Basic validation to avoid crashing on bad/stale data
+		if (parsed.state.isInitialized !== true) return null;
+		if (!Array.isArray(parsed.state.players) || parsed.state.players.length === 0) return null;
+		if (typeof parsed.state.gameId !== 'string' || parsed.state.gameId.length === 0) return null;
+
+		return parsed.state;
+	} catch (err) {
+		console.warn('[PlaytestGame] Failed to load persisted state:', err);
+		return null;
+	}
+}
+
+function persistPlaytestState(state: PlaytestGameState): void {
+	if (!browser) return;
+	if (!state.isInitialized) return;
+
+	try {
+		const payload: PersistedPlaytestState = {
+			version: PLAYTEST_STORAGE_VERSION,
+			savedAt: Date.now(),
+			state
+		};
+		localStorage.setItem(PLAYTEST_STORAGE_KEY, JSON.stringify(payload));
+	} catch (err) {
+		console.warn('[PlaytestGame] Failed to persist state:', err);
+	}
+}
+
+function clearPersistedPlaytestState(): void {
+	if (!browser) return;
+	try {
+		localStorage.removeItem(PLAYTEST_STORAGE_KEY);
+	} catch (err) {
+		console.warn('[PlaytestGame] Failed to clear persisted state:', err);
+	}
+}
+
 /**
  * Create playtest game store
  */
 function createPlaytestGameStore() {
-	const { subscribe, set, update } = writable<PlaytestGameState>(initialState);
+	const hydrated = loadPersistedPlaytestState();
+	const { subscribe, set, update } = writable<PlaytestGameState>(hydrated ?? initialState);
+
+	// Persist any meaningful state changes (client-only)
+	subscribe((state) => {
+		persistPlaytestState(state);
+	});
 
 	/**
 	 * Initialize game state with players and their decks
@@ -195,6 +260,13 @@ function createPlaytestGameStore() {
 						sourceZone = `hand:${player.playerId}`;
 						break;
 					}
+
+					const libraryIndex = player.library.findIndex(c => c.id === cardId);
+					if (libraryIndex !== -1) {
+						card = player.library[libraryIndex];
+						sourceZone = `library:${player.playerId}`;
+						break;
+					}
 					
 					const graveyardIndex = player.graveyard.findIndex(c => c.id === cardId);
 					if (graveyardIndex !== -1) {
@@ -230,6 +302,13 @@ function createPlaytestGameStore() {
 				newState.players = state.players.map(p =>
 					p.playerId === playerId
 						? { ...p, hand: p.hand.filter(c => c.id !== cardId), handCount: p.hand.length - 1 }
+						: p
+				);
+			} else if (sourceZone.startsWith('library:')) {
+				const playerId = sourceZone.split(':')[1];
+				newState.players = state.players.map(p =>
+					p.playerId === playerId
+						? { ...p, library: p.library.filter(c => c.id !== cardId), libraryCount: p.library.length - 1 }
 						: p
 				);
 			} else if (sourceZone.startsWith('graveyard:')) {
@@ -426,15 +505,31 @@ function createPlaytestGameStore() {
 			const token: CardView = {
 				id: tokenId,
 				name,
+				displayName: name,
+				subTypes: '',
+				superTypes: '',
+				color,
 				type: types,
 				power,
 				toughness,
+				loyalty: '',
 				manaCost: '',
+				cardNumber: 0,
+				expansionSetCode: '',
+				rarity: '',
+				rulesText: '',
+				abilities: [],
 				zone: 2, // BATTLEFIELD
 				ownerId: state.activeControlSeat,
 				controllerId: state.activeControlSeat,
 				tapped: false,
-				faceDown: false
+				flipped: false,
+				transformed: false,
+				faceDown: false,
+				counters: [],
+				attachedTo: [],
+				summoningSickness: true,
+				availableActions: []
 			};
 
 			return {
@@ -527,6 +622,7 @@ function createPlaytestGameStore() {
 	 */
 	function reset(): void {
 		set(initialState);
+		clearPersistedPlaytestState();
 	}
 
 	return {
@@ -548,7 +644,8 @@ function createPlaytestGameStore() {
 		nextTurn,
 		mulligan,
 		keepHand,
-		reset
+		reset,
+		clearPersisted: clearPersistedPlaytestState
 	};
 }
 
