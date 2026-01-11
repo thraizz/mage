@@ -3,6 +3,10 @@
 	import type { Deck, DeckCard } from '$lib/types/deck';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { toast } from '$lib/stores/toast';
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import Copy from '@lucide/svelte/icons/copy';
+	import Download from '@lucide/svelte/icons/download';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	export let deck: Deck;
 	export let loading = false;
@@ -259,14 +263,7 @@
 		<div class="viewer-header">
 			<div class="header-left">
 				<button class="btn-back" on:click={handleClose} title="Back to deck list">
-					<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M10 19l-7-7m0 0l7-7m-7 7h18"
-						/>
-					</svg>
+					<ArrowLeft class="icon" size={20} aria-hidden="true" />
 				</button>
 				<div class="header-text">
 					<h1>{deck.name}</h1>
@@ -278,36 +275,15 @@
 			</div>
 			<div class="header-actions">
 				<button class="btn-copy" on:click={handleCopy} title="Copy deck to clipboard">
-					<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2h-8a2 2 0 00-2 2z"
-						/>
-					</svg>
+					<Copy class="icon" size={20} aria-hidden="true" />
 					Copy
 				</button>
 				<button class="btn-export" on:click={handleExport}>
-					<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-						/>
-					</svg>
+					<Download class="icon" size={20} aria-hidden="true" />
 					Export
 				</button>
 				<button class="btn-delete" on:click={handleDelete}>
-					<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-						/>
-					</svg>
+					<Trash2 class="icon" size={20} aria-hidden="true" />
 					Delete
 				</button>
 			</div>
@@ -440,9 +416,10 @@
 
 <style>
 	.deck-viewer {
-		background-color: #f9fafb;
+		background: var(--bg-void);
 		min-height: 100vh;
-		padding: 2rem 0;
+		padding: var(--space-8) 0;
+		color: var(--text-bright);
 	}
 
 	.loading-container {
@@ -450,30 +427,30 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 4rem 0;
+		padding: var(--space-16) 0;
 	}
 
 	.loading-container p {
-		margin-top: 1rem;
-		color: #4b5563;
+		margin-top: var(--space-4);
+		color: var(--text-muted);
 	}
 
 	/* Header */
 	.viewer-header {
 		max-width: 1280px;
-		margin: 0 auto 2rem;
-		padding: 0 1rem;
+		margin: 0 auto var(--space-8);
+		padding: 0 var(--space-4);
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
-		gap: 1rem;
+		gap: var(--space-4);
 		flex-wrap: wrap;
 	}
 
 	.header-left {
 		display: flex;
 		align-items: flex-start;
-		gap: 1rem;
+		gap: var(--space-4);
 		flex: 1;
 	}
 
@@ -481,54 +458,61 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0.5rem;
-		border: 1px solid #d1d5db;
-		border-radius: 0.375rem;
-		background-color: white;
+		padding: var(--space-2);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		background: var(--bg-iron);
+		color: var(--text-muted);
 		cursor: pointer;
-		transition: background-color 0.2s;
+		transition: all var(--transition-fast);
 	}
 
 	.btn-back:hover {
-		background-color: #f9fafb;
+		background: var(--bg-steel);
+		border-color: var(--border-strong);
+		color: var(--text-bright);
 	}
 
-	.btn-back .icon {
-		width: 1.25rem;
-		height: 1.25rem;
+	.btn-back:focus-visible {
+		outline: none;
+		box-shadow: 0 0 0 3px var(--accent-gold-glow);
+		border-color: var(--accent-gold);
 	}
 
 	.header-text h1 {
-		font-size: 1.875rem;
-		font-weight: 700;
-		color: #111827;
-		margin: 0 0 0.5rem 0;
+		font-family: var(--font-display);
+		font-size: var(--text-3xl);
+		font-weight: var(--weight-bold);
+		color: var(--text-bright);
+		margin: 0 0 var(--space-2) 0;
 	}
 
 	.deck-meta {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--space-3);
+		flex-wrap: wrap;
 	}
 
 	.format-badge {
 		display: inline-block;
-		padding: 0.25rem 0.75rem;
-		font-size: 0.875rem;
-		font-weight: 500;
-		background-color: #dbeafe;
-		color: #1e40af;
-		border-radius: 0.375rem;
+		padding: var(--space-1) var(--space-3);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		background: var(--bg-iron);
+		color: var(--text-bright);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-full);
 	}
 
 	.card-count {
-		font-size: 0.875rem;
-		color: #6b7280;
+		font-size: var(--text-sm);
+		color: var(--text-muted);
 	}
 
 	.header-actions {
 		display: flex;
-		gap: 0.75rem;
+		gap: var(--space-3);
 		flex-wrap: wrap;
 	}
 
@@ -537,106 +521,120 @@
 	.btn-copy {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.5rem 1rem;
-		border: none;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 500;
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-4);
+		border: 1px solid transparent;
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
-		transition: background-color 0.2s;
+		transition: all var(--transition-fast);
 	}
 
 	.btn-export {
-		background-color: #3b82f6;
-		color: white;
+		background: var(--accent-gold);
+		color: var(--bg-void);
+		border-color: var(--accent-gold);
 	}
 
 	.btn-export:hover {
-		background-color: #2563eb;
+		background: var(--accent-gold-bright);
+		box-shadow: var(--shadow-glow);
 	}
 
 	.btn-copy {
-		background-color: #6b7280;
-		color: white;
+		background: var(--bg-iron);
+		color: var(--text-bright);
+		border-color: var(--border-default);
 	}
 
 	.btn-copy:hover {
-		background-color: #4b5563;
+		background: var(--bg-steel);
+		border-color: var(--border-strong);
 	}
 
 	.btn-delete {
-		background-color: #ef4444;
+		background: var(--status-error);
 		color: white;
+		border-color: var(--status-error);
 	}
 
 	.btn-delete:hover {
 		background-color: #dc2626;
 	}
 
-	.btn-export .icon,
-	.btn-delete .icon,
-	.btn-copy .icon {
-		width: 1.25rem;
-		height: 1.25rem;
+	.btn-export:focus-visible,
+	.btn-copy:focus-visible,
+	.btn-delete:focus-visible {
+		outline: none;
+		box-shadow: 0 0 0 3px var(--accent-gold-glow);
+	}
+
+	:global(svg.icon) {
+		display: block;
+		flex-shrink: 0;
 	}
 
 	/* Content */
 	.viewer-content {
 		max-width: 1280px;
 		margin: 0 auto;
-		padding: 0 1rem;
+		padding: 0 var(--space-4);
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
+		gap: var(--space-8);
 	}
 
 	/* Stats Section */
 	.stats-section {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-		gap: 1rem;
+		gap: var(--space-4);
 	}
 
 	.stat-card {
-		background-color: white;
-		padding: 1.5rem;
-		border-radius: 0.5rem;
-		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+		background: var(--bg-obsidian);
+		padding: var(--space-6);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--border-subtle);
+		box-shadow: var(--shadow-sm);
 		text-align: center;
 	}
 
 	.stat-label {
-		font-size: 0.875rem;
-		color: #6b7280;
-		margin-bottom: 0.5rem;
+		font-size: var(--text-sm);
+		color: var(--text-muted);
+		margin-bottom: var(--space-2);
 	}
 
 	.stat-value {
-		font-size: 2rem;
-		font-weight: 700;
-		color: #111827;
+		font-family: var(--font-display);
+		font-size: var(--text-3xl);
+		font-weight: var(--weight-bold);
+		color: var(--text-bright);
 	}
 
 	/* Visualizations */
 	.visualization-section {
-		background-color: white;
-		padding: 1.5rem;
-		border-radius: 0.5rem;
-		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+		background: var(--bg-obsidian);
+		padding: var(--space-6);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--border-subtle);
+		box-shadow: var(--shadow-sm);
 	}
 
 	.visualization-section h2 {
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: #111827;
-		margin: 0 0 1.5rem 0;
+		font-family: var(--font-display);
+		font-size: var(--text-2xl);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
+		margin: 0 0 var(--space-6) 0;
 	}
 
 	.chart-note {
-		margin-top: 1rem;
-		font-size: 0.75rem;
-		color: #9ca3af;
+		margin-top: var(--space-4);
+		font-size: var(--text-xs);
+		color: var(--text-dim);
 		font-style: italic;
 	}
 
@@ -646,8 +644,8 @@
 		align-items: flex-end;
 		justify-content: space-around;
 		height: 200px;
-		gap: 0.5rem;
-		padding: 0 1rem;
+		gap: var(--space-2);
+		padding: 0 var(--space-4);
 	}
 
 	.curve-bar {
@@ -655,113 +653,116 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.5rem;
+		gap: var(--space-2);
 	}
 
 	.bar-fill {
 		width: 100%;
-		background: linear-gradient(to top, #3b82f6, #60a5fa);
-		border-radius: 0.25rem 0.25rem 0 0;
+		background: linear-gradient(to top, var(--accent-gold-dim), var(--accent-gold-bright));
+		border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 		display: flex;
 		align-items: flex-start;
 		justify-content: center;
-		padding-top: 0.25rem;
+		padding-top: var(--space-1);
 		min-height: 0;
-		transition: height 0.3s ease;
+		transition: height var(--transition-slow);
 	}
 
 	.bar-count {
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: white;
+		font-size: var(--text-xs);
+		font-weight: var(--weight-semibold);
+		color: var(--bg-void);
 	}
 
 	.bar-label {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #4b5563;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--text-muted);
 	}
 
 	/* Color Distribution */
 	.color-distribution {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: var(--space-4);
 	}
 
 	.color-bar {
 		display: grid;
 		grid-template-columns: 100px 1fr 60px;
 		align-items: center;
-		gap: 1rem;
+		gap: var(--space-4);
 	}
 
 	.color-label {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: #374151;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--text-muted);
 	}
 
 	.color-bar-track {
 		height: 24px;
-		background-color: #f3f4f6;
-		border-radius: 0.25rem;
+		background: var(--bg-iron);
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--border-subtle);
 		overflow: hidden;
 	}
 
 	.color-bar-fill {
 		height: 100%;
-		transition: width 0.3s ease;
+		transition: width var(--transition-slow);
 	}
 
 	.color-white {
-		background-color: #fef3c7;
+		background: var(--mana-white);
 	}
 
 	.color-blue {
-		background-color: #3b82f6;
+		background: var(--mana-blue);
 	}
 
 	.color-black {
-		background-color: #1f2937;
+		background: var(--mana-black);
 	}
 
 	.color-red {
-		background-color: #ef4444;
+		background: var(--mana-red);
 	}
 
 	.color-green {
-		background-color: #10b981;
+		background: var(--mana-green);
 	}
 
 	.color-colorless {
-		background-color: #9ca3af;
+		background: var(--mana-colorless);
 	}
 
 	.color-count {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #111827;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
 		text-align: right;
 	}
 
 	/* Card List */
 	.card-list-section {
-		background-color: white;
-		padding: 1.5rem;
-		border-radius: 0.5rem;
-		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+		background: var(--bg-obsidian);
+		padding: var(--space-6);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--border-subtle);
+		box-shadow: var(--shadow-sm);
 	}
 
 	.card-list-section > h2 {
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: #111827;
-		margin: 0 0 1.5rem 0;
+		font-family: var(--font-display);
+		font-size: var(--text-2xl);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
+		margin: 0 0 var(--space-6) 0;
 	}
 
 	.card-group {
-		margin-bottom: 2rem;
+		margin-bottom: var(--space-8);
 	}
 
 	.card-group:last-child {
@@ -769,58 +770,61 @@
 	}
 
 	.group-header {
-		font-size: 1rem;
-		font-weight: 600;
-		color: #374151;
-		margin: 0 0 1rem 0;
-		padding-bottom: 0.5rem;
-		border-bottom: 2px solid #e5e7eb;
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
+		margin: 0 0 var(--space-4) 0;
+		padding-bottom: var(--space-2);
+		border-bottom: 1px solid var(--border-subtle);
 	}
 
 	.commander-header {
-		color: #7c3aed;
-		border-bottom-color: #7c3aed;
+		color: var(--accent-gold);
+		border-bottom-color: var(--border-accent);
 	}
 
 	.card-items {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-		gap: 0.5rem;
+		gap: var(--space-2);
 	}
 
 	.card-item {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		padding: 0.5rem 0.75rem;
-		background-color: #f9fafb;
-		border-radius: 0.25rem;
-		transition: background-color 0.2s;
+		gap: var(--space-3);
+		padding: var(--space-2) var(--space-3);
+		background: var(--bg-slate);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-sm);
+		transition: all var(--transition-fast);
 	}
 
 	.card-item:hover {
-		background-color: #f3f4f6;
+		background: var(--bg-iron);
+		border-color: var(--border-default);
 	}
 
 	.commander-card {
-		background-color: #f5f3ff;
-		border-left: 3px solid #7c3aed;
+		background: var(--bg-slate);
+		border-left: 3px solid var(--accent-gold);
 	}
 
 	.commander-card:hover {
-		background-color: #ede9fe;
+		background: var(--bg-iron);
 	}
 
 	.card-quantity {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #6b7280;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
+		color: var(--text-dim);
 		min-width: 2rem;
 	}
 
 	.card-name {
-		font-size: 0.875rem;
-		color: #111827;
+		font-size: var(--text-sm);
+		color: var(--text-bright);
 		flex: 1;
 	}
 
@@ -845,7 +849,7 @@
 		}
 
 		.mana-curve {
-			padding: 0 0.5rem;
+			padding: 0 var(--space-2);
 		}
 	}
 </style>

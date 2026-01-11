@@ -7,6 +7,7 @@
 	import DeckViewer from '$lib/components/DeckViewer.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import { toast } from '$lib/stores/toast';
+	import CircleX from '@lucide/svelte/icons/circle-x';
 
 	let deck: Deck | null = null;
 	let loading = true;
@@ -78,13 +79,7 @@
 {#if error}
 	<div class="error-page">
 		<div class="error-content">
-			<svg class="error-icon" fill="currentColor" viewBox="0 0 20 20">
-				<path
-					fill-rule="evenodd"
-					d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-					clip-rule="evenodd"
-				/>
-			</svg>
+			<CircleX class="error-icon" aria-hidden="true" />
 			<h2>Error Loading Deck</h2>
 			<p>{error}</p>
 			<div class="error-actions">
@@ -117,68 +112,83 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: #f9fafb;
-		padding: 2rem;
+		background: var(--bg-void);
+		padding: var(--space-8);
 	}
 
 	.error-content {
 		text-align: center;
 		max-width: 400px;
+		background: var(--bg-obsidian);
+		border: 1px solid var(--border-subtle);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-md);
+		padding: var(--space-8);
 	}
 
-	.error-icon {
+	/* Icon is rendered by a component, so style it globally */
+	:global(svg.error-icon) {
 		width: 4rem;
 		height: 4rem;
-		color: #ef4444;
-		margin: 0 auto 1rem;
+		color: var(--status-error);
+		margin: 0 auto var(--space-4);
 	}
 
 	.error-content h2 {
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: #111827;
-		margin: 0 0 0.5rem 0;
+		font-family: var(--font-display);
+		font-size: var(--text-2xl);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
+		margin: 0 0 var(--space-2) 0;
 	}
 
 	.error-content p {
-		font-size: 0.875rem;
-		color: #6b7280;
-		margin: 0 0 1.5rem 0;
+		font-size: var(--text-sm);
+		color: var(--text-muted);
+		margin: 0 0 var(--space-6) 0;
 	}
 
 	.error-actions {
 		display: flex;
-		gap: 0.75rem;
+		gap: var(--space-3);
 		justify-content: center;
 	}
 
 	.btn-retry,
 	.btn-back {
-		padding: 0.5rem 1rem;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		font-weight: 500;
+		padding: var(--space-2) var(--space-4);
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-semibold);
 		cursor: pointer;
-		transition: background-color 0.2s;
+		transition: all var(--transition-fast);
 	}
 
 	.btn-retry {
-		background-color: #3b82f6;
-		color: white;
-		border: none;
+		background: var(--accent-gold);
+		color: var(--bg-void);
+		border: 1px solid var(--accent-gold);
 	}
 
 	.btn-retry:hover {
-		background-color: #2563eb;
+		background: var(--accent-gold-bright);
+		box-shadow: var(--shadow-glow);
 	}
 
 	.btn-back {
-		background-color: white;
-		color: #374151;
-		border: 1px solid #d1d5db;
+		background: var(--bg-iron);
+		color: var(--text-bright);
+		border: 1px solid var(--border-default);
 	}
 
 	.btn-back:hover {
-		background-color: #f9fafb;
+		background: var(--bg-steel);
+		border-color: var(--border-strong);
+	}
+
+	.btn-retry:focus-visible,
+	.btn-back:focus-visible {
+		outline: none;
+		box-shadow: 0 0 0 3px var(--accent-gold-glow);
 	}
 </style>
