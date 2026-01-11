@@ -7,6 +7,7 @@
 	import { getMageClient } from '$lib/grpc/client';
 	import { createSessionToken } from '$lib/utils/jwt';
 	import Modal from '$lib/components/Modal.svelte';
+	import Copy from '@lucide/svelte/icons/copy';
 
 	// Form state
 	let username = '';
@@ -434,7 +435,7 @@
 
 		<div class="credentials-box">
 			<div class="credential-item">
-				<label>Username:</label>
+				<span class="credential-label">Username:</span>
 				<div class="credential-value">
 					<code>{guestUsername}</code>
 					<button
@@ -448,26 +449,13 @@
 						}}
 						title="Copy username"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-							<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-						</svg>
+						<Copy size={16} aria-hidden="true" />
 					</button>
 				</div>
 			</div>
 
 			<div class="credential-item">
-				<label>Password:</label>
+				<span class="credential-label">Password:</span>
 				<div class="credential-value">
 					<code class="password-display">{guestPassword}</code>
 					<button
@@ -476,20 +464,7 @@
 						on:click={copyPasswordToClipboard}
 						title="Copy password"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-							<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-						</svg>
+						<Copy size={16} aria-hidden="true" />
 					</button>
 				</div>
 			</div>

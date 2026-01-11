@@ -2,25 +2,16 @@
 	import { fly } from 'svelte/transition';
 	import { toast } from '$lib/stores/toast';
 	import type { Toast as ToastType } from '$lib/types/toast';
+	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
+	import CircleX from '@lucide/svelte/icons/circle-x';
+	import AlertTriangle from '@lucide/svelte/icons/triangle-alert';
+	import Info from '@lucide/svelte/icons/info';
+	import X from '@lucide/svelte/icons/x';
 
 	export let data: ToastType;
 
 	function handleDismiss() {
 		toast.dismiss(data.id);
-	}
-
-	function getIcon(type: ToastType['type']): string {
-		switch (type) {
-			case 'success':
-				return '✓';
-			case 'error':
-				return '✕';
-			case 'warning':
-				return '⚠';
-			case 'info':
-			default:
-				return 'ℹ';
-		}
 	}
 
 	function getColorClass(type: ToastType['type']): string {
@@ -45,7 +36,15 @@
 	transition:fly={{ x: 300, duration: 300 }}
 >
 	<div class="toast-icon">
-		{getIcon(data.type)}
+		{#if data.type === 'success'}
+			<CheckCircle2 size={20} aria-hidden="true" />
+		{:else if data.type === 'error'}
+			<CircleX size={20} aria-hidden="true" />
+		{:else if data.type === 'warning'}
+			<AlertTriangle size={20} aria-hidden="true" />
+		{:else}
+			<Info size={20} aria-hidden="true" />
+		{/if}
 	</div>
 
 	<div class="toast-message">
@@ -54,20 +53,7 @@
 
 	{#if data.dismissible}
 		<button class="toast-dismiss" on:click={handleDismiss} aria-label="Dismiss notification">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="16"
-				height="16"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<line x1="18" y1="6" x2="6" y2="18"></line>
-				<line x1="6" y1="6" x2="18" y2="18"></line>
-			</svg>
+			<X size={16} aria-hidden="true" />
 		</button>
 	{/if}
 </div>

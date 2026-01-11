@@ -2,6 +2,10 @@
 	import { auth } from '$lib/stores/auth';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import User from '@lucide/svelte/icons/user';
+	import Layers from '@lucide/svelte/icons/layers';
+	import LogOut from '@lucide/svelte/icons/log-out';
 
 	let menuOpen = false;
 	let menuButton: HTMLButtonElement;
@@ -59,21 +63,7 @@
 		<span class="user-name">
 			{$auth.user?.username || 'Guest'}
 		</span>
-		<svg
-			class="chevron"
-			class:rotated={menuOpen}
-			xmlns="http://www.w3.org/2000/svg"
-			width="16"
-			height="16"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-		>
-			<polyline points="6 9 12 15 18 9"></polyline>
-		</svg>
+		<ChevronDown class={`chevron ${menuOpen ? 'rotated' : ''}`} size={16} aria-hidden="true" />
 	</button>
 
 	{#if menuOpen}
@@ -85,59 +75,19 @@
 			<div class="dropdown-divider"></div>
 
 			<a href="/profile" class="dropdown-item" on:click={closeMenu} role="menuitem">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-					<circle cx="12" cy="7" r="4"></circle>
-				</svg>
+				<User size={16} aria-hidden="true" />
 				Profile
 			</a>
 
 			<a href="/decks" class="dropdown-item" on:click={closeMenu} role="menuitem">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
-					<polyline points="17 2 12 7 7 2"></polyline>
-				</svg>
+				<Layers size={16} aria-hidden="true" />
 				My Decks
 			</a>
 
 			<div class="dropdown-divider"></div>
 
 			<button class="dropdown-item logout" on:click={handleLogout} role="menuitem">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-					<polyline points="16 17 21 12 16 7"></polyline>
-					<line x1="21" y1="12" x2="9" y2="12"></line>
-				</svg>
+				<LogOut size={16} aria-hidden="true" />
 				Logout
 			</button>
 		</div>
@@ -187,12 +137,12 @@
 		display: none;
 	}
 
-	.chevron {
+	:global(svg.chevron) {
 		transition: transform var(--transition-fast);
 		color: var(--text-dim);
 	}
 
-	.chevron.rotated {
+	:global(svg.chevron.rotated) {
 		transform: rotate(180deg);
 	}
 
@@ -233,12 +183,6 @@
 		font-size: var(--text-sm);
 	}
 
-	.dropdown-email {
-		font-size: var(--text-xs);
-		color: var(--text-dim);
-		margin-top: var(--space-1);
-	}
-
 	.dropdown-divider {
 		height: 1px;
 		background: var(--border-subtle);
@@ -274,7 +218,7 @@
 		background: var(--status-error-dim);
 	}
 
-	.dropdown-item svg {
+	.dropdown-item :global(svg) {
 		flex-shrink: 0;
 	}
 

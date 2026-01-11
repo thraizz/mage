@@ -6,6 +6,10 @@
 	import DeckCard from '$lib/components/DeckCard.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import DeckUploadModal from '$lib/components/DeckUploadModal.svelte';
+	import Plus from '@lucide/svelte/icons/plus';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import CircleX from '@lucide/svelte/icons/circle-x';
+	import Inbox from '@lucide/svelte/icons/inbox';
 
 	let decks: Deck[] = [];
 	let loading = true;
@@ -71,14 +75,7 @@
 					<p>Manage your deck collection</p>
 				</div>
 				<button class="btn-upload" on:click={handleUploadNewDeck}>
-					<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 4v16m8-8H4"
-						/>
-					</svg>
+					<Plus class="icon" size={20} aria-hidden="true" />
 					Upload New Deck
 				</button>
 			</div>
@@ -94,14 +91,7 @@
 				{/each}
 			</select>
 			<button on:click={loadDecks} class="btn-refresh" title="Refresh deck list">
-				<svg class="refresh-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-					/>
-				</svg>
+				<RefreshCw class="refresh-icon" size={16} aria-hidden="true" />
 			</button>
 		</div>
 
@@ -115,13 +105,7 @@
 			<div class="error-state">
 				<div class="error-content">
 					<div class="error-icon-wrapper">
-						<svg class="error-icon" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-								clip-rule="evenodd"
-							/>
-						</svg>
+						<CircleX class="error-icon" size={20} aria-hidden="true" />
 					</div>
 					<div class="error-text">
 						<h3>Error loading decks</h3>
@@ -132,14 +116,7 @@
 			</div>
 		{:else if decks.length === 0}
 			<div class="empty-state">
-				<svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-					/>
-				</svg>
+				<Inbox class="empty-icon" size={48} aria-hidden="true" />
 				<h3>No decks found</h3>
 				<p>
 					{selectedFormat
@@ -148,14 +125,7 @@
 				</p>
 				<div class="empty-actions">
 					<button class="btn-upload-empty" on:click={handleUploadNewDeck}>
-						<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 4v16m8-8H4"
-							/>
-						</svg>
+						<Plus class="icon" size={20} aria-hidden="true" />
 						Upload Deck
 					</button>
 				</div>
