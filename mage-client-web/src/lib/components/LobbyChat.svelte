@@ -7,6 +7,10 @@
 	import { getMageClient } from '$lib/grpc/client';
 	import { onMount, onDestroy } from 'svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
+	import MessageSquare from '@lucide/svelte/icons/message-square';
+	import ArrowDown from '@lucide/svelte/icons/arrow-down';
+	import Send from '@lucide/svelte/icons/send';
 	import {
 		convertProtoMessageToClientMessage,
 		formatMessageTime,
@@ -288,38 +292,12 @@
 			</div>
 		{:else if error}
 			<div class="error-state">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="20"
-					height="20"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<circle cx="12" cy="12" r="10"></circle>
-					<line x1="12" y1="8" x2="12" y2="12"></line>
-					<line x1="12" y1="16" x2="12.01" y2="16"></line>
-				</svg>
+				<CircleAlert size={20} aria-hidden="true" />
 				<span>{error}</span>
 			</div>
 		{:else if messages.length === 0}
 			<div class="empty-state">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="32"
-					height="32"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-				</svg>
+				<MessageSquare size={32} aria-hidden="true" />
 				<p>No messages yet</p>
 				<span class="empty-subtitle">Be the first to say something!</span>
 			</div>
@@ -351,19 +329,7 @@
 		<!-- Scroll to Bottom Button -->
 		{#if !isAtBottom && messages.length > 0}
 			<button class="scroll-to-bottom" onclick={scrollToBottom} title="Scroll to bottom">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="18"
-					height="18"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M12 5v14M19 12l-7 7-7-7"></path>
-				</svg>
+				<ArrowDown size={18} aria-hidden="true" />
 			</button>
 		{/if}
 	</div>
@@ -381,21 +347,7 @@
 			/>
 			{#if rateLimitCooldownSeconds > 0}
 				<div class="rate-limit-warning">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="14"
-						height="14"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<circle cx="12" cy="12" r="10"></circle>
-						<line x1="12" y1="8" x2="12" y2="12"></line>
-						<line x1="12" y1="16" x2="12.01" y2="16"></line>
-					</svg>
+					<CircleAlert size={14} aria-hidden="true" />
 					<span
 						>Sending too fast, wait {rateLimitCooldownSeconds} second{rateLimitCooldownSeconds !== 1
 							? 's'
@@ -413,19 +365,7 @@
 			{#if sending}
 				<LoadingSpinner size="small" color="white" />
 			{:else}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="18"
-					height="18"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
-				</svg>
+				<Send size={18} aria-hidden="true" />
 			{/if}
 		</button>
 	</form>
@@ -541,7 +481,7 @@
 		padding: var(--space-8);
 	}
 
-	.empty-state svg {
+	.empty-state :global(svg) {
 		color: var(--border-default);
 	}
 
@@ -737,7 +677,7 @@
 		padding: 0 var(--space-1);
 	}
 
-	.rate-limit-warning svg {
+	.rate-limit-warning :global(svg) {
 		flex-shrink: 0;
 	}
 

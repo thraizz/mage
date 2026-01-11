@@ -22,6 +22,13 @@
 	import LobbyChat from '$lib/components/LobbyChat.svelte';
 	import ServerDebugPanel from '$lib/components/ServerDebugPanel.svelte';
 	import PlaytestModal from '$lib/components/PlaytestModal.svelte';
+	import Code from '@lucide/svelte/icons/code';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import Plus from '@lucide/svelte/icons/plus';
+	import FlaskConical from '@lucide/svelte/icons/flask-conical';
+	import Search from '@lucide/svelte/icons/search';
+	import X from '@lucide/svelte/icons/x';
+	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 
 	// State
 	let tables = $state<Table[]>([]);
@@ -387,21 +394,7 @@
 					title="Server Debug Panel"
 					class:active={showDebugPanel}
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path d="m18 16 4-4-4-4" />
-						<path d="m6 8-4 4 4 4" />
-						<path d="m14.5 4-5 16" />
-					</svg>
+					<Code size={20} aria-hidden="true" />
 					<span>Debug</span>
 				</button>
 
@@ -411,58 +404,17 @@
 					disabled={loading}
 					title="Refresh tables"
 				>
-					<svg
-						class="refresh-icon"
-						class:spinning={loading}
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path
-							d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"
-						/>
-					</svg>
+					<RefreshCw class={`refresh-icon ${loading ? 'spinning' : ''}`} size={20} aria-hidden="true" />
 					<span>Refresh</span>
 				</button>
 
 			<button class="create-button" onclick={openCreateModal} title="Create new table">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="20"
-					height="20"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<line x1="12" y1="5" x2="12" y2="19"></line>
-					<line x1="5" y1="12" x2="19" y2="12"></line>
-				</svg>
+				<Plus size={20} aria-hidden="true" />
 				<span>Create Table</span>
 			</button>
 
 			<button class="playtest-button ghost-btn" onclick={() => showPlaytestModal = true} title="Test decks locally">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="20"
-					height="20"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-				</svg>
+				<FlaskConical size={20} aria-hidden="true" />
 				<span>+ Playtest Decks</span>
 			</button>
 			</div>
@@ -473,21 +425,7 @@
 			<div class="filters-bar">
 				<!-- Search Input -->
 				<div class="search-input-wrapper">
-					<svg
-						class="search-icon"
-						xmlns="http://www.w3.org/2000/svg"
-						width="18"
-						height="18"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<circle cx="11" cy="11" r="8"></circle>
-						<path d="m21 21-4.35-4.35"></path>
-					</svg>
+					<Search class="search-icon" size={18} aria-hidden="true" />
 					<input
 						type="text"
 						class="search-input"
@@ -496,20 +434,7 @@
 					/>
 					{#if searchQuery}
 						<button class="clear-search" onclick={() => (searchQuery = '')} title="Clear search">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<line x1="18" y1="6" x2="6" y2="18"></line>
-								<line x1="6" y1="6" x2="18" y2="18"></line>
-							</svg>
+							<X size={16} aria-hidden="true" />
 						</button>
 					{/if}
 				</div>
@@ -591,10 +516,7 @@
 										</div>
 									</div>
 									<button class="rejoin-button" onclick={() => rejoinGame(game.gameId)}>
-										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-											<path d="M5 12h14"></path>
-											<path d="m12 5 7 7-7 7"></path>
-										</svg>
+										<ArrowRight size={16} aria-hidden="true" />
 										Rejoin
 									</button>
 								</div>
@@ -865,11 +787,11 @@
 		background: rgba(102, 126, 234, 0.05);
 	}
 
-	.refresh-icon {
+	:global(svg.refresh-icon) {
 		transition: transform 0.6s ease;
 	}
 
-	.refresh-icon.spinning {
+	:global(svg.refresh-icon.spinning) {
 		animation: spin 1s linear infinite;
 	}
 
@@ -1060,7 +982,7 @@
 		max-width: 400px;
 	}
 
-	.search-icon {
+	:global(svg.search-icon) {
 		position: absolute;
 		left: var(--space-3);
 		top: 50%;

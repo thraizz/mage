@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+
 	interface Option {
 		value: string;
 		label: string;
@@ -52,16 +54,7 @@
 			{/each}
 		</select>
 		<span class="select-arrow">
-			<svg
-				width="16"
-				height="16"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-			>
-				<polyline points="6 9 12 15 18 9"></polyline>
-			</svg>
+			<ChevronDown size={16} aria-hidden="true" />
 		</span>
 	</div>
 

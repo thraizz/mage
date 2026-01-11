@@ -3,6 +3,7 @@
 	import FormatBadge from '$lib/components/mtg/FormatBadge.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Panel from '$lib/components/ui/Panel.svelte';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
 	interface Props {
 		deck: Deck;
@@ -33,9 +34,7 @@
 			<div class="deck-card-content">
 				<div class="deck-header">
 					<h3 class="deck-name" title={deck.name}>{deck.name}</h3>
-					<svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-						<polyline points="9 18 15 12 9 6"></polyline>
-					</svg>
+					<ChevronRight class="chevron" size={18} aria-hidden="true" />
 				</div>
 
 				<div class="deck-badges">
@@ -163,14 +162,14 @@
 		line-clamp: 2;
 	}
 
-	.chevron {
+	:global(svg.chevron) {
 		color: var(--text-ghost);
 		flex: 0 0 auto;
 		margin-top: 2px;
 		transition: transform var(--transition-fast), color var(--transition-fast);
 	}
 
-	.deck-card:hover .chevron {
+	.deck-card:hover :global(svg.chevron) {
 		transform: translateX(2px);
 		color: var(--text-dim);
 	}

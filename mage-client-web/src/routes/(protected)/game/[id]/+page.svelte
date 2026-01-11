@@ -95,6 +95,8 @@
 	import XManaSelector from '$lib/components/game/XManaSelector.svelte';
 	import LibrarySearch from '$lib/components/game/LibrarySearch.svelte';
 	import type { GamePlayManaData, GamePlayXManaData, GameAssignDamageData } from '$lib/generated/mage/v1/websocket';
+	import Keyboard from '@lucide/svelte/icons/keyboard';
+	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
 	
 	// Combat components
 	import DeclareAttackers from '$lib/components/game/DeclareAttackers.svelte';
@@ -122,6 +124,7 @@
 	let showChat = $state(false);
 	let showDebugOverlay = $state(false);
 	let showTokenCreator = $state(false);
+	let showKeyboardShortcuts = $state(false);
 	let showLifeMenu = $state(false);
 	let lifeMenuEl: HTMLDivElement | null = $state(null);
 	
@@ -883,6 +886,12 @@
 
 		// === GLOBAL HOTKEYS (no card needed) ===
 		switch (key) {
+			case '?':
+				// ? - Keyboard shortcuts
+				showKeyboardShortcuts = !showKeyboardShortcuts;
+				event.preventDefault();
+				return;
+
 			case 'x':
 				// X - Untap all permanents
 				handleUntapAll();
@@ -1941,6 +1950,14 @@
 			<button class="floating-btn" onclick={() => showChat = true} title="Game Chat">
 				💬
 			</button>
+			<button
+				class="floating-btn"
+				onclick={() => showKeyboardShortcuts = true}
+				title="Keyboard shortcuts (?)"
+				aria-label="Keyboard shortcuts"
+			>
+				<Keyboard size={18} aria-hidden="true" />
+			</button>
 		</div>
 
 		<!-- Mana Payment Modal -->
@@ -2296,6 +2313,7 @@
 		<!-- Overlay Panels -->
 		<ActionLogOverlay bind:this={actionLogRef} bind:open={showActionLog} onRequestRollback={handleRequestRollback} />
 		<GameChatOverlay bind:this={gameChatRef} gameId={gameId || ''} bind:open={showChat} />
+		<KeyboardShortcutsModal bind:open={showKeyboardShortcuts} mode="game" />
 
 
 		<!-- Priority Action Bar (Docked at bottom) -->

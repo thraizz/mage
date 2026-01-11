@@ -2,6 +2,8 @@
 	import type { OnlinePlayer } from '$lib/types/player';
 	import Panel from '$lib/components/ui/Panel.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import Users from '@lucide/svelte/icons/users';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 
 	interface Props {
 		players: OnlinePlayer[];
@@ -21,27 +23,11 @@
 <div class="player-list-container">
 	<button class="list-header" onclick={toggleOpen} aria-expanded={isOpen}>
 		<div class="header-left">
-			<svg class="header-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-				<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-				<circle cx="9" cy="7" r="4"></circle>
-				<path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-				<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-			</svg>
+			<Users class="header-icon" size={18} aria-hidden="true" />
 			<span class="header-title">Online</span>
 			<Badge variant="default" size="sm">{playerCount}</Badge>
 		</div>
-		<svg
-			class="toggle-icon"
-			class:open={isOpen}
-			width="16"
-			height="16"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-		>
-			<polyline points="6 9 12 15 18 9"></polyline>
-		</svg>
+		<ChevronDown class={`toggle-icon ${isOpen ? 'open' : ''}`} size={16} aria-hidden="true" />
 	</button>
 
 	{#if isOpen}
@@ -98,7 +84,7 @@
 		gap: var(--space-2);
 	}
 
-	.header-icon {
+	:global(svg.header-icon) {
 		color: var(--accent-gold);
 	}
 
@@ -108,12 +94,12 @@
 		color: var(--text-bright);
 	}
 
-	.toggle-icon {
+	:global(svg.toggle-icon) {
 		color: var(--text-dim);
 		transition: transform var(--transition-fast);
 	}
 
-	.toggle-icon.open {
+	:global(svg.toggle-icon.open) {
 		transform: rotate(180deg);
 	}
 

@@ -5,6 +5,7 @@
 	import { uploadDeck } from '$lib/api/decks';
 	import type { DeckUploadRequest } from '$lib/types/deck';
 	import { toast } from '$lib/stores/toast';
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import {
 		parseStructuredCards,
 		structuredCardsToText,
@@ -648,13 +649,7 @@ Sideboard:
 			{#if errors.length > 0}
 				<div class="error-box">
 					<div class="error-header">
-						<svg class="error-icon" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-								clip-rule="evenodd"
-							/>
-						</svg>
+						<CircleAlert class="error-icon" size={20} aria-hidden="true" />
 						<h3>
 							{errors.length === 1 ? '1 Validation Error' : `${errors.length} Validation Errors`}
 						</h3>
@@ -1038,9 +1033,7 @@ Sideboard:
 		margin-bottom: 0.75rem;
 	}
 
-	.error-icon {
-		width: 1.25rem;
-		height: 1.25rem;
+	:global(svg.error-icon) {
 		color: #dc2626;
 		flex-shrink: 0;
 	}

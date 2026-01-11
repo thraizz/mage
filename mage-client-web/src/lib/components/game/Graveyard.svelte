@@ -37,6 +37,7 @@
 	// State
 	let showModal = $state(false);
 	let selectedCardId = $state<string | null>(null);
+	let searchQuery = $state('');
 	let dragStartPosition = $state<{ x: number; y: number } | null>(null);
 	let isDragPending = $state(false);
 	const DRAG_THRESHOLD = 5;
@@ -49,9 +50,8 @@
 	 * Toggle graveyard modal
 	 */
 	function toggleModal(): void {
-		if (!isEmpty) {
-			showModal = !showModal;
-		}
+		showModal = !showModal;
+		if (showModal) searchQuery = '';
 	}
 
 	/**
@@ -59,6 +59,7 @@
 	 */
 	function closeModal(): void {
 		showModal = false;
+		searchQuery = '';
 	}
 
 	/**
@@ -146,6 +147,15 @@
 	const cardCount = $derived(cards.length);
 	const isEmpty = $derived(cardCount === 0);
 	const topCard = $derived(cards.length > 0 ? cards[cards.length - 1] : null);
+	const filteredCards = $derived(() => {
+		if (!searchQuery.trim()) return cards;
+		const q = searchQuery.toLowerCase();
+		return cards.filter((c) => {
+			const name = (c.name || '').toLowerCase();
+			const type = (c.cardType || '').toLowerCase();
+			return name.includes(q) || type.includes(q);
+		});
+	});
 </script>
 
 <button
@@ -178,8 +188,17 @@
 						<p>No cards in graveyard</p>
 					</div>
 				{:else}
+					<div class="search-row">
+						<input
+							class="search-input"
+							type="text"
+							placeholder="Search graveyard..."
+							bind:value={searchQuery}
+						/>
+					</div>
+
 					<div class="card-grid">
-						{#each cards as card (card.id)}
+						{#each filteredCards() as card (card.id)}
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
 								class="card-grid-item"
@@ -366,6 +385,25 @@
 		flex: 1;
 		overflow-y: auto;
 		padding: 1.5rem;
+	}
+
+	.search-row {
+		margin-bottom: 1rem;
+	}
+
+	.search-input {
+		width: 100%;
+		padding: 0.75rem 1rem;
+		background: #141821;
+		border: 1px solid #2a3441;
+		border-radius: 8px;
+		color: #e2e8f0;
+		font-size: 0.875rem;
+	}
+
+	.search-input:focus {
+		outline: none;
+		border-color: rgba(156, 163, 175, 0.7);
 	}
 
 	.empty-state {

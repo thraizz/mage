@@ -2,6 +2,7 @@
 	import type { Table } from '$lib/types/table';
 	import FormatBadge from '$lib/components/mtg/FormatBadge.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import Lock from '@lucide/svelte/icons/lock';
 
 	interface Props {
 		table: Table;
@@ -53,60 +54,98 @@
 	}
 </script>
 
-<div
-	class="table-card"
-	class:clickable={onclick}
-	class:full={isFull}
-	onclick={onclick ? handleClick : undefined}
-	onkeypress={onclick ? handleKeypress : undefined}
-	role={onclick ? 'button' : undefined}
-	tabindex={onclick ? 0 : undefined}
->
-	<header class="card-header">
-		<FormatBadge format={table.format} size="md" />
-		<div class="header-icons">
-			{#if table.hasPassword}
-				<span class="lock-icon" title="Password protected">
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-						<path
-							d="M12 1C8.676 1 6 3.676 6 7v2H4v14h16V9h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v2H8V7c0-2.276 1.724-4 4-4zm0 10c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"
-						/>
-					</svg>
-				</span>
-			{/if}
-		</div>
-	</header>
-
-	<h3 class="table-name">{table.name}</h3>
-
-	<div class="table-meta">
-		<div class="meta-row">
-			<span class="meta-label">Host</span>
-			<span class="meta-value">{table.hostUsername}</span>
-		</div>
-	</div>
-
-	<div class="player-slots">
-		{#each Array(table.maxPlayers) as _, i}
-			<div class="slot" class:filled={i < table.players.length}>
-				{#if i < table.players.length}
-					<span class="slot-filled"></span>
+{#if onclick}
+	<button
+		type="button"
+		class="table-card clickable"
+		class:full={isFull}
+		onclick={handleClick}
+		onkeydown={handleKeypress}
+	>
+		<header class="card-header">
+			<FormatBadge format={table.format} size="md" />
+			<div class="header-icons">
+				{#if table.hasPassword}
+					<span class="lock-icon" title="Password protected">
+						<Lock size={14} aria-hidden="true" />
+					</span>
 				{/if}
 			</div>
-		{/each}
-		<span class="slot-count">{table.players.length}/{table.maxPlayers}</span>
-	</div>
+		</header>
 
-	<footer class="card-footer">
-		<Badge variant={statusVariant}>{statusText}</Badge>
-		{#if isOpen && onclick}
-			<span class="join-hint">Click to join</span>
-		{/if}
-	</footer>
-</div>
+		<h3 class="table-name">{table.name}</h3>
+
+		<div class="table-meta">
+			<div class="meta-row">
+				<span class="meta-label">Host</span>
+				<span class="meta-value">{table.hostUsername}</span>
+			</div>
+		</div>
+
+		<div class="player-slots">
+			{#each Array(table.maxPlayers) as _, i}
+				<div class="slot" class:filled={i < table.players.length}>
+					{#if i < table.players.length}
+						<span class="slot-filled"></span>
+					{/if}
+				</div>
+			{/each}
+			<span class="slot-count">{table.players.length}/{table.maxPlayers}</span>
+		</div>
+
+		<footer class="card-footer">
+			<Badge variant={statusVariant}>{statusText}</Badge>
+			{#if isOpen}
+				<span class="join-hint">Click to join</span>
+			{/if}
+		</footer>
+	</button>
+{:else}
+	<div class="table-card" class:full={isFull}>
+		<header class="card-header">
+			<FormatBadge format={table.format} size="md" />
+			<div class="header-icons">
+				{#if table.hasPassword}
+					<span class="lock-icon" title="Password protected">
+						<Lock size={14} aria-hidden="true" />
+					</span>
+				{/if}
+			</div>
+		</header>
+
+		<h3 class="table-name">{table.name}</h3>
+
+		<div class="table-meta">
+			<div class="meta-row">
+				<span class="meta-label">Host</span>
+				<span class="meta-value">{table.hostUsername}</span>
+			</div>
+		</div>
+
+		<div class="player-slots">
+			{#each Array(table.maxPlayers) as _, i}
+				<div class="slot" class:filled={i < table.players.length}>
+					{#if i < table.players.length}
+						<span class="slot-filled"></span>
+					{/if}
+				</div>
+			{/each}
+			<span class="slot-count">{table.players.length}/{table.maxPlayers}</span>
+		</div>
+
+		<footer class="card-footer">
+			<Badge variant={statusVariant}>{statusText}</Badge>
+		</footer>
+	</div>
+{/if}
 
 <style>
 	.table-card {
+		display: block;
+		width: 100%;
+		text-align: left;
+		font: inherit;
+		color: inherit;
 		background: var(--bg-obsidian);
 		border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-lg);

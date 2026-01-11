@@ -4,6 +4,7 @@
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Panel from '$lib/components/ui/Panel.svelte';
+	import Lock from '@lucide/svelte/icons/lock';
 
 	interface Props {
 		table: Table;
@@ -50,11 +51,7 @@
 					<FormatBadge format={table.format} size="lg" />
 					{#if table.hasPassword}
 						<Badge variant="warning" size="sm">
-							<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-								<path
-									d="M12 1C8.676 1 6 3.676 6 7v2H4v14h16V9h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v2H8V7c0-2.276 1.724-4 4-4z"
-								/>
-							</svg>
+							<Lock size={12} aria-hidden="true" />
 							Protected
 						</Badge>
 					{/if}

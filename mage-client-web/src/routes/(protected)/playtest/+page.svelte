@@ -26,6 +26,8 @@
 	import ManaPool from '$lib/components/game/ManaPool.svelte';
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
+	import Keyboard from '@lucide/svelte/icons/keyboard';
+	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
 	import { CardActionType } from '$lib/generated/mage/v1/models';
 	import {
 		dragDropStore,
@@ -45,6 +47,7 @@
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let showTokenCreator = $state(false);
+	let showKeyboardShortcuts = $state(false);
 	let showAllHands = $state(false);
 	let hoveredCardId = $state<string | null>(null);
 	let showLifeMenu = $state(false);
@@ -439,6 +442,10 @@
 		const key = event.key.toLowerCase();
 
 		switch (key) {
+			case '?':
+				showKeyboardShortcuts = !showKeyboardShortcuts;
+				event.preventDefault();
+				break;
 			case 'x':
 				handleUntapAll();
 				event.preventDefault();
@@ -630,6 +637,14 @@
 
 			<div class="header-right">
 				<button class="btn-action" onclick={handleNextTurn}>Next Turn</button>
+				<button
+					class="btn-debug"
+					onclick={() => showKeyboardShortcuts = true}
+					title="Keyboard shortcuts (?)"
+					aria-label="Keyboard shortcuts"
+				>
+					<Keyboard size={20} aria-hidden="true" />
+				</button>
 				<button class="btn-debug" onclick={() => showDebugOverlay = true} title="Debug View">
 					🔧
 				</button>
@@ -932,6 +947,8 @@
 				onClose={() => showTokenCreator = false}
 			/>
 		{/if}
+
+		<KeyboardShortcutsModal bind:open={showKeyboardShortcuts} mode="playtest" />
 
 		<!-- Debug Overlay -->
 		{#if showDebugOverlay}

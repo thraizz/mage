@@ -67,3 +67,5 @@ mage-bundle.zip
 *.pyc
 **/__pycache__
 mage-server-go/data/cards_seed.postgres.sql
+
+.playwright-mcp/

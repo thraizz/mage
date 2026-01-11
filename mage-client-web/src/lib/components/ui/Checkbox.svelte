@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Check from '@lucide/svelte/icons/check';
+
 	interface Props {
 		checked?: boolean;
 		label?: string;
@@ -29,9 +31,7 @@
 		{onchange}
 	/>
 	<span class="checkbox-box">
-		<svg class="checkbox-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-			<polyline points="20 6 9 17 4 12"></polyline>
-		</svg>
+		<Check class="checkbox-icon" size={12} aria-hidden="true" />
 	</span>
 	{#if label}
 		<span class="checkbox-label">{label}</span>
@@ -71,7 +71,7 @@
 		transition: all var(--transition-fast);
 	}
 
-	.checkbox-icon {
+	:global(svg.checkbox-icon) {
 		width: 0.75rem;
 		height: 0.75rem;
 		opacity: 0;
@@ -85,7 +85,7 @@
 		border-color: var(--accent-gold);
 	}
 
-	.checkbox-input:checked + .checkbox-box .checkbox-icon {
+	.checkbox-input:checked + .checkbox-box :global(svg.checkbox-icon) {
 		opacity: 1;
 		transform: scale(1);
 	}

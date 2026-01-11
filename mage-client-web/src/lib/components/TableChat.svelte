@@ -6,6 +6,9 @@
 	import type { ChatMessageData } from '$lib/generated/mage/v1/websocket';
 	import { onMount, onDestroy } from 'svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
+	import MessageSquare from '@lucide/svelte/icons/message-square';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Send from '@lucide/svelte/icons/send';
 	import {
 		convertProtoMessageToClientMessage,
 		formatMessageTime,
@@ -234,19 +237,7 @@
 			</div>
 		{:else if messages.length === 0}
 			<div class="empty-state">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="48"
-					height="48"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-				</svg>
+				<MessageSquare size={48} aria-hidden="true" />
 				<p>No messages yet</p>
 				<span>Be the first to say something!</span>
 			</div>
@@ -266,19 +257,7 @@
 
 		{#if !isAtBottom}
 			<button class="scroll-to-bottom" onclick={scrollToBottom} title="Scroll to bottom">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="20"
-					height="20"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<polyline points="6 9 12 15 18 9"></polyline>
-				</svg>
+				<ChevronDown size={20} aria-hidden="true" />
 			</button>
 		{/if}
 	</div>
@@ -312,20 +291,7 @@
 				{#if sending}
 					<LoadingSpinner size="small" color="white" />
 				{:else}
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<line x1="22" y1="2" x2="11" y2="13"></line>
-						<polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-					</svg>
+					<Send size={20} aria-hidden="true" />
 				{/if}
 			</button>
 		</form>
@@ -433,7 +399,7 @@
 		color: #9ca3af;
 	}
 
-	.empty-state svg {
+	.empty-state :global(svg) {
 		opacity: 0.5;
 	}
 

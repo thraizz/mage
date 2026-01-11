@@ -14,6 +14,9 @@
 	import GameStartCountdown from '$lib/components/GameStartCountdown.svelte';
 	import { getMageClient } from '$lib/grpc/client';
 	import { CallbackMethod } from '$lib/generated/mage/v1/websocket';
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
+	import Lock from '@lucide/svelte/icons/lock';
+	import User from '@lucide/svelte/icons/user';
 
 	// Get table ID from URL
 	const tableId = $derived($page.params.id ?? '');
@@ -252,21 +255,7 @@
 		</div>
 	{:else if error && !table}
 		<div class="error-container">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="48"
-				height="48"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<circle cx="12" cy="12" r="10"></circle>
-				<line x1="12" y1="8" x2="12" y2="12"></line>
-				<line x1="12" y1="16" x2="12.01" y2="16"></line>
-			</svg>
+			<CircleAlert size={48} aria-hidden="true" />
 			<p>{error}</p>
 			<button class="btn-primary" onclick={loadTable}>Retry</button>
 		</div>
@@ -280,20 +269,7 @@
 						<span class="format-badge">{table.format}</span>
 						{#if table.hasPassword}
 							<span class="password-badge">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="14"
-									height="14"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								>
-									<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-									<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-								</svg>
+								<Lock size={14} aria-hidden="true" />
 								Password Protected
 							</span>
 						{/if}
@@ -307,21 +283,7 @@
 		<!-- Error Banner -->
 		{#if error}
 			<div class="error-banner">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="20"
-					height="20"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<circle cx="12" cy="12" r="10"></circle>
-					<line x1="12" y1="8" x2="12" y2="12"></line>
-					<line x1="12" y1="16" x2="12.01" y2="16"></line>
-				</svg>
+				<CircleAlert size={20} aria-hidden="true" />
 				<span>{error}</span>
 			</div>
 		{/if}
@@ -351,20 +313,7 @@
 						class:is-current={player.username === currentPlayer?.username}
 					>
 						<div class="player-avatar">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="48"
-								height="48"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-								<circle cx="12" cy="7" r="4"></circle>
-							</svg>
+							<User size={48} aria-hidden="true" />
 						</div>
 						<div class="player-info">
 							<h3>
@@ -397,21 +346,7 @@
 					.map((_, i) => i) as i (i)}
 					<div class="player-slot empty">
 						<div class="empty-icon">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="48"
-								height="48"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								opacity="0.3"
-							>
-								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-								<circle cx="12" cy="7" r="4"></circle>
-							</svg>
+							<User size={48} aria-hidden="true" style="opacity: 0.3;" />
 						</div>
 						<p>Waiting for player...</p>
 					</div>
@@ -494,7 +429,7 @@
 		color: var(--status-error);
 	}
 
-	.error-container svg {
+	.error-container :global(svg) {
 		color: var(--status-error);
 	}
 
@@ -566,7 +501,7 @@
 		margin-bottom: var(--space-6);
 	}
 
-	.error-banner svg {
+	.error-banner :global(svg) {
 		flex-shrink: 0;
 	}
 

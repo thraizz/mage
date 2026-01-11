@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { OnlinePlayer } from '$lib/types/player';
+	import Users from '@lucide/svelte/icons/users';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 
 	// Props
 	let {
@@ -25,22 +27,7 @@
 	<button class="players-header" onclick={toggleOpen} aria-expanded={isOpen}>
 		<div class="header-content">
 			<div class="header-icon">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="18"
-					height="18"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-					<circle cx="9" cy="7" r="4"></circle>
-					<path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-					<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-				</svg>
+				<Users size={18} aria-hidden="true" />
 			</div>
 			<div class="header-text">
 				<span class="header-title">Online Players</span>
@@ -48,19 +35,7 @@
 			</div>
 		</div>
 		<div class="toggle-icon" class:open={isOpen}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="16"
-				height="16"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<polyline points="6 9 12 15 18 9"></polyline>
-			</svg>
+			<ChevronDown size={16} aria-hidden="true" />
 		</div>
 	</button>
 

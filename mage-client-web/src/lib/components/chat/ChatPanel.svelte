@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import MessageSquare from '@lucide/svelte/icons/message-square';
 
 	interface ChatMessage {
 		id: string;
@@ -72,9 +73,7 @@
 <div class="chat-panel">
 	{#if title}
 		<header class="chat-header">
-			<svg class="chat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-				<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-			</svg>
+			<MessageSquare class="chat-icon" size={16} aria-hidden="true" />
 			<span class="chat-title">{title}</span>
 		</header>
 	{/if}
@@ -146,7 +145,7 @@
 		border-bottom: 1px solid var(--border-subtle);
 	}
 
-	.chat-icon {
+	:global(svg.chat-icon) {
 		color: var(--accent-gold);
 	}
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import User from '@lucide/svelte/icons/user';
 
 	interface Player {
 		id: string;
@@ -27,10 +28,7 @@
 
 	{#if player}
 		<div class="avatar">
-			<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-				<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-				<circle cx="12" cy="7" r="4"></circle>
-			</svg>
+			<User size={32} aria-hidden="true" />
 		</div>
 
 		<div class="player-info">
@@ -53,10 +51,7 @@
 		{/if}
 	{:else}
 		<div class="empty-avatar">
-			<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity="0.3">
-				<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-				<circle cx="12" cy="7" r="4"></circle>
-			</svg>
+			<User size={32} aria-hidden="true" style="opacity: 0.3;" />
 		</div>
 		<span class="waiting-text">Waiting...</span>
 	{/if}

@@ -217,7 +217,7 @@
 		box-shadow: 0 0 0 3px var(--accent-gold-glow);
 	}
 
-	.btn-upload .icon {
+	.btn-upload :global(svg.icon) {
 		width: 1.25rem;
 		height: 1.25rem;
 		margin-right: var(--space-2);
@@ -288,7 +288,7 @@
 		box-shadow: 0 0 0 3px var(--accent-gold-glow);
 	}
 
-	.refresh-icon {
+	:global(svg.refresh-icon) {
 		width: 1rem;
 		height: 1rem;
 	}
@@ -323,7 +323,7 @@
 		flex-shrink: 0;
 	}
 
-	.error-icon {
+	:global(svg.error-icon) {
 		width: 1.25rem;
 		height: 1.25rem;
 		color: var(--status-error);
@@ -380,7 +380,7 @@
 		border: 2px dashed var(--border-default);
 	}
 
-	.empty-icon {
+	:global(svg.empty-icon) {
 		margin: 0 auto;
 		width: 3rem;
 		height: 3rem;
@@ -428,7 +428,7 @@
 		box-shadow: 0 0 0 3px var(--accent-gold-glow);
 	}
 
-	.btn-upload-empty .icon {
+	.btn-upload-empty :global(svg.icon) {
 		width: 1.25rem;
 		height: 1.25rem;
 		margin-right: var(--space-2);
