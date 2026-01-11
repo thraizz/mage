@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/magefree/mage-server-go/internal/repository"
@@ -12,6 +13,74 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var deckExportSuffixRE = regexp.MustCompile(`\s+\(([a-z0-9]{2,6})\)(?:\s+\d+[a-z]?)?\s*$`)
+
+// normalizeImportedCardName strips common deck export suffixes like "(EOC) 93" from card names.
+func normalizeImportedCardName(raw string) string {
+	name := strings.TrimSpace(raw)
+	if name == "" {
+		return ""
+	}
+	name = deckExportSuffixRE.ReplaceAllString(name, "")
+	return strings.TrimSpace(name)
+}
+
+// resolveCardNames maps imported card names to canonical DB names.
+//
+// This handles common export formats that include extra suffixes, and also supports
+// Adventure-style "Creature // Adventure" names by falling back to the left side
+// when the full string isn't found in the card DB.
+func (s *mageServer) resolveCardNames(ctx context.Context, cardNames []string) ([]string, error) {
+	if len(cardNames) == 0 {
+		return nil, nil
+	}
+
+	cache := make(map[string]string) // normalized input -> resolved canonical name
+	var invalid []string
+	resolved := make([]string, 0, len(cardNames))
+
+	for _, raw := range cardNames {
+		normalized := normalizeImportedCardName(raw)
+		if normalized == "" {
+			continue
+		}
+
+		if cached, ok := cache[normalized]; ok {
+			resolved = append(resolved, cached)
+			continue
+		}
+
+		// Try full name first
+		cards, err := s.cardRepo.GetByNameCaseInsensitive(ctx, normalized)
+		if err == nil && len(cards) > 0 {
+			cache[normalized] = cards[0].Name
+			resolved = append(resolved, cards[0].Name)
+			continue
+		}
+
+		// Fallback for Adventure-style exports: "Brazen Borrower // Petty Theft"
+		if strings.Contains(normalized, " // ") {
+			left := strings.TrimSpace(strings.SplitN(normalized, " // ", 2)[0])
+			if left != "" {
+				cards2, err2 := s.cardRepo.GetByNameCaseInsensitive(ctx, left)
+				if err2 == nil && len(cards2) > 0 {
+					cache[normalized] = cards2[0].Name
+					resolved = append(resolved, cards2[0].Name)
+					continue
+				}
+			}
+		}
+
+		invalid = append(invalid, normalized)
+	}
+
+	if len(invalid) > 0 {
+		return nil, fmt.Errorf("invalid card names: %s", strings.Join(invalid, ", "))
+	}
+
+	return resolved, nil
+}
 
 // RoomJoinTable allows a player to join an existing table.
 func (s *mageServer) RoomJoinTable(ctx context.Context, req *pb.RoomJoinTableRequest) (*pb.RoomJoinTableResponse, error) {
@@ -127,30 +196,34 @@ func (s *mageServer) RoomJoinTable(ctx context.Context, req *pb.RoomJoinTableReq
 		)
 
 		if len(mainDeck) > 0 || len(commanders) > 0 {
-			// Validate card names exist in the database
-			allCardNames := append(append(mainDeck, sideboard...), commanders...)
-			s.logger.Debug("[DECK DEBUG] Validating card names",
-				zap.String("table_id", tbl.ID),
-				zap.String("username", username),
-				zap.Int("total_cards_to_validate", len(allCardNames)),
-			)
+			// Resolve + validate card names exist in the database (also handles "A // B" Adventure exports)
+			resolvedMain, errMain := s.resolveCardNames(ctx, mainDeck)
+			resolvedSide, errSide := s.resolveCardNames(ctx, sideboard)
+			resolvedCmd, errCmd := s.resolveCardNames(ctx, commanders)
 
-			if err := s.validateCardNames(ctx, allCardNames); err != nil {
+			if errMain != nil || errSide != nil || errCmd != nil {
+				err := errMain
+				if err == nil {
+					err = errSide
+				}
+				if err == nil {
+					err = errCmd
+				}
 				s.logger.Warn("[DECK DEBUG] Deck validation FAILED, player joined without deck",
 					zap.String("table_id", tbl.ID),
 					zap.String("username", username),
 					zap.Error(err),
 				)
 			} else {
-				s.logger.Debug("[DECK DEBUG] Card validation PASSED",
+				s.logger.Debug("[DECK DEBUG] Card validation PASSED (resolved names)",
 					zap.String("table_id", tbl.ID),
 					zap.String("username", username),
 				)
 
 				deckList := table.DeckList{
-					MainDeck:   mainDeck,
-					Sideboard:  sideboard,
-					Commanders: commanders,
+					MainDeck:   resolvedMain,
+					Sideboard:  resolvedSide,
+					Commanders: resolvedCmd,
 				}
 
 				if err := tbl.SubmitDeck(username, deckList); err != nil {
@@ -328,12 +401,12 @@ func parseCardLine(line string) (quantity int, cardName string) {
 		qtyStr := strings.TrimSuffix(parts[0], "x")
 		qtyStr = strings.TrimSuffix(qtyStr, "X")
 		if qty, err := parseQuantity(qtyStr); err == nil && qty > 0 {
-			return qty, strings.TrimSpace(parts[1])
+			return qty, normalizeImportedCardName(strings.TrimSpace(parts[1]))
 		}
 	}
 
 	// Single card without quantity
-	return 1, line
+	return 1, normalizeImportedCardName(line)
 }
 
 // parseQuantity parses a quantity string, returns error if not a valid number
@@ -941,28 +1014,49 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 	// Convert DeckCard messages to card name strings for internal representation
 	mainDeckNames := make([]string, 0)
 	for _, card := range deck.GetMainDeck() {
+		name := normalizeImportedCardName(card.GetName())
+		if name == "" {
+			continue
+		}
 		for i := int32(0); i < card.GetQuantity(); i++ {
-			mainDeckNames = append(mainDeckNames, card.GetName())
+			mainDeckNames = append(mainDeckNames, name)
 		}
 	}
 
 	sideboardNames := make([]string, 0)
 	for _, card := range deck.GetSideboard() {
+		name := normalizeImportedCardName(card.GetName())
+		if name == "" {
+			continue
+		}
 		for i := int32(0); i < card.GetQuantity(); i++ {
-			sideboardNames = append(sideboardNames, card.GetName())
+			sideboardNames = append(sideboardNames, name)
 		}
 	}
 
 	commanderNames := make([]string, 0)
 	for _, card := range deck.GetCommanders() {
+		name := normalizeImportedCardName(card.GetName())
+		if name == "" {
+			continue
+		}
 		for i := int32(0); i < card.GetQuantity(); i++ {
-			commanderNames = append(commanderNames, card.GetName())
+			commanderNames = append(commanderNames, name)
 		}
 	}
 
 	// Validate all card names exist in the database
-	allCardNames := append(append(mainDeckNames, sideboardNames...), commanderNames...)
-	if err := s.validateCardNames(ctx, allCardNames); err != nil {
+	resolvedMain, errMain := s.resolveCardNames(ctx, mainDeckNames)
+	resolvedSide, errSide := s.resolveCardNames(ctx, sideboardNames)
+	resolvedCmd, errCmd := s.resolveCardNames(ctx, commanderNames)
+	if errMain != nil || errSide != nil || errCmd != nil {
+		err := errMain
+		if err == nil {
+			err = errSide
+		}
+		if err == nil {
+			err = errCmd
+		}
 		return &pb.DeckSubmitResponse{
 			Success: false,
 			Error:   err.Error(),
@@ -970,9 +1064,9 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 	}
 
 	deckList := table.DeckList{
-		MainDeck:   mainDeckNames,
-		Sideboard:  sideboardNames,
-		Commanders: commanderNames,
+		MainDeck:   resolvedMain,
+		Sideboard:  resolvedSide,
+		Commanders: resolvedCmd,
 	}
 
 	if err := tbl.SubmitDeck(username, deckList); err != nil {
@@ -1062,28 +1156,49 @@ func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb
 	// Convert DeckCard messages to card name strings for storage
 	var mainDeckNames []string
 	for _, card := range deck.GetMainDeck() {
+		name := normalizeImportedCardName(card.GetName())
+		if name == "" {
+			continue
+		}
 		for i := int32(0); i < card.GetQuantity(); i++ {
-			mainDeckNames = append(mainDeckNames, card.GetName())
+			mainDeckNames = append(mainDeckNames, name)
 		}
 	}
 
 	var sideboardNames []string
 	for _, card := range deck.GetSideboard() {
+		name := normalizeImportedCardName(card.GetName())
+		if name == "" {
+			continue
+		}
 		for i := int32(0); i < card.GetQuantity(); i++ {
-			sideboardNames = append(sideboardNames, card.GetName())
+			sideboardNames = append(sideboardNames, name)
 		}
 	}
 
 	var commanderNames []string
 	for _, card := range deck.GetCommanders() {
+		name := normalizeImportedCardName(card.GetName())
+		if name == "" {
+			continue
+		}
 		for i := int32(0); i < card.GetQuantity(); i++ {
-			commanderNames = append(commanderNames, card.GetName())
+			commanderNames = append(commanderNames, name)
 		}
 	}
 
 	// Validate all card names exist in the database
-	allCardNames := append(append(mainDeckNames, sideboardNames...), commanderNames...)
-	if err := s.validateCardNames(ctx, allCardNames); err != nil {
+	resolvedMain, errMain := s.resolveCardNames(ctx, mainDeckNames)
+	resolvedSide, errSide := s.resolveCardNames(ctx, sideboardNames)
+	resolvedCmd, errCmd := s.resolveCardNames(ctx, commanderNames)
+	if errMain != nil || errSide != nil || errCmd != nil {
+		err := errMain
+		if err == nil {
+			err = errSide
+		}
+		if err == nil {
+			err = errCmd
+		}
 		return &pb.DeckSaveResponse{
 			Success: false,
 			Error:   err.Error(),
@@ -1096,9 +1211,9 @@ func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb
 		Name:        deckName,
 		Format:      format,
 		Description: strings.TrimSpace(req.GetDescription()),
-		MainDeck:    mainDeckNames,
-		Sideboard:   sideboardNames,
-		Commanders:  commanderNames,
+		MainDeck:    resolvedMain,
+		Sideboard:   resolvedSide,
+		Commanders:  resolvedCmd,
 	}
 
 	if err := s.deckRepo.Create(ctx, deckModel); err != nil {
@@ -1433,7 +1548,7 @@ func (s *mageServer) validateCardNames(ctx context.Context, cardNames []string) 
 	// Use lowercase for deduplication but preserve original name for search
 	uniqueNames := make(map[string]string) // lowercase -> original
 	for _, name := range cardNames {
-		trimmed := strings.TrimSpace(name)
+		trimmed := normalizeImportedCardName(name)
 		if trimmed != "" {
 			key := strings.ToLower(trimmed)
 			if _, exists := uniqueNames[key]; !exists {

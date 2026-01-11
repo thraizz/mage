@@ -164,7 +164,7 @@
 			<!-- Deck Grid -->
 			<div class="deck-grid">
 				{#each decks as deck (deck.id)}
-					<DeckCard {deck} on:click={() => handleDeckClick(deck.id)} />
+					<DeckCard {deck} onclick={() => handleDeckClick(deck.id)} />
 				{/each}
 			</div>
 

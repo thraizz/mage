@@ -5,6 +5,10 @@
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 
+	// Available background images (shared with auth pages)
+	const backgroundImages = ['Boros.jpg', 'Golgari.jpg', 'Gruul.jpg', 'Izzet.jpg', 'Rakdos.jpg'];
+	let selectedBackground = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+
 	// Modal state
 	let showBasicModal = false;
 	let showSmallModal = false;
@@ -130,146 +134,192 @@
 	<title>MAGE - Magic: The Gathering Online</title>
 </svelte:head>
 
-<div class="container">
-	<div class="hero">
-		<h1>🎮 MAGE</h1>
-		<p>Magic: The Gathering Online - Play, Compete, Collect</p>
-	</div>
-
-	<div class="nav-grid">
-		<a href="/login" class="nav-card">
-			<div class="icon">🔐</div>
-			<h2>Login</h2>
-			<p>Sign in to your account</p>
-		</a>
-
-		<a href="/register" class="nav-card">
-			<div class="icon">📝</div>
-			<h2>Register</h2>
-			<p>Create a new account</p>
-		</a>
-
-		<a href="/lobby" class="nav-card">
-			<div class="icon">🎯</div>
-			<h2>Lobby</h2>
-			<p>Find and join games</p>
-		</a>
-
-		<a href="/decks" class="nav-card">
-			<div class="icon">🎴</div>
-			<h2>My Decks</h2>
-			<p>Manage your deck collection</p>
-		</a>
-
-		<a href="/profile" class="nav-card">
-			<div class="icon">👤</div>
-			<h2>Profile</h2>
-			<p>View your stats and settings</p>
-		</a>
-
-		<a href="/table/demo" class="nav-card">
-			<div class="icon">🪑</div>
-			<h2>Table (Demo)</h2>
-			<p>Pre-game table lobby</p>
-		</a>
-
-		<a href="/game/demo" class="nav-card">
-			<div class="icon">⚔️</div>
-			<h2>Game (Demo)</h2>
-			<p>Active game view</p>
-		</a>
-	</div>
-
-	<div class="footer">
-		<p>All routes are placeholder pages - full functionality coming soon!</p>
-	</div>
-
-	<!-- Toast Testing Section -->
-	<div class="toast-test">
-		<h3>Toast Notification Test</h3>
-		<div class="test-buttons">
-			<button class="test-btn success" on:click={testSuccess}>Success Toast</button>
-			<button class="test-btn error" on:click={testError}>Error Toast</button>
-			<button class="test-btn warning" on:click={testWarning}>Warning Toast</button>
-			<button class="test-btn info" on:click={testInfo}>Info Toast</button>
-			<button class="test-btn multiple" on:click={testMultiple}>Multiple Toasts</button>
-		</div>
-	</div>
-
-	<!-- Modal Testing Section -->
-	<div class="modal-test">
-		<h3>Modal Dialog Test</h3>
-		<div class="test-buttons">
-			<button class="test-btn info" on:click={() => (showBasicModal = true)}> Basic Modal </button>
-			<button class="test-btn success" on:click={() => (showSmallModal = true)}>
-				Small Modal
-			</button>
-			<button class="test-btn warning" on:click={() => (showLargeModal = true)}>
-				Large Modal
-			</button>
-			<button class="test-btn error" on:click={() => (showNoBackdropModal = true)}>
-				No Backdrop Close
-			</button>
-			<button class="test-btn multiple" on:click={() => (showNoCloseModal = true)}>
-				No Close Button
-			</button>
-		</div>
-	</div>
-
-	<!-- Confirmation Dialog Testing Section -->
-	<div class="confirm-test">
-		<h3>Confirmation Dialog Test</h3>
-		<div class="test-buttons">
-			<button class="test-btn info" on:click={testBasicConfirm}>Basic Confirm</button>
-			<button class="test-btn error" on:click={testDestructiveConfirm}>
-				Destructive Confirm
-			</button>
-			<button class="test-btn success" on:click={testCustomConfirm}>Custom Text</button>
-			<button class="test-btn multiple" on:click={() => (showComponentConfirm = true)}>
-				Component-based
-			</button>
-		</div>
-	</div>
-
-	<!-- Loading Spinner Testing Section -->
-	<div class="loading-test">
-		<h3>Loading Spinner Test</h3>
-		<div class="test-buttons">
-			<button class="test-btn info" on:click={testOverlaySpinner}>Overlay Spinner</button>
-			<button class="test-btn success" on:click={testOverlaySpinnerWithLabel}> With Label </button>
-			<button class="test-btn warning" on:click={() => (showInlineSpinners = !showInlineSpinners)}>
-				Toggle Inline
-			</button>
+<div class="container" style="background-image: url('/images/{selectedBackground}')">
+	<div class="card page-card">
+		<div class="hero">
+			<h1>MAGE</h1>
+			<p class="flavor-text">Magic: The Gathering Online — play, compete, collect.</p>
 		</div>
 
-		{#if showInlineSpinners}
-			<div class="inline-spinner-demo">
-				<div class="spinner-row">
-					<div class="spinner-item">
-						<p>Small:</p>
-						<LoadingSpinner size="small" />
-					</div>
-					<div class="spinner-item">
-						<p>Medium:</p>
-						<LoadingSpinner size="medium" />
-					</div>
-					<div class="spinner-item">
-						<p>Large:</p>
-						<LoadingSpinner size="large" />
-					</div>
-				</div>
-				<div class="spinner-row">
-					<div class="spinner-item">
-						<p>With Label:</p>
-						<LoadingSpinner size="medium" label="Loading data..." />
-					</div>
-					<div class="spinner-item">
-						<p>Custom Color:</p>
-						<LoadingSpinner size="medium" color="#10b981" label="Processing..." />
-					</div>
-				</div>
+		<nav class="nav-grid" aria-label="Primary navigation">
+			<a href="/login" class="nav-card">
+				<div class="icon" aria-hidden="true">🔐</div>
+				<h2>Login</h2>
+				<p>Sign in to your account</p>
+			</a>
+
+			<a href="/register" class="nav-card">
+				<div class="icon" aria-hidden="true">📝</div>
+				<h2>Register</h2>
+				<p>Create a new account</p>
+			</a>
+
+			<a href="/lobby" class="nav-card">
+				<div class="icon" aria-hidden="true">🎯</div>
+				<h2>Lobby</h2>
+				<p>Find and join games</p>
+			</a>
+
+			<a href="/decks" class="nav-card">
+				<div class="icon" aria-hidden="true">🎴</div>
+				<h2>My Decks</h2>
+				<p>Manage your deck collection</p>
+			</a>
+
+			<a href="/profile" class="nav-card">
+				<div class="icon" aria-hidden="true">👤</div>
+				<h2>Profile</h2>
+				<p>View your stats and settings</p>
+			</a>
+
+			<a href="/table/demo" class="nav-card">
+				<div class="icon" aria-hidden="true">🪑</div>
+				<h2>Table (Demo)</h2>
+				<p>Pre-game table lobby</p>
+			</a>
+
+			<a href="/game/demo" class="nav-card">
+				<div class="icon" aria-hidden="true">⚔️</div>
+				<h2>Game (Demo)</h2>
+				<p>Active game view</p>
+			</a>
+		</nav>
+
+		<div class="footer">
+			<p class="flavor-text">All routes are placeholder pages — full functionality coming soon.</p>
+		</div>
+
+		<!-- Toast Testing Section -->
+		<div class="test-panel toast-test">
+			<h3>Toast Notification Test</h3>
+			<div class="test-buttons">
+				<button class="btn-secondary test-btn" data-tone="success" on:click={testSuccess}>
+					Success Toast
+				</button>
+				<button class="btn-secondary test-btn" data-tone="error" on:click={testError}>Error Toast</button>
+				<button class="btn-secondary test-btn" data-tone="warning" on:click={testWarning}>
+					Warning Toast
+				</button>
+				<button class="btn-secondary test-btn" data-tone="info" on:click={testInfo}>Info Toast</button>
+				<button class="btn-secondary test-btn" data-tone="multiple" on:click={testMultiple}>
+					Multiple Toasts
+				</button>
 			</div>
-		{/if}
+		</div>
+
+		<!-- Modal Testing Section -->
+		<div class="test-panel modal-test">
+			<h3>Modal Dialog Test</h3>
+			<div class="test-buttons">
+				<button class="btn-secondary test-btn" data-tone="info" on:click={() => (showBasicModal = true)}>
+					Basic Modal
+				</button>
+				<button
+					class="btn-secondary test-btn"
+					data-tone="success"
+					on:click={() => (showSmallModal = true)}
+				>
+					Small Modal
+				</button>
+				<button
+					class="btn-secondary test-btn"
+					data-tone="warning"
+					on:click={() => (showLargeModal = true)}
+				>
+					Large Modal
+				</button>
+				<button
+					class="btn-secondary test-btn"
+					data-tone="error"
+					on:click={() => (showNoBackdropModal = true)}
+				>
+					No Backdrop Close
+				</button>
+				<button
+					class="btn-secondary test-btn"
+					data-tone="multiple"
+					on:click={() => (showNoCloseModal = true)}
+				>
+					No Close Button
+				</button>
+			</div>
+		</div>
+
+		<!-- Confirmation Dialog Testing Section -->
+		<div class="test-panel confirm-test">
+			<h3>Confirmation Dialog Test</h3>
+			<div class="test-buttons">
+				<button class="btn-secondary test-btn" data-tone="info" on:click={testBasicConfirm}>
+					Basic Confirm
+				</button>
+				<button class="btn-secondary test-btn" data-tone="error" on:click={testDestructiveConfirm}>
+					Destructive Confirm
+				</button>
+				<button class="btn-secondary test-btn" data-tone="success" on:click={testCustomConfirm}>
+					Custom Text
+				</button>
+				<button
+					class="btn-secondary test-btn"
+					data-tone="multiple"
+					on:click={() => (showComponentConfirm = true)}
+				>
+					Component-based
+				</button>
+			</div>
+		</div>
+
+		<!-- Loading Spinner Testing Section -->
+		<div class="test-panel loading-test">
+			<h3>Loading Spinner Test</h3>
+			<div class="test-buttons">
+				<button class="btn-secondary test-btn" data-tone="info" on:click={testOverlaySpinner}>
+					Overlay Spinner
+				</button>
+				<button
+					class="btn-secondary test-btn"
+					data-tone="success"
+					on:click={testOverlaySpinnerWithLabel}
+				>
+					With Label
+				</button>
+				<button
+					class="btn-secondary test-btn"
+					data-tone="warning"
+					on:click={() => (showInlineSpinners = !showInlineSpinners)}
+				>
+					Toggle Inline
+				</button>
+			</div>
+
+			{#if showInlineSpinners}
+				<div class="inline-spinner-demo">
+					<div class="spinner-row">
+						<div class="spinner-item">
+							<p>Small</p>
+							<LoadingSpinner size="small" />
+						</div>
+						<div class="spinner-item">
+							<p>Medium</p>
+							<LoadingSpinner size="medium" />
+						</div>
+						<div class="spinner-item">
+							<p>Large</p>
+							<LoadingSpinner size="large" />
+						</div>
+					</div>
+					<div class="spinner-row">
+						<div class="spinner-item">
+							<p>With Label</p>
+							<LoadingSpinner size="medium" label="Loading data..." />
+						</div>
+						<div class="spinner-item">
+							<p>Custom Color</p>
+							<LoadingSpinner size="medium" color="#10b981" label="Processing..." />
+						</div>
+					</div>
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -351,80 +401,102 @@
 
 <style>
 	.container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		min-height: 100vh;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		padding: 2rem;
+		position: relative;
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	.container::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(11, 12, 16, 0.7);
+		z-index: 0;
+	}
+
+	.page-card {
+		width: 100%;
+		max-width: 1100px;
+		position: relative;
+		z-index: 1;
 	}
 
 	.hero {
 		text-align: center;
-		margin-bottom: 3rem;
-		color: white;
+		margin-bottom: 2rem;
 	}
 
 	h1 {
-		font-size: 4rem;
-		margin: 0 0 1rem 0;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+		font-size: 2.25rem;
+		margin: 0 0 0.75rem 0;
 	}
 
-	.hero p {
-		font-size: 1.5rem;
+	.hero :global(.flavor-text) {
 		margin: 0;
-		opacity: 0.9;
+		font-size: 1rem;
+		text-align: center;
 	}
 
 	.nav-grid {
-		max-width: 1200px;
-		margin: 0 auto;
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 1.5rem;
+		gap: 1rem;
+		margin-top: 1.25rem;
 	}
 
 	.nav-card {
-		background: white;
-		border-radius: 12px;
-		padding: 2rem;
+		background: rgba(166, 154, 168, 0.12);
+		border-radius: var(--radius-xl);
+		padding: 1.25rem 1.25rem;
 		text-align: center;
 		text-decoration: none;
-		color: #333;
-		transition: all 0.3s;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		color: var(--ci-scroll-parchment);
+		transition: all var(--transition-base);
+		border: 1px solid rgba(59, 130, 246, 0.18);
+		backdrop-filter: blur(6px);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 	}
 
 	.nav-card:hover {
-		transform: translateY(-5px);
-		box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+		transform: translateY(-2px);
+		border-color: rgba(59, 130, 246, 0.35);
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(59, 130, 246, 0.12);
 	}
 
 	.icon {
-		font-size: 3rem;
-		margin-bottom: 1rem;
+		font-size: 2.25rem;
+		margin-bottom: 0.75rem;
 	}
 
 	.nav-card h2 {
-		margin: 0 0 0.5rem 0;
-		font-size: 1.5rem;
-		color: #667eea;
+		margin: 0 0 0.35rem 0;
+		font-size: 1.25rem;
 	}
 
 	.nav-card p {
 		margin: 0;
-		color: #666;
-		font-size: 0.875rem;
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.9375rem;
+		line-height: 1.4;
 	}
 
 	.footer {
 		text-align: center;
-		margin-top: 3rem;
-		color: white;
-		opacity: 0.8;
+		margin-top: 1.75rem;
 	}
 
-	.footer p {
+	.footer :global(.flavor-text) {
 		margin: 0;
-		font-size: 0.875rem;
+		text-align: center;
 	}
 
 	/* Testing Sections */
@@ -432,128 +504,68 @@
 	.modal-test,
 	.confirm-test,
 	.loading-test {
-		max-width: 800px;
-		margin: 3rem auto 0;
-		background: rgba(255, 255, 255, 0.95);
-		border-radius: 12px;
-		padding: 2rem;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		margin-top: 1.25rem;
 	}
 
-	.modal-test,
-	.confirm-test,
-	.loading-test {
-		margin-top: 2rem;
+	.test-panel {
+		background: rgba(11, 12, 16, 0.55);
+		border: 1px solid rgba(59, 130, 246, 0.18);
+		border-radius: var(--radius-xl);
+		padding: 1.25rem;
 	}
 
 	.toast-test h3,
 	.modal-test h3,
 	.confirm-test h3,
 	.loading-test h3 {
-		margin: 0 0 1.5rem 0;
-		color: #667eea;
-		text-align: center;
-		font-size: 1.5rem;
+		margin: 0 0 1rem 0;
+		text-align: left;
+		font-size: 1.125rem;
 	}
 
 	.test-buttons {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.75rem;
-		justify-content: center;
+		gap: 0.5rem;
 	}
 
 	.test-btn {
-		padding: 0.75rem 1.5rem;
-		border: none;
-		border-radius: 0.5rem;
-		font-weight: 600;
+		padding: 0.625rem 1rem;
 		font-size: 0.875rem;
-		cursor: pointer;
-		transition: all 0.2s;
-		color: white;
+		text-transform: none;
+		letter-spacing: 0.02em;
 	}
 
-	.test-btn.success {
-		background-color: #10b981;
+	.test-btn[data-tone='success'] {
+		border-color: rgba(81, 207, 102, 0.35);
 	}
 
-	.test-btn.success:hover {
-		background-color: #059669;
+	.test-btn[data-tone='error'] {
+		border-color: rgba(255, 77, 77, 0.45);
 	}
 
-	.test-btn.error {
-		background-color: #ef4444;
+	.test-btn[data-tone='warning'] {
+		border-color: rgba(245, 158, 11, 0.45);
 	}
 
-	.test-btn.error:hover {
-		background-color: #dc2626;
+	.test-btn[data-tone='info'] {
+		border-color: rgba(59, 130, 246, 0.45);
 	}
 
-	.test-btn.warning {
-		background-color: #f59e0b;
-	}
-
-	.test-btn.warning:hover {
-		background-color: #d97706;
-	}
-
-	.test-btn.info {
-		background-color: #3b82f6;
-	}
-
-	.test-btn.info:hover {
-		background-color: #2563eb;
-	}
-
-	.test-btn.multiple {
-		background-color: #8b5cf6;
-	}
-
-	.test-btn.multiple:hover {
-		background-color: #7c3aed;
-	}
-
-	/* Modal Button Styles */
-	:global(.btn-primary),
-	:global(.btn-secondary) {
-		padding: 0.625rem 1.25rem;
-		border-radius: 0.5rem;
-		font-weight: 600;
-		font-size: 0.875rem;
-		cursor: pointer;
-		transition: all 0.2s;
-		border: none;
-	}
-
-	:global(.btn-primary) {
-		background-color: #667eea;
-		color: white;
-	}
-
-	:global(.btn-primary:hover) {
-		background-color: #5568d3;
-	}
-
-	:global(.btn-secondary) {
-		background-color: #e5e7eb;
-		color: #374151;
-	}
-
-	:global(.btn-secondary:hover) {
-		background-color: #d1d5db;
+	.test-btn[data-tone='multiple'] {
+		border-color: rgba(139, 92, 246, 0.45);
 	}
 
 	:global(.modal-content p) {
 		margin: 0 0 1rem 0;
 		line-height: 1.5;
-		color: #374151;
+		color: var(--ci-scroll-parchment);
 	}
 
 	:global(.modal-content ul) {
 		margin: 0 0 1rem 0;
 		padding-left: 1.5rem;
-		color: #374151;
+		color: var(--ci-scroll-parchment);
 	}
 
 	:global(.modal-content li) {
@@ -562,18 +574,19 @@
 
 	/* Inline Spinner Demo */
 	.inline-spinner-demo {
-		margin-top: 2rem;
-		padding: 2rem;
-		background: #f9fafb;
-		border-radius: 0.5rem;
+		margin-top: 1rem;
+		padding: 1rem;
+		background: rgba(166, 154, 168, 0.08);
+		border: 1px solid rgba(59, 130, 246, 0.15);
+		border-radius: var(--radius-xl);
 	}
 
 	.spinner-row {
 		display: flex;
-		gap: 2rem;
-		margin-bottom: 2rem;
+		gap: 1rem;
+		margin-bottom: 1rem;
 		flex-wrap: wrap;
-		justify-content: center;
+		justify-content: flex-start;
 	}
 
 	.spinner-row:last-child {
@@ -584,28 +597,24 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.75rem;
 		padding: 1rem;
-		background: white;
-		border-radius: 0.5rem;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		background: rgba(11, 12, 16, 0.55);
+		border: 1px solid rgba(59, 130, 246, 0.18);
+		border-radius: var(--radius-xl);
 		min-width: 120px;
 	}
 
 	.spinner-item p {
 		margin: 0;
 		font-weight: 600;
-		color: #374151;
+		color: var(--ci-scroll-parchment);
 		font-size: 0.875rem;
 	}
 
 	@media (max-width: 768px) {
 		h1 {
-			font-size: 2.5rem;
-		}
-
-		.hero p {
-			font-size: 1.125rem;
+			font-size: 2rem;
 		}
 
 		.nav-grid {

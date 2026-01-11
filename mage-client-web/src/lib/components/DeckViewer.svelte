@@ -2,6 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import type { Deck, DeckCard } from '$lib/types/deck';
 	import LoadingSpinner from './LoadingSpinner.svelte';
+	import { toast } from '$lib/stores/toast';
 
 	export let deck: Deck;
 	export let loading = false;
@@ -155,8 +156,7 @@
 		return cmc;
 	}
 
-	function handleExport() {
-		// Export deck as text
+	function buildDeckText(): string {
 		let deckText = `# ${deck.name}\n`;
 		deckText += `# Format: ${deck.format}\n`;
 		deckText += `# Cards: ${deck.cardCount}\n\n`;
@@ -189,6 +189,13 @@
 			}
 		}
 
+		return deckText;
+	}
+
+	function handleExport() {
+		// Export deck as text
+		const deckText = buildDeckText();
+
 		// Create download
 		const blob = new Blob([deckText], { type: 'text/plain' });
 		const url = URL.createObjectURL(blob);
@@ -199,6 +206,37 @@
 		a.click();
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
+	}
+
+	async function handleCopy() {
+		const deckText = buildDeckText();
+
+		try {
+			if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+				await navigator.clipboard.writeText(deckText);
+				toast.success('Deck copied to clipboard!');
+				return;
+			}
+
+			// Fallback for older browsers / non-secure contexts
+			const textarea = document.createElement('textarea');
+			textarea.value = deckText;
+			textarea.style.position = 'fixed';
+			textarea.style.top = '0';
+			textarea.style.left = '0';
+			textarea.style.opacity = '0';
+			document.body.appendChild(textarea);
+			textarea.focus();
+			textarea.select();
+			const ok = document.execCommand('copy');
+			document.body.removeChild(textarea);
+
+			if (!ok) throw new Error('execCommand(copy) returned false');
+			toast.success('Deck copied to clipboard!');
+		} catch (err) {
+			console.error('Failed to copy deck to clipboard:', err);
+			toast.error('Failed to copy deck');
+		}
 	}
 
 	function handleDelete() {
@@ -239,6 +277,17 @@
 				</div>
 			</div>
 			<div class="header-actions">
+				<button class="btn-copy" on:click={handleCopy} title="Copy deck to clipboard">
+					<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2h-8a2 2 0 00-2 2z"
+						/>
+					</svg>
+					Copy
+				</button>
 				<button class="btn-export" on:click={handleExport}>
 					<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -484,7 +533,8 @@
 	}
 
 	.btn-export,
-	.btn-delete {
+	.btn-delete,
+	.btn-copy {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -506,6 +556,15 @@
 		background-color: #2563eb;
 	}
 
+	.btn-copy {
+		background-color: #6b7280;
+		color: white;
+	}
+
+	.btn-copy:hover {
+		background-color: #4b5563;
+	}
+
 	.btn-delete {
 		background-color: #ef4444;
 		color: white;
@@ -516,7 +575,8 @@
 	}
 
 	.btn-export .icon,
-	.btn-delete .icon {
+	.btn-delete .icon,
+	.btn-copy .icon {
 		width: 1.25rem;
 		height: 1.25rem;
 	}
@@ -775,7 +835,8 @@
 		}
 
 		.btn-export,
-		.btn-delete {
+		.btn-delete,
+		.btn-copy {
 			flex: 1;
 		}
 

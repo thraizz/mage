@@ -66,3 +66,4 @@ mage-bundle.zip
 # Python
 *.pyc
 **/__pycache__
+mage-server-go/data/cards_seed.postgres.sql

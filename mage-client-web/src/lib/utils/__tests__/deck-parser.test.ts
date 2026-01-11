@@ -308,6 +308,15 @@ Deck
 			expect(cards[0]).toEqual({ name: 'Lightning Bolt', quantity: 4, section: 'main' });
 		});
 
+		it('should parse MTGO-style "1x Card (set) 123" format', () => {
+			const cards = parseStructuredCards('1x Beast Within (eoc) 93');
+			expect(cards[0]).toEqual({ name: 'Beast Within', quantity: 1, section: 'main' });
+
+			const stats = parseDeckList('1x Beast Within (eoc) 93', 'Standard');
+			expect(stats.mainDeckCount).toBe(1);
+			expect(stats.errors).toHaveLength(0);
+		});
+
 		it('should parse card without quantity as 1', () => {
 			const cards = parseStructuredCards('Lightning Bolt');
 			expect(cards[0]).toEqual({ name: 'Lightning Bolt', quantity: 1, section: 'main' });

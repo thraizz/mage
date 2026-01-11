@@ -2,10 +2,11 @@
 	import type { Deck } from '$lib/types/deck';
 	import FormatBadge from '$lib/components/mtg/FormatBadge.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import Panel from '$lib/components/ui/Panel.svelte';
 
 	interface Props {
 		deck: Deck;
-		onclick?: () => void;
+		onclick?: (e: MouseEvent) => void;
 	}
 
 	let { deck, onclick }: Props = $props();
@@ -22,111 +23,187 @@
 		if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
 		return date.toLocaleDateString();
 	}
-
-	function handleKeypress(e: KeyboardEvent) {
-		if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault();
-			onclick?.();
-		}
-	}
 </script>
 
-<div
-	class="deck-card"
-	onclick={onclick}
-	onkeypress={handleKeypress}
-	role="button"
-	tabindex="0"
->
-	<header class="card-header">
-		<FormatBadge format={deck.format} size="md" />
-		<Badge variant={deck.isValid ? 'success' : 'error'} size="sm">
-			{deck.isValid ? 'Valid' : 'Invalid'}
-		</Badge>
-	</header>
+<button class="deck-card" type="button" {onclick} aria-label={`Open deck: ${deck.name}`}>
+	<Panel variant="bordered" padding="md">
+		<div class="deck-card-inner" data-invalid={!deck.isValid}>
+			<div class="deck-card-shine" aria-hidden="true"></div>
 
-	<h3 class="deck-name" title={deck.name}>{deck.name}</h3>
+			<div class="deck-card-content">
+				<div class="deck-header">
+					<h3 class="deck-name" title={deck.name}>{deck.name}</h3>
+					<svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+						<polyline points="9 18 15 12 9 6"></polyline>
+					</svg>
+				</div>
 
-	<div class="deck-stats">
-		<div class="stat">
-			<span class="stat-value">{deck.cardCount}</span>
-			<span class="stat-label">cards</span>
-		</div>
-		<div class="stat">
-			<span class="stat-value">{deck.mainDeck.length}</span>
-			<span class="stat-label">main</span>
-		</div>
-		{#if deck.sideboard && deck.sideboard.length > 0}
-			<div class="stat">
-				<span class="stat-value">{deck.sideboard.length}</span>
-				<span class="stat-label">side</span>
+				<div class="deck-badges">
+					<FormatBadge format={deck.format} size="md" />
+					<Badge variant={deck.isValid ? 'success' : 'error'} size="sm">
+						{deck.isValid ? 'Valid' : 'Fix required'}
+					</Badge>
+					{#if deck.commanders && deck.commanders.length > 0}
+						<Badge variant="info" size="sm">Commander</Badge>
+					{/if}
+				</div>
+
+				<div class="deck-stats" aria-label="Deck stats">
+					<div class="stat">
+						<div class="stat-value">{deck.cardCount}</div>
+						<div class="stat-label">Total</div>
+					</div>
+					<div class="stat">
+						<div class="stat-value">{deck.mainDeck.length}</div>
+						<div class="stat-label">Main</div>
+					</div>
+					{#if deck.sideboard && deck.sideboard.length > 0}
+						<div class="stat">
+							<div class="stat-value">{deck.sideboard.length}</div>
+							<div class="stat-label">Side</div>
+						</div>
+					{/if}
+					{#if deck.commanders && deck.commanders.length > 0}
+						<div class="stat">
+							<div class="stat-value">{deck.commanders.length}</div>
+							<div class="stat-label">Cmd</div>
+						</div>
+					{/if}
+				</div>
+
+				<div class="deck-footer">
+					<span class="modified-date">Updated {formatDate(deck.updatedAt)}</span>
+					{#if !deck.isValid}
+						<span class="invalid-hint">Invalid cards</span>
+					{/if}
+				</div>
 			</div>
-		{/if}
-	</div>
-
-	<footer class="card-footer">
-		<span class="modified-date">{formatDate(deck.updatedAt)}</span>
-	</footer>
-</div>
+		</div>
+	</Panel>
+</button>
 
 <style>
 	.deck-card {
-		background: var(--bg-obsidian);
-		border: 1px solid var(--border-subtle);
-		border-radius: var(--radius-lg);
-		padding: var(--space-4);
+		width: 100%;
+		display: block;
+		text-align: left;
+		background: transparent;
+		border: none;
+		padding: 0;
 		cursor: pointer;
-		transition: all var(--transition-base);
 	}
 
-	.deck-card:hover {
-		border-color: var(--accent-gold-dim);
-		box-shadow: var(--shadow-glow);
+	.deck-card :global(.panel) {
+		transition: transform var(--transition-base), box-shadow var(--transition-base);
+	}
+
+	.deck-card:hover :global(.panel) {
 		transform: translateY(-2px);
+		box-shadow: var(--shadow-glow);
+	}
+
+	.deck-card:active :global(.panel) {
+		transform: translateY(-1px);
 	}
 
 	.deck-card:focus-visible {
-		outline: 2px solid var(--accent-gold);
-		outline-offset: 2px;
+		outline: none;
 	}
 
-	/* Header */
-	.card-header {
+	.deck-card:focus-visible :global(.panel) {
+		box-shadow: 0 0 0 3px var(--accent-gold-glow), var(--shadow-glow);
+	}
+
+	.deck-card-inner {
+		position: relative;
+	}
+
+	.deck-card-shine {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: linear-gradient(
+			135deg,
+			color-mix(in srgb, var(--accent-gold) 10%, transparent) 0%,
+			transparent 45%,
+			color-mix(in srgb, var(--accent-gold) 6%, transparent) 100%
+		);
+		opacity: 0;
+		transition: opacity var(--transition-fast);
+	}
+
+	.deck-card:hover .deck-card-shine {
+		opacity: 1;
+	}
+
+	.deck-card-content {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: var(--space-3);
+		flex-direction: column;
+		gap: var(--space-3);
 	}
 
-	/* Deck Name */
+	.deck-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: var(--space-3);
+	}
+
 	.deck-name {
 		font-family: var(--font-display);
-		font-size: var(--text-lg);
+		font-size: var(--text-xl);
 		font-weight: var(--weight-semibold);
 		color: var(--text-bright);
-		margin: 0 0 var(--space-4);
+		margin: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		white-space: nowrap;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		line-clamp: 2;
 	}
 
-	/* Stats */
-	.deck-stats {
+	.chevron {
+		color: var(--text-ghost);
+		flex: 0 0 auto;
+		margin-top: 2px;
+		transition: transform var(--transition-fast), color var(--transition-fast);
+	}
+
+	.deck-card:hover .chevron {
+		transform: translateX(2px);
+		color: var(--text-dim);
+	}
+
+	.deck-badges {
 		display: flex;
-		gap: var(--space-4);
-		margin-bottom: var(--space-4);
+		align-items: center;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+	}
+
+	.deck-stats {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: var(--space-3);
+		padding: var(--space-3);
+		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--bg-slate) 65%, transparent);
+		border: 1px solid var(--border-subtle);
 	}
 
 	.stat {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		align-items: flex-start;
+		gap: 2px;
 	}
 
 	.stat-value {
-		font-size: var(--text-xl);
-		font-weight: var(--weight-bold);
-		color: var(--accent-gold);
+		font-size: var(--text-lg);
+		font-weight: var(--weight-semibold);
+		color: var(--text-bright);
+		letter-spacing: -0.01em;
 	}
 
 	.stat-label {
@@ -136,14 +213,31 @@
 		letter-spacing: 0.05em;
 	}
 
-	/* Footer */
-	.card-footer {
-		padding-top: var(--space-3);
-		border-top: 1px solid var(--border-subtle);
+	.deck-footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
 	}
 
 	.modified-date {
 		font-size: var(--text-xs);
 		color: var(--text-ghost);
+	}
+
+	.invalid-hint {
+		font-size: var(--text-xs);
+		font-weight: var(--weight-medium);
+		color: var(--status-error);
+		background: var(--status-error-dim);
+		padding: 0.125rem var(--space-2);
+		border-radius: var(--radius-full);
+		white-space: nowrap;
+	}
+
+	@media (max-width: 480px) {
+		.deck-stats {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 	}
 </style>

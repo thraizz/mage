@@ -38,6 +38,27 @@ const BASIC_LANDS = [
 ];
 
 /**
+ * Normalize common deck export formats into a canonical card name.
+ *
+ * Supports MTGO-style suffixes like:
+ * - "Beast Within (EOC) 93"
+ * - "Beast Within (eoc) 93"
+ * - "Beast Within (EOC)"
+ *
+ * This strips the trailing "(SET) [collector]" portion so backend name validation works.
+ */
+export function normalizeImportedCardName(rawName: string): string {
+	const name = rawName.trim();
+	if (!name) return name;
+
+	// Strip trailing: " (SET) 123" or " (SET)" (case-insensitive)
+	// Keep it conservative: SET is 2-6 alnum chars, collector is 1+ digits (optional trailing letter).
+	return name
+		.replace(/\s+\(([a-z0-9]{2,6})\)(?:\s+\d+[a-z]?)?\s*$/i, '')
+		.trim();
+}
+
+/**
  * Parse a deck list text into structured card entries
  */
 export function parseStructuredCards(text: string): CardEntry[] {
@@ -131,7 +152,7 @@ export function parseStructuredCards(text: string): CardEntry[] {
 		const match = line.match(/^(\d+)x?\s+(.+)$/i);
 		if (match) {
 			const quantity = parseInt(match[1]);
-			const cardName = match[2].trim();
+			const cardName = normalizeImportedCardName(match[2].trim());
 			if (cardName && quantity > 0) {
 				// In Commander format: allow up to 2 commander cards total (for partner commanders)
 				// After processing the first commander card, allow a second ONLY if it would make total exactly 2
@@ -163,7 +184,7 @@ export function parseStructuredCards(text: string): CardEntry[] {
 			}
 		} else if (line) {
 			// Single card without quantity
-			const cardName = line.trim();
+			const cardName = normalizeImportedCardName(line.trim());
 			if (cardName) {
 				// In Commander format: allow up to 2 commander cards total (for partner commanders)
 				// After processing the first commander card, allow a second ONLY if it would make total exactly 2
@@ -335,7 +356,7 @@ export function parseDeckList(text: string, format: DeckFormat = 'Standard'): De
 		const match = line.match(/^(\d+)x?\s+(.+)$/i);
 		if (match) {
 			const quantity = parseInt(match[1]);
-			const cardName = match[2].trim();
+			const cardName = normalizeImportedCardName(match[2].trim());
 
 			if (quantity <= 0 || quantity > 100) {
 				parseErrors.push(`Line ${i + 1}: Invalid quantity (${quantity})`);
@@ -389,7 +410,7 @@ export function parseDeckList(text: string, format: DeckFormat = 'Standard'): De
 			}
 		} else if (line) {
 			// Single card without quantity prefix
-			const cardName = line.trim();
+			const cardName = normalizeImportedCardName(line.trim());
 			const lowerName = cardName.toLowerCase();
 
 			// In Commander format: allow up to 2 commander cards total (for partner commanders)

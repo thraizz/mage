@@ -1,5 +1,6 @@
 import type { Deck, DeckUploadRequest } from '$lib/types/deck';
 import { getMageClient } from '$lib/grpc/client';
+import { normalizeImportedCardName } from '$lib/utils/deck-parser';
 import type {
 	DeckListRequest,
 	DeckListResponse,
@@ -195,7 +196,8 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 		const match = line.match(/^(\d+)x?\s+(.+)$/i);
 		if (match) {
 			const quantity = parseInt(match[1]);
-			const cardName = match[2].trim();
+			const cardName = normalizeImportedCardName(match[2].trim());
+			if (!cardName) continue;
 
 			// In Commander format: allow up to 2 commander cards total (for partner commanders)
 			// Check BEFORE processing: if we've already processed 2+ cards, switch to main
@@ -220,6 +222,8 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 			}
 		} else if (line) {
 			// Single card without quantity prefix
+			const cardName = normalizeImportedCardName(line);
+			if (!cardName) continue;
 			// In Commander format: allow up to 2 commander cards total (for partner commanders)
 			// Check BEFORE processing: if we've already processed 2+ cards, switch to main
 			if (inCommander && commanderCardsProcessed >= 2) {
@@ -230,16 +234,16 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 			}
 
 			if (inSideboard) {
-				sideboardCards.set(line, (sideboardCards.get(line) || 0) + 1);
+				sideboardCards.set(cardName, (sideboardCards.get(cardName) || 0) + 1);
 			} else if (inCommander) {
-				commanderCards.set(line, (commanderCards.get(line) || 0) + 1);
+				commanderCards.set(cardName, (commanderCards.get(cardName) || 0) + 1);
 				commanderCardsProcessed += 1;
 				// After processing commander cards, switch to main deck for next card
 				if (commanderCardsProcessed >= 2) {
 					inCommander = false;
 				}
 			} else {
-				mainDeckCards.set(line, (mainDeckCards.get(line) || 0) + 1);
+				mainDeckCards.set(cardName, (mainDeckCards.get(cardName) || 0) + 1);
 			}
 		}
 	}
