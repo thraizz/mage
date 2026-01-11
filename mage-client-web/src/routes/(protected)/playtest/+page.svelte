@@ -83,6 +83,10 @@
 	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
 	let battlefieldIsDragPending = $state(false);
 	const DRAG_THRESHOLD = 5;
+	
+	// Command zone drag state
+	let commandDragStartPosition = $state<{ x: number; y: number } | null>(null);
+	let commandIsDragPending = $state(false);
 
 	// Derived state from stores
 	const players = $derived($playtestPlayers);
@@ -409,6 +413,53 @@
 		const handleMouseUp = () => {
 			battlefieldIsDragPending = false;
 			battlefieldDragStartPosition = null;
+			document.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('mouseup', handleMouseUp);
+		};
+
+		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('mouseup', handleMouseUp);
+	}
+
+	/**
+	 * Handle command zone card mouse down (for drag)
+	 */
+	function handleCommandCardMouseDown(cardId: string, cardName: string, event: MouseEvent): void {
+		if (event.button !== 0) return;
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		commandDragStartPosition = { x: event.clientX, y: event.clientY };
+		commandIsDragPending = true;
+
+		const handleMouseMove = (moveEvent: MouseEvent) => {
+			if (!commandDragStartPosition || !commandIsDragPending) return;
+
+			const dx = moveEvent.clientX - commandDragStartPosition.x;
+			const dy = moveEvent.clientY - commandDragStartPosition.y;
+			const distance = Math.sqrt(dx * dx + dy * dy);
+
+			if (distance >= DRAG_THRESHOLD) {
+				commandIsDragPending = false;
+				const validZones = getAllValidDropZones('command' as SourceZone);
+				dragDropStore.startDrag(
+					cardId,
+					cardName,
+					'command' as SourceZone,
+					moveEvent.clientX,
+					moveEvent.clientY,
+					validZones
+				);
+
+				document.removeEventListener('mousemove', handleMouseMove);
+				document.removeEventListener('mouseup', handleMouseUp);
+			}
+		};
+
+		const handleMouseUp = () => {
+			commandIsDragPending = false;
+			commandDragStartPosition = null;
 			document.removeEventListener('mousemove', handleMouseMove);
 			document.removeEventListener('mouseup', handleMouseUp);
 		};
@@ -886,7 +937,14 @@
 						<span class="zone-label">Command Zone</span>
 						<div class="command-cards">
 							{#each myCommandCards as card (card.id)}
-								<div class="command-card-wrapper" title={card.name}>
+								<div
+									class="command-card-wrapper"
+									title={card.name}
+									role="button"
+									tabindex="0"
+									aria-label={card.name}
+									onmousedown={(e) => handleCommandCardMouseDown(card.id, card.name, e)}
+								>
 									<Card
 										cardId={card.id}
 										cardName={card.name}
@@ -1613,6 +1671,7 @@
 
 	.command-card-wrapper {
 		display: flex;
+		cursor: grab;
 	}
 
 	.battlefield-card-wrapper {
