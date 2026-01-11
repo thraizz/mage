@@ -59,9 +59,14 @@ func (s *mageServer) resolveCardNames(ctx context.Context, cardNames []string) (
 			continue
 		}
 
-		// Fallback for Adventure-style exports: "Brazen Borrower // Petty Theft"
-		if strings.Contains(normalized, " // ") {
-			left := strings.TrimSpace(strings.SplitN(normalized, " // ", 2)[0])
+		// Fallback for Adventure-style exports: "Brazen Borrower // Petty Theft" (or "Brazen Borrower//Petty Theft")
+		// Only used if the full name wasn't found.
+		if strings.Contains(normalized, "//") {
+			idx := strings.Index(normalized, "//")
+			left := ""
+			if idx >= 0 {
+				left = strings.TrimSpace(normalized[:idx])
+			}
 			if left != "" {
 				cards2, err2 := s.cardRepo.GetByNameCaseInsensitive(ctx, left)
 				if err2 == nil && len(cards2) > 0 {

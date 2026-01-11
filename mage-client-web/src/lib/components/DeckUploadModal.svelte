@@ -10,6 +10,7 @@
 	import X from '@lucide/svelte/icons/x';
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
 	import ArrowDown from '@lucide/svelte/icons/arrow-down';
+	import Crown from '@lucide/svelte/icons/crown';
 	import TextCursorInput from '@lucide/svelte/icons/text-cursor-input';
 	import Rows3 from '@lucide/svelte/icons/rows-3';
 	import BookOpen from '@lucide/svelte/icons/book-open';
@@ -55,6 +56,8 @@
 
 	// Structured card data
 	let structuredCards: CardEntry[] = [];
+	$: hasCommander =
+		selectedFormat === 'Commander' && structuredCards.some((c) => c.section === 'commander' && c.quantity > 0);
 
 	function validateDeck(): string[] {
 		return validateDeckUtil(deckName, deckList, selectedFormat as DeckFormat, stats);
@@ -545,17 +548,18 @@ Sideboard:
 											disabled={loading}
 										/>
 										{#if selectedFormat === 'Commander'}
-											<button
-												type="button"
-												class="btn-move"
-												on:click={() => moveCard(globalIndex, 'commander')}
-												disabled={loading}
-												title="Move to Commander"
-												aria-label="Move to Commander"
-											>
-												<ArrowUp class="icon" size={16} aria-hidden="true" />
-											</button
-											>
+											{#if !hasCommander}
+												<button
+													type="button"
+													class="btn-move btn-move-commander"
+													on:click={() => moveCard(globalIndex, 'commander')}
+													disabled={loading}
+													title="Set as Commander"
+													aria-label="Set as Commander"
+												>
+													<Crown class="icon crown-icon" size={16} aria-hidden="true" />
+												</button>
+											{/if}
 										{/if}
 										{#if selectedFormat !== 'Commander'}
 											<button
@@ -1016,6 +1020,10 @@ Sideboard:
 	.btn-move :global(svg.icon),
 	.btn-remove :global(svg.icon) {
 		color: currentColor;
+	}
+
+	.btn-move-commander :global(svg.crown-icon) {
+		color: var(--accent-gold);
 	}
 
 	.btn-move {

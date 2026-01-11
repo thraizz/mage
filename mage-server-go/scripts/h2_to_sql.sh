@@ -1,13 +1,45 @@
 #!/bin/bash
-# Export Java H2 database to portable SQL format
+# Export Java H2 database to portable SQL format.
 # Can be imported into SQLite, PostgreSQL, MySQL, etc.
+#
+# Usage:
+#   ./scripts/h2_to_sql.sh
+#   ./scripts/h2_to_sql.sh --db-path /path/to/cards.h2 --output /path/to/cards.sql
+#
+# Env overrides:
+#   JAVA_DB_PATH=/path/to/cards.h2 OUTPUT_SQL=/path/to/cards.sql ./scripts/h2_to_sql.sh
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-JAVA_DB_PATH="${PROJECT_ROOT}/../Mage.Server/db/cards.h2"
-OUTPUT_SQL="${PROJECT_ROOT}/data/cards.sql"
+
+JAVA_DB_PATH_DEFAULT="${PROJECT_ROOT}/../Mage.Server/db/cards.h2"
+OUTPUT_SQL_DEFAULT="${PROJECT_ROOT}/data/cards.sql"
+
+JAVA_DB_PATH="${JAVA_DB_PATH:-$JAVA_DB_PATH_DEFAULT}"
+OUTPUT_SQL="${OUTPUT_SQL:-$OUTPUT_SQL_DEFAULT}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --db-path)
+      JAVA_DB_PATH="$2"
+      shift 2
+      ;;
+    --output)
+      OUTPUT_SQL="$2"
+      shift 2
+      ;;
+    -h|--help)
+      echo "Usage: $0 [--db-path /path/to/cards.h2] [--output /path/to/cards.sql]"
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+done
 
 echo "=== H2 to SQL Export ==="
 echo "Source: ${JAVA_DB_PATH}.mv.db"

@@ -69,3 +69,4 @@ mage-bundle.zip
 mage-server-go/data/cards_seed.postgres.sql
 
 .playwright-mcp/
+tmp/

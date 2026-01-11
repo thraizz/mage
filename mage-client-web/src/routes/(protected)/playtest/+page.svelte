@@ -27,6 +27,7 @@
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
+	import Clock from '@lucide/svelte/icons/clock';
 	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
 	import {
 		dragDropStore,
@@ -71,10 +72,12 @@
 	let graveyardDropZoneEl: HTMLElement | null = $state(null);
 	let exileDropZoneEl: HTMLElement | null = $state(null);
 	let handDropZoneEl: HTMLElement | null = $state(null);
+	let libraryDropZoneEl: HTMLElement | null = $state(null);
 	let dropZoneUnregister: (() => void) | null = null;
 	let graveyardDropZoneUnregister: (() => void) | null = null;
 	let exileDropZoneUnregister: (() => void) | null = null;
 	let handDropZoneUnregister: (() => void) | null = null;
+	let libraryDropZoneUnregister: (() => void) | null = null;
 
 	// Battlefield drag state
 	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
@@ -124,6 +127,19 @@
 
 	// Hovered card
 	const hoveredCard = $derived(hoveredCardId ? battlefield.find(c => c.id === hoveredCardId) : null);
+
+	const activePlayerName = $derived(() => {
+		return players.find((p) => p.playerId === $playtestGameStore.activePlayerId)?.name ?? '';
+	});
+
+	// Playtest store "turn" currently increments each time we advance priority seat.
+	// For display, we want "Turn 2" only when player 1 starts their second turn (i.e. rounds).
+	const turnNumber = $derived(() => {
+		const step = Math.max(1, $playtestGameStore.turn);
+		const n = players.length;
+		if (n <= 0) return step;
+		return Math.floor((step - 1) / n) + 1;
+	});
 
 	// Check if all players have kept hands
 	const allPlayersKept = $derived(players.every(p => p.keptHand));
@@ -561,6 +577,24 @@
 		};
 	});
 
+	$effect(() => {
+		if (libraryDropZoneEl && !libraryDropZoneUnregister) {
+			libraryDropZoneUnregister = dragDropStore.registerDropZone({
+				id: 'library',
+				type: 'library',
+				element: libraryDropZoneEl,
+				accepts: (_cardId, sourceZone) => sourceZone !== 'library',
+				onDrop: (cardId) => handleZoneDrop(cardId, 'LIBRARY')
+			});
+		}
+		return () => {
+			if (libraryDropZoneUnregister) {
+				libraryDropZoneUnregister();
+				libraryDropZoneUnregister = null;
+			}
+		};
+	});
+
 	// Initialize on mount
 	onMount(() => {
 		// Prefer restoring from persisted playtest state (refresh-safe).
@@ -652,6 +686,12 @@
 			</div>
 
 			<div class="header-right">
+				<div class="turn-indicator" title="Current turn">
+					<Clock size={16} aria-hidden="true" />
+					<span class="turn-text">
+						Turn {turnNumber()}{activePlayerName() ? ` · ${activePlayerName()}` : ''}
+					</span>
+				</div>
 				<button class="btn-action" onclick={handleNextTurn}>Next Turn</button>
 				<button
 					class="btn-debug"
@@ -946,11 +986,13 @@
 							</div>
 						{/if}
 
-						<LibraryZone
-							libraryCount={me.libraryCount}
-							playerName="You"
-							onSearch={() => { showDeckSearch = true; }}
-						/>
+						<div bind:this={libraryDropZoneEl} class="library-drop-zone">
+							<LibraryZone
+								libraryCount={me.libraryCount}
+								playerName="You"
+								onSearch={() => { showDeckSearch = true; }}
+							/>
+						</div>
 
 						{#if showLifeMenu}
 							<div bind:this={lifeMenuEl} class="quick-menu">
@@ -1236,6 +1278,25 @@
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
+	}
+
+	.turn-indicator {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.375rem 0.625rem;
+		border-radius: 999px;
+		border: 1px solid rgba(148, 163, 184, 0.25);
+		background: rgba(17, 24, 39, 0.5);
+		color: #cbd5e1;
+		font-size: 0.875rem;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.turn-text {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 0.8125rem;
 	}
 
 	.btn-back {
@@ -1698,6 +1759,13 @@
 		transition: all 0.2s ease;
 		border-radius: 6px;
 		min-width: 70px;
+		min-height: 32px;
+	}
+
+	.library-drop-zone {
+		transition: all 0.2s ease;
+		border-radius: 6px;
+		min-width: 120px;
 		min-height: 32px;
 	}
 

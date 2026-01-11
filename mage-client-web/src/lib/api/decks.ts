@@ -36,18 +36,40 @@ function convertDeckInfoToDeck(deckInfo: DeckInfo): Deck {
  * Convert DeckCardLists from proto to our DeckCard array format
  */
 function convertCardListsToDeckCards(cardLists: DeckCardLists) {
+	const stripMetaSuffix = (value: unknown): string => {
+		if (typeof value !== 'string') return '';
+		// Some upstream sources encode extra metadata after "@@@"
+		// Example: "CREATURE@@@" → "CREATURE"
+		return value.split('@@@')[0].trim();
+	};
+
+	const hasMetaSuffix = (value: unknown): boolean => typeof value === 'string' && value.includes('@@@');
+
 	const convertCardList = (cards: any[]) => {
-		return cards.map((card) => ({
-			cardName: card.name,
+		return cards.map((card) => {
+			// Console debug: help identify upstream serialization issues
+			// (Only logs if metadata marker is present)
+			if (hasMetaSuffix(card?.name) || hasMetaSuffix(card?.cardType)) {
+				console.warn('[DeckGet] Card contains @@@ metadata marker:', {
+					name: card?.name,
+					cardType: card?.cardType,
+					manaCost: card?.manaCost,
+					setCode: card?.setCode
+				});
+			}
+
+			return {
+				cardName: stripMetaSuffix(card.name),
 			quantity: card.quantity || 1,
 			setCode: card.setCode,
-			manaCost: card.manaCost,
-			cardType: card.cardType,
+			manaCost: stripMetaSuffix(card.manaCost),
+			cardType: stripMetaSuffix(card.cardType),
 			types: card.types || [],
 			colors: card.colors || [],
 			power: card.power,
 			toughness: card.toughness
-		}));
+			};
+		});
 	};
 
 	return {

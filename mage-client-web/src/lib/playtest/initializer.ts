@@ -24,6 +24,17 @@ export async function initializePlaytest(deckIds: string[]): Promise<PlaytestPla
 	const decks = await Promise.all(deckPromises);
 
 	console.log('[PlaytestInit] Decks loaded:', decks.map(d => d.name));
+	console.log('[PlaytestInit] Deck meta sample:', decks.map(d => ({
+		id: d.id,
+		name: d.name,
+		format: d.format,
+		mainDeckCount: d.mainDeck.length,
+		firstCard: d.mainDeck[0] ? {
+			cardName: d.mainDeck[0].cardName,
+			cardType: d.mainDeck[0].cardType,
+			manaCost: d.mainDeck[0].manaCost
+		} : null
+	})));
 
 	// Create players from decks
 	const players: PlaytestPlayer[] = decks.map((deck, index) => 
@@ -118,6 +129,13 @@ function createPlayerFromDeck(deck: Deck, playerNumber: number): PlaytestPlayer 
 /**
  * Create a CardView from deck card data
  */
+function normalizeCardName(rawName: string): string {
+	if (!rawName) return '';
+	// Some upstream sources encode extra metadata after "@@@"
+	// Example: "Swamp@@@<meta>" → "Swamp"
+	return rawName.split('@@@')[0].trim();
+}
+
 function createCardView(
 	ownerId: string,
 	cardName: string,
@@ -130,17 +148,25 @@ function createCardView(
 	},
 	index: number
 ): CardView {
+	const cleanedName = normalizeCardName(cardName);
+
+	const rawPower = deckCard.power || '';
+	const rawToughness = deckCard.toughness || '';
+	const isLand = (deckCard.cardType || '').toLowerCase().includes('land');
+	const power = isLand && rawPower === '0' && rawToughness === '0' ? '' : rawPower;
+	const toughness = isLand && rawPower === '0' && rawToughness === '0' ? '' : rawToughness;
+
 	return {
 		id: `${ownerId}-card-${index}`,
-		name: cardName,
-		displayName: cardName,
+		name: cleanedName,
+		displayName: cleanedName,
 		manaCost: deckCard.manaCost || '',
 		type: deckCard.cardType || '',
 		subTypes: '',
 		superTypes: '',
 		color: (deckCard.colors || []).join(''),
-		power: deckCard.power || '',
-		toughness: deckCard.toughness || '',
+		power,
+		toughness,
 		loyalty: '',
 		cardNumber: 0,
 		expansionSetCode: '',
