@@ -97,7 +97,21 @@ mage-server-go/
    make migrate-up
    ```
 
-6. **Generate Protocol Buffer code:**
+6. **Import card data from Scryfall:**
+   ```bash
+   # Download latest Scryfall bulk data
+   ./scripts/download_scryfall_bulk.sh
+   
+   # Import into database
+   go run ./cmd/scryfall-import/main.go \
+     --input=./data/scryfall-all-cards-latest.json \
+     --lang=en --skip-tokens=true --batch=1000
+   ```
+   
+   Note: Card data is now sourced from [Scryfall](https://scryfall.com/) instead of H2 exports.
+   See [`docker-initdb/README.md`](docker-initdb/README.md) for migration details.
+
+7. **Generate Protocol Buffer code:**
    ```bash
    make proto
    ```

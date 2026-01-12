@@ -2,6 +2,7 @@ package cards
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/google/uuid"
@@ -28,6 +29,12 @@ func Register(cardName string, builder CardBuilder) {
 	Registry.register(cardName, builder)
 }
 
+// RegisterSplitCard registers a split/DFC card under both its combined name and individual face names
+// Example: RegisterSplitCard("Fire // Ice", []string{"Fire", "Ice"}, builder)
+func RegisterSplitCard(fullName string, faceNames []string, builder CardBuilder) {
+	Registry.registerSplitCard(fullName, faceNames, builder)
+}
+
 func (r *cardRegistry) register(cardName string, builder CardBuilder) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -40,13 +47,70 @@ func (r *cardRegistry) register(cardName string, builder CardBuilder) {
 	r.builders[cardName] = builder
 }
 
+func (r *cardRegistry) registerSplitCard(fullName string, faceNames []string, builder CardBuilder) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	// Register under full name
+	r.builders[fullName] = builder
+
+	// Register under each face name
+	for _, faceName := range faceNames {
+		if faceName != "" {
+			r.builders[faceName] = builder
+		}
+	}
+}
+
 // Get retrieves a card builder by name
+// Handles split/DFC card names by trying multiple variations:
+// 1. Exact match (e.g., "Fire // Ice")
+// 2. First face only (e.g., "Fire" for "Fire // Ice")
+// 3. Second face only (e.g., "Ice" for "Fire // Ice")
 func (r *cardRegistry) Get(cardName string) (CardBuilder, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	builder, ok := r.builders[cardName]
-	return builder, ok
+	// Try exact match first
+	if builder, ok := r.builders[cardName]; ok {
+		return builder, true
+	}
+
+	// Try normalizing split/DFC card names
+	// Handle "Fire // Ice" or "Fire / Ice" formats
+	if strings.Contains(cardName, "//") {
+		parts := strings.Split(cardName, "//")
+		if len(parts) >= 2 {
+			// Try first face
+			firstFace := strings.TrimSpace(parts[0])
+			if builder, ok := r.builders[firstFace]; ok {
+				return builder, true
+			}
+			// Try second face
+			secondFace := strings.TrimSpace(parts[1])
+			if builder, ok := r.builders[secondFace]; ok {
+				return builder, true
+			}
+		}
+	}
+
+	// Try single slash format
+	if strings.Contains(cardName, " / ") {
+		normalized := strings.ReplaceAll(cardName, " / ", " // ")
+		if builder, ok := r.builders[normalized]; ok {
+			return builder, true
+		}
+		// Also try individual faces
+		parts := strings.Split(cardName, " / ")
+		if len(parts) >= 2 {
+			firstFace := strings.TrimSpace(parts[0])
+			if builder, ok := r.builders[firstFace]; ok {
+				return builder, true
+			}
+		}
+	}
+
+	return nil, false
 }
 
 // GetByClassName retrieves a card builder by Java class name

@@ -51,17 +51,28 @@ SQL
   done
 fi
 
-SEED_SQL="/docker-entrypoint-initdb.d/data/cards_seed.postgres.sql"
-if [[ -f "$SEED_SQL" ]]; then
-  echo "==> initdb: seeding cards via H2->SQL seed file: $SEED_SQL"
-  # This file is expected to be PostgreSQL-compatible SQL that:
-  # - creates/populates the Java-export tables (e.g. card, expansion)
-  # - migrates them into the Go server's cards table
-  psql_base -f "$SEED_SQL"
-  echo "==> initdb: card seeding complete"
-else
-  echo "WARNING: seed SQL not found at $SEED_SQL (cards will NOT be seeded)"
-  echo "         Generate it locally with: mage-server-go/scripts/build_postgres_seed_sql.sh"
-fi
+# NOTE: H2 data seeding is now deprecated in favor of Scryfall import
+# The old H2 seed file is no longer used. Instead, use the scryfall-import tool.
+#
+# To seed cards in a fresh database:
+# 1. Download Scryfall bulk data:
+#    ./scripts/download_scryfall_bulk.sh
+#
+# 2. Import Scryfall data:
+#    go run ./cmd/scryfall-import/main.go \
+#      --input=./data/scryfall-all-cards-latest.json \
+#      --lang=en --skip-tokens=true --batch=1000
+#
+# 3. Create the compatibility view (if needed):
+#    psql -U mage -d mage -f migrations/009_create_scryfall_tables.up.sql
+
+echo "==> initdb: Scryfall card import"
+echo "INFO: H2 seed data is no longer used"
+echo "INFO: Cards will be loaded from Scryfall data via scryfall-import tool"
+echo "INFO: Run the import manually after the database is initialized"
+echo ""
+echo "Quick start:"
+echo "  1. Download: ./scripts/download_scryfall_bulk.sh"
+echo "  2. Import: go run ./cmd/scryfall-import/main.go --input=./data/scryfall-all-cards-latest.json"
 
 echo "==> initdb: done"

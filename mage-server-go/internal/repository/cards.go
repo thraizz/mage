@@ -98,6 +98,7 @@ func (r *CardRepository) GetByID(ctx context.Context, id int64) (*Card, error) {
 }
 
 // GetByName retrieves cards by name
+// Handles both single-faced cards and multi-faced cards (DFC, split, etc.)
 func (r *CardRepository) GetByName(ctx context.Context, name string) ([]*Card, error) {
 	query := `
 		SELECT id,
@@ -118,7 +119,7 @@ func (r *CardRepository) GetByName(ctx context.Context, name string) ([]*Card, e
 		       COALESCE(card_class_name, ''),
 		       created_at
 		FROM cards
-		WHERE name = $1
+		WHERE name = $1 OR name LIKE $1 || ' //%'
 		ORDER BY set_code, card_number
 	`
 
@@ -147,6 +148,7 @@ func (r *CardRepository) GetByName(ctx context.Context, name string) ([]*Card, e
 }
 
 // GetByNameCaseInsensitive retrieves cards by name (case-insensitive)
+// Handles both single-faced cards and multi-faced cards (DFC, split, etc.)
 func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name string) ([]*Card, error) {
 	// Trim and normalize the input name
 	name = strings.TrimSpace(name)
@@ -175,7 +177,8 @@ func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name stri
 		       COALESCE(card_class_name, ''),
 		       created_at
 		FROM cards
-		WHERE LOWER(TRIM(name)) = LOWER(TRIM($1))
+		WHERE LOWER(TRIM(name)) = LOWER(TRIM($1)) 
+		   OR LOWER(name) LIKE LOWER($1) || ' //%'
 		ORDER BY set_code, card_number
 	`
 

@@ -1,4 +1,0 @@
-[submodule "upstream/mage-upstream"]
-	path = upstream/mage-upstream
-	url = https://github.com/magefree/mage.git
-	ignore = dirty

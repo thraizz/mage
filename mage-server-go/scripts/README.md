@@ -1,111 +1,57 @@
 # MAGE Scripts Guide
 
-This directory contains various scripts for working with the MAGE project.
+This directory contains various scripts for working with the MAGE Go server.
 
-## Card Transpilation Scripts
+## Scryfall Card Data Scripts
 
-### Main Scripts (Use These)
+MAGE now uses Scryfall bulk data instead of the legacy XMage Java system.
 
-**`transpile_cards.py`** - The main transpiler script
-Converts Java card implementations to Go code.
+### Download Latest Scryfall Data
 
-```bash
-# Transpile a single card
-python3 scripts/transpile_cards.py --card=LightningBolt
-
-# Transpile all cards
-python3 scripts/transpile_cards.py --batch
-
-# Transpile first 1000 cards
-python3 scripts/transpile_cards.py --batch --limit=1000
-
-# Specify output location and stats file
-python3 scripts/transpile_cards.py --batch \
-  --output=internal/game/cards/generated \
-  --stats=transpile_stats.json
-```
-
-**`batch_transpile.sh`** - Shell wrapper for batch transpilation
-Uses the Python transpiler in batch mode with statistics tracking.
+**`download_scryfall_bulk.sh`** - Download the latest Scryfall "All Cards" bulk data
 
 ```bash
-# Transpile all cards
-./scripts/batch_transpile.sh
-
-# Transpile first 50 cards (for testing)
-./scripts/batch_transpile.sh 50
-
-# Transpile first 1000 cards
-./scripts/batch_transpile.sh 1000
+./scripts/download_scryfall_bulk.sh
 ```
 
-**Output:**
-- Generated Go files: `internal/game/cards/generated/*.go`
-- Statistics: `transpile_stats.json` (includes error breakdown and TODO analysis)
-- Log: `transpile_results.log`
+Downloads to: `mage-server-go/data/scryfall-all-cards-YYYYMMDD.json`
 
-**`test_transpile_coverage.py`** - Test that transpiler finds all Java cards
+### Migrate to Scryfall
 
-Verifies that the transpiler processes all Java card files (either successfully or with errors).
+**`migrate_to_scryfall.sh`** - Full migration from XMage to Scryfall
 
 ```bash
-# Test all cards (takes a long time - 30,000+ cards)
-python3 scripts/test_transpile_coverage.py
-
-# Test first 100 cards (quick check)
-python3 scripts/test_transpile_coverage.py --limit=100
-
-# Test random sample of 50 cards
-python3 scripts/test_transpile_coverage.py --sample=50
-
-# Save results to JSON file
-python3 scripts/test_transpile_coverage.py --limit=1000 --json=test_results.json
+./scripts/migrate_to_scryfall.sh
 ```
 
-**What it tests:**
-- Scans Java directory for all `.java` card files
-- Runs transpiler on each file
-- Verifies all cards were processed (successfully or with errors)
-- Reports any cards that were completely missed
+This script:
+1. Applies database migrations
+2. Downloads latest Scryfall data (if needed)
+3. Imports cards to PostgreSQL
+4. Creates compatibility views
+5. Verifies the migration
 
-**Output:**
-- Reports total cards found vs processed
-- Lists missing cards (if any)
-- Shows failure breakdown by error type
-- Exit code: 0 if all cards processed, 1 if any missing
+See `SCRYFALL_MIGRATION_GUIDE.md` for details.
 
-**`analyze_transpile_stats.py`** - Analyze transpilation statistics
+### Rollback from Scryfall
 
-View and query statistics from `transpile_stats.json`:
+**`rollback_from_scryfall.sh`** - Revert to XMage data (if needed)
 
 ```bash
-# Show full analysis
-python3 scripts/analyze_transpile_stats.py
-
-# Show summary only
-python3 scripts/analyze_transpile_stats.py --summary
-
-# Show TODO analysis
-python3 scripts/analyze_transpile_stats.py --todos
-
-# Show error details
-python3 scripts/analyze_transpile_stats.py --errors
-
-# Export failed cards to CSV
-python3 scripts/analyze_transpile_stats.py --export-csv failed_cards.csv
+./scripts/rollback_from_scryfall.sh
 ```
 
-## Database Scripts
+Restores the old `cards_xmage_backup` table.
 
-**`build_sqlite_card_db.sh`** - Build SQLite database from card data
+## Database Migration Scripts
 
-**`import_to_postgres.sh`** - Import card data to PostgreSQL
+**`run_postgres_migrations.sh`** - Apply database migrations
 
-**`import_to_sqlite.sh`** - Import card data to SQLite
+```bash
+./scripts/run_postgres_migrations.sh
+```
 
-**`h2_to_sql.sh`** - Convert H2 database to SQL
-
-**`export_java_cards.sh`** - Export Java card metadata
+Applies all pending migrations from the `migrations/` directory.
 
 ## Protobuf Scripts
 
@@ -117,86 +63,101 @@ make proto  # Preferred - use the Makefile target
 ./scripts/generate_proto.sh
 ```
 
-## Understanding Transpile Statistics
+Generates gRPC/protobuf Go code from `.proto` files in `api/`.
 
-The `transpile_stats.json` file provides detailed information about the transpilation process:
+## Production Scripts
 
-```json
-{
-  "timestamp": "2025-11-23T11:00:13.600246",
-  "summary": {
-    "total": 1000,
-    "successful": 994,
-    "failed": 6,
-    "success_rate": "99.40%"
-  },
-  "error_categories": {
-    "ParseError": {
-      "count": 6,
-      "cards": ["Card1", "Card2", ...]
-    }
-  },
-  "failed_cards": [
-    {
-      "card_name": "CardName",
-      "java_file": "/path/to/Card.java",
-      "error_type": "ParseError",
-      "error_message": "Could not find class name..."
-    }
-  ]
-}
+See the root directory for production deployment scripts:
+
+- `deploy.sh` - Deploy full application to production
+- `update-cards-prod.sh` - Update only card data on production
+- `update-cards-weekly.sh` - Automated weekly card updates
+
+## Scryfall Importer
+
+The Scryfall importer is a Go application located at `cmd/scryfall-import/`.
+
+### Usage
+
+```bash
+# Import from local file
+go run ./cmd/scryfall-import/main.go \
+  --input=/path/to/scryfall-all-cards.json \
+  --lang=en \
+  --skip-tokens=true \
+  --batch=1000
+
+# Or set DATABASE_URL directly
+DATABASE_URL='postgres://user:pass@localhost:5432/mage?sslmode=disable' \
+  go run ./cmd/scryfall-import/main.go \
+  --input=/path/to/scryfall-all-cards.json
 ```
 
-### Common Error Types
+### Options
 
-- **ParseError**: Failed to parse Java file (usually missing class name or unsupported card type)
-- **ValueError**: Invalid card data or missing required fields
-- **IOError**: File system issues
+- `--input` - Path to Scryfall JSON file
+- `--lang` - Language filter (default: "en")
+- `--skip-tokens` - Skip token cards (recommended)
+- `--batch` - Batch size for inserts (default: 1000)
 
 ## Workflow
 
-### Full Transpilation Workflow
+### Initial Setup
 
 ```bash
-# 1. Clean previous transpilation
-rm -rf internal/game/cards/generated
-rm transpile_stats.json
+# 1. Run database migrations
+./scripts/run_postgres_migrations.sh
 
-# 2. Run batch transpilation
-./scripts/batch_transpile.sh
+# 2. Download and import Scryfall data
+./scripts/migrate_to_scryfall.sh
+```
 
-# 3. Check results
-cat transpile_stats.json | python3 -m json.tool
+### Update Card Data
 
-# 4. Test compilation
-go build ./internal/game/cards/generated/...
+```bash
+# Local development
+./scripts/download_scryfall_bulk.sh
+./scripts/migrate_to_scryfall.sh
 
-# 5. Fix errors if needed
-# Check failed_cards in transpile_stats.json
-# Update transpile_cards.py to handle new patterns
+# Production
+cd ../../  # Back to root
+./update-cards-prod.sh --download
 ```
 
 ### Development Workflow
 
 ```bash
-# 1. Make changes to transpile_cards.py
+# 1. Make changes to database schema
+vim migrations/NNN_description.up.sql
+vim migrations/NNN_description.down.sql
 
-# 2. Test with sample cards
-./scripts/batch_transpile.sh 50  # Quick test with 50 cards
+# 2. Apply migrations
+./scripts/run_postgres_migrations.sh
 
-# 3. Check for errors
-cat transpile_stats.json
+# 3. Test
+go test ./...
 
-# 4. If good, test with more cards
-./scripts/batch_transpile.sh 1000  # Test with 1000
-
-# 5. Then full transpilation
-./scripts/batch_transpile.sh
+# 4. Deploy
+cd ../../
+./deploy.sh
 ```
 
-## Performance Notes
+## Documentation
 
-- **Python batch mode**: ~200x faster than shell-based transpilation
-- **1000 cards**: ~15 seconds
-- **50,000+ cards**: ~10 minutes
-- Stats tracking adds negligible overhead (~1%)
+- **SCRYFALL_MIGRATION_GUIDE.md** - User guide for Scryfall data
+- **DATA_MIGRATION.md** - Technical migration details
+- **SCRYFALL_DFC_CARDS.md** - Double-faced card handling
+- **PRODUCTION_CARD_UPDATES.md** - Production update guide
+- **QUICK_REFERENCE.md** - Command reference
+
+## Legacy XMage System (Removed)
+
+The legacy XMage/Java-based card import system has been removed. If you need to access the old system:
+
+```bash
+# Check out the commit before Scryfall migration
+git log --all --oneline --grep="Scryfall"
+git checkout <commit-before-migration>
+```
+
+All Maven, Java, and XMage dependencies have been removed from the project.

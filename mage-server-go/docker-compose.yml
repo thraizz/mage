@@ -12,7 +12,11 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./migrations:/docker-entrypoint-initdb.d
+      # Mount init script and migrations for database initialization
+      - ./docker-initdb:/docker-entrypoint-initdb.d:ro
+      - ./migrations:/docker-entrypoint-initdb.d/migrations:ro
+      # Mount data directory for Scryfall imports
+      - ./data:/docker-entrypoint-initdb.d/data:ro
     ports:
       - "5432:5432"
     healthcheck:
@@ -41,6 +45,10 @@ services:
       - "9090:9090"    # Metrics
     volumes:
       - ./config/config.yaml:/app/config/config.yaml:ro
+      # Mount data directory for Scryfall imports
+      - ./data:/app/data:rw
+      # Mount scripts directory for running import scripts
+      - ./scripts:/app/scripts:ro
     networks:
       - mage-network
     restart: unless-stopped
