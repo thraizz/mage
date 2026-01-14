@@ -896,7 +896,8 @@ function createPlaytestGameStore() {
 		clearSessions: (): void => clearPlaytestSessions(),
 		// Log API methods
 		clearLog,
-		addLog
+		addLog,
+		buildLogText
 	};
 }
 

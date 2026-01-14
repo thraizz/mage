@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { goto, beforeNavigate } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { gameStore } from '$lib/stores/game';
 	import {
 		playtestGameStore,
@@ -29,6 +29,7 @@
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import Clock from '@lucide/svelte/icons/clock';
+	import Copy from '@lucide/svelte/icons/copy';
 	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
 	import {
 		dragDropStore,
@@ -67,6 +68,9 @@
 	const dragPos = $derived($dragPosition);
 	const isOverValidDrop = $derived($isOverValidDropZone);
 	const dropZone = $derived($currentDropZone);
+
+	// Game log
+	const gameLog = $derived($playtestGameStore.log || []);
 
 	// Drop zone elements
 	let battlefieldDropZoneEl: HTMLDivElement | null = $state(null);
@@ -168,6 +172,19 @@
 	);
 
 	/**
+	 * Update the URL with playtestId parameter
+	 */
+	async function updateUrlWithPlaytestId(playtestId: string): Promise<void> {
+		const newSearchParams = new URLSearchParams($page.url.searchParams);
+		newSearchParams.set('playtestId', playtestId);
+		await goto(`${$page.url.pathname}?${newSearchParams.toString()}`, {
+			replaceState: true,
+			noScroll: true,
+			keepFocus: true
+		});
+	}
+
+	/**
 	 * Initialize playtest from URL params
 	 */
 	async function initializeFromUrl(): Promise<void> {
@@ -192,7 +209,7 @@
 			syncPlaytestToGameStore();
 
 			// Set playtestId in URL
-			$page.url.searchParams.set('playtestId', gameId);
+			await updateUrlWithPlaytestId(gameId);
 
 			// Start mulligan phase for first player
 			mulliganPlayerIndex = 0;
@@ -517,6 +534,40 @@
 	}
 
 	/**
+	 * Copy game log to clipboard
+	 */
+	async function handleCopyLog(): Promise<void> {
+		const logText = playtestGameStore.buildLogText($playtestGameStore);
+		try {
+			if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+				await navigator.clipboard.writeText(logText);
+				toast.success('Game log copied to clipboard!');
+				return;
+			}
+			// Fallback for older browsers
+			const textarea = document.createElement('textarea');
+			textarea.value = logText;
+			textarea.style.position = 'fixed';
+			textarea.style.top = '0';
+			textarea.style.left = '0';
+			textarea.style.opacity = '0';
+			document.body.appendChild(textarea);
+			textarea.focus();
+			textarea.select();
+			const ok = document.execCommand('copy');
+			document.body.removeChild(textarea);
+			if (ok) {
+				toast.success('Game log copied to clipboard!');
+			} else {
+				toast.error('Failed to copy log');
+			}
+		} catch (err) {
+			console.error('Failed to copy log to clipboard:', err);
+			toast.error('Failed to copy log');
+		}
+	}
+
+	/**
 	 * Handle keyboard shortcuts
 	 */
 	function handleGlobalKeydown(event: KeyboardEvent): void {
@@ -684,7 +735,7 @@
 	/**
 	 * Restore a specific session
 	 */
-	function restoreSession(sessionId: string): void {
+	async function restoreSession(sessionId: string): Promise<void> {
 		const success = playtestGameStore.restoreSession(sessionId);
 		if (success) {
 			loading = false;
@@ -700,7 +751,7 @@
 			syncPlaytestToGameStore();
 
 			// Set playtestId in URL
-			$page.url.searchParams.set('playtestId', $playtestGameStore.gameId);
+			await updateUrlWithPlaytestId($playtestGameStore.gameId);
 
 			toast.success('Session restored');
 		} else {
@@ -717,13 +768,28 @@
 		toast.info('Session deleted');
 	}
 
-	function initializeFromPlaytestId(): void {
+	async function initializeFromPlaytestId(): Promise<void> {
 		const playtestId = $page.url.searchParams.get('playtestId');
 		if (playtestId) {
-			playtestGameStore.restoreSession(playtestId);
+			const success = playtestGameStore.restoreSession(playtestId);
+			if (success) {
+				loading = false;
 
-			// Set playtestId in URL
-			$page.url.searchParams.set('playtestId', playtestId);
+				// Restore mulligan phase based on first player who hasn't kept.
+				const idx = players.findIndex((p) => !p.keptHand);
+				mulliganPlayerIndex = idx === -1 ? null : idx;
+				mulliganCount = 0;
+
+				// Ensure the normal game store is initialized for shared components.
+				gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
+				syncPlaytestToGameStore();
+
+				// URL already has playtestId, but ensure it's set correctly
+				await updateUrlWithPlaytestId(playtestId);
+			} else {
+				error = 'Failed to restore playtest session';
+				loading = false;
+			}
 		}
 	}
 
@@ -770,7 +836,7 @@
 			syncPlaytestToGameStore();
 
 			// Set playtestId in URL
-			$page.url.searchParams.set('playtestId', $playtestGameStore.gameId);
+			updateUrlWithPlaytestId($playtestGameStore.gameId);
 			return;
 		}
 
@@ -1432,6 +1498,44 @@
 <span class="dk">activePlayerId:</span> <span class="ds">"${$playtestGameStore.activePlayerId}"</span>
 <span class="dk">isInitialized:</span> <span class="db">${isInitialized}</span>`}</code
 									></pre>
+							</div>
+						</section>
+
+						<!-- Game State Log -->
+						<section class="debug-section">
+							<div class="debug-section-header">
+								<span>Game State Log ({gameLog.length} events)</span>
+								<button
+									class="debug-copy-btn"
+									onclick={handleCopyLog}
+									title="Copy log to clipboard"
+									aria-label="Copy log to clipboard"
+								>
+									<Copy size={16} aria-hidden="true" />
+									<span>Copy</span>
+								</button>
+							</div>
+							<div class="debug-log-container">
+								{#if gameLog.length === 0}
+									<div class="debug-log-empty">No events logged yet</div>
+								{:else}
+									<div class="debug-log-entries">
+										{#each gameLog as entry (entry.id)}
+											<div class="debug-log-entry">
+												<span class="debug-log-time">
+													{new Date(entry.at).toLocaleTimeString([], {
+														hour: '2-digit',
+														minute: '2-digit',
+														second: '2-digit'
+													})}
+												</span>
+												<span class="debug-log-turn">T{entry.turn}</span>
+												<span class="debug-log-kind">{entry.kind}</span>
+												<span class="debug-log-message">{entry.message}</span>
+											</div>
+										{/each}
+									</div>
+								{/if}
 							</div>
 						</section>
 
@@ -2292,6 +2396,7 @@
 	.debug-section-header {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: 0.5rem;
 		width: 100%;
 		padding: 0.75rem 1rem;
@@ -2406,6 +2511,91 @@
 	:global(.debug-code .dc) {
 		color: #6a9955;
 		font-style: italic;
+	}
+
+	/* Game State Log Styles */
+	.debug-log-container {
+		max-height: 400px;
+		overflow-y: auto;
+		background: #0d0d0d;
+		padding: 0.75rem 1rem;
+	}
+
+	.debug-log-empty {
+		color: #6b7280;
+		font-style: italic;
+		padding: 1rem;
+		text-align: center;
+	}
+
+	.debug-log-entries {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.debug-log-entry {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.5rem;
+		font-size: 0.75rem;
+		line-height: 1.4;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.debug-log-entry:last-child {
+		border-bottom: none;
+	}
+
+	.debug-log-time {
+		color: #6b7280;
+		min-width: 70px;
+		font-size: 0.6875rem;
+	}
+
+	.debug-log-turn {
+		color: #9cdcfe;
+		min-width: 30px;
+		font-weight: 600;
+	}
+
+	.debug-log-kind {
+		color: #ce9178;
+		min-width: 80px;
+		text-transform: uppercase;
+		font-size: 0.6875rem;
+		font-weight: 600;
+	}
+
+	.debug-log-message {
+		color: #d4d4d4;
+		flex: 1;
+	}
+
+	.debug-copy-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.375rem 0.75rem;
+		background: rgba(102, 126, 234, 0.2);
+		border: 1px solid rgba(102, 126, 234, 0.4);
+		border-radius: 4px;
+		color: #667eea;
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.debug-copy-btn:hover {
+		background: rgba(102, 126, 234, 0.3);
+		border-color: rgba(102, 126, 234, 0.6);
+	}
+
+	.debug-copy-btn span {
+		font-family: inherit;
 	}
 
 	/* Session Picker Styles */
@@ -2543,10 +2733,5 @@
 		justify-content: flex-end;
 		padding-top: 1rem;
 		border-top: 1px solid #2a3441;
-	}
-
-	.session-picker-overlay {
-		background: white;
-		color: black;
 	}
 </style>
