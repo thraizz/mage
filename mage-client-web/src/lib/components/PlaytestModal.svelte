@@ -28,6 +28,26 @@
 	let starting = $state(false);
 
 	/**
+	 * Get an unchosen deck from available decks
+	 */
+	function getUnchosenDeck(): string | null {
+		const chosen = new Set(selectedDecks.filter((id): id is string => id !== null));
+		const unchosen = availableDecks.find(deck => !chosen.has(deck.id));
+		return unchosen?.id ?? null;
+	}
+
+	/**
+	 * Prepopulate deck slots with unchosen decks
+	 */
+	function prepopulateDeckSlots(): void {
+		for (let i = 0; i < playerCount; i++) {
+			if (selectedDecks[i] === null) {
+				selectedDecks[i] = getUnchosenDeck();
+			}
+		}
+	}
+
+	/**
 	 * Load all available decks
 	 */
 	async function loadDecks(): Promise<void> {
@@ -37,12 +57,7 @@
 			availableDecks = await fetchUserDecks();
 			
 			// Auto-select first available decks if we have any
-			if (availableDecks.length > 0) {
-				selectedDecks[0] = availableDecks[0].id;
-				if (availableDecks.length > 1) {
-					selectedDecks[1] = availableDecks[1].id;
-				}
-			}
+			prepopulateDeckSlots();
 		} catch (err) {
 			console.error('Failed to load decks:', err);
 			deckError = err instanceof Error ? err.message : 'Failed to load decks';
@@ -122,6 +137,17 @@
 			loadDecks();
 		} else {
 			resetForm();
+		}
+	});
+
+	/**
+	 * Prepopulate deck slots when player count changes
+	 */
+	$effect(() => {
+		// React to playerCount changes
+		void playerCount;
+		if (open && availableDecks.length > 0) {
+			prepopulateDeckSlots();
 		}
 	});
 </script>

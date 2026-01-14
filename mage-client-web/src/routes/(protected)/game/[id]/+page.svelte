@@ -44,21 +44,21 @@
 	} from '$lib/api/game';
 	import { CardActionType, type CardView } from '$lib/generated/mage/v1/models';
 	import {
-	tapUntap,
-	untapAll,
-	flipCard,
-	transformCard,
-	moveCard as moveCardToZone,
-	modifyCardCounter,
-	drawCards,
-	shuffleLibrary,
-	nextTurn,
-	searchLibrary,
-	addToStack,
-	removeFromStack,
-	modifyLife,
-	setPlayerCounter
-} from '$lib/api/direct-actions';
+		tapUntap,
+		untapAll,
+		flipCard,
+		transformCard,
+		moveCard as moveCardToZone,
+		modifyCardCounter,
+		drawCards,
+		shuffleLibrary,
+		nextTurn,
+		searchLibrary,
+		addToStack,
+		removeFromStack,
+		modifyLife,
+		setPlayerCounter
+	} from '$lib/api/direct-actions';
 	import type { GameCard, GamePhase } from '$lib/types/game';
 	import {
 		dragDropStore,
@@ -85,7 +85,7 @@
 	import ManaPool from '$lib/components/game/ManaPool.svelte';
 	import GameHeader from '$lib/components/game/GameHeader.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
-	
+
 	import PriorityActionBar from '$lib/components/game/PriorityActionBar.svelte';
 	import ActionLogOverlay from '$lib/components/game/ActionLogOverlay.svelte';
 	import GameChatOverlay from '$lib/components/game/GameChatOverlay.svelte';
@@ -94,28 +94,45 @@
 	import ManaPayment from '$lib/components/game/ManaPayment.svelte';
 	import XManaSelector from '$lib/components/game/XManaSelector.svelte';
 	import LibrarySearch from '$lib/components/game/LibrarySearch.svelte';
-	import type { GamePlayManaData, GamePlayXManaData, GameAssignDamageData } from '$lib/generated/mage/v1/websocket';
+	import type {
+		GamePlayManaData,
+		GamePlayXManaData,
+		GameAssignDamageData
+	} from '$lib/generated/mage/v1/websocket';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
-	
+
 	// Combat components
 	import DeclareAttackers from '$lib/components/game/DeclareAttackers.svelte';
 	import DeclareBlockers from '$lib/components/game/DeclareBlockers.svelte';
 	import AssignDamage from '$lib/components/game/AssignDamage.svelte';
-	
+
 	// Direct player control components
 	import CardContextMenu from '$lib/components/game/CardContextMenu.svelte';
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import VisualStack from '$lib/components/game/VisualStack.svelte';
 	import RollbackConsentDialog from '$lib/components/game/RollbackConsentDialog.svelte';
 	import { requestRollback, respondToRollback } from '$lib/api/game';
-	import { combatStore, isInCombat, canAttackCardIds, declaredAttackerIds, canBlockCardIds, assignedBlockerIds } from '$lib/stores/combat';
+	import {
+		combatStore,
+		isInCombat,
+		canAttackCardIds,
+		declaredAttackerIds,
+		canBlockCardIds,
+		assignedBlockerIds
+	} from '$lib/stores/combat';
 	import { visualStackStore, visualStackIsOpen, visualStackCount } from '$lib/stores/visual-stack';
-	import { parseCombatOptions, type DeclaredAttacker, type DefenderTarget, type DamageAssignmentPrompt, type ParsedCombatOptions } from '$lib/types/combat';
+	import {
+		parseCombatOptions,
+		type DeclaredAttacker,
+		type DefenderTarget,
+		type DamageAssignmentPrompt,
+		type ParsedCombatOptions
+	} from '$lib/types/combat';
 
 	// Page data from load function
 	const { data } = $props();
-	
+
 	// Game ID from load function (more reliable than accessing $page.params directly)
 	const gameId = $derived(data.gameId);
 
@@ -127,12 +144,12 @@
 	let showKeyboardShortcuts = $state(false);
 	let showLifeMenu = $state(false);
 	let lifeMenuEl: HTMLDivElement | null = $state(null);
-	
+
 	// Context menu state
-	let contextMenuCard = $state<typeof battlefieldCards[0] | null>(null);
+	let contextMenuCard = $state<(typeof battlefieldCards)[0] | null>(null);
 	let contextMenuPosition = $state({ x: 0, y: 0 });
 	let actionLogRef = $state<ActionLogOverlay | undefined>(undefined);
-	
+
 	// Hovered card tracking for keyboard shortcuts
 	let hoveredCardId = $state<string | null>(null);
 	let gameChatRef = $state<GameChatOverlay | undefined>(undefined);
@@ -169,7 +186,7 @@
 	const damageAssignmentPrompt = $derived<DamageAssignmentPrompt | null>(() => {
 		if (!prompt) return null;
 		// Check if this is a damage assignment prompt (sent as 'assignDamage' type)
-		if ((prompt as {type: string}).type === 'assignDamage') {
+		if ((prompt as { type: string }).type === 'assignDamage') {
 			return prompt.data as DamageAssignmentPrompt;
 		}
 		return null;
@@ -177,7 +194,7 @@
 
 	// Drag-drop state (from store)
 	const isDragging = $derived($isDraggingStore);
-	 
+
 	const dragCardId = $derived($draggedCardId);
 	const dragCardName = $derived($draggedCardName);
 	const dragPos = $derived($dragPosition);
@@ -195,7 +212,7 @@
 	let exileDropZoneUnregister: (() => void) | null = null;
 	let handDropZoneUnregister: (() => void) | null = null;
 	let visualStackDropZoneUnregister: (() => void) | null = null;
-	
+
 	// Battlefield drag state
 	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
 	let battlefieldIsDragPending = $state(false);
@@ -210,7 +227,7 @@
 	// Mulligan state
 	let mulliganCount = $state(0);
 	let isMulliganLoading = $state(false);
-	
+
 	// Guard to prevent double initialization
 	let isInitializing = $state(false);
 
@@ -222,7 +239,7 @@
 	const allPlayers = $derived($players);
 	const me = $derived($localPlayer);
 	const otherPlayers = $derived($opponents);
-	
+
 	// Ensure opponentExpanded has entries for all opponents (fixes bind:expanded with undefined)
 	$effect(() => {
 		for (const p of otherPlayers) {
@@ -231,7 +248,7 @@
 			}
 		}
 	});
-	
+
 	const myCards = $derived($myHand);
 	const myGrave = $derived($myGraveyard);
 	const myExile = $derived($exile);
@@ -242,7 +259,9 @@
 	const turn = $derived($currentTurn);
 	const battlefieldCards = $derived($battlefield);
 	// Hovered card (for keyboard shortcuts) - derived after battlefieldCards is defined
-	const hoveredCard = $derived(hoveredCardId ? battlefieldCards.find(c => c.id === hoveredCardId) : null);
+	const hoveredCard = $derived(
+		hoveredCardId ? battlefieldCards.find((c) => c.id === hoveredCardId) : null
+	);
 	const stackCards = $derived($stack);
 	const commandCards = $derived($command);
 	const prompt = $derived($pendingPrompt);
@@ -250,7 +269,7 @@
 	const gameWinner = $derived($winner);
 	const error = $derived($gameError);
 	const loading = $derived($isLoading);
-	
+
 	// Visual stack state (client-side only)
 	const showVisualStack = $derived($visualStackIsOpen);
 	const visualStackItemCount = $derived($visualStackCount);
@@ -259,9 +278,7 @@
 	const pendingRollbackRequest = $derived(gameState.pendingRollbackRequest);
 
 	// Player name map for display
-	const playerNames = $derived(
-		new Map(allPlayers.map((p) => [p.playerId, p.name]))
-	);
+	const playerNames = $derived(new Map(allPlayers.map((p) => [p.playerId, p.name])));
 
 	// Mulligan phase detection - use server-provided value
 	const isMulliganPhase = $derived(
@@ -272,26 +289,20 @@
 	const hasKeptHand = $derived(me?.keptHand ?? false);
 
 	// Is it the local player's turn?
-	const isYourTurn = $derived(
-		gameState.gameView?.activePlayerId === localPlayerId
-	);
+	const isYourTurn = $derived(gameState.gameView?.activePlayerId === localPlayerId);
 
 	// Does the local player have any available actions? (server-computed)
 	const myHasAvailableActions = $derived(me?.hasAvailableActions ?? false);
 
 	// Get active player name - use server-provided value
-	const activePlayerName = $derived(
-		gameState.gameView?.activePlayerName || 'Unknown'
-	);
+	const activePlayerName = $derived(gameState.gameView?.activePlayerName || 'Unknown');
 
 	// Game format - use server-provided value
-	const gameFormat = $derived(
-		gameState.gameView?.gameFormat || 'Game'
-	);
+	const gameFormat = $derived(gameState.gameView?.gameFormat || 'Game');
 
 	// Priority player name - who currently has priority
 	const priorityPlayerName = $derived(
-		gameState.gameView?.priorityPlayerId 
+		gameState.gameView?.priorityPlayerId
 			? playerNames.get(gameState.gameView.priorityPlayerId) || gameState.gameView.priorityPlayerId
 			: ''
 	);
@@ -318,38 +329,38 @@
 	/**
 	 * Convert phase/step string to GamePhase type
 	 * Maps server step names to client phase keys for PhaseIndicator
-	 * 
+	 *
 	 * Server sends steps like: UNTAP, UPKEEP, DRAW, MAIN1, BEGIN_COMBAT, etc.
 	 * Client expects: UNTAP, UPKEEP, DRAW, PRECOMBAT_MAIN, COMBAT, etc.
 	 */
 	function toGamePhase(phaseOrStep: string): GamePhase {
 		const mapping: Record<string, GamePhase> = {
 			// Direct matches (server step = client key)
-			'UNTAP': 'UNTAP',
-			'UPKEEP': 'UPKEEP',
-			'DRAW': 'DRAW',
-			'DECLARE_ATTACKERS': 'DECLARE_ATTACKERS',
-			'DECLARE_BLOCKERS': 'DECLARE_BLOCKERS',
-			'COMBAT_DAMAGE': 'COMBAT_DAMAGE',
-			'END': 'END',
-			'CLEANUP': 'CLEANUP',
-			
+			UNTAP: 'UNTAP',
+			UPKEEP: 'UPKEEP',
+			DRAW: 'DRAW',
+			DECLARE_ATTACKERS: 'DECLARE_ATTACKERS',
+			DECLARE_BLOCKERS: 'DECLARE_BLOCKERS',
+			COMBAT_DAMAGE: 'COMBAT_DAMAGE',
+			END: 'END',
+			CLEANUP: 'CLEANUP',
+
 			// Server step names that need mapping to client keys
-			'MAIN1': 'PRECOMBAT_MAIN',
-			'BEGIN_COMBAT': 'COMBAT',
-			'END_COMBAT': 'END_OF_COMBAT',
-			'MAIN2': 'POSTCOMBAT_MAIN',
-			
+			MAIN1: 'PRECOMBAT_MAIN',
+			BEGIN_COMBAT: 'COMBAT',
+			END_COMBAT: 'END_OF_COMBAT',
+			MAIN2: 'POSTCOMBAT_MAIN',
+
 			// Client-only keys (for backwards compatibility)
-			'BEGINNING': 'BEGINNING',
-			'PRECOMBAT_MAIN': 'PRECOMBAT_MAIN',
-			'COMBAT': 'COMBAT',
-			'END_OF_COMBAT': 'END_OF_COMBAT',
-			'POSTCOMBAT_MAIN': 'POSTCOMBAT_MAIN',
-			'END_OF_TURN': 'END_OF_TURN',
-			
+			BEGINNING: 'BEGINNING',
+			PRECOMBAT_MAIN: 'PRECOMBAT_MAIN',
+			COMBAT: 'COMBAT',
+			END_OF_COMBAT: 'END_OF_COMBAT',
+			POSTCOMBAT_MAIN: 'POSTCOMBAT_MAIN',
+			END_OF_TURN: 'END_OF_TURN',
+
 			// Phase names (fallback when step not available)
-			'ENDING': 'END'
+			ENDING: 'END'
 		};
 		return mapping[phaseOrStep] || 'PRECOMBAT_MAIN';
 	}
@@ -360,7 +371,7 @@
 	function parseGameError(err: unknown): { title: string; message: string } {
 		const errorMsg = err instanceof Error ? err.message : String(err);
 		const lowerMsg = errorMsg.toLowerCase();
-		
+
 		// Game has ended (found in match history)
 		if (lowerMsg.includes('game has ended')) {
 			return {
@@ -368,7 +379,7 @@
 				message: 'This game has already finished. You can view your match history from the lobby.'
 			};
 		}
-		
+
 		// Game not found errors
 		if (lowerMsg.includes('game not found') || lowerMsg.includes('no game data')) {
 			return {
@@ -376,15 +387,16 @@
 				message: 'This game does not exist. The link may be invalid or the game was never created.'
 			};
 		}
-		
+
 		// Player not in game
 		if (lowerMsg.includes('not part of this game')) {
 			return {
 				title: 'Access Denied',
-				message: 'You are not a participant in this game. You may need to join as a spectator instead.'
+				message:
+					'You are not a participant in this game. You may need to join as a spectator instead.'
 			};
 		}
-		
+
 		// Session/auth errors
 		if (lowerMsg.includes('session') || lowerMsg.includes('login') || lowerMsg.includes('auth')) {
 			return {
@@ -392,15 +404,16 @@
 				message: 'Your session has expired. Please log in again to continue.'
 			};
 		}
-		
+
 		// WebSocket/connection errors
 		if (lowerMsg.includes('websocket') || lowerMsg.includes('connection')) {
 			return {
 				title: 'Connection Failed',
-				message: 'Unable to connect to the game server. Please check your internet connection and try again.'
+				message:
+					'Unable to connect to the game server. Please check your internet connection and try again.'
 			};
 		}
-		
+
 		// Default error
 		return {
 			title: 'Error Loading Game',
@@ -418,18 +431,18 @@
 			return;
 		}
 		isInitializing = true;
-		
+
 		// Read player ID directly from auth store to avoid timing issues with $derived
 		const playerId = $auth.user?.username || '';
-		
-		console.log('[GamePage] initializeGame called', { 
-			gameId, 
+
+		console.log('[GamePage] initializeGame called', {
+			gameId,
 			playerId,
 			localPlayerId,
 			authUser: $auth.user,
-			isAuthenticated: $auth.isAuthenticated 
+			isAuthenticated: $auth.isAuthenticated
 		});
-		
+
 		if (!playerId || !gameId) {
 			console.error('[GamePage] Missing player ID or game ID', { playerId, gameId });
 			isInitializing = false;
@@ -483,7 +496,7 @@
 			gameStore.setGameView(gameView);
 
 			// Initialize opponent expanded states
-			otherPlayers.forEach(p => {
+			otherPlayers.forEach((p) => {
 				opponentExpanded[p.playerId] = true;
 			});
 
@@ -572,7 +585,10 @@
 
 		const cardId = selectedIds[0];
 		console.log('[handleCastSpell] Looking for card:', cardId);
-		console.log('[handleCastSpell] myCards:', myCards.map(c => ({ id: c.id, name: c.name, type: c.type, actions: c.availableActions })));
+		console.log(
+			'[handleCastSpell] myCards:',
+			myCards.map((c) => ({ id: c.id, name: c.name, type: c.type, actions: c.availableActions }))
+		);
 
 		const card = myCards.find((c) => c.id === cardId);
 		if (!card) {
@@ -581,11 +597,20 @@
 			return;
 		}
 
-		console.log('[handleCastSpell] Found card:', { id: card.id, name: card.name, type: card.type, actions: card.availableActions });
+		console.log('[handleCastSpell] Found card:', {
+			id: card.id,
+			name: card.name,
+			type: card.type,
+			actions: card.availableActions
+		});
 
 		// Use server-provided availableActions to determine action type
-		const playLandAction = card.availableActions?.find(a => a.actionType === CardActionType.CARD_ACTION_PLAY_LAND);
-		const castSpellAction = card.availableActions?.find(a => a.actionType === CardActionType.CARD_ACTION_CAST_SPELL);
+		const playLandAction = card.availableActions?.find(
+			(a) => a.actionType === CardActionType.CARD_ACTION_PLAY_LAND
+		);
+		const castSpellAction = card.availableActions?.find(
+			(a) => a.actionType === CardActionType.CARD_ACTION_CAST_SPELL
+		);
 
 		// Check if action is enabled
 		if (playLandAction && !playLandAction.isEnabled) {
@@ -602,8 +627,17 @@
 		isActionLoading = true;
 		try {
 			// Use server-provided action type, fall back to type check for backward compatibility
-			const isLand = playLandAction !== undefined || (!castSpellAction && card.type.toLowerCase().includes('land'));
-			console.log('[handleCastSpell] isLand:', isLand, 'playLandAction:', !!playLandAction, 'castSpellAction:', !!castSpellAction);
+			const isLand =
+				playLandAction !== undefined ||
+				(!castSpellAction && card.type.toLowerCase().includes('land'));
+			console.log(
+				'[handleCastSpell] isLand:',
+				isLand,
+				'playLandAction:',
+				!!playLandAction,
+				'castSpellAction:',
+				!!castSpellAction
+			);
 
 			if (isLand) {
 				console.log('[handleCastSpell] Calling playLand with gameId:', gameId, 'cardId:', cardId);
@@ -625,7 +659,6 @@
 			isActionLoading = false;
 		}
 	}
-
 
 	/**
 	 * Play a card with optimistic UI update (used by drag-drop)
@@ -684,7 +717,7 @@
 		// Get the source zone from drag state
 		const dragState = get(dragDropStore);
 		const sourceZone = dragState.sourceZone;
-		
+
 		if (sourceZone === 'hand') {
 			// Playing from hand - use existing play logic
 			playCardOptimistic(cardId);
@@ -725,7 +758,7 @@
 	async function handleVisualStackDrop(cardId: string): Promise<void> {
 		console.log('[handleVisualStackDrop] Card dropped:', cardId);
 		if (!gameId) return;
-		
+
 		const card = getCardById(cardId);
 		try {
 			await addToStack(gameId, cardId);
@@ -743,7 +776,7 @@
 	async function handleStackItemRemove(itemId: string): Promise<void> {
 		console.log('[handleStackItemRemove] Removing stack item:', itemId);
 		if (!gameId) return;
-		
+
 		try {
 			await removeFromStack(gameId, itemId);
 			addLogEntry('Resolved stack item');
@@ -759,7 +792,7 @@
 	 */
 	async function handleZoneDrop(cardId: string, targetZone: DropZone): Promise<void> {
 		if (!gameId) return;
-		
+
 		console.log(`[handleZoneDrop] Moving card ${cardId} to ${targetZone}`);
 		try {
 			await moveCard(gameId, cardId, targetZone.toUpperCase());
@@ -776,7 +809,11 @@
 	 * Note: No priority check - players can always drag battlefield cards
 	 * to manage game state (e.g., moving destroyed creatures to graveyard)
 	 */
-	function handleBattlefieldCardMouseDown(cardId: string, cardName: string, event: MouseEvent): void {
+	function handleBattlefieldCardMouseDown(
+		cardId: string,
+		cardName: string,
+		event: MouseEvent
+	): void {
 		if (event.button !== 0) return; // Only left click
 
 		event.preventDefault();
@@ -897,19 +934,19 @@
 				handleUntapAll();
 				event.preventDefault();
 				return;
-			
+
 			case 'c':
 				// C - Draw a card from deck
 				handleDrawCard();
 				event.preventDefault();
 				return;
-			
+
 			case 'v':
 				// V - Shuffle your deck
 				handleShuffleLibrary();
 				event.preventDefault();
 				return;
-			
+
 			case 'm':
 				// M - Mulligan hand (only in mulligan phase)
 				if (isMulliganPhase && !hasKeptHand) {
@@ -917,32 +954,32 @@
 					event.preventDefault();
 				}
 				return;
-			
+
 			case 'b':
 				// B - Focus chat input
 				showChat = true;
 				// Focus will happen when chat opens
 				event.preventDefault();
 				return;
-			
+
 			case 'n':
 				// N - Next phase of turn
 				handleAdvancePhase();
 				event.preventDefault();
 				return;
-			
+
 			case 'e':
 				// E - End Turn (pass until next turn)
 				handleEndTurn();
 				event.preventDefault();
 				return;
-			
+
 			case 'w':
 				// W - Insert token or card (show token creator)
 				showTokenCreator = true;
 				event.preventDefault();
 				return;
-			
+
 			case 'f':
 				// F - Find a card in your main deck (search library)
 				handleSearchLibrary();
@@ -958,43 +995,43 @@
 					handleFlipCard(hoveredCard.id, hoveredCard.faceDown ?? false);
 					event.preventDefault();
 					return;
-				
+
 				case 'l':
 					// L - Alt/Default Face (Transform)
 					handleTransformCard(hoveredCard.id);
 					event.preventDefault();
 					return;
-				
+
 				case 'd':
 					// D - Send card to Graveyard
 					handleMoveCard(hoveredCard.id, 'GRAVEYARD');
 					event.preventDefault();
 					return;
-				
+
 				case 's':
 					// S - Send card to Exile
 					handleMoveCard(hoveredCard.id, 'EXILE');
 					event.preventDefault();
 					return;
-				
+
 				case 'r':
 					// R - Send card to hand
 					handleMoveCard(hoveredCard.id, 'HAND');
 					event.preventDefault();
 					return;
-				
+
 				case 't':
 					// T - Send card to top of Deck
 					handleMoveCard(hoveredCard.id, 'LIBRARY');
 					event.preventDefault();
 					return;
-				
+
 				case '.':
 					// . - Send card to bottom of Deck
 					handleMoveCard(hoveredCard.id, 'LIBRARY_BOTTOM');
 					event.preventDefault();
 					return;
-				
+
 				case 'u':
 					// U - Add +1/+1 counter
 					handleAddCounter(hoveredCard.id);
@@ -1037,7 +1074,7 @@
 	 */
 	async function handleDrawCard() {
 		if (isActionLoading || !gameId || !localPlayerId) return;
-		
+
 		isActionLoading = true;
 		try {
 			await drawCards(gameId, localPlayerId, 1);
@@ -1056,7 +1093,7 @@
 	 */
 	async function handleShuffleLibrary() {
 		if (isActionLoading || !gameId) return;
-		
+
 		isActionLoading = true;
 		try {
 			await shuffleLibrary(gameId, localPlayerId);
@@ -1075,7 +1112,7 @@
 	 */
 	async function handleEndTurn() {
 		if (isActionLoading || !gameId) return;
-		
+
 		isActionLoading = true;
 		try {
 			await nextTurn(gameId);
@@ -1094,7 +1131,7 @@
 	 */
 	async function handleSearchLibrary() {
 		if (isActionLoading || !gameId) return;
-		
+
 		isActionLoading = true;
 		try {
 			await searchLibrary(gameId, 'hand', true);
@@ -1113,7 +1150,7 @@
 	 */
 	async function handleFlipCard(cardId: string, currentlyFaceDown: boolean) {
 		if (isActionLoading || !gameId) return;
-		
+
 		isActionLoading = true;
 		try {
 			await flipCard(gameId, cardId, !currentlyFaceDown);
@@ -1132,7 +1169,7 @@
 	 */
 	async function handleTransformCard(cardId: string) {
 		if (isActionLoading || !gameId) return;
-		
+
 		isActionLoading = true;
 		try {
 			await transformCard(gameId, cardId);
@@ -1151,15 +1188,15 @@
 	 */
 	async function handleMoveCard(cardId: string, zone: string) {
 		if (isActionLoading || !gameId) return;
-		
+
 		const zoneNames: Record<string, string> = {
-			'GRAVEYARD': 'graveyard',
-			'EXILE': 'exile',
-			'HAND': 'hand',
-			'LIBRARY': 'top of library',
-			'LIBRARY_BOTTOM': 'bottom of library'
+			GRAVEYARD: 'graveyard',
+			EXILE: 'exile',
+			HAND: 'hand',
+			LIBRARY: 'top of library',
+			LIBRARY_BOTTOM: 'bottom of library'
 		};
-		
+
 		isActionLoading = true;
 		try {
 			await moveCardToZone(gameId, cardId, zone);
@@ -1178,7 +1215,7 @@
 	 */
 	async function handleAddCounter(cardId: string) {
 		if (isActionLoading || !gameId) return;
-		
+
 		isActionLoading = true;
 		try {
 			await modifyCardCounter(gameId, cardId, '+1/+1', 1);
@@ -1232,7 +1269,7 @@
 		if (isDeclaringAttackersPhase && combatPromptOptions()) {
 			const card = battlefieldCards.find((c) => c.id === cardId);
 			if (!card) return;
-			
+
 			// Check if this card can attack
 			const canAttack = canAttackIds.has(cardId);
 			if (canAttack) {
@@ -1241,17 +1278,18 @@
 				const validDefenders = options.attackOptions
 					.filter((opt) => opt.cardId === cardId)
 					.map((opt) => opt.defenderId);
-				
+
 				if (validDefenders.length > 0) {
 					const isCurrentlyAttacking = attackingIds.has(cardId);
 					combatStore.toggleAttacker(cardId, validDefenders[0]);
-					
+
 					if (isCurrentlyAttacking) {
 						addLogEntry(`${card.name} will not attack`);
 					} else {
 						// Get defender name for log
 						const defenders = getDefenderTargets();
-						const defenderName = defenders.find(d => d.id === validDefenders[0])?.name || 'opponent';
+						const defenderName =
+							defenders.find((d) => d.id === validDefenders[0])?.name || 'opponent';
 						addLogEntry(`${card.name} attacks ${defenderName}`);
 					}
 				}
@@ -1280,7 +1318,7 @@
 			isActionLoading,
 			gameId
 		});
-		
+
 		// Log each action for debugging
 		if (card.availableActions && card.availableActions.length > 0) {
 			card.availableActions.forEach((action, i) => {
@@ -1303,8 +1341,10 @@
 			// Note: actionType can be either a number (enum) or string (JSON serialized)
 			// so we check for both using string comparison
 			const manaAbilityAction = card.availableActions?.find(
-				(a) => (a.actionType === CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY || 
-				        String(a.actionType) === 'CARD_ACTION_ACTIVATE_MANA_ABILITY') && a.isEnabled
+				(a) =>
+					(a.actionType === CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY ||
+						String(a.actionType) === 'CARD_ACTION_ACTIVATE_MANA_ABILITY') &&
+					a.isEnabled
 			);
 
 			console.log('[handleBattlefieldCardClick] Mana ability action found:', manaAbilityAction);
@@ -1341,7 +1381,7 @@
 	/**
 	 * Handle right-click context menu on battlefield cards
 	 */
-	function handleCardContextMenu(event: MouseEvent, card: typeof battlefieldCards[0]) {
+	function handleCardContextMenu(event: MouseEvent, card: (typeof battlefieldCards)[0]) {
 		event.preventDefault();
 		contextMenuCard = card;
 		contextMenuPosition = { x: event.clientX, y: event.clientY };
@@ -1429,7 +1469,7 @@
 	 */
 	async function handleRequestRollback(messageId: number) {
 		if (!gameId) return;
-		
+
 		try {
 			const result = await requestRollback(gameId, messageId);
 			if (result.success) {
@@ -1452,7 +1492,7 @@
 	 */
 	async function handleApproveRollback() {
 		if (!gameId || !pendingRollbackRequest) return;
-		
+
 		try {
 			const result = await respondToRollback(gameId, pendingRollbackRequest.requestId, true);
 			if (!result.success) {
@@ -1471,7 +1511,7 @@
 	 */
 	async function handleDenyRollback() {
 		if (!gameId || !pendingRollbackRequest) return;
-		
+
 		try {
 			const result = await respondToRollback(gameId, pendingRollbackRequest.requestId, false);
 			if (!result.success) {
@@ -1500,7 +1540,7 @@
 	 */
 	function getDefenderTargets(): DefenderTarget[] {
 		const defenders: DefenderTarget[] = [];
-		
+
 		// Add opponents as defenders
 		for (const opponent of otherPlayers) {
 			defenders.push({
@@ -1510,11 +1550,13 @@
 				life: opponent.life
 			});
 		}
-		
+
 		// Add planeswalkers controlled by opponents
 		for (const card of battlefieldCards) {
-			if (card.type?.toLowerCase().includes('planeswalker') && 
-			    card.controllerId !== localPlayerId) {
+			if (
+				card.type?.toLowerCase().includes('planeswalker') &&
+				card.controllerId !== localPlayerId
+			) {
 				defenders.push({
 					id: card.id,
 					name: card.name,
@@ -1523,7 +1565,7 @@
 				});
 			}
 		}
-		
+
 		return defenders;
 	}
 
@@ -1532,13 +1574,13 @@
 	 */
 	function getAttackingCreatures(): DeclaredAttacker[] {
 		const attackers: DeclaredAttacker[] = [];
-		
+
 		// Get combat info from game view if available
 		const combatView = gameState.gameView?.combat;
 		if (combatView?.groups) {
 			for (const group of combatView.groups) {
 				for (const attackerId of group.attackers || []) {
-					const card = battlefieldCards.find(c => c.id === attackerId);
+					const card = battlefieldCards.find((c) => c.id === attackerId);
 					if (card) {
 						attackers.push({
 							cardId: attackerId,
@@ -1550,7 +1592,7 @@
 				}
 			}
 		}
-		
+
 		return attackers;
 	}
 
@@ -1591,7 +1633,7 @@
 
 	/**
 	 * Auto-pass effect - passes priority on opponent's turn
-	 * 
+	 *
 	 * This is a rules-light auto-pass: it only checks whose turn it is,
 	 * not what actions are available (which would require rules enforcement).
 	 */
@@ -1608,7 +1650,7 @@
 
 		// Auto-pass on opponent's turn
 		if (autoPass && !isYourTurn) {
-			console.log('[AutoPass] Triggering auto-pass: opponent\'s turn');
+			console.log("[AutoPass] Triggering auto-pass: opponent's turn");
 			isAutoPassPending = true;
 
 			// Capture gameId in local scope for the async callback
@@ -1633,18 +1675,18 @@
 	// Click outside handler for life menu
 	$effect(() => {
 		if (!showLifeMenu) return;
-		
+
 		const handleClickOutside = (event: MouseEvent) => {
 			if (lifeMenuEl && !lifeMenuEl.contains(event.target as Node)) {
 				showLifeMenu = false;
 			}
 		};
-		
+
 		// Delay to prevent immediate close from the click that opened it
 		const timeoutId = setTimeout(() => {
 			document.addEventListener('click', handleClickOutside);
 		}, 10);
-		
+
 		return () => {
 			clearTimeout(timeoutId);
 			document.removeEventListener('click', handleClickOutside);
@@ -1678,7 +1720,7 @@
 	// Register graveyard drop zone
 	$effect(() => {
 		if (graveyardDropZoneEl && !graveyardDropZoneUnregister) {
-			console.log('[GamePage] Registering graveyard drop zone', { 
+			console.log('[GamePage] Registering graveyard drop zone', {
 				element: graveyardDropZoneEl,
 				rect: graveyardDropZoneEl.getBoundingClientRect()
 			});
@@ -1690,7 +1732,11 @@
 					// Accept cards from any zone except graveyard when player has priority
 					// Use get() to read current store value at call time
 					const hasPrio = get(hasPriority);
-					console.log('[Graveyard accepts]', { sourceZone, hasPrio, result: sourceZone !== 'graveyard' && hasPrio });
+					console.log('[Graveyard accepts]', {
+						sourceZone,
+						hasPrio,
+						result: sourceZone !== 'graveyard' && hasPrio
+					});
 					return sourceZone !== 'graveyard' && hasPrio;
 				},
 				onDrop: handleGraveyardDrop
@@ -1720,7 +1766,11 @@
 					// Accept cards from any zone except exile when player has priority
 					// Use get() to read current store value at call time
 					const hasPrio = get(hasPriority);
-					console.log('[Exile accepts]', { sourceZone, hasPrio, result: sourceZone !== 'exile' && hasPrio });
+					console.log('[Exile accepts]', {
+						sourceZone,
+						hasPrio,
+						result: sourceZone !== 'exile' && hasPrio
+					});
 					return sourceZone !== 'exile' && hasPrio;
 				},
 				onDrop: handleExileDrop
@@ -1789,34 +1839,33 @@
 
 	// Sync server stack cards to visual stack - using store subscription for reliability
 	function syncServerStackToVisualStack(currentStack: typeof stackCards) {
-		console.log('[GamePage] Server stack sync running, cards:', currentStack.length, currentStack.map(c => ({ id: c.id, name: c.name })));
+		console.log(
+			'[GamePage] Server stack sync running, cards:',
+			currentStack.length,
+			currentStack.map((c) => ({ id: c.id, name: c.name }))
+		);
 		console.log('[GamePage] Already synced IDs:', [...lastSyncedStackIds]);
-		
-		const serverIds = new Set(currentStack.map(c => c.id));
-		
+
+		const serverIds = new Set(currentStack.map((c) => c.id));
+
 		// Add new server stack items to visual stack
 		for (const card of currentStack) {
 			if (!lastSyncedStackIds.has(card.id)) {
 				console.log('[GamePage] Syncing server stack item to visual stack:', card.name, card.id);
-				visualStackStore.addItem(
-					card.id,
-					card.name,
-					'stack',
-					{
-						imageUrl: card.imageUrl || getScryfallImageUrl(card.name),
-						controllerId: card.controllerId,
-						note: 'Spell',
-						// Use server's stack item ID as localId for sync
-						localId: card.id
-					}
-				);
+				visualStackStore.addItem(card.id, card.name, 'stack', {
+					imageUrl: card.imageUrl || getScryfallImageUrl(card.name),
+					controllerId: card.controllerId,
+					note: 'Spell',
+					// Use server's stack item ID as localId for sync
+					localId: card.id
+				});
 				lastSyncedStackIds.add(card.id);
-				
+
 				// Auto-open visual stack when items are added
 				visualStackStore.setOpen(true);
 			}
 		}
-		
+
 		// Remove items from visual stack that are no longer on server stack
 		for (const id of lastSyncedStackIds) {
 			if (!serverIds.has(id)) {
@@ -1835,7 +1884,7 @@
 			gameId,
 			localPlayerId
 		});
-		
+
 		if (!$auth.isAuthenticated) {
 			console.log('[GamePage] Not authenticated, redirecting to login');
 			goto('/login');
@@ -1844,7 +1893,7 @@
 
 		// Initialize game - gameId should always be available from load function
 		initializeGame();
-		
+
 		// Subscribe to stack changes to sync with visual stack
 		console.log('[GamePage] Setting up stack subscription');
 		stackUnsubscribe = stack.subscribe((currentStack) => {
@@ -1892,7 +1941,9 @@
 					❓
 				{:else if parsedError.title.toLowerCase().includes('access denied')}
 					🚫
-				{:else if parsedError.title.toLowerCase().includes('session') || parsedError.title.toLowerCase().includes('expired')}
+				{:else if parsedError.title.toLowerCase().includes('session') || parsedError.title
+						.toLowerCase()
+						.includes('expired')}
 					🔐
 				{:else if parsedError.title.toLowerCase().includes('connection')}
 					📡
@@ -1905,7 +1956,14 @@
 			<div class="error-actions">
 				<button class="btn-primary" onclick={() => goto('/lobby')}>Return to Lobby</button>
 				{#if parsedError.title.toLowerCase().includes('connection')}
-					<button class="btn-secondary" onclick={() => { isInitializing = false; initialized = false; initializeGame(); }}>
+					<button
+						class="btn-secondary"
+						onclick={() => {
+							isInitializing = false;
+							initialized = false;
+							initializeGame();
+						}}
+					>
 						Try Again
 					</button>
 				{/if}
@@ -1915,18 +1973,20 @@
 		<div class="game-over-overlay">
 			<div class="game-over-content">
 				<h2>Game Over</h2>
-				<p class="winner-text">{gameWinner ? `Winner: ${playerNames.get(gameWinner) || gameWinner}` : 'Draw'}</p>
+				<p class="winner-text">
+					{gameWinner ? `Winner: ${playerNames.get(gameWinner) || gameWinner}` : 'Draw'}
+				</p>
 				<button class="btn-primary" onclick={() => goto('/lobby')}>Return to Lobby</button>
 			</div>
 		</div>
 	{:else if isMulliganPhase}
 		<MulliganDialog
 			cards={myCards}
-			mulliganCount={mulliganCount}
+			{mulliganCount}
 			onKeep={handleKeepHand}
 			onMulligan={handleMulligan}
 			isLoading={isMulliganLoading}
-			hasKeptHand={hasKeptHand}
+			{hasKeptHand}
 		/>
 	{:else}
 		<!-- Game Header - Clean UX answering key questions -->
@@ -1937,26 +1997,26 @@
 			localPlayerName={localPlayerId}
 			hasPriority={havePriority}
 			currentPhase={toGamePhase(step || phase)}
-			onLogClick={() => showActionLog = true}
+			onLogClick={() => (showActionLog = true)}
 			onConcedeClick={handleConcede}
 		/>
 
 		<!-- Floating action buttons -->
 		<div class="floating-actions">
-			<button 
-				class="floating-btn stack-btn" 
+			<button
+				class="floating-btn stack-btn"
 				class:has-items={visualStackItemCount > 0 || stackCards.length > 0}
-				onclick={() => visualStackStore.toggleOpen()} 
+				onclick={() => visualStackStore.toggleOpen()}
 				title="Stack ({visualStackItemCount} items)"
 			>
-				📚 {#if visualStackItemCount > 0 || stackCards.length > 0}<span class="badge">{visualStackItemCount || stackCards.length}</span>{/if}
+				📚 {#if visualStackItemCount > 0 || stackCards.length > 0}<span class="badge"
+						>{visualStackItemCount || stackCards.length}</span
+					>{/if}
 			</button>
-			<button class="floating-btn" onclick={() => showChat = true} title="Game Chat">
-				💬
-			</button>
+			<button class="floating-btn" onclick={() => (showChat = true)} title="Game Chat"> 💬 </button>
 			<button
 				class="floating-btn"
-				onclick={() => showKeyboardShortcuts = true}
+				onclick={() => (showKeyboardShortcuts = true)}
 				title="Keyboard shortcuts (?)"
 				aria-label="Keyboard shortcuts"
 			>
@@ -2018,11 +2078,7 @@
 
 		<!-- Combat: Assign Damage -->
 		{#if damageAssignmentPrompt() && gameId}
-			<AssignDamage
-				{gameId}
-				prompt={damageAssignmentPrompt()!}
-				onComplete={handleCombatComplete}
-			/>
+			<AssignDamage {gameId} prompt={damageAssignmentPrompt()!} onComplete={handleCombatComplete} />
 		{/if}
 
 		<!-- Prompt Overlay (non-mana prompts) -->
@@ -2051,318 +2107,353 @@
 
 		<!-- Main Game Area with Sidebar -->
 		<div class="game-area-wrapper">
-		<main class="game-layout" class:four-player={otherPlayers.length >= 3}>
-			<!-- Opponents Row -->
-			<div class="opponents-row">
-				{#each otherPlayers as opponent, idx (opponent.playerId)}
-					{@const position = getOpponentPosition(idx, otherPlayers.length)}
-					<OpponentPanel
-						{opponent}
-						battlefieldCards={getPlayerBattlefieldCards(opponent.playerId)}
-						selectedCardIds={gameState.selectedCardIds}
-						bind:expanded={opponentExpanded[opponent.playerId]}
-						{position}
-						onCardClick={handleBattlefieldCardClick}
-					/>
-				{/each}
-			</div>
-
-			<!-- Central Battlefield Area (Drop Zone) -->
-			<div
-				bind:this={battlefieldDropZoneEl}
-				class="battlefield-area"
-				class:drag-active={isDragging}
-				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'battlefield'}
-			>
-				<!-- Command Zone -->
-				{#if commandCards.length > 0}
-					<div class="command-zone">
-						<span class="zone-label">Command Zone</span>
-						<div class="command-cards">
-							{#each commandCards as card (card.id)}
-								<Card
-									cardId={card.id}
-									cardName={card.name}
-									manaCost={card.manaCost}
-									cardType={card.type}
-									power={card.power}
-									toughness={card.toughness}
-									imageUrl=""
-									isTapped={card.tapped}
-									isSelected={gameState.selectedCardIds.includes(card.id)}
-									size="small"
-									onclick={() => handleBattlefieldCardClick(card.id)}
-									hasActivatedAbilities={card.availableActions?.some(a => a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY || String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' || a.actionType === 3)}
-									summoningSickness={card.summoningSickness}
-								/>
-							{/each}
-						</div>
-					</div>
-				{/if}
-
-				<!-- My Battlefield -->
-				<div class="my-battlefield">
-					<span class="zone-label">Your Battlefield</span>
-					<div class="battlefield-rows">
-						{#if getPlayerBattlefieldCards(localPlayerId).filter(c => !isLandPermanent(c.type)).length > 0}
-							<div class="battlefield-cards battlefield-row--nonlands">
-								{#each getPlayerBattlefieldCards(localPlayerId).filter(c => !isLandPermanent(c.type)) as card (card.id)}
-									<!-- svelte-ignore a11y_no_static_element_interactions -->
-									<div
-										class="battlefield-card-wrapper"
-										class:draggable={true}
-										class:is-dragging={isBattlefieldCardDragging(card.id)}
-										class:is-hovered={hoveredCardId === card.id}
-										onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-										ondragstart={handleBattlefieldDragStart}
-										onmouseenter={() => hoveredCardId = card.id}
-										onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
-									>
-										<Card
-											cardId={card.id}
-											cardName={card.name}
-											manaCost={card.manaCost}
-											cardType={card.type}
-											power={card.power}
-											toughness={card.toughness}
-											imageUrl=""
-											isTapped={card.tapped}
-											isSelected={gameState.selectedCardIds.includes(card.id)}
-											size="normal"
-											onclick={() => handleBattlefieldCardClick(card.id)}
-											oncontextmenu={(e) => handleCardContextMenu(e, card)}
-											canAttack={canAttackIds.has(card.id)}
-											isAttacking={attackingIds.has(card.id)}
-											canBlock={canBlockIds.has(card.id)}
-											isBlocking={blockingIds.has(card.id)}
-											summoningSickness={card.summoningSickness}
-											isDragging={isBattlefieldCardDragging(card.id)}
-										/>
-									</div>
-								{/each}
-							</div>
-						{/if}
-
-						{#if getPlayerBattlefieldCards(localPlayerId).filter(c => isLandPermanent(c.type)).length > 0}
-							<div class="battlefield-cards battlefield-row--lands">
-								{#each getPlayerBattlefieldCards(localPlayerId).filter(c => isLandPermanent(c.type)) as card (card.id)}
-									<!-- svelte-ignore a11y_no_static_element_interactions -->
-									<div
-										class="battlefield-card-wrapper"
-										class:draggable={true}
-										class:is-dragging={isBattlefieldCardDragging(card.id)}
-										class:is-hovered={hoveredCardId === card.id}
-										onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-										ondragstart={handleBattlefieldDragStart}
-										onmouseenter={() => hoveredCardId = card.id}
-										onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
-									>
-										<Card
-											cardId={card.id}
-											cardName={card.name}
-											manaCost={card.manaCost}
-											cardType={card.type}
-											power={card.power}
-											toughness={card.toughness}
-											imageUrl=""
-											isTapped={card.tapped}
-											isSelected={gameState.selectedCardIds.includes(card.id)}
-											size="normal"
-											onclick={() => handleBattlefieldCardClick(card.id)}
-											oncontextmenu={(e) => handleCardContextMenu(e, card)}
-											canAttack={canAttackIds.has(card.id)}
-											isAttacking={attackingIds.has(card.id)}
-											canBlock={canBlockIds.has(card.id)}
-											isBlocking={blockingIds.has(card.id)}
-											summoningSickness={card.summoningSickness}
-											isDragging={isBattlefieldCardDragging(card.id)}
-										/>
-									</div>
-								{/each}
-							</div>
-						{/if}
-
-						{#if getPlayerBattlefieldCards(localPlayerId).length === 0}
-							<div class="empty-battlefield">
-								{#if isDragging}
-									<span class="drop-hint">Drop card here to play</span>
-								{:else}
-									No permanents
-								{/if}
-							</div>
-						{/if}
-					</div>
-				</div>
-
-				<!-- Drop zone overlay indicator -->
-				{#if isDragging}
-					<div class="drop-zone-overlay" class:valid={isOverValidDrop && dropZone === 'battlefield'}>
-						<span class="drop-label">
-							{#if isOverValidDrop && dropZone === 'battlefield'}
-								✓ Release to play
-							{:else}
-								Drag card here
-							{/if}
-						</span>
-					</div>
-				{/if}
-			</div>
-
-		<!-- Player Info & Zones Row (Compact) -->
-		<div class="player-info-row compact">
-			{#if me}
-				<div class="player-identity">
-					<span class="player-name" class:has-priority={havePriority}>
-						You
-						{#if havePriority}
-							<span class="priority-dot"></span>
-						{/if}
-					</span>
-				</div>
-				
-				<!-- Player Stats (Life, Poison, Library) -->
-				<div class="player-stats-inline">
-					<div class="life-group">
-						<button class="stat-btn life-btn minus" onclick={() => handleLifeChange(-1)} title="Lose 1 life">−</button>
-						<button 
-							class="stat-display life" 
-							onclick={() => showLifeMenu = !showLifeMenu}
-							title="Click for more options"
-						>
-							<span class="stat-icon">❤️</span>
-							<span class="stat-value">{me.life}</span>
-						</button>
-						<button class="stat-btn life-btn plus" onclick={() => handleLifeChange(1)} title="Gain 1 life">+</button>
-					</div>
-
-					{#if (me.poison ?? 0) > 0}
-						<div class="stat-display poison" title="Poison counters">
-							<span class="stat-icon">☠️</span>
-							<span class="stat-value">{me.poison}</span>
-						</div>
-					{/if}
-
-					<LibraryZone
-						libraryCount={me.libraryCount ?? 0}
-						playerName="You"
-						onSearch={handleSearchLibrary}
-					/>
-
-					<!-- Life/Library Quick Menu -->
-					{#if showLifeMenu}
-						<!-- svelte-ignore a11y_no_static_element_interactions -->
-						<!-- svelte-ignore a11y_click_events_have_key_events -->
-						<div bind:this={lifeMenuEl} class="quick-menu" onclick={(e) => e.stopPropagation()}>
-							<div class="menu-section">
-								<span class="menu-label">Life</span>
-								<div class="menu-row">
-									<button onclick={() => handleLifeChange(-5)}>−5</button>
-									<button onclick={() => handleLifeChange(-1)}>−1</button>
-									<button onclick={() => handleLifeChange(1)}>+1</button>
-									<button onclick={() => handleLifeChange(5)}>+5</button>
-								</div>
-							</div>
-							<div class="menu-section">
-								<span class="menu-label">Poison</span>
-								<div class="menu-row">
-									<button onclick={() => handlePoisonChange(-1)}>−1</button>
-									<span class="menu-value">{me.poison ?? 0}</span>
-									<button onclick={() => handlePoisonChange(1)}>+1</button>
-								</div>
-							</div>
-							<div class="menu-section">
-								<span class="menu-label">Library</span>
-								<div class="menu-row">
-									<button onclick={() => { handleDrawCard(); showLifeMenu = false; }}>Draw 1</button>
-									<button onclick={() => { handleShuffleLibrary(); showLifeMenu = false; }}>Shuffle</button>
-								</div>
-								<div class="menu-row" style="margin-top: 0.25rem;">
-									<button onclick={() => { handleSearchLibrary(); showLifeMenu = false; }} class="search-btn">🔍 Search</button>
-								</div>
-							</div>
-							<button class="menu-close" onclick={() => showLifeMenu = false}>✕</button>
-						</div>
-					{/if}
-				</div>
-
-				<div class="player-zones">
-						<!-- svelte-ignore a11y_no_static_element_interactions -->
-						<div
-							bind:this={graveyardDropZoneEl}
-							class="graveyard-drop-zone"
-							class:drag-active={isDragging}
-							class:drag-valid={isDragging && isOverValidDrop && dropZone === 'graveyard'}
-						>
-							<Graveyard
-								cards={myGrave.map(toGameCard)}
-								playerName="You"
-								isOpponent={false}
-								canDrag={havePriority}
-								onCardClick={handleCardClick}
-							/>
-						</div>
-						<!-- svelte-ignore a11y_no_static_element_interactions -->
-						<div
-							bind:this={exileDropZoneEl}
-							class="exile-drop-zone"
-							class:drag-active={isDragging}
-							class:drag-valid={isDragging && isOverValidDrop && dropZone === 'exile'}
-						>
-							<ExileZone
-								cards={myExile.map(toGameCard)}
-								playerName="You"
-								isOpponent={false}
-								canDrag={havePriority}
-								onCardClick={handleCardClick}
-								compact={true}
-							/>
-						</div>
-						<ManaPool
-							mana={myMana}
-							showEmpty={false}
-							size="small"
-							onManaClick={() => {}}
+			<main class="game-layout" class:four-player={otherPlayers.length >= 3}>
+				<!-- Opponents Row -->
+				<div class="opponents-row">
+					{#each otherPlayers as opponent, idx (opponent.playerId)}
+						{@const position = getOpponentPosition(idx, otherPlayers.length)}
+						<OpponentPanel
+							{opponent}
+							battlefieldCards={getPlayerBattlefieldCards(opponent.playerId)}
+							selectedCardIds={gameState.selectedCardIds}
+							bind:expanded={opponentExpanded[opponent.playerId]}
+							{position}
+							onCardClick={handleBattlefieldCardClick}
 						/>
-					</div>
-				{/if}
-			</div>
+					{/each}
+				</div>
 
-			<!-- Player Hand -->
-			<div 
-				bind:this={handDropZoneEl}
-				class="hand-area"
+				<!-- Central Battlefield Area (Drop Zone) -->
+				<div
+					bind:this={battlefieldDropZoneEl}
+					class="battlefield-area"
+					class:drag-active={isDragging}
+					class:drag-valid={isDragging && isOverValidDrop && dropZone === 'battlefield'}
+				>
+					<!-- Command Zone -->
+					{#if commandCards.length > 0}
+						<div class="command-zone">
+							<span class="zone-label">Command Zone</span>
+							<div class="command-cards">
+								{#each commandCards as card (card.id)}
+									<Card
+										cardId={card.id}
+										cardName={card.name}
+										manaCost={card.manaCost}
+										cardType={card.type}
+										power={card.power}
+										toughness={card.toughness}
+										imageUrl=""
+										isTapped={card.tapped}
+										isSelected={gameState.selectedCardIds.includes(card.id)}
+										size="small"
+										onclick={() => handleBattlefieldCardClick(card.id)}
+										hasActivatedAbilities={card.availableActions?.some(
+											(a) =>
+												a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY ||
+												String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' ||
+												a.actionType === 3
+										)}
+										summoningSickness={card.summoningSickness}
+									/>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					<!-- My Battlefield -->
+					<div class="my-battlefield">
+						<span class="zone-label">Your Battlefield</span>
+						<div class="battlefield-rows">
+							{#if getPlayerBattlefieldCards(localPlayerId).filter((c) => !isLandPermanent(c.type)).length > 0}
+								<div class="battlefield-cards battlefield-row--nonlands">
+									{#each getPlayerBattlefieldCards(localPlayerId).filter((c) => !isLandPermanent(c.type)) as card (card.id)}
+										<!-- svelte-ignore a11y_no_static_element_interactions -->
+										<div
+											class="battlefield-card-wrapper"
+											class:draggable={true}
+											class:is-dragging={isBattlefieldCardDragging(card.id)}
+											class:is-hovered={hoveredCardId === card.id}
+											onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
+											ondragstart={handleBattlefieldDragStart}
+											onmouseenter={() => (hoveredCardId = card.id)}
+											onmouseleave={() => {
+												if (hoveredCardId === card.id) hoveredCardId = null;
+											}}
+										>
+											<Card
+												cardId={card.id}
+												cardName={card.name}
+												manaCost={card.manaCost}
+												cardType={card.type}
+												power={card.power}
+												toughness={card.toughness}
+												imageUrl=""
+												isTapped={card.tapped}
+												isSelected={gameState.selectedCardIds.includes(card.id)}
+												size="normal"
+												onclick={() => handleBattlefieldCardClick(card.id)}
+												oncontextmenu={(e) => handleCardContextMenu(e, card)}
+												canAttack={canAttackIds.has(card.id)}
+												isAttacking={attackingIds.has(card.id)}
+												canBlock={canBlockIds.has(card.id)}
+												isBlocking={blockingIds.has(card.id)}
+												summoningSickness={card.summoningSickness}
+												isDragging={isBattlefieldCardDragging(card.id)}
+											/>
+										</div>
+									{/each}
+								</div>
+							{/if}
+
+							{#if getPlayerBattlefieldCards(localPlayerId).filter( (c) => isLandPermanent(c.type) ).length > 0}
+								<div class="battlefield-cards battlefield-row--lands">
+									{#each getPlayerBattlefieldCards(localPlayerId).filter( (c) => isLandPermanent(c.type) ) as card (card.id)}
+										<!-- svelte-ignore a11y_no_static_element_interactions -->
+										<div
+											class="battlefield-card-wrapper"
+											class:draggable={true}
+											class:is-dragging={isBattlefieldCardDragging(card.id)}
+											class:is-hovered={hoveredCardId === card.id}
+											onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
+											ondragstart={handleBattlefieldDragStart}
+											onmouseenter={() => (hoveredCardId = card.id)}
+											onmouseleave={() => {
+												if (hoveredCardId === card.id) hoveredCardId = null;
+											}}
+										>
+											<Card
+												cardId={card.id}
+												cardName={card.name}
+												manaCost={card.manaCost}
+												cardType={card.type}
+												power={card.power}
+												toughness={card.toughness}
+												imageUrl=""
+												isTapped={card.tapped}
+												isSelected={gameState.selectedCardIds.includes(card.id)}
+												size="normal"
+												onclick={() => handleBattlefieldCardClick(card.id)}
+												oncontextmenu={(e) => handleCardContextMenu(e, card)}
+												canAttack={canAttackIds.has(card.id)}
+												isAttacking={attackingIds.has(card.id)}
+												canBlock={canBlockIds.has(card.id)}
+												isBlocking={blockingIds.has(card.id)}
+												summoningSickness={card.summoningSickness}
+												isDragging={isBattlefieldCardDragging(card.id)}
+											/>
+										</div>
+									{/each}
+								</div>
+							{/if}
+
+							{#if getPlayerBattlefieldCards(localPlayerId).length === 0}
+								<div class="empty-battlefield">
+									{#if isDragging}
+										<span class="drop-hint">Drop card here to play</span>
+									{:else}
+										No permanents
+									{/if}
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Drop zone overlay indicator -->
+					{#if isDragging}
+						<div
+							class="drop-zone-overlay"
+							class:valid={isOverValidDrop && dropZone === 'battlefield'}
+						>
+							<span class="drop-label">
+								{#if isOverValidDrop && dropZone === 'battlefield'}
+									✓ Release to play
+								{:else}
+									Drag card here
+								{/if}
+							</span>
+						</div>
+					{/if}
+				</div>
+
+				<!-- Player Info & Zones Row (Compact) -->
+				<div class="player-info-row compact">
+					{#if me}
+						<div class="player-identity">
+							<span class="player-name" class:has-priority={havePriority}>
+								You
+								{#if havePriority}
+									<span class="priority-dot"></span>
+								{/if}
+							</span>
+						</div>
+
+						<!-- Player Stats (Life, Poison, Library) -->
+						<div class="player-stats-inline">
+							<div class="life-group">
+								<button
+									class="stat-btn life-btn minus"
+									onclick={() => handleLifeChange(-1)}
+									title="Lose 1 life">−</button
+								>
+								<button
+									class="stat-display life"
+									onclick={() => (showLifeMenu = !showLifeMenu)}
+									title="Click for more options"
+								>
+									<span class="stat-icon">❤️</span>
+									<span class="stat-value">{me.life}</span>
+								</button>
+								<button
+									class="stat-btn life-btn plus"
+									onclick={() => handleLifeChange(1)}
+									title="Gain 1 life">+</button
+								>
+							</div>
+
+							{#if (me.poison ?? 0) > 0}
+								<div class="stat-display poison" title="Poison counters">
+									<span class="stat-icon">☠️</span>
+									<span class="stat-value">{me.poison}</span>
+								</div>
+							{/if}
+
+							<LibraryZone
+								libraryCount={me.libraryCount ?? 0}
+								playerName="You"
+								onSearch={handleSearchLibrary}
+							/>
+
+							<!-- Life/Library Quick Menu -->
+							{#if showLifeMenu}
+								<!-- svelte-ignore a11y_no_static_element_interactions -->
+								<!-- svelte-ignore a11y_click_events_have_key_events -->
+								<div bind:this={lifeMenuEl} class="quick-menu" onclick={(e) => e.stopPropagation()}>
+									<div class="menu-section">
+										<span class="menu-label">Life</span>
+										<div class="menu-row">
+											<button onclick={() => handleLifeChange(-5)}>−5</button>
+											<button onclick={() => handleLifeChange(-1)}>−1</button>
+											<button onclick={() => handleLifeChange(1)}>+1</button>
+											<button onclick={() => handleLifeChange(5)}>+5</button>
+										</div>
+									</div>
+									<div class="menu-section">
+										<span class="menu-label">Poison</span>
+										<div class="menu-row">
+											<button onclick={() => handlePoisonChange(-1)}>−1</button>
+											<span class="menu-value">{me.poison ?? 0}</span>
+											<button onclick={() => handlePoisonChange(1)}>+1</button>
+										</div>
+									</div>
+									<div class="menu-section">
+										<span class="menu-label">Library</span>
+										<div class="menu-row">
+											<button
+												onclick={() => {
+													handleDrawCard();
+													showLifeMenu = false;
+												}}>Draw 1</button
+											>
+											<button
+												onclick={() => {
+													handleShuffleLibrary();
+													showLifeMenu = false;
+												}}>Shuffle</button
+											>
+										</div>
+										<div class="menu-row" style="margin-top: 0.25rem;">
+											<button
+												onclick={() => {
+													handleSearchLibrary();
+													showLifeMenu = false;
+												}}
+												class="search-btn">🔍 Search</button
+											>
+										</div>
+									</div>
+									<button class="menu-close" onclick={() => (showLifeMenu = false)}>✕</button>
+								</div>
+							{/if}
+						</div>
+
+						<div class="player-zones">
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<div
+								bind:this={graveyardDropZoneEl}
+								class="graveyard-drop-zone"
+								class:drag-active={isDragging}
+								class:drag-valid={isDragging && isOverValidDrop && dropZone === 'graveyard'}
+							>
+								<Graveyard
+									cards={myGrave.map(toGameCard)}
+									playerName="You"
+									isOpponent={false}
+									canDrag={havePriority}
+									onCardClick={handleCardClick}
+								/>
+							</div>
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<div
+								bind:this={exileDropZoneEl}
+								class="exile-drop-zone"
+								class:drag-active={isDragging}
+								class:drag-valid={isDragging && isOverValidDrop && dropZone === 'exile'}
+							>
+								<ExileZone
+									cards={myExile.map(toGameCard)}
+									playerName="You"
+									isOpponent={false}
+									canDrag={havePriority}
+									onCardClick={handleCardClick}
+									compact={true}
+								/>
+							</div>
+							<ManaPool mana={myMana} showEmpty={false} size="small" onManaClick={() => {}} />
+						</div>
+					{/if}
+				</div>
+
+				<!-- Player Hand -->
+				<div
+					bind:this={handDropZoneEl}
+					class="hand-area"
+					class:drag-active={isDragging}
+					class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
+				>
+					<PlayerHand
+						onCardClick={handleCardClick}
+						size="normal"
+						currentPhase={step || phase}
+						canDrag={havePriority}
+					/>
+				</div>
+			</main>
+
+			<!-- Visual Stack Sidebar (inline, not overlay) -->
+			<div
+				bind:this={visualStackDropZoneEl}
+				class="visual-stack-sidebar-container"
 				class:drag-active={isDragging}
-				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
+				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'stack'}
 			>
-				<PlayerHand
-					onCardClick={handleCardClick}
-					size="normal"
-					currentPhase={step || phase}
-					canDrag={havePriority}
+				<VisualStack
+					isOpen={showVisualStack}
+					onResolve={handleStackItemRemove}
+					onRemove={handleStackItemRemove}
 				/>
 			</div>
-		</main>
-
-		<!-- Visual Stack Sidebar (inline, not overlay) -->
-		<div 
-			bind:this={visualStackDropZoneEl}
-			class="visual-stack-sidebar-container"
-			class:drag-active={isDragging}
-			class:drag-valid={isDragging && isOverValidDrop && dropZone === 'stack'}
-		>
-			<VisualStack 
-			isOpen={showVisualStack}
-			onResolve={handleStackItemRemove}
-			onRemove={handleStackItemRemove}
-		/>
 		</div>
-		</div><!-- End game-area-wrapper -->
+		<!-- End game-area-wrapper -->
 
 		<!-- Overlay Panels -->
-		<ActionLogOverlay bind:this={actionLogRef} bind:open={showActionLog} onRequestRollback={handleRequestRollback} />
+		<ActionLogOverlay
+			bind:this={actionLogRef}
+			bind:open={showActionLog}
+			onRequestRollback={handleRequestRollback}
+		/>
 		<GameChatOverlay bind:this={gameChatRef} gameId={gameId || ''} bind:open={showChat} />
 		<KeyboardShortcutsModal bind:open={showKeyboardShortcuts} mode="game" />
-
 
 		<!-- Priority Action Bar (Docked at bottom) -->
 		<PriorityActionBar
@@ -2370,7 +2461,7 @@
 			hasPriority={havePriority}
 			activePlayerId={gameState.gameView?.activePlayerId || ''}
 			{localPlayerId}
-			activePlayerName={activePlayerName}
+			{activePlayerName}
 			currentPhase={phase}
 			canPassPriority={havePriority}
 			isLoading={isActionLoading}
@@ -2378,16 +2469,12 @@
 			onPassUntilEOT={handlePassUntilEOT}
 			onCastSpell={handleCastSpell}
 			onAdvancePhase={handleAdvancePhase}
-			onCreateToken={() => showTokenCreator = true}
+			onCreateToken={() => (showTokenCreator = true)}
 			bind:autoPass
 		/>
 
 		<!-- Floating Debug Button -->
-		<button 
-			class="debug-fab" 
-			onclick={() => showDebugOverlay = true}
-			title="Open Debug View"
-		>
+		<button class="debug-fab" onclick={() => (showDebugOverlay = true)} title="Open Debug View">
 			🔧
 		</button>
 
@@ -2411,7 +2498,7 @@
 			{activePlayerName}
 			{prompt}
 			{error}
-			onClose={() => showDebugOverlay = false}
+			onClose={() => (showDebugOverlay = false)}
 		/>
 
 		<!-- Card Context Menu -->
@@ -2431,10 +2518,7 @@
 
 		<!-- Token Creator Dialog -->
 		{#if showTokenCreator && gameId}
-			<TokenCreator
-				{gameId}
-				onClose={() => showTokenCreator = false}
-			/>
+			<TokenCreator {gameId} onClose={() => (showTokenCreator = false)} />
 		{/if}
 
 		<!-- Rollback Consent Dialog -->
@@ -2449,18 +2533,10 @@
 		<!-- Drag Ghost - Card following the cursor during drag -->
 		{#if isDragging && dragCardName}
 			{@const dragImageUrl = getScryfallImageUrl(dragCardName, 'small')}
-			<div
-				class="drag-ghost"
-				style="left: {dragPos.x}px; top: {dragPos.y}px;"
-			>
+			<div class="drag-ghost" style="left: {dragPos.x}px; top: {dragPos.y}px;">
 				<div class="drag-ghost-card" class:valid={isOverValidDrop}>
 					{#if dragImageUrl}
-						<img
-							src={dragImageUrl}
-							alt={dragCardName}
-							class="drag-ghost-image"
-							draggable="false"
-						/>
+						<img src={dragImageUrl} alt={dragCardName} class="drag-ghost-image" draggable="false" />
 					{:else}
 						<span class="drag-ghost-name">{dragCardName}</span>
 					{/if}
@@ -2499,8 +2575,13 @@
 	}
 
 	@keyframes priority-border-pulse {
-		0%, 100% { border-color: rgba(251, 191, 36, 0.25); }
-		50% { border-color: rgba(251, 191, 36, 0.5); }
+		0%,
+		100% {
+			border-color: rgba(251, 191, 36, 0.25);
+		}
+		50% {
+			border-color: rgba(251, 191, 36, 0.5);
+		}
 	}
 
 	/* Loading & Error & Game Over States */
@@ -2528,7 +2609,9 @@
 	}
 
 	@keyframes spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.error-icon {
@@ -2675,7 +2758,9 @@
 		transition: background 0.2s;
 	}
 
-	.btn-primary:hover { background: #5568d3; }
+	.btn-primary:hover {
+		background: #5568d3;
+	}
 
 	/* Prompt Overlay */
 	.prompt-overlay {
@@ -2726,7 +2811,9 @@
 		transition: background 0.2s;
 	}
 
-	.btn-yes:hover { background: #16a34a; }
+	.btn-yes:hover {
+		background: #16a34a;
+	}
 
 	.btn-no {
 		background: #ef4444;
@@ -2739,7 +2826,9 @@
 		transition: background 0.2s;
 	}
 
-	.btn-no:hover { background: #dc2626; }
+	.btn-no:hover {
+		background: #dc2626;
+	}
 
 	.btn-choice {
 		background: #374151;
@@ -2751,7 +2840,9 @@
 		transition: background 0.2s;
 	}
 
-	.btn-choice:hover { background: #4b5563; }
+	.btn-choice:hover {
+		background: #4b5563;
+	}
 
 	/* Game Area Wrapper - contains game layout + sidebar */
 	.game-area-wrapper {
@@ -2824,7 +2915,9 @@
 		overflow: auto;
 		min-height: 200px;
 		position: relative;
-		transition: border-color 0.2s, box-shadow 0.2s;
+		transition:
+			border-color 0.2s,
+			box-shadow 0.2s;
 	}
 
 	/* Battlefield drag state */
@@ -2879,8 +2972,13 @@
 	}
 
 	@keyframes drop-hint-pulse {
-		0%, 100% { opacity: 0.7; }
-		50% { opacity: 1; }
+		0%,
+		100% {
+			opacity: 0.7;
+		}
+		50% {
+			opacity: 1;
+		}
 	}
 
 	.zone-label {
@@ -2920,7 +3018,9 @@
 	.battlefield-card-wrapper {
 		user-select: none;
 		-webkit-user-select: none;
-		transition: transform 0.2s ease, opacity 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			opacity 0.2s ease;
 	}
 
 	.battlefield-card-wrapper.draggable {
@@ -3014,8 +3114,15 @@
 	}
 
 	@keyframes pulse {
-		0%, 100% { opacity: 1; transform: scale(1); }
-		50% { opacity: 0.6; transform: scale(1.2); }
+		0%,
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
+		50% {
+			opacity: 0.6;
+			transform: scale(1.2);
+		}
 	}
 
 	.player-zones {
@@ -3359,7 +3466,10 @@
 			0 0 30px rgba(102, 126, 234, 0.2);
 		opacity: 0.95;
 		transform: scale(1.1) rotate(-5deg);
-		transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+		transition:
+			border-color 0.15s,
+			transform 0.15s,
+			box-shadow 0.15s;
 	}
 
 	.drag-ghost-card.valid {

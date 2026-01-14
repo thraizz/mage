@@ -90,16 +90,16 @@
 
 	// Derive the effective image URL - use Scryfall if no explicit imageUrl provided
 	const effectiveImageUrl = $derived(
-		imageUrl || (!isCardBack && !isPlaceholder && cardName
-			? getScryfallImageUrl(cardName, getScryfallVersionForSize(size))
-			: '')
+		imageUrl ||
+			(!isCardBack && !isPlaceholder && cardName
+				? getScryfallImageUrl(cardName, getScryfallVersionForSize(size))
+				: '')
 	);
 
 	// Larger image URL for the hover preview
 	const previewImageUrl = $derived(
-		imageUrl || (!isCardBack && !isPlaceholder && cardName
-			? getScryfallImageUrl(cardName, 'large')
-			: '')
+		imageUrl ||
+			(!isCardBack && !isPlaceholder && cardName ? getScryfallImageUrl(cardName, 'large') : '')
 	);
 
 	// State
@@ -231,7 +231,7 @@
 	// Update preview element when showPreview changes
 	$effect(() => {
 		if (!portalContainer) return;
-		
+
 		if (showPreview && !isCardBack && !isPlaceholder && previewImageUrl) {
 			// Create/update preview element
 			portalContainer.innerHTML = `
@@ -265,7 +265,13 @@
 	bind:this={cardElement}
 	class="card {sizeClasses()} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack
 		? 'card-back'
-		: ''} {isAnimatingTap ? 'tap-animating' : ''} {isDragging ? 'dragging' : ''} {isBeingPlayed ? 'being-played' : ''} {isPending ? 'pending' : ''} {isAttacking ? 'attacking' : ''} {canAttack ? 'can-attack' : ''} {isBlocking ? 'blocking' : ''} {canBlock ? 'can-block' : ''} {summoningSickness ? 'summoning-sick' : ''}"
+		: ''} {isAnimatingTap ? 'tap-animating' : ''} {isDragging ? 'dragging' : ''} {isBeingPlayed
+		? 'being-played'
+		: ''} {isPending ? 'pending' : ''} {isAttacking ? 'attacking' : ''} {canAttack
+		? 'can-attack'
+		: ''} {isBlocking ? 'blocking' : ''} {canBlock ? 'can-block' : ''} {summoningSickness
+		? 'summoning-sick'
+		: ''}"
 	role="button"
 	tabindex="0"
 	draggable="false"
@@ -329,6 +335,48 @@
 				{/if}
 			</div>
 		{/if}
+		<!-- Real Card -->
+		{#if effectiveImageUrl && !imageError}
+			<img
+				src={effectiveImageUrl}
+				alt={cardName}
+				class="card-image {imageLoaded ? 'loaded' : ''}"
+				draggable="false"
+				onload={handleImageLoad}
+				onerror={handleImageError}
+			/>
+			<!-- Loading Spinner -->
+			{#if !imageLoaded}
+				<div class="loading-spinner"></div>
+			{/if}
+
+			<!-- Text Overlay for Readability -->
+			<div class="text-overlay">
+				<!-- Card Name & Mana Cost -->
+				<div class="overlay-header">
+					<div class="overlay-card-name">{cardName}</div>
+					{#if manaCost}
+						<div class="overlay-mana-cost">
+							{#each manaSymbols as symbol}
+								<ManaSymbol {symbol} size="sm" />
+							{/each}
+						</div>
+					{/if}
+				</div>
+
+				<!-- Card Type -->
+				{#if cardType}
+					<div class="overlay-type">{cardType}</div>
+				{/if}
+
+				<!-- Power/Toughness -->
+				{#if hasPowerToughness}
+					<div class="overlay-pt">
+						{power}/{toughness}
+					</div>
+				{/if}
+			</div>
+		{/if}
 
 		<!-- Counters Badge -->
 		{#if hasCounters}
@@ -350,7 +398,10 @@
 
 		<!-- Combat: Attacking Badge -->
 		{#if isAttacking}
-			<div class="combat-badge attacking-badge" title="Attacking{attackTarget ? ` ${attackTarget}` : ''}">
+			<div
+				class="combat-badge attacking-badge"
+				title="Attacking{attackTarget ? ` ${attackTarget}` : ''}"
+			>
 				<span class="combat-icon">⚔️</span>
 			</div>
 			{#if attackTarget}
@@ -369,7 +420,10 @@
 
 		<!-- Combat: Blocking Badge -->
 		{#if isBlocking}
-			<div class="combat-badge blocking-badge" title="Blocking{blockingWhat.length > 0 ? `: ${blockingWhat.join(', ')}` : ''}">
+			<div
+				class="combat-badge blocking-badge"
+				title="Blocking{blockingWhat.length > 0 ? `: ${blockingWhat.join(', ')}` : ''}"
+			>
 				<span class="combat-icon">🛡️</span>
 			</div>
 			{#if blockingWhat.length > 0}
@@ -395,7 +449,10 @@
 
 		<!-- Summoning Sickness Overlay -->
 		{#if summoningSickness}
-			<div class="summoning-sickness-overlay" title="Summoning Sickness - Cannot attack or use tap abilities this turn">
+			<div
+				class="summoning-sickness-overlay"
+				title="Summoning Sickness - Cannot attack or use tap abilities this turn"
+			>
 				<div class="zzz-indicator">💤</div>
 			</div>
 		{/if}
@@ -443,8 +500,8 @@
 	}
 
 	.card-normal {
-		width: 100px;
-		height: 140px;
+		width: 150px;
+		height: 210px;
 		font-size: 0.75rem;
 	}
 
@@ -508,7 +565,7 @@
 			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 		}
 		50% {
-			box-shadow: 
+			box-shadow:
 				0 4px 12px rgba(102, 126, 234, 0.4),
 				0 0 20px rgba(102, 126, 234, 0.2);
 		}
@@ -528,7 +585,7 @@
 			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 		}
 		50% {
-			box-shadow: 
+			box-shadow:
 				0 4px 12px rgba(16, 185, 129, 0.4),
 				0 0 20px rgba(16, 185, 129, 0.2);
 		}
@@ -543,7 +600,8 @@
 
 	/* Subtle glow pulse during any tap state change */
 	@keyframes tap-glow {
-		0%, 100% {
+		0%,
+		100% {
 			filter: brightness(1);
 		}
 		50% {
@@ -870,7 +928,8 @@
 	}
 
 	@keyframes attacking-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow:
 				0 0 0 3px rgba(239, 68, 68, 0.4),
 				0 8px 20px rgba(239, 68, 68, 0.5),
@@ -907,7 +966,8 @@
 	}
 
 	@keyframes can-attack-shimmer {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow:
 				0 0 0 2px rgba(34, 197, 94, 0.3),
 				0 0 15px rgba(34, 197, 94, 0.2);
@@ -939,7 +999,8 @@
 	}
 
 	@keyframes blocking-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow:
 				0 0 0 3px rgba(59, 130, 246, 0.4),
 				0 8px 20px rgba(59, 130, 246, 0.5),
@@ -968,7 +1029,8 @@
 	}
 
 	@keyframes can-block-shimmer {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow:
 				0 0 0 2px rgba(59, 130, 246, 0.3),
 				0 0 15px rgba(59, 130, 246, 0.2);
@@ -1124,7 +1186,8 @@
 	}
 
 	@keyframes zzz-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			opacity: 0.7;
 			transform: scale(1);
 		}
@@ -1138,5 +1201,123 @@
 	.card-back .summoning-sickness-overlay,
 	.card-placeholder .summoning-sickness-overlay {
 		display: none;
+	}
+
+	/* ============================================
+   TEXT OVERLAY FOR READABILITY
+   ============================================ */
+
+	.text-overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		pointer-events: none;
+		z-index: 3;
+		padding: 0.375rem;
+		border-radius: 6px;
+	}
+
+	/* Header: Card Name + Mana Cost */
+	.overlay-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 0.25rem;
+		margin-bottom: auto;
+	}
+
+	.overlay-card-name {
+		flex: 1;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		line-height: 1.2;
+		color: white;
+		background: rgba(0, 0, 0, 0.75);
+		padding: 0.25rem 0.375rem;
+		border-radius: 4px;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+		backdrop-filter: blur(4px);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+
+	.overlay-mana-cost {
+		display: flex;
+		gap: 0.125rem;
+		flex-wrap: wrap;
+		background: rgba(0, 0, 0, 0.75);
+		padding: 0.25rem;
+		border-radius: 4px;
+		backdrop-filter: blur(4px);
+	}
+
+	/* Card Type */
+	.overlay-type {
+		font-size: 0.625rem;
+		font-weight: 600;
+		color: white;
+		background: rgba(0, 0, 0, 0.7);
+		padding: 0.125rem 0.375rem;
+		border-radius: 4px;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+		backdrop-filter: blur(4px);
+		align-self: flex-start;
+		max-width: 90%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		bottom: 36%;
+		position: relative;
+	}
+
+	/* Power/Toughness */
+	.overlay-pt {
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: #fbbf24;
+		background: rgba(0, 0, 0, 0.8);
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		text-shadow:
+			0 1px 2px rgba(0, 0, 0, 0.8),
+			0 0 8px rgba(251, 191, 36, 0.5);
+		backdrop-filter: blur(4px);
+		align-self: flex-end;
+		min-width: 2rem;
+		text-align: center;
+		position: absolute;
+		bottom: 0;
+	}
+
+	/* Responsive sizing for different card sizes */
+	.card-small .overlay-card-name {
+		font-size: 0.5rem;
+		padding: 0.125rem 0.25rem;
+	}
+
+	.card-small .overlay-type {
+		font-size: 0.5rem;
+		padding: 0.125rem 0.25rem;
+	}
+
+	.card-small .overlay-pt {
+		font-size: 0.625rem;
+		padding: 0.125rem 0.25rem;
+	}
+
+	.card-large .overlay-card-name {
+		font-size: 0.75rem;
+	}
+
+	.card-large .overlay-type {
+		font-size: 0.6875rem;
+	}
+
+	.card-large .overlay-pt {
+		font-size: 1rem;
 	}
 </style>

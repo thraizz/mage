@@ -3,7 +3,7 @@
  * Real gRPC implementation for MTG game interactions
  */
 
-import { getMageClient } from '$lib/grpc/client';
+import { withSession, withSessionValidated } from '$lib/utils/game-api';
 import type {
 	GameJoinRequest,
 	GameJoinResponse,
@@ -40,23 +40,11 @@ export { PlayerAction, SpecialActionType } from '$lib/generated/mage/v1/game';
  * Must be called before receiving game updates
  */
 export async function joinGame(gameId: string): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: GameJoinRequest = {
-		sessionId,
-		gameId
-	};
-
-	const response = await client.call<GameJoinRequest, GameJoinResponse>('GameJoin', request);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to join game');
-	}
+	await withSessionValidated<GameJoinRequest, GameJoinResponse>(
+		'GameJoin',
+		(sessionId) => ({ sessionId, gameId }),
+		'Failed to join game'
+	);
 }
 
 /**
@@ -65,25 +53,15 @@ export async function joinGame(gameId: string): Promise<void> {
  */
 export async function fetchGameView(gameId: string, playerId?: string): Promise<GameView> {
 	console.log('[fetchGameView] Starting', { gameId, playerId });
-	
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-	console.log('[fetchGameView] Got sessionId', { sessionId });
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: GameGetViewRequest = {
-		sessionId,
-		gameId,
-		playerId: playerId || ''
-	};
 
 	console.log('[fetchGameView] Calling GameGetView RPC...');
-	const response = await client.call<GameGetViewRequest, GameGetViewResponse>(
+	const response = await withSession<GameGetViewRequest, GameGetViewResponse>(
 		'GameGetView',
-		request
+		(sessionId) => ({
+			sessionId,
+			gameId,
+			playerId: playerId || ''
+		})
 	);
 	console.log('[fetchGameView] Got response', { hasGame: !!response.game });
 
@@ -98,135 +76,55 @@ export async function fetchGameView(gameId: string, playerId?: string): Promise<
  * Send a player action (pass priority, concede, etc.)
  */
 export async function sendPlayerAction(gameId: string, action: PlayerAction): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: SendPlayerActionRequest = {
-		sessionId,
-		gameId,
-		action
-	};
-
-	const response = await client.call<SendPlayerActionRequest, SendPlayerActionResponse>(
+	await withSessionValidated<SendPlayerActionRequest, SendPlayerActionResponse>(
 		'SendPlayerAction',
-		request
+		(sessionId) => ({ sessionId, gameId, action }),
+		'Failed to send action'
 	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to send action');
-	}
 }
 
 /**
  * Send a UUID selection (card, permanent, ability target)
  */
 export async function sendPlayerUUID(gameId: string, uuid: string): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: SendPlayerUUIDRequest = {
-		sessionId,
-		gameId,
-		uuid
-	};
-
-	const response = await client.call<SendPlayerUUIDRequest, SendPlayerUUIDResponse>(
+	await withSessionValidated<SendPlayerUUIDRequest, SendPlayerUUIDResponse>(
 		'SendPlayerUUID',
-		request
+		(sessionId) => ({ sessionId, gameId, uuid }),
+		'Failed to send UUID selection'
 	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to send UUID selection');
-	}
 }
 
 /**
  * Send a boolean response (yes/no choices)
  */
 export async function sendPlayerBoolean(gameId: string, value: boolean): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: SendPlayerBooleanRequest = {
-		sessionId,
-		gameId,
-		data: value
-	};
-
-	const response = await client.call<SendPlayerBooleanRequest, SendPlayerBooleanResponse>(
+	await withSessionValidated<SendPlayerBooleanRequest, SendPlayerBooleanResponse>(
 		'SendPlayerBoolean',
-		request
+		(sessionId) => ({ sessionId, gameId, data: value }),
+		'Failed to send boolean response'
 	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to send boolean response');
-	}
 }
 
 /**
  * Send an integer response (amount selections)
  */
 export async function sendPlayerInteger(gameId: string, value: number): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: SendPlayerIntegerRequest = {
-		sessionId,
-		gameId,
-		data: value
-	};
-
-	const response = await client.call<SendPlayerIntegerRequest, SendPlayerIntegerResponse>(
+	await withSessionValidated<SendPlayerIntegerRequest, SendPlayerIntegerResponse>(
 		'SendPlayerInteger',
-		request
+		(sessionId) => ({ sessionId, gameId, data: value }),
+		'Failed to send integer response'
 	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to send integer response');
-	}
 }
 
 /**
  * Send a string response (mode/choice selections)
  */
 export async function sendPlayerString(gameId: string, value: string): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: SendPlayerStringRequest = {
-		sessionId,
-		gameId,
-		data: value
-	};
-
-	const response = await client.call<SendPlayerStringRequest, SendPlayerStringResponse>(
+	await withSessionValidated<SendPlayerStringRequest, SendPlayerStringResponse>(
 		'SendPlayerString',
-		request
+		(sessionId) => ({ sessionId, gameId, data: value }),
+		'Failed to send string response'
 	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to send string response');
-	}
 }
 
 /**
@@ -237,28 +135,16 @@ export async function sendPlayerManaType(
 	manaType: string,
 	manaTypeStr?: string
 ): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: SendPlayerManaTypeRequest = {
-		sessionId,
-		gameId,
-		manaType,
-		manaTypeStr: manaTypeStr || manaType
-	};
-
-	const response = await client.call<SendPlayerManaTypeRequest, SendPlayerManaTypeResponse>(
+	await withSessionValidated<SendPlayerManaTypeRequest, SendPlayerManaTypeResponse>(
 		'SendPlayerManaType',
-		request
+		(sessionId) => ({
+			sessionId,
+			gameId,
+			manaType,
+			manaTypeStr: manaTypeStr || manaType
+		}),
+		'Failed to send mana type selection'
 	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to send mana type selection');
-	}
 }
 
 /**
@@ -321,23 +207,11 @@ export async function mulligan(gameId: string): Promise<void> {
  * Quit the match entirely
  */
 export async function quitMatch(gameId: string): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: MatchQuitRequest = {
-		sessionId,
-		gameId
-	};
-
-	const response = await client.call<MatchQuitRequest, MatchQuitResponse>('MatchQuit', request);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to quit match');
-	}
+	await withSessionValidated<MatchQuitRequest, MatchQuitResponse>(
+		'MatchQuit',
+		(sessionId) => ({ sessionId, gameId }),
+		'Failed to quit match'
+	);
 }
 
 /**
@@ -349,28 +223,11 @@ export async function sendSpecialAction(
 	actionType: SpecialActionType,
 	sourceId: string
 ): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: SendSpecialActionRequest = {
-		sessionId,
-		gameId,
-		actionType,
-		sourceId
-	};
-
-	const response = await client.call<SendSpecialActionRequest, SendSpecialActionResponse>(
+	await withSessionValidated<SendSpecialActionRequest, SendSpecialActionResponse>(
 		'SendSpecialAction',
-		request
+		(sessionId) => ({ sessionId, gameId, actionType, sourceId }),
+		'Failed to execute special action'
 	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to execute special action');
-	}
 }
 
 /**
@@ -407,29 +264,11 @@ export async function activateAbility(
 	abilityId: string,
 	targets: string[] = []
 ): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: ActivateAbilityRequest = {
-		sessionId,
-		gameId,
-		cardId,
-		abilityId,
-		targets
-	};
-
-	const response = await client.call<ActivateAbilityRequest, ActivateAbilityResponse>(
+	await withSessionValidated<ActivateAbilityRequest, ActivateAbilityResponse>(
 		'ActivateAbility',
-		request
+		(sessionId) => ({ sessionId, gameId, cardId, abilityId, targets }),
+		'Failed to activate ability'
 	);
-
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to activate ability');
-	}
 }
 
 // ============================================================================
@@ -567,34 +406,20 @@ import type {
  * In multiplayer games, this sends a request to opponents for consent
  * @param gameId - The game ID
  * @param messageId - The message ID to rollback to
- * @returns Object containing success status, requestId (for multiplayer), and whether consent is required
+ * @returns Object containing success status and requestId (for multiplayer)
  */
 export async function requestRollback(
 	gameId: string,
 	messageId: number
-): Promise<{ success: boolean; requestId: string; requiresConsent: boolean; error?: string }> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: RequestRollbackRequest = {
-		sessionId,
-		gameId,
-		messageId
-	};
-
-	const response = await client.call<RequestRollbackRequest, RequestRollbackResponse>(
+): Promise<{ success: boolean; requestId: string; error?: string }> {
+	const response = await withSession<RequestRollbackRequest, RequestRollbackResponse>(
 		'RequestRollback',
-		request
+		(sessionId) => ({ sessionId, gameId, messageId })
 	);
 
 	return {
 		success: response.success,
 		requestId: response.requestId,
-		requiresConsent: response.requiresConsent,
 		error: response.error
 	};
 }
@@ -610,23 +435,9 @@ export async function respondToRollback(
 	requestId: string,
 	approved: boolean
 ): Promise<{ success: boolean; error?: string }> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: RespondToRollbackRequest = {
-		sessionId,
-		gameId,
-		requestId,
-		approved
-	};
-
-	const response = await client.call<RespondToRollbackRequest, RespondToRollbackResponse>(
+	const response = await withSession<RespondToRollbackRequest, RespondToRollbackResponse>(
 		'RespondToRollback',
-		request
+		(sessionId) => ({ sessionId, gameId, requestId, approved })
 	);
 
 	return {
@@ -644,22 +455,9 @@ export async function cancelRollback(
 	gameId: string,
 	requestId: string
 ): Promise<{ success: boolean; error?: string }> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
-
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
-
-	const request: CancelRollbackRequest = {
-		sessionId,
-		gameId,
-		requestId
-	};
-
-	const response = await client.call<CancelRollbackRequest, CancelRollbackResponse>(
+	const response = await withSession<CancelRollbackRequest, CancelRollbackResponse>(
 		'CancelRollback',
-		request
+		(sessionId) => ({ sessionId, gameId, requestId } as CancelRollbackRequest)
 	);
 
 	return {

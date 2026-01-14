@@ -1,6 +1,6 @@
 /**
  * Playtest Game Store
- * 
+ *
  * Client-side only game state management for playtest mode.
  * No server communication - all state is local.
  */
@@ -8,6 +8,15 @@
 import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { CardView, ManaPoolView } from '$lib/generated/mage/v1/models';
+import { ZoneId } from '$lib/utils/zones';
+import {
+	updatePlayer,
+	findCardInState,
+	removeCardFromZone,
+	addCardToZone,
+	shuffleArray,
+	getNextPlayer
+} from '$lib/utils/playtest-helpers';
 
 /**
  * Local player state for playtest
@@ -41,6 +50,7 @@ export interface PlaytestGameState {
 	turn: number;
 	activePlayerId: string;
 	isInitialized: boolean;
+	log: PlaytestLogEntry[];
 }
 
 const initialState: PlaytestGameState = {
@@ -53,77 +63,337 @@ const initialState: PlaytestGameState = {
 	command: [],
 	turn: 1,
 	activePlayerId: '',
-	isInitialized: false
+	isInitialized: false,
+	log: []
 };
 
-const PLAYTEST_STORAGE_KEY = 'mage.playtest.state.v1';
+// Store up to the last 10 playtest sessions
+const PLAYTEST_SESSIONS_STORAGE_KEY = 'mage.playtest.sessions.v1';
+const PLAYTEST_ACTIVE_SESSION_ID_KEY = 'mage.playtest.activeSessionId.v1';
 const PLAYTEST_STORAGE_VERSION = 1;
 
-type PersistedPlaytestState = {
+// Legacy (single-session) key migration:
+const PLAYTEST_LEGACY_STORAGE_KEY = 'mage.playtest.state.v1';
+
+export type PlaytestSessionMeta = {
+	id: string;
+	createdAt: number;
+	savedAt: number;
+	label: string;
+	playerCount: number;
+	turn: number;
+};
+
+type PersistedPlaytestStateV1 = {
 	version: number;
 	savedAt: number;
 	state: PlaytestGameState;
 };
 
-function loadPersistedPlaytestState(): PlaytestGameState | null {
+type PersistedPlaytestSession = {
+	id: string;
+	createdAt: number;
+	savedAt: number;
+	label: string;
+	state: PlaytestGameState;
+};
+
+type PersistedPlaytestSessionsPayload = {
+	version: number;
+	sessions: PersistedPlaytestSession[];
+};
+
+/**
+ * Game log (for playtest analysis)
+ */
+export type PlaytestLogEntry = {
+	id: string;
+	at: number; // unix ms
+	turn: number;
+	activePlayerId: string;
+	controlSeat: string; // activeControlSeat at time of event
+	kind: string; // "draw" | "move" | "life" | ...
+	message: string;
+};
+
+const PLAYTEST_LOG_MAX_ENTRIES = 1000;
+
+function makeLogId(): string {
+	return `log-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function formatLogEntry(e: PlaytestLogEntry, state: PlaytestGameState): string {
+	const t = new Date(e.at);
+	const hh = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+	const activeName =
+		state.players.find((p) => p.playerId === e.activePlayerId)?.name ?? e.activePlayerId;
+	const controlName =
+		state.players.find((p) => p.playerId === e.controlSeat)?.name ?? e.controlSeat;
+
+	return `[${hh}] Turn ${e.turn} · Active: ${activeName} · Controlling: ${controlName} · ${e.message}`;
+}
+
+function appendLogToState(
+	state: PlaytestGameState,
+	entry: Omit<PlaytestLogEntry, 'id' | 'at' | 'turn' | 'activePlayerId' | 'controlSeat'>
+): PlaytestGameState {
+	// Avoid logging if the session isn't initialized yet.
+	if (!state.isInitialized) return state;
+
+	const full: PlaytestLogEntry = {
+		id: makeLogId(),
+		at: Date.now(),
+		turn: state.turn,
+		activePlayerId: state.activePlayerId,
+		controlSeat: state.activeControlSeat,
+		...entry
+	};
+
+	const next = [...(state.log ?? []), full];
+	const trimmed =
+		next.length > PLAYTEST_LOG_MAX_ENTRIES
+			? next.slice(next.length - PLAYTEST_LOG_MAX_ENTRIES)
+			: next;
+
+	return { ...state, log: trimmed };
+}
+
+function playerName(state: PlaytestGameState, playerId: string): string {
+	return state.players.find((p) => p.playerId === playerId)?.name ?? playerId;
+}
+
+function isValidPlaytestState(state: PlaytestGameState): boolean {
+	if (!state || typeof state !== 'object') return false;
+	if (state.isInitialized !== true) return false;
+	if (!Array.isArray(state.players) || state.players.length === 0) return false;
+	if (typeof state.gameId !== 'string' || state.gameId.length === 0) return false;
+	return true;
+}
+
+function buildSessionLabel(state: PlaytestGameState): string {
+	const names = (state.players || []).map((p) => p.name).filter(Boolean);
+	if (names.length === 0) return 'Playtest session';
+	return names.join(' vs ');
+}
+
+function readSessionsPayload(): PersistedPlaytestSessionsPayload | null {
 	if (!browser) return null;
-
 	try {
-		const raw = localStorage.getItem(PLAYTEST_STORAGE_KEY);
+		const raw = localStorage.getItem(PLAYTEST_SESSIONS_STORAGE_KEY);
 		if (!raw) return null;
-
-		const parsed = JSON.parse(raw) as PersistedPlaytestState;
+		const parsed = JSON.parse(raw) as PersistedPlaytestSessionsPayload;
 		if (!parsed || typeof parsed !== 'object') return null;
 		if (parsed.version !== PLAYTEST_STORAGE_VERSION) return null;
-		if (!parsed.state || typeof parsed.state !== 'object') return null;
-
-		// Basic validation to avoid crashing on bad/stale data
-		if (parsed.state.isInitialized !== true) return null;
-		if (!Array.isArray(parsed.state.players) || parsed.state.players.length === 0) return null;
-		if (typeof parsed.state.gameId !== 'string' || parsed.state.gameId.length === 0) return null;
-
-		return parsed.state;
+		if (!Array.isArray(parsed.sessions)) return null;
+		return parsed;
 	} catch (err) {
-		console.warn('[PlaytestGame] Failed to load persisted state:', err);
+		console.warn('[PlaytestGame] Failed to load persisted sessions:', err);
 		return null;
 	}
 }
 
-function persistPlaytestState(state: PlaytestGameState): void {
+function writeSessionsPayload(payload: PersistedPlaytestSessionsPayload): void {
 	if (!browser) return;
-	if (!state.isInitialized) return;
-
 	try {
-		const payload: PersistedPlaytestState = {
-			version: PLAYTEST_STORAGE_VERSION,
-			savedAt: Date.now(),
-			state
-		};
-		localStorage.setItem(PLAYTEST_STORAGE_KEY, JSON.stringify(payload));
+		localStorage.setItem(PLAYTEST_SESSIONS_STORAGE_KEY, JSON.stringify(payload));
 	} catch (err) {
-		console.warn('[PlaytestGame] Failed to persist state:', err);
+		console.warn('[PlaytestGame] Failed to persist sessions:', err);
 	}
 }
 
-function clearPersistedPlaytestState(): void {
+function readActiveSessionId(): string | null {
+	if (!browser) return null;
+	try {
+		return localStorage.getItem(PLAYTEST_ACTIVE_SESSION_ID_KEY);
+	} catch (err) {
+		console.warn('[PlaytestGame] Failed to read active session id:', err);
+		return null;
+	}
+}
+
+function writeActiveSessionId(sessionId: string | null): void {
 	if (!browser) return;
 	try {
-		localStorage.removeItem(PLAYTEST_STORAGE_KEY);
+		if (!sessionId) {
+			localStorage.removeItem(PLAYTEST_ACTIVE_SESSION_ID_KEY);
+			return;
+		}
+		localStorage.setItem(PLAYTEST_ACTIVE_SESSION_ID_KEY, sessionId);
 	} catch (err) {
-		console.warn('[PlaytestGame] Failed to clear persisted state:', err);
+		console.warn('[PlaytestGame] Failed to write active session id:', err);
 	}
+}
+
+function loadPersistedSessions(): PersistedPlaytestSession[] {
+	const payload = readSessionsPayload();
+	const sessions = payload?.sessions ?? [];
+	return sessions
+		.filter(
+			(s) =>
+				s &&
+				typeof s === 'object' &&
+				typeof s.id === 'string' &&
+				s.id.length > 0 &&
+				isValidPlaytestState(s.state)
+		)
+		.sort((a, b) => (b.savedAt ?? 0) - (a.savedAt ?? 0))
+		.slice(0, 10);
+}
+
+function savePersistedSessions(sessions: PersistedPlaytestSession[]): void {
+	writeSessionsPayload({
+		version: PLAYTEST_STORAGE_VERSION,
+		sessions: sessions.slice(0, 10)
+	});
+}
+
+function migrateLegacySingleSessionIfNeeded(): void {
+	if (!browser) return;
+	try {
+		const legacyRaw = localStorage.getItem(PLAYTEST_LEGACY_STORAGE_KEY);
+		if (!legacyRaw) return;
+
+		const legacyParsed = JSON.parse(legacyRaw) as PersistedPlaytestStateV1;
+		if (!legacyParsed || legacyParsed.version !== PLAYTEST_STORAGE_VERSION) {
+			localStorage.removeItem(PLAYTEST_LEGACY_STORAGE_KEY);
+			return;
+		}
+		if (!legacyParsed.state || !isValidPlaytestState(legacyParsed.state)) {
+			localStorage.removeItem(PLAYTEST_LEGACY_STORAGE_KEY);
+			return;
+		}
+
+		const state = legacyParsed.state;
+		const id = state.gameId || `playtest-${legacyParsed.savedAt || Date.now()}`;
+		const now = Date.now();
+		const createdAt = legacyParsed.savedAt || now;
+		const savedAt = legacyParsed.savedAt || now;
+		const label = buildSessionLabel(state);
+
+		const existing = loadPersistedSessions();
+		const without = existing.filter((s) => s.id !== id);
+		const migrated: PersistedPlaytestSession = { id, createdAt, savedAt, label, state };
+		savePersistedSessions([migrated, ...without]);
+		writeActiveSessionId(id);
+
+		localStorage.removeItem(PLAYTEST_LEGACY_STORAGE_KEY);
+	} catch (err) {
+		console.warn('[PlaytestGame] Failed to migrate legacy playtest state:', err);
+	}
+}
+
+function upsertSessionFromState(state: PlaytestGameState, opts?: { bumpSavedAt?: boolean }): void {
+	if (!browser) return;
+	if (!isValidPlaytestState(state)) return;
+
+	const now = Date.now();
+	const id = state.gameId;
+
+	const sessions = loadPersistedSessions();
+	const existing = sessions.find((s) => s.id === id);
+
+	const createdAt = existing?.createdAt ?? now;
+	const savedAt = opts?.bumpSavedAt === false ? (existing?.savedAt ?? now) : now;
+	const label = buildSessionLabel(state);
+
+	const updated: PersistedPlaytestSession = {
+		id,
+		createdAt,
+		savedAt,
+		label,
+		state
+	};
+
+	savePersistedSessions([updated, ...sessions.filter((s) => s.id !== id)]);
+	writeActiveSessionId(id);
+}
+
+export function getPlaytestSessionsMeta(): PlaytestSessionMeta[] {
+	if (!browser) return [];
+	migrateLegacySingleSessionIfNeeded();
+	const sessions = loadPersistedSessions();
+	return sessions.map((s) => ({
+		id: s.id,
+		createdAt: s.createdAt,
+		savedAt: s.savedAt,
+		label: s.label,
+		playerCount: s.state.players.length,
+		turn: s.state.turn
+	}));
+}
+
+export function deletePlaytestSession(sessionId: string): void {
+	if (!browser) return;
+	migrateLegacySingleSessionIfNeeded();
+	const sessions = loadPersistedSessions().filter((s) => s.id !== sessionId);
+	savePersistedSessions(sessions);
+
+	const active = readActiveSessionId();
+	if (active === sessionId) {
+		writeActiveSessionId(sessions[0]?.id ?? null);
+	}
+}
+
+export function clearPlaytestSessions(): void {
+	if (!browser) return;
+	try {
+		localStorage.removeItem(PLAYTEST_SESSIONS_STORAGE_KEY);
+		localStorage.removeItem(PLAYTEST_ACTIVE_SESSION_ID_KEY);
+	} catch (err) {
+		console.warn('[PlaytestGame] Failed to clear playtest sessions:', err);
+	}
+}
+
+function loadPersistedPlaytestState(): PlaytestGameState | null {
+	if (!browser) return null;
+
+	migrateLegacySingleSessionIfNeeded();
+
+	const activeId = readActiveSessionId();
+	const sessions = loadPersistedSessions();
+	const active = (activeId ? sessions.find((s) => s.id === activeId) : null) ?? sessions[0];
+
+	if (!active || !isValidPlaytestState(active.state)) return null;
+	return active.state;
 }
 
 /**
  * Create playtest game store
  */
 function createPlaytestGameStore() {
-	const hydrated = loadPersistedPlaytestState();
-	const { subscribe, set, update } = writable<PlaytestGameState>(hydrated ?? initialState);
+	function clearLog(): void {
+		update((state) => ({ ...state, log: [] }));
+	}
 
-	// Persist any meaningful state changes (client-only)
+	function addLog(message: string, kind: string = 'note'): void {
+		update((state) => appendLogToState(state, { kind, message }));
+	}
+
+	function buildLogText(state: PlaytestGameState): string {
+		const entries = Array.isArray(state.log) ? state.log : [];
+		return entries.map((e) => formatLogEntry(e, state)).join('\n');
+	}
+
+	const hydrated = loadPersistedPlaytestState();
+	const normalizedHydrated = hydrated
+		? { ...hydrated, log: Array.isArray(hydrated.log) ? hydrated.log : [] }
+		: null;
+
+	const { subscribe, set, update } = writable<PlaytestGameState>(
+		normalizedHydrated ?? initialState
+	);
+
+	// Persist any meaningful state changes (client-only). Debounced to avoid excessive writes.
+	let persistTimer: ReturnType<typeof setTimeout> | null = null;
 	subscribe((state) => {
-		persistPlaytestState(state);
+		if (!browser) return;
+		if (!isValidPlaytestState(state)) return;
+		if (persistTimer) clearTimeout(persistTimer);
+		persistTimer = setTimeout(() => {
+			upsertSessionFromState(state, { bumpSavedAt: true });
+			persistTimer = null;
+		}, 200);
 	});
 
 	/**
@@ -135,7 +405,7 @@ function createPlaytestGameStore() {
 			return;
 		}
 
-		set({
+		const nextState: PlaytestGameState = {
 			gameId,
 			activeControlSeat: players[0].playerId,
 			players,
@@ -145,8 +415,28 @@ function createPlaytestGameStore() {
 			command: [],
 			turn: 1,
 			activePlayerId: players[0].playerId,
-			isInitialized: true
-		});
+			isInitialized: true,
+			log: [
+				{
+					id: makeLogId(),
+					at: Date.now(),
+					turn: 1,
+					activePlayerId: players[0].playerId,
+					controlSeat: players[0].playerId,
+					kind: 'init',
+					message: `Game initialized (${
+						players
+							.map((p) => p.name)
+							.filter(Boolean)
+							.join(' vs ') || 'Playtest'
+					})`
+				}
+			]
+		};
+
+		set(nextState);
+		// Persist immediately as a new/active session.
+		upsertSessionFromState(nextState, { bumpSavedAt: true });
 
 		console.log('[PlaytestGame] Initialized with', players.length, 'players');
 	}
@@ -165,7 +455,7 @@ function createPlaytestGameStore() {
 	 * Switch active control seat (which player you're controlling)
 	 */
 	function switchControlSeat(playerId: string): void {
-		update(state => ({
+		update((state) => ({
 			...state,
 			activeControlSeat: playerId
 		}));
@@ -175,19 +465,20 @@ function createPlaytestGameStore() {
 	 * Draw cards for a player
 	 */
 	function drawCards(playerId: string, count: number): void {
-		update(state => {
-			const playerIndex = state.players.findIndex(p => p.playerId === playerId);
+		update((state) => {
+			const playerIndex = state.players.findIndex((p) => p.playerId === playerId);
 			if (playerIndex === -1) {
 				console.error('[PlaytestGame] Player not found:', playerId);
 				return state;
 			}
 
 			const player = state.players[playerIndex];
+			const before = player.library.length;
 			const drawn = player.library.splice(0, Math.min(count, player.library.length));
-			
+
 			// Update zone and make cards visible
-			drawn.forEach(card => {
-				card.zone = 1; // HAND
+			drawn.forEach((card) => {
+				card.zone = ZoneId.HAND;
 				card.faceDown = false;
 			});
 
@@ -199,10 +490,14 @@ function createPlaytestGameStore() {
 				libraryCount: player.library.length
 			};
 
-			return {
+			const msg = `${playerName(state, playerId)} draws ${drawn.length}${count !== drawn.length ? ` (requested ${count})` : ''}. Library: ${before} → ${player.library.length}.`;
+
+			const next = {
 				...state,
 				players: newPlayers
 			};
+
+			return appendLogToState(next, { kind: 'draw', message: msg });
 		});
 	}
 
@@ -210,11 +505,11 @@ function createPlaytestGameStore() {
 	 * Play a card from hand to battlefield
 	 */
 	function playCard(cardId: string, tapped: boolean = false): void {
-		update(state => {
-			const controllingPlayer = state.players.find(p => p.playerId === state.activeControlSeat);
+		update((state) => {
+			const controllingPlayer = state.players.find((p) => p.playerId === state.activeControlSeat);
 			if (!controllingPlayer) return state;
 
-			const cardIndex = controllingPlayer.hand.findIndex(c => c.id === cardId);
+			const cardIndex = controllingPlayer.hand.findIndex((c) => c.id === cardId);
 			if (cardIndex === -1) {
 				console.error('[PlaytestGame] Card not found in hand:', cardId);
 				return state;
@@ -225,23 +520,26 @@ function createPlaytestGameStore() {
 			newHand.splice(cardIndex, 1);
 
 			// Update card properties
-			card.zone = 2; // BATTLEFIELD
+			card.zone = ZoneId.BATTLEFIELD;
 			card.controllerId = state.activeControlSeat;
 			card.tapped = tapped;
 			card.faceDown = false;
 
 			// Update player
-			const newPlayers = state.players.map(p => 
+			const newPlayers = state.players.map((p) =>
 				p.playerId === state.activeControlSeat
 					? { ...p, hand: newHand, handCount: newHand.length }
 					: p
 			);
 
-			return {
+			const msg = `${playerName(state, state.activeControlSeat)} plays ${card.name}${tapped ? ' (tapped)' : ''}. Hand: ${controllingPlayer.hand.length} → ${newHand.length}.`;
+
+			const next = {
 				...state,
 				players: newPlayers,
 				battlefield: [...state.battlefield, card]
 			};
+			return appendLogToState(next, { kind: 'play', message: msg });
 		});
 	}
 
@@ -249,149 +547,24 @@ function createPlaytestGameStore() {
 	 * Move a card to a different zone
 	 */
 	function moveCardToZone(cardId: string, targetZone: string): void {
-		update(state => {
+		update((state) => {
 			// Find the card in any zone
-			let card: CardView | null = null;
-			let sourceZone: string | null = null;
-
-			// Check battlefield
-			const bfIndex = state.battlefield.findIndex(c => c.id === cardId);
-			if (bfIndex !== -1) {
-				card = state.battlefield[bfIndex];
-				sourceZone = 'battlefield';
-			}
-
-			// Check player zones
-			if (!card) {
-				for (const player of state.players) {
-					const handIndex = player.hand.findIndex(c => c.id === cardId);
-					if (handIndex !== -1) {
-						card = player.hand[handIndex];
-						sourceZone = `hand:${player.playerId}`;
-						break;
-					}
-
-					const libraryIndex = player.library.findIndex(c => c.id === cardId);
-					if (libraryIndex !== -1) {
-						card = player.library[libraryIndex];
-						sourceZone = `library:${player.playerId}`;
-						break;
-					}
-					
-					const graveyardIndex = player.graveyard.findIndex(c => c.id === cardId);
-					if (graveyardIndex !== -1) {
-						card = player.graveyard[graveyardIndex];
-						sourceZone = `graveyard:${player.playerId}`;
-						break;
-					}
-				}
-			}
-
-			// Check exile
-			if (!card) {
-				const exileIndex = state.exile.findIndex(c => c.id === cardId);
-				if (exileIndex !== -1) {
-					card = state.exile[exileIndex];
-					sourceZone = 'exile';
-				}
-			}
-
-			// Check command zone
-			if (!card) {
-				const cmdIndex = state.command.findIndex(c => c.id === cardId);
-				if (cmdIndex !== -1) {
-					card = state.command[cmdIndex];
-					sourceZone = 'command';
-				}
-			}
-
-			if (!card || !sourceZone) {
+			const found = findCardInState(state, cardId);
+			if (!found) {
 				console.error('[PlaytestGame] Card not found:', cardId);
 				return state;
 			}
 
+			const { card, sourceZone } = found;
+
 			// Remove from source zone
-			let newState = { ...state };
-			if (sourceZone === 'battlefield') {
-				newState.battlefield = state.battlefield.filter(c => c.id !== cardId);
-			} else if (sourceZone === 'exile') {
-				newState.exile = state.exile.filter(c => c.id !== cardId);
-			} else if (sourceZone === 'command') {
-				newState.command = state.command.filter(c => c.id !== cardId);
-			} else if (sourceZone.startsWith('hand:')) {
-				const playerId = sourceZone.split(':')[1];
-				newState.players = state.players.map(p =>
-					p.playerId === playerId
-						? { ...p, hand: p.hand.filter(c => c.id !== cardId), handCount: p.hand.length - 1 }
-						: p
-				);
-			} else if (sourceZone.startsWith('library:')) {
-				const playerId = sourceZone.split(':')[1];
-				newState.players = state.players.map(p =>
-					p.playerId === playerId
-						? { ...p, library: p.library.filter(c => c.id !== cardId), libraryCount: p.library.length - 1 }
-						: p
-				);
-			} else if (sourceZone.startsWith('graveyard:')) {
-				const playerId = sourceZone.split(':')[1];
-				newState.players = state.players.map(p =>
-					p.playerId === playerId
-						? { ...p, graveyard: p.graveyard.filter(c => c.id !== cardId) }
-						: p
-				);
-			}
+			let next = removeCardFromZone(state, cardId, sourceZone);
 
 			// Add to target zone
-			card.faceDown = false;
-			const upperTargetZone = targetZone.toUpperCase();
-			
-			if (upperTargetZone === 'BATTLEFIELD') {
-				card.zone = 2;
-				card.controllerId = state.activeControlSeat;
-				newState.battlefield = [...newState.battlefield, card];
-			} else if (upperTargetZone === 'GRAVEYARD') {
-				card.zone = 3;
-				const owner = card.ownerId || state.activeControlSeat;
-				newState.players = newState.players.map(p =>
-					p.playerId === owner
-						? { ...p, graveyard: [...p.graveyard, card] }
-						: p
-				);
-			} else if (upperTargetZone === 'EXILE') {
-				card.zone = 4;
-				newState.exile = [...newState.exile, card];
-			} else if (upperTargetZone === 'HAND') {
-				card.zone = 1;
-				newState.players = newState.players.map(p =>
-					p.playerId === state.activeControlSeat
-						? { ...p, hand: [...p.hand, card], handCount: p.hand.length + 1 }
-						: p
-				);
-			} else if (upperTargetZone === 'COMMAND') {
-				card.zone = 5;
-				card.faceDown = false;
-				newState.command = [...newState.command, card];
-			} else if (upperTargetZone === 'LIBRARY' || upperTargetZone === 'LIBRARY_TOP') {
-				card.zone = 0;
-				card.faceDown = true;
-				const owner = card.ownerId || state.activeControlSeat;
-				newState.players = newState.players.map(p =>
-					p.playerId === owner
-						? { ...p, library: [card, ...p.library], libraryCount: p.library.length + 1 }
-						: p
-				);
-			} else if (upperTargetZone === 'LIBRARY_BOTTOM') {
-				card.zone = 0;
-				card.faceDown = true;
-				const owner = card.ownerId || state.activeControlSeat;
-				newState.players = newState.players.map(p =>
-					p.playerId === owner
-						? { ...p, library: [...p.library, card], libraryCount: p.library.length + 1 }
-						: p
-				);
-			}
+			next = addCardToZone(next, card, targetZone, state.activeControlSeat);
 
-			return newState;
+			const msg = `${playerName(state, state.activeControlSeat)} moves ${card.name} from ${sourceZone} to ${targetZone}.`;
+			return appendLogToState(next, { kind: 'move', message: msg });
 		});
 	}
 
@@ -399,89 +572,108 @@ function createPlaytestGameStore() {
 	 * Tap or untap a card
 	 */
 	function tapCard(cardId: string, tapped: boolean): void {
-		update(state => ({
-			...state,
-			battlefield: state.battlefield.map(card =>
-				card.id === cardId ? { ...card, tapped } : card
-			)
-		}));
+		// update((state) => ({
+		// 	...state,
+		// 	battlefield: state.battlefield.map((card) =>
+		// 		card.id === cardId ? { ...card, tapped } : card
+		// 	)
+		// }));
+		update((state) => {
+			const card = state.battlefield.find((c) => c.id === cardId);
+			if (!card) return state;
+
+			const msg = `${playerName(state, state.activeControlSeat)} ${tapped ? 'taps' : 'untaps'} ${card.name}.`;
+			const next = {
+				...state,
+				battlefield: state.battlefield.map((c) => (c.id === cardId ? { ...c, tapped } : c))
+			};
+			return appendLogToState(next, { kind: 'tap', message: msg });
+		});
 	}
 
 	/**
 	 * Untap all permanents controlled by a player
 	 */
 	function untapAll(playerId: string): void {
-		update(state => ({
-			...state,
-			battlefield: state.battlefield.map(card =>
-				card.controllerId === playerId ? { ...card, tapped: false } : card
-			)
-		}));
+		update((state) => {
+			const msg = `${playerName(state, state.activeControlSeat)} untaps all permanents.`;
+			const next = {
+				...state,
+				battlefield: state.battlefield.map((c) =>
+					c.controllerId === playerId ? { ...c, tapped: false } : c
+				)
+			};
+			return appendLogToState(next, { kind: 'untap', message: msg });
+		});
 	}
 
 	/**
 	 * Flip a card face up/down
 	 */
 	function flipCard(cardId: string, faceDown: boolean): void {
-		update(state => ({
-			...state,
-			battlefield: state.battlefield.map(card =>
-				card.id === cardId ? { ...card, faceDown } : card
-			)
-		}));
+		update((state) => {
+			const card = state.battlefield.find((c) => c.id === cardId);
+			if (!card) return state;
+
+			const msg = `${playerName(state, state.activeControlSeat)} flips ${card.name} face ${faceDown ? 'down' : 'up'}.`;
+			const next = {
+				...state,
+				battlefield: state.battlefield.map((c) => (c.id === cardId ? { ...c, faceDown } : c))
+			};
+			return appendLogToState(next, { kind: 'flip', message: msg });
+		});
 	}
 
 	/**
 	 * Modify player life
 	 */
 	function modifyLife(playerId: string, delta: number): void {
-		update(state => ({
-			...state,
-			players: state.players.map(p =>
-				p.playerId === playerId
-					? { ...p, life: Math.max(0, p.life + delta) }
-					: p
-			)
-		}));
+		update((state) => {
+			const msg = `${playerName(state, state.activeControlSeat)} modifies life by ${delta}.`;
+			const next = {
+				...state,
+				players: updatePlayer(state.players, playerId, (p) => ({
+					life: Math.max(0, p.life + delta)
+				}))
+			};
+			return appendLogToState(next, { kind: 'life', message: msg });
+		});
 	}
 
 	/**
 	 * Set player counter (poison, energy, etc.)
 	 */
 	function setPlayerCounter(playerId: string, counterType: string, value: number): void {
-		update(state => ({
-			...state,
-			players: state.players.map(p => {
-				if (p.playerId !== playerId) return p;
-				
-				if (counterType === 'poison') {
-					return { ...p, poison: Math.max(0, value) };
-				} else if (counterType === 'energy') {
-					return { ...p, energy: Math.max(0, value) };
-				}
-				return p;
-			})
-		}));
+		update((state) => {
+			const updates: Partial<PlaytestPlayer> = {};
+			if (counterType === 'poison') {
+				updates.poison = Math.max(0, value);
+			} else if (counterType === 'energy') {
+				updates.energy = Math.max(0, value);
+			}
+
+			const msg = `${playerName(state, state.activeControlSeat)} sets ${counterType} to ${value}.`;
+			const next = {
+				...state,
+				players: updatePlayer(state.players, playerId, () => updates)
+			};
+			return appendLogToState(next, { kind: 'counter', message: msg });
+		});
 	}
 
 	/**
 	 * Shuffle a player's library (Fisher-Yates algorithm)
 	 */
 	function shuffleLibrary(playerId: string): void {
-		update(state => {
-			const newPlayers = state.players.map(p => {
-				if (p.playerId !== playerId) return p;
-
-				const shuffled = [...p.library];
-				for (let i = shuffled.length - 1; i > 0; i--) {
-					const j = Math.floor(Math.random() * (i + 1));
-					[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-				}
-
-				return { ...p, library: shuffled };
-			});
-
-			return { ...state, players: newPlayers };
+		update((state) => {
+			const msg = `${playerName(state, state.activeControlSeat)} shuffles their library.`;
+			const next = {
+				...state,
+				players: updatePlayer(state.players, playerId, (p) => ({
+					library: shuffleArray(p.library)
+				}))
+			};
+			return appendLogToState(next, { kind: 'shuffle', message: msg });
 		});
 	}
 
@@ -489,19 +681,22 @@ function createPlaytestGameStore() {
 	 * Add a card to the visual stack
 	 */
 	function addToStack(cardId: string): void {
-		update(state => {
-			const card = state.battlefield.find(c => c.id === cardId) ||
-			              state.players.flatMap(p => p.hand).find(c => c.id === cardId);
-			
+		update((state) => {
+			const card =
+				state.battlefield.find((c) => c.id === cardId) ||
+				state.players.flatMap((p) => p.hand).find((c) => c.id === cardId);
+
 			if (!card) {
 				console.error('[PlaytestGame] Card not found for stack:', cardId);
 				return state;
 			}
 
-			return {
+			const msg = `${playerName(state, state.activeControlSeat)} adds ${card.name} to the stack.`;
+			const next = {
 				...state,
 				stack: [...state.stack, { ...card }]
 			};
+			return appendLogToState(next, { kind: 'add', message: msg });
 		});
 	}
 
@@ -509,10 +704,14 @@ function createPlaytestGameStore() {
 	 * Remove an item from the stack
 	 */
 	function removeFromStack(itemId: string): void {
-		update(state => ({
-			...state,
-			stack: state.stack.filter(item => item.id !== itemId)
-		}));
+		update((state) => {
+			const msg = `${playerName(state, state.activeControlSeat)} removes ${itemId} from the stack.`;
+			const next = {
+				...state,
+				stack: state.stack.filter((item) => item.id !== itemId)
+			};
+			return appendLogToState(next, { kind: 'remove', message: msg });
+		});
 	}
 
 	/**
@@ -525,7 +724,7 @@ function createPlaytestGameStore() {
 		toughness: string,
 		color: string
 	): void {
-		update(state => {
+		update((state) => {
 			const tokenId = `token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 			const token: CardView = {
 				id: tokenId,
@@ -544,7 +743,7 @@ function createPlaytestGameStore() {
 				rarity: '',
 				rulesText: '',
 				abilities: [],
-				zone: 2, // BATTLEFIELD
+				zone: ZoneId.BATTLEFIELD,
 				ownerId: state.activeControlSeat,
 				controllerId: state.activeControlSeat,
 				tapped: false,
@@ -557,10 +756,12 @@ function createPlaytestGameStore() {
 				availableActions: []
 			};
 
-			return {
+			const msg = `${playerName(state, state.activeControlSeat)} creates ${token.name} token.`;
+			const next = {
 				...state,
 				battlefield: [...state.battlefield, token]
 			};
+			return appendLogToState(next, { kind: 'create', message: msg });
 		});
 	}
 
@@ -568,18 +769,18 @@ function createPlaytestGameStore() {
 	 * Next turn
 	 */
 	function nextTurn(): void {
-		update(state => {
-			// Find next player in turn order
-			const currentIndex = state.players.findIndex(p => p.playerId === state.activePlayerId);
-			const nextIndex = (currentIndex + 1) % state.players.length;
-			const nextPlayer = state.players[nextIndex];
+		update((state) => {
+			const nextPlayer = getNextPlayer(state.players, state.activePlayerId);
+			if (!nextPlayer) return state;
 
-			return {
+			const msg = `${playerName(state, state.activeControlSeat)} ends their turn.`;
+			const next = {
 				...state,
 				turn: state.turn + 1,
 				activePlayerId: nextPlayer.playerId,
 				activeControlSeat: nextPlayer.playerId
 			};
+			return appendLogToState(next, { kind: 'endTurn', message: msg });
 		});
 	}
 
@@ -587,32 +788,27 @@ function createPlaytestGameStore() {
 	 * Mulligan for a player
 	 */
 	function mulligan(playerId: string): void {
-		update(state => {
-			const playerIndex = state.players.findIndex(p => p.playerId === playerId);
+		update((state) => {
+			const playerIndex = state.players.findIndex((p) => p.playerId === playerId);
 			if (playerIndex === -1) return state;
 
 			const player = state.players[playerIndex];
-			
+
 			// Return hand to library
-			const returnedCards = player.hand.map(card => ({
+			const returnedCards = player.hand.map((card) => ({
 				...card,
-				zone: 0,
+				zone: ZoneId.LIBRARY,
 				faceDown: true
 			}));
-			
-			const newLibrary = [...returnedCards, ...player.library];
-			
-			// Shuffle
-			for (let i = newLibrary.length - 1; i > 0; i--) {
-				const j = Math.floor(Math.random() * (i + 1));
-				[newLibrary[i], newLibrary[j]] = [newLibrary[j], newLibrary[i]];
-			}
-			
+
+			// Shuffle library with returned cards
+			const newLibrary = shuffleArray([...returnedCards, ...player.library]);
+
 			// Draw one less card
 			const newHandSize = Math.max(0, player.handCount - 1);
-			const newHand = newLibrary.splice(0, newHandSize).map(card => ({
+			const newHand = newLibrary.splice(0, newHandSize).map((card) => ({
 				...card,
-				zone: 1,
+				zone: ZoneId.HAND,
 				faceDown: false
 			}));
 
@@ -626,7 +822,10 @@ function createPlaytestGameStore() {
 				keptHand: false
 			};
 
-			return { ...state, players: newPlayers };
+			const msg = `${playerName(state, state.activeControlSeat)} mulls their hand.`;
+			const next = { ...state, players: newPlayers };
+
+			return appendLogToState(next, { kind: 'mulligan', message: msg });
 		});
 	}
 
@@ -634,12 +833,15 @@ function createPlaytestGameStore() {
 	 * Keep hand (no mulligan)
 	 */
 	function keepHand(playerId: string): void {
-		update(state => ({
-			...state,
-			players: state.players.map(p =>
-				p.playerId === playerId ? { ...p, keptHand: true } : p
-			)
-		}));
+		update((state) => {
+			const msg = `${playerName(state, state.activeControlSeat)} keeps their hand.`;
+			const next = {
+				...state,
+				players: updatePlayer(state.players, playerId, () => ({ keptHand: true }))
+			};
+
+			return appendLogToState(next, { kind: 'keepHand', message: msg });
+		});
 	}
 
 	/**
@@ -647,7 +849,24 @@ function createPlaytestGameStore() {
 	 */
 	function reset(): void {
 		set(initialState);
-		clearPersistedPlaytestState();
+		// Do not delete session history; just drop active in-memory session.
+		writeActiveSessionId(null);
+	}
+
+	function restoreSession(sessionId: string): boolean {
+		if (!browser) return false;
+		migrateLegacySingleSessionIfNeeded();
+		const sessions = loadPersistedSessions();
+		const found = sessions.find((s) => s.id === sessionId);
+		if (!found) return false;
+
+		// Bump recency and mark active.
+		const now = Date.now();
+		const updated: PersistedPlaytestSession = { ...found, savedAt: now };
+		savePersistedSessions([updated, ...sessions.filter((s) => s.id !== sessionId)]);
+		writeActiveSessionId(sessionId);
+		set(updated.state);
+		return true;
 	}
 
 	return {
@@ -671,7 +890,13 @@ function createPlaytestGameStore() {
 		mulligan,
 		keepHand,
 		reset,
-		clearPersisted: clearPersistedPlaytestState
+		restoreSession,
+		listSessions: (): PlaytestSessionMeta[] => getPlaytestSessionsMeta(),
+		deleteSession: (sessionId: string): void => deletePlaytestSession(sessionId),
+		clearSessions: (): void => clearPlaytestSessions(),
+		// Log API methods
+		clearLog,
+		addLog
 	};
 }
 
@@ -682,22 +907,25 @@ export const playtestGameStore = createPlaytestGameStore();
 
 // Derived stores for convenient access
 
-export const playtestPlayers = derived(playtestGameStore, $game => $game.players);
+export const playtestPlayers = derived(playtestGameStore, ($game) => $game.players);
 
-export const playtestLocalPlayer = derived(playtestGameStore, $game => {
-	return $game.players.find(p => p.playerId === $game.activeControlSeat) || null;
+export const playtestLocalPlayer = derived(playtestGameStore, ($game) => {
+	return $game.players.find((p) => p.playerId === $game.activeControlSeat) || null;
 });
 
-export const playtestOpponents = derived(playtestGameStore, $game => {
-	return $game.players.filter(p => p.playerId !== $game.activeControlSeat);
+export const playtestOpponents = derived(playtestGameStore, ($game) => {
+	return $game.players.filter((p) => p.playerId !== $game.activeControlSeat);
 });
 
-export const playtestBattlefield = derived(playtestGameStore, $game => $game.battlefield);
+export const playtestBattlefield = derived(playtestGameStore, ($game) => $game.battlefield);
 
-export const playtestExile = derived(playtestGameStore, $game => $game.exile);
+export const playtestExile = derived(playtestGameStore, ($game) => $game.exile);
 
-export const playtestStack = derived(playtestGameStore, $game => $game.stack);
+export const playtestStack = derived(playtestGameStore, ($game) => $game.stack);
 
-export const playtestActiveControlSeat = derived(playtestGameStore, $game => $game.activeControlSeat);
+export const playtestActiveControlSeat = derived(
+	playtestGameStore,
+	($game) => $game.activeControlSeat
+);
 
-export const playtestIsInitialized = derived(playtestGameStore, $game => $game.isInitialized);
+export const playtestIsInitialized = derived(playtestGameStore, ($game) => $game.isInitialized);

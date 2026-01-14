@@ -11,11 +11,12 @@
 		playtestBattlefield,
 		playtestExile,
 		playtestActiveControlSeat,
-		playtestIsInitialized
+		playtestIsInitialized,
+		type PlaytestSessionMeta
 	} from '$lib/stores/playtest-game';
 	import { initializePlaytest, validateDeckIds } from '$lib/playtest/initializer';
 	import { toast } from '$lib/stores/toast';
-	
+
 	// Game components
 	import Card from '$lib/components/game/Card.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
@@ -83,10 +84,14 @@
 	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
 	let battlefieldIsDragPending = $state(false);
 	const DRAG_THRESHOLD = 5;
-	
+
 	// Command zone drag state
 	let commandDragStartPosition = $state<{ x: number; y: number } | null>(null);
 	let commandIsDragPending = $state(false);
+
+	// State for session restore UI
+	let showSessionPicker = $state(false);
+	let availableSessions = $state<PlaytestSessionMeta[]>([]);
 
 	// Derived state from stores
 	const players = $derived($playtestPlayers);
@@ -100,18 +105,18 @@
 	// Selected opponent (auto-select first opponent if not set)
 	const selectedOpponent = $derived(() => {
 		if (otherPlayers.length === 0) return null;
-		if (!selectedOpponentId || !otherPlayers.find(p => p.playerId === selectedOpponentId)) {
+		if (!selectedOpponentId || !otherPlayers.find((p) => p.playerId === selectedOpponentId)) {
 			// Auto-select first opponent
 			return otherPlayers[0];
 		}
-		return otherPlayers.find(p => p.playerId === selectedOpponentId) || otherPlayers[0];
+		return otherPlayers.find((p) => p.playerId === selectedOpponentId) || otherPlayers[0];
 	});
 
 	// Split battlefield by controller
-	const myBattlefield = $derived(battlefield.filter(c => c.controllerId === activeControlSeat));
+	const myBattlefield = $derived(battlefield.filter((c) => c.controllerId === activeControlSeat));
 	const opponentBattlefield = $derived(() => {
 		const opponent = selectedOpponent();
-		return opponent ? battlefield.filter(c => c.controllerId === opponent.playerId) : [];
+		return opponent ? battlefield.filter((c) => c.controllerId === opponent.playerId) : [];
 	});
 
 	function isLandPermanent(cardType?: string | null): boolean {
@@ -120,17 +125,25 @@
 	}
 
 	// Split battlefield rows: nonlands (top) + lands (bottom)
-	const myBattlefieldNonlands = $derived(myBattlefield.filter(c => !isLandPermanent(c.type)));
-	const myBattlefieldLands = $derived(myBattlefield.filter(c => isLandPermanent(c.type)));
-	const opponentBattlefieldNonlands = $derived(() => opponentBattlefield().filter(c => !isLandPermanent(c.type)));
-	const opponentBattlefieldLands = $derived(() => opponentBattlefield().filter(c => isLandPermanent(c.type)));
+	const myBattlefieldNonlands = $derived(myBattlefield.filter((c) => !isLandPermanent(c.type)));
+	const myBattlefieldLands = $derived(myBattlefield.filter((c) => isLandPermanent(c.type)));
+	const opponentBattlefieldNonlands = $derived(() =>
+		opponentBattlefield().filter((c) => !isLandPermanent(c.type))
+	);
+	const opponentBattlefieldLands = $derived(() =>
+		opponentBattlefield().filter((c) => isLandPermanent(c.type))
+	);
 
 	// My cards (from controlling player perspective)
 	const myGrave = $derived(me?.graveyard || []);
-	const myMana = $derived(me?.manaPool || { white: 0, blue: 0, black: 0, red: 0, green: 0, colorless: 0 });
+	const myMana = $derived(
+		me?.manaPool || { white: 0, blue: 0, black: 0, red: 0, green: 0, colorless: 0 }
+	);
 
 	// Hovered card
-	const hoveredCard = $derived(hoveredCardId ? battlefield.find(c => c.id === hoveredCardId) : null);
+	const hoveredCard = $derived(
+		hoveredCardId ? battlefield.find((c) => c.id === hoveredCardId) : null
+	);
 
 	const activePlayerName = $derived(() => {
 		return players.find((p) => p.playerId === $playtestGameStore.activePlayerId)?.name ?? '';
@@ -146,11 +159,13 @@
 	});
 
 	// Check if all players have kept hands
-	const allPlayersKept = $derived(players.every(p => p.keptHand));
+	const allPlayersKept = $derived(players.every((p) => p.keptHand));
 
 	// Command zone (Commander): show for currently controlled player
 	const commandCards = $derived($playtestGameStore.command || []);
-	const myCommandCards = $derived(commandCards.filter(c => (c.ownerId || c.controllerId) === activeControlSeat));
+	const myCommandCards = $derived(
+		commandCards.filter((c) => (c.ownerId || c.controllerId) === activeControlSeat)
+	);
 
 	/**
 	 * Initialize playtest from URL params
@@ -168,7 +183,7 @@
 			const init = await initializePlaytest(deckIds);
 			const initializedPlayers = init.players;
 			const gameId = `playtest-${Date.now()}`;
-			
+
 			playtestGameStore.initialize(gameId, initializedPlayers);
 			playtestGameStore.setCommand(init.command);
 
@@ -176,15 +191,18 @@
 			gameStore.initGame(gameId, initializedPlayers[0].playerId);
 			syncPlaytestToGameStore();
 
+			// Set playtestId in URL
+			$page.url.searchParams.set('playtestId', gameId);
+
 			// Start mulligan phase for first player
 			mulliganPlayerIndex = 0;
-			
+
 			loading = false;
 		} catch (err) {
 			console.error('[Playtest] Initialization failed:', err);
 			error = err instanceof Error ? err.message : 'Failed to initialize playtest';
 			loading = false;
-			
+
 			// Redirect back to lobby after showing error
 			setTimeout(() => {
 				goto('/lobby');
@@ -197,8 +215,8 @@
 	 */
 	function syncPlaytestToGameStore(): void {
 		const state = $playtestGameStore;
-		const controllingPlayer = players.find(p => p.playerId === activeControlSeat);
-		
+		const controllingPlayer = players.find((p) => p.playerId === activeControlSeat);
+
 		if (!controllingPlayer) return;
 
 		// Convert playtest state to GameView format
@@ -212,7 +230,7 @@
 			activePlayerName: controllingPlayer.name,
 			priorityPlayerId: activeControlSeat,
 			priorityPlayerName: controllingPlayer.name,
-			players: players.map(p => ({
+			players: players.map((p) => ({
 				playerId: p.playerId,
 				name: p.name,
 				life: p.life,
@@ -266,7 +284,7 @@
 	 */
 	function handleMulligan(): void {
 		if (mulliganPlayerIndex === null) return;
-		
+
 		const player = players[mulliganPlayerIndex];
 		playtestGameStore.mulligan(player.playerId);
 		mulliganCount++;
@@ -278,15 +296,15 @@
 	 */
 	function handleKeepHand(): void {
 		if (mulliganPlayerIndex === null) return;
-		
+
 		const player = players[mulliganPlayerIndex];
 		playtestGameStore.keepHand(player.playerId);
 		toast.success(`${player.name} kept their hand`);
-		
+
 		// Move to next player
 		mulliganPlayerIndex++;
 		mulliganCount = 0;
-		
+
 		// If all players have decided, end mulligan phase
 		if (mulliganPlayerIndex >= players.length) {
 			mulliganPlayerIndex = null;
@@ -298,7 +316,7 @@
 	 */
 	function switchPlayer(playerId: string): void {
 		playtestGameStore.switchControlSeat(playerId);
-		const player = players.find(p => p.playerId === playerId);
+		const player = players.find((p) => p.playerId === playerId);
 		if (player) {
 			toast.info(`Now controlling ${player.name}`);
 		}
@@ -319,7 +337,7 @@
 	function handlePoisonChange(delta: number, playerId?: string): void {
 		const targetPlayerId = playerId || me?.playerId;
 		if (!targetPlayerId) return;
-		const player = players.find(p => p.playerId === targetPlayerId);
+		const player = players.find((p) => p.playerId === targetPlayerId);
 		if (!player) return;
 		const newValue = Math.max(0, (player.poison || 0) + delta);
 		playtestGameStore.setPlayerCounter(targetPlayerId, 'poison', newValue);
@@ -357,7 +375,7 @@
 	 */
 	function handleNextTurn(): void {
 		playtestGameStore.nextTurn();
-		const newActivePlayer = players.find(p => p.playerId === $playtestGameStore.activePlayerId);
+		const newActivePlayer = players.find((p) => p.playerId === $playtestGameStore.activePlayerId);
 		if (newActivePlayer) {
 			toast.info(`${newActivePlayer.name}'s turn`);
 		}
@@ -367,7 +385,7 @@
 	 * Handle battlefield card click
 	 */
 	function handleBattlefieldCardClick(cardId: string): void {
-		const card = battlefield.find(c => c.id === cardId);
+		const card = battlefield.find((c) => c.id === cardId);
 		if (!card) return;
 
 		// Toggle tap/untap
@@ -377,7 +395,11 @@
 	/**
 	 * Handle battlefield card mouse down (for drag)
 	 */
-	function handleBattlefieldCardMouseDown(cardId: string, cardName: string, event: MouseEvent): void {
+	function handleBattlefieldCardMouseDown(
+		cardId: string,
+		cardName: string,
+		event: MouseEvent
+	): void {
 		if (event.button !== 0) return;
 
 		event.preventDefault();
@@ -474,7 +496,7 @@
 	function handleBattlefieldDrop(cardId: string): void {
 		const dragState = $dragDropStore;
 		const sourceZone = dragState.sourceZone;
-		
+
 		if (sourceZone === 'hand') {
 			// Move from hand to battlefield
 			playtestGameStore.moveCardToZone(cardId, 'BATTLEFIELD');
@@ -652,10 +674,89 @@
 		};
 	});
 
+	/**
+	 * Load available sessions for restoration
+	 */
+	function loadAvailableSessions(): void {
+		availableSessions = playtestGameStore.listSessions();
+	}
+
+	/**
+	 * Restore a specific session
+	 */
+	function restoreSession(sessionId: string): void {
+		const success = playtestGameStore.restoreSession(sessionId);
+		if (success) {
+			loading = false;
+			showSessionPicker = false;
+
+			// Restore mulligan phase based on first player who hasn't kept.
+			const idx = players.findIndex((p) => !p.keptHand);
+			mulliganPlayerIndex = idx === -1 ? null : idx;
+			mulliganCount = 0;
+
+			// Ensure the normal game store is initialized for shared components.
+			gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
+			syncPlaytestToGameStore();
+
+			// Set playtestId in URL
+			$page.url.searchParams.set('playtestId', $playtestGameStore.gameId);
+
+			toast.success('Session restored');
+		} else {
+			toast.error('Failed to restore session');
+		}
+	}
+
+	/**
+	 * Delete a session
+	 */
+	function deleteSession(sessionId: string): void {
+		playtestGameStore.deleteSession(sessionId);
+		loadAvailableSessions();
+		toast.info('Session deleted');
+	}
+
+	function initializeFromPlaytestId(): void {
+		const playtestId = $page.url.searchParams.get('playtestId');
+		if (playtestId) {
+			playtestGameStore.restoreSession(playtestId);
+
+			// Set playtestId in URL
+			$page.url.searchParams.set('playtestId', playtestId);
+		}
+	}
+
 	// Initialize on mount
 	onMount(() => {
-		// Prefer restoring from persisted playtest state (refresh-safe).
-		// If no persisted state exists, fall back to URL-based initialization.
+		// Check if URL has deck params (user wants to start a new playtest)
+		const hasUrlDecks = $page.url.searchParams.has('d1') || $page.url.searchParams.has('d2');
+		const hasPlaytestIdInUrl = $page.url.searchParams.has('playtestId');
+
+		// Otherwise, check for existing sessions
+		loadAvailableSessions();
+
+		if (hasPlaytestIdInUrl) {
+			initializeFromPlaytestId();
+			return;
+		}
+
+		// If URL has decks, start new playtest
+		if (hasUrlDecks) {
+			initializeFromUrl();
+			return;
+		}
+
+		if (availableSessions.length === 0) {
+			// No sessions and no URL decks - redirect to lobby
+			error = 'No playtest sessions found. Please configure a new playtest from the lobby.';
+			setTimeout(() => {
+				goto('/lobby');
+			}, 2000);
+			return;
+		}
+
+		// If there's an active session, restore it
 		if ($playtestGameStore.isInitialized) {
 			loading = false;
 
@@ -667,22 +768,20 @@
 			// Ensure the normal game store is initialized for shared components.
 			gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
 			syncPlaytestToGameStore();
+
+			// Set playtestId in URL
+			$page.url.searchParams.set('playtestId', $playtestGameStore.gameId);
 			return;
 		}
 
-		initializeFromUrl();
+		// Show session picker if we have sessions but none active
+		if (availableSessions.length > 0) {
+			loading = false;
+			showSessionPicker = true;
+		}
 	});
 
-	// Cleanup ONLY when navigating away (client-side). This preserves state across refresh.
-	beforeNavigate(({ from, to }) => {
-		if (!from) return;
-		if (from.url.pathname !== '/playtest') return;
-		if (!to) return;
-		if (to.url.pathname === '/playtest') return;
-
-		playtestGameStore.reset();
-		gameStore.reset();
-	});
+	// Remove the beforeNavigate cleanup - we want to persist sessions across navigation
 </script>
 
 <svelte:window onkeydown={handleGlobalKeydown} />
@@ -702,9 +801,55 @@
 			<div class="error-icon">⚠️</div>
 			<h2>Error</h2>
 			<p>{error}</p>
-			<button class="btn-primary" onclick={() => goto('/lobby')}>
-				Return to Lobby
-			</button>
+			<button class="btn-primary" onclick={() => goto('/lobby')}> Return to Lobby </button>
+		</div>
+	{:else if showSessionPicker}
+		<div class="session-picker-overlay">
+			<div class="session-picker-modal">
+				<h2>Restore Playtest Session</h2>
+				<p class="session-picker-hint">
+					Select a recent playtest session to continue, or start a new one.
+				</p>
+
+				{#if availableSessions.length > 0}
+					<div class="sessions-list">
+						{#each availableSessions as session (session.id)}
+							<div class="session-card">
+								<div class="session-info">
+									<div class="session-label">{session.label}</div>
+									<div class="session-meta">
+										{session.playerCount} players · Turn {session.turn} ·
+										{new Date(session.savedAt).toLocaleDateString()}
+										{new Date(session.savedAt).toLocaleTimeString([], {
+											hour: '2-digit',
+											minute: '2-digit'
+										})}
+									</div>
+								</div>
+								<div class="session-actions">
+									<button class="btn-restore" onclick={() => restoreSession(session.id)}>
+										Restore
+									</button>
+									<button
+										class="btn-delete"
+										onclick={() => deleteSession(session.id)}
+										title="Delete session"
+									>
+										✕
+									</button>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{:else}
+					<p class="no-sessions">No saved sessions found.</p>
+				{/if}
+
+				<div class="session-picker-actions">
+					<button class="btn-secondary" onclick={() => goto('/lobby')}> Back to Lobby </button>
+					<button class="btn-primary" onclick={() => goto('/lobby')}> Start New Playtest </button>
+				</div>
+			</div>
 		</div>
 	{:else if !isInitialized}
 		<div class="loading-overlay">
@@ -713,31 +858,84 @@
 	{:else if mulliganPlayerIndex !== null && !allPlayersKept}
 		<MulliganDialog
 			cards={players[mulliganPlayerIndex]?.hand || []}
-			mulliganCount={mulliganCount}
+			{mulliganCount}
 			playerName={players[mulliganPlayerIndex]?.name}
 			onKeep={handleKeepHand}
 			onMulligan={handleMulligan}
 			isLoading={false}
 			hasKeptHand={false}
-		/>
+		>
+			<!-- Restore session modal -->
+			<h2>Restore Playtest Session</h2>
+			<p class="session-picker-hint">
+				Select a recent playtest session to continue, or start a new one.
+			</p>
+
+			{#if availableSessions.length > 0}
+				<div class="sessions-list">
+					{#each availableSessions as session (session.id)}
+						<div class="session-card">
+							<div class="session-info">
+								<div class="session-label">{session.label}</div>
+								<div class="session-meta">
+									{session.playerCount} players · Turn {session.turn} ·
+									{new Date(session.savedAt).toLocaleDateString()}
+									{new Date(session.savedAt).toLocaleTimeString([], {
+										hour: '2-digit',
+										minute: '2-digit'
+									})}
+								</div>
+							</div>
+							<div class="session-actions">
+								<button class="btn-restore" onclick={() => restoreSession(session.id)}>
+									Restore
+								</button>
+								<button
+									class="btn-delete"
+									onclick={() => deleteSession(session.id)}
+									title="Delete session"
+								>
+									✕
+								</button>
+							</div>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<p class="no-sessions">No saved sessions found.</p>
+			{/if}
+		</MulliganDialog>
 	{:else}
 		<!-- Playtest Header -->
 		<div class="playtest-header">
 			<div class="header-left">
-				<button class="btn-back" onclick={() => goto('/lobby')}>
-					← Back to Lobby
-				</button>
+				<button class="btn-back" onclick={() => goto('/lobby')}> ← Back to Lobby </button>
 				<span class="mode-badge">Playtest Mode</span>
+				<button
+					class="btn-sessions"
+					onclick={() => {
+						loadAvailableSessions();
+						showSessionPicker = true;
+					}}
+					title="Manage sessions"
+				>
+					Sessions ({availableSessions.length})
+				</button>
 			</div>
-			
+
 			<div class="playtest-controls">
 				<label for="playtest-controlling-select">Controlling:</label>
-				<select id="playtest-controlling-select" class="player-select" value={activeControlSeat} onchange={(e) => switchPlayer(e.currentTarget.value)}>
+				<select
+					id="playtest-controlling-select"
+					class="player-select"
+					value={activeControlSeat}
+					onchange={(e) => switchPlayer(e.currentTarget.value)}
+				>
 					{#each players as player}
 						<option value={player.playerId}>{player.name}</option>
 					{/each}
 				</select>
-				<button class="btn-toggle" onclick={() => showAllHands = !showAllHands}>
+				<button class="btn-toggle" onclick={() => (showAllHands = !showAllHands)}>
 					{showAllHands ? '🙈 Hide' : '👁️ Show'} All Hands
 				</button>
 			</div>
@@ -752,13 +950,13 @@
 				<button class="btn-action" onclick={handleNextTurn}>Next Turn</button>
 				<button
 					class="btn-debug"
-					onclick={() => showKeyboardShortcuts = true}
+					onclick={() => (showKeyboardShortcuts = true)}
 					title="Keyboard shortcuts (?)"
 					aria-label="Keyboard shortcuts"
 				>
 					<Keyboard size={20} aria-hidden="true" />
 				</button>
-				<button class="btn-debug" onclick={() => showDebugOverlay = true} title="Debug View">
+				<button class="btn-debug" onclick={() => (showDebugOverlay = true)} title="Debug View">
 					🔧
 				</button>
 			</div>
@@ -799,10 +997,10 @@
 					<div class="opponent-header-bar">
 						<div class="opponent-identity">
 							{#if otherPlayers.length > 1}
-								<select 
-									class="opponent-select" 
-									value={opponent.playerId} 
-									onchange={(e) => selectedOpponentId = e.currentTarget.value}
+								<select
+									class="opponent-select"
+									value={opponent.playerId}
+									onchange={(e) => (selectedOpponentId = e.currentTarget.value)}
 								>
 									{#each otherPlayers as opp}
 										<option value={opp.playerId}>{opp.name}</option>
@@ -814,12 +1012,20 @@
 						</div>
 						<div class="opponent-controls">
 							<div class="life-group">
-								<button class="stat-btn minus" onclick={() => handleLifeChange(-1, opponent.playerId)}>−</button>
-								<button class="stat-display life" onclick={() => showOpponentLifeMenu = !showOpponentLifeMenu}>
+								<button
+									class="stat-btn minus"
+									onclick={() => handleLifeChange(-1, opponent.playerId)}>−</button
+								>
+								<button
+									class="stat-display life"
+									onclick={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+								>
 									<span class="stat-icon">❤️</span>
 									<span class="stat-value">{opponent.life}</span>
 								</button>
-								<button class="stat-btn plus" onclick={() => handleLifeChange(1, opponent.playerId)}>+</button>
+								<button class="stat-btn plus" onclick={() => handleLifeChange(1, opponent.playerId)}
+									>+</button
+								>
 							</div>
 
 							{#if opponent.poison > 0}
@@ -848,7 +1054,9 @@
 											<button onclick={() => handlePoisonChange(1, opponent.playerId)}>+1</button>
 										</div>
 									</div>
-									<button class="menu-close" onclick={() => showOpponentLifeMenu = false}>✕</button>
+									<button class="menu-close" onclick={() => (showOpponentLifeMenu = false)}
+										>✕</button
+									>
 								</div>
 							{/if}
 
@@ -915,9 +1123,7 @@
 							{/if}
 
 							{#if opponentBattlefieldNonlands().length === 0 && opponentBattlefieldLands().length === 0}
-								<div class="empty-battlefield">
-									No permanents
-								</div>
+								<div class="empty-battlefield">No permanents</div>
 							{/if}
 						</div>
 					</div>
@@ -982,8 +1188,10 @@
 											handleBattlefieldCardClick(card.id);
 										}
 									}}
-									onmouseenter={() => hoveredCardId = card.id}
-									onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
+									onmouseenter={() => (hoveredCardId = card.id)}
+									onmouseleave={() => {
+										if (hoveredCardId === card.id) hoveredCardId = null;
+									}}
 								>
 									<Card
 										cardId={card.id}
@@ -1019,8 +1227,10 @@
 											handleBattlefieldCardClick(card.id);
 										}
 									}}
-									onmouseenter={() => hoveredCardId = card.id}
-									onmouseleave={() => { if (hoveredCardId === card.id) hoveredCardId = null; }}
+									onmouseenter={() => (hoveredCardId = card.id)}
+									onmouseleave={() => {
+										if (hoveredCardId === card.id) hoveredCardId = null;
+									}}
 								>
 									<Card
 										cardId={card.id}
@@ -1058,11 +1268,11 @@
 					<div class="player-identity">
 						<span class="player-name">{me.name}</span>
 					</div>
-					
+
 					<div class="player-stats-inline">
 						<div class="life-group">
 							<button class="stat-btn minus" onclick={() => handleLifeChange(-1)}>−</button>
-							<button class="stat-display life" onclick={() => showLifeMenu = !showLifeMenu}>
+							<button class="stat-display life" onclick={() => (showLifeMenu = !showLifeMenu)}>
 								<span class="stat-icon">❤️</span>
 								<span class="stat-value">{me.life}</span>
 							</button>
@@ -1080,7 +1290,9 @@
 							<LibraryZone
 								libraryCount={me.libraryCount}
 								playerName="You"
-								onSearch={() => { showDeckSearch = true; }}
+								onSearch={() => {
+									showDeckSearch = true;
+								}}
 							/>
 						</div>
 
@@ -1103,7 +1315,7 @@
 										<button onclick={() => handlePoisonChange(1)}>+1</button>
 									</div>
 								</div>
-								<button class="menu-close" onclick={() => showLifeMenu = false}>✕</button>
+								<button class="menu-close" onclick={() => (showLifeMenu = false)}>✕</button>
 							</div>
 						{/if}
 					</div>
@@ -1111,7 +1323,7 @@
 					<div class="player-zones">
 						<div bind:this={graveyardDropZoneEl} class="graveyard-drop-zone">
 							<Graveyard
-								cards={myGrave.map(c => ({
+								cards={myGrave.map((c) => ({
 									id: c.id,
 									name: c.name,
 									manaCost: c.manaCost,
@@ -1130,7 +1342,7 @@
 						</div>
 						<div bind:this={exileDropZoneEl} class="exile-drop-zone">
 							<ExileZone
-								cards={exile.map(c => ({
+								cards={exile.map((c) => ({
 									id: c.id,
 									name: c.name,
 									manaCost: c.manaCost,
@@ -1160,21 +1372,18 @@
 				class:drag-active={isDragging}
 				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
 			>
-		<PlayerHand
-			onCardClick={() => {}}
-			size="normal"
-			currentPhase="PRECOMBAT_MAIN"
-			canDrag={true}
-		/>
+				<PlayerHand
+					onCardClick={() => {}}
+					size="normal"
+					currentPhase="PRECOMBAT_MAIN"
+					canDrag={true}
+				/>
 			</div>
 		</main>
 
 		<!-- Token Creator -->
 		{#if showTokenCreator}
-			<TokenCreator
-				gameId="playtest"
-				onClose={() => showTokenCreator = false}
-			/>
+			<TokenCreator gameId="playtest" onClose={() => (showTokenCreator = false)} />
 		{/if}
 
 		<!-- Deck Search -->
@@ -1190,7 +1399,7 @@
 					playtestGameStore.shuffleLibrary(me.playerId);
 					syncPlaytestToGameStore();
 				}}
-				onClose={() => showDeckSearch = false}
+				onClose={() => (showDeckSearch = false)}
 			/>
 		{/if}
 
@@ -1206,7 +1415,7 @@
 							<div class="debug-status connected">● Playtest Mode</div>
 						</div>
 						<div class="debug-header-right">
-							<button class="debug-close" onclick={() => showDebugOverlay = false}>✕</button>
+							<button class="debug-close" onclick={() => (showDebugOverlay = false)}>✕</button>
 						</div>
 					</header>
 
@@ -1217,10 +1426,12 @@
 								<span>Game State Overview</span>
 							</div>
 							<div class="debug-code">
-								<pre><code>{@html `<span class="dk">activeControlSeat:</span> <span class="ds">"${activeControlSeat}"</span>
+								<pre><code
+										>{@html `<span class="dk">activeControlSeat:</span> <span class="ds">"${activeControlSeat}"</span>
 <span class="dk">turn:</span> <span class="dn">${$playtestGameStore.turn}</span>
 <span class="dk">activePlayerId:</span> <span class="ds">"${$playtestGameStore.activePlayerId}"</span>
-<span class="dk">isInitialized:</span> <span class="db">${isInitialized}</span>`}</code></pre>
+<span class="dk">isInitialized:</span> <span class="db">${isInitialized}</span>`}</code
+									></pre>
 							</div>
 						</section>
 
@@ -1238,18 +1449,25 @@
 										<span>{player.name}</span>
 									</div>
 									<div class="debug-code">
-										<pre><code>{@html `<span class="dk">playerId:</span> <span class="ds">"${player.playerId}"</span>
+										<pre><code
+												>{@html `<span class="dk">playerId:</span> <span class="ds">"${player.playerId}"</span>
 <span class="dk">life:</span> <span class="dn">${player.life}</span>
 <span class="dk">poison:</span> <span class="dn">${player.poison}</span>
 <span class="dk">libraryCount:</span> <span class="dn">${player.libraryCount}</span>
 <span class="dk">handCount:</span> <span class="dn">${player.handCount}</span>
-<span class="dk">hand:</span> [${player.hand.map(c => `\n  <span class="ds">"${c.name}"</span> <span class="dc">// ${c.id}</span>`).join(',') || ''}
+<span class="dk">hand:</span> [${player.hand.map((c) => `\n  <span class="ds">"${c.name}"</span> <span class="dc">// ${c.id}</span>`).join(',') || ''}
 ]
-<span class="dk">graveyard:</span> [${player.graveyard.map(c => `\n  <span class="ds">"${c.name}"</span>`).join(',') || ''}
+<span class="dk">graveyard:</span> [${player.graveyard.map((c) => `\n  <span class="ds">"${c.name}"</span>`).join(',') || ''}
 ]
-<span class="dk">library (first 5):</span> [${player.library.slice(0, 5).map(c => `\n  <span class="ds">"${c.name}"</span>`).join(',') || ''}
+<span class="dk">library (first 5):</span> [${
+													player.library
+														.slice(0, 5)
+														.map((c) => `\n  <span class="ds">"${c.name}"</span>`)
+														.join(',') || ''
+												}
 ]
-<span class="dk">keptHand:</span> <span class="db">${player.keptHand}</span>`}</code></pre>
+<span class="dk">keptHand:</span> <span class="db">${player.keptHand}</span>`}</code
+											></pre>
 									</div>
 								</div>
 							{/each}
@@ -1264,19 +1482,34 @@
 								<div class="debug-zone">
 									<h4>🏟️ Battlefield ({battlefield.length})</h4>
 									<div class="debug-code small">
-										<pre><code>{battlefield.length > 0 
-											? JSON.stringify(battlefield.map(c => ({
-												id: c.id, name: c.name, controller: c.controllerId, tapped: c.tapped
-											})), null, 2)
-											: '[]'}</code></pre>
+										<pre><code
+												>{battlefield.length > 0
+													? JSON.stringify(
+															battlefield.map((c) => ({
+																id: c.id,
+																name: c.name,
+																controller: c.controllerId,
+																tapped: c.tapped
+															})),
+															null,
+															2
+														)
+													: '[]'}</code
+											></pre>
 									</div>
 								</div>
 								<div class="debug-zone">
 									<h4>🚫 Exile ({exile.length})</h4>
 									<div class="debug-code small">
-										<pre><code>{exile.length > 0 
-											? JSON.stringify(exile.map(c => ({ id: c.id, name: c.name })), null, 2)
-											: '[]'}</code></pre>
+										<pre><code
+												>{exile.length > 0
+													? JSON.stringify(
+															exile.map((c) => ({ id: c.id, name: c.name })),
+															null,
+															2
+														)
+													: '[]'}</code
+											></pre>
 									</div>
 								</div>
 							</div>
@@ -1335,7 +1568,9 @@
 	}
 
 	@keyframes spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.error-icon {
@@ -1412,6 +1647,23 @@
 		color: #667eea;
 		font-size: 0.875rem;
 		font-weight: 600;
+	}
+
+	.btn-sessions {
+		padding: 0.5rem 1rem;
+		background: transparent;
+		border: 1px solid rgba(102, 126, 234, 0.3);
+		color: #667eea;
+		border-radius: 6px;
+		font-size: 0.875rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-sessions:hover {
+		background: rgba(102, 126, 234, 0.1);
+		border-color: rgba(102, 126, 234, 0.5);
 	}
 
 	.playtest-controls {
@@ -1780,6 +2032,7 @@
 		font-family: 'JetBrains Mono', monospace;
 		min-width: 20px;
 		text-align: center;
+		color: #f4f4f5;
 	}
 
 	.quick-menu {
@@ -1911,7 +2164,9 @@
 
 	.drag-ghost-card.valid {
 		border-color: #22c55e;
-		box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(34, 197, 94, 0.5);
+		box-shadow:
+			0 15px 40px rgba(0, 0, 0, 0.6),
+			0 0 30px rgba(34, 197, 94, 0.5);
 		transform: scale(1.15) rotate(0deg);
 	}
 
@@ -1936,8 +2191,13 @@
 	}
 
 	@keyframes drop-hint-pulse {
-		0%, 100% { opacity: 0.7; }
-		50% { opacity: 1; }
+		0%,
+		100% {
+			opacity: 0.7;
+		}
+		50% {
+			opacity: 1;
+		}
 	}
 
 	/* Debug Overlay Styles */
@@ -2131,9 +2391,162 @@
 	}
 
 	/* Syntax highlighting */
-	:global(.debug-code .dk) { color: #9cdcfe; }
-	:global(.debug-code .ds) { color: #ce9178; }
-	:global(.debug-code .dn) { color: #b5cea8; }
-	:global(.debug-code .db) { color: #569cd6; }
-	:global(.debug-code .dc) { color: #6a9955; font-style: italic; }
+	:global(.debug-code .dk) {
+		color: #9cdcfe;
+	}
+	:global(.debug-code .ds) {
+		color: #ce9178;
+	}
+	:global(.debug-code .dn) {
+		color: #b5cea8;
+	}
+	:global(.debug-code .db) {
+		color: #569cd6;
+	}
+	:global(.debug-code .dc) {
+		color: #6a9955;
+		font-style: italic;
+	}
+
+	/* Session Picker Styles */
+	.session-picker-overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #0a0d12;
+		padding: 2rem;
+	}
+
+	.session-picker-modal {
+		background: rgba(26, 31, 46, 0.98);
+		border: 1px solid #2a3441;
+		border-radius: 12px;
+		padding: 2rem;
+		max-width: 700px;
+		width: 100%;
+		max-height: 80vh;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.session-picker-modal h2 {
+		margin: 0;
+		color: #f8fafc;
+		font-size: 1.5rem;
+	}
+
+	.session-picker-hint {
+		margin: 0;
+		color: #94a3b8;
+		font-size: 0.875rem;
+	}
+
+	.sessions-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		max-height: 400px;
+		overflow-y: auto;
+		padding: 0.5rem;
+		margin: -0.5rem;
+	}
+
+	.session-card {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1rem;
+		background: rgba(17, 24, 39, 0.8);
+		border: 1px solid #2a3441;
+		border-radius: 8px;
+		transition: all 0.2s;
+		gap: 1rem;
+	}
+
+	.session-card:hover {
+		border-color: #667eea;
+		background: rgba(102, 126, 234, 0.1);
+	}
+
+	.session-info {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.session-label {
+		font-weight: 600;
+		color: #f8fafc;
+		font-size: 0.9375rem;
+	}
+
+	.session-meta {
+		font-size: 0.8125rem;
+		color: #94a3b8;
+	}
+
+	.session-actions {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.btn-restore {
+		padding: 0.5rem 1rem;
+		background: #667eea;
+		color: white;
+		border: none;
+		border-radius: 6px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.2s;
+	}
+
+	.btn-restore:hover {
+		background: #5568d3;
+	}
+
+	.btn-delete {
+		width: 32px;
+		height: 32px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(239, 68, 68, 0.1);
+		border: 1px solid rgba(239, 68, 68, 0.3);
+		border-radius: 6px;
+		color: #ef4444;
+		cursor: pointer;
+		transition: all 0.2s;
+		font-size: 1rem;
+	}
+
+	.btn-delete:hover {
+		background: rgba(239, 68, 68, 0.2);
+		border-color: rgba(239, 68, 68, 0.5);
+	}
+
+	.no-sessions {
+		color: #94a3b8;
+		text-align: center;
+		padding: 2rem;
+		font-style: italic;
+	}
+
+	.session-picker-actions {
+		display: flex;
+		gap: 0.75rem;
+		justify-content: flex-end;
+		padding-top: 1rem;
+		border-top: 1px solid #2a3441;
+	}
+
+	.session-picker-overlay {
+		background: white;
+		color: black;
+	}
 </style>

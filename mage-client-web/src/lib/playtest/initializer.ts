@@ -1,6 +1,6 @@
 /**
  * Playtest Initializer
- * 
+ *
  * Handles initialization of playtest games from deck lists
  */
 
@@ -8,6 +8,8 @@ import type { Deck } from '$lib/types/deck';
 import type { CardView } from '$lib/generated/mage/v1/models';
 import type { PlaytestPlayer } from '$lib/stores/playtest-game';
 import { getDeckDetails } from '$lib/api/decks';
+import { ZoneId } from '$lib/utils/zones';
+import { shuffleArray } from '$lib/utils/playtest-helpers';
 
 export type PlaytestInitResult = {
 	players: PlaytestPlayer[];
@@ -47,15 +49,15 @@ export async function initializePlaytest(deckIds: string[]): Promise<PlaytestIni
 	const command: CardView[] = perDeck.flatMap((x) => x.commanders);
 
 	// Shuffle each player's library
-	players.forEach(player => {
-		shuffleArray(player.library);
+	players.forEach((player) => {
+		player.library = shuffleArray(player.library);
 	});
 
 	// Draw opening hands (7 cards each)
-	players.forEach(player => {
+	players.forEach((player) => {
 		const hand = player.library.splice(0, 7);
-		hand.forEach(card => {
-			card.zone = 1; // HAND
+		hand.forEach((card) => {
+			card.zone = ZoneId.HAND;
 			card.faceDown = false;
 		});
 		player.hand = hand;
@@ -95,13 +97,8 @@ function createPlayerFromDeck(deck: Deck, playerNumber: number): { player: Playt
 	if (deck.commanders && deck.commanders.length > 0) {
 		for (const deckCard of deck.commanders) {
 			for (let i = 0; i < deckCard.quantity; i++) {
-				const commander = createCardView(
-					playerId,
-					deckCard.cardName,
-					deckCard,
-					cardIndex++
-				);
-				commander.zone = 5; // COMMAND (client-side convention)
+				const commander = createCardView(playerId, deckCard.cardName, deckCard, cardIndex++);
+				commander.zone = ZoneId.COMMAND;
 				commander.faceDown = false;
 				commanders.push(commander);
 			}
@@ -149,7 +146,7 @@ function normalizeCardName(rawName: string): string {
 function createCardView(
 	ownerId: string,
 	cardName: string,
-	deckCard: { 
+	deckCard: {
 		manaCost?: string;
 		cardType?: string;
 		power?: string;
@@ -183,7 +180,7 @@ function createCardView(
 		rarity: '',
 		rulesText: '',
 		abilities: [],
-		zone: 0, // LIBRARY
+		zone: ZoneId.LIBRARY,
 		ownerId,
 		controllerId: ownerId,
 		tapped: false,
@@ -202,23 +199,13 @@ function createCardView(
  */
 function getStartingLife(format: string): number {
 	const normalizedFormat = format.toLowerCase();
-	
+
 	if (normalizedFormat.includes('commander') || normalizedFormat.includes('edh')) {
 		return 40;
 	}
-	
+
 	// Standard, Modern, Legacy, Vintage, etc.
 	return 20;
-}
-
-/**
- * Fisher-Yates shuffle algorithm
- */
-function shuffleArray<T>(array: T[]): void {
-	for (let i = array.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[array[i], array[j]] = [array[j], array[i]];
-	}
 }
 
 /**

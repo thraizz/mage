@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { CardView } from '$lib/generated/mage/v1/models';
+	import type { Snippet } from 'svelte';
 	import Card from './Card.svelte';
 
 	interface Props {
@@ -10,9 +11,19 @@
 		isLoading?: boolean;
 		hasKeptHand?: boolean;
 		playerName?: string;
+		children?: Snippet;
 	}
 
-	let { cards, mulliganCount, onKeep, onMulligan, isLoading = false, hasKeptHand = false, playerName }: Props = $props();
+	let {
+		cards,
+		mulliganCount,
+		onKeep,
+		onMulligan,
+		isLoading = false,
+		hasKeptHand = false,
+		playerName,
+		children
+	}: Props = $props();
 
 	// Calculate next hand size after mulligan
 	const nextHandSize = $derived(Math.max(0, 7 - (mulliganCount + 1)));
@@ -75,23 +86,18 @@
 					If you mulligan, you'll draw 7 cards and put <strong>{mulliganCount + 1}</strong> on the bottom.
 				</p>
 			{:else}
-				<p class="warning">
-					⚠️ If you mulligan again, you'll have 0 cards!
-				</p>
+				<p class="warning">⚠️ If you mulligan again, you'll have 0 cards!</p>
 			{/if}
 		</div>
 
+		{#if children}
+			{@render children()}
+		{/if}
 		<div class="dialog-actions">
 			{#if hasKeptHand}
-				<div class="kept-badge">
-					✓ Hand Kept
-				</div>
+				<div class="kept-badge">✓ Hand Kept</div>
 			{:else}
-				<button
-					class="btn-keep"
-					onclick={onKeep}
-					disabled={isLoading}
-				>
+				<button class="btn-keep" onclick={onKeep} disabled={isLoading}>
 					{#if isLoading}
 						<span class="spinner-small"></span>
 					{:else}
@@ -136,7 +142,8 @@
 		max-width: 1000px;
 		width: 100%;
 		padding: 2rem;
-		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+		box-shadow:
+			0 25px 50px -12px rgba(0, 0, 0, 0.5),
 			0 0 40px rgba(102, 126, 234, 0.3);
 	}
 
@@ -192,7 +199,9 @@
 	}
 
 	.mulligan-card {
-		transition: transform 0.2s ease, box-shadow 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease;
 	}
 
 	.mulligan-card:hover {
@@ -365,4 +374,3 @@
 		}
 	}
 </style>
-
