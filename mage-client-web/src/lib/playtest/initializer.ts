@@ -158,12 +158,6 @@ function createCardView(
 ): CardView {
 	const cleanedName = normalizeCardName(cardName);
 
-	const rawPower = deckCard.power || '';
-	const rawToughness = deckCard.toughness || '';
-	const isLand = (deckCard.cardType || '').toLowerCase().includes('land');
-	const power = isLand && rawPower === '0' && rawToughness === '0' ? '' : rawPower;
-	const toughness = isLand && rawPower === '0' && rawToughness === '0' ? '' : rawToughness;
-
 	return {
 		id: `${ownerId}-card-${index}`,
 		name: cleanedName,
@@ -173,8 +167,8 @@ function createCardView(
 		subTypes: '',
 		superTypes: '',
 		color: (deckCard.colors || []).join(''),
-		power,
-		toughness,
+		power: deckCard.power || '',
+		toughness: deckCard.toughness || '',
 		loyalty: '',
 		cardNumber: 0,
 		expansionSetCode: '',
