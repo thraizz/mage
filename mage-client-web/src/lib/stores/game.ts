@@ -11,7 +11,6 @@ import type {
 	GameInitData,
 	GameUpdateData,
 	GameUpdateAndInformData,
-	GameInformPersonalData,
 	GameErrorData,
 	GameTargetData,
 	GameChooseAbilityData,
@@ -24,7 +23,6 @@ import type {
 	GameGetAmountData,
 	GameGetMultiAmountData,
 	GameOverData,
-	StartGameData,
 	GameAssignDamageData,
 	GameRollbackRequestData,
 	GameRollbackCompleteData
@@ -149,13 +147,11 @@ function createGameStore() {
 		// Unsubscribe from previous subscriptions
 		unsubscribeFromEvents();
 		
-		console.log('[GameStore] Subscribing to game WebSocket events...');
+
 
 		// START_GAME - Game is starting
 		unsubscribers.push(
-			websocketStore.on(CallbackMethod.START_GAME, (data) => {
-				const startData = data as StartGameData;
-				console.log('[GameStore] START_GAME:', startData);
+			websocketStore.on(CallbackMethod.START_GAME, () => {
 				update((s) => ({
 					...s,
 					isLoading: true,
@@ -168,7 +164,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_INIT, (data) => {
 				const initData = data as GameInitData;
-				console.log('[GameStore] GAME_INIT:', initData);
+
 				if (initData.game) {
 					const normalized = normalizeGameView(initData.game);
 					update((s) => ({
@@ -186,27 +182,8 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_UPDATE, (data) => {
 				const updateData = data as GameUpdateData;
-				console.log('[GameStore] GAME_UPDATE received:', {
-					hasGame: !!updateData.game,
-					state: updateData.game?.state,
-					turn: updateData.game?.turn,
-					phase: updateData.game?.phase,
-					playerCount: updateData.game?.players?.length,
-					stackCount: updateData.game?.stack?.length || 0,
-					stackCards: updateData.game?.stack?.map(c => ({ id: c.id, name: c.name })) || []
-				});
-				if (updateData.game) {
-					// Log each player's hand
-					updateData.game.players?.forEach((player) => {
-						console.log('[GameStore] Player hand data:', {
-							playerId: player.playerId,
-							playerName: player.name,
-							handCount: player.handCount,
-							handCards: player.hand?.map((c) => c.name) || [],
-							handCardIds: player.hand?.map((c) => c.id) || []
-						});
-					});
 
+				if (updateData.game) {
 					const normalized = normalizeGameView(updateData.game);
 					update((s) => {
 						// Clear pending plays for cards that are now on battlefield or stack
@@ -230,7 +207,7 @@ function createGameStore() {
 						// Check for pending library search from server
 						let newPrompt = s.pendingPrompt;
 						if (normalized.pendingLibrarySearch) {
-							console.log('[GameStore] Library search detected:', normalized.pendingLibrarySearch);
+
 							newPrompt = {
 								type: 'librarySearch',
 								message: normalized.pendingLibrarySearch.message || 'Search your library',
@@ -258,7 +235,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_UPDATE_AND_INFORM, (data) => {
 				const updateData = data as GameUpdateAndInformData;
-				console.log('[GameStore] GAME_UPDATE_AND_INFORM:', updateData);
+
 				if (updateData.game) {
 					const normalized = normalizeGameView(updateData.game);
 					update((s) => ({
@@ -270,19 +247,12 @@ function createGameStore() {
 			})
 		);
 
-		// GAME_INFORM_PERSONAL - Personal message
-		unsubscribers.push(
-			websocketStore.on(CallbackMethod.GAME_INFORM_PERSONAL, (data) => {
-				const informData = data as GameInformPersonalData;
-				console.log('[GameStore] GAME_INFORM_PERSONAL:', informData);
-			})
-		);
 
 		// GAME_ERROR - Error message
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_ERROR, (data) => {
 				const errorData = data as GameErrorData;
-				console.error('[GameStore] GAME_ERROR:', errorData);
+
 				
 				// Show toast notification for game errors
 				if (errorData.error) {
@@ -298,11 +268,6 @@ function createGameStore() {
 				update((s) => {
 					// Rollback all pending card plays on error
 					// The server has rejected the action(s)
-					if (s.pendingCardPlays.size > 0) {
-						console.log('[GameStore] Rolling back pending plays due to error:', 
-							Array.from(s.pendingCardPlays.keys())
-						);
-					}
 					
 					return {
 						...s,
@@ -319,7 +284,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_TARGET, (data) => {
 				const targetData = data as GameTargetData;
-				console.log('[GameStore] GAME_TARGET:', targetData);
+
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -335,7 +300,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_CHOOSE_ABILITY, (data) => {
 				const abilityData = data as GameChooseAbilityData;
-				console.log('[GameStore] GAME_CHOOSE_ABILITY:', abilityData);
+
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -351,7 +316,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_CHOOSE_PILE, (data) => {
 				const pileData = data as GameChoosePileData;
-				console.log('[GameStore] GAME_CHOOSE_PILE:', pileData);
+
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -367,7 +332,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_CHOOSE_CHOICE, (data) => {
 				const choiceData = data as GameChoiceData;
-				console.log('[GameStore] GAME_CHOOSE_CHOICE:', choiceData);
+
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -383,7 +348,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_ASK, (data) => {
 				const askData = data as GameAskData;
-				console.log('[GameStore] GAME_ASK:', askData);
+
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -399,7 +364,6 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_SELECT, (data) => {
 				const selectData = data as GameSelectData;
-				console.log('[GameStore] GAME_SELECT:', selectData);
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -415,7 +379,6 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_PLAY_MANA, (data) => {
 				const manaData = data as GamePlayManaData;
-				console.log('[GameStore] GAME_PLAY_MANA:', manaData);
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -431,7 +394,6 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_PLAY_XMANA, (data) => {
 				const xmanaData = data as GamePlayXManaData;
-				console.log('[GameStore] GAME_PLAY_XMANA:', xmanaData);
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -447,7 +409,6 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_GET_AMOUNT, (data) => {
 				const amountData = data as GameGetAmountData;
-				console.log('[GameStore] GAME_GET_AMOUNT:', amountData);
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -463,7 +424,6 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_GET_MULTI_AMOUNT, (data) => {
 				const multiAmountData = data as GameGetMultiAmountData;
-				console.log('[GameStore] GAME_GET_MULTI_AMOUNT:', multiAmountData);
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -479,7 +439,6 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_ASSIGN_DAMAGE, (data) => {
 				const assignDamageData = data as GameAssignDamageData;
-				console.log('[GameStore] GAME_ASSIGN_DAMAGE:', assignDamageData);
 				update((s) => ({
 					...s,
 					pendingPrompt: {
@@ -509,7 +468,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_OVER, (data) => {
 				const overData = data as GameOverData;
-				console.log('[GameStore] GAME_OVER:', overData);
+
 				update((s) => ({
 					...s,
 					gameOver: true,
@@ -524,7 +483,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_ROLLBACK_REQUEST, (data) => {
 				const rollbackData = data as GameRollbackRequestData;
-				console.log('[GameStore] GAME_ROLLBACK_REQUEST:', rollbackData);
+
 				update((s) => ({
 					...s,
 					pendingRollbackRequest: {
@@ -543,7 +502,7 @@ function createGameStore() {
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_ROLLBACK_COMPLETE, (data) => {
 				const completeData = data as GameRollbackCompleteData;
-				console.log('[GameStore] GAME_ROLLBACK_COMPLETE:', completeData);
+
 				update((s) => ({
 					...s,
 					pendingRollbackRequest: null
@@ -552,7 +511,7 @@ function createGameStore() {
 			})
 		);
 
-		console.log(`[GameStore] Subscribed to ${unsubscribers.length} game event types`);
+
 	}
 
 	/**
@@ -610,24 +569,6 @@ function createGameStore() {
 	 * Update game view directly (for initial load via RPC)
 	 */
 	function setGameView(gameView: GameView) {
-		console.log('[GameStore] setGameView called:', {
-			state: gameView.state,
-			turn: gameView.turn,
-			phase: gameView.phase,
-			playerCount: gameView.players?.length
-		});
-
-		// Log each player's hand
-		gameView.players?.forEach((player) => {
-			console.log('[GameStore] setGameView - Player hand:', {
-				playerId: player.playerId,
-				playerName: player.name,
-				handCount: player.handCount,
-				handCards: player.hand?.map((c) => c.name) || [],
-				handCardIds: player.hand?.map((c) => c.id) || []
-			});
-		});
-
 		const normalized = normalizeGameView(gameView);
 		update((s) => ({
 			...s,
@@ -778,17 +719,10 @@ function createGameStore() {
 	function rollbackCardPlay(cardId: string): PendingCardPlay | null {
 		const state = get({ subscribe });
 		const pending = state.pendingCardPlays.get(cardId);
-
 		if (!pending) {
-			console.warn('[GameStore] Attempted to rollback non-pending card:', cardId);
 			return null;
 		}
 
-		console.log('[GameStore] Rolling back card play:', {
-			cardId,
-			cardName: pending.card.name,
-			sourceZone: pending.sourceZone
-		});
 
 		// Remove from pending and playing state
 		removePendingCardPlay(cardId);

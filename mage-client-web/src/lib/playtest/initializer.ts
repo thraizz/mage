@@ -127,7 +127,8 @@ function createPlayerFromDeck(deck: Deck, playerNumber: number): { player: Playt
 			green: 0,
 			colorless: 0
 		},
-		keptHand: false
+		keptHand: false,
+		mulliganCount: 0
 	};
 
 	return { player, commanders };

@@ -9,7 +9,9 @@
 	let isChecking = $state(true);
 
 	// Check if we're on a game page - hide navbar for immersive experience
-	const isGamePage = $derived($page.url.pathname.startsWith('/game/'));
+	const isGamePage = $derived(
+		$page.url.pathname.startsWith('/game/') || $page.url.pathname.startsWith('/playtest')
+	);
 
 	// Check authentication on mount
 	onMount(() => {

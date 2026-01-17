@@ -356,14 +356,12 @@ function createWebSocketStore() {
 			handlers.set(method, new Set());
 		}
 		handlers.get(method)!.add(handler);
-		console.log(`[WebSocket] Handler registered for method ${method}, total handlers: ${handlers.get(method)!.size}`);
 
 		// Return unsubscribe function
 		return () => {
 			const methodHandlers = handlers.get(method);
 			if (methodHandlers) {
 				methodHandlers.delete(handler);
-				console.log(`[WebSocket] Handler unregistered for method ${method}, remaining: ${methodHandlers.size}`);
 				if (methodHandlers.size === 0) {
 					handlers.delete(method);
 				}

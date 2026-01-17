@@ -6,27 +6,38 @@
 	interface Props {
 		cards: CardView[];
 		mulliganCount: number;
+		freeMulligans?: number;
 		onKeep: () => void;
 		onMulligan: () => void;
 		isLoading?: boolean;
 		hasKeptHand?: boolean;
 		playerName?: string;
-		children?: Snippet;
 	}
 
 	let {
 		cards,
 		mulliganCount,
+		freeMulligans = 0,
 		onKeep,
 		onMulligan,
 		isLoading = false,
 		hasKeptHand = false,
-		playerName,
-		children
+		playerName
 	}: Props = $props();
 
 	// Calculate next hand size after mulligan
-	const nextHandSize = $derived(Math.max(0, 7 - (mulliganCount + 1)));
+	const nextMulliganCount = $derived(mulliganCount + 1);
+	const nextHandSize = $derived(() => {
+		if (nextMulliganCount <= freeMulligans) {
+			return 7; // Free mulligan - draw full 7
+		} else {
+			const penaltyMulligans = nextMulliganCount - freeMulligans;
+			return Math.max(0, 7 - penaltyMulligans);
+		}
+	});
+
+	// Check if next mulligan is free
+	const isNextMulliganFree = $derived(nextMulliganCount <= freeMulligans);
 
 	// Determine if this is the first draw or subsequent mulligan
 	const isFirstDraw = $derived(mulliganCount === 0);
@@ -82,17 +93,20 @@
 					Waiting for other players to decide...
 				</p>
 			{:else if nextHandSize > 0}
-				<p class="next-hand-info">
-					If you mulligan, you'll draw 7 cards and put <strong>{mulliganCount + 1}</strong> on the bottom.
-				</p>
+				{#if isNextMulliganFree}
+					<p class="next-hand-info">
+						If you mulligan, you'll draw <strong>7 cards</strong> (free mulligan).
+					</p>
+				{:else}
+					<p class="next-hand-info">
+						If you mulligan, you'll draw <strong>{nextHandSize} cards</strong>.
+					</p>
+				{/if}
 			{:else}
 				<p class="warning">⚠️ If you mulligan again, you'll have 0 cards!</p>
 			{/if}
 		</div>
 
-		{#if children}
-			{@render children()}
-		{/if}
 		<div class="dialog-actions">
 			{#if hasKeptHand}
 				<div class="kept-badge">✓ Hand Kept</div>
@@ -109,11 +123,14 @@
 					onclick={onMulligan}
 					disabled={isLoading || nextHandSize === 0}
 					class:warning={showWarning}
+					class:free={isNextMulliganFree}
 				>
 					{#if isLoading}
 						<span class="spinner-small"></span>
 					{:else if nextHandSize === 0}
 						No Mulligan Available
+					{:else if isNextMulliganFree}
+						Free Mulligan (7 cards)
 					{:else}
 						Mulligan to {nextHandSize} cards
 					{/if}
@@ -310,6 +327,15 @@
 	.btn-mulligan:hover:not(:disabled) {
 		transform: translateY(-2px);
 		box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+	}
+
+	.btn-mulligan.free {
+		background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+		box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+	}
+
+	.btn-mulligan.free:hover:not(:disabled) {
+		box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
 	}
 
 	.btn-mulligan.warning {

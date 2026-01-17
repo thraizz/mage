@@ -108,3 +108,5 @@ cards_backup_*.sql
 *~
 .#*
 .playwright-mcp/
+**/CLAUDE.md
+!./CLAUDE.md

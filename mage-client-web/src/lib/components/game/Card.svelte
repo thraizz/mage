@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import { getScryfallImageUrl, getScryfallVersionForSize } from '$lib/utils/scryfall';
+	import {
+		getScryfallImageUrl,
+		getScryfallVersionForSize,
+		getScryfallTokenSearchUrl
+	} from '$lib/utils/scryfall';
 	import ManaSymbol from '$lib/components/mtg/ManaSymbol.svelte';
 
 	// Props
@@ -12,6 +16,7 @@
 		cardType = '',
 		power = '',
 		toughness = '',
+		color = '',
 		imageUrl = '',
 		isTapped = false,
 		isSelected = false,
@@ -44,10 +49,11 @@
 		cardType?: string;
 		power?: string;
 		toughness?: string;
+		color?: string;
 		imageUrl?: string;
 		isTapped?: boolean;
 		isSelected?: boolean;
-		counters?: Array<{ type: string; count: number }>;
+		counters?: Array<{ name: string; count: number }>;
 		isPlaceholder?: boolean;
 		isCardBack?: boolean;
 		onclick?: () => void;
@@ -88,20 +94,6 @@
 		}
 	});
 
-	// Derive the effective image URL - use Scryfall if no explicit imageUrl provided
-	const effectiveImageUrl = $derived(
-		imageUrl ||
-			(!isCardBack && !isPlaceholder && cardName
-				? getScryfallImageUrl(cardName, getScryfallVersionForSize(size))
-				: '')
-	);
-
-	// Larger image URL for the hover preview
-	const previewImageUrl = $derived(
-		imageUrl ||
-			(!isCardBack && !isPlaceholder && cardName ? getScryfallImageUrl(cardName, 'large') : '')
-	);
-
 	// State
 	let showPreview = $state(false);
 	let previewPosition = $state({ x: 0, y: 0 });
@@ -109,6 +101,85 @@
 	let imageLoaded = $state(false);
 	let imageError = $state(false);
 	let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
+	let tokenImageUrl = $state<string | null>(null);
+	let tokenImageFetching = $state(false);
+	let lastFetchedTokenKey = $state<string>('');
+
+	// Check if this is a token based on card ID
+	const isToken = $derived(cardId?.startsWith('token-') ?? false);
+
+	// Create a unique key for this token based on its characteristics
+	const tokenKey = $derived(isToken ? `${cardName}|${power}|${toughness}|${color}` : '');
+
+	// Fetch token image from Scryfall search API
+	async function fetchTokenImage(): Promise<void> {
+		if (!isToken || !cardName || tokenImageFetching) return;
+
+		// Don't refetch if we already have this token
+		if (lastFetchedTokenKey === tokenKey && tokenImageUrl) return;
+
+		tokenImageFetching = true;
+		lastFetchedTokenKey = tokenKey;
+
+		try {
+			const searchUrl = getScryfallTokenSearchUrl(cardName, power, toughness, color);
+			const response = await fetch(searchUrl);
+
+			if (!response.ok) {
+				console.warn(`Failed to fetch token image for ${cardName}:`, response.statusText);
+				tokenImageUrl = null;
+				tokenImageFetching = false;
+				return;
+			}
+
+			const data = await response.json();
+
+			// Get the first matching card's image
+			if (data.data && data.data.length > 0) {
+				const card = data.data[0];
+				const versionKey = getScryfallVersionForSize(size);
+				// Extract image URL from the card object
+				tokenImageUrl = card.image_uris?.[versionKey] || card.image_uris?.normal || null;
+			} else {
+				console.warn(
+					`No token found for ${cardName} with power=${power} toughness=${toughness} color=${color}`
+				);
+				tokenImageUrl = null;
+			}
+		} catch (error) {
+			console.error(`Error fetching token image for ${cardName}:`, error);
+			tokenImageUrl = null;
+		} finally {
+			tokenImageFetching = false;
+		}
+	}
+
+	// Fetch token image when token identity changes
+	$effect(() => {
+		if (isToken && cardName && !imageUrl && tokenKey !== lastFetchedTokenKey) {
+			fetchTokenImage();
+		}
+	});
+
+	// Derive the effective image URL - use Scryfall if no explicit imageUrl provided
+	const effectiveImageUrl = $derived(
+		imageUrl ||
+			(isToken && tokenImageUrl
+				? tokenImageUrl
+				: !isCardBack && !isPlaceholder && cardName
+					? getScryfallImageUrl(cardName, getScryfallVersionForSize(size))
+					: '')
+	);
+
+	// Larger image URL for the hover preview
+	const previewImageUrl = $derived(
+		imageUrl ||
+			(isToken && tokenImageUrl
+				? tokenImageUrl
+				: !isCardBack && !isPlaceholder && cardName
+					? getScryfallImageUrl(cardName, 'large')
+					: '')
+	);
 
 	// Create portal container for preview (to avoid transform issues with fixed positioning)
 	let portalContainer: HTMLDivElement | null = null;
@@ -382,8 +453,11 @@
 		{#if hasCounters}
 			<div class="counters-badge">
 				{#each counters as counter}
-					<div class="counter" title="{counter.count} {counter.type} counter(s)">
-						{counter.count > 0 ? `+${counter.count}` : counter.count}
+					<div class="counter" title="{counter.count} {counter.name} counter(s)">
+						<span class="counter-name">{counter.name}</span>
+						<span class="counter-count"
+							>{counter.count > 0 ? `x${counter.count}` : counter.count}</span
+						>
 					</div>
 				{/each}
 			</div>
@@ -811,7 +885,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.125rem;
-		z-index: 2;
+		z-index: 20;
 	}
 
 	.counter {
@@ -822,6 +896,17 @@
 		font-weight: 700;
 		color: white;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.counter-name {
+		font-weight: 800;
+	}
+
+	.counter-count {
+		font-weight: 700;
 	}
 
 	/* Ability Badge */

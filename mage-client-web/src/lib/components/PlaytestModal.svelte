@@ -35,6 +35,10 @@
 	let selectedDecks = $state<(string | null)[]>([null, null, null, null]);
 	let playerCount = $state(2);
 
+	// Mulligan settings
+	let mulliganType = $state<'london'>('london');
+	let freeMulligans = $state(0);
+
 	// UI state
 	let starting = $state(false);
 	let continuing = $state(false);
@@ -158,6 +162,10 @@
 				}
 			}
 
+			// Add mulligan settings
+			params.append('mulliganType', mulliganType);
+			params.append('freeMulligans', freeMulligans.toString());
+
 			// Navigate to playtest page
 			await goto(`/playtest?${params.toString()}`);
 
@@ -177,6 +185,8 @@
 	function resetForm(): void {
 		selectedDecks = [null, null, null, null];
 		playerCount = 2;
+		mulliganType = 'london';
+		freeMulligans = 0;
 		starting = false;
 		continuing = false;
 		deckError = null;
@@ -327,6 +337,28 @@
 								</select>
 							</div>
 						{/each}
+					</div>
+
+					<!-- Mulligan settings -->
+					<div class="mulligan-settings">
+						<div class="form-group">
+							<label for="mulligan-type">Mulligan Type</label>
+							<select id="mulligan-type" bind:value={mulliganType} class="deck-select">
+								<option value="london">London Mulligan</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="free-mulligans">Free Mulligans</label>
+							<input
+								id="free-mulligans"
+								type="number"
+								min="0"
+								max="10"
+								bind:value={freeMulligans}
+								class="number-input"
+							/>
+							<p class="field-hint">Number of mulligans before drawing fewer cards</p>
+						</div>
 					</div>
 
 					<!-- Info section -->
@@ -604,6 +636,44 @@
 		overflow-y: auto;
 		padding: 0.5rem;
 		margin: -0.5rem;
+	}
+
+	.mulligan-settings {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 1rem;
+		background: rgba(102, 126, 234, 0.05);
+		border: 1px solid rgba(102, 126, 234, 0.15);
+		border-radius: 8px;
+	}
+
+	.number-input {
+		width: 100%;
+		padding: 0.75rem;
+		background: #1a1f2e;
+		border: 1px solid #2a3441;
+		border-radius: 6px;
+		color: #f8fafc;
+		font-size: 0.875rem;
+		transition: border-color 0.2s;
+	}
+
+	.number-input:hover {
+		border-color: #667eea;
+	}
+
+	.number-input:focus {
+		outline: none;
+		border-color: #667eea;
+		box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+	}
+
+	.field-hint {
+		margin: 0.25rem 0 0;
+		color: #94a3b8;
+		font-size: 0.75rem;
+		line-height: 1.4;
 	}
 
 	.deck-select {

@@ -26,10 +26,14 @@
 	import PlaytestLibrarySearch from '$lib/components/game/PlaytestLibrarySearch.svelte';
 	import ManaPool from '$lib/components/game/ManaPool.svelte';
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
+	import CreateTokenDialog from '$lib/components/game/CreateTokenDialog.svelte';
+	import CounterDialog from '$lib/components/game/CounterDialog.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import Clock from '@lucide/svelte/icons/clock';
 	import Copy from '@lucide/svelte/icons/copy';
+	import Menu from '@lucide/svelte/icons/menu';
+	import X from '@lucide/svelte/icons/x';
 	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
 	import {
 		dragDropStore,
@@ -47,8 +51,12 @@
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let showTokenCreator = $state(false);
+	let showCreateTokenDialog = $state(false);
+	let showCounterDialog = $state(false);
+	let selectedCardForCounters = $state<{ id: string; name: string } | null>(null);
 	let showKeyboardShortcuts = $state(false);
 	let showAllHands = $state(false);
+	let showMenu = $state(false);
 	let hoveredCardId = $state<string | null>(null);
 	let showLifeMenu = $state(false);
 	let lifeMenuEl: HTMLDivElement | null = $state(null);
@@ -78,11 +86,13 @@
 	let exileDropZoneEl: HTMLElement | null = $state(null);
 	let handDropZoneEl: HTMLElement | null = $state(null);
 	let libraryDropZoneEl: HTMLElement | null = $state(null);
+	let commandDropZoneEl: HTMLElement | null = $state(null);
 	let dropZoneUnregister: (() => void) | null = null;
 	let graveyardDropZoneUnregister: (() => void) | null = null;
 	let exileDropZoneUnregister: (() => void) | null = null;
 	let handDropZoneUnregister: (() => void) | null = null;
 	let libraryDropZoneUnregister: (() => void) | null = null;
+	let commandDropZoneUnregister: (() => void) | null = null;
 
 	// Battlefield drag state
 	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
@@ -144,6 +154,25 @@
 		me?.manaPool || { white: 0, blue: 0, black: 0, red: 0, green: 0, colorless: 0 }
 	);
 
+	// Reactive card lookup for counter dialog
+	const selectedCardForCountersData = $derived(() => {
+		if (!selectedCardForCounters) return null;
+		const card =
+			$playtestBattlefield.find((c) => c.id === selectedCardForCounters.id) ||
+			me?.hand.find((c) => c.id === selectedCardForCounters.id) ||
+			me?.graveyard.find((c) => c.id === selectedCardForCounters.id) ||
+			me?.exile.find((c) => c.id === selectedCardForCounters.id) ||
+			me?.commandZone.find((c) => c.id === selectedCardForCounters.id) ||
+			null;
+		console.log(
+			'[selectedCardForCountersData] Re-evaluated. Card:',
+			card?.name,
+			'Counters:',
+			card?.counters
+		);
+		return card;
+	});
+
 	// Hovered card
 	const hoveredCard = $derived(
 		hoveredCardId ? battlefield.find((c) => c.id === hoveredCardId) : null
@@ -165,11 +194,25 @@
 	// Check if all players have kept hands
 	const allPlayersKept = $derived(players.every((p) => p.keptHand));
 
+	// Game started state (for header visibility)
+	const isGameStarted = $derived(allPlayersKept && mulliganPlayerIndex === null);
+
 	// Command zone (Commander): show for currently controlled player
 	const commandCards = $derived($playtestGameStore.command || []);
 	const myCommandCards = $derived(
 		commandCards.filter((c) => (c.ownerId || c.controllerId) === activeControlSeat)
 	);
+
+	// Opponent command cards
+	const opponentCommandCards = $derived(() => {
+		const opponent = selectedOpponent();
+		return opponent
+			? commandCards.filter((c) => (c.ownerId || c.controllerId) === opponent.playerId)
+			: [];
+	});
+
+	// Check if this is a Commander game (has or had command zone cards)
+	const isCommanderGame = $derived(commandCards.length > 0);
 
 	/**
 	 * Update the URL with playtestId parameter
@@ -195,13 +238,21 @@
 			const searchParams = $page.url.searchParams;
 			const deckIds = validateDeckIds(searchParams);
 
+			// Parse mulligan settings from URL
+			const mulliganType = (searchParams.get('mulliganType') as 'london') || 'london';
+			const freeMulligans = parseInt(searchParams.get('freeMulligans') || '0', 10);
+
 			console.log('[Playtest] Initializing with deck IDs:', deckIds);
+			console.log('[Playtest] Mulligan settings:', { mulliganType, freeMulligans });
 
 			const init = await initializePlaytest(deckIds);
 			const initializedPlayers = init.players;
 			const gameId = `playtest-${Date.now()}`;
 
-			playtestGameStore.initialize(gameId, initializedPlayers);
+			playtestGameStore.initialize(gameId, initializedPlayers, {
+				mulliganType,
+				freeMulligans
+			});
 			playtestGameStore.setCommand(init.command);
 
 			// Initialize the normal game store with playtest data so PlayerHand works
@@ -231,10 +282,14 @@
 	 * Sync playtest store to game store for component compatibility
 	 */
 	function syncPlaytestToGameStore(): void {
+		console.log('[syncPlaytestToGameStore] Called');
 		const state = $playtestGameStore;
 		const controllingPlayer = players.find((p) => p.playerId === activeControlSeat);
 
-		if (!controllingPlayer) return;
+		if (!controllingPlayer) {
+			console.log('[syncPlaytestToGameStore] No controlling player found');
+			return;
+		}
 
 		// Convert playtest state to GameView format
 		const gameView = {
@@ -304,7 +359,6 @@
 
 		const player = players[mulliganPlayerIndex];
 		playtestGameStore.mulligan(player.playerId);
-		mulliganCount++;
 		toast.info(`${player.name} mulliganed`);
 	}
 
@@ -320,7 +374,6 @@
 
 		// Move to next player
 		mulliganPlayerIndex++;
-		mulliganCount = 0;
 
 		// If all players have decided, end mulligan phase
 		if (mulliganPlayerIndex >= players.length) {
@@ -578,6 +631,36 @@
 		const key = event.key.toLowerCase();
 
 		switch (key) {
+			case 'm':
+				// M - Toggle menu (only when game started)
+				if (isGameStarted) {
+					showMenu = !showMenu;
+					event.preventDefault();
+				}
+				break;
+			case 'escape':
+				// Escape - Close menu or modals
+				if (showMenu) {
+					showMenu = false;
+					event.preventDefault();
+				} else if (showKeyboardShortcuts) {
+					showKeyboardShortcuts = false;
+					event.preventDefault();
+				} else if (showTokenCreator) {
+					showTokenCreator = false;
+					event.preventDefault();
+				} else if (showCreateTokenDialog) {
+					showCreateTokenDialog = false;
+					event.preventDefault();
+				} else if (showCounterDialog) {
+					showCounterDialog = false;
+					selectedCardForCounters = null;
+					event.preventDefault();
+				} else if (showDebugOverlay) {
+					showDebugOverlay = false;
+					event.preventDefault();
+				}
+				break;
 			case '?':
 				showKeyboardShortcuts = !showKeyboardShortcuts;
 				event.preventDefault();
@@ -604,7 +687,7 @@
 				event.preventDefault();
 				break;
 			case 'w':
-				showTokenCreator = true;
+				showCreateTokenDialog = true;
 				event.preventDefault();
 				break;
 		}
@@ -626,6 +709,11 @@
 					break;
 				case 't':
 					playtestGameStore.moveCardToZone(hoveredCard.id, 'LIBRARY');
+					event.preventDefault();
+					break;
+				case 'k':
+					selectedCardForCounters = { id: hoveredCard.id, name: hoveredCard.name };
+					showCounterDialog = true;
 					event.preventDefault();
 					break;
 			}
@@ -721,6 +809,24 @@
 			if (libraryDropZoneUnregister) {
 				libraryDropZoneUnregister();
 				libraryDropZoneUnregister = null;
+			}
+		};
+	});
+
+	$effect(() => {
+		if (commandDropZoneEl && !commandDropZoneUnregister) {
+			commandDropZoneUnregister = dragDropStore.registerDropZone({
+				id: 'command',
+				type: 'command',
+				element: commandDropZoneEl,
+				accepts: (_cardId, sourceZone) => sourceZone !== 'command',
+				onDrop: (cardId) => handleZoneDrop(cardId, 'COMMAND')
+			});
+		}
+		return () => {
+			if (commandDropZoneUnregister) {
+				commandDropZoneUnregister();
+				commandDropZoneUnregister = null;
 			}
 		};
 	});
@@ -924,56 +1030,24 @@
 	{:else if mulliganPlayerIndex !== null && !allPlayersKept}
 		<MulliganDialog
 			cards={players[mulliganPlayerIndex]?.hand || []}
-			{mulliganCount}
+			mulliganCount={players[mulliganPlayerIndex]?.mulliganCount || 0}
+			freeMulligans={$playtestGameStore.freeMulligans}
 			playerName={players[mulliganPlayerIndex]?.name}
 			onKeep={handleKeepHand}
 			onMulligan={handleMulligan}
 			isLoading={false}
 			hasKeptHand={false}
-		>
-			<!-- Restore session modal -->
-			<h2>Restore Playtest Session</h2>
-			<p class="session-picker-hint">
-				Select a recent playtest session to continue, or start a new one.
-			</p>
-
-			{#if availableSessions.length > 0}
-				<div class="sessions-list">
-					{#each availableSessions as session (session.id)}
-						<div class="session-card">
-							<div class="session-info">
-								<div class="session-label">{session.label}</div>
-								<div class="session-meta">
-									{session.playerCount} players · Turn {session.turn} ·
-									{new Date(session.savedAt).toLocaleDateString()}
-									{new Date(session.savedAt).toLocaleTimeString([], {
-										hour: '2-digit',
-										minute: '2-digit'
-									})}
-								</div>
-							</div>
-							<div class="session-actions">
-								<button class="btn-restore" onclick={() => restoreSession(session.id)}>
-									Restore
-								</button>
-								<button
-									class="btn-delete"
-									onclick={() => deleteSession(session.id)}
-									title="Delete session"
-								>
-									✕
-								</button>
-							</div>
-						</div>
-					{/each}
-				</div>
-			{:else}
-				<p class="no-sessions">No saved sessions found.</p>
-			{/if}
-		</MulliganDialog>
+		/>
 	{:else}
+		<!-- Hamburger Menu Button (shown when game started) -->
+		{#if isGameStarted}
+			<button class="menu-toggle-btn" onclick={() => (showMenu = !showMenu)} aria-label="Open menu">
+				<Menu size={24} />
+			</button>
+		{/if}
+
 		<!-- Playtest Header -->
-		<div class="playtest-header">
+		<div class="playtest-header" class:hidden={isGameStarted}>
 			<div class="header-left">
 				<button class="btn-back" onclick={() => goto('/lobby')}> ← Back to Lobby </button>
 				<span class="mode-badge">Playtest Mode</span>
@@ -1028,6 +1102,112 @@
 			</div>
 		</div>
 
+		<!-- Menu Overlay (slide-in from right) -->
+		{#if showMenu}
+			<!-- Backdrop -->
+			<div
+				class="menu-backdrop"
+				role="button"
+				tabindex="0"
+				onclick={() => (showMenu = false)}
+				onkeydown={(e) => e.key === 'Escape' && (showMenu = false)}
+			></div>
+
+			<!-- Menu Panel -->
+			<div class="menu-overlay open">
+				<div class="menu-header">
+					<h2>Menu</h2>
+					<button class="menu-close-btn" onclick={() => (showMenu = false)} aria-label="Close menu">
+						<X size={24} />
+					</button>
+				</div>
+
+				<div class="menu-content">
+					<!-- Controls Section -->
+					<div class="menu-section">
+						<h3 class="menu-section-title">Controls</h3>
+						<div class="menu-section-content">
+							<label>
+								<span class="menu-label">Controlling:</span>
+								<select
+									class="control-select"
+									value={activeControlSeat}
+									onchange={(e) => playtestGameStore.switchControlSeat(e.currentTarget.value)}
+								>
+									{#each players as player}
+										<option value={player.playerId}>{player.name}</option>
+									{/each}
+								</select>
+							</label>
+
+							<button class="menu-btn" onclick={() => (showAllHands = !showAllHands)}>
+								{showAllHands ? '🙈 Hide' : '👁️ Show'} All Hands
+							</button>
+						</div>
+					</div>
+
+					<!-- Turn Info Section -->
+					<div class="menu-section">
+						<h3 class="menu-section-title">Turn Info</h3>
+						<div class="menu-section-content">
+							<div class="turn-info">
+								<Clock size={18} />
+								<span>Turn {turnNumber()}</span>
+								{#if activePlayerName()}
+									<span class="active-player">· {activePlayerName()}</span>
+								{/if}
+							</div>
+							<button class="menu-btn primary" onclick={handleNextTurn}>Next Turn</button>
+						</div>
+					</div>
+
+					<!-- Utility Section -->
+					<div class="menu-section">
+						<h3 class="menu-section-title">Utilities</h3>
+						<div class="menu-section-content">
+							<button
+								class="menu-btn"
+								onclick={() => {
+									showKeyboardShortcuts = true;
+									showMenu = false;
+								}}
+							>
+								<Keyboard size={18} />
+								Keyboard Shortcuts
+							</button>
+							<button
+								class="menu-btn"
+								onclick={() => {
+									showDebugOverlay = true;
+									showMenu = false;
+								}}
+							>
+								🔧 Debug View
+							</button>
+						</div>
+					</div>
+
+					<!-- Navigation Section -->
+					<div class="menu-section">
+						<h3 class="menu-section-title">Navigation</h3>
+						<div class="menu-section-content">
+							<button class="menu-btn" onclick={() => goto('/lobby')}> ← Back to Lobby </button>
+							<button
+								class="menu-btn"
+								onclick={() => {
+									showSessionPicker = true;
+									showMenu = false;
+								}}
+							>
+								<Clock size={18} />
+								Sessions
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		{/if}
+
 		<!-- All Hands Overlay -->
 		{#if showAllHands}
 			<div class="all-hands-overlay">
@@ -1059,137 +1239,202 @@
 			{#if selectedOpponent()}
 				{@const opponent = selectedOpponent()!}
 				<div class="opponent-section">
-					<!-- Opponent Header -->
-					<div class="opponent-header-bar">
-						<div class="opponent-identity">
-							{#if otherPlayers.length > 1}
-								<select
-									class="opponent-select"
-									value={opponent.playerId}
-									onchange={(e) => (selectedOpponentId = e.currentTarget.value)}
-								>
-									{#each otherPlayers as opp}
-										<option value={opp.playerId}>{opp.name}</option>
-									{/each}
-								</select>
-							{:else}
-								<span class="opponent-name-label">{opponent.name}</span>
-							{/if}
-						</div>
-						<div class="opponent-controls">
-							<div class="life-group">
-								<button
-									class="stat-btn minus"
-									onclick={() => handleLifeChange(-1, opponent.playerId)}>−</button
-								>
-								<button
-									class="stat-display life"
-									onclick={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
-								>
-									<span class="stat-icon">❤️</span>
-									<span class="stat-value">{opponent.life}</span>
-								</button>
-								<button class="stat-btn plus" onclick={() => handleLifeChange(1, opponent.playerId)}
-									>+</button
-								>
-							</div>
-
-							{#if opponent.poison > 0}
-								<div class="stat-display poison">
-									<span class="stat-icon">☠️</span>
-									<span class="stat-value">{opponent.poison}</span>
-								</div>
-							{/if}
-
-							{#if showOpponentLifeMenu}
-								<div bind:this={opponentLifeMenuEl} class="quick-menu opponent-menu">
-									<div class="menu-section">
-										<span class="menu-label">Life</span>
-										<div class="menu-row">
-											<button onclick={() => handleLifeChange(-5, opponent.playerId)}>−5</button>
-											<button onclick={() => handleLifeChange(-1, opponent.playerId)}>−1</button>
-											<button onclick={() => handleLifeChange(1, opponent.playerId)}>+1</button>
-											<button onclick={() => handleLifeChange(5, opponent.playerId)}>+5</button>
-										</div>
-									</div>
-									<div class="menu-section">
-										<span class="menu-label">Poison</span>
-										<div class="menu-row">
-											<button onclick={() => handlePoisonChange(-1, opponent.playerId)}>−1</button>
-											<span class="menu-value">{opponent.poison}</span>
-											<button onclick={() => handlePoisonChange(1, opponent.playerId)}>+1</button>
-										</div>
-									</div>
-									<button class="menu-close" onclick={() => (showOpponentLifeMenu = false)}
-										>✕</button
-									>
-								</div>
-							{/if}
-
-							<div class="opponent-stats">
-								<span class="opponent-stat">Hand: {opponent.handCount}</span>
-								<span class="opponent-stat">Library: {opponent.libraryCount}</span>
-								<span class="opponent-stat">Graveyard: {opponent.graveyard.length}</span>
-							</div>
-						</div>
-					</div>
-
 					<!-- Opponent Battlefield (Non-editable) -->
 					<div class="battlefield-area opponent-battlefield">
-						<span class="zone-label">{opponent.name}'s Battlefield</span>
-						<div class="battlefield-rows">
-							{#if opponentBattlefieldNonlands().length > 0}
-								<div class="battlefield-row battlefield-row--nonlands">
-									{#each opponentBattlefieldNonlands() as card (card.id)}
-										<div
-											class="battlefield-card-wrapper readonly"
-											title="{card.name} (controlled by {opponent.name})"
-										>
-											<Card
-												cardId={card.id}
-												cardName={card.name}
-												manaCost={card.manaCost}
-												cardType={card.type}
-												power={card.power}
-												toughness={card.toughness}
-												imageUrl=""
-												isTapped={card.tapped}
-												isSelected={false}
-												size="normal"
-												onclick={() => {}}
-											/>
-										</div>
-									{/each}
-								</div>
-							{/if}
+						<!-- Opponent Info Overlay -->
+						<div class="opponent-info-overlay">
+							<div class="opponent-identity">
+								{#if otherPlayers.length > 1}
+									<select
+										class="opponent-select"
+										value={opponent.playerId}
+										onchange={(e) => (selectedOpponentId = e.currentTarget.value)}
+									>
+										{#each otherPlayers as opp}
+											<option value={opp.playerId}>{opp.name}</option>
+										{/each}
+									</select>
+								{:else}
+									<span class="opponent-name-label">{opponent.name}</span>
+								{/if}
+							</div>
 
-							{#if opponentBattlefieldLands().length > 0}
-								<div class="battlefield-row battlefield-row--lands">
-									{#each opponentBattlefieldLands() as card (card.id)}
-										<div
-											class="battlefield-card-wrapper readonly"
-											title="{card.name} (controlled by {opponent.name})"
-										>
-											<Card
-												cardId={card.id}
-												cardName={card.name}
-												manaCost={card.manaCost}
-												cardType={card.type}
-												power={card.power}
-												toughness={card.toughness}
-												imageUrl=""
-												isTapped={card.tapped}
-												isSelected={false}
-												size="normal"
-												onclick={() => {}}
-											/>
-										</div>
-									{/each}
+							<div class="opponent-stats-compact">
+								<div class="life-group">
+									<button
+										class="stat-btn minus"
+										onclick={() => handleLifeChange(-1, opponent.playerId)}
+										title="Decrease life"
+									>
+										−
+									</button>
+									<button
+										class="stat-display life"
+										onclick={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+										title="Life total"
+									>
+										<span class="stat-icon">❤️</span>
+										<span class="stat-value">{opponent.life}</span>
+									</button>
+									<button
+										class="stat-btn plus"
+										onclick={() => handleLifeChange(1, opponent.playerId)}
+										title="Increase life"
+									>
+										+
+									</button>
 								</div>
-							{/if}
 
-							{#if opponentBattlefieldNonlands().length === 0 && opponentBattlefieldLands().length === 0}
-								<div class="empty-battlefield">No permanents</div>
+								{#if opponent.poison > 0}
+									<div class="stat-display poison" title="Poison counters">
+										<span class="stat-icon">☠️</span>
+										<span class="stat-value">{opponent.poison}</span>
+									</div>
+								{/if}
+
+								<div class="opponent-counts">
+									<span class="opponent-count" title="Hand cards">🃏 {opponent.handCount}</span>
+									<span class="opponent-count" title="Library cards"
+										>📚 {opponent.libraryCount}</span
+									>
+									<span class="opponent-count" title="Graveyard cards"
+										>🪦 {opponent.graveyard.length}</span
+									>
+								</div>
+
+								{#if showOpponentLifeMenu}
+									<div class="quick-menu opponent-menu">
+										<div class="menu-section">
+											<span class="menu-label">Life</span>
+											<div class="menu-row">
+												<button onclick={() => handleLifeChange(-5, opponent.playerId)}>−5</button>
+												<button onclick={() => handleLifeChange(-1, opponent.playerId)}>−1</button>
+												<button onclick={() => handleLifeChange(1, opponent.playerId)}>+1</button>
+												<button onclick={() => handleLifeChange(5, opponent.playerId)}>+5</button>
+											</div>
+										</div>
+										<div class="menu-section">
+											<span class="menu-label">Poison</span>
+											<div class="menu-row">
+												<button onclick={() => handlePoisonChange(-1, opponent.playerId)}>−1</button
+												>
+												<span class="menu-value">{opponent.poison}</span>
+												<button onclick={() => handlePoisonChange(1, opponent.playerId)}>+1</button>
+											</div>
+										</div>
+										<button class="menu-close" onclick={() => (showOpponentLifeMenu = false)}>
+											✕
+										</button>
+									</div>
+								{/if}
+							</div>
+						</div>
+
+						<!-- Opponent Battlefield Content Wrapper -->
+						<div class="battlefield-content-wrapper">
+							<!-- Opponent Battlefield Main -->
+							<div class="battlefield-main">
+								<div class="battlefield-rows">
+									{#if opponentBattlefieldNonlands().length > 0}
+										<div class="battlefield-row battlefield-row--nonlands">
+											{#each opponentBattlefieldNonlands() as card (card.id)}
+												<div
+													class="battlefield-card-wrapper readonly"
+													title="{card.name} (controlled by {opponent.name})"
+												>
+													<Card
+														cardId={card.id}
+														cardName={card.name}
+														manaCost={card.manaCost}
+														cardType={card.type}
+														power={card.power}
+														toughness={card.toughness}
+														color={card.color}
+														imageUrl=""
+														isTapped={card.tapped}
+														isSelected={false}
+														counters={card.counters}
+														size="normal"
+														onclick={() => {}}
+														oncontextmenu={(e) => {
+															e.preventDefault();
+															selectedCardForCounters = { id: card.id, name: card.name };
+															showCounterDialog = true;
+														}}
+													/>
+												</div>
+											{/each}
+										</div>
+									{/if}
+
+									{#if opponentBattlefieldLands().length > 0}
+										<div class="battlefield-row battlefield-row--lands">
+											{#each opponentBattlefieldLands() as card (card.id)}
+												<div
+													class="battlefield-card-wrapper readonly"
+													title="{card.name} (controlled by {opponent.name})"
+												>
+													<Card
+														cardId={card.id}
+														cardName={card.name}
+														manaCost={card.manaCost}
+														cardType={card.type}
+														power={card.power}
+														toughness={card.toughness}
+														color={card.color}
+														imageUrl=""
+														isTapped={card.tapped}
+														isSelected={false}
+														counters={card.counters}
+														size="normal"
+														onclick={() => {}}
+														oncontextmenu={(e) => {
+															e.preventDefault();
+															selectedCardForCounters = { id: card.id, name: card.name };
+															showCounterDialog = true;
+														}}
+													/>
+												</div>
+											{/each}
+										</div>
+									{/if}
+
+									{#if opponentBattlefieldNonlands().length === 0 && opponentBattlefieldLands().length === 0}
+										<div class="empty-battlefield">No permanents</div>
+									{/if}
+								</div>
+							</div>
+
+							<!-- Opponent Command Zone (right side) -->
+							{#if isCommanderGame}
+								<div class="command-zone opponent-command-zone">
+									<span class="zone-label">Command Zone</span>
+									<div class="command-cards">
+										{#if opponentCommandCards().length === 0}
+											<div class="command-zone-empty">
+												<span class="zone-empty-text">Empty</span>
+											</div>
+										{/if}
+										{#each opponentCommandCards() as card (card.id)}
+											<div class="command-card-wrapper readonly" title={card.name}>
+												<Card
+													cardId={card.id}
+													cardName={card.name}
+													manaCost={card.manaCost}
+													cardType={card.type}
+													power={card.power}
+													toughness={card.toughness}
+													color={card.color}
+													imageUrl=""
+													isTapped={card.tapped}
+													isSelected={false}
+													size="small"
+													onclick={() => {}}
+												/>
+											</div>
+										{/each}
+									</div>
+								</div>
 							{/if}
 						</div>
 					</div>
@@ -1203,126 +1448,156 @@
 				class:drag-active={isDragging}
 				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'battlefield'}
 			>
-				<!-- Command Zone (Commander) -->
-				{#if myCommandCards.length > 0}
-					<div class="command-zone">
-						<span class="zone-label">Command Zone</span>
-						<div class="command-cards">
-							{#each myCommandCards as card (card.id)}
-								<div
-									class="command-card-wrapper"
-									title={card.name}
-									role="button"
-									tabindex="0"
-									aria-label={card.name}
-									onmousedown={(e) => handleCommandCardMouseDown(card.id, card.name, e)}
-								>
-									<Card
-										cardId={card.id}
-										cardName={card.name}
-										manaCost={card.manaCost}
-										cardType={card.type}
-										power={card.power}
-										toughness={card.toughness}
-										imageUrl=""
-										isTapped={card.tapped}
-										isSelected={false}
-										size="small"
-										onclick={() => {}}
-									/>
+				<div class="battlefield-content-wrapper">
+					<!-- Main Battlefield (left side) -->
+					<div class="battlefield-main">
+						<span class="zone-label">Your Battlefield</span>
+						<div class="battlefield-rows">
+							{#if myBattlefieldNonlands.length > 0}
+								<div class="battlefield-row battlefield-row--nonlands">
+									{#each myBattlefieldNonlands as card (card.id)}
+										<div
+											class="battlefield-card-wrapper"
+											class:is-hovered={hoveredCardId === card.id}
+											role="button"
+											tabindex="0"
+											aria-label={card.name}
+											onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
+											onkeydown={(e) => {
+												if (e.key === 'Enter' || e.key === ' ') {
+													e.preventDefault();
+													handleBattlefieldCardClick(card.id);
+												}
+											}}
+											onmouseenter={() => (hoveredCardId = card.id)}
+											onmouseleave={() => {
+												if (hoveredCardId === card.id) hoveredCardId = null;
+											}}
+										>
+											<Card
+												cardId={card.id}
+												cardName={card.name}
+												manaCost={card.manaCost}
+												cardType={card.type}
+												power={card.power}
+												toughness={card.toughness}
+												color={card.color}
+												imageUrl=""
+												isTapped={card.tapped}
+												isSelected={false}
+												counters={card.counters}
+												size="normal"
+												onclick={() => handleBattlefieldCardClick(card.id)}
+												oncontextmenu={(e) => {
+													e.preventDefault();
+													selectedCardForCounters = { id: card.id, name: card.name };
+													showCounterDialog = true;
+												}}
+											/>
+										</div>
+									{/each}
 								</div>
-							{/each}
+							{/if}
+
+							{#if myBattlefieldLands.length > 0}
+								<div class="battlefield-row battlefield-row--lands">
+									{#each myBattlefieldLands as card (card.id)}
+										<div
+											class="battlefield-card-wrapper"
+											class:is-hovered={hoveredCardId === card.id}
+											role="button"
+											tabindex="0"
+											aria-label={card.name}
+											onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
+											onkeydown={(e) => {
+												if (e.key === 'Enter' || e.key === ' ') {
+													e.preventDefault();
+													handleBattlefieldCardClick(card.id);
+												}
+											}}
+											onmouseenter={() => (hoveredCardId = card.id)}
+											onmouseleave={() => {
+												if (hoveredCardId === card.id) hoveredCardId = null;
+											}}
+										>
+											<Card
+												cardId={card.id}
+												cardName={card.name}
+												manaCost={card.manaCost}
+												cardType={card.type}
+												power={card.power}
+												toughness={card.toughness}
+												color={card.color}
+												imageUrl=""
+												isTapped={card.tapped}
+												isSelected={false}
+												counters={card.counters}
+												size="normal"
+												onclick={() => handleBattlefieldCardClick(card.id)}
+												oncontextmenu={(e) => {
+													e.preventDefault();
+													selectedCardForCounters = { id: card.id, name: card.name };
+													showCounterDialog = true;
+												}}
+											/>
+										</div>
+									{/each}
+								</div>
+							{/if}
+
+							{#if myBattlefield.length === 0}
+								<div class="empty-battlefield">
+									{#if isDragging}
+										<span class="drop-hint">Drop card here to play</span>
+									{:else}
+										No permanents
+									{/if}
+								</div>
+							{/if}
 						</div>
 					</div>
-				{/if}
 
-				<span class="zone-label">Your Battlefield</span>
-				<div class="battlefield-rows">
-					{#if myBattlefieldNonlands.length > 0}
-						<div class="battlefield-row battlefield-row--nonlands">
-							{#each myBattlefieldNonlands as card (card.id)}
-								<div
-									class="battlefield-card-wrapper"
-									class:is-hovered={hoveredCardId === card.id}
-									role="button"
-									tabindex="0"
-									aria-label={card.name}
-									onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-									onkeydown={(e) => {
-										if (e.key === 'Enter' || e.key === ' ') {
-											e.preventDefault();
-											handleBattlefieldCardClick(card.id);
-										}
-									}}
-									onmouseenter={() => (hoveredCardId = card.id)}
-									onmouseleave={() => {
-										if (hoveredCardId === card.id) hoveredCardId = null;
-									}}
-								>
-									<Card
-										cardId={card.id}
-										cardName={card.name}
-										manaCost={card.manaCost}
-										cardType={card.type}
-										power={card.power}
-										toughness={card.toughness}
-										imageUrl=""
-										isTapped={card.tapped}
-										isSelected={false}
-										size="normal"
-										onclick={() => handleBattlefieldCardClick(card.id)}
-									/>
-								</div>
-							{/each}
-						</div>
-					{/if}
-
-					{#if myBattlefieldLands.length > 0}
-						<div class="battlefield-row battlefield-row--lands">
-							{#each myBattlefieldLands as card (card.id)}
-								<div
-									class="battlefield-card-wrapper"
-									class:is-hovered={hoveredCardId === card.id}
-									role="button"
-									tabindex="0"
-									aria-label={card.name}
-									onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-									onkeydown={(e) => {
-										if (e.key === 'Enter' || e.key === ' ') {
-											e.preventDefault();
-											handleBattlefieldCardClick(card.id);
-										}
-									}}
-									onmouseenter={() => (hoveredCardId = card.id)}
-									onmouseleave={() => {
-										if (hoveredCardId === card.id) hoveredCardId = null;
-									}}
-								>
-									<Card
-										cardId={card.id}
-										cardName={card.name}
-										manaCost={card.manaCost}
-										cardType={card.type}
-										power={card.power}
-										toughness={card.toughness}
-										imageUrl=""
-										isTapped={card.tapped}
-										isSelected={false}
-										size="normal"
-										onclick={() => handleBattlefieldCardClick(card.id)}
-									/>
-								</div>
-							{/each}
-						</div>
-					{/if}
-
-					{#if myBattlefield.length === 0}
-						<div class="empty-battlefield">
-							{#if isDragging}
-								<span class="drop-hint">Drop card here to play</span>
-							{:else}
-								No permanents
-							{/if}
+					<!-- Command Zone (right side) -->
+					{#if isCommanderGame}
+						<div
+							bind:this={commandDropZoneEl}
+							class="command-zone"
+							class:drag-valid={isDragging && isOverValidDrop && dropZone === 'command'}
+						>
+							<span class="zone-label">Command Zone</span>
+							<div class="command-cards">
+								{#if myCommandCards.length === 0}
+									<div class="command-zone-empty">
+										<span class="zone-empty-text">Empty</span>
+										<span class="zone-empty-hint">Drag commander here</span>
+									</div>
+								{/if}
+								{#each myCommandCards as card (card.id)}
+									<div
+										class="command-card-wrapper"
+										title={card.name}
+										role="button"
+										tabindex="0"
+										aria-label={card.name}
+										onmousedown={(e) => handleCommandCardMouseDown(card.id, card.name, e)}
+									>
+										<Card
+											cardId={card.id}
+											cardName={card.name}
+											manaCost={card.manaCost}
+											cardType={card.type}
+											power={card.power}
+											toughness={card.toughness}
+											color={card.color}
+											imageUrl=""
+											isTapped={card.tapped}
+											isSelected={false}
+											size="small"
+											onclick={() => {}}
+										/>
+									</div>
+								{/each}
+							</div>
 						</div>
 					{/if}
 				</div>
@@ -1450,6 +1725,46 @@
 		<!-- Token Creator -->
 		{#if showTokenCreator}
 			<TokenCreator gameId="playtest" onClose={() => (showTokenCreator = false)} />
+		{/if}
+
+		<!-- Create Token Dialog (New) -->
+		{#if showCreateTokenDialog}
+			<CreateTokenDialog
+				onCreateToken={(name, types, power, toughness, color) => {
+					playtestGameStore.createToken(name, types, power, toughness, color);
+					syncPlaytestToGameStore();
+					showCreateTokenDialog = false;
+				}}
+				onClose={() => (showCreateTokenDialog = false)}
+			/>
+		{/if}
+
+		<!-- Counter Dialog -->
+		{#if showCounterDialog && selectedCardForCounters && selectedCardForCountersData()}
+			<CounterDialog
+				cardName={selectedCardForCountersData().name}
+				cardId={selectedCardForCountersData().id}
+				currentCounters={selectedCardForCountersData().counters}
+				onAddCounter={(counterName, amount) => {
+					const card = selectedCardForCountersData();
+					playtestGameStore.addCounter(card.id, counterName, amount);
+					syncPlaytestToGameStore();
+				}}
+				onRemoveCounter={(counterName, amount) => {
+					const card = selectedCardForCountersData();
+					playtestGameStore.removeCounter(card.id, counterName, amount);
+					syncPlaytestToGameStore();
+				}}
+				onSetCounter={(counterName, amount) => {
+					const card = selectedCardForCountersData();
+					playtestGameStore.setCounter(card.id, counterName, amount);
+					syncPlaytestToGameStore();
+				}}
+				onClose={() => {
+					showCounterDialog = false;
+					selectedCardForCounters = null;
+				}}
+			/>
 		{/if}
 
 		<!-- Deck Search -->
@@ -1695,11 +2010,219 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin-top: 80px;
+		margin-top: 0;
 		padding: 1rem;
 		background: rgba(26, 31, 46, 0.95);
 		border-bottom: 1px solid #2a3441;
 		gap: 1rem;
+		transition: all 0.3s ease;
+	}
+
+	.playtest-header.hidden {
+		transform: translateY(-100%);
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	/* Hamburger Menu Button */
+	.menu-toggle-btn {
+		position: fixed;
+		top: 1rem;
+		right: 1rem;
+		z-index: 200;
+		width: 48px;
+		height: 48px;
+		background: rgba(26, 31, 46, 0.95);
+		border: 1px solid #2a3441;
+		border-radius: 8px;
+		color: #f4f4f5;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s ease;
+		backdrop-filter: blur(8px);
+	}
+
+	.menu-toggle-btn:hover {
+		background: rgba(102, 126, 234, 0.2);
+		border-color: #667eea;
+		transform: scale(1.05);
+	}
+
+	/* Menu Backdrop */
+	.menu-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 149;
+		animation: fadeIn 0.3s ease;
+		cursor: pointer;
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	/* Menu Overlay */
+	.menu-overlay {
+		position: fixed;
+		top: 0;
+		right: 0;
+		width: 400px;
+		max-width: 90vw;
+		height: 100vh;
+		background: rgba(26, 31, 46, 0.98);
+		border-left: 1px solid #2a3441;
+		z-index: 150;
+		padding: 0;
+		overflow-y: auto;
+		transform: translateX(100%);
+		transition: transform 0.3s ease;
+		backdrop-filter: blur(16px);
+	}
+
+	.menu-overlay.open {
+		transform: translateX(0);
+	}
+
+	.menu-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.5rem;
+		border-bottom: 1px solid #2a3441;
+		position: sticky;
+		top: 0;
+		background: rgba(26, 31, 46, 0.98);
+		backdrop-filter: blur(16px);
+		z-index: 10;
+	}
+
+	.menu-header h2 {
+		font-size: 1.25rem;
+		font-weight: 700;
+		margin: 0;
+		color: #f4f4f5;
+	}
+
+	.menu-close-btn {
+		width: 36px;
+		height: 36px;
+		border-radius: 6px;
+		background: rgba(63, 63, 70, 0.4);
+		border: 1px solid rgba(63, 63, 70, 0.6);
+		color: #f4f4f5;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s ease;
+	}
+
+	.menu-close-btn:hover {
+		background: rgba(239, 68, 68, 0.2);
+		border-color: #ef4444;
+	}
+
+	.menu-content {
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.menu-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.menu-section-title {
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #71717a;
+		margin: 0;
+	}
+
+	.menu-section-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.menu-label {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: #a1a1aa;
+		display: block;
+		margin-bottom: 0.25rem;
+	}
+
+	.control-select {
+		width: 100%;
+		padding: 0.5rem 0.75rem;
+		background: rgba(36, 40, 51, 0.8);
+		border: 1px solid rgba(63, 63, 70, 0.5);
+		border-radius: 6px;
+		color: #f4f4f5;
+		font-size: 0.875rem;
+		cursor: pointer;
+	}
+
+	.menu-btn {
+		width: 100%;
+		padding: 0.625rem 0.75rem;
+		background: rgba(36, 40, 51, 0.8);
+		border: 1px solid rgba(63, 63, 70, 0.5);
+		border-radius: 6px;
+		color: #f4f4f5;
+		font-size: 0.875rem;
+		font-weight: 500;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		justify-content: center;
+		transition: all 0.2s ease;
+	}
+
+	.menu-btn:hover {
+		background: rgba(63, 63, 70, 0.6);
+		border-color: #667eea;
+	}
+
+	.menu-btn.primary {
+		background: rgba(102, 126, 234, 0.2);
+		border-color: #667eea;
+		color: #667eea;
+		font-weight: 600;
+	}
+
+	.menu-btn.primary:hover {
+		background: rgba(102, 126, 234, 0.3);
+	}
+
+	.turn-info {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		background: rgba(36, 40, 51, 0.6);
+		border-radius: 6px;
+		font-size: 0.875rem;
+		color: #f4f4f5;
+	}
+
+	.turn-info .active-player {
+		color: #a1a1aa;
 	}
 
 	.header-left,
@@ -1885,19 +2408,25 @@
 	.opponent-section {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
-		flex-shrink: 0;
+		gap: 0;
+		flex: 1;
 	}
 
-	.opponent-header-bar {
+	.opponent-info-overlay {
+		position: absolute;
+		top: 0.5rem;
+		left: 0.5rem;
+		right: 0.5rem;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0.5rem 0.75rem;
-		background: rgba(26, 31, 46, 0.8);
-		border: 1px solid #2a3441;
+		background: rgba(26, 31, 46, 0.9);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(42, 52, 65, 0.6);
 		border-radius: 8px;
-		gap: 1rem;
+		padding: 0.5rem 0.75rem;
+		z-index: 10;
+		gap: 0.75rem;
 	}
 
 	.opponent-identity {
@@ -1905,14 +2434,6 @@
 		align-items: center;
 		gap: 0.5rem;
 		flex-shrink: 0;
-	}
-
-	.opponent-controls {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		flex: 1;
-		position: relative;
 	}
 
 	.opponent-select {
@@ -1938,16 +2459,22 @@
 		color: #f8fafc;
 	}
 
-	.opponent-stats {
+	.opponent-stats-compact {
 		display: flex;
-		gap: 0.75rem;
-		font-size: 0.875rem;
 		align-items: center;
-		margin-left: auto;
+		gap: 0.75rem;
+		position: relative;
 	}
 
-	.opponent-stat {
-		color: #94a3b8;
+	.opponent-counts {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.opponent-count {
+		font-size: 0.75rem;
+		color: #a1a1aa;
 		white-space: nowrap;
 	}
 
@@ -1966,15 +2493,17 @@
 	}
 
 	.my-battlefield {
-		flex: 1;
-		min-height: 200px;
+		min-height: 473px;
 	}
 
 	.opponent-battlefield {
+		position: relative;
 		min-height: 150px;
-		max-height: 250px;
+		max-height: none;
 		background: linear-gradient(135deg, #1a1217, #1c1428);
 		border-color: rgba(200, 100, 100, 0.3);
+		padding-top: 4rem;
+		flex: 1;
 	}
 
 	.battlefield-area.drag-active {
@@ -2014,15 +2543,80 @@
 		border-top: 1px dashed rgba(148, 163, 184, 0.25);
 	}
 
-	/* Command zone (Commander) */
+	/* Battlefield content wrapper - flexbox for main battlefield + command zone */
+	.battlefield-content-wrapper {
+		display: flex;
+		gap: 1rem;
+		height: 100%;
+		align-items: flex-start;
+	}
+
+	.battlefield-main {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	/* Command zone (Commander) - right side */
 	.command-zone {
-		margin-bottom: 0.75rem;
+		width: fit-content;
+		flex-shrink: 0;
+		padding: 0.75rem;
+		background: rgba(26, 31, 46, 0.4);
+		border: 1px solid rgba(102, 126, 234, 0.3);
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+		gap: 0.5rem;
+		transition: all 0.2s ease;
+	}
+
+	.command-zone.drag-valid {
+		border-color: #22c55e;
+		background: rgba(34, 197, 94, 0.1);
+		box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+	}
+
+	/* Opponent command zone - slightly different styling */
+	.opponent-command-zone {
+		background: rgba(26, 18, 23, 0.4);
+		border-color: rgba(200, 100, 100, 0.3);
 	}
 
 	.command-cards {
 		display: flex;
-		flex-wrap: wrap;
+		flex-direction: column;
 		gap: 0.5rem;
+	}
+
+	.command-zone-empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 1.5rem 0.5rem;
+		border: 1px dashed rgba(102, 126, 234, 0.3);
+		border-radius: 6px;
+		background: rgba(26, 31, 46, 0.2);
+		min-height: 120px;
+	}
+
+	.zone-empty-text {
+		font-size: 0.75rem;
+		color: #71717a;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		font-weight: 600;
+	}
+
+	.zone-empty-hint {
+		font-size: 0.6875rem;
+		color: #52525b;
+		margin-top: 0.25rem;
+		font-style: italic;
 	}
 
 	.command-card-wrapper {
@@ -2733,5 +3327,50 @@
 		justify-content: flex-end;
 		padding-top: 1rem;
 		border-top: 1px solid #2a3441;
+	}
+
+	/* Responsive Design */
+	@media (max-width: 1200px) {
+		.command-zone,
+		.opponent-command-zone {
+			min-width: 150px;
+			max-width: 150px;
+		}
+
+		.menu-overlay {
+			width: 350px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.battlefield-content-wrapper {
+			flex-direction: column;
+		}
+
+		.command-zone,
+		.opponent-command-zone {
+			width: 100%;
+			max-width: 100%;
+		}
+
+		.command-cards {
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
+
+		.menu-overlay {
+			width: 100%;
+		}
+
+		.opponent-info-overlay {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.5rem;
+		}
+
+		.opponent-stats-compact {
+			width: 100%;
+			justify-content: space-between;
+		}
 	}
 </style>

@@ -15,7 +15,8 @@ import {
 	removeCardFromZone,
 	addCardToZone,
 	shuffleArray,
-	getNextPlayer
+	getNextPlayer,
+	updateCardInZone
 } from '$lib/utils/playtest-helpers';
 
 /**
@@ -34,6 +35,7 @@ export interface PlaytestPlayer {
 	graveyard: CardView[];
 	manaPool: ManaPoolView;
 	keptHand: boolean;
+	mulliganCount: number;
 }
 
 /**
@@ -51,6 +53,8 @@ export interface PlaytestGameState {
 	activePlayerId: string;
 	isInitialized: boolean;
 	log: PlaytestLogEntry[];
+	mulliganType: 'london';
+	freeMulligans: number;
 }
 
 const initialState: PlaytestGameState = {
@@ -64,7 +68,9 @@ const initialState: PlaytestGameState = {
 	turn: 1,
 	activePlayerId: '',
 	isInitialized: false,
-	log: []
+	log: [],
+	mulliganType: 'london',
+	freeMulligans: 0
 };
 
 // Store up to the last 10 playtest sessions
@@ -399,7 +405,14 @@ function createPlaytestGameStore() {
 	/**
 	 * Initialize game state with players and their decks
 	 */
-	function initialize(gameId: string, players: PlaytestPlayer[]): void {
+	function initialize(
+		gameId: string,
+		players: PlaytestPlayer[],
+		options?: {
+			mulliganType?: 'london';
+			freeMulligans?: number;
+		}
+	): void {
 		if (players.length === 0) {
 			console.error('[PlaytestGame] Cannot initialize with no players');
 			return;
@@ -431,7 +444,9 @@ function createPlaytestGameStore() {
 							.join(' vs ') || 'Playtest'
 					})`
 				}
-			]
+			],
+			mulliganType: options?.mulliganType ?? 'london',
+			freeMulligans: options?.freeMulligans ?? 0
 		};
 
 		set(nextState);
@@ -555,7 +570,20 @@ function createPlaytestGameStore() {
 				return state;
 			}
 
+			console.log('[PlaytestGame] Found card:', found);
 			const { card, sourceZone } = found;
+			if (!card) {
+				console.error('[PlaytestGame] Card not found:', cardId);
+				return state;
+			}
+
+			// MTG Rule: Tokens cease to exist when they leave the battlefield
+			if (cardId.startsWith('token-') && sourceZone === 'battlefield') {
+				// Token is leaving the battlefield - it ceases to exist
+				const next = removeCardFromZone(state, cardId, sourceZone);
+				const msg = `${playerName(state, state.activeControlSeat)} moves ${card.name} to ${targetZone}. Token ceases to exist.`;
+				return appendLogToState(next, { kind: 'move', message: msg });
+			}
 
 			// Remove from source zone
 			let next = removeCardFromZone(state, cardId, sourceZone);
@@ -766,6 +794,120 @@ function createPlaytestGameStore() {
 	}
 
 	/**
+	 * Add counters to a card
+	 */
+	function addCounter(cardId: string, counterName: string, amount: number = 1): void {
+		console.log('[addCounter] Called with:', { cardId, counterName, amount });
+		update((state) => {
+			// Find the card in any zone
+			const found = findCardInState(state, cardId);
+			if (!found) {
+				console.log('[addCounter] Card not found:', cardId);
+				return state;
+			}
+
+			const { card, sourceZone } = found;
+			console.log('[addCounter] Found card:', card.name, 'Current counters:', card.counters);
+
+			// Create new card with updated counters
+			const existingCounter = card.counters.find((c) => c.name === counterName);
+			const newCounters = existingCounter
+				? card.counters.map((c) => (c.name === counterName ? { ...c, count: c.count + amount } : c))
+				: [...card.counters, { name: counterName, count: amount }];
+
+			console.log('[addCounter] New counters:', newCounters);
+
+			// Update card in zone with new card object
+			const updatedState = updateCardInZone(state, cardId, sourceZone, (c) => ({
+				...c,
+				counters: newCounters
+			}));
+
+			const msg = `Added ${amount} ${counterName} counter(s) to ${card.name}.`;
+			return appendLogToState(updatedState, { kind: 'counter', message: msg });
+		});
+	}
+
+	/**
+	 * Remove counters from a card
+	 */
+	function removeCounter(cardId: string, counterName: string, amount: number = 1): void {
+		console.log('[removeCounter] Called with:', { cardId, counterName, amount });
+		update((state) => {
+			const found = findCardInState(state, cardId);
+			if (!found) {
+				console.log('[removeCounter] Card not found:', cardId);
+				return state;
+			}
+
+			const { card, sourceZone } = found;
+			console.log('[removeCounter] Found card:', card.name, 'Current counters:', card.counters);
+
+			const counter = card.counters.find((c) => c.name === counterName);
+			if (!counter) {
+				console.log('[removeCounter] Counter not found:', counterName);
+				return state;
+			}
+
+			const newCount = Math.max(0, counter.count - amount);
+
+			// Create new counters array - remove if 0, otherwise update count
+			const newCounters =
+				newCount === 0
+					? card.counters.filter((c) => c.name !== counterName)
+					: card.counters.map((c) => (c.name === counterName ? { ...c, count: newCount } : c));
+
+			console.log('[removeCounter] New counters:', newCounters);
+
+			// Update card in zone with new card object
+			const updatedState = updateCardInZone(state, cardId, sourceZone, (c) => ({
+				...c,
+				counters: newCounters
+			}));
+
+			const msg = `Removed ${amount} ${counterName} counter(s) from ${card.name}.`;
+			return appendLogToState(updatedState, { kind: 'counter', message: msg });
+		});
+	}
+
+	/**
+	 * Set a counter to a specific value
+	 */
+	function setCounter(cardId: string, counterName: string, amount: number): void {
+		console.log('[setCounter] Called with:', { cardId, counterName, amount });
+		update((state) => {
+			const found = findCardInState(state, cardId);
+			if (!found) {
+				console.log('[setCounter] Card not found:', cardId);
+				return state;
+			}
+
+			const { card, sourceZone } = found;
+			console.log('[setCounter] Found card:', card.name, 'Current counters:', card.counters);
+
+			// Create new counters array
+			const newCounters =
+				amount <= 0
+					? card.counters.filter((c) => c.name !== counterName)
+					: card.counters.find((c) => c.name === counterName)
+						? card.counters.map((c) => (c.name === counterName ? { ...c, count: amount } : c))
+						: [...card.counters, { name: counterName, count: amount }];
+
+			console.log('[setCounter] New counters:', newCounters);
+
+			// Update card in zone with new card object
+			const updatedState = updateCardInZone(state, cardId, sourceZone, (c) => ({
+				...c,
+				counters: newCounters
+			}));
+
+			const msg = `Set ${counterName} counters on ${card.name} to ${amount}.`;
+			return appendLogToState(updatedState, { kind: 'counter', message: msg });
+		});
+	}
+
+
+	/**
 	 * Next turn
 	 */
 	function nextTurn(): void {
@@ -793,6 +935,7 @@ function createPlaytestGameStore() {
 			if (playerIndex === -1) return state;
 
 			const player = state.players[playerIndex];
+			const newMulliganCount = player.mulliganCount + 1;
 
 			// Return hand to library
 			const returnedCards = player.hand.map((card) => ({
@@ -804,8 +947,17 @@ function createPlaytestGameStore() {
 			// Shuffle library with returned cards
 			const newLibrary = shuffleArray([...returnedCards, ...player.library]);
 
-			// Draw one less card
-			const newHandSize = Math.max(0, player.handCount - 1);
+			// Calculate new hand size based on free mulligans
+			// If mulliganCount < freeMulligans, draw 7 cards (no penalty)
+			// Otherwise, draw 7 - (mulliganCount - freeMulligans + 1) cards
+			let newHandSize: number;
+			if (newMulliganCount <= state.freeMulligans) {
+				newHandSize = 7; // Free mulligan - draw full 7
+			} else {
+				const penaltyMulligans = newMulliganCount - state.freeMulligans;
+				newHandSize = Math.max(0, 7 - penaltyMulligans);
+			}
+
 			const newHand = newLibrary.splice(0, newHandSize).map((card) => ({
 				...card,
 				zone: ZoneId.HAND,
@@ -819,7 +971,8 @@ function createPlaytestGameStore() {
 				handCount: newHand.length,
 				library: newLibrary,
 				libraryCount: newLibrary.length,
-				keptHand: false
+				keptHand: false,
+				mulliganCount: newMulliganCount
 			};
 
 			const msg = `${playerName(state, state.activeControlSeat)} mulls their hand.`;
@@ -886,6 +1039,9 @@ function createPlaytestGameStore() {
 		addToStack,
 		removeFromStack,
 		createToken,
+		addCounter,
+		removeCounter,
+		setCounter,
 		nextTurn,
 		mulligan,
 		keepHand,
