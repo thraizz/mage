@@ -330,6 +330,13 @@
 	const manaSymbols = $derived(parseManaCost(manaCost));
 	const hasCounters = $derived(counters && counters.length > 0);
 	const hasPowerToughness = $derived(power && toughness && power !== '' && toughness !== '');
+
+	// Debug the power and toughness values whenever they change
+	$effect(() => {
+		console.log('power', power);
+		console.log('toughness', toughness);
+		console.log('hasPowerToughness', hasPowerToughness);
+	});
 </script>
 
 <div
