@@ -10,7 +10,6 @@
 
 	let { cards, onComplete, onCancel }: Props = $props();
 
-	console.log('cards', cards);
 	let keepOnTop = $state<CardView[]>([]);
 	let putToBottom = $state<CardView[]>([]);
 
@@ -65,9 +64,18 @@
 		<div class="card-grid">
 			{#each remaining as card (card.id)}
 				<div class="card-item">
-					<div class="card-preview">
-						<Card {card} interactive={false} />
-					</div>
+					<Card
+						cardId={card.id}
+						cardName={card.name}
+						manaCost={card.manaCost}
+						cardType={card.type}
+						power={card.power}
+						toughness={card.toughness}
+						isSelected={false}
+						size="normal"
+						onclick={() => {}}
+						onhover={() => {}}
+					/>
 					<div class="card-actions">
 						<button class="btn-top" onclick={() => moveToTop(card)}>↑ Top</button>
 						<button class="btn-bottom" onclick={() => moveToBottom(card)}>↓ Bottom</button>
@@ -86,9 +94,7 @@
 			</div>
 			<div class="footer-actions">
 				<button class="btn-secondary" onclick={onCancel}>Cancel</button>
-				<button class="btn-primary" onclick={handleComplete} disabled={remaining.length > 0}>
-					Complete
-				</button>
+				<button class="btn-primary" onclick={handleComplete}> Complete </button>
 			</div>
 		</div>
 	</div>
@@ -298,41 +304,5 @@
 	.footer-actions {
 		display: flex;
 		gap: 0.75rem;
-	}
-
-	.btn-primary,
-	.btn-secondary {
-		padding: 0.5rem 1rem;
-		border-radius: 6px;
-		font-weight: 600;
-		font-size: 0.875rem;
-		cursor: pointer;
-		transition: all 0.2s;
-		border: none;
-	}
-
-	.btn-primary {
-		background: #667eea;
-		color: white;
-	}
-
-	.btn-primary:hover:not(:disabled) {
-		background: #5568d3;
-		transform: translateY(-1px);
-	}
-
-	.btn-primary:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.btn-secondary {
-		background: rgba(255, 255, 255, 0.1);
-		color: #fff;
-		border: 1px solid #3a4451;
-	}
-
-	.btn-secondary:hover {
-		background: rgba(255, 255, 255, 0.15);
 	}
 </style>
