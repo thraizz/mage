@@ -24,13 +24,13 @@
 	let filterType = $state<string>('all');
 	let isLoading = $state(false);
 	let error = $state<string | null>(null);
-	
+
 	// Drag state
 	let draggedCard = $state<{ id: string; name: string } | null>(null);
 	let dragPosition = $state({ x: 0, y: 0 });
 	let isDragging = $state(false);
 	let hoveredDropZone = $state<string | null>(null);
-	
+
 	// Selected destination for click-to-send
 	let selectedDestination = $state<'hand' | 'battlefield' | 'graveyard' | 'exile'>('hand');
 
@@ -38,7 +38,7 @@
 	const message = $derived(librarySearchData.message || 'Search your library for a card');
 	const canCancel = $derived(librarySearchData.canCancel ?? true);
 	const cards = $derived(librarySearchData.cards || []);
-	
+
 	// Initialize selected destination from server if provided
 	$effect(() => {
 		const serverDest = librarySearchData.destination;
@@ -48,7 +48,16 @@
 	});
 
 	// Card type filters
-	const cardTypes = ['all', 'creature', 'instant', 'sorcery', 'artifact', 'enchantment', 'land', 'planeswalker'];
+	const cardTypes = [
+		'all',
+		'creature',
+		'instant',
+		'sorcery',
+		'artifact',
+		'enchantment',
+		'land',
+		'planeswalker'
+	];
 
 	// Filtered and sorted cards
 	const filteredCards = $derived(() => {
@@ -67,9 +76,7 @@
 
 		// Filter by card type
 		if (filterType !== 'all') {
-			result = result.filter((card) =>
-				card.type?.toLowerCase().includes(filterType)
-			);
+			result = result.filter((card) => card.type?.toLowerCase().includes(filterType));
 		}
 
 		// Sort by name
@@ -77,7 +84,6 @@
 
 		return result;
 	});
-
 
 	/**
 	 * Handle confirm selection - moves card to selected destination
@@ -120,9 +126,7 @@
 	/**
 	 * Get selected card
 	 */
-	const selectedCard = $derived(
-		selectedCardId ? cards.find((c) => c.id === selectedCardId) : null
-	);
+	const selectedCard = $derived(selectedCardId ? cards.find((c) => c.id === selectedCardId) : null);
 
 	// Drop zones configuration
 	const dropZones = [
@@ -138,11 +142,11 @@
 	function handleDragStart(cardId: string, cardName: string, event: MouseEvent) {
 		event.preventDefault();
 		event.stopPropagation();
-		
+
 		draggedCard = { id: cardId, name: cardName };
 		dragPosition = { x: event.clientX, y: event.clientY };
 		isDragging = true;
-		
+
 		document.addEventListener('mousemove', handleDragMove);
 		document.addEventListener('mouseup', handleDragEnd);
 		document.body.style.userSelect = 'none';
@@ -163,11 +167,11 @@
 		document.removeEventListener('mousemove', handleDragMove);
 		document.removeEventListener('mouseup', handleDragEnd);
 		document.body.style.userSelect = '';
-		
+
 		if (draggedCard && hoveredDropZone) {
 			await moveCardToZone(draggedCard.id, hoveredDropZone);
 		}
-		
+
 		draggedCard = null;
 		isDragging = false;
 		hoveredDropZone = null;
@@ -194,19 +198,19 @@
 	 */
 	async function moveCardToZone(cardId: string, zoneId: string) {
 		if (isLoading) return;
-		
+
 		isLoading = true;
 		error = null;
-		
+
 		try {
 			// Map zone id to API format
 			const zoneMap: Record<string, string> = {
-				'hand': 'HAND',
-				'battlefield': 'BATTLEFIELD',
-				'graveyard': 'GRAVEYARD',
-				'exile': 'EXILE'
+				hand: 'HAND',
+				battlefield: 'BATTLEFIELD',
+				graveyard: 'GRAVEYARD',
+				exile: 'EXILE'
 			};
-			
+
 			await moveCard(gameId, cardId, zoneMap[zoneId] || 'HAND');
 			onComplete();
 		} catch (err) {
@@ -262,7 +266,9 @@
 				/>
 				<select class="type-filter" bind:value={filterType}>
 					{#each cardTypes as type}
-						<option value={type}>{type === 'all' ? 'All Types' : type.charAt(0).toUpperCase() + type.slice(1)}</option>
+						<option value={type}
+							>{type === 'all' ? 'All Types' : type.charAt(0).toUpperCase() + type.slice(1)}</option
+						>
 					{/each}
 				</select>
 			</div>
@@ -293,7 +299,12 @@
 							>
 								<div class="card-thumbnail">
 									{#if getScryfallImageUrl(card.name, 'small')}
-										<img src={getScryfallImageUrl(card.name, 'small')} alt={card.name} class="card-image" draggable="false" />
+										<img
+											src={getScryfallImageUrl(card.name, 'small')}
+											alt={card.name}
+											class="card-image"
+											draggable="false"
+										/>
 									{:else}
 										<div class="card-placeholder">🃏</div>
 									{/if}
@@ -360,12 +371,12 @@
 					Cancel (Close)
 				</button>
 			{/if}
-			<button
-				class="btn-confirm"
-				onclick={handleConfirm}
-				disabled={isLoading || !selectedCardId}
-			>
-				{isLoading ? 'Moving...' : selectedCard ? `Send ${selectedCard.name} to ${selectedDestination}` : 'Select a Card'}
+			<button class="btn-confirm" onclick={handleConfirm} disabled={isLoading || !selectedCardId}>
+				{isLoading
+					? 'Moving...'
+					: selectedCard
+						? `Send ${selectedCard.name} to ${selectedDestination}`
+						: 'Select a Card'}
 			</button>
 		</div>
 	</div>
@@ -373,10 +384,7 @@
 	<!-- Drag ghost -->
 	{#if isDragging && draggedCard}
 		{@const dragImageUrl = getScryfallImageUrl(draggedCard.name, 'small')}
-		<div
-			class="drag-ghost"
-			style="left: {dragPosition.x}px; top: {dragPosition.y}px;"
-		>
+		<div class="drag-ghost" style="left: {dragPosition.x}px; top: {dragPosition.y}px;">
 			<div class="drag-ghost-card" class:over-zone={hoveredDropZone !== null}>
 				{#if dragImageUrl}
 					<img src={dragImageUrl} alt={draggedCard.name} class="drag-image" draggable="false" />
@@ -385,7 +393,9 @@
 				{/if}
 			</div>
 			{#if hoveredDropZone}
-				<div class="drag-destination">→ {dropZones.find(z => z.id === hoveredDropZone)?.label}</div>
+				<div class="drag-destination">
+					→ {dropZones.find((z) => z.id === hoveredDropZone)?.label}
+				</div>
 			{/if}
 		</div>
 	{/if}
@@ -404,8 +414,12 @@
 	}
 
 	@keyframes fadeIn {
-		from { opacity: 0; }
-		to { opacity: 1; }
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
 	}
 
 	.library-search-modal {

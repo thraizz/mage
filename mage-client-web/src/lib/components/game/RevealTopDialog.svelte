@@ -54,7 +54,7 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 1000;
-		backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.85);
 		animation: fadeIn 0.2s ease-out;
 	}
 

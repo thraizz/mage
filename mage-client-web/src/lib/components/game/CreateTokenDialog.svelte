@@ -28,11 +28,30 @@
 		{ name: 'Soldier', types: 'Creature — Soldier', power: '1', toughness: '1', color: 'white' },
 		{ name: 'Goblin', types: 'Creature — Goblin', power: '1', toughness: '1', color: 'red' },
 		{ name: 'Zombie', types: 'Creature — Zombie', power: '2', toughness: '2', color: 'black' },
-		{ name: 'Elf Warrior', types: 'Creature — Elf Warrior', power: '1', toughness: '1', color: 'green' },
+		{
+			name: 'Elf Warrior',
+			types: 'Creature — Elf Warrior',
+			power: '1',
+			toughness: '1',
+			color: 'green'
+		},
 		{ name: 'Bird', types: 'Creature — Bird', power: '1', toughness: '1', color: 'blue' },
-		{ name: 'Treasure', types: 'Artifact — Treasure', power: '', toughness: '', color: 'colorless' },
+		{
+			name: 'Treasure',
+			types: 'Artifact — Treasure',
+			power: '',
+			toughness: '',
+			color: 'colorless'
+		},
 		{ name: 'Food', types: 'Artifact — Food', power: '', toughness: '', color: 'colorless' },
-		{ name: 'Clue', types: 'Artifact — Clue', power: '', toughness: '', color: 'colorless' }
+		{ name: 'Clue', types: 'Artifact — Clue', power: '', toughness: '', color: 'colorless' },
+		{
+			name: 'Faerie Rogue',
+			types: 'Creature — Faerie Rogue',
+			power: '1',
+			toughness: '1',
+			color: 'black'
+		}
 	];
 
 	// Card types
@@ -49,7 +68,7 @@
 		{ value: 'multicolor', label: 'Multicolor', symbol: null }
 	];
 
-	function loadPreset(preset: typeof commonTokens[0]) {
+	function loadPreset(preset: (typeof commonTokens)[0]) {
 		tokenName = preset.name;
 		tokenTypes = preset.types.split(' — ')[0];
 		tokenSubtypes = preset.types.includes(' — ') ? preset.types.split(' — ')[1] : '';
@@ -61,9 +80,7 @@
 	function handleCreate() {
 		if (!tokenName.trim()) return;
 
-		const fullTypes = tokenSubtypes.trim()
-			? `${tokenTypes} — ${tokenSubtypes.trim()}`
-			: tokenTypes;
+		const fullTypes = tokenSubtypes.trim() ? `${tokenTypes} — ${tokenSubtypes.trim()}` : tokenTypes;
 
 		onCreateToken(
 			tokenName.trim(),
@@ -84,6 +101,7 @@
 	}
 
 	const isCreature = $derived(tokenTypes === 'Creature');
+	const isCreateDisabled = $derived(!tokenName.trim() || !tokenTypes.trim() || !tokenColor.trim());
 </script>
 
 <div class="token-overlay" role="dialog" aria-labelledby="token-dialog-title">
@@ -199,7 +217,7 @@
 
 		<div class="dialog-footer">
 			<button class="btn-secondary" onclick={onClose}>Cancel</button>
-			<button class="btn-primary" onclick={handleCreate} disabled={!tokenName.trim()}>
+			<button class="btn-primary" onclick={handleCreate} disabled={isCreateDisabled}>
 				Create Token
 			</button>
 		</div>
@@ -215,7 +233,7 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 1000;
-		backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.85); /* Darker background instead of blur */
 		animation: fadeIn 0.2s ease-out;
 	}
 
@@ -239,6 +257,8 @@
 		overflow-y: auto;
 		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
 		animation: slideUp 0.3s ease-out;
+		will-change: transform, opacity;
+		transform: translateZ(0); /* Forces GPU acceleration */
 	}
 
 	@keyframes slideUp {

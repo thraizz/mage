@@ -11,16 +11,19 @@
 		onClose: () => void;
 	}
 
-	let { cardName, cardId, currentCounters, onAddCounter, onRemoveCounter, onSetCounter, onClose }: Props = $props();
+	let {
+		cardName,
+		cardId,
+		currentCounters,
+		onAddCounter,
+		onRemoveCounter,
+		onSetCounter,
+		onClose
+	}: Props = $props();
 
 	// State for new counter
 	let newCounterName = $state('');
 	let newCounterAmount = $state(1);
-
-	// Debug: log when currentCounters changes
-	$effect(() => {
-		console.log('[CounterDialog] currentCounters prop updated:', currentCounters);
-	});
 
 	// Common counter types for quick selection
 	const commonCounters = [
@@ -80,7 +83,10 @@
 								<button class="btn-small btn-secondary" onclick={() => handleRemove(counter.name)}>
 									−1
 								</button>
-								<button class="btn-small btn-secondary" onclick={() => onAddCounter(counter.name, 1)}>
+								<button
+									class="btn-small btn-secondary"
+									onclick={() => onAddCounter(counter.name, 1)}
+								>
 									+1
 								</button>
 								<button class="btn-small btn-danger" onclick={() => handleSet(counter.name, 0)}>
@@ -116,12 +122,7 @@
 					class="counter-input"
 					onkeydown={(e) => e.key === 'Enter' && handleAddCounter()}
 				/>
-				<input
-					type="number"
-					bind:value={newCounterAmount}
-					min="1"
-					class="amount-input"
-				/>
+				<input type="number" bind:value={newCounterAmount} min="1" class="amount-input" />
 				<button class="btn-primary" onclick={handleAddCounter}>Add</button>
 			</div>
 		</div>
@@ -141,7 +142,7 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 1000;
-		backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.85);
 		animation: fadeIn 0.2s ease-out;
 	}
 

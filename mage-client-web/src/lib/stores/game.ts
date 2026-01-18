@@ -901,7 +901,7 @@ export const gameMessages = derived(gameStore, ($game) => $game.gameView?.messag
 export const myHand = derived(gameStore, ($game) => {
 	if (!$game.gameView || !$game.localPlayerId) return [];
 	const player = $game.gameView.players.find((p) => p.playerId === $game.localPlayerId);
-	return [...(player?.hand || [])].sort((a, b) => a.id.localeCompare(b.id));
+	return player?.hand || [];
 });
 
 /**

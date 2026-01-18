@@ -61,7 +61,6 @@
 		onCastSpell();
 	}
 
-
 	function handleAdvancePhase(): void {
 		if (!hasPriority || isLoading) return;
 		onAdvancePhase();
@@ -163,7 +162,6 @@
 			<kbd>C</kbd>
 		</button>
 
-
 		<button
 			class="action-btn phase"
 			disabled={!hasPriority || isLoading}
@@ -181,29 +179,17 @@
 	<!-- Direct Controls -->
 	<div class="actions-group">
 		{#if isInCombat}
-			<button
-				class="action-btn danger"
-				onclick={handleClearCombat}
-				title="Clear combat"
-			>
+			<button class="action-btn danger" onclick={handleClearCombat} title="Clear combat">
 				<span class="btn-icon">🛑</span>
 			</button>
 		{/if}
 
-		<button
-			class="action-btn"
-			onclick={handleNextTurn}
-			title="End turn"
-		>
+		<button class="action-btn" onclick={handleNextTurn} title="End turn">
 			<span class="btn-icon">⏭</span>
 			<span class="btn-text">End Turn</span>
 		</button>
 
-		<button
-			class="action-btn accent"
-			onclick={onCreateToken}
-			title="Create token (T)"
-		>
+		<button class="action-btn accent" onclick={onCreateToken} title="Create token (T)">
 			<span class="btn-icon">✨</span>
 			<span class="btn-text">Token</span>
 			<kbd>T</kbd>
@@ -221,10 +207,10 @@
 	</div>
 
 	<!-- Auto-Pass Toggle -->
-	<button 
-		class="auto-pass-toggle" 
+	<button
+		class="auto-pass-toggle"
 		class:active={autoPass}
-		onclick={() => autoPass = !autoPass}
+		onclick={() => (autoPass = !autoPass)}
 		role="switch"
 		aria-checked={autoPass}
 		title="Auto-pass on opponent's turn"
@@ -250,14 +236,14 @@
 		border: 1px solid rgba(63, 63, 70, 0.5);
 		border-bottom: none;
 		border-radius: 12px 12px 0 0;
-		backdrop-filter: blur(12px);
+		background: rgba(0, 0, 0, 0.85);
 		box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
 		z-index: 100;
 	}
 
 	.action-bar.has-priority {
 		border-color: rgba(201, 162, 39, 0.5);
-		box-shadow: 
+		box-shadow:
 			0 -4px 24px rgba(0, 0, 0, 0.5),
 			0 0 30px rgba(201, 162, 39, 0.1);
 	}
@@ -294,8 +280,13 @@
 	}
 
 	@keyframes status-pulse {
-		0%, 100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.3); }
-		50% { box-shadow: 0 0 0 6px rgba(201, 162, 39, 0); }
+		0%,
+		100% {
+			box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.3);
+		}
+		50% {
+			box-shadow: 0 0 0 6px rgba(201, 162, 39, 0);
+		}
 	}
 
 	.status-icon {
@@ -366,8 +357,13 @@
 	}
 
 	@keyframes pass-pulse {
-		0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-		50% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+		0%,
+		100% {
+			box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+		}
+		50% {
+			box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+		}
 	}
 
 	.action-btn.phase {
@@ -446,7 +442,9 @@
 	}
 
 	@keyframes spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	/* Auto-Pass Toggle */

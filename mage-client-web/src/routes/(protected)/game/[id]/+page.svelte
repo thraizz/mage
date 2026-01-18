@@ -2702,7 +2702,7 @@
 		transition: all 0.2s;
 		color: #fff;
 		position: relative;
-		backdrop-filter: blur(8px);
+		background: rgba(0, 0, 0, 0.85);
 	}
 
 	.floating-btn:hover {

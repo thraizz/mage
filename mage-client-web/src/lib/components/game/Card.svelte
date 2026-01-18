@@ -935,8 +935,8 @@
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: 30vw;
 		height: auto;
+		max-height: 90vh;
 		z-index: 99999;
 		pointer-events: none;
 		border-radius: 39px;
@@ -1281,7 +1281,7 @@
 		padding: 0.25rem 0.375rem;
 		border-radius: 4px;
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-		backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.85); /* Darker background instead of blur */
 		overflow: hidden;
 		text-overflow: ellipsis;
 		display: -webkit-box;
@@ -1296,7 +1296,7 @@
 		background: rgba(0, 0, 0, 0.75);
 		padding: 0.25rem;
 		border-radius: 4px;
-		backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.85);
 	}
 
 	/* Card Type */
@@ -1308,7 +1308,7 @@
 		padding: 0.125rem 0.375rem;
 		border-radius: 4px;
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-		backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.85);
 		align-self: flex-start;
 		max-width: 90%;
 		overflow: hidden;
@@ -1329,7 +1329,7 @@
 		text-shadow:
 			0 1px 2px rgba(0, 0, 0, 0.8),
 			0 0 8px rgba(251, 191, 36, 0.5);
-		backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.85);
 		align-self: flex-end;
 		min-width: 2rem;
 		text-align: center;

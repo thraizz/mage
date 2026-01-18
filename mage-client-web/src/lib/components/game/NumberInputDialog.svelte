@@ -56,14 +56,7 @@
 				−
 			</button>
 
-			<input
-				type="number"
-				bind:value
-				{min}
-				{max}
-				class="number-input"
-				autofocus
-			/>
+			<input type="number" bind:value {min} {max} class="number-input" autofocus />
 
 			<button
 				class="btn-adjust"
@@ -91,7 +84,7 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 1000;
-		backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.85);
 		animation: fadeIn 0.2s ease-out;
 	}
 
