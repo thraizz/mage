@@ -150,6 +150,65 @@
 		// Text is already synced via deckList binding
 	}
 
+	function handlePaste() {
+		// Use setTimeout to check after paste completes and deckList updates
+		setTimeout(() => {
+			const currentStats = parseDeckList(deckList, selectedFormat as DeckFormat);
+			if (currentStats.totalCount === 100) {
+				selectedFormat = 'Commander';
+				
+				// Check if there's an empty line in the pasted content
+				const lines = deckList.split('\n');
+				const hasEmptyLine = lines.some((line) => line.trim() === '');
+				
+				if (hasEmptyLine) {
+					// Find the last non-empty line (this will be the commander)
+					let lastNonEmptyLine = '';
+					let lastNonEmptyIndex = -1;
+					
+					for (let i = lines.length - 1; i >= 0; i--) {
+						const trimmed = lines[i].trim();
+						if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('//')) {
+							// Check if it's a card line (has quantity and name)
+							const cardMatch = trimmed.match(/^(\d+)x?\s+(.+)$/i);
+							if (cardMatch) {
+								lastNonEmptyLine = trimmed;
+								lastNonEmptyIndex = i;
+								break;
+							}
+						}
+					}
+					
+					if (lastNonEmptyLine && lastNonEmptyIndex >= 0) {
+						// Remove the commander line from the original list
+						const mainDeckLines = [...lines];
+						mainDeckLines.splice(lastNonEmptyIndex, 1);
+						
+						// Remove trailing empty lines from main deck
+						while (mainDeckLines.length > 0 && mainDeckLines[mainDeckLines.length - 1].trim() === '') {
+							mainDeckLines.pop();
+						}
+						
+						// Reformat: Commander first, then empty line, then main deck
+						const formattedLines = [
+							'Commander:',
+							lastNonEmptyLine,
+							'',
+							...mainDeckLines
+						];
+						
+						deckList = formattedLines.join('\n');
+						
+						// Update structured view if active
+						if (viewMode === 'structured') {
+							structuredCards = parseStructuredCards(deckList);
+						}
+					}
+				}
+			}
+		}, 0);
+	}
+
 	function loadExample() {
 		// Clear deck list before inserting example
 		deckList = '';
@@ -438,6 +497,7 @@ Sideboard:
 					<textarea
 						id="deck-list"
 						bind:value={deckList}
+						on:paste={handlePaste}
 						placeholder="4 Lightning Bolt&#10;20 Mountain&#10;&#10;Sideboard:&#10;2 Dragon's Claw"
 						rows="12"
 						disabled={loading}

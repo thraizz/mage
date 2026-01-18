@@ -142,39 +142,8 @@
 			<!-- Opponent Battlefield Main -->
 			<div class="battlefield-main">
 				<div class="battlefield-rows">
-					{#if battlefieldNonlands.length > 0}
-						<div class="battlefield-row battlefield-row--nonlands">
-							{#each battlefieldNonlands as card (card.id)}
-								<div
-									class="battlefield-card-wrapper readonly"
-									title="{card.name} (controlled by {opponent.name})"
-								>
-									<Card
-										cardId={card.id}
-										cardName={card.name}
-										manaCost={card.manaCost}
-										cardType={card.type}
-										power={card.power}
-										toughness={card.toughness}
-										color={card.color}
-										imageUrl=""
-										isTapped={card.tapped}
-										isSelected={false}
-										counters={card.counters}
-										size="normal"
-										onclick={() => {}}
-										oncontextmenu={(e) => {
-											e.preventDefault();
-											onCardContextMenu(card.id, card.name);
-										}}
-									/>
-								</div>
-							{/each}
-						</div>
-					{/if}
-
-					{#if battlefieldLands.length > 0}
-						<div class="battlefield-row battlefield-row--lands">
+					<div class="battlefield-row battlefield-row--lands">
+						{#if battlefieldLands.length > 0}
 							{#each battlefieldLands as card (card.id)}
 								<div
 									class="battlefield-card-wrapper readonly"
@@ -201,12 +170,45 @@
 									/>
 								</div>
 							{/each}
-						</div>
-					{/if}
+						{/if}
+						{#if battlefieldLands.length === 0}
+							<div class="empty-battlefield">No lands</div>
+						{/if}
+					</div>
 
-					{#if battlefieldNonlands.length === 0 && battlefieldLands.length === 0}
-						<div class="empty-battlefield">No permanents</div>
-					{/if}
+					<div class="battlefield-row battlefield-row--nonlands">
+						{#if battlefieldNonlands.length > 0}
+							{#each battlefieldNonlands as card (card.id)}
+								<div
+									class="battlefield-card-wrapper readonly"
+									title="{card.name} (controlled by {opponent.name})"
+								>
+									<Card
+										cardId={card.id}
+										cardName={card.name}
+										manaCost={card.manaCost}
+										cardType={card.type}
+										power={card.power}
+										toughness={card.toughness}
+										color={card.color}
+										imageUrl=""
+										isTapped={card.tapped}
+										isSelected={false}
+										counters={card.counters}
+										size="normal"
+										onclick={() => {}}
+										oncontextmenu={(e) => {
+											e.preventDefault();
+											onCardContextMenu(card.id, card.name);
+										}}
+									/>
+								</div>
+							{/each}
+						{/if}
+						{#if battlefieldNonlands.length === 0}
+							<div class="empty-battlefield">No permanents</div>
+						{/if}
+					</div>
 				</div>
 			</div>
 
@@ -233,7 +235,6 @@
 									imageUrl=""
 									isTapped={card.tapped}
 									isSelected={false}
-									size="small"
 									onclick={() => {}}
 								/>
 							</div>

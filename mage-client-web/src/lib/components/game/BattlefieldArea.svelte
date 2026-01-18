@@ -73,8 +73,8 @@
 		<div class="battlefield-main">
 			<span class="zone-label">Your Battlefield</span>
 			<div class="battlefield-rows">
-				{#if battlefieldNonlands.length > 0}
-					<div class="battlefield-row battlefield-row--nonlands">
+				<div class="battlefield-row battlefield-row--nonlands">
+					{#if battlefieldNonlands.length > 0}
 						{#each battlefieldNonlands as card (card.id)}
 							<div
 								class="battlefield-card-wrapper"
@@ -115,11 +115,14 @@
 								/>
 							</div>
 						{/each}
-					</div>
-				{/if}
+					{/if}
+					{#if battlefieldNonlands.length === 0}
+						<div class="empty-battlefield">No permanents</div>
+					{/if}
+				</div>
 
-				{#if battlefieldLands.length > 0}
-					<div class="battlefield-row battlefield-row--lands">
+				<div class="battlefield-row battlefield-row--lands">
+					{#if battlefieldLands.length > 0}
 						{#each battlefieldLands as card (card.id)}
 							<div
 								class="battlefield-card-wrapper"
@@ -160,18 +163,11 @@
 								/>
 							</div>
 						{/each}
-					</div>
-				{/if}
-
-				{#if totalCards === 0}
-					<div class="empty-battlefield">
-						{#if isDragging}
-							<span class="drop-hint">Drop card here to play</span>
-						{:else}
-							No permanents
-						{/if}
-					</div>
-				{/if}
+					{/if}
+					{#if battlefieldLands.length === 0}
+						<div class="empty-battlefield">No lands</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 
@@ -210,7 +206,6 @@
 								imageUrl=""
 								isTapped={card.tapped}
 								isSelected={false}
-								size="small"
 								onclick={() => {}}
 							/>
 						</div>

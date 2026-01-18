@@ -5,6 +5,12 @@
  * These styles can be used across the application.
  */
 
+:root {
+	--card-size: 110px;
+	--card-width: var(--card-size);
+	--card-height: calc(var(--card-size) * 1.4);
+}
+
 /* =========================================
  * BUTTONS
  * ========================================= */
@@ -712,15 +718,16 @@ input[type='checkbox'] {
 }
 
 @media (max-width: 1279px) {
-	.header-left,
 	.header-right {
 		gap: 0.5rem;
 	}
 
 	.playtest-controls {
-		order: 3;
-		width: 100%;
-		justify-content: space-between;
+		display: none !important;
+	}
+
+	.header-left {
+		display: none !important;
 	}
 }
 
@@ -1082,11 +1089,9 @@ input[type='checkbox'] {
 	border-radius: 12px;
 	padding: 1rem;
 	overflow: auto;
-	position: relative;
-}
-
-.my-battlefield {
-	min-height: 473px;
+	position: relative;  
+    min-height: 150px;
+    max-height: none;
 }
 
 .opponent-battlefield {
@@ -1096,7 +1101,6 @@ input[type='checkbox'] {
 	background: linear-gradient(135deg, #1a1217, #1c1428);
 	border-color: rgba(200, 100, 100, 0.3);
 	padding-top: 4rem;
-	flex: 1;
 }
 
 .battlefield-area.drag-active {
@@ -1128,11 +1132,28 @@ input[type='checkbox'] {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.5rem;
+	min-height: var(--card-height);
 }
 
 .battlefield-row--lands {
 	margin-top: 0.25rem;
 	padding-top: 0.5rem;
+}
+
+.opponent-battlefield .battlefield-row--nonlands {
+	border-top: 1px dashed rgba(148, 163, 184, 0.25);
+}
+
+.empty-battlefield {
+    display: flex;
+    align-items: center;
+	color: #4b5563;
+	font-style: italic;
+	font-size: 0.875rem;
+	text-align: center;
+}
+
+.battlefield-main .battlefield-row--lands {
 	border-top: 1px dashed rgba(148, 163, 184, 0.25);
 }
 
@@ -1140,7 +1161,6 @@ input[type='checkbox'] {
 .battlefield-content-wrapper {
 	display: flex;
 	gap: 1rem;
-	height: 100%;
 	align-items: flex-start;
 }
 
@@ -1230,14 +1250,6 @@ input[type='checkbox'] {
 
 .battlefield-card-wrapper.is-hovered {
 	filter: drop-shadow(0 0 4px rgba(100, 200, 255, 0.5));
-}
-
-.empty-battlefield {
-	color: #4b5563;
-	font-style: italic;
-	font-size: 0.875rem;
-	padding: 2rem;
-	text-align: center;
 }
 
 .player-info-row {
@@ -1423,6 +1435,7 @@ input[type='checkbox'] {
 	flex-shrink: 0;
 	transition: all 0.2s ease;
 	border-radius: 8px;
+	height: calc(var(--card-height) + 32px);
 }
 
 .hand-area.drag-valid {
@@ -1926,8 +1939,7 @@ input[type='checkbox'] {
 @media (max-width: 1200px) {
 	.command-zone,
 	.opponent-command-zone {
-		min-width: 150px;
-		max-width: 150px;
+		display: none !important;
 	}
 
 	.menu-overlay {
@@ -1956,7 +1968,6 @@ input[type='checkbox'] {
 	}
 
 	.opponent-info-overlay {
-		flex-direction: column;
 		align-items: flex-start;
 		gap: 0.5rem;
 	}

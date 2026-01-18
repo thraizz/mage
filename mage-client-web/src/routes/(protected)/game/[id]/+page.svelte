@@ -3045,14 +3045,6 @@
 		flex: 1;
 	}
 
-	.empty-battlefield {
-		color: #4b5563;
-		font-style: italic;
-		font-size: 0.875rem;
-		padding: 2rem;
-		text-align: center;
-	}
-
 	/* Player Info Row */
 	.player-info-row {
 		display: flex;

@@ -18,11 +18,29 @@
 	} = $props();
 
 	let searchQuery = $state('');
-	let filterType = $state<'all' | 'creature' | 'instant' | 'sorcery' | 'artifact' | 'enchantment' | 'land' | 'planeswalker'>('all');
+	let filterType = $state<
+		| 'all'
+		| 'creature'
+		| 'instant'
+		| 'sorcery'
+		| 'artifact'
+		| 'enchantment'
+		| 'land'
+		| 'planeswalker'
+	>('all');
 	let selectedDestination = $state<'HAND' | 'BATTLEFIELD' | 'GRAVEYARD' | 'EXILE'>('HAND');
 	let shuffleAfter = $state(true);
 
-	const cardTypes = ['all', 'creature', 'instant', 'sorcery', 'artifact', 'enchantment', 'land', 'planeswalker'] as const;
+	const cardTypes = [
+		'all',
+		'creature',
+		'instant',
+		'sorcery',
+		'artifact',
+		'enchantment',
+		'land',
+		'planeswalker'
+	] as const;
 
 	const filteredCards = $derived(() => {
 		let result = [...cards];
@@ -42,7 +60,6 @@
 			result = result.filter((c) => (c.type || '').toLowerCase().includes(filterType));
 		}
 
-		result.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 		return result;
 	});
 
@@ -75,11 +92,18 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="overlay" role="dialog" aria-modal="true" aria-label="Search library" tabindex="-1" onclick={handleBackdropClick}>
+<div
+	class="overlay"
+	role="dialog"
+	aria-modal="true"
+	aria-label="Search library"
+	tabindex="-1"
+	onclick={handleBackdropClick}
+>
 	<div class="modal">
 		<header class="header">
 			<div class="title">
-				<h2>📚 {playerName}'s Deck</h2>
+				<h2>📚 {playerName === 'You' ? 'Your' : `${playerName}'s`} Deck</h2>
 				<span class="count">{cards.length} cards</span>
 			</div>
 			<button class="close" onclick={onClose} title="Close">✕</button>
@@ -95,7 +119,9 @@
 				/>
 				<select class="type" bind:value={filterType}>
 					{#each cardTypes as t}
-						<option value={t}>{t === 'all' ? 'All Types' : t.charAt(0).toUpperCase() + t.slice(1)}</option>
+						<option value={t}
+							>{t === 'all' ? 'All Types' : t.charAt(0).toUpperCase() + t.slice(1)}</option
+						>
 					{/each}
 				</select>
 			</div>
@@ -128,7 +154,12 @@
 					</div>
 				{:else}
 					{#each filteredCards() as card (card.id)}
-						<button class="row" type="button" onclick={() => sendCard(card.id)} title="Click to send">
+						<button
+							class="row"
+							type="button"
+							onclick={() => sendCard(card.id)}
+							title="Click to send"
+						>
 							<div class="thumb">
 								{#if imageUrlFor(card.name)}
 									<img src={imageUrlFor(card.name)} alt={card.name} draggable="false" />
@@ -375,4 +406,3 @@
 		}
 	}
 </style>
-

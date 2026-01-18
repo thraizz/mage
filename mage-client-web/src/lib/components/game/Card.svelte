@@ -96,7 +96,6 @@
 
 	// State
 	let showPreview = $state(false);
-	let previewPosition = $state({ x: 0, y: 0 });
 	let cardElement: HTMLDivElement | null = $state(null);
 	let imageLoaded = $state(false);
 	let imageError = $state(false);
@@ -194,7 +193,7 @@
 	/**
 	 * Handle mouse enter - show preview after delay
 	 */
-	function handleMouseEnter(event: MouseEvent): void {
+	function handleMouseEnter(): void {
 		if (isCardBack || isPlaceholder) return;
 
 		// Call hover callback
@@ -203,7 +202,6 @@
 		// Delay preview to avoid flickering
 		hoverTimeout = setTimeout(() => {
 			showPreview = true;
-			updatePreviewPosition(event);
 		}, 300);
 	}
 
@@ -216,43 +214,6 @@
 			hoverTimeout = null;
 		}
 		showPreview = false;
-	}
-
-	/**
-	 * Handle mouse move - update preview position
-	 */
-	function handleMouseMove(event: MouseEvent): void {
-		if (showPreview) {
-			updatePreviewPosition(event);
-		}
-	}
-
-	/**
-	 * Update preview position to avoid going off-screen
-	 */
-	function updatePreviewPosition(event: MouseEvent): void {
-		const padding = 20;
-		const previewWidth = 250;
-		const previewHeight = 350;
-
-		let x = event.clientX + padding;
-		let y = event.clientY + padding;
-
-		// Check if preview goes off right edge
-		if (x + previewWidth > window.innerWidth) {
-			x = event.clientX - previewWidth - padding;
-		}
-
-		// Check if preview goes off bottom edge
-		if (y + previewHeight > window.innerHeight) {
-			y = window.innerHeight - previewHeight - padding;
-		}
-
-		// Ensure preview doesn't go off top or left
-		x = Math.max(padding, x);
-		y = Math.max(padding, y);
-
-		previewPosition = { x, y };
 	}
 
 	/**
@@ -304,9 +265,9 @@
 		if (!portalContainer) return;
 
 		if (showPreview && !isCardBack && !isPlaceholder && previewImageUrl) {
-			// Create/update preview element
+			// Create/update preview element - centered in viewport
 			portalContainer.innerHTML = `
-				<div class="card-preview" style="left: ${previewPosition.x}px; top: ${previewPosition.y}px;">
+				<div class="card-preview">
 					<img src="${previewImageUrl}" alt="${cardName} (preview)" class="preview-image" />
 				</div>
 			`;
@@ -356,7 +317,6 @@
 	onclick={handleClick}
 	onmouseenter={handleMouseEnter}
 	onmouseleave={handleMouseLeave}
-	onmousemove={handleMouseMove}
 	onkeydown={(e) => e.key === 'Enter' && handleClick()}
 	oncontextmenu={(e) => oncontextmenu?.(e)}
 >
@@ -554,6 +514,7 @@
 			box-shadow 0.2s ease-out,
 			filter 0.2s ease-out,
 			border-color 0.15s ease-out;
+		padding: 0;
 		transform-origin: center center;
 		user-select: none;
 		-webkit-user-select: none;
@@ -575,20 +536,20 @@
 
 	/* Card Sizes */
 	.card-small {
-		width: 80px;
-		height: 112px;
+		height: calc(var(--card-height) * 0.8);
+		width: calc(var(--card-width) * 0.8);
 		font-size: 0.625rem;
 	}
 
 	.card-normal {
-		width: 150px;
-		height: 210px;
+		height: var(--card-height);
+		width: var(--card-width);
 		font-size: 0.75rem;
 	}
 
 	.card-large {
-		width: 120px;
-		height: 168px;
+		height: calc(var(--card-height) * 1.25);
+		width: calc(var(--card-width) * 1.25);
 		font-size: 0.875rem;
 	}
 
@@ -971,29 +932,20 @@
 
 	:global(.card-preview) {
 		position: fixed;
-		width: 250px;
-		height: 350px;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 30vw;
+		height: auto;
 		z-index: 99999;
 		pointer-events: none;
-		animation: cardPreviewFadeIn 0.2s ease-out;
-		border-radius: 12px;
+		border-radius: 39px;
 		box-shadow:
 			0 20px 25px -5px rgba(0, 0, 0, 0.5),
 			0 10px 10px -5px rgba(0, 0, 0, 0.3);
 		border: 3px solid #667eea;
 		overflow: hidden;
 		background: #1a1f2e;
-	}
-
-	@keyframes cardPreviewFadeIn {
-		from {
-			opacity: 0;
-			transform: scale(0.95);
-		}
-		to {
-			opacity: 1;
-			transform: scale(1);
-		}
 	}
 
 	:global(.card-preview .preview-image) {
