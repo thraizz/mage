@@ -8,6 +8,7 @@
 		getAllValidDropZones,
 		type SourceZone
 	} from '$lib/utils/drag-drop';
+	import Skull from '@lucide/svelte/icons/skull';
 
 	// Props
 	let {
@@ -164,7 +165,9 @@
 	onclick={toggleModal}
 	title="{playerName}'s Graveyard ({cardCount} cards){isEmpty ? '' : ' - Click to view'}"
 >
-	<span class="graveyard-icon">🪦</span>
+	<span class="graveyard-icon">
+		<Skull size={14} />
+	</span>
 	<span class="graveyard-label">Grave</span>
 	<span class="card-count" class:zero={isEmpty}>{cardCount}</span>
 </button>
@@ -234,25 +237,28 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.375rem 0.625rem;
-		background: rgba(26, 31, 46, 0.6);
-		border: 1px solid #2a3441;
-		border-radius: 6px;
-		min-height: 32px;
+		padding: 0.5rem 0.75rem;
+		background: linear-gradient(135deg, rgba(26, 31, 46, 0.6) 0%, rgba(17, 24, 39, 0.6) 100%);
+		border: 1px solid rgba(166, 154, 168, 0.3);
+		border-radius: 8px;
+		min-height: 36px;
 		cursor: default;
-		transition: all 0.15s;
+		transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 		color: inherit;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 	}
 
 	.graveyard-compact.has-cards {
 		cursor: pointer;
-		background: rgba(26, 31, 46, 0.9);
-		border-color: rgba(107, 114, 128, 0.4);
+		background: linear-gradient(135deg, rgba(166, 154, 168, 0.15) 0%, rgba(26, 31, 46, 0.9) 100%);
+		border-color: rgba(166, 154, 168, 0.5);
 	}
 
 	.graveyard-compact.has-cards:hover {
-		background: rgba(42, 52, 65, 0.9);
-		border-color: rgba(156, 163, 175, 0.5);
+		background: linear-gradient(135deg, rgba(166, 154, 168, 0.25) 0%, rgba(42, 52, 65, 0.9) 100%);
+		border-color: rgba(166, 154, 168, 0.7);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(166, 154, 168, 0.2);
+		transform: translateY(-1px);
 	}
 
 	.graveyard-icon {
@@ -266,7 +272,7 @@
 
 	.graveyard-label {
 		font-size: 0.6875rem;
-		color: #6b7280;
+		color: #a69aa8;
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;

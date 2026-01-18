@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	export interface MenuAction {
-		label: string;
+		label?: string;
 		icon?: string;
 		divider?: boolean;
 		submenu?: MenuAction[];
@@ -10,16 +10,15 @@
 </script>
 
 <script lang="ts">
-	import type { CardView } from '$lib/generated/mage/v1/models';
-
 	interface Props {
 		position: { x: number; y: number };
-		card: CardView;
+		deckCount: number;
+		playerName: string;
 		onClose: () => void;
 		actions: MenuAction[];
 	}
 
-	let { position, card, onClose, actions }: Props = $props();
+	let { position, deckCount, playerName, onClose, actions }: Props = $props();
 
 	let openSubmenu: string | null = $state(null);
 	let submenuPosition: { x: number; y: number } | null = $state(null);
@@ -99,11 +98,9 @@
 	role="menu"
 >
 	<div class="menu-header">
-		<span class="card-info">
-			{card.name}
-			{#if card.type}
-				<span class="card-type">{card.type}</span>
-			{/if}
+		<span class="deck-info">
+			{playerName}'s Deck
+			<span class="deck-count">({deckCount} cards)</span>
 		</span>
 		<button class="close-btn" onclick={onClose}>×</button>
 	</div>
@@ -201,7 +198,7 @@
 		margin-bottom: 0.25rem;
 	}
 
-	.card-info {
+	.deck-info {
 		font-size: 0.875rem;
 		font-weight: 600;
 		color: #fff;
@@ -210,7 +207,7 @@
 		gap: 0.125rem;
 	}
 
-	.card-type {
+	.deck-count {
 		font-size: 0.75rem;
 		color: #9ca3af;
 		font-weight: 400;
@@ -288,4 +285,3 @@
 		margin: 0.25rem 0;
 	}
 </style>
-

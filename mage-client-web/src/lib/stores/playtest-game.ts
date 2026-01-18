@@ -36,6 +36,7 @@ export interface PlaytestPlayer {
 	manaPool: ManaPoolView;
 	keptHand: boolean;
 	mulliganCount: number;
+	revealedTopCard: boolean; // When true, top card of library is permanently visible
 }
 
 /**
@@ -120,6 +121,15 @@ export type PlaytestLogEntry = {
 	controlSeat: string; // activeControlSeat at time of event
 	kind: string; // "draw" | "move" | "life" | ...
 	message: string;
+};
+
+/**
+ * Scry session for tracking ongoing scry operations
+ */
+export type ScrySession = {
+	sessionId: string;
+	playerId: string;
+	cards: CardView[];
 };
 
 const PLAYTEST_LOG_MAX_ENTRIES = 1000;
@@ -698,7 +708,8 @@ function createPlaytestGameStore() {
 			const next = {
 				...state,
 				players: updatePlayer(state.players, playerId, (p) => ({
-					library: shuffleArray(p.library)
+					library: shuffleArray(p.library),
+					revealedTopCard: false // Clear revealed top when shuffling
 				}))
 			};
 			return appendLogToState(next, { kind: 'shuffle', message: msg });
@@ -908,6 +919,159 @@ function createPlaytestGameStore() {
 
 
 	/**
+	 * Mill cards (move top N cards from library to graveyard)
+	 */
+	function millCards(playerId: string, count: number): void {
+		update((state) => {
+			const playerIndex = state.players.findIndex((p) => p.playerId === playerId);
+			if (playerIndex === -1) {
+				console.error('[PlaytestGame] Player not found:', playerId);
+				return state;
+			}
+
+			const player = state.players[playerIndex];
+			const actualCount = Math.min(count, player.library.length);
+			const milled = player.library.splice(0, actualCount);
+
+			// Update zone for milled cards
+			milled.forEach((card) => {
+				card.zone = ZoneId.GRAVEYARD;
+				card.faceDown = false;
+			});
+
+			const newPlayers = [...state.players];
+			newPlayers[playerIndex] = {
+				...player,
+				graveyard: [...player.graveyard, ...milled],
+				libraryCount: player.library.length
+			};
+
+			const msg = `${playerName(state, playerId)} mills ${actualCount} card(s). Library: ${player.library.length + actualCount} → ${player.library.length}.`;
+
+			const next = {
+				...state,
+				players: newPlayers
+			};
+
+			return appendLogToState(next, { kind: 'mill', message: msg });
+		});
+	}
+
+	/**
+	 * Reveal top N cards (for temporary view, like Reveal the First Card)
+	 */
+	function revealTopCards(playerId: string, count: number): CardView[] {
+		let revealed: CardView[] = [];
+		update((state) => {
+			const player = state.players.find((p) => p.playerId === playerId);
+			if (!player) {
+				console.error('[PlaytestGame] Player not found:', playerId);
+				return state;
+			}
+
+			const actualCount = Math.min(count, player.library.length);
+			revealed = player.library.slice(0, actualCount);
+
+			const msg = `${playerName(state, playerId)} reveals top ${actualCount} card(s) of their library.`;
+			return appendLogToState(state, { kind: 'reveal', message: msg });
+		});
+		return revealed;
+	}
+
+	/**
+	 * Start a scry session (extract top N cards for scry decision)
+	 */
+	function scryCards(playerId: string, count: number): ScrySession | null {
+		let session: ScrySession | null = null;
+		update((state) => {
+			const player = state.players.find((p) => p.playerId === playerId);
+			if (!player) {
+				console.error('[PlaytestGame] Player not found:', playerId);
+				return state;
+			}
+
+			const actualCount = Math.min(count, player.library.length);
+			if (actualCount === 0) {
+				console.warn('[PlaytestGame] No cards to scry');
+				return state;
+			}
+
+			const cards = player.library.slice(0, actualCount);
+			const sessionId = `scry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+			session = {
+				sessionId,
+				playerId,
+				cards
+			};
+
+			const msg = `${playerName(state, playerId)} scries ${actualCount}.`;
+			return appendLogToState(state, { kind: 'scry', message: msg });
+		});
+		return session;
+	}
+
+	/**
+	 * Apply scry decision (reorder library based on user choices)
+	 */
+	function applyScryDecision(
+		playerId: string,
+		scryCount: number,
+		keepOnTop: CardView[],
+		putToBottom: CardView[]
+	): void {
+		update((state) => {
+			const playerIndex = state.players.findIndex((p) => p.playerId === playerId);
+			if (playerIndex === -1) {
+				console.error('[PlaytestGame] Player not found:', playerId);
+				return state;
+			}
+
+			const player = state.players[playerIndex];
+
+			// Remove the scried cards from the library
+			const scryCardIds = new Set([...keepOnTop, ...putToBottom].map((c) => c.id));
+			const remaining = player.library.filter((c) => !scryCardIds.has(c.id));
+
+			// Rebuild library: keep on top, remaining cards, put to bottom
+			const newLibrary = [...keepOnTop, ...remaining, ...putToBottom];
+
+			const newPlayers = [...state.players];
+			newPlayers[playerIndex] = {
+				...player,
+				library: newLibrary
+			};
+
+			const msg = `${playerName(state, playerId)} completes scry ${scryCount} (${keepOnTop.length} kept on top, ${putToBottom.length} to bottom).`;
+
+			const next = {
+				...state,
+				players: newPlayers
+			};
+
+			return appendLogToState(next, { kind: 'scry', message: msg });
+		});
+	}
+
+	/**
+	 * Set revealed top card state (like Courser of Kruphix)
+	 */
+	function setRevealedTop(playerId: string, revealed: boolean): void {
+		update((state) => {
+			const msg = revealed
+				? `${playerName(state, playerId)} reveals the top card of their library permanently.`
+				: `${playerName(state, playerId)} hides the revealed top card.`;
+
+			const next = {
+				...state,
+				players: updatePlayer(state.players, playerId, () => ({ revealedTopCard: revealed }))
+			};
+
+			return appendLogToState(next, { kind: 'reveal', message: msg });
+		});
+	}
+
+	/**
 	 * Next turn
 	 */
 	function nextTurn(): void {
@@ -1042,6 +1206,11 @@ function createPlaytestGameStore() {
 		addCounter,
 		removeCounter,
 		setCounter,
+		millCards,
+		revealTopCards,
+		scryCards,
+		applyScryDecision,
+		setRevealedTop,
 		nextTurn,
 		mulligan,
 		keepHand,

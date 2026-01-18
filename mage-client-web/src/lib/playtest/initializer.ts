@@ -128,7 +128,8 @@ function createPlayerFromDeck(deck: Deck, playerNumber: number): { player: Playt
 			colorless: 0
 		},
 		keptHand: false,
-		mulliganCount: 0
+		mulliganCount: 0,
+		revealedTopCard: false
 	};
 
 	return { player, commanders };

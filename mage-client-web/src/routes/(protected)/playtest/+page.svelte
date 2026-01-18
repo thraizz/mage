@@ -20,20 +20,39 @@
 	// Game components
 	import Card from '$lib/components/game/Card.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
-	import Graveyard from '$lib/components/game/Graveyard.svelte';
-	import ExileZone from '$lib/components/game/ExileZone.svelte';
-	import LibraryZone from '$lib/components/game/LibraryZone.svelte';
 	import PlaytestLibrarySearch from '$lib/components/game/PlaytestLibrarySearch.svelte';
-	import ManaPool from '$lib/components/game/ManaPool.svelte';
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import CreateTokenDialog from '$lib/components/game/CreateTokenDialog.svelte';
 	import CounterDialog from '$lib/components/game/CounterDialog.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
+	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte';
+	import NumberInputDialog from '$lib/components/game/NumberInputDialog.svelte';
+	import ScryDialog from '$lib/components/game/ScryDialog.svelte';
+	import RevealTopDialog from '$lib/components/game/RevealTopDialog.svelte';
+	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
+	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
+	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
+	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
+	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
+	import type { ScrySession } from '$lib/stores/playtest-game';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import Clock from '@lucide/svelte/icons/clock';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Menu from '@lucide/svelte/icons/menu';
 	import X from '@lucide/svelte/icons/x';
+	import ArrowDown from '@lucide/svelte/icons/arrow-down';
+	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import Shuffle from '@lucide/svelte/icons/shuffle';
+	import Search from '@lucide/svelte/icons/search';
+	import Plus from '@lucide/svelte/icons/plus';
+	import Hand from '@lucide/svelte/icons/hand';
+	import BookOpen from '@lucide/svelte/icons/book-open';
+	import Eye from '@lucide/svelte/icons/eye';
+	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import Heart from '@lucide/svelte/icons/heart';
+	import Skull from '@lucide/svelte/icons/skull';
+	import GalleryVertical from '@lucide/svelte/icons/gallery-vertical';
+	import FastForward from '@lucide/svelte/icons/fast-forward';
 	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
 	import {
 		dragDropStore,
@@ -65,6 +84,22 @@
 	let showOpponentLifeMenu = $state(false);
 	let opponentLifeMenuEl: HTMLDivElement | null = $state(null);
 	let showDeckSearch = $state(false);
+
+	// Deck context menu and dialog state
+	let showDeckContextMenu = $state(false);
+	let deckContextMenuPosition = $state<{ x: number; y: number }>({ x: 0, y: 0 });
+	let showNumberInputDialog = $state(false);
+	let numberInputDialogConfig = $state<{
+		title: string;
+		defaultValue: number;
+		min: number;
+		max: number;
+		onConfirm: (value: number) => void;
+	} | null>(null);
+	let showScryDialog = $state(false);
+	let currentScrySession = $state<ScrySession | null>(null);
+	let showRevealTopDialog = $state(false);
+	let revealedCards = $state<import('$lib/generated/mage/v1/models').CardView[]>([]);
 
 	// Mulligan state
 	let mulliganPlayerIndex = $state<number | null>(null);
@@ -450,6 +485,139 @@
 			toast.info(`${newActivePlayer.name}'s turn`);
 		}
 	}
+
+	/**
+	 * Deck context menu handlers
+	 */
+	function handleDeckContextMenu(event: MouseEvent): void {
+		if (!me) return;
+		deckContextMenuPosition = { x: event.clientX, y: event.clientY };
+		showDeckContextMenu = true;
+	}
+
+	function handleDrawN(count: number): void {
+		if (!me) return;
+		playtestGameStore.drawCards(me.playerId, count);
+		toast.success(`Drew ${count} card(s)`);
+	}
+
+	function handleMill(count: number): void {
+		if (!me) return;
+		playtestGameStore.millCards(me.playerId, count);
+		toast.success(`Milled ${count} card(s)`);
+	}
+
+	function handleScry(count: number): void {
+		if (!me) return;
+		const session = playtestGameStore.scryCards(me.playerId, count);
+		if (session) {
+			currentScrySession = session;
+			showScryDialog = true;
+		} else {
+			toast.error('No cards to scry');
+		}
+	}
+
+	function handleScryComplete(
+		keepOnTop: import('$lib/generated/mage/v1/models').CardView[],
+		putToBottom: import('$lib/generated/mage/v1/models').CardView[]
+	): void {
+		if (!me || !currentScrySession) return;
+		const scryCount = currentScrySession.cards.length;
+		playtestGameStore.applyScryDecision(me.playerId, scryCount, keepOnTop, putToBottom);
+		showScryDialog = false;
+		currentScrySession = null;
+		toast.success(`Scry ${scryCount} complete`);
+	}
+
+	function handleRevealTop(count: number): void {
+		if (!me) return;
+		const cards = playtestGameStore.revealTopCards(me.playerId, count);
+		revealedCards = cards;
+		showRevealTopDialog = true;
+	}
+
+	function handleToggleRevealedTop(): void {
+		if (!me) return;
+		const willReveal = !me.revealedTopCard;
+		playtestGameStore.setRevealedTop(me.playerId, willReveal);
+		toast.info(willReveal ? 'Top card revealed permanently' : 'Top card hidden');
+	}
+
+	function showNumberInput(
+		title: string,
+		defaultValue: number,
+		onConfirm: (value: number) => void
+	): void {
+		numberInputDialogConfig = {
+			title,
+			defaultValue,
+			min: 1,
+			max: 99,
+			onConfirm: (value) => {
+				onConfirm(value);
+				showNumberInputDialog = false;
+				numberInputDialogConfig = null;
+			}
+		};
+		showNumberInputDialog = true;
+	}
+
+	const deckContextMenuActions = $derived<MenuAction[]>(
+		!me
+			? []
+			: [
+					{
+						label: 'Draw Cards',
+						submenu: [
+							{ label: '1 Card', onClick: () => handleDrawN(1) },
+							{ label: '2 Cards', onClick: () => handleDrawN(2) },
+							{ label: '3 Cards', onClick: () => handleDrawN(3) },
+							{ label: '7 Cards', onClick: () => handleDrawN(7) },
+							{ label: 'Custom...', onClick: () => showNumberInput('Draw N Cards', 1, handleDrawN) }
+						]
+					},
+					{
+						label: 'Scry',
+						submenu: [
+							{ label: '1 Card', onClick: () => handleScry(1) },
+							{ label: '2 Cards', onClick: () => handleScry(2) },
+							{ label: '3 Cards', onClick: () => handleScry(3) },
+							{ label: 'Custom...', onClick: () => showNumberInput('Scry N Cards', 1, handleScry) }
+						]
+					},
+					{
+						label: 'Mill Cards',
+						submenu: [
+							{ label: '1 Card', onClick: () => handleMill(1) },
+							{ label: '2 Cards', onClick: () => handleMill(2) },
+							{ label: '3 Cards', onClick: () => handleMill(3) },
+							{ label: '5 Cards', onClick: () => handleMill(5) },
+							{ label: 'Custom...', onClick: () => showNumberInput('Mill N Cards', 1, handleMill) }
+						]
+					},
+					{ divider: true },
+					{
+						label: 'Reveal Top Card',
+						onClick: () => handleRevealTop(1)
+					},
+					{
+						label: me.revealedTopCard ? 'Hide Revealed Top' : 'Reveal Top Permanently',
+						onClick: handleToggleRevealedTop
+					},
+					{ divider: true },
+					{
+						label: 'Search Library',
+						onClick: () => {
+							showDeckSearch = true;
+						}
+					},
+					{
+						label: 'Shuffle Library',
+						onClick: handleShuffleLibrary
+					}
+				]
+	);
 
 	/**
 	 * Handle battlefield card click
@@ -1039,68 +1207,30 @@
 			hasKeptHand={false}
 		/>
 	{:else}
-		<!-- Hamburger Menu Button (shown when game started) -->
-		{#if isGameStarted}
-			<button class="menu-toggle-btn" onclick={() => (showMenu = !showMenu)} aria-label="Open menu">
-				<Menu size={24} />
-			</button>
-		{/if}
-
-		<!-- Playtest Header -->
-		<div class="playtest-header" class:hidden={isGameStarted}>
-			<div class="header-left">
-				<button class="btn-back" onclick={() => goto('/lobby')}> ← Back to Lobby </button>
-				<span class="mode-badge">Playtest Mode</span>
-				<button
-					class="btn-sessions"
-					onclick={() => {
-						loadAvailableSessions();
-						showSessionPicker = true;
-					}}
-					title="Manage sessions"
-				>
-					Sessions ({availableSessions.length})
-				</button>
-			</div>
-
-			<div class="playtest-controls">
-				<label for="playtest-controlling-select">Controlling:</label>
-				<select
-					id="playtest-controlling-select"
-					class="player-select"
-					value={activeControlSeat}
-					onchange={(e) => switchPlayer(e.currentTarget.value)}
-				>
-					{#each players as player}
-						<option value={player.playerId}>{player.name}</option>
-					{/each}
-				</select>
-				<button class="btn-toggle" onclick={() => (showAllHands = !showAllHands)}>
-					{showAllHands ? '🙈 Hide' : '👁️ Show'} All Hands
-				</button>
-			</div>
-
-			<div class="header-right">
-				<div class="turn-indicator" title="Current turn">
-					<Clock size={16} aria-hidden="true" />
-					<span class="turn-text">
-						Turn {turnNumber()}{activePlayerName() ? ` · ${activePlayerName()}` : ''}
-					</span>
-				</div>
-				<button class="btn-action" onclick={handleNextTurn}>Next Turn</button>
-				<button
-					class="btn-debug"
-					onclick={() => (showKeyboardShortcuts = true)}
-					title="Keyboard shortcuts (?)"
-					aria-label="Keyboard shortcuts"
-				>
-					<Keyboard size={20} aria-hidden="true" />
-				</button>
-				<button class="btn-debug" onclick={() => (showDebugOverlay = true)} title="Debug View">
-					🔧
-				</button>
-			</div>
-		</div>
+		<PlaytestHeader
+			{players}
+			{activeControlSeat}
+			availableSessions={availableSessions.length}
+			turnNumber={turnNumber()}
+			activePlayerName={activePlayerName()}
+			{showAllHands}
+			onBack={() => goto('/lobby')}
+			onSessionsClick={() => {
+				loadAvailableSessions();
+				showSessionPicker = true;
+			}}
+			onSwitchPlayer={switchPlayer}
+			onToggleAllHands={() => (showAllHands = !showAllHands)}
+			onDrawCard={handleDrawCard}
+			onUntapAll={handleUntapAll}
+			onShuffleLibrary={handleShuffleLibrary}
+			onSearchLibrary={() => (showDeckSearch = true)}
+			onCreateToken={() => (showCreateTokenDialog = true)}
+			onNextTurn={handleNextTurn}
+			onShowKeyboardShortcuts={() => (showKeyboardShortcuts = true)}
+			onShowDebug={() => (showDebugOverlay = true)}
+			onToggleMenu={() => (showMenu = !showMenu)}
+		/>
 
 		<!-- Menu Overlay (slide-in from right) -->
 		{#if showMenu}
@@ -1141,7 +1271,14 @@
 							</label>
 
 							<button class="menu-btn" onclick={() => (showAllHands = !showAllHands)}>
-								{showAllHands ? '🙈 Hide' : '👁️ Show'} All Hands
+								{#if showAllHands}
+									<EyeOff size={16} />
+									Hide
+								{:else}
+									<Eye size={16} />
+									Show
+								{/if}
+								All Hands
 							</button>
 						</div>
 					</div>
@@ -1215,7 +1352,7 @@
 					<div class="player-hand-compact" class:active={player.playerId === activeControlSeat}>
 						<div class="compact-header">
 							<span class="player-name-compact">{player.name}</span>
-							<span class="life-compact">❤️ {player.life}</span>
+							<span class="life-compact"><Heart size={14} /> {player.life}</span>
 						</div>
 						<div class="cards-compact">
 							{#each player.hand as card}
@@ -1238,472 +1375,69 @@
 			<!-- Opponent Section -->
 			{#if selectedOpponent()}
 				{@const opponent = selectedOpponent()!}
-				<div class="opponent-section">
-					<!-- Opponent Battlefield (Non-editable) -->
-					<div class="battlefield-area opponent-battlefield">
-						<!-- Opponent Info Overlay -->
-						<div class="opponent-info-overlay">
-							<div class="opponent-identity">
-								{#if otherPlayers.length > 1}
-									<select
-										class="opponent-select"
-										value={opponent.playerId}
-										onchange={(e) => (selectedOpponentId = e.currentTarget.value)}
-									>
-										{#each otherPlayers as opp}
-											<option value={opp.playerId}>{opp.name}</option>
-										{/each}
-									</select>
-								{:else}
-									<span class="opponent-name-label">{opponent.name}</span>
-								{/if}
-							</div>
-
-							<div class="opponent-stats-compact">
-								<div class="life-group">
-									<button
-										class="stat-btn minus"
-										onclick={() => handleLifeChange(-1, opponent.playerId)}
-										title="Decrease life"
-									>
-										−
-									</button>
-									<button
-										class="stat-display life"
-										onclick={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
-										title="Life total"
-									>
-										<span class="stat-icon">❤️</span>
-										<span class="stat-value">{opponent.life}</span>
-									</button>
-									<button
-										class="stat-btn plus"
-										onclick={() => handleLifeChange(1, opponent.playerId)}
-										title="Increase life"
-									>
-										+
-									</button>
-								</div>
-
-								{#if opponent.poison > 0}
-									<div class="stat-display poison" title="Poison counters">
-										<span class="stat-icon">☠️</span>
-										<span class="stat-value">{opponent.poison}</span>
-									</div>
-								{/if}
-
-								<div class="opponent-counts">
-									<span class="opponent-count" title="Hand cards">🃏 {opponent.handCount}</span>
-									<span class="opponent-count" title="Library cards"
-										>📚 {opponent.libraryCount}</span
-									>
-									<span class="opponent-count" title="Graveyard cards"
-										>🪦 {opponent.graveyard.length}</span
-									>
-								</div>
-
-								{#if showOpponentLifeMenu}
-									<div class="quick-menu opponent-menu">
-										<div class="menu-section">
-											<span class="menu-label">Life</span>
-											<div class="menu-row">
-												<button onclick={() => handleLifeChange(-5, opponent.playerId)}>−5</button>
-												<button onclick={() => handleLifeChange(-1, opponent.playerId)}>−1</button>
-												<button onclick={() => handleLifeChange(1, opponent.playerId)}>+1</button>
-												<button onclick={() => handleLifeChange(5, opponent.playerId)}>+5</button>
-											</div>
-										</div>
-										<div class="menu-section">
-											<span class="menu-label">Poison</span>
-											<div class="menu-row">
-												<button onclick={() => handlePoisonChange(-1, opponent.playerId)}>−1</button
-												>
-												<span class="menu-value">{opponent.poison}</span>
-												<button onclick={() => handlePoisonChange(1, opponent.playerId)}>+1</button>
-											</div>
-										</div>
-										<button class="menu-close" onclick={() => (showOpponentLifeMenu = false)}>
-											✕
-										</button>
-									</div>
-								{/if}
-							</div>
-						</div>
-
-						<!-- Opponent Battlefield Content Wrapper -->
-						<div class="battlefield-content-wrapper">
-							<!-- Opponent Battlefield Main -->
-							<div class="battlefield-main">
-								<div class="battlefield-rows">
-									{#if opponentBattlefieldNonlands().length > 0}
-										<div class="battlefield-row battlefield-row--nonlands">
-											{#each opponentBattlefieldNonlands() as card (card.id)}
-												<div
-													class="battlefield-card-wrapper readonly"
-													title="{card.name} (controlled by {opponent.name})"
-												>
-													<Card
-														cardId={card.id}
-														cardName={card.name}
-														manaCost={card.manaCost}
-														cardType={card.type}
-														power={card.power}
-														toughness={card.toughness}
-														color={card.color}
-														imageUrl=""
-														isTapped={card.tapped}
-														isSelected={false}
-														counters={card.counters}
-														size="normal"
-														onclick={() => {}}
-														oncontextmenu={(e) => {
-															e.preventDefault();
-															selectedCardForCounters = { id: card.id, name: card.name };
-															showCounterDialog = true;
-														}}
-													/>
-												</div>
-											{/each}
-										</div>
-									{/if}
-
-									{#if opponentBattlefieldLands().length > 0}
-										<div class="battlefield-row battlefield-row--lands">
-											{#each opponentBattlefieldLands() as card (card.id)}
-												<div
-													class="battlefield-card-wrapper readonly"
-													title="{card.name} (controlled by {opponent.name})"
-												>
-													<Card
-														cardId={card.id}
-														cardName={card.name}
-														manaCost={card.manaCost}
-														cardType={card.type}
-														power={card.power}
-														toughness={card.toughness}
-														color={card.color}
-														imageUrl=""
-														isTapped={card.tapped}
-														isSelected={false}
-														counters={card.counters}
-														size="normal"
-														onclick={() => {}}
-														oncontextmenu={(e) => {
-															e.preventDefault();
-															selectedCardForCounters = { id: card.id, name: card.name };
-															showCounterDialog = true;
-														}}
-													/>
-												</div>
-											{/each}
-										</div>
-									{/if}
-
-									{#if opponentBattlefieldNonlands().length === 0 && opponentBattlefieldLands().length === 0}
-										<div class="empty-battlefield">No permanents</div>
-									{/if}
-								</div>
-							</div>
-
-							<!-- Opponent Command Zone (right side) -->
-							{#if isCommanderGame}
-								<div class="command-zone opponent-command-zone">
-									<span class="zone-label">Command Zone</span>
-									<div class="command-cards">
-										{#if opponentCommandCards().length === 0}
-											<div class="command-zone-empty">
-												<span class="zone-empty-text">Empty</span>
-											</div>
-										{/if}
-										{#each opponentCommandCards() as card (card.id)}
-											<div class="command-card-wrapper readonly" title={card.name}>
-												<Card
-													cardId={card.id}
-													cardName={card.name}
-													manaCost={card.manaCost}
-													cardType={card.type}
-													power={card.power}
-													toughness={card.toughness}
-													color={card.color}
-													imageUrl=""
-													isTapped={card.tapped}
-													isSelected={false}
-													size="small"
-													onclick={() => {}}
-												/>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{/if}
-						</div>
-					</div>
-				</div>
+				<OpponentSection
+					{opponent}
+					{otherPlayers}
+					battlefieldNonlands={opponentBattlefieldNonlands()}
+					battlefieldLands={opponentBattlefieldLands()}
+					commandCards={opponentCommandCards()}
+					{isCommanderGame}
+					showLifeMenu={showOpponentLifeMenu}
+					onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+					onLifeChange={handleLifeChange}
+					onPoisonChange={handlePoisonChange}
+					onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+					onCardContextMenu={(cardId, cardName) => {
+						selectedCardForCounters = { id: cardId, name: cardName };
+						showCounterDialog = true;
+					}}
+				/>
 			{/if}
 
 			<!-- My Battlefield Area (Editable) -->
-			<div
-				bind:this={battlefieldDropZoneEl}
-				class="battlefield-area my-battlefield"
-				class:drag-active={isDragging}
-				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'battlefield'}
-			>
-				<div class="battlefield-content-wrapper">
-					<!-- Main Battlefield (left side) -->
-					<div class="battlefield-main">
-						<span class="zone-label">Your Battlefield</span>
-						<div class="battlefield-rows">
-							{#if myBattlefieldNonlands.length > 0}
-								<div class="battlefield-row battlefield-row--nonlands">
-									{#each myBattlefieldNonlands as card (card.id)}
-										<div
-											class="battlefield-card-wrapper"
-											class:is-hovered={hoveredCardId === card.id}
-											role="button"
-											tabindex="0"
-											aria-label={card.name}
-											onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-											onkeydown={(e) => {
-												if (e.key === 'Enter' || e.key === ' ') {
-													e.preventDefault();
-													handleBattlefieldCardClick(card.id);
-												}
-											}}
-											onmouseenter={() => (hoveredCardId = card.id)}
-											onmouseleave={() => {
-												if (hoveredCardId === card.id) hoveredCardId = null;
-											}}
-										>
-											<Card
-												cardId={card.id}
-												cardName={card.name}
-												manaCost={card.manaCost}
-												cardType={card.type}
-												power={card.power}
-												toughness={card.toughness}
-												color={card.color}
-												imageUrl=""
-												isTapped={card.tapped}
-												isSelected={false}
-												counters={card.counters}
-												size="normal"
-												onclick={() => handleBattlefieldCardClick(card.id)}
-												oncontextmenu={(e) => {
-													e.preventDefault();
-													selectedCardForCounters = { id: card.id, name: card.name };
-													showCounterDialog = true;
-												}}
-											/>
-										</div>
-									{/each}
-								</div>
-							{/if}
-
-							{#if myBattlefieldLands.length > 0}
-								<div class="battlefield-row battlefield-row--lands">
-									{#each myBattlefieldLands as card (card.id)}
-										<div
-											class="battlefield-card-wrapper"
-											class:is-hovered={hoveredCardId === card.id}
-											role="button"
-											tabindex="0"
-											aria-label={card.name}
-											onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-											onkeydown={(e) => {
-												if (e.key === 'Enter' || e.key === ' ') {
-													e.preventDefault();
-													handleBattlefieldCardClick(card.id);
-												}
-											}}
-											onmouseenter={() => (hoveredCardId = card.id)}
-											onmouseleave={() => {
-												if (hoveredCardId === card.id) hoveredCardId = null;
-											}}
-										>
-											<Card
-												cardId={card.id}
-												cardName={card.name}
-												manaCost={card.manaCost}
-												cardType={card.type}
-												power={card.power}
-												toughness={card.toughness}
-												color={card.color}
-												imageUrl=""
-												isTapped={card.tapped}
-												isSelected={false}
-												counters={card.counters}
-												size="normal"
-												onclick={() => handleBattlefieldCardClick(card.id)}
-												oncontextmenu={(e) => {
-													e.preventDefault();
-													selectedCardForCounters = { id: card.id, name: card.name };
-													showCounterDialog = true;
-												}}
-											/>
-										</div>
-									{/each}
-								</div>
-							{/if}
-
-							{#if myBattlefield.length === 0}
-								<div class="empty-battlefield">
-									{#if isDragging}
-										<span class="drop-hint">Drop card here to play</span>
-									{:else}
-										No permanents
-									{/if}
-								</div>
-							{/if}
-						</div>
-					</div>
-
-					<!-- Command Zone (right side) -->
-					{#if isCommanderGame}
-						<div
-							bind:this={commandDropZoneEl}
-							class="command-zone"
-							class:drag-valid={isDragging && isOverValidDrop && dropZone === 'command'}
-						>
-							<span class="zone-label">Command Zone</span>
-							<div class="command-cards">
-								{#if myCommandCards.length === 0}
-									<div class="command-zone-empty">
-										<span class="zone-empty-text">Empty</span>
-										<span class="zone-empty-hint">Drag commander here</span>
-									</div>
-								{/if}
-								{#each myCommandCards as card (card.id)}
-									<div
-										class="command-card-wrapper"
-										title={card.name}
-										role="button"
-										tabindex="0"
-										aria-label={card.name}
-										onmousedown={(e) => handleCommandCardMouseDown(card.id, card.name, e)}
-									>
-										<Card
-											cardId={card.id}
-											cardName={card.name}
-											manaCost={card.manaCost}
-											cardType={card.type}
-											power={card.power}
-											toughness={card.toughness}
-											color={card.color}
-											imageUrl=""
-											isTapped={card.tapped}
-											isSelected={false}
-											size="small"
-											onclick={() => {}}
-										/>
-									</div>
-								{/each}
-							</div>
-						</div>
-					{/if}
-				</div>
-			</div>
+			<BattlefieldArea
+				battlefieldNonlands={myBattlefieldNonlands}
+				battlefieldLands={myBattlefieldLands}
+				commandCards={myCommandCards}
+				{isCommanderGame}
+				{isDragging}
+				{isOverValidDrop}
+				{dropZone}
+				{hoveredCardId}
+				onCardClick={handleBattlefieldCardClick}
+				onCardMouseDown={handleBattlefieldCardMouseDown}
+				onCardContextMenu={(cardId, cardName) => {
+					selectedCardForCounters = { id: cardId, name: cardName };
+					showCounterDialog = true;
+				}}
+				onCommandCardMouseDown={handleCommandCardMouseDown}
+				onCardHover={(cardId) => (hoveredCardId = cardId)}
+				battlefieldDropZoneRef={(el) => (battlefieldDropZoneEl = el)}
+				commandDropZoneRef={(el) => (commandDropZoneEl = el)}
+			/>
 
 			<!-- Player Info Row -->
 			{#if me}
-				<div class="player-info-row">
-					<div class="player-identity">
-						<span class="player-name">{me.name}</span>
-					</div>
-
-					<div class="player-stats-inline">
-						<div class="life-group">
-							<button class="stat-btn minus" onclick={() => handleLifeChange(-1)}>−</button>
-							<button class="stat-display life" onclick={() => (showLifeMenu = !showLifeMenu)}>
-								<span class="stat-icon">❤️</span>
-								<span class="stat-value">{me.life}</span>
-							</button>
-							<button class="stat-btn plus" onclick={() => handleLifeChange(1)}>+</button>
-						</div>
-
-						{#if me.poison > 0}
-							<div class="stat-display poison">
-								<span class="stat-icon">☠️</span>
-								<span class="stat-value">{me.poison}</span>
-							</div>
-						{/if}
-
-						<div bind:this={libraryDropZoneEl} class="library-drop-zone">
-							<LibraryZone
-								libraryCount={me.libraryCount}
-								playerName="You"
-								onSearch={() => {
-									showDeckSearch = true;
-								}}
-							/>
-						</div>
-
-						{#if showLifeMenu}
-							<div bind:this={lifeMenuEl} class="quick-menu">
-								<div class="menu-section">
-									<span class="menu-label">Life</span>
-									<div class="menu-row">
-										<button onclick={() => handleLifeChange(-5)}>−5</button>
-										<button onclick={() => handleLifeChange(-1)}>−1</button>
-										<button onclick={() => handleLifeChange(1)}>+1</button>
-										<button onclick={() => handleLifeChange(5)}>+5</button>
-									</div>
-								</div>
-								<div class="menu-section">
-									<span class="menu-label">Poison</span>
-									<div class="menu-row">
-										<button onclick={() => handlePoisonChange(-1)}>−1</button>
-										<span class="menu-value">{me.poison}</span>
-										<button onclick={() => handlePoisonChange(1)}>+1</button>
-									</div>
-								</div>
-								<button class="menu-close" onclick={() => (showLifeMenu = false)}>✕</button>
-							</div>
-						{/if}
-					</div>
-
-					<div class="player-zones">
-						<div bind:this={graveyardDropZoneEl} class="graveyard-drop-zone">
-							<Graveyard
-								cards={myGrave.map((c) => ({
-									id: c.id,
-									name: c.name,
-									manaCost: c.manaCost,
-									cardType: c.type,
-									power: c.power,
-									toughness: c.toughness,
-									imageUrl: '',
-									isTapped: false,
-									isSelected: false
-								}))}
-								playerName="You"
-								isOpponent={false}
-								canDrag={true}
-								onCardClick={() => {}}
-							/>
-						</div>
-						<div bind:this={exileDropZoneEl} class="exile-drop-zone">
-							<ExileZone
-								cards={exile.map((c) => ({
-									id: c.id,
-									name: c.name,
-									manaCost: c.manaCost,
-									cardType: c.type,
-									power: c.power,
-									toughness: c.toughness,
-									imageUrl: '',
-									isTapped: false,
-									isSelected: false
-								}))}
-								playerName="You"
-								isOpponent={false}
-								canDrag={true}
-								onCardClick={() => {}}
-								compact={true}
-							/>
-						</div>
-						<ManaPool mana={myMana} showEmpty={false} size="small" onManaClick={() => {}} />
-					</div>
-				</div>
+				<PlayerInfoRow
+					player={{
+						name: me.name,
+						life: me.life,
+						poison: me.poison,
+						libraryCount: me.libraryCount
+					}}
+					graveyard={myGrave}
+					{exile}
+					mana={myMana}
+					{showLifeMenu}
+					onLifeChange={handleLifeChange}
+					onPoisonChange={handlePoisonChange}
+					onToggleLifeMenu={() => (showLifeMenu = !showLifeMenu)}
+					onSearchLibrary={() => (showDeckSearch = true)}
+					onDeckContextMenu={handleDeckContextMenu}
+					libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
+					graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
+					exileDropZoneRef={(el) => (exileDropZoneEl = el)}
+				/>
 			{/if}
 
 			<!-- Player Hand -->
@@ -1781,6 +1515,55 @@
 					syncPlaytestToGameStore();
 				}}
 				onClose={() => (showDeckSearch = false)}
+			/>
+		{/if}
+
+		<!-- Deck Context Menu -->
+		{#if showDeckContextMenu}
+			<DeckContextMenu
+				position={deckContextMenuPosition}
+				deckCount={me?.libraryCount || 0}
+				playerName={me?.name || 'You'}
+				onClose={() => (showDeckContextMenu = false)}
+				actions={deckContextMenuActions}
+			/>
+		{/if}
+
+		<!-- Number Input Dialog -->
+		{#if showNumberInputDialog && numberInputDialogConfig}
+			<NumberInputDialog
+				title={numberInputDialogConfig.title}
+				defaultValue={numberInputDialogConfig.defaultValue}
+				min={numberInputDialogConfig.min}
+				max={numberInputDialogConfig.max}
+				onConfirm={numberInputDialogConfig.onConfirm}
+				onCancel={() => {
+					showNumberInputDialog = false;
+					numberInputDialogConfig = null;
+				}}
+			/>
+		{/if}
+
+		<!-- Scry Dialog -->
+		{#if showScryDialog && currentScrySession}
+			<ScryDialog
+				cards={currentScrySession.cards}
+				onComplete={handleScryComplete}
+				onCancel={() => {
+					showScryDialog = false;
+					currentScrySession = null;
+				}}
+			/>
+		{/if}
+
+		<!-- Reveal Top Dialog -->
+		{#if showRevealTopDialog}
+			<RevealTopDialog
+				cards={revealedCards}
+				onClose={() => {
+					showRevealTopDialog = false;
+					revealedCards = [];
+				}}
 			/>
 		{/if}
 
@@ -2011,17 +1794,21 @@
 		align-items: center;
 		justify-content: space-between;
 		margin-top: 0;
-		padding: 1rem;
+		padding: 0.75rem 1rem;
 		background: rgba(26, 31, 46, 0.95);
 		border-bottom: 1px solid #2a3441;
 		gap: 1rem;
-		transition: all 0.3s ease;
+		flex-wrap: wrap;
+		position: sticky;
+		top: 0;
+		z-index: 100;
 	}
 
-	.playtest-header.hidden {
-		transform: translateY(-100%);
-		opacity: 0;
-		pointer-events: none;
+	@media (min-width: 1280px) {
+		.playtest-header {
+			padding: 1rem;
+			flex-wrap: nowrap;
+		}
 	}
 
 	/* Hamburger Menu Button */
@@ -2230,6 +2017,28 @@
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.header-left {
+		flex: 0 0 auto;
+	}
+
+	.header-right {
+		flex: 0 1 auto;
+	}
+
+	@media (max-width: 1279px) {
+		.header-left,
+		.header-right {
+			gap: 0.5rem;
+		}
+
+		.playtest-controls {
+			order: 3;
+			width: 100%;
+			justify-content: space-between;
+		}
 	}
 
 	.turn-indicator {
@@ -2293,6 +2102,36 @@
 		border-color: rgba(102, 126, 234, 0.5);
 	}
 
+	@media (max-width: 640px) {
+		.mode-badge {
+			display: none;
+		}
+
+		.btn-back {
+			padding: 0.5rem 0.75rem;
+			font-size: 0.8125rem;
+		}
+
+		.btn-sessions {
+			padding: 0.5rem 0.75rem;
+			font-size: 0.8125rem;
+		}
+
+		.btn-toggle,
+		.btn-action {
+			padding: 0.5rem 0.75rem;
+			font-size: 0.8125rem;
+		}
+
+		.turn-text {
+			font-size: 0.75rem;
+		}
+
+		.btn-icon {
+			padding: 0.375rem;
+		}
+	}
+
 	.playtest-controls {
 		display: flex;
 		align-items: center;
@@ -2314,21 +2153,100 @@
 		cursor: pointer;
 	}
 
+	.header-actions {
+		display: none;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	/* Show header-actions on large screens */
+	@media (min-width: 1280px) {
+		.header-actions {
+			display: flex;
+		}
+	}
+
 	.btn-toggle,
 	.btn-action {
-		padding: 0.5rem 1rem;
-		background: #667eea;
-		color: white;
-		border: none;
-		border-radius: 6px;
-		font-weight: 600;
+		padding: 0.625rem 1.25rem;
+		background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+		color: #e2e8f0;
+		border: 1px solid rgba(59, 130, 246, 0.3);
+		border-radius: 8px;
+		font-weight: 700;
+		font-size: 0.8125rem;
+		text-transform: uppercase;
+		letter-spacing: 0.025em;
 		cursor: pointer;
-		transition: background 0.2s;
+		transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+		white-space: nowrap;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		box-shadow:
+			0 2px 4px rgba(0, 0, 0, 0.2),
+			0 1px 2px rgba(59, 130, 246, 0.1);
+	}
+
+	.btn-action.btn-next-turn {
+		background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+		border-color: rgba(46, 204, 113, 0.3);
+		box-shadow:
+			0 2px 4px rgba(0, 0, 0, 0.2),
+			0 1px 2px rgba(46, 204, 113, 0.1);
+	}
+
+	.btn-action.btn-next-turn:hover {
+		background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+		box-shadow:
+			0 4px 8px rgba(0, 0, 0, 0.3),
+			0 2px 4px rgba(46, 204, 113, 0.2);
+		transform: translateY(-1px);
+	}
+
+	.btn-icon {
+		padding: 0.5rem;
+		background: #1a1f2e;
+		color: #f4f4f5;
+		border: 1px solid #2a3441;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: all 0.2s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.btn-icon:hover {
+		background: #2a3441;
+		border-color: #3a4451;
+	}
+
+	.menu-toggle-btn-header {
+		display: flex;
+	}
+
+	/* Hide menu button on large screens */
+	@media (min-width: 1280px) {
+		.menu-toggle-btn-header {
+			display: none;
+		}
 	}
 
 	.btn-toggle:hover,
 	.btn-action:hover {
-		background: #5568d3;
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+		border-color: rgba(59, 130, 246, 0.5);
+		transform: translateY(-1px);
+		box-shadow:
+			0 4px 8px rgba(0, 0, 0, 0.3),
+			0 2px 4px rgba(59, 130, 246, 0.2);
+	}
+
+	.btn-toggle:active,
+	.btn-action:active {
+		transform: translateY(0);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 	}
 
 	.all-hands-overlay {

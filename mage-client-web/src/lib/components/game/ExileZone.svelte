@@ -8,6 +8,7 @@
 		getAllValidDropZones,
 		type SourceZone
 	} from '$lib/utils/drag-drop';
+	import Sparkles from '@lucide/svelte/icons/sparkles';
 
 	// Props
 	let {
@@ -168,7 +169,9 @@
 		onclick={toggleModal}
 		title="{playerName}'s Exile ({cardCount} cards){isEmpty ? '' : ' - Click to view'}"
 	>
-		<span class="exile-icon-compact">{isEmpty ? '🌌' : '✨'}</span>
+		<span class="exile-icon-compact">
+			<Sparkles size={14} />
+		</span>
 		<span class="exile-label-compact">Exile</span>
 		<span class="card-count-compact" class:zero={isEmpty}>{cardCount}</span>
 	</button>
@@ -556,27 +559,30 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.375rem 0.625rem;
-		background: rgba(26, 31, 46, 0.6);
-		border: 1px solid rgba(124, 58, 237, 0.3);
-		border-radius: 6px;
-		min-height: 32px;
+		padding: 0.5rem 0.75rem;
+		background: linear-gradient(135deg, rgba(26, 31, 46, 0.6) 0%, rgba(17, 24, 39, 0.6) 100%);
+		border: 1px solid rgba(167, 139, 250, 0.3);
+		border-radius: 8px;
+		min-height: 36px;
 		cursor: default;
-		transition: all 0.15s;
+		transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 		color: inherit;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 		/* Allow parent drop zone to receive drag events */
 		pointer-events: auto;
 	}
 
 	.exile-compact.has-cards {
 		cursor: pointer;
-		background: rgba(26, 31, 46, 0.9);
-		border-color: rgba(124, 58, 237, 0.4);
+		background: linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(26, 31, 46, 0.9) 100%);
+		border-color: rgba(167, 139, 250, 0.5);
 	}
 
 	.exile-compact.has-cards:hover {
-		background: rgba(42, 52, 65, 0.9);
-		border-color: rgba(167, 139, 250, 0.5);
+		background: linear-gradient(135deg, rgba(167, 139, 250, 0.25) 0%, rgba(42, 52, 65, 0.9) 100%);
+		border-color: rgba(167, 139, 250, 0.7);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(167, 139, 250, 0.2);
+		transform: translateY(-1px);
 	}
 
 	.exile-icon-compact {
