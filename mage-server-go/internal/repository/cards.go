@@ -57,7 +57,7 @@ func (r *CardRepository) GetByID(ctx context.Context, id int64) (*Card, error) {
 	// Query scryfall_cards table (primary data source)
 	// Map Scryfall fields to Card struct fields
 	query := `
-		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		SELECT ('x' || REPLACE(substring(id::text, 1, 18), '-', ''))::bit(64)::bigint as id,
 		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
@@ -74,7 +74,7 @@ func (r *CardRepository) GetByID(ctx context.Context, id int64) (*Card, error) {
 		       COALESCE(rarity, ''),
 		       created_at
 		FROM scryfall_cards
-		WHERE ('x' || substring(id::text, 1, 16))::bit(64)::bigint = $1
+		WHERE ('x' || REPLACE(substring(id::text, 1, 18), '-', ''))::bit(64)::bigint = $1
 		  AND lang = 'en'
 		LIMIT 1
 	`
@@ -102,7 +102,7 @@ func (r *CardRepository) GetByID(ctx context.Context, id int64) (*Card, error) {
 func (r *CardRepository) GetByName(ctx context.Context, name string) ([]*Card, error) {
 	// Query scryfall_cards table (primary data source)
 	query := `
-		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		SELECT ('x' || REPLACE(substring(id::text, 1, 18), '-', ''))::bit(64)::bigint as id,
 		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
@@ -161,7 +161,7 @@ func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name stri
 
 	// Query scryfall_cards table (primary data source)
 	query := `
-		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		SELECT ('x' || REPLACE(substring(id::text, 1, 18), '-', ''))::bit(64)::bigint as id,
 		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
@@ -212,7 +212,7 @@ func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name stri
 func (r *CardRepository) SearchByName(ctx context.Context, searchTerm string, limit int) ([]*Card, error) {
 	// Query scryfall_cards table (primary data source)
 	query := `
-		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		SELECT ('x' || REPLACE(substring(id::text, 1, 18), '-', ''))::bit(64)::bigint as id,
 		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
@@ -263,7 +263,7 @@ func (r *CardRepository) SearchByName(ctx context.Context, searchTerm string, li
 func (r *CardRepository) GetBySetCode(ctx context.Context, setCode string) ([]*Card, error) {
 	// Query scryfall_cards table (primary data source)
 	query := `
-		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		SELECT ('x' || REPLACE(substring(id::text, 1, 18), '-', ''))::bit(64)::bigint as id,
 		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
