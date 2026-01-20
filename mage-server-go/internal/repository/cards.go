@@ -13,23 +13,22 @@ import (
 
 // Card represents a Magic card
 type Card struct {
-	ID            int64
-	CardNumber    string
-	SetCode       string
-	Name          string
-	CardType      string
-	ManaCost      string
-	Power         string
-	Toughness     string
-	RulesText     string
-	FlavorText    sql.NullString // Nullable
-	OriginalText  sql.NullString // Nullable
-	OriginalType  sql.NullString // Nullable
-	CN            sql.NullInt64  // Nullable - basic lands have NULL collector numbers
-	CardName      sql.NullString // Nullable - basic lands have NULL card_name
-	Rarity        string
-	CardClassName string
-	CreatedAt     time.Time
+	ID           int64
+	CardNumber   string
+	SetCode      string
+	Name         string
+	CardType     string
+	ManaCost     string
+	Power        string
+	Toughness    string
+	RulesText    string
+	FlavorText   sql.NullString // Nullable
+	OriginalText sql.NullString // Nullable
+	OriginalType sql.NullString // Nullable
+	CN           sql.NullInt64  // Nullable - basic lands have NULL collector numbers
+	CardName     sql.NullString // Nullable - basic lands have NULL card_name
+	Rarity       string
+	CreatedAt    time.Time
 }
 
 // CardRepository handles card database operations
@@ -55,28 +54,29 @@ func (r *CardRepository) GetByID(ctx context.Context, id int64) (*Card, error) {
 		return card, nil
 	}
 
-	// Many card fields are optional (e.g. lands have no mana cost, non-creatures have no power/toughness).
-	// We coalesce nullable text columns to empty strings to avoid scan errors into Go string fields.
+	// Query scryfall_cards table (primary data source)
+	// Map Scryfall fields to Card struct fields
 	query := `
-		SELECT id,
-		       COALESCE(card_number, ''),
+		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
-		       COALESCE(card_type, ''),
+		       COALESCE(type_line, ''),
 		       COALESCE(mana_cost, ''),
 		       COALESCE(power, ''),
 		       COALESCE(toughness, ''),
-		       COALESCE(rules_text, ''),
-		       flavor_text,
-		       original_text,
-		       original_type,
-		       cn,
-		       card_name,
+		       COALESCE(oracle_text, ''),
+		       NULL::text as flavor_text,
+		       NULL::text as original_text,
+		       NULL::text as original_type,
+		       CASE WHEN collector_number ~ '^[0-9]+$' THEN collector_number::bigint ELSE NULL END as cn,
+		       name as card_name,
 		       COALESCE(rarity, ''),
-		       COALESCE(card_class_name, ''),
 		       created_at
-		FROM cards
-		WHERE id = $1
+		FROM scryfall_cards
+		WHERE ('x' || substring(id::text, 1, 16))::bit(64)::bigint = $1
+		  AND lang = 'en'
+		LIMIT 1
 	`
 
 	card := &Card{}
@@ -84,7 +84,7 @@ func (r *CardRepository) GetByID(ctx context.Context, id int64) (*Card, error) {
 		&card.ID, &card.CardNumber, &card.SetCode, &card.Name, &card.CardType,
 		&card.ManaCost, &card.Power, &card.Toughness, &card.RulesText,
 		&card.FlavorText, &card.OriginalText, &card.OriginalType, &card.CN,
-		&card.CardName, &card.Rarity, &card.CardClassName, &card.CreatedAt,
+		&card.CardName, &card.Rarity, &card.CreatedAt,
 	)
 
 	if err != nil {
@@ -100,27 +100,28 @@ func (r *CardRepository) GetByID(ctx context.Context, id int64) (*Card, error) {
 // GetByName retrieves cards by name
 // Handles both single-faced cards and multi-faced cards (DFC, split, etc.)
 func (r *CardRepository) GetByName(ctx context.Context, name string) ([]*Card, error) {
+	// Query scryfall_cards table (primary data source)
 	query := `
-		SELECT id,
-		       COALESCE(card_number, ''),
+		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
-		       COALESCE(card_type, ''),
+		       COALESCE(type_line, ''),
 		       COALESCE(mana_cost, ''),
 		       COALESCE(power, ''),
 		       COALESCE(toughness, ''),
-		       COALESCE(rules_text, ''),
-		       flavor_text,
-		       original_text,
-		       original_type,
-		       cn,
-		       card_name,
+		       COALESCE(oracle_text, ''),
+		       NULL::text as flavor_text,
+		       NULL::text as original_text,
+		       NULL::text as original_type,
+		       CASE WHEN collector_number ~ '^[0-9]+$' THEN collector_number::bigint ELSE NULL END as cn,
+		       name as card_name,
 		       COALESCE(rarity, ''),
-		       COALESCE(card_class_name, ''),
 		       created_at
-		FROM cards
-		WHERE name = $1 OR name LIKE $1 || ' //%'
-		ORDER BY set_code, card_number
+		FROM scryfall_cards
+		WHERE lang = 'en'
+		  AND (name = $1 OR name LIKE $1 || ' //%')
+		ORDER BY released_at DESC, set_code, collector_number
 	`
 
 	rows, err := r.db.Pool.Query(ctx, query, name)
@@ -136,7 +137,7 @@ func (r *CardRepository) GetByName(ctx context.Context, name string) ([]*Card, e
 			&card.ID, &card.CardNumber, &card.SetCode, &card.Name, &card.CardType,
 			&card.ManaCost, &card.Power, &card.Toughness, &card.RulesText,
 			&card.FlavorText, &card.OriginalText, &card.OriginalType, &card.CN,
-			&card.CardName, &card.Rarity, &card.CardClassName, &card.CreatedAt,
+			&card.CardName, &card.Rarity, &card.CreatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan card: %w", err)
@@ -158,28 +159,29 @@ func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name stri
 	name = strings.ReplaceAll(name, "'", "'")
 	name = strings.ReplaceAll(name, "'", "'")
 
+	// Query scryfall_cards table (primary data source)
 	query := `
-		SELECT id,
-		       COALESCE(card_number, ''),
+		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
-		       COALESCE(card_type, ''),
+		       COALESCE(type_line, ''),
 		       COALESCE(mana_cost, ''),
 		       COALESCE(power, ''),
 		       COALESCE(toughness, ''),
-		       COALESCE(rules_text, ''),
-		       flavor_text,
-		       original_text,
-		       original_type,
-		       cn,
-		       card_name,
+		       COALESCE(oracle_text, ''),
+		       NULL::text as flavor_text,
+		       NULL::text as original_text,
+		       NULL::text as original_type,
+		       CASE WHEN collector_number ~ '^[0-9]+$' THEN collector_number::bigint ELSE NULL END as cn,
+		       name as card_name,
 		       COALESCE(rarity, ''),
-		       COALESCE(card_class_name, ''),
 		       created_at
-		FROM cards
-		WHERE LOWER(TRIM(name)) = LOWER(TRIM($1)) 
-		   OR LOWER(name) LIKE LOWER($1) || ' //%'
-		ORDER BY set_code, card_number
+		FROM scryfall_cards
+		WHERE lang = 'en'
+		  AND (LOWER(TRIM(name)) = LOWER(TRIM($1))
+		       OR LOWER(name) LIKE LOWER($1) || ' //%')
+		ORDER BY released_at DESC, set_code, collector_number
 	`
 
 	rows, err := r.db.Pool.Query(ctx, query, name)
@@ -195,7 +197,7 @@ func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name stri
 			&card.ID, &card.CardNumber, &card.SetCode, &card.Name, &card.CardType,
 			&card.ManaCost, &card.Power, &card.Toughness, &card.RulesText,
 			&card.FlavorText, &card.OriginalText, &card.OriginalType, &card.CN,
-			&card.CardName, &card.Rarity, &card.CardClassName, &card.CreatedAt,
+			&card.CardName, &card.Rarity, &card.CreatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan card: %w", err)
@@ -208,27 +210,28 @@ func (r *CardRepository) GetByNameCaseInsensitive(ctx context.Context, name stri
 
 // SearchByName performs a full-text search on card names
 func (r *CardRepository) SearchByName(ctx context.Context, searchTerm string, limit int) ([]*Card, error) {
+	// Query scryfall_cards table (primary data source)
 	query := `
-		SELECT id,
-		       COALESCE(card_number, ''),
+		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
-		       COALESCE(card_type, ''),
+		       COALESCE(type_line, ''),
 		       COALESCE(mana_cost, ''),
 		       COALESCE(power, ''),
 		       COALESCE(toughness, ''),
-		       COALESCE(rules_text, ''),
-		       flavor_text,
-		       original_text,
-		       original_type,
-		       cn,
-		       card_name,
+		       COALESCE(oracle_text, ''),
+		       NULL::text as flavor_text,
+		       NULL::text as original_text,
+		       NULL::text as original_type,
+		       CASE WHEN collector_number ~ '^[0-9]+$' THEN collector_number::bigint ELSE NULL END as cn,
+		       name as card_name,
 		       COALESCE(rarity, ''),
-		       COALESCE(card_class_name, ''),
 		       created_at
-		FROM cards
-		WHERE name ILIKE $1
-		ORDER BY name
+		FROM scryfall_cards
+		WHERE lang = 'en'
+		  AND name ILIKE $1
+		ORDER BY name, released_at DESC
 		LIMIT $2
 	`
 
@@ -245,7 +248,7 @@ func (r *CardRepository) SearchByName(ctx context.Context, searchTerm string, li
 			&card.ID, &card.CardNumber, &card.SetCode, &card.Name, &card.CardType,
 			&card.ManaCost, &card.Power, &card.Toughness, &card.RulesText,
 			&card.FlavorText, &card.OriginalText, &card.OriginalType, &card.CN,
-			&card.CardName, &card.Rarity, &card.CardClassName, &card.CreatedAt,
+			&card.CardName, &card.Rarity, &card.CreatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan card: %w", err)
@@ -258,27 +261,28 @@ func (r *CardRepository) SearchByName(ctx context.Context, searchTerm string, li
 
 // GetBySetCode retrieves all cards from a set
 func (r *CardRepository) GetBySetCode(ctx context.Context, setCode string) ([]*Card, error) {
+	// Query scryfall_cards table (primary data source)
 	query := `
-		SELECT id,
-		       COALESCE(card_number, ''),
+		SELECT ('x' || substring(id::text, 1, 16))::bit(64)::bigint as id,
+		       COALESCE(collector_number, ''),
 		       set_code,
 		       name,
-		       COALESCE(card_type, ''),
+		       COALESCE(type_line, ''),
 		       COALESCE(mana_cost, ''),
 		       COALESCE(power, ''),
 		       COALESCE(toughness, ''),
-		       COALESCE(rules_text, ''),
-		       flavor_text,
-		       original_text,
-		       original_type,
-		       cn,
-		       card_name,
+		       COALESCE(oracle_text, ''),
+		       NULL::text as flavor_text,
+		       NULL::text as original_text,
+		       NULL::text as original_type,
+		       CASE WHEN collector_number ~ '^[0-9]+$' THEN collector_number::bigint ELSE NULL END as cn,
+		       name as card_name,
 		       COALESCE(rarity, ''),
-		       COALESCE(card_class_name, ''),
 		       created_at
-		FROM cards
-		WHERE set_code = $1
-		ORDER BY card_number
+		FROM scryfall_cards
+		WHERE lang = 'en'
+		  AND set_code = $1
+		ORDER BY collector_number
 	`
 
 	rows, err := r.db.Pool.Query(ctx, query, setCode)
@@ -294,7 +298,7 @@ func (r *CardRepository) GetBySetCode(ctx context.Context, setCode string) ([]*C
 			&card.ID, &card.CardNumber, &card.SetCode, &card.Name, &card.CardType,
 			&card.ManaCost, &card.Power, &card.Toughness, &card.RulesText,
 			&card.FlavorText, &card.OriginalText, &card.OriginalType, &card.CN,
-			&card.CardName, &card.Rarity, &card.CardClassName, &card.CreatedAt,
+			&card.CardName, &card.Rarity, &card.CreatedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan card: %w", err)
@@ -305,53 +309,13 @@ func (r *CardRepository) GetBySetCode(ctx context.Context, setCode string) ([]*C
 	return cards, nil
 }
 
-// GetByClassName retrieves a card by its Java class name
-func (r *CardRepository) GetByClassName(ctx context.Context, className string) (*Card, error) {
-	query := `
-		SELECT id,
-		       COALESCE(card_number, ''),
-		       set_code,
-		       name,
-		       COALESCE(card_type, ''),
-		       COALESCE(mana_cost, ''),
-		       COALESCE(power, ''),
-		       COALESCE(toughness, ''),
-		       COALESCE(rules_text, ''),
-		       flavor_text,
-		       original_text,
-		       original_type,
-		       cn,
-		       card_name,
-		       COALESCE(rarity, ''),
-		       COALESCE(card_class_name, ''),
-		       created_at
-		FROM cards
-		WHERE card_class_name = $1
-		LIMIT 1
-	`
-
-	card := &Card{}
-	err := r.db.Pool.QueryRow(ctx, query, className).Scan(
-		&card.ID, &card.CardNumber, &card.SetCode, &card.Name, &card.CardType,
-		&card.ManaCost, &card.Power, &card.Toughness, &card.RulesText,
-		&card.FlavorText, &card.OriginalText, &card.OriginalType, &card.CN,
-		&card.CardName, &card.Rarity, &card.CardClassName, &card.CreatedAt,
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to get card by class name: %w", err)
-	}
-
-	return card, nil
-}
-
 // Create creates a new card
 func (r *CardRepository) Create(ctx context.Context, card *Card) error {
 	query := `
 		INSERT INTO cards (card_number, set_code, name, card_type, mana_cost,
 		                   power, toughness, rules_text, flavor_text, original_text,
-		                   original_type, cn, card_name, rarity, card_class_name)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+		                   original_type, cn, card_name, rarity)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 		RETURNING id, created_at
 	`
 
@@ -361,7 +325,7 @@ func (r *CardRepository) Create(ctx context.Context, card *Card) error {
 		getNullStringValue(card.FlavorText),
 		getNullStringValue(card.OriginalText),
 		getNullStringValue(card.OriginalType),
-		getNullInt64Value(card.CN), getNullStringValue(card.CardName), card.Rarity, card.CardClassName,
+		getNullInt64Value(card.CN), getNullStringValue(card.CardName), card.Rarity,
 	).Scan(&card.ID, &card.CreatedAt)
 
 	if err != nil {

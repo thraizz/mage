@@ -1,3 +1,8 @@
+-- ⚠️ LEGACY MIGRATION - Historical reference only
+-- This table structure originated from XMage H2 database migration.
+-- Current card data comes from scryfall_cards (see migration 009).
+-- XMage backup was dropped in migration 010.
+
 -- Enable pg_trgm extension for full-text search
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 

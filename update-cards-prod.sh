@@ -113,7 +113,7 @@ if [[ "$ROLLBACK" == "true" ]]; then
     fi
     
     echo -e "${GREEN}[ROLLBACK] Restoring previous card data...${NC}"
-    execute ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_PATH}/mage-server-go && docker compose exec -T postgres bash -c './scripts/rollback_from_scryfall.sh'"
+    execute ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_PATH}/mage-server-go && docker compose -f ../docker-compose.yml exec -T postgres bash -c './scripts/rollback_from_scryfall.sh'"
     
     echo -e "${GREEN}✓ Rollback complete${NC}"
     exit 0
@@ -215,7 +215,7 @@ execute ssh "${REMOTE_USER}@${REMOTE_HOST}" bash << EOF
     
     # Backup current cards table
     echo "Creating SQL backup..."
-    docker compose exec -T postgres pg_dump -U mage -d mage \
+    docker compose -f ../docker-compose.yml exec -T postgres pg_dump -U mage -d mage \
         -t cards \
         -t cards_xmage_backup \
         --if-exists --clean \
@@ -223,9 +223,9 @@ execute ssh "${REMOTE_USER}@${REMOTE_HOST}" bash << EOF
     
     # Also create a simple count snapshot
     echo "Current card counts before update:" > mage-server-go/data/backup_${BACKUP_DATE}_info.txt
-    docker compose exec -T postgres psql -U mage -d mage -tAc \
+    docker compose -f ../docker-compose.yml exec -T postgres psql -U mage -d mage -tAc \
         "SELECT 'cards table:', COUNT(*) FROM cards;" >> mage-server-go/data/backup_${BACKUP_DATE}_info.txt 2>/dev/null || true
-    docker compose exec -T postgres psql -U mage -d mage -tAc \
+    docker compose -f ../docker-compose.yml exec -T postgres psql -U mage -d mage -tAc \
         "SELECT 'scryfall_cards:', COUNT(*) FROM scryfall_cards WHERE lang='en';" >> mage-server-go/data/backup_${BACKUP_DATE}_info.txt 2>/dev/null || true
     
     echo "✓ Backup created: ${BACKUP_SQL}"
@@ -250,11 +250,11 @@ if [[ "$DRY_RUN" == "false" ]]; then
             docker ps -q --filter "publish=5432" | xargs -r docker stop 2>/dev/null || true
             # Remove any conflicting containers by name
             docker rm -f mage-postgres 2>/dev/null || true
-            docker compose up -d postgres
+            docker compose -f ../docker-compose.yml up -d postgres
             echo "Waiting for database to be ready..."
             # Wait for postgres to be actually ready
             for i in {1..30}; do
-                if docker compose exec -T postgres pg_isready -U mage &>/dev/null; then
+                if docker compose -f ../docker-compose.yml exec -T postgres pg_isready -U mage &>/dev/null; then
                     echo "Database is ready!"
                     break
                 fi
@@ -266,7 +266,7 @@ if [[ "$DRY_RUN" == "false" ]]; then
         fi
         
         echo "Applying Scryfall migrations..."
-        docker compose exec -T postgres psql -U mage -d mage < migrations/009_create_scryfall_tables.up.sql 2>&1 | grep -v "already exists" || true
+        docker compose -f ../docker-compose.yml exec -T postgres psql -U mage -d mage < migrations/009_create_scryfall_tables.up.sql 2>&1 | grep -v "already exists" || true
         
         echo ""
         echo "Importing Scryfall data..."
@@ -283,11 +283,11 @@ if [[ "$DRY_RUN" == "false" ]]; then
             echo "Mage-server already running"
         fi
         
-        docker compose exec -T mage-server bash -c "DATABASE_URL='postgres://mage:mage@postgres:5432/mage?sslmode=disable' go run ./cmd/scryfall-import/main.go --input='/app/data/$(basename "$SCRYFALL_FILE")' --lang=en --skip-tokens=true --batch=1000" 2>&1 | tail -20
+        docker compose -f ../docker-compose.yml exec -T mage-server bash -c "DATABASE_URL='postgres://mage:mage@postgres:5432/mage?sslmode=disable' go run ./cmd/scryfall-import/main.go --input='/app/data/$(basename "$SCRYFALL_FILE")' --lang=en --skip-tokens=true --batch=1000" 2>&1 | tail -20
         
         echo ""
         echo "Creating compatibility view..."
-        docker compose exec -T postgres psql -U mage -d mage << 'SQL'
+        docker compose -f ../docker-compose.yml exec -T postgres psql -U mage -d mage << 'SQL'
 -- Backup old cards table if it exists and isn't already backed up
 DO \$\$
 BEGIN
@@ -339,7 +339,7 @@ if [[ "$DRY_RUN" == "false" ]]; then
         cd ${REMOTE_PATH}
         
         echo "Card counts after update:"
-        docker compose exec -T postgres psql -U mage -d mage << 'SQL'
+        docker compose -f docker-compose.yml exec -T postgres psql -U mage -d mage << 'SQL'
 SELECT 
     'English Scryfall Cards' as metric, 
     COUNT(*)::text as count 
@@ -358,7 +358,7 @@ SQL
 
         echo ""
         echo "Sample card lookup test:"
-        docker compose exec -T postgres psql -U mage -d mage -c \
+        docker compose -f docker-compose.yml exec -T postgres psql -U mage -d mage -c \
             "SELECT name, card_type, mana_cost FROM cards WHERE name LIKE 'Lightning%' LIMIT 3;"
 EOF
 else
@@ -384,7 +384,7 @@ echo -e "${YELLOW}Rollback (if needed):${NC}"
 echo -e "  ./update-cards-prod.sh --rollback"
 echo ""
 echo -e "${YELLOW}View production logs:${NC}"
-echo -e "  ssh ${REMOTE_USER}@${REMOTE_HOST} 'cd ${REMOTE_PATH} && docker compose logs -f mage-server'"
+echo -e "  ssh ${REMOTE_USER}@${REMOTE_HOST} 'cd ${REMOTE_PATH} && docker compose -f ../docker-compose.yml logs -f mage-server'"
 echo ""
 echo -e "${YELLOW}Verify production is working:${NC}"
 echo -e "  curl http://${REMOTE_HOST}:17171/status"

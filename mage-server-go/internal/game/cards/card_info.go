@@ -5,18 +5,17 @@ import "github.com/google/uuid"
 // CardInfo contains metadata about a card loaded from the database
 type CardInfo struct {
 	// Legacy database fields (from XMage migration)
-	ID            int64
-	CardNumber    string
-	SetCode       string
-	Name          string
-	CardType      string
-	ManaCost      string
-	Power         string
-	Toughness     string
-	RulesText     string
-	FlavorText    string
-	Rarity        string
-	CardClassName string
+	ID         int64
+	CardNumber string
+	SetCode    string
+	Name       string
+	CardType   string
+	ManaCost   string
+	Power      string
+	Toughness  string
+	RulesText  string
+	FlavorText string
+	Rarity     string
 
 	// Scryfall fields (when using Scryfall data)
 	ScryfallID uuid.UUID

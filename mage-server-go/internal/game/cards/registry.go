@@ -113,14 +113,6 @@ func (r *cardRegistry) Get(cardName string) (CardBuilder, bool) {
 	return nil, false
 }
 
-// GetByClassName retrieves a card builder by Java class name
-// e.g., "mage.cards.l.LightningBolt" -> "Lightning Bolt"
-func (r *cardRegistry) GetByClassName(className string) (CardBuilder, bool) {
-	// For now, just try to extract the simple name
-	// TODO: Build a proper class name -> card name mapping
-	return r.Get(className)
-}
-
 // IsImplemented returns true if a card implementation exists
 func (r *cardRegistry) IsImplemented(cardName string) bool {
 	r.mu.RLock()

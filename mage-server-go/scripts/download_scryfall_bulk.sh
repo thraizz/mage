@@ -22,10 +22,15 @@ echo "=== Scryfall Bulk Data Download ==="
 echo "Fetching bulk data info from Scryfall API..."
 BULK_INFO=$(curl -s https://api.scryfall.com/bulk-data/all-cards)
 
-# Extract download URL and updated timestamp
-DOWNLOAD_URL=$(echo "$BULK_INFO" | grep -o '"download_uri":"[^"]*"' | cut -d'"' -f4)
-UPDATED_AT=$(echo "$BULK_INFO" | grep -o '"updated_at":"[^"]*"' | head -1 | cut -d'"' -f4)
-FILE_SIZE=$(echo "$BULK_INFO" | grep -o '"compressed_size":[0-9]*' | cut -d':' -f2)
+# Extract download URL and updated timestamp using jq
+DOWNLOAD_URL=$(echo "$BULK_INFO" | jq -r '.download_uri')
+UPDATED_AT=$(echo "$BULK_INFO" | jq -r '.updated_at')
+FILE_SIZE=$(echo "$BULK_INFO" | jq -r '.compressed_size')
+
+echo "BULK_INFO: $BULK_INFO"
+echo "DOWNLOAD_URL: $DOWNLOAD_URL"
+echo "UPDATED_AT: $UPDATED_AT"
+echo "FILE_SIZE: $FILE_SIZE"
 
 if [ -z "$DOWNLOAD_URL" ]; then
     echo "ERROR: Failed to get download URL from Scryfall API"
@@ -64,7 +69,7 @@ echo ""
 
 # Show some stats
 echo "Quick stats:"
-TOTAL_CARDS=$(grep -o '"id"' "$OUTPUT_FILE" | wc -l | tr -d ' ')
+TOTAL_CARDS=$(jq 'length' "$OUTPUT_FILE" 2>/dev/null || echo "0")
 echo "  Total cards: $TOTAL_CARDS"
 
 echo ""

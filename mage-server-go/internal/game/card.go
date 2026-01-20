@@ -14,20 +14,19 @@ type Card struct {
 	OwnerID uuid.UUID
 
 	// Card characteristics
-	ManaCost      string
-	Types         []string // CREATURE, INSTANT, SORCERY, etc.
-	Subtypes      []string // HUMAN, WIZARD, etc.
-	Supertypes    []string // LEGENDARY, BASIC, etc.
-	Color         string   // Color identity
-	Power         string   // Power (for creatures)
-	Toughness     string   // Toughness (for creatures)
-	Loyalty       string   // Starting loyalty (for planeswalkers)
-	RulesText     string   // Rules text
-	FlavorText    string   // Flavor text
-	Rarity        string   // common, uncommon, rare, mythic
-	CardNumber    int      // Card number in set
-	SetCode       string   // Set code
-	CardClassName string   // Java class name
+	ManaCost   string
+	Types      []string // CREATURE, INSTANT, SORCERY, etc.
+	Subtypes   []string // HUMAN, WIZARD, etc.
+	Supertypes []string // LEGENDARY, BASIC, etc.
+	Color      string   // Color identity
+	Power      string   // Power (for creatures)
+	Toughness  string   // Toughness (for creatures)
+	Loyalty    string   // Starting loyalty (for planeswalkers)
+	RulesText  string   // Rules text
+	FlavorText string   // Flavor text
+	Rarity     string   // common, uncommon, rare, mythic
+	CardNumber int      // Card number in set
+	SetCode    string   // Set code
 
 	// Game state
 	Zone         Zone               // Current zone

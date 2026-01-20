@@ -16,9 +16,6 @@ type Factory interface {
 	// CreateCard creates a new card instance by name
 	CreateCard(ctx context.Context, name string, ownerID uuid.UUID) (*game.Card, error)
 
-	// CreateCardByClassName creates a new card instance by Java class name
-	CreateCardByClassName(ctx context.Context, className string, ownerID uuid.UUID) (*game.Card, error)
-
 	// IsImplemented returns true if a card has an implementation
 	IsImplemented(name string) bool
 
@@ -73,18 +70,17 @@ func (f *factory) CreateCard(ctx context.Context, name string, ownerID uuid.UUID
 
 	// 3. Convert repository.Card to cards.CardInfo
 	cardInfo := &CardInfo{
-		ID:            cardData.ID,
-		CardNumber:    cardData.CardNumber,
-		SetCode:       cardData.SetCode,
-		Name:          cardData.Name,
-		CardType:      cardData.CardType,
-		ManaCost:      cardData.ManaCost,
-		Power:         cardData.Power,
-		Toughness:     cardData.Toughness,
-		RulesText:     cardData.RulesText,
-		FlavorText:    nullStringToString(cardData.FlavorText),
-		Rarity:        cardData.Rarity,
-		CardClassName: cardData.CardClassName,
+		ID:         cardData.ID,
+		CardNumber: cardData.CardNumber,
+		SetCode:    cardData.SetCode,
+		Name:       cardData.Name,
+		CardType:   cardData.CardType,
+		ManaCost:   cardData.ManaCost,
+		Power:      cardData.Power,
+		Toughness:  cardData.Toughness,
+		RulesText:  cardData.RulesText,
+		FlavorText: nullStringToString(cardData.FlavorText),
+		Rarity:     cardData.Rarity,
 		// TODO: Parse types, subtypes, supertypes, colors from CardType string
 	}
 
@@ -100,18 +96,6 @@ func (f *factory) CreateCard(ctx context.Context, name string, ownerID uuid.UUID
 	)
 
 	return card, nil
-}
-
-// CreateCardByClassName creates a new card instance by Java class name
-func (f *factory) CreateCardByClassName(ctx context.Context, className string, ownerID uuid.UUID) (*game.Card, error) {
-	// 1. Get card metadata from database by class name
-	cardData, err := f.cardRepo.GetByClassName(ctx, className)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get card by class name: %w", err)
-	}
-
-	// 2. Use CreateCard with the card name
-	return f.CreateCard(ctx, cardData.Name, ownerID)
 }
 
 // IsImplemented returns true if a card has an implementation
