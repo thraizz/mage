@@ -18,17 +18,28 @@
 		// Handle string symbols - normalize to lowercase for mana-font
 		const s = String(sym).toLowerCase();
 		switch (s) {
-			case 'w': return 'ms-w';
-			case 'u': return 'ms-u';
-			case 'b': return 'ms-b';
-			case 'r': return 'ms-r';
-			case 'g': return 'ms-g';
-			case 'c': return 'ms-c';
-			case 'x': return 'ms-x';
-			case 't': return 'ms-tap';
-			case 'q': return 'ms-untap';
-			case 's': return 'ms-s'; // snow
-			case 'e': return 'ms-e'; // energy
+			case 'w':
+				return 'ms-w';
+			case 'u':
+				return 'ms-u';
+			case 'b':
+				return 'ms-b';
+			case 'r':
+				return 'ms-r';
+			case 'g':
+				return 'ms-g';
+			case 'c':
+				return 'ms-c';
+			case 'x':
+				return 'ms-x';
+			case 't':
+				return 'ms-tap';
+			case 'q':
+				return 'ms-untap';
+			case 's':
+				return 'ms-s'; // snow
+			case 'e':
+				return 'ms-e'; // energy
 			default:
 				// Try parsing as number
 				const num = parseInt(s, 10);
@@ -40,24 +51,22 @@
 	}
 
 	const manaClass = $derived(getManaClass(symbol));
-	
+
 	// Size classes - mana-font uses ms-cost for circle backgrounds, ms-shadow for shadows
-	const sizeClass = $derived({
-		sm: 'mana-size-sm',
-		md: 'mana-size-md',
-		lg: 'mana-size-lg',
-		xl: 'mana-size-xl',
-		'2x': 'ms-2x',
-		'3x': 'ms-3x'
-	}[size] || 'mana-size-md');
+	const sizeClass = $derived(
+		{
+			sm: 'mana-size-sm',
+			md: 'mana-size-md',
+			lg: 'mana-size-lg',
+			xl: 'mana-size-xl',
+			'2x': 'ms-2x',
+			'3x': 'ms-3x'
+		}[size] || 'mana-size-md'
+	);
 </script>
 
 {#if interactive}
-	<button
-		type="button"
-		class="mana-symbol-wrapper mana-interactive {sizeClass}"
-		{onclick}
-	>
+	<button type="button" class="mana-symbol-wrapper mana-interactive {sizeClass}" {onclick}>
 		<i class="ms ms-cost {manaClass}"></i>
 	</button>
 {:else}

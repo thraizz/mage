@@ -6,7 +6,12 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { fetchUserDecks, getDeckDetails } from '../decks';
-import type { DeckListResponse, DeckGetResponse, DeckInfo, DeckCardLists } from '$lib/generated/mage/v1/table';
+import type {
+	DeckListResponse,
+	DeckGetResponse,
+	DeckInfo,
+	DeckCardLists
+} from '$lib/generated/mage/v1/table';
 
 // Mock the gRPC client
 vi.mock('$lib/grpc/client', () => {
@@ -164,7 +169,7 @@ describe('decks.ts API', () => {
 				sideboard: [],
 				commanders: [
 					{
-						name: 'Atraxa, Praetors\' Voice',
+						name: "Atraxa, Praetors' Voice",
 						quantity: 1,
 						manaCost: '{G}{W}{U}{B}',
 						cardType: 'Legendary Creature - Phyrexian Horror',
@@ -223,7 +228,7 @@ describe('decks.ts API', () => {
 				sideboard: [],
 				commanders: [
 					{
-						cardName: 'Atraxa, Praetors\' Voice',
+						cardName: "Atraxa, Praetors' Voice",
 						quantity: 1,
 						setCode: undefined,
 						manaCost: '{G}{W}{U}{B}',
@@ -311,11 +316,29 @@ describe('decks.ts API', () => {
 			// Mock getDeckDetails response (full data)
 			const mockDeckCards: DeckCardLists = {
 				mainDeck: [
-					{ name: 'Lightning Bolt', quantity: 4, manaCost: '{R}', cardType: 'Instant', types: [], colors: [], power: '', toughness: '' }
+					{
+						name: 'Lightning Bolt',
+						quantity: 4,
+						manaCost: '{R}',
+						cardType: 'Instant',
+						types: [],
+						colors: [],
+						power: '',
+						toughness: ''
+					}
 				],
 				sideboard: [],
 				commanders: [
-					{ name: 'Atraxa', quantity: 1, manaCost: '{G}{W}{U}{B}', cardType: 'Creature', types: [], colors: [], power: '4', toughness: '4' }
+					{
+						name: 'Atraxa',
+						quantity: 1,
+						manaCost: '{G}{W}{U}{B}',
+						cardType: 'Creature',
+						types: [],
+						colors: [],
+						power: '4',
+						toughness: '4'
+					}
 				]
 			};
 
@@ -349,4 +372,3 @@ describe('decks.ts API', () => {
 		});
 	});
 });
-

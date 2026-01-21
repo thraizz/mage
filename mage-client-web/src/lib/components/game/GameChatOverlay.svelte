@@ -308,9 +308,7 @@
 			<h3>Game Chat</h3>
 			<span class="message-count">{messages.length}</span>
 		</div>
-		<button class="close-btn" onclick={close} title="Close (Esc)">
-			✕
-		</button>
+		<button class="close-btn" onclick={close} title="Close (Esc)"> ✕ </button>
 	</div>
 
 	<div class="chat-messages" bind:this={messagesContainer} onscroll={handleScroll}>
@@ -391,8 +389,12 @@
 	}
 
 	@keyframes fade-in {
-		from { opacity: 0; }
-		to { opacity: 1; }
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
 	}
 
 	.chat-overlay {
@@ -691,5 +693,3 @@
 		}
 	}
 </style>
-
-

@@ -15,7 +15,11 @@ import type {
 	DamageAssignment,
 	ParsedCombatOptions
 } from '$lib/types/combat';
-import { parseCombatOptions, groupAttackOptionsByCard, groupBlockOptionsByBlocker } from '$lib/types/combat';
+import {
+	parseCombatOptions,
+	groupAttackOptionsByCard,
+	groupBlockOptionsByBlocker
+} from '$lib/types/combat';
 
 const initialState: CombatStoreState = {
 	phase: 'idle',
@@ -467,15 +471,17 @@ export const isAssigningDamage = derived(
 /**
  * Set of card IDs that can attack
  */
-export const canAttackCardIds = derived(combatStore, ($combat) =>
-	new Set($combat.availableAttackers.keys())
+export const canAttackCardIds = derived(
+	combatStore,
+	($combat) => new Set($combat.availableAttackers.keys())
 );
 
 /**
  * Set of card IDs that are declared as attackers
  */
-export const declaredAttackerIds = derived(combatStore, ($combat) =>
-	new Set($combat.declaredAttackers.keys())
+export const declaredAttackerIds = derived(
+	combatStore,
+	($combat) => new Set($combat.declaredAttackers.keys())
 );
 
 /**
@@ -489,15 +495,17 @@ export const declaredAttackerCount = derived(
 /**
  * Set of card IDs that can block
  */
-export const canBlockCardIds = derived(combatStore, ($combat) =>
-	new Set($combat.availableBlockers.keys())
+export const canBlockCardIds = derived(
+	combatStore,
+	($combat) => new Set($combat.availableBlockers.keys())
 );
 
 /**
  * Set of card IDs that have block assignments
  */
-export const assignedBlockerIds = derived(combatStore, ($combat) =>
-	new Set($combat.blockAssignments.keys())
+export const assignedBlockerIds = derived(
+	combatStore,
+	($combat) => new Set($combat.blockAssignments.keys())
 );
 
 /**
@@ -551,4 +559,3 @@ export function getAttackTarget(cardId: string): string | undefined {
 export function getBlockTarget(cardId: string): string | undefined {
 	return get(combatStore).blockAssignments.get(cardId);
 }
-

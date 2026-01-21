@@ -10,5 +10,3 @@ export const load: PageLoad = async ({ params }) => {
 		gameId: params.id
 	};
 };
-
-

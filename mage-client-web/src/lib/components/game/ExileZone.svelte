@@ -499,7 +499,9 @@
 		justify-content: center;
 		user-select: none;
 		-webkit-user-select: none;
-		transition: transform 0.2s ease, opacity 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			opacity 0.2s ease;
 	}
 
 	.card-grid-item.draggable {
@@ -581,7 +583,9 @@
 	.exile-compact.has-cards:hover {
 		background: linear-gradient(135deg, rgba(167, 139, 250, 0.25) 0%, rgba(42, 52, 65, 0.9) 100%);
 		border-color: rgba(167, 139, 250, 0.7);
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(167, 139, 250, 0.2);
+		box-shadow:
+			0 2px 6px rgba(0, 0, 0, 0.3),
+			0 1px 3px rgba(167, 139, 250, 0.2);
 		transform: translateY(-1px);
 	}
 

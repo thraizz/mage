@@ -6,17 +6,10 @@
 		lines?: number;
 	}
 
-	let {
-		variant = 'text',
-		width = '100%',
-		height = '',
-		lines = 1
-	}: Props = $props();
+	let { variant = 'text', width = '100%', height = '', lines = 1 }: Props = $props();
 
 	const defaultHeight = $derived(
-		variant === 'text' ? '1rem' :
-		variant === 'circular' ? width :
-		'3rem'
+		variant === 'text' ? '1rem' : variant === 'circular' ? width : '3rem'
 	);
 
 	const actualHeight = $derived(height || defaultHeight);
@@ -32,10 +25,7 @@
 		{/each}
 	</div>
 {:else}
-	<div
-		class="skeleton skeleton-{variant}"
-		style="width: {width}; height: {actualHeight}"
-	></div>
+	<div class="skeleton skeleton-{variant}" style="width: {width}; height: {actualHeight}"></div>
 {/if}
 
 <style>

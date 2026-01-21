@@ -104,7 +104,7 @@
 		justify-content: center;
 		width: 2.5rem;
 		height: 2.5rem;
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		border-radius: var(--radius-md);
 		box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
@@ -181,7 +181,8 @@
 	}
 
 	@keyframes pulse-glow {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow: 0 0 4px rgba(46, 204, 113, 0.4);
 		}
 		50% {
@@ -207,7 +208,7 @@
 		display: inline-flex;
 		align-items: center;
 		padding: 0.125rem var(--space-2);
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		font-size: var(--text-xs);
 		font-weight: var(--weight-semibold);

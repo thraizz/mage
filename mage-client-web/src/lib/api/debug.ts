@@ -110,5 +110,3 @@ export async function fetchServerDebugState(): Promise<ServerDebugState> {
 		lastGameSave: response.lastGameSave
 	};
 }
-
-

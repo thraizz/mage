@@ -789,6 +789,157 @@
 	}
 
 	/**
+	 * Build visible gamestate JSON for export
+	 */
+	function buildVisibleGamestate() {
+		const state = $playtestGameStore;
+
+		// Helper to find card name by ID
+		const findCardName = (cardId: string): string => {
+			const card =
+				battlefield.find((c) => c.id === cardId) ||
+				exile.find((c) => c.id === cardId) ||
+				players
+					.flatMap((p) => [...p.hand, ...p.graveyard, ...p.library])
+					.find((c) => c.id === cardId);
+			return card?.name || 'Unknown';
+		};
+
+		// Helper to extract card details
+		const extractCardDetails = (card: import('$lib/generated/mage/v1/models').CardView) => {
+			const details: any = {
+				name: card.name,
+				type: card.type || '',
+				manaCost: card.manaCost || ''
+			};
+
+			if (card.power !== undefined && card.power !== null) details.power = card.power;
+			if (card.toughness !== undefined && card.toughness !== null)
+				details.toughness = card.toughness;
+			if (card.abilities && card.abilities.length > 0) {
+				details.abilities = card.abilities.map((a) => a.text || '').filter((t) => t);
+			}
+			if (card.counters && card.counters.length > 0) {
+				details.counters = card.counters;
+			}
+			if (card.tapped) details.tapped = true;
+			if (card.faceDown) details.faceDown = true;
+			if (card.summoningSickness) details.summoningSickness = true;
+			if (card.attachedTo && card.attachedTo.length > 0) {
+				details.attachedTo = card.attachedTo.map((id) => findCardName(id));
+			}
+
+			return details;
+		};
+
+		// Get my player (active control seat)
+		const myPlayer = players.find((p) => p.playerId === activeControlSeat);
+		if (!myPlayer) return null;
+
+		// Build my state
+		const myState = {
+			hand: myPlayer.hand.map(extractCardDetails),
+			battlefield: battlefield
+				.filter((c) => c.controllerId === activeControlSeat)
+				.map(extractCardDetails),
+			graveyard: myPlayer.graveyard.map(extractCardDetails),
+			exile: exile
+				.filter((c) => (c.controllerId || c.ownerId) === activeControlSeat)
+				.map(extractCardDetails),
+			command: commandCards
+				.filter((c) => (c.controllerId || c.ownerId) === activeControlSeat)
+				.map(extractCardDetails),
+			manaPool: myPlayer.manaPool,
+			life: myPlayer.life,
+			poison: myPlayer.poison || 0,
+			energy: myPlayer.energy || 0,
+			libraryCount: myPlayer.libraryCount,
+			libraryContents: myPlayer.library.map(extractCardDetails)
+		};
+
+		// Build opponents state
+		const opponents = players
+			.filter((p) => p.playerId !== activeControlSeat)
+			.map((opponent) => ({
+				name: opponent.name,
+				battlefield: battlefield
+					.filter((c) => c.controllerId === opponent.playerId)
+					.map(extractCardDetails),
+				graveyard: opponent.graveyard.map(extractCardDetails),
+				exile: exile
+					.filter((c) => (c.controllerId || c.ownerId) === opponent.playerId)
+					.map(extractCardDetails),
+				command: commandCards
+					.filter((c) => (c.controllerId || c.ownerId) === opponent.playerId)
+					.map(extractCardDetails),
+				life: opponent.life,
+				poison: opponent.poison || 0,
+				energy: opponent.energy || 0,
+				handCount: opponent.handCount,
+				libraryCount: opponent.libraryCount
+			}));
+
+		// Build game state
+		const gameState = {
+			turnNumber: turnNumber(),
+			activePlayer: activePlayerName() || '',
+			currentPhase: 'N/A', // Playtest doesn't track phases
+			stack: (state.stack || []).map(extractCardDetails)
+		};
+
+		// Get game log text
+		const gameLogText = playtestGameStore.buildLogText(state);
+
+		return {
+			myState,
+			opponents,
+			gameState,
+			gameLog: gameLogText
+		};
+	}
+
+	/**
+	 * Copy gamestate to clipboard
+	 */
+	async function copyGamestateToClipboard(): Promise<void> {
+		const gamestate = buildVisibleGamestate();
+		if (!gamestate) {
+			toast.error('No gamestate available');
+			return;
+		}
+
+		const json = JSON.stringify(gamestate, null, 2);
+
+		try {
+			if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+				await navigator.clipboard.writeText(json);
+				toast.success('Gamestate copied to clipboard!');
+				return;
+			}
+			// Fallback for older browsers
+			const textarea = document.createElement('textarea');
+			textarea.value = json;
+			textarea.style.position = 'fixed';
+			textarea.style.top = '0';
+			textarea.style.left = '0';
+			textarea.style.opacity = '0';
+			document.body.appendChild(textarea);
+			textarea.focus();
+			textarea.select();
+			const ok = document.execCommand('copy');
+			document.body.removeChild(textarea);
+			if (ok) {
+				toast.success('Gamestate copied to clipboard!');
+			} else {
+				toast.error('Failed to copy gamestate');
+			}
+		} catch (err) {
+			console.error('Failed to copy gamestate to clipboard:', err);
+			toast.error('Failed to copy gamestate');
+		}
+	}
+
+	/**
 	 * Handle keyboard shortcuts
 	 */
 	function handleGlobalKeydown(event: KeyboardEvent): void {
@@ -799,6 +950,13 @@
 		const key = event.key.toLowerCase();
 
 		switch (key) {
+			case 'j':
+				// Shift+J - Copy gamestate to clipboard
+				if (event.shiftKey) {
+					copyGamestateToClipboard();
+					event.preventDefault();
+				}
+				break;
 			case 'm':
 				// M - Toggle menu (only when game started)
 				if (isGameStarted) {
@@ -1356,13 +1514,7 @@
 						</div>
 						<div class="cards-compact">
 							{#each player.hand as card}
-								<div class="card-mini">
-									<img
-										src={getScryfallImageUrl(card.name, 'small')}
-										alt={card.name}
-										title={card.name}
-									/>
-								</div>
+								<Card cardId={card.id} cardName={card.name} size="large" manaCost={card.manaCost} />
 							{/each}
 						</div>
 					</div>
@@ -1372,26 +1524,84 @@
 
 		<!-- Main Game Area -->
 		<main class="game-layout">
-			<!-- Opponent Section -->
-			{#if selectedOpponent()}
-				{@const opponent = selectedOpponent()!}
-				<OpponentSection
-					{opponent}
-					{otherPlayers}
-					battlefieldNonlands={opponentBattlefieldNonlands()}
-					battlefieldLands={opponentBattlefieldLands()}
-					commandCards={opponentCommandCards()}
-					{isCommanderGame}
-					showLifeMenu={showOpponentLifeMenu}
-					onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
-					onLifeChange={handleLifeChange}
-					onPoisonChange={handlePoisonChange}
-					onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
-					onCardContextMenu={(cardId, cardName) => {
-						selectedCardForCounters = { id: cardId, name: cardName };
-						showCounterDialog = true;
-					}}
-				/>
+			<!-- Opponent Section(s) -->
+			{#if otherPlayers.length === 1}
+				<!-- 1v1 Layout: Single opponent -->
+				{#if selectedOpponent()}
+					{@const opponent = selectedOpponent()!}
+					<OpponentSection
+						{opponent}
+						{otherPlayers}
+						battlefieldNonlands={opponentBattlefieldNonlands()}
+						battlefieldLands={opponentBattlefieldLands()}
+						commandCards={opponentCommandCards()}
+						{isCommanderGame}
+						showLifeMenu={showOpponentLifeMenu}
+						onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+						onLifeChange={handleLifeChange}
+						onPoisonChange={handlePoisonChange}
+						onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+						onCardContextMenu={(cardId, cardName) => {
+							selectedCardForCounters = { id: cardId, name: cardName };
+							showCounterDialog = true;
+						}}
+					/>
+				{/if}
+			{:else}
+				<!-- Multiplayer (3-4 players): Grid on large screens, cycling on small -->
+				<!-- Grid layout (shown on large screens) -->
+				<div class="opponents-grid opponents-grid-large">
+					{#each otherPlayers as opponent (opponent.playerId)}
+						{@const oppBattlefield = battlefield.filter(
+							(c) => c.controllerId === opponent.playerId
+						)}
+						{@const oppBattlefieldNonlands = oppBattlefield.filter((c) => !isLandPermanent(c.type))}
+						{@const oppBattlefieldLands = oppBattlefield.filter((c) => isLandPermanent(c.type))}
+						{@const oppCommandCards = commandCards.filter(
+							(c) => (c.ownerId || c.controllerId) === opponent.playerId
+						)}
+						<OpponentSection
+							{opponent}
+							otherPlayers={[]}
+							battlefieldNonlands={oppBattlefieldNonlands}
+							battlefieldLands={oppBattlefieldLands}
+							commandCards={oppCommandCards}
+							{isCommanderGame}
+							showLifeMenu={false}
+							onSelectOpponent={undefined}
+							onLifeChange={handleLifeChange}
+							onPoisonChange={handlePoisonChange}
+							onToggleLifeMenu={() => {}}
+							onCardContextMenu={(cardId, cardName) => {
+								selectedCardForCounters = { id: cardId, name: cardName };
+								showCounterDialog = true;
+							}}
+						/>
+					{/each}
+				</div>
+				<!-- Single opponent with cycling (shown on small screens) -->
+				<div class="opponents-grid-small">
+					{#if selectedOpponent()}
+						{@const opponent = selectedOpponent()!}
+						<OpponentSection
+							{opponent}
+							{otherPlayers}
+							battlefieldNonlands={opponentBattlefieldNonlands()}
+							battlefieldLands={opponentBattlefieldLands()}
+							commandCards={opponentCommandCards()}
+							{isCommanderGame}
+							showLifeMenu={showOpponentLifeMenu}
+							onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+							onLifeChange={handleLifeChange}
+							onPoisonChange={handlePoisonChange}
+							onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+							onCardContextMenu={(cardId, cardName) => {
+								selectedCardForCounters = { id: cardId, name: cardName };
+								showCounterDialog = true;
+							}}
+						/>
+					{/if}
+				</div>
 			{/if}
 
 			<!-- My Battlefield Area (Editable) -->
@@ -1595,6 +1805,34 @@
 <span class="dk">turn:</span> <span class="dn">${$playtestGameStore.turn}</span>
 <span class="dk">activePlayerId:</span> <span class="ds">"${$playtestGameStore.activePlayerId}"</span>
 <span class="dk">isInitialized:</span> <span class="db">${isInitialized}</span>`}</code
+									></pre>
+							</div>
+						</section>
+
+						<!-- Visible Gamestate (JSON Export) -->
+						<section class="debug-section">
+							<div class="debug-section-header">
+								<span>Visible Gamestate</span>
+								<button
+									class="debug-copy-btn"
+									onclick={copyGamestateToClipboard}
+									title="Copy complete gamestate to clipboard"
+									aria-label="Copy gamestate to clipboard"
+								>
+									<Copy size={16} aria-hidden="true" />
+									<span>Copy JSON</span>
+								</button>
+							</div>
+							<div class="debug-code">
+								<pre><code
+										>{@html `<span class="dc">// Complete game state in JSON format</span>
+<span class="dc">// Includes all players, zones, cards, and game info</span>
+<span class="dc">// Click "Copy JSON" to copy to clipboard</span>
+
+<span class="dk">myState:</span> { hand, battlefield, graveyard, exile, command, manaPool, life, ... }
+<span class="dk">opponents:</span> [{ name, battlefield, graveyard, life, ... }]
+<span class="dk">gameState:</span> { turnNumber, activePlayer, currentPhase, stack }
+<span class="dk">gameLog:</span> "T1: Player drew 7 cards\\nT1: Player kept hand\\n..."`}</code
 									></pre>
 							</div>
 						</section>

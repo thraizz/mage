@@ -917,7 +917,6 @@ function createPlaytestGameStore() {
 		});
 	}
 
-
 	/**
 	 * Mill cards (move top N cards from library to graveyard)
 	 */

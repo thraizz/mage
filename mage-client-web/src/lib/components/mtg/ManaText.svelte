@@ -42,17 +42,28 @@
 	// Convert symbol to mana-font class
 	function getManaClass(symbol: string): string {
 		switch (symbol) {
-			case 'W': return 'ms-w';
-			case 'U': return 'ms-u';
-			case 'B': return 'ms-b';
-			case 'R': return 'ms-r';
-			case 'G': return 'ms-g';
-			case 'C': return 'ms-c';
-			case 'X': return 'ms-x';
-			case 'T': return 'ms-tap';
-			case 'Q': return 'ms-untap';
-			case 'S': return 'ms-s';
-			case 'E': return 'ms-e';
+			case 'W':
+				return 'ms-w';
+			case 'U':
+				return 'ms-u';
+			case 'B':
+				return 'ms-b';
+			case 'R':
+				return 'ms-r';
+			case 'G':
+				return 'ms-g';
+			case 'C':
+				return 'ms-c';
+			case 'X':
+				return 'ms-x';
+			case 'T':
+				return 'ms-tap';
+			case 'Q':
+				return 'ms-untap';
+			case 'S':
+				return 'ms-s';
+			case 'E':
+				return 'ms-e';
 			default:
 				// Numeric values
 				const num = parseInt(symbol, 10);
@@ -64,12 +75,14 @@
 	}
 
 	const parsedParts = $derived(parseText(text));
-	
-	const sizeClass = $derived({
-		sm: 'mana-text-sm',
-		md: 'mana-text-md',
-		lg: 'mana-text-lg'
-	}[size] || 'mana-text-sm');
+
+	const sizeClass = $derived(
+		{
+			sm: 'mana-text-sm',
+			md: 'mana-text-md',
+			lg: 'mana-text-lg'
+		}[size] || 'mana-text-sm'
+	);
 </script>
 
 <span class="mana-text {sizeClass}">
@@ -105,5 +118,3 @@
 		font-size: 1.3em;
 	}
 </style>
-
-

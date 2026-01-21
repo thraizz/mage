@@ -1,4 +1,6 @@
 <script lang="ts">
+	export const ssr = false;
+
 	import { toast } from '$lib/stores/toast';
 	import { confirm } from '$lib/stores/confirm';
 	import Modal from '$lib/components/Modal.svelte';
@@ -196,11 +198,15 @@
 				<button class="btn-secondary test-btn" data-tone="success" on:click={testSuccess}>
 					Success Toast
 				</button>
-				<button class="btn-secondary test-btn" data-tone="error" on:click={testError}>Error Toast</button>
+				<button class="btn-secondary test-btn" data-tone="error" on:click={testError}
+					>Error Toast</button
+				>
 				<button class="btn-secondary test-btn" data-tone="warning" on:click={testWarning}>
 					Warning Toast
 				</button>
-				<button class="btn-secondary test-btn" data-tone="info" on:click={testInfo}>Info Toast</button>
+				<button class="btn-secondary test-btn" data-tone="info" on:click={testInfo}
+					>Info Toast</button
+				>
 				<button class="btn-secondary test-btn" data-tone="multiple" on:click={testMultiple}>
 					Multiple Toasts
 				</button>
@@ -211,7 +217,11 @@
 		<div class="test-panel modal-test">
 			<h3>Modal Dialog Test</h3>
 			<div class="test-buttons">
-				<button class="btn-secondary test-btn" data-tone="info" on:click={() => (showBasicModal = true)}>
+				<button
+					class="btn-secondary test-btn"
+					data-tone="info"
+					on:click={() => (showBasicModal = true)}
+				>
 					Basic Modal
 				</button>
 				<button
@@ -469,7 +479,9 @@
 	.nav-card:hover {
 		transform: translateY(-2px);
 		border-color: rgba(59, 130, 246, 0.35);
-		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(59, 130, 246, 0.12);
+		box-shadow:
+			0 12px 28px rgba(0, 0, 0, 0.45),
+			0 0 0 1px rgba(59, 130, 246, 0.12);
 	}
 
 	.icon {

@@ -14,9 +14,13 @@
 	let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
 	// Computed
-	const activeGames = $derived(tables.filter(t => t.state === 'PLAYING' || t.state === 'SIDEBOARDING'));
-	const waitingTables = $derived(tables.filter(t => t.state === 'WAITING' || t.state === 'READY'));
-	const finishedTables = $derived(tables.filter(t => t.state === 'FINISHED'));
+	const activeGames = $derived(
+		tables.filter((t) => t.state === 'PLAYING' || t.state === 'SIDEBOARDING')
+	);
+	const waitingTables = $derived(
+		tables.filter((t) => t.state === 'WAITING' || t.state === 'READY')
+	);
+	const finishedTables = $derived(tables.filter((t) => t.state === 'FINISHED'));
 
 	/**
 	 * Fetch all tables from the server
@@ -116,7 +120,7 @@
 			goto('/login');
 			return;
 		}
-		
+
 		loadTables();
 		if (autoRefresh) {
 			startAutoRefresh();
@@ -210,11 +214,14 @@
 								</div>
 								<div class="info-row">
 									<span class="label">Players:</span>
-									<span class="value">{table.seats?.filter(s => s?.player).length || 0}/{table.seats?.length || 0}</span>
+									<span class="value"
+										>{table.seats?.filter((s) => s?.player).length || 0}/{table.seats?.length ||
+											0}</span
+									>
 								</div>
 							</div>
 							<div class="game-players">
-								{#each (table.seats || []) as seat}
+								{#each table.seats || [] as seat}
 									{#if seat?.player}
 										<span class="player-badge">{seat.player.name}</span>
 									{/if}
@@ -253,7 +260,7 @@
 							<span class="table-state {stateInfo.class}">{stateInfo.label}</span>
 							<span class="table-format">{table.deckType || 'Unknown'}</span>
 							<span class="table-players">
-								{table.seats?.filter(s => s?.player).length || 0}/{table.seats?.length || 0} players
+								{table.seats?.filter((s) => s?.player).length || 0}/{table.seats?.length || 0} players
 							</span>
 							<code class="table-id">{table.id.slice(0, 8)}...</code>
 						</div>
@@ -677,4 +684,3 @@
 		}
 	}
 </style>
-

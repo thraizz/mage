@@ -178,7 +178,9 @@
 
 	.table-card.clickable:hover {
 		border-color: var(--ci-jace-cloak);
-		box-shadow: 0 0 20px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
+		box-shadow:
+			0 0 20px rgba(59, 130, 246, 0.2),
+			0 4px 12px rgba(0, 0, 0, 0.3);
 		transform: translateY(-2px);
 	}
 
@@ -207,7 +209,7 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		padding: var(--space-1) var(--space-3);
 		border-radius: var(--radius-md);
@@ -319,7 +321,7 @@
 	.join-button {
 		width: 100%;
 		padding: var(--space-3) var(--space-4);
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		border: none;
 		border-radius: var(--radius-md);
@@ -335,7 +337,7 @@
 	}
 
 	.join-button:hover {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 		transform: translateY(-1px);
 	}

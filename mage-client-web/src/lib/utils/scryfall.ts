@@ -1,6 +1,6 @@
 /**
  * Scryfall API utilities for fetching card images
- * 
+ *
  * Scryfall provides free card images for Magic: The Gathering cards.
  * API docs: https://scryfall.com/docs/api
  */
@@ -8,7 +8,7 @@
 /**
  * Generate a Scryfall image URL for a card by exact name.
  * Uses the redirect endpoint which returns a 302 to the actual image.
- * 
+ *
  * @param cardName - The exact name of the card
  * @param version - Image version: 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop'
  * @returns The Scryfall image URL
@@ -27,7 +27,7 @@ export function getScryfallImageUrl(
 
 /**
  * Generate a Scryfall image URL with fuzzy matching (more forgiving of typos)
- * 
+ *
  * @param cardName - The card name (fuzzy matched)
  * @param version - Image version
  * @returns The Scryfall image URL
@@ -45,7 +45,9 @@ export function getScryfallImageUrlFuzzy(
 /**
  * Get the appropriate image size for card display
  */
-export function getScryfallVersionForSize(size: 'small' | 'normal' | 'large'): 'small' | 'normal' | 'large' {
+export function getScryfallVersionForSize(
+	size: 'small' | 'normal' | 'large'
+): 'small' | 'normal' | 'large' {
 	switch (size) {
 		case 'small':
 			return 'small'; // 146 × 204
@@ -113,4 +115,3 @@ export function getScryfallTokenSearchUrl(
 
 	return `https://api.scryfall.com/cards/search?q=${encodedQuery}&order=released`;
 }
-

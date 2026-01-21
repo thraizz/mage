@@ -43,7 +43,8 @@ function convertCardListsToDeckCards(cardLists: DeckCardLists) {
 		return value.split('@@@')[0].trim();
 	};
 
-	const hasMetaSuffix = (value: unknown): boolean => typeof value === 'string' && value.includes('@@@');
+	const hasMetaSuffix = (value: unknown): boolean =>
+		typeof value === 'string' && value.includes('@@@');
 
 	const convertCardList = (cards: any[]) => {
 		return cards.map((card) => {
@@ -60,14 +61,14 @@ function convertCardListsToDeckCards(cardLists: DeckCardLists) {
 
 			return {
 				cardName: stripMetaSuffix(card.name),
-			quantity: card.quantity || 1,
-			setCode: card.setCode,
-			manaCost: stripMetaSuffix(card.manaCost),
-			cardType: stripMetaSuffix(card.cardType),
-			types: card.types || [],
-			colors: card.colors || [],
-			power: card.power,
-			toughness: card.toughness
+				quantity: card.quantity || 1,
+				setCode: card.setCode,
+				manaCost: stripMetaSuffix(card.manaCost),
+				cardType: stripMetaSuffix(card.cardType),
+				types: card.types || [],
+				colors: card.colors || [],
+				power: card.power,
+				toughness: card.toughness
 			};
 		});
 	};

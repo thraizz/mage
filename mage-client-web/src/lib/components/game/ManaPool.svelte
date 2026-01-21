@@ -60,7 +60,7 @@
 
 <div class="mana-pool {sizeClass()}" class:has-mana={hasAnyMana}>
 	<span class="label">Mana</span>
-	
+
 	{#if hasAnyMana}
 		<div class="mana-orbs">
 			{#each manaColors as manaColor}

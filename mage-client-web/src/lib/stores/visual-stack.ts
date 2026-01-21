@@ -11,14 +11,14 @@ import type { SourceZone } from '$lib/utils/drag-drop';
  * Represents a single item on the visual stack
  */
 export interface VisualStackItem {
-	localId: string;        // Unique local ID (allows same card multiple times)
-	cardId: string;         // Original card ID from the game
+	localId: string; // Unique local ID (allows same card multiple times)
+	cardId: string; // Original card ID from the game
 	cardName: string;
 	imageUrl?: string;
 	sourceZone: SourceZone;
-	addedAt: number;        // Timestamp for ordering
-	note?: string;          // Optional player note (e.g., "ETB trigger")
-	controllerId?: string;  // Player who controls this item
+	addedAt: number; // Timestamp for ordering
+	note?: string; // Optional player note (e.g., "ETB trigger")
+	controllerId?: string; // Player who controls this item
 }
 
 /**
@@ -143,9 +143,7 @@ function createVisualStackStore() {
 		updateNote(localId: string, note: string): void {
 			update((state) => ({
 				...state,
-				items: state.items.map((item) =>
-					item.localId === localId ? { ...item, note } : item
-				)
+				items: state.items.map((item) => (item.localId === localId ? { ...item, note } : item))
 			}));
 		},
 
@@ -194,30 +192,17 @@ function createVisualStackStore() {
 export const visualStackStore = createVisualStackStore();
 
 // Derived stores for convenient access
-export const visualStackItems = derived(
-	visualStackStore,
-	($state) => $state.items
-);
+export const visualStackItems = derived(visualStackStore, ($state) => $state.items);
 
-export const visualStackIsOpen = derived(
-	visualStackStore,
-	($state) => $state.isOpen
-);
+export const visualStackIsOpen = derived(visualStackStore, ($state) => $state.isOpen);
 
-export const visualStackCount = derived(
-	visualStackStore,
-	($state) => $state.items.length
-);
+export const visualStackCount = derived(visualStackStore, ($state) => $state.items.length);
 
-export const visualStackIsEmpty = derived(
-	visualStackStore,
-	($state) => $state.items.length === 0
-);
+export const visualStackIsEmpty = derived(visualStackStore, ($state) => $state.items.length === 0);
 
 /**
  * Get the top item (the one that would resolve next)
  */
-export const visualStackTop = derived(
-	visualStackStore,
-	($state) => $state.items.length > 0 ? $state.items[$state.items.length - 1] : null
+export const visualStackTop = derived(visualStackStore, ($state) =>
+	$state.items.length > 0 ? $state.items[$state.items.length - 1] : null
 );

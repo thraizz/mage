@@ -5,7 +5,12 @@
 	import type { Table, GameFormat } from '$lib/types/table';
 	import type { OnlinePlayer } from '$lib/types/player';
 	import type { ActiveGame } from '$lib/types/game';
-	import { fetchTables, fetchOnlinePlayers, getGameFormats, fetchMyActiveGames } from '$lib/api/lobby';
+	import {
+		fetchTables,
+		fetchOnlinePlayers,
+		getGameFormats,
+		fetchMyActiveGames
+	} from '$lib/api/lobby';
 	import {
 		subscribeLobbyUpdates,
 		connectLobbyUpdates,
@@ -141,7 +146,7 @@
 	 */
 	function getOpponents(players: string[]): string {
 		const currentUsername = $auth.user?.username;
-		const opponents = players.filter(p => p !== currentUsername);
+		const opponents = players.filter((p) => p !== currentUsername);
 		return opponents.length > 0 ? opponents.join(', ') : 'Unknown';
 	}
 
@@ -404,19 +409,27 @@
 					disabled={loading}
 					title="Refresh tables"
 				>
-					<RefreshCw class={`refresh-icon ${loading ? 'spinning' : ''}`} size={20} aria-hidden="true" />
+					<RefreshCw
+						class={`refresh-icon ${loading ? 'spinning' : ''}`}
+						size={20}
+						aria-hidden="true"
+					/>
 					<span>Refresh</span>
 				</button>
 
-			<button class="create-button" onclick={openCreateModal} title="Create new table">
-				<Plus size={20} aria-hidden="true" />
-				<span>Create Table</span>
-			</button>
+				<button class="create-button" onclick={openCreateModal} title="Create new table">
+					<Plus size={20} aria-hidden="true" />
+					<span>Create Table</span>
+				</button>
 
-			<button class="playtest-button ghost-btn" onclick={() => showPlaytestModal = true} title="Test decks locally">
-				<FlaskConical size={20} aria-hidden="true" />
-				<span>+ Playtest Decks</span>
-			</button>
+				<button
+					class="playtest-button ghost-btn"
+					onclick={() => (showPlaytestModal = true)}
+					title="Test decks locally"
+				>
+					<FlaskConical size={20} aria-hidden="true" />
+					<span>+ Playtest Decks</span>
+				</button>
 			</div>
 		</div>
 
@@ -506,7 +519,11 @@
 									<div class="game-info">
 										<div class="game-header">
 											<span class="game-type">{game.gameType}</span>
-											<span class="game-state" class:in-progress={game.state === 'IN_PROGRESS'} class:mulligan={game.state === 'MULLIGAN'}>
+											<span
+												class="game-state"
+												class:in-progress={game.state === 'IN_PROGRESS'}
+												class:mulligan={game.state === 'MULLIGAN'}
+											>
 												{formatGameState(game.state)}
 											</span>
 										</div>
@@ -581,10 +598,7 @@
 <JoinTableModal bind:open={showJoinModal} table={joiningTable} onSuccess={handleTableJoined} />
 
 <!-- Playtest Modal -->
-<PlaytestModal
-	bind:open={showPlaytestModal}
-	onClose={() => showPlaytestModal = false}
-/>
+<PlaytestModal bind:open={showPlaytestModal} onClose={() => (showPlaytestModal = false)} />
 
 <style>
 	.lobby-page {
@@ -626,7 +640,7 @@
 	}
 
 	.table-count {
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		padding: var(--space-1) var(--space-3);
 		border-radius: var(--radius-full);
@@ -750,14 +764,14 @@
 	}
 
 	.create-button {
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		border-color: transparent;
 		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 	}
 
 	.create-button:hover {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		border-color: transparent;
 		color: var(--ci-scroll-parchment);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
@@ -890,7 +904,7 @@
 	.retry-button {
 		margin-top: var(--space-4);
 		padding: var(--space-3) var(--space-6);
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		border: none;
 		border-radius: var(--radius-md);
@@ -904,7 +918,7 @@
 	}
 
 	.retry-button:hover {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 		transform: translateY(-1px);
 	}
@@ -947,7 +961,7 @@
 	.create-table-button {
 		margin-top: var(--space-4);
 		padding: var(--space-3) var(--space-6);
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		border: none;
 		border-radius: var(--radius-md);
@@ -961,7 +975,7 @@
 	}
 
 	.create-table-button:hover {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 		transform: translateY(-1px);
 	}
@@ -1102,7 +1116,7 @@
 
 	.clear-filters-button {
 		padding: var(--space-2) var(--space-5);
-		background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #DC2626 100%);
+		background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #dc2626 100%);
 		color: var(--ci-scroll-parchment);
 		border: none;
 		border-radius: var(--radius-md);
@@ -1116,7 +1130,7 @@
 	}
 
 	.clear-filters-button:hover {
-		background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+		background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
 		box-shadow: 0 4px 12px rgba(255, 77, 77, 0.4);
 		transform: translateY(-1px);
 	}
@@ -1257,7 +1271,7 @@
 		align-items: center;
 		gap: var(--space-2);
 		padding: var(--space-2) var(--space-4);
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		border: none;
 		border-radius: var(--radius-md);
@@ -1271,7 +1285,7 @@
 	}
 
 	.rejoin-button:hover {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 		transform: translateY(-1px);
 	}

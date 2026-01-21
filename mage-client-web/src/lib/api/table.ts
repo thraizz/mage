@@ -20,10 +20,7 @@ import type {
 	DeckCard,
 	DeckCardLists
 } from '$lib/generated/mage/v1/table';
-import type {
-	MatchStartRequest,
-	MatchStartResponse
-} from '$lib/generated/mage/v1/game';
+import type { MatchStartRequest, MatchStartResponse } from '$lib/generated/mage/v1/game';
 
 /**
  * Convert TableView from proto to our Table type

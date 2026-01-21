@@ -187,9 +187,7 @@
 							{amount}
 						</button>
 					{/each}
-					<button class="btn-quick btn-max" onclick={selectMax} disabled={isLoading}>
-						MAX
-					</button>
+					<button class="btn-quick btn-max" onclick={selectMax} disabled={isLoading}> MAX </button>
 				</div>
 			{/if}
 
@@ -213,14 +211,8 @@
 		</div>
 
 		<div class="modal-footer">
-			<button class="btn-cancel" onclick={handleCancel} disabled={isLoading}>
-				Cancel
-			</button>
-			<button
-				class="btn-confirm"
-				onclick={handleConfirm}
-				disabled={isLoading}
-			>
+			<button class="btn-cancel" onclick={handleCancel} disabled={isLoading}> Cancel </button>
+			<button class="btn-confirm" onclick={handleConfirm} disabled={isLoading}>
 				{isLoading ? 'Confirming...' : `Pay X = ${selectedAmount}`}
 			</button>
 		</div>
@@ -583,4 +575,3 @@
 		}
 	}
 </style>
-

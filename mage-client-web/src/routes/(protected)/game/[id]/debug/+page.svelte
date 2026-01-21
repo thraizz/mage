@@ -29,7 +29,7 @@
 
 	// Game ID from route params
 	const gameId = $derived($page.params.id);
-	
+
 	// Local state
 	let initialized = $state(false);
 	let lastUpdateTime = $state<Date | null>(null);
@@ -71,7 +71,7 @@
 
 	// Track state changes
 	let previousStateJson = $state('');
-	
+
 	$effect(() => {
 		const currentJson = JSON.stringify(gameState.gameView);
 		if (currentJson !== previousStateJson && gameState.gameView) {
@@ -193,7 +193,8 @@
 			</button>
 			{#if expandedSections.gameState}
 				<div class="code-block">
-					<pre><code>{@html `<span class="key">gameId:</span> <span class="string">"${gameId}"</span>
+					<pre><code
+							>{@html `<span class="key">gameId:</span> <span class="string">"${gameId}"</span>
 <span class="key">localPlayerId:</span> <span class="string">"${localPlayerId}"</span>
 <span class="key">state:</span> <span class="string">"${gameState.gameView?.state || 'N/A'}"</span>
 <span class="key">turn:</span> <span class="number">${turn}</span>
@@ -206,7 +207,8 @@
 <span class="key">isMulliganPhase:</span> <span class="boolean">${gameState.gameView?.isMulliganPhase || false}</span>
 <span class="key">gameFormat:</span> <span class="string">"${gameState.gameView?.gameFormat || 'N/A'}"</span>
 <span class="key">isGameOver:</span> <span class="boolean">${isGameOver}</span>
-<span class="key">winner:</span> <span class="string">${gameWinner ? `"${gameWinner}"` : 'null'}</span>`}</code></pre>
+<span class="key">winner:</span> <span class="string">${gameWinner ? `"${gameWinner}"` : 'null'}</span>`}</code
+						></pre>
 				</div>
 			{/if}
 		</section>
@@ -227,15 +229,16 @@
 							<span class="player-name">{player.name}</span>
 						</div>
 						<div class="code-block">
-							<pre><code>{@html `<span class="key">playerId:</span> <span class="string">"${player.playerId}"</span>
+							<pre><code
+									>{@html `<span class="key">playerId:</span> <span class="string">"${player.playerId}"</span>
 <span class="key">name:</span> <span class="string">"${player.name}"</span>
 <span class="key">life:</span> <span class="number">${player.life}</span>
 <span class="key">poison:</span> <span class="number">${player.poison}</span>
 <span class="key">libraryCount:</span> <span class="number">${player.libraryCount}</span>
 <span class="key">handCount:</span> <span class="number">${player.handCount}</span>
-<span class="key">hand:</span> [${player.hand?.map(c => `\n  <span class="string">"${c.name}"</span> <span class="comment">// ${c.id}</span>`).join(',') || ''}
+<span class="key">hand:</span> [${player.hand?.map((c) => `\n  <span class="string">"${c.name}"</span> <span class="comment">// ${c.id}</span>`).join(',') || ''}
 ]
-<span class="key">graveyard:</span> [${player.graveyard?.map(c => `\n  <span class="string">"${c.name}"</span>`).join(',') || ''}
+<span class="key">graveyard:</span> [${player.graveyard?.map((c) => `\n  <span class="string">"${c.name}"</span>`).join(',') || ''}
 ]
 <span class="key">manaPool:</span> {
   <span class="key">white:</span> <span class="number">${player.manaPool?.white || 0}</span>,
@@ -244,7 +247,8 @@
   <span class="key">red:</span> <span class="number">${player.manaPool?.red || 0}</span>,
   <span class="key">green:</span> <span class="number">${player.manaPool?.green || 0}</span>,
   <span class="key">colorless:</span> <span class="number">${player.manaPool?.colorless || 0}</span>
-}`}</code></pre>
+}`}</code
+								></pre>
 						</div>
 					</div>
 				{/each}
@@ -262,56 +266,72 @@
 					<div class="zone-block">
 						<h3>🏟️ Battlefield ({battlefieldCards.length})</h3>
 						<div class="code-block small">
-							<pre><code>{battlefieldCards.length > 0 
-								? formatJson(battlefieldCards.map(c => ({
-									id: c.id,
-									name: c.name,
-									type: c.type,
-									controllerId: c.controllerId,
-									tapped: c.tapped,
-									power: c.power,
-									toughness: c.toughness
-								})))
-								: '[]'}</code></pre>
+							<pre><code
+									>{battlefieldCards.length > 0
+										? formatJson(
+												battlefieldCards.map((c) => ({
+													id: c.id,
+													name: c.name,
+													type: c.type,
+													controllerId: c.controllerId,
+													tapped: c.tapped,
+													power: c.power,
+													toughness: c.toughness
+												}))
+											)
+										: '[]'}</code
+								></pre>
 						</div>
 					</div>
-					
+
 					<div class="zone-block">
 						<h3>📚 Stack ({stackCards.length})</h3>
 						<div class="code-block small">
-							<pre><code>{stackCards.length > 0 
-								? formatJson(stackCards.map(c => ({
-									id: c.id,
-									name: c.name,
-									type: c.type,
-									controllerId: c.controllerId
-								})))
-								: '[]'}</code></pre>
+							<pre><code
+									>{stackCards.length > 0
+										? formatJson(
+												stackCards.map((c) => ({
+													id: c.id,
+													name: c.name,
+													type: c.type,
+													controllerId: c.controllerId
+												}))
+											)
+										: '[]'}</code
+								></pre>
 						</div>
 					</div>
 
 					<div class="zone-block">
 						<h3>⚔️ Command ({commandCards.length})</h3>
 						<div class="code-block small">
-							<pre><code>{commandCards.length > 0 
-								? formatJson(commandCards.map(c => ({
-									id: c.id,
-									name: c.name,
-									type: c.type
-								})))
-								: '[]'}</code></pre>
+							<pre><code
+									>{commandCards.length > 0
+										? formatJson(
+												commandCards.map((c) => ({
+													id: c.id,
+													name: c.name,
+													type: c.type
+												}))
+											)
+										: '[]'}</code
+								></pre>
 						</div>
 					</div>
 
 					<div class="zone-block">
 						<h3>🚫 Exile ({gameState.gameView?.exile?.length || 0})</h3>
 						<div class="code-block small">
-							<pre><code>{gameState.gameView?.exile && gameState.gameView.exile.length > 0 
-								? formatJson(gameState.gameView.exile.map(c => ({
-									id: c.id,
-									name: c.name
-								})))
-								: '[]'}</code></pre>
+							<pre><code
+									>{gameState.gameView?.exile && gameState.gameView.exile.length > 0
+										? formatJson(
+												gameState.gameView.exile.map((c) => ({
+													id: c.id,
+													name: c.name
+												}))
+											)
+										: '[]'}</code
+								></pre>
 						</div>
 					</div>
 				</div>
@@ -326,21 +346,27 @@
 			</button>
 			{#if expandedSections.clientState}
 				<div class="code-block">
-					<pre><code>{@html `<span class="comment">// Store meta state</span>
+					<pre><code
+							>{@html `<span class="comment">// Store meta state</span>
 <span class="key">isConnected:</span> <span class="boolean">${gameState.isConnected}</span>
 <span class="key">isLoading:</span> <span class="boolean">${gameState.isLoading}</span>
 <span class="key">error:</span> <span class="string">${error ? `"${error}"` : 'null'}</span>
-<span class="key">selectedCardIds:</span> [${gameState.selectedCardIds.map(id => `<span class="string">"${id}"</span>`).join(', ')}]
+<span class="key">selectedCardIds:</span> [${gameState.selectedCardIds.map((id) => `<span class="string">"${id}"</span>`).join(', ')}]
 <span class="key">showStack:</span> <span class="boolean">${gameState.showStack}</span>
 <span class="key">gameOver:</span> <span class="boolean">${gameState.gameOver}</span>
 <span class="key">winner:</span> <span class="string">${gameState.winner ? `"${gameState.winner}"` : 'null'}</span>
 
 <span class="comment">// Pending prompt</span>
-<span class="key">pendingPrompt:</span> ${prompt ? `{
+<span class="key">pendingPrompt:</span> ${
+								prompt
+									? `{
   <span class="key">type:</span> <span class="string">"${prompt.type}"</span>,
   <span class="key">message:</span> <span class="string">"${prompt.message}"</span>,
   <span class="key">data:</span> ${formatJson(prompt.data)}
-}` : 'null'}`}</code></pre>
+}`
+									: 'null'
+							}`}</code
+						></pre>
 				</div>
 			{/if}
 		</section>
@@ -353,11 +379,13 @@
 			</button>
 			{#if expandedSections.websocket}
 				<div class="code-block">
-					<pre><code>{@html `<span class="comment">// WebSocket connection</span>
+					<pre><code
+							>{@html `<span class="comment">// WebSocket connection</span>
 <span class="key">state:</span> <span class="string">"${$websocketStore.state}"</span>
 <span class="key">error:</span> <span class="string">${$websocketStore.error ? `"${$websocketStore.error}"` : 'null'}</span>
 <span class="key">lastConnected:</span> <span class="number">${$websocketStore.lastConnected ? new Date($websocketStore.lastConnected).toISOString() : 'null'}</span>
-<span class="key">reconnectAttempts:</span> <span class="number">${$websocketStore.reconnectAttempts}</span>`}</code></pre>
+<span class="key">reconnectAttempts:</span> <span class="number">${$websocketStore.reconnectAttempts}</span>`}</code
+						></pre>
 				</div>
 			{/if}
 		</section>
@@ -702,8 +730,14 @@
 
 	/* Terminal cursor blink effect */
 	@keyframes blink {
-		0%, 50% { opacity: 1; }
-		51%, 100% { opacity: 0; }
+		0%,
+		50% {
+			opacity: 1;
+		}
+		51%,
+		100% {
+			opacity: 0;
+		}
 	}
 
 	.debug-header h1::after {
@@ -712,4 +746,3 @@
 		margin-left: 4px;
 	}
 </style>
-

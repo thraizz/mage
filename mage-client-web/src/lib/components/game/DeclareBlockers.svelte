@@ -225,7 +225,12 @@
 </script>
 
 <!-- Overlay -->
-<div class="declare-blockers-overlay" role="dialog" aria-modal="true" aria-labelledby="blockers-title">
+<div
+	class="declare-blockers-overlay"
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="blockers-title"
+>
 	<!-- Top Banner -->
 	<div class="blockers-banner">
 		<div class="banner-icon">🛡️</div>
@@ -233,25 +238,25 @@
 			<h3 id="blockers-title" class="banner-title">Declare Blockers</h3>
 			{#if selectedBlockerId}
 				<p class="banner-description select-attacker">
-					Now click an <strong>attacker</strong> to block with {cardNames().get(selectedBlockerId) || 'selected creature'}
+					Now click an <strong>attacker</strong> to block with {cardNames().get(
+						selectedBlockerId
+					) || 'selected creature'}
 				</p>
 			{:else}
-				<p class="banner-description">
-					Click a creature you control to select it as a blocker
-				</p>
+				<p class="banner-description">Click a creature you control to select it as a blocker</p>
 			{/if}
 			<div class="banner-status">
 				{#if assignedIds.size > 0}
-					<span class="blocker-count">{assignedIds.size} blocker{assignedIds.size !== 1 ? 's' : ''} assigned</span>
+					<span class="blocker-count"
+						>{assignedIds.size} blocker{assignedIds.size !== 1 ? 's' : ''} assigned</span
+					>
 				{:else}
 					<span class="blocker-hint">No blockers assigned yet</span>
 				{/if}
 			</div>
 		</div>
 		{#if selectedBlockerId}
-			<button class="cancel-selection" onclick={handleCancelSelection}>
-				Cancel Selection
-			</button>
+			<button class="cancel-selection" onclick={handleCancelSelection}> Cancel Selection </button>
 		{/if}
 	</div>
 
@@ -262,7 +267,8 @@
 			<h4 class="section-title">Attacking Creatures</h4>
 			<div class="attacker-cards">
 				{#each attackingCreatures as attacker}
-					{@const isBlockable = selectedBlockerId && getBlockableAttackers(selectedBlockerId).includes(attacker.cardId)}
+					{@const isBlockable =
+						selectedBlockerId && getBlockableAttackers(selectedBlockerId).includes(attacker.cardId)}
 					{@const blockers = blocksByAttacker().get(attacker.cardId) || []}
 					<button
 						class="attacker-card"
@@ -337,30 +343,21 @@
 	<div class="blockers-actions">
 		<div class="action-hints">
 			<span class="hint">
-				<kbd>ESC</kbd> {selectedBlockerId ? 'cancel selection' : 'no blocks'}
+				<kbd>ESC</kbd>
+				{selectedBlockerId ? 'cancel selection' : 'no blocks'}
 			</span>
 			<span class="hint">
 				<kbd>Enter</kbd> to confirm
 			</span>
 		</div>
 		<div class="action-buttons">
-			<button
-				class="btn-decline"
-				onclick={handleDecline}
-				disabled={isSubmitting}
-				type="button"
-			>
+			<button class="btn-decline" onclick={handleDecline} disabled={isSubmitting} type="button">
 				{#if isSubmitting}
 					<span class="spinner"></span>
 				{/if}
 				No Blocks
 			</button>
-			<button
-				class="btn-confirm"
-				onclick={handleConfirm}
-				disabled={isSubmitting}
-				type="button"
-			>
+			<button class="btn-confirm" onclick={handleConfirm} disabled={isSubmitting} type="button">
 				{#if isSubmitting}
 					<span class="spinner"></span>
 				{/if}
@@ -414,7 +411,8 @@
 	}
 
 	@keyframes shield-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			transform: scale(1);
 		}
 		50% {
@@ -532,7 +530,8 @@
 	}
 
 	@keyframes blockable-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
 		}
 		50% {
@@ -783,4 +782,3 @@
 		}
 	}
 </style>
-

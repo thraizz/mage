@@ -3,7 +3,5 @@
 //   protoc-gen-ts_proto  v2.8.3
 //   protoc               v6.33.2
 
- 
-
-export * as google from "./index.google";
-export * as mage from "./index.mage";
+export * as google from './index.google';
+export * as mage from './index.mage';

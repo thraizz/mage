@@ -67,9 +67,7 @@
 	const remainingDamage = $derived(() => prompt.attackerPower - totalAssigned());
 
 	// Sorted blockers by damage order
-	const sortedBlockers = $derived(() =>
-		[...prompt.blockers].sort((a, b) => a.order - b.order)
-	);
+	const sortedBlockers = $derived(() => [...prompt.blockers].sort((a, b) => a.order - b.order));
 
 	/**
 	 * Get damage assigned to a target
@@ -248,7 +246,11 @@
 				<span class="attacker-power">{prompt.attackerPower} Power</span>
 			</div>
 			<div class="damage-counter">
-				<span class="remaining" class:over={remainingDamage() < 0} class:exact={remainingDamage() === 0}>
+				<span
+					class="remaining"
+					class:over={remainingDamage() < 0}
+					class:exact={remainingDamage() === 0}
+				>
 					{remainingDamage() >= 0 ? remainingDamage() : Math.abs(remainingDamage())}
 				</span>
 				<span class="remaining-label">
@@ -340,7 +342,8 @@
 							class="damage-input trample"
 							value={trampleDamage}
 							min="0"
-							onchange={(e) => setDamage(prompt.defendingPlayerId, parseInt(e.currentTarget.value) || 0)}
+							onchange={(e) =>
+								setDamage(prompt.defendingPlayerId, parseInt(e.currentTarget.value) || 0)}
 							disabled={isSubmitting}
 						/>
 						<button
@@ -759,4 +762,3 @@
 		}
 	}
 </style>
-

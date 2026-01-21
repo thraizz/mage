@@ -80,6 +80,8 @@ services:
     volumes:
       # Mount the Docker-specific config file
       - ./mage-server-go/config/config.docker.yaml:/app/config/config.yaml:ro
+      # Mount the data directory for Scryfall import
+      - ./mage-server-go/data:/app/data:ro
     networks:
       - mage-network
     restart: unless-stopped
@@ -88,7 +90,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 180s  # Extended to allow for Scryfall import on first boot
 
   # MAGE Svelte web client
   mage-client:

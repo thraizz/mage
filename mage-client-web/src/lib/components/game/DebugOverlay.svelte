@@ -63,7 +63,7 @@
 
 	// Track state changes
 	let previousStateJson = $state('');
-	
+
 	$effect(() => {
 		if (open) {
 			const currentJson = JSON.stringify(gameState.gameView);
@@ -138,7 +138,8 @@
 					</button>
 					{#if expandedSections.gameState}
 						<div class="debug-code">
-							<pre><code>{@html `<span class="dk">gameId:</span> <span class="ds">"${gameId}"</span>
+							<pre><code
+									>{@html `<span class="dk">gameId:</span> <span class="ds">"${gameId}"</span>
 <span class="dk">localPlayerId:</span> <span class="ds">"${localPlayerId}"</span>
 <span class="dk">state:</span> <span class="ds">"${gameState.gameView?.state || 'N/A'}"</span>
 <span class="dk">turn:</span> <span class="dn">${turn}</span>
@@ -151,7 +152,8 @@
 <span class="dk">isMulliganPhase:</span> <span class="db">${isMulliganPhase}</span>
 <span class="dk">gameFormat:</span> <span class="ds">"${gameFormat}"</span>
 <span class="dk">isGameOver:</span> <span class="db">${isGameOver}</span>
-<span class="dk">winner:</span> <span class="ds">${gameWinner ? `"${gameWinner}"` : 'null'}</span>`}</code></pre>
+<span class="dk">winner:</span> <span class="ds">${gameWinner ? `"${gameWinner}"` : 'null'}</span>`}</code
+								></pre>
 						</div>
 					{/if}
 				</section>
@@ -172,16 +174,18 @@
 									<span>{player.name}</span>
 								</div>
 								<div class="debug-code">
-									<pre><code>{@html `<span class="dk">playerId:</span> <span class="ds">"${player.playerId}"</span>
+									<pre><code
+											>{@html `<span class="dk">playerId:</span> <span class="ds">"${player.playerId}"</span>
 <span class="dk">life:</span> <span class="dn">${player.life}</span>
 <span class="dk">poison:</span> <span class="dn">${player.poison}</span>
 <span class="dk">libraryCount:</span> <span class="dn">${player.libraryCount}</span>
 <span class="dk">handCount:</span> <span class="dn">${player.handCount}</span>
-<span class="dk">hand:</span> [${player.hand?.map(c => `\n  <span class="ds">"${c.name}"</span> <span class="dc">// ${c.id}</span>`).join(',') || ''}
+<span class="dk">hand:</span> [${player.hand?.map((c) => `\n  <span class="ds">"${c.name}"</span> <span class="dc">// ${c.id}</span>`).join(',') || ''}
 ]
-<span class="dk">graveyard:</span> [${player.graveyard?.map(c => `\n  <span class="ds">"${c.name}"</span>`).join(',') || ''}
+<span class="dk">graveyard:</span> [${player.graveyard?.map((c) => `\n  <span class="ds">"${c.name}"</span>`).join(',') || ''}
 ]
-<span class="dk">manaPool:</span> { W:${player.manaPool?.white||0}, U:${player.manaPool?.blue||0}, B:${player.manaPool?.black||0}, R:${player.manaPool?.red||0}, G:${player.manaPool?.green||0}, C:${player.manaPool?.colorless||0} }`}</code></pre>
+<span class="dk">manaPool:</span> { W:${player.manaPool?.white || 0}, U:${player.manaPool?.blue || 0}, B:${player.manaPool?.black || 0}, R:${player.manaPool?.red || 0}, G:${player.manaPool?.green || 0}, C:${player.manaPool?.colorless || 0} }`}</code
+										></pre>
 								</div>
 							</div>
 						{/each}
@@ -199,38 +203,57 @@
 							<div class="debug-zone">
 								<h4>🏟️ Battlefield ({battlefieldCards.length})</h4>
 								<div class="debug-code small">
-									<pre><code>{battlefieldCards.length > 0 
-										? formatJson(battlefieldCards.map(c => ({
-											id: c.id, name: c.name, type: c.type, 
-											controllerId: c.controllerId, tapped: c.tapped
-										})))
-										: '[]'}</code></pre>
+									<pre><code
+											>{battlefieldCards.length > 0
+												? formatJson(
+														battlefieldCards.map((c) => ({
+															id: c.id,
+															name: c.name,
+															type: c.type,
+															controllerId: c.controllerId,
+															tapped: c.tapped
+														}))
+													)
+												: '[]'}</code
+										></pre>
 								</div>
 							</div>
 							<div class="debug-zone">
 								<h4>📚 Stack ({stackCards.length})</h4>
 								<div class="debug-code small">
-									<pre><code>{stackCards.length > 0 
-										? formatJson(stackCards.map(c => ({
-											id: c.id, name: c.name, controllerId: c.controllerId
-										})))
-										: '[]'}</code></pre>
+									<pre><code
+											>{stackCards.length > 0
+												? formatJson(
+														stackCards.map((c) => ({
+															id: c.id,
+															name: c.name,
+															controllerId: c.controllerId
+														}))
+													)
+												: '[]'}</code
+										></pre>
 								</div>
 							</div>
 							<div class="debug-zone">
 								<h4>⚔️ Command ({commandCards.length})</h4>
 								<div class="debug-code small">
-									<pre><code>{commandCards.length > 0 
-										? formatJson(commandCards.map(c => ({ id: c.id, name: c.name })))
-										: '[]'}</code></pre>
+									<pre><code
+											>{commandCards.length > 0
+												? formatJson(commandCards.map((c) => ({ id: c.id, name: c.name })))
+												: '[]'}</code
+										></pre>
 								</div>
 							</div>
 							<div class="debug-zone">
 								<h4>🚫 Exile ({gameState.gameView?.exile?.length || 0})</h4>
 								<div class="debug-code small">
-									<pre><code>{gameState.gameView?.exile?.length 
-										? formatJson(gameState.gameView.exile.map(c => ({ id: c.id, name: c.name })))
-										: '[]'}</code></pre>
+									<pre><code
+											>{gameState.gameView?.exile?.length
+												? formatJson(
+														gameState.gameView.exile.map((c) => ({ id: c.id, name: c.name }))
+													)
+												: '[]'}</code
+										></pre>
 								</div>
 							</div>
 						</div>
@@ -245,14 +268,16 @@
 					</button>
 					{#if expandedSections.clientState}
 						<div class="debug-code">
-							<pre><code>{@html `<span class="dc">// Store meta</span>
+							<pre><code
+									>{@html `<span class="dc">// Store meta</span>
 <span class="dk">isConnected:</span> <span class="db">${gameState.isConnected}</span>
 <span class="dk">isLoading:</span> <span class="db">${gameState.isLoading}</span>
 <span class="dk">error:</span> <span class="ds">${error ? `"${error}"` : 'null'}</span>
-<span class="dk">selectedCardIds:</span> [${gameState.selectedCardIds.map(id => `<span class="ds">"${id}"</span>`).join(', ')}]
+<span class="dk">selectedCardIds:</span> [${gameState.selectedCardIds.map((id) => `<span class="ds">"${id}"</span>`).join(', ')}]
 <span class="dk">showStack:</span> <span class="db">${gameState.showStack}</span>
 <span class="dk">gameOver:</span> <span class="db">${gameState.gameOver}</span>
-<span class="dk">pendingPrompt:</span> ${prompt ? `{ type: "${prompt.type}", message: "${prompt.message}" }` : 'null'}`}</code></pre>
+<span class="dk">pendingPrompt:</span> ${prompt ? `{ type: "${prompt.type}", message: "${prompt.message}" }` : 'null'}`}</code
+								></pre>
 						</div>
 					{/if}
 				</section>
@@ -265,10 +290,12 @@
 					</button>
 					{#if expandedSections.websocket}
 						<div class="debug-code">
-							<pre><code>{@html `<span class="dk">state:</span> <span class="ds">"${$websocketStore.state}"</span>
+							<pre><code
+									>{@html `<span class="dk">state:</span> <span class="ds">"${$websocketStore.state}"</span>
 <span class="dk">error:</span> <span class="ds">${$websocketStore.error ? `"${$websocketStore.error}"` : 'null'}</span>
 <span class="dk">lastConnected:</span> <span class="dn">${$websocketStore.lastConnected ? new Date($websocketStore.lastConnected).toISOString() : 'null'}</span>
-<span class="dk">reconnectAttempts:</span> <span class="dn">${$websocketStore.reconnectAttempts}</span>`}</code></pre>
+<span class="dk">reconnectAttempts:</span> <span class="dn">${$websocketStore.reconnectAttempts}</span>`}</code
+								></pre>
 						</div>
 					{/if}
 				</section>
@@ -316,7 +343,7 @@
 	.debug-overlay {
 		position: fixed;
 		inset: 0;
-        top: 9rem;
+		top: 9rem;
 		background: #2d2d2d;
 		z-index: 2000;
 		overflow: hidden;
@@ -473,11 +500,22 @@
 	}
 
 	/* Syntax highlighting */
-	:global(.debug-code .dk) { color: #9cdcfe; }
-	:global(.debug-code .ds) { color: #ce9178; }
-	:global(.debug-code .dn) { color: #b5cea8; }
-	:global(.debug-code .db) { color: #569cd6; }
-	:global(.debug-code .dc) { color: #6a9955; font-style: italic; }
+	:global(.debug-code .dk) {
+		color: #9cdcfe;
+	}
+	:global(.debug-code .ds) {
+		color: #ce9178;
+	}
+	:global(.debug-code .dn) {
+		color: #b5cea8;
+	}
+	:global(.debug-code .db) {
+		color: #569cd6;
+	}
+	:global(.debug-code .dc) {
+		color: #6a9955;
+		font-style: italic;
+	}
 
 	.debug-player {
 		border-top: 1px solid #333;
@@ -566,4 +604,3 @@
 		background: #555;
 	}
 </style>
-

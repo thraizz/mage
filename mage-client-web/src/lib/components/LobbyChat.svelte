@@ -569,7 +569,7 @@
 		width: 2.5rem;
 		height: 2.5rem;
 		border-radius: var(--radius-full);
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		border: none;
 		cursor: pointer;
@@ -581,7 +581,7 @@
 	}
 
 	.scroll-to-bottom:hover {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		transform: translateY(-2px);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 	}
@@ -625,7 +625,7 @@
 
 	.send-button {
 		padding: var(--space-3) var(--space-4);
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		border: none;
 		border-radius: var(--radius-md);
@@ -640,7 +640,7 @@
 	}
 
 	.send-button:hover:not(:disabled) {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 	}
 
@@ -682,11 +682,11 @@
 	}
 
 	.send-button.rate-limited {
-		background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #DC2626 100%);
+		background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #dc2626 100%);
 		cursor: not-allowed;
 	}
 
 	.send-button.rate-limited:hover {
-		background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #DC2626 100%);
+		background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #dc2626 100%);
 	}
 </style>

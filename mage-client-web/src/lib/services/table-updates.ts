@@ -15,10 +15,7 @@ export interface TableUpdateCallback {
  * Subscribe to table updates for a specific table
  * Listens for TABLE_WAITING events and filters by table ID
  */
-export function subscribeTableUpdates(
-	tableId: string,
-	callback: TableUpdateCallback
-): () => void {
+export function subscribeTableUpdates(tableId: string, callback: TableUpdateCallback): () => void {
 	const unsubscribe = websocketStore.on(CallbackMethod.TABLE_WAITING, (data) => {
 		try {
 			// Parse table data from WebSocket event

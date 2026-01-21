@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import Modal from './Modal.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { uploadDeck } from '$lib/api/decks';
@@ -25,23 +24,26 @@
 		type DeckFormat
 	} from '$lib/utils/deck-parser';
 
-	export let open = false;
-
-	const dispatch = createEventDispatcher<{
-		close: void;
-		success: { deckId: string };
-	}>();
+	let {
+		open = $bindable(false),
+		onclose,
+		onsuccess
+	}: {
+		open?: boolean;
+		onclose?: () => void;
+		onsuccess?: (data: { deckId: string }) => void;
+	} = $props();
 
 	// Form state
-	let deckName = '';
-	let selectedFormat = 'Standard';
-	let deckList = '';
-	let loading = false;
-	let errors: string[] = [];
-	let viewMode: 'text' | 'structured' = 'text';
+	let deckName = $state('');
+	let selectedFormat = $state('Standard');
+	let deckList = $state('');
+	let loading = $state(false);
+	let errors = $state<string[]>([]);
+	let viewMode = $state<'text' | 'structured'>('text');
 
 	// Real-time stats
-	$: stats = parseDeckList(deckList, selectedFormat as DeckFormat);
+	let stats = $derived(parseDeckList(deckList, selectedFormat as DeckFormat));
 
 	const formats: DeckFormat[] = [
 		'Standard',
@@ -55,9 +57,11 @@
 	];
 
 	// Structured card data
-	let structuredCards: CardEntry[] = [];
-	$: hasCommander =
-		selectedFormat === 'Commander' && structuredCards.some((c) => c.section === 'commander' && c.quantity > 0);
+	let structuredCards = $state<CardEntry[]>([]);
+	let hasCommander = $derived(
+		selectedFormat === 'Commander' &&
+			structuredCards.some((c) => c.section === 'commander' && c.quantity > 0)
+	);
 
 	function validateDeck(): string[] {
 		return validateDeckUtil(deckName, deckList, selectedFormat as DeckFormat, stats);
@@ -80,7 +84,7 @@
 
 			const deck = await uploadDeck(request);
 			toast.success(`Deck "${deckName}" uploaded successfully!`);
-			dispatch('success', { deckId: deck.id });
+			onsuccess?.({ deckId: deck.id });
 			handleClose();
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : 'Failed to upload deck';
@@ -99,7 +103,7 @@
 		structuredCards = [];
 		viewMode = 'text';
 		errors = [];
-		dispatch('close');
+		onclose?.();
 	}
 
 	function handleClear() {
@@ -156,16 +160,21 @@
 			const currentStats = parseDeckList(deckList, selectedFormat as DeckFormat);
 			if (currentStats.totalCount === 100) {
 				selectedFormat = 'Commander';
-				
-				// Check if there's an empty line in the pasted content
+
+				// First, check if we already have a commander section
+				if (deckList.toLowerCase().includes('commander:')) {
+					return;
+				}
+
+				// Else, check if there's an empty line in the pasted content
 				const lines = deckList.split('\n');
 				const hasEmptyLine = lines.some((line) => line.trim() === '');
-				
+
 				if (hasEmptyLine) {
 					// Find the last non-empty line (this will be the commander)
 					let lastNonEmptyLine = '';
 					let lastNonEmptyIndex = -1;
-					
+
 					for (let i = lines.length - 1; i >= 0; i--) {
 						const trimmed = lines[i].trim();
 						if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('//')) {
@@ -178,27 +187,25 @@
 							}
 						}
 					}
-					
+
 					if (lastNonEmptyLine && lastNonEmptyIndex >= 0) {
 						// Remove the commander line from the original list
 						const mainDeckLines = [...lines];
 						mainDeckLines.splice(lastNonEmptyIndex, 1);
-						
+
 						// Remove trailing empty lines from main deck
-						while (mainDeckLines.length > 0 && mainDeckLines[mainDeckLines.length - 1].trim() === '') {
+						while (
+							mainDeckLines.length > 0 &&
+							mainDeckLines[mainDeckLines.length - 1].trim() === ''
+						) {
 							mainDeckLines.pop();
 						}
-						
+
 						// Reformat: Commander first, then empty line, then main deck
-						const formattedLines = [
-							'Commander:',
-							lastNonEmptyLine,
-							'',
-							...mainDeckLines
-						];
-						
+						const formattedLines = ['Commander:', lastNonEmptyLine, '', ...mainDeckLines];
+
 						deckList = formattedLines.join('\n');
-						
+
 						// Update structured view if active
 						if (viewMode === 'structured') {
 							structuredCards = parseStructuredCards(deckList);
@@ -429,7 +436,7 @@ Sideboard:
 	}
 </script>
 
-<Modal {open} size="large" on:close={handleClose}>
+<Modal {open} size="large" onClose={handleClose}>
 	<div class="modal-content">
 		<!-- Header -->
 		<div class="modal-header">
@@ -561,8 +568,7 @@ Sideboard:
 												title="Remove"
 											>
 												<X class="icon" size={16} aria-hidden="true" />
-											</button
-											>
+											</button>
 										</div>
 									{/each}
 								</div>
@@ -631,8 +637,7 @@ Sideboard:
 												aria-label="Move to Sideboard"
 											>
 												<ArrowDown class="icon" size={16} aria-hidden="true" />
-											</button
-											>
+											</button>
 										{/if}
 										<button
 											type="button"
@@ -643,8 +648,7 @@ Sideboard:
 											title="Remove"
 										>
 											<X class="icon" size={16} aria-hidden="true" />
-										</button
-										>
+										</button>
 									</div>
 								{/each}
 							</div>
@@ -698,8 +702,7 @@ Sideboard:
 												aria-label="Move to Main Deck"
 											>
 												<ArrowUp class="icon" size={16} aria-hidden="true" />
-											</button
-											>
+											</button>
 											<button
 												type="button"
 												class="btn-remove"
@@ -709,8 +712,7 @@ Sideboard:
 												title="Remove"
 											>
 												<X class="icon" size={16} aria-hidden="true" />
-											</button
-											>
+											</button>
 										</div>
 									{/each}
 								</div>
@@ -1027,7 +1029,9 @@ Sideboard:
 		background: var(--bg-iron);
 		border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-sm);
-		transition: background var(--transition-fast), border-color var(--transition-fast);
+		transition:
+			background var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.card-item:hover {

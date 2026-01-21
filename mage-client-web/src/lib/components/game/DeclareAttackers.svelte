@@ -59,12 +59,12 @@
 	 */
 	function handleCardClick(cardId: string) {
 		if (isSubmitting) return;
-		
+
 		// Check if this card can attack (is in available attackers)
 		const canAttackDefenders = options.attackOptions
 			.filter((opt) => opt.cardId === cardId)
 			.map((opt) => opt.defenderId);
-		
+
 		if (canAttackDefenders.length === 0) {
 			// Card cannot attack
 			return;
@@ -178,7 +178,12 @@
 </script>
 
 <!-- Overlay -->
-<div class="declare-attackers-overlay" role="dialog" aria-modal="true" aria-labelledby="attackers-title">
+<div
+	class="declare-attackers-overlay"
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="attackers-title"
+>
 	<!-- Top Banner -->
 	<div class="attackers-banner">
 		<div class="banner-icon">⚔️</div>
@@ -189,7 +194,9 @@
 			</p>
 			<div class="banner-status">
 				{#if attackerCount > 0}
-					<span class="attacker-count">{attackerCount} creature{attackerCount !== 1 ? 's' : ''} attacking</span>
+					<span class="attacker-count"
+						>{attackerCount} creature{attackerCount !== 1 ? 's' : ''} attacking</span
+					>
 				{:else}
 					<span class="attacker-hint">No attackers declared yet</span>
 				{/if}
@@ -253,23 +260,13 @@
 			</span>
 		</div>
 		<div class="action-buttons">
-			<button
-				class="btn-skip"
-				onclick={handleSkip}
-				disabled={isSubmitting}
-				type="button"
-			>
+			<button class="btn-skip" onclick={handleSkip} disabled={isSubmitting} type="button">
 				{#if isSubmitting}
 					<span class="spinner"></span>
 				{/if}
 				Skip Combat
 			</button>
-			<button
-				class="btn-confirm"
-				onclick={handleConfirm}
-				disabled={isSubmitting}
-				type="button"
-			>
+			<button class="btn-confirm" onclick={handleConfirm} disabled={isSubmitting} type="button">
 				{#if isSubmitting}
 					<span class="spinner"></span>
 				{/if}
@@ -324,7 +321,8 @@
 	}
 
 	@keyframes sword-bounce {
-		0%, 100% {
+		0%,
+		100% {
 			transform: translateY(0) rotate(-5deg);
 		}
 		50% {
@@ -469,7 +467,12 @@
 		align-items: center;
 		padding: 1rem 1.5rem;
 		padding-bottom: 100px !important;
-		background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 50%, transparent 100%);
+		background: linear-gradient(
+			0deg,
+			rgba(0, 0, 0, 0.9) 0%,
+			rgba(0, 0, 0, 0.6) 50%,
+			transparent 100%
+		);
 		pointer-events: auto;
 	}
 
@@ -589,4 +592,3 @@
 		}
 	}
 </style>
-

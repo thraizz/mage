@@ -93,11 +93,7 @@
 
 <svelte:window onclick={handleClickOutside} onkeydown={handleKeydown} />
 
-<div
-	class="context-menu"
-	style="left: {position.x}px; top: {position.y}px;"
-	role="menu"
->
+<div class="context-menu" style="left: {position.x}px; top: {position.y}px;" role="menu">
 	<div class="menu-header">
 		<span class="card-info">
 			{card.name}
@@ -288,4 +284,3 @@
 		margin: 0.25rem 0;
 	}
 </style>
-

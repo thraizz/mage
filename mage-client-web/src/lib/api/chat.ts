@@ -289,10 +289,7 @@ export async function getGameChatId(gameId: string): Promise<string> {
 /**
  * Send a message to game chat
  */
-export async function sendGameMessage(
-	gameId: string,
-	content: string
-): Promise<ClientChatMessage> {
+export async function sendGameMessage(gameId: string, content: string): Promise<ClientChatMessage> {
 	const client = getMageClient();
 	const sessionId = await client.ensureSessionId();
 

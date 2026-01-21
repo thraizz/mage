@@ -302,7 +302,7 @@
 </svelte:head>
 
 <div class="container" style="background-image: url('/images/{selectedBackground}')">
-		<div class="card">
+	<div class="card">
 		<h1>Enter the Blind Eternities</h1>
 		<p class="flavor-text">Welcome, Planeswalker. Ignite your spark and draw your destiny.</p>
 
@@ -391,23 +391,23 @@
 			</div>
 
 			<div class="dev-login-buttons">
-			<button type="button" class="btn-dev" on:click={handleDevLogin} disabled={isLoading}>
-				{#if isLoading}
-					<span class="spinner" aria-hidden="true"></span>
-					Gathering Mana...
-				{:else}
-					[DEV] thraizz
-				{/if}
-			</button>
+				<button type="button" class="btn-dev" on:click={handleDevLogin} disabled={isLoading}>
+					{#if isLoading}
+						<span class="spinner" aria-hidden="true"></span>
+						Gathering Mana...
+					{:else}
+						[DEV] thraizz
+					{/if}
+				</button>
 
-			<button type="button" class="btn-dev" on:click={handleDevLogin2} disabled={isLoading}>
-				{#if isLoading}
-					<span class="spinner" aria-hidden="true"></span>
-					Gathering Mana...
-				{:else}
-					[DEV] thraizz2
-				{/if}
-			</button>
+				<button type="button" class="btn-dev" on:click={handleDevLogin2} disabled={isLoading}>
+					{#if isLoading}
+						<span class="spinner" aria-hidden="true"></span>
+						Gathering Mana...
+					{:else}
+						[DEV] thraizz2
+					{/if}
+				</button>
 			</div>
 		{/if}
 

@@ -93,7 +93,9 @@
 		border: 1px solid var(--border-default);
 		border-radius: var(--radius-md);
 		outline: none;
-		transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+		transition:
+			border-color var(--transition-fast),
+			box-shadow var(--transition-fast);
 	}
 
 	.textarea::placeholder {

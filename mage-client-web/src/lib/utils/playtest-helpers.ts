@@ -6,7 +6,11 @@
  */
 
 import type { AbilityView, CardAction, CardView, CounterView } from '$lib/generated/mage/v1/models';
-import type { PlaytestPlayer, PlaytestGameState, PlaytestLogEntry } from '$lib/stores/playtest-game';
+import type {
+	PlaytestPlayer,
+	PlaytestGameState,
+	PlaytestLogEntry
+} from '$lib/stores/playtest-game';
 import { ZoneId, isLibraryTop, isLibraryBottom, normalizeZoneName } from './zones';
 
 /**
@@ -87,7 +91,9 @@ export function updateCardInZone(
 	} else if (sourceZone.startsWith('hand:')) {
 		const playerId = sourceZone.split(':')[1];
 		newState.players = state.players.map((p) =>
-			p.playerId === playerId ? { ...p, hand: p.hand.map((c) => (c.id === cardId ? updater(c) : c)) } : p
+			p.playerId === playerId
+				? { ...p, hand: p.hand.map((c) => (c.id === cardId ? updater(c) : c)) }
+				: p
 		);
 	} else if (sourceZone.startsWith('library:')) {
 		const playerId = sourceZone.split(':')[1];
@@ -118,7 +124,10 @@ export function removeCardFromZone(
 ): PlaytestGameState {
 	// Handle undefined sourceZone gracefully
 	if (!sourceZone) {
-		console.warn('[playtest-helpers] removeCardFromZone called with undefined sourceZone for card:', cardId);
+		console.warn(
+			'[playtest-helpers] removeCardFromZone called with undefined sourceZone for card:',
+			cardId
+		);
 		return state;
 	}
 
@@ -233,7 +242,12 @@ export function addCardToZone(
 	return newState;
 }
 
-function addCardToLibrary(cardCopy: CardView, controllerId: string, upperTargetZone: string, newState: PlaytestGameState) {
+function addCardToLibrary(
+	cardCopy: CardView,
+	controllerId: string,
+	upperTargetZone: string,
+	newState: PlaytestGameState
+) {
 	cardCopy.zone = ZoneId.LIBRARY;
 	cardCopy.faceDown = true;
 	const libraryOwner = cardCopy.ownerId || controllerId;

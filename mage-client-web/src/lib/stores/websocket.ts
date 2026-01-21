@@ -4,7 +4,13 @@
  */
 
 import { writable, get } from 'svelte/store';
-import type { CallbackMethod, ChatMessageData, StartGameData, GameUpdateData, GameInitData } from '$lib/generated/mage/v1/websocket';
+import type {
+	CallbackMethod,
+	ChatMessageData,
+	StartGameData,
+	GameUpdateData,
+	GameInitData
+} from '$lib/generated/mage/v1/websocket';
 import {
 	callbackMethodFromJSON,
 	ChatMessageData as ChatMessageDataCodec,
@@ -52,7 +58,7 @@ function getWebSocketUrl(): string {
 	if (import.meta.env.VITE_WEBSOCKET_URL) {
 		return import.meta.env.VITE_WEBSOCKET_URL;
 	}
-	
+
 	// Derive from gRPC server URL if available
 	const grpcUrl = import.meta.env.VITE_GRPC_SERVER_URL;
 	if (grpcUrl) {
@@ -62,7 +68,7 @@ function getWebSocketUrl(): string {
 		const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
 		return `${wsProtocol}//${url.host}/ws`;
 	}
-	
+
 	// Default to localhost for development
 	return 'ws://localhost:17179/ws';
 }
@@ -203,11 +209,11 @@ function createWebSocketStore() {
 							// Check for protojson format (uses @type) or binary format (uses typeUrl + value)
 							const dataObj = eventData as Record<string, unknown>;
 							const typeUrl = (dataObj['@type'] as string) || (dataObj['typeUrl'] as string);
-							
+
 							if (typeUrl) {
 								decodedTypeUrl = typeUrl;
 								console.log('[WebSocket] Detected Any type:', typeUrl);
-								
+
 								// Check if this is JSON format (protojson) or binary format
 								if ('@type' in dataObj) {
 									// protojson format - data is already JSON decoded, just extract it
@@ -254,8 +260,10 @@ function createWebSocketStore() {
 						// Call all registered handlers for this method
 						const methodHandlers = handlers.get(serverEvent.method);
 						const handlerCount = methodHandlers?.size || 0;
-						console.log(`[WebSocket] Found ${handlerCount} handler(s) for method ${serverEvent.method}`);
-						
+						console.log(
+							`[WebSocket] Found ${handlerCount} handler(s) for method ${serverEvent.method}`
+						);
+
 						if (methodHandlers) {
 							methodHandlers.forEach((handler) => {
 								try {

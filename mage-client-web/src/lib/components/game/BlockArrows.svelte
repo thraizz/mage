@@ -52,10 +52,7 @@
 	/**
 	 * Calculate SVG path from blocker to attacker
 	 */
-	function calculatePath(
-		blockerEl: HTMLElement,
-		attackerEl: HTMLElement
-	): string {
+	function calculatePath(blockerEl: HTMLElement, attackerEl: HTMLElement): string {
 		const blockerRect = blockerEl.getBoundingClientRect();
 		const attackerRect = attackerEl.getBoundingClientRect();
 
@@ -139,11 +136,7 @@
 	});
 </script>
 
-<svg
-	bind:this={containerRef}
-	class="block-arrows-overlay"
-	aria-hidden="true"
->
+<svg bind:this={containerRef} class="block-arrows-overlay" aria-hidden="true">
 	<defs>
 		<!-- Arrow marker for path ends -->
 		{#each paths as path}
@@ -155,13 +148,10 @@
 				refY="3.5"
 				orient="auto"
 			>
-				<polygon
-					points="0 0, 10 3.5, 0 7"
-					fill={path.color}
-				/>
+				<polygon points="0 0, 10 3.5, 0 7" fill={path.color} />
 			</marker>
 		{/each}
-		
+
 		<!-- Glow filter -->
 		<filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
 			<feGaussianBlur stdDeviation="3" result="coloredBlur" />
@@ -239,4 +229,3 @@
 		opacity: 0.5;
 	}
 </style>
-

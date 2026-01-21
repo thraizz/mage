@@ -112,16 +112,8 @@
 	</div>
 
 	<form class="chat-input-form" onsubmit={handleSubmit}>
-		<input
-			type="text"
-			class="chat-input"
-			{placeholder}
-			bind:value={inputValue}
-			maxlength="500"
-		/>
-		<Button type="submit" variant="primary" size="sm" disabled={!inputValue.trim()}>
-			Send
-		</Button>
+		<input type="text" class="chat-input" {placeholder} bind:value={inputValue} maxlength="500" />
+		<Button type="submit" variant="primary" size="sm" disabled={!inputValue.trim()}>Send</Button>
 	</form>
 </div>
 

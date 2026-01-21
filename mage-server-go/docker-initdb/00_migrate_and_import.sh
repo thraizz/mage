@@ -51,28 +51,20 @@ SQL
   done
 fi
 
-# NOTE: H2 data seeding is now deprecated in favor of Scryfall import
-# The old H2 seed file is no longer used. Instead, use the scryfall-import tool.
+# NOTE: Scryfall card import is now handled automatically by the mage-server container
+# on first startup via the docker-entrypoint.sh script.
 #
-# To seed cards in a fresh database:
-# 1. Download Scryfall bulk data:
-#    ./scripts/download_scryfall_bulk.sh
+# The entrypoint script will:
+# 1. Check if scryfall_cards table is empty
+# 2. Import Scryfall data from /app/data/scryfall-all-cards-*.json
+# 3. Create the compatibility view
+# 4. Start the server
 #
-# 2. Import Scryfall data:
-#    go run ./cmd/scryfall-import/main.go \
-#      --input=./data/scryfall-all-cards-latest.json \
-#      --lang=en --skip-tokens=true --batch=1000
-#
-# 3. Create the compatibility view (if needed):
-#    psql -U mage -d mage -f migrations/009_create_scryfall_tables.up.sql
+# This happens automatically when the mage-server container starts for the first time.
 
 echo "==> initdb: Scryfall card import"
-echo "INFO: H2 seed data is no longer used"
-echo "INFO: Cards will be loaded from Scryfall data via scryfall-import tool"
-echo "INFO: Run the import manually after the database is initialized"
-echo ""
-echo "Quick start:"
-echo "  1. Download: ./scripts/download_scryfall_bulk.sh"
-echo "  2. Import: go run ./cmd/scryfall-import/main.go --input=./data/scryfall-all-cards-latest.json"
+echo "INFO: Card data will be imported automatically by mage-server on first startup"
+echo "INFO: The mage-server entrypoint script will detect empty database and import data"
+echo "INFO: Ensure Scryfall JSON file exists in mage-server-go/data/ directory"
 
 echo "==> initdb: done"

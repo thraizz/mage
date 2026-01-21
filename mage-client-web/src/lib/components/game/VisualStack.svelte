@@ -193,24 +193,12 @@
 		</div>
 		<div class="header-actions">
 			{#if !isEmpty}
-				<button
-					class="resolve-btn"
-					onclick={handleResolveTop}
-					title="Resolve top item"
-				>
+				<button class="resolve-btn" onclick={handleResolveTop} title="Resolve top item">
 					✓ Resolve
 				</button>
-				<button
-					class="clear-btn"
-					onclick={handleClearAll}
-					title="Clear all"
-				>
-					🗑️
-				</button>
+				<button class="clear-btn" onclick={handleClearAll} title="Clear all"> 🗑️ </button>
 			{/if}
-			<button class="close-btn" onclick={handleClose} title="Close">
-				→
-			</button>
+			<button class="close-btn" onclick={handleClose} title="Close"> → </button>
 		</div>
 	</div>
 
@@ -258,7 +246,7 @@
 						<div class="item-info">
 							<div class="card-name">{item.cardName}</div>
 							<div class="source-zone">{getZoneLabel(item.sourceZone)}</div>
-							
+
 							{#if editingNoteLocalId === item.localId}
 								<div class="note-editor">
 									<input

@@ -46,7 +46,9 @@
 		}
 	}}
 	disabled={isOpponent}
-	title="{playerName}'s Library ({libraryCount} cards){isEmpty || isOpponent ? '' : ' - Click to view, Right-click for actions'}"
+	title="{playerName}'s Library ({libraryCount} cards){isEmpty || isOpponent
+		? ''
+		: ' - Click to view, Right-click for actions'}"
 >
 	<span class="library-icon">
 		<Library size={14} />
@@ -81,7 +83,9 @@
 	.library-compact.has-cards:not(.opponent):hover {
 		background: linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(42, 52, 65, 0.9) 100%);
 		border-color: rgba(34, 197, 94, 0.7);
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(34, 197, 94, 0.2);
+		box-shadow:
+			0 2px 6px rgba(0, 0, 0, 0.3),
+			0 1px 3px rgba(34, 197, 94, 0.2);
 		transform: translateY(-1px);
 	}
 
@@ -127,4 +131,3 @@
 		background: transparent;
 	}
 </style>
-

@@ -93,7 +93,9 @@
 	}
 
 	.deck-card :global(.panel) {
-		transition: transform var(--transition-base), box-shadow var(--transition-base);
+		transition:
+			transform var(--transition-base),
+			box-shadow var(--transition-base);
 	}
 
 	.deck-card:hover :global(.panel) {
@@ -110,7 +112,9 @@
 	}
 
 	.deck-card:focus-visible :global(.panel) {
-		box-shadow: 0 0 0 3px var(--accent-gold-glow), var(--shadow-glow);
+		box-shadow:
+			0 0 0 3px var(--accent-gold-glow),
+			var(--shadow-glow);
 	}
 
 	.deck-card-inner {
@@ -166,7 +170,9 @@
 		color: var(--text-ghost);
 		flex: 0 0 auto;
 		margin-top: 2px;
-		transition: transform var(--transition-fast), color var(--transition-fast);
+		transition:
+			transform var(--transition-fast),
+			color var(--transition-fast);
 	}
 
 	.deck-card:hover :global(svg.chevron) {

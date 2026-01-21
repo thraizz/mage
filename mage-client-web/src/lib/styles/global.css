@@ -38,14 +38,18 @@
 }
 
 .btn-primary {
-	background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+	background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 	color: var(--ci-scroll-parchment);
-	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(59, 130, 246, 0.2);
+	box-shadow:
+		0 4px 12px rgba(59, 130, 246, 0.4),
+		0 0 0 1px rgba(59, 130, 246, 0.2);
 }
 
 .btn-primary:hover:not(:disabled) {
-	background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-	box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.3);
+	background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+	box-shadow:
+		0 6px 16px rgba(59, 130, 246, 0.5),
+		0 0 0 1px rgba(59, 130, 246, 0.3);
 	transform: translateY(-1px);
 }
 
@@ -72,13 +76,13 @@
 }
 
 .btn-dev {
-	background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #DC2626 100%);
+	background: linear-gradient(135deg, var(--ci-mountain-ember) 0%, #dc2626 100%);
 	color: var(--ci-scroll-parchment);
 	box-shadow: 0 4px 12px rgba(255, 77, 77, 0.3);
 }
 
 .btn-dev:hover:not(:disabled) {
-	background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+	background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
 	box-shadow: 0 6px 16px rgba(255, 77, 77, 0.4);
 	transform: translateY(-1px);
 }
@@ -160,7 +164,9 @@ input[type='number']:focus,
 textarea:focus {
 	outline: none;
 	border-color: var(--ci-jace-cloak);
-	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 0 12px rgba(59, 130, 246, 0.3);
+	box-shadow:
+		0 0 0 3px rgba(59, 130, 246, 0.2),
+		0 0 12px rgba(59, 130, 246, 0.3);
 	background: rgba(11, 12, 16, 0.95);
 }
 
@@ -220,11 +226,13 @@ label {
 	padding: var(--space-10);
 	border-radius: var(--radius-xl);
 	border: 1px solid rgba(59, 130, 246, 0.2);
-	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.1);
+	box-shadow:
+		0 8px 32px rgba(0, 0, 0, 0.5),
+		0 0 0 1px rgba(59, 130, 246, 0.1);
 	position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
 }
 
 /* =========================================
@@ -332,14 +340,14 @@ a {
 }
 
 a:hover {
-	color: #60A5FA;
+	color: #60a5fa;
 	text-decoration: underline;
 	text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
 }
 
 a strong {
 	font-weight: var(--weight-bold);
-	color: #60A5FA;
+	color: #60a5fa;
 }
 
 /* =========================================
@@ -412,20 +420,37 @@ input[type='checkbox'] {
 	text-align: right;
 }
 
-.mt-1 { margin-top: var(--space-1); }
-.mt-2 { margin-top: var(--space-2); }
-.mt-3 { margin-top: var(--space-3); }
-.mt-4 { margin-top: var(--space-4); }
-.mt-6 { margin-top: var(--space-6); }
+.mt-1 {
+	margin-top: var(--space-1);
+}
+.mt-2 {
+	margin-top: var(--space-2);
+}
+.mt-3 {
+	margin-top: var(--space-3);
+}
+.mt-4 {
+	margin-top: var(--space-4);
+}
+.mt-6 {
+	margin-top: var(--space-6);
+}
 
-.mb-1 { margin-bottom: var(--space-1); }
-.mb-2 { margin-bottom: var(--space-2); }
-.mb-3 { margin-bottom: var(--space-3); }
-.mb-4 { margin-bottom: var(--space-4); }
-.mb-6 { margin-bottom: var(--space-6); }
-
-
-
+.mb-1 {
+	margin-bottom: var(--space-1);
+}
+.mb-2 {
+	margin-bottom: var(--space-2);
+}
+.mb-3 {
+	margin-bottom: var(--space-3);
+}
+.mb-4 {
+	margin-bottom: var(--space-4);
+}
+.mb-6 {
+	margin-bottom: var(--space-6);
+}
 
 .playtest-container {
 	position: fixed;
@@ -873,18 +898,24 @@ input[type='checkbox'] {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1);
+	box-shadow:
+		0 2px 4px rgba(0, 0, 0, 0.2),
+		0 1px 2px rgba(59, 130, 246, 0.1);
 }
 
 .btn-action.btn-next-turn {
 	background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
 	border-color: rgba(46, 204, 113, 0.3);
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(46, 204, 113, 0.1);
+	box-shadow:
+		0 2px 4px rgba(0, 0, 0, 0.2),
+		0 1px 2px rgba(46, 204, 113, 0.1);
 }
 
 .btn-action.btn-next-turn:hover {
 	background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(46, 204, 113, 0.2);
+	box-shadow:
+		0 4px 8px rgba(0, 0, 0, 0.3),
+		0 2px 4px rgba(46, 204, 113, 0.2);
 	transform: translateY(-1px);
 }
 
@@ -922,7 +953,9 @@ input[type='checkbox'] {
 	background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 	border-color: rgba(59, 130, 246, 0.5);
 	transform: translateY(-1px);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(59, 130, 246, 0.2);
+	box-shadow:
+		0 4px 8px rgba(0, 0, 0, 0.3),
+		0 2px 4px rgba(59, 130, 246, 0.2);
 }
 
 .btn-toggle:active,
@@ -933,12 +966,14 @@ input[type='checkbox'] {
 
 .all-hands-overlay {
 	position: fixed;
-	top: 5rem;
-	right: 1rem;
-	width: 300px;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 90vw;
+	max-width: 1200px;
 	max-height: calc(100vh - 6rem);
 	overflow-y: auto;
-	background: rgba(26, 31, 46, 0.98);
+	background: rgba(0, 0, 0, 0.85);
 	border: 1px solid #2a3441;
 	border-radius: 8px;
 	padding: 0.75rem;
@@ -946,7 +981,8 @@ input[type='checkbox'] {
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
-}
+  }
+  
 
 .player-hand-compact {
 	padding: 0.75rem;
@@ -1010,6 +1046,44 @@ input[type='checkbox'] {
 	flex-direction: column;
 	gap: 0;
 	flex: 1;
+}
+
+/* Multiplayer grid layout for 3-4 players */
+.opponents-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 0.75rem;
+	min-height: 0;
+}
+
+.opponents-grid .opponent-section {
+	flex: 0 0 auto;
+	min-height: 0;
+}
+
+/* Responsive behavior for multiplayer */
+.opponents-grid-large {
+	display: grid;
+}
+
+.opponents-grid-small {
+	display: none;
+}
+
+.opponents-grid-small .opponent-section {
+	flex: 1;
+}
+
+/* On small screens: hide grid, show cycling */
+@media (max-width: 1023px) {
+	.opponents-grid-large {
+		display: none;
+	}
+
+	.opponents-grid-small {
+		display: flex;
+		flex-direction: column;
+	}
 }
 
 .opponent-info-overlay {
@@ -1089,9 +1163,9 @@ input[type='checkbox'] {
 	border-radius: 12px;
 	padding: 1rem;
 	overflow: auto;
-	position: relative;  
-    min-height: 150px;
-    max-height: none;
+	position: relative;
+	min-height: 150px;
+	max-height: none;
 }
 
 .opponent-battlefield {
@@ -1145,8 +1219,8 @@ input[type='checkbox'] {
 }
 
 .empty-battlefield {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 	color: #4b5563;
 	font-style: italic;
 	font-size: 0.875rem;

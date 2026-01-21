@@ -176,7 +176,8 @@
 		border: 1px solid var(--border-subtle);
 		background: var(--bg-obsidian);
 		color: var(--text-bright);
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+		font-family:
+			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
 			monospace;
 		font-size: var(--text-xs);
 		line-height: 1.4;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	/**
 	 * GameHeader - Clean header for game page answering key questions:
-	 * - What turn is it? 
+	 * - What turn is it?
 	 * - Whose turn is it?
 	 * - Who has priority?
 	 * - Where can I find what happened? (Log button)
@@ -53,15 +53,13 @@
 	);
 
 	// Derived: turn display text
-	const turnDisplay = $derived(
-		isYourTurn ? 'Your Turn' : `${activePlayerName}'s turn`
-	);
+	const turnDisplay = $derived(isYourTurn ? 'Your Turn' : `${activePlayerName}'s turn`);
 
 	// Derived: who has priority display text
 	const priorityDisplay = $derived(
-		hasPriority 
-			? 'You have priority' 
-			: priorityPlayerName 
+		hasPriority
+			? 'You have priority'
+			: priorityPlayerName
 				? `${priorityPlayerName} has priority`
 				: 'Waiting...'
 	);
@@ -73,32 +71,48 @@
 
 	// Check if we're in a combat step
 	const isInCombatStep = $derived(
-		['COMBAT', 'DECLARE_ATTACKERS', 'DECLARE_BLOCKERS', 'COMBAT_DAMAGE', 'END_OF_COMBAT'].includes(currentPhase)
+		['COMBAT', 'DECLARE_ATTACKERS', 'DECLARE_BLOCKERS', 'COMBAT_DAMAGE', 'END_OF_COMBAT'].includes(
+			currentPhase
+		)
 	);
 
 	// Get specific combat step for styling
 	const combatStepClass = $derived(
-		currentPhase === 'DECLARE_ATTACKERS' ? 'attackers' :
-		currentPhase === 'DECLARE_BLOCKERS' ? 'blockers' :
-		currentPhase === 'COMBAT_DAMAGE' ? 'damage' : ''
+		currentPhase === 'DECLARE_ATTACKERS'
+			? 'attackers'
+			: currentPhase === 'DECLARE_BLOCKERS'
+				? 'blockers'
+				: currentPhase === 'COMBAT_DAMAGE'
+					? 'damage'
+					: ''
 	);
 </script>
 
-<header class="game-header" class:has-priority={hasPriority} class:in-combat={isInCombatStep} class:attackers={combatStepClass === 'attackers'} class:blockers={combatStepClass === 'blockers'} class:damage={combatStepClass === 'damage'}>
+<header
+	class="game-header"
+	class:has-priority={hasPriority}
+	class:in-combat={isInCombatStep}
+	class:attackers={combatStepClass === 'attackers'}
+	class:blockers={combatStepClass === 'blockers'}
+	class:damage={combatStepClass === 'damage'}
+>
 	<!-- Left section: Log button and turn info -->
 	<div class="header-left">
-		<button class="log-btn" onclick={onLogClick} title="View game log">
-			Log
-		</button>
-		
+		<button class="log-btn" onclick={onLogClick} title="View game log"> Log </button>
+
 		<div class="turn-info">
 			<span class="turn-number">Turn {turn}</span>
 			<span class="turn-player" class:your-turn={isYourTurn}>{turnDisplay}</span>
 		</div>
-		
+
 		<!-- Combat Phase Badge -->
 		{#if isInCombatStep}
-			<div class="combat-badge" class:attackers={combatStepClass === 'attackers'} class:blockers={combatStepClass === 'blockers'} class:damage={combatStepClass === 'damage'}>
+			<div
+				class="combat-badge"
+				class:attackers={combatStepClass === 'attackers'}
+				class:blockers={combatStepClass === 'blockers'}
+				class:damage={combatStepClass === 'damage'}
+			>
 				{#if combatStepClass === 'attackers'}
 					⚔️ Declare Attackers
 				{:else if combatStepClass === 'blockers'}
@@ -117,9 +131,7 @@
 		<span class="priority-indicator" class:active={hasPriority}>
 			{priorityDisplay}
 		</span>
-		<button class="concede-btn" onclick={onConcedeClick} title="Concede game">
-			🏳️ Concede
-		</button>
+		<button class="concede-btn" onclick={onConcedeClick} title="Concede game"> 🏳️ Concede </button>
 	</div>
 </header>
 
@@ -127,8 +139,8 @@
 <div class="phase-track-container" class:has-priority={hasPriority}>
 	<div class="phase-track">
 		{#each phases as phase}
-			<div 
-				class="phase-item" 
+			<div
+				class="phase-item"
 				class:active={isActive(phase.key)}
 				class:main={phase.type === 'main'}
 				class:combat={phase.type === 'combat'}
@@ -236,7 +248,8 @@
 	}
 
 	@keyframes combat-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.4);
 		}
 		50% {
@@ -249,7 +262,8 @@
 	}
 
 	@keyframes combat-pulse-red {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
 		}
 		50% {
@@ -262,7 +276,8 @@
 	}
 
 	@keyframes combat-pulse-blue {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
 		}
 		50% {
@@ -275,7 +290,8 @@
 	}
 
 	@keyframes combat-pulse-orange {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
 		}
 		50% {
@@ -466,6 +482,3 @@
 		}
 	}
 </style>
-
-
-

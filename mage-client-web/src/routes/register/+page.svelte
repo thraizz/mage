@@ -188,7 +188,9 @@
 <div class="container" style="background-image: url('/images/{selectedBackground}')">
 	<div class="card">
 		<h1>Ignite Your Spark</h1>
-		<p class="flavor-text">Welcome, aspiring Planeswalker. Forge your identity and begin your journey.</p>
+		<p class="flavor-text">
+			Welcome, aspiring Planeswalker. Forge your identity and begin your journey.
+		</p>
 
 		{#if errorMessage}
 			<div class="error-message" role="alert" aria-live="polite">

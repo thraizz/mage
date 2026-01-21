@@ -57,7 +57,11 @@
 			<Navbar />
 		{/if}
 		<main class="main-content" class:full-screen={isGamePage}>
-			<div class="content-wrapper" class:no-padding={isGamePage} in:fly={{ y: 20, duration: 300, delay: 100 }}>
+			<div
+				class="content-wrapper"
+				class:no-padding={isGamePage}
+				in:fly={{ y: 20, duration: 300, delay: 100 }}
+			>
 				<slot />
 			</div>
 		</main>

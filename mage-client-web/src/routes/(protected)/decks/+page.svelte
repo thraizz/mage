@@ -152,8 +152,8 @@
 <!-- Deck Upload Modal -->
 <DeckUploadModal
 	open={showUploadModal}
-	on:close={() => (showUploadModal = false)}
-	on:success={handleUploadSuccess}
+	onclose={() => (showUploadModal = false)}
+	onsuccess={handleUploadSuccess}
 />
 
 <style>

@@ -75,7 +75,11 @@
 	}
 </script>
 
-<div class="action-log-item" class:is-system={action.type === 'system'} class:has-rollback={action.rollbackAvailable}>
+<div
+	class="action-log-item"
+	class:is-system={action.type === 'system'}
+	class:has-rollback={action.rollbackAvailable}
+>
 	<div class="action-time">{formatTime(action.timestamp)}</div>
 
 	<div class="action-content">
@@ -97,11 +101,7 @@
 	</div>
 
 	{#if action.rollbackAvailable && onRequestRollback}
-		<button
-			class="rollback-btn"
-			onclick={handleRollbackClick}
-			title="Rollback to this point"
-		>
+		<button class="rollback-btn" onclick={handleRollbackClick} title="Rollback to this point">
 			Rollback
 		</button>
 	{/if}

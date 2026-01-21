@@ -23,12 +23,30 @@
 		{ name: 'Spirit', types: 'Creature — Spirit', power: '1', toughness: '1', color: 'white' },
 		{ name: 'Zombie', types: 'Creature — Zombie', power: '2', toughness: '2', color: 'black' },
 		{ name: 'Goblin', types: 'Creature — Goblin', power: '1', toughness: '1', color: 'red' },
-		{ name: 'Saproling', types: 'Creature — Saproling', power: '1', toughness: '1', color: 'green' },
+		{
+			name: 'Saproling',
+			types: 'Creature — Saproling',
+			power: '1',
+			toughness: '1',
+			color: 'green'
+		},
 		{ name: 'Beast', types: 'Creature — Beast', power: '3', toughness: '3', color: 'green' },
 		{ name: 'Angel', types: 'Creature — Angel', power: '4', toughness: '4', color: 'white' },
 		{ name: 'Dragon', types: 'Creature — Dragon', power: '5', toughness: '5', color: 'red' },
-		{ name: 'Elemental', types: 'Creature — Elemental', power: '*', toughness: '*', color: 'green' },
-		{ name: 'Treasure', types: 'Artifact — Treasure', power: '', toughness: '', color: 'colorless' },
+		{
+			name: 'Elemental',
+			types: 'Creature — Elemental',
+			power: '*',
+			toughness: '*',
+			color: 'green'
+		},
+		{
+			name: 'Treasure',
+			types: 'Artifact — Treasure',
+			power: '',
+			toughness: '',
+			color: 'colorless'
+		},
 		{ name: 'Clue', types: 'Artifact — Clue', power: '', toughness: '', color: 'colorless' },
 		{ name: 'Food', types: 'Artifact — Food', power: '', toughness: '', color: 'colorless' },
 		{ name: 'Copy', types: 'Copy of any permanent', power: '*', toughness: '*', color: 'colorless' }
@@ -64,12 +82,14 @@
 				.map((a) => a.trim())
 				.filter((a) => a.length > 0);
 
-		await createToken(gameId, name, types, power, toughness, color, abilities, 1);
+			await createToken(gameId, name, types, power, toughness, color, abilities, 1);
 
-		toast.success(`Created ${name} token`);
+			toast.success(`Created ${name} token`);
 			onClose();
 		} catch (error) {
-			toast.error(`Failed to create token: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			toast.error(
+				`Failed to create token: ${error instanceof Error ? error.message : 'Unknown error'}`
+			);
 		}
 	}
 
@@ -521,4 +541,3 @@
 		background: var(--accent-hover, #33ddff);
 	}
 </style>
-

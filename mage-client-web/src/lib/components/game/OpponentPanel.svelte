@@ -70,11 +70,18 @@
 		return !!cardType && cardType.toLowerCase().includes('land');
 	}
 
-	const battlefieldNonlands = $derived(battlefieldCards.filter(c => !isLandPermanent(c.type)));
-	const battlefieldLands = $derived(battlefieldCards.filter(c => isLandPermanent(c.type)));
+	const battlefieldNonlands = $derived(battlefieldCards.filter((c) => !isLandPermanent(c.type)));
+	const battlefieldLands = $derived(battlefieldCards.filter((c) => isLandPermanent(c.type)));
 </script>
 
-<div class="opponent-panel" class:expanded class:collapsed={!expanded} class:position-left={position === 'left'} class:position-right={position === 'right'} class:position-top={position === 'top'}>
+<div
+	class="opponent-panel"
+	class:expanded
+	class:collapsed={!expanded}
+	class:position-left={position === 'left'}
+	class:position-right={position === 'right'}
+	class:position-top={position === 'top'}
+>
 	<!-- Header - Always visible -->
 	<button class="panel-header" onclick={toggle}>
 		<div class="player-info">
@@ -176,7 +183,7 @@
 						cards={opponent.graveyard.map(toGameCard)}
 						playerName={opponent.name}
 						isOpponent={true}
-						onCardClick={onCardClick}
+						{onCardClick}
 					/>
 				</div>
 			{/if}
@@ -267,8 +274,15 @@
 	}
 
 	@keyframes pulse {
-		0%, 100% { opacity: 1; transform: scale(1); }
-		50% { opacity: 0.6; transform: scale(1.2); }
+		0%,
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
+		50% {
+			opacity: 0.6;
+			transform: scale(1.2);
+		}
 	}
 
 	.player-stats {
@@ -288,10 +302,19 @@
 		font-size: 0.75rem;
 	}
 
-	.life { color: #ef4444; font-weight: 700; }
-	.poison { color: #a855f7; }
-	.library { color: #3b82f6; }
-	.hand-count { color: #fbbf24; }
+	.life {
+		color: #ef4444;
+		font-weight: 700;
+	}
+	.poison {
+		color: #a855f7;
+	}
+	.library {
+		color: #3b82f6;
+	}
+	.hand-count {
+		color: #fbbf24;
+	}
 
 	.expand-icon {
 		font-size: 0.75rem;
@@ -401,5 +424,3 @@
 		}
 	}
 </style>
-
-

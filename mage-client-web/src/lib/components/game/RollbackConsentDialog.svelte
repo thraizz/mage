@@ -21,18 +21,12 @@
 				<span class="label">Rollback to:</span>
 				<span class="message">"{request.targetMessageText}"</span>
 			</div>
-			<p class="note">
-				This will undo all game actions since that point for all players.
-			</p>
+			<p class="note">This will undo all game actions since that point for all players.</p>
 		</div>
 
 		<div class="dialog-actions">
-			<button class="deny-btn" on:click={onDeny}>
-				Deny
-			</button>
-			<button class="approve-btn" on:click={onApprove}>
-				Approve
-			</button>
+			<button class="deny-btn" on:click={onDeny}> Deny </button>
+			<button class="approve-btn" on:click={onApprove}> Approve </button>
 		</div>
 	</div>
 </div>

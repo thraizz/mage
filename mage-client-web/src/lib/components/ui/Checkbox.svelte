@@ -21,15 +21,7 @@
 </script>
 
 <label class="checkbox-wrapper" class:disabled>
-	<input
-		type="checkbox"
-		{id}
-		{name}
-		bind:checked
-		{disabled}
-		class="checkbox-input"
-		{onchange}
-	/>
+	<input type="checkbox" {id} {name} bind:checked {disabled} class="checkbox-input" {onchange} />
 	<span class="checkbox-box">
 		<Check class="checkbox-icon" size={12} aria-hidden="true" />
 	</span>

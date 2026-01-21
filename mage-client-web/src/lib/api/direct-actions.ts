@@ -170,11 +170,7 @@ export async function drawCards(gameId: string, playerId: string, count: number)
  * @param playerId - The player whose life to modify
  * @param delta - The amount to add (positive) or remove (negative)
  */
-export async function modifyLife(
-	gameId: string,
-	playerId: string,
-	delta: number
-): Promise<void> {
+export async function modifyLife(gameId: string, playerId: string, delta: number): Promise<void> {
 	return modifyPlayerLife(gameId, playerId, delta);
 }
 

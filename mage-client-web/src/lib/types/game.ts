@@ -159,7 +159,7 @@ export interface ActionLogEntry {
 	text: string;
 	cardName?: string;
 	cardId?: string;
-	bookmarkId?: number;         // Snapshot ID for rollback (0 = no rollback available)
+	bookmarkId?: number; // Snapshot ID for rollback (0 = no rollback available)
 	rollbackAvailable?: boolean; // Whether rollback is available to this point
 }
 
@@ -206,9 +206,4 @@ export interface ActiveGame {
 	updatedAt: string;
 }
 
-export type ActiveGameState =
-	| 'STARTING'
-	| 'MULLIGAN'
-	| 'IN_PROGRESS'
-	| 'PAUSED'
-	| 'FINISHED';
+export type ActiveGameState = 'STARTING' | 'MULLIGAN' | 'IN_PROGRESS' | 'PAUSED' | 'FINISHED';

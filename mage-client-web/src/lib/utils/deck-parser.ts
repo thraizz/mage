@@ -53,9 +53,7 @@ export function normalizeImportedCardName(rawName: string): string {
 
 	// Strip trailing: " (SET) 123" or " (SET)" (case-insensitive)
 	// Keep it conservative: SET is 2-6 alnum chars, collector is 1+ digits (optional trailing letter).
-	return name
-		.replace(/\s+\(([a-z0-9]{2,6})\)(?:\s+\d+[a-z]?)?\s*$/i, '')
-		.trim();
+	return name.replace(/\s+\(([a-z0-9]{2,6})\)(?:\s+\d+[a-z]?)?\s*$/i, '').trim();
 }
 
 /**

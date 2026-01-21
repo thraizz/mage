@@ -125,13 +125,25 @@
 		{/if}
 
 		<div class="tabs">
-			<button class="tab" class:active={activeTab === 'state'} onclick={() => (activeTab = 'state')}>
+			<button
+				class="tab"
+				class:active={activeTab === 'state'}
+				onclick={() => (activeTab = 'state')}
+			>
 				📊 Server State
 			</button>
-			<button class="tab" class:active={activeTab === 'games'} onclick={() => (activeTab = 'games')}>
+			<button
+				class="tab"
+				class:active={activeTab === 'games'}
+				onclick={() => (activeTab = 'games')}
+			>
 				🎮 Active Games ({activeGames?.games.length ?? 0})
 			</button>
-			<button class="tab" class:active={activeTab === 'history'} onclick={() => (activeTab = 'history')}>
+			<button
+				class="tab"
+				class:active={activeTab === 'history'}
+				onclick={() => (activeTab = 'history')}
+			>
 				📜 Match History ({matchHistoryCount})
 			</button>
 		</div>
@@ -666,5 +678,3 @@
 		color: #f59e0b;
 	}
 </style>
-
-

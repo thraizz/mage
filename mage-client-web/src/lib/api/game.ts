@@ -457,7 +457,7 @@ export async function cancelRollback(
 ): Promise<{ success: boolean; error?: string }> {
 	const response = await withSession<CancelRollbackRequest, CancelRollbackResponse>(
 		'CancelRollback',
-		(sessionId) => ({ sessionId, gameId, requestId } as CancelRollbackRequest)
+		(sessionId) => ({ sessionId, gameId, requestId }) as CancelRollbackRequest
 	);
 
 	return {

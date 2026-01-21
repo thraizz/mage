@@ -69,5 +69,3 @@ export function isSessionErrorResponse(response: { error?: string; success?: boo
 
 	return false;
 }
-
-

@@ -12,7 +12,7 @@
 	let {
 		open = $bindable(false),
 		table,
-		 
+
 		onSuccess
 	}: {
 		open: boolean;
@@ -294,7 +294,7 @@
 	}
 
 	.format-badge {
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		padding: var(--space-1) var(--space-2);
 		border-radius: var(--radius-sm);
@@ -331,7 +331,7 @@
 	.create-deck-link {
 		display: inline-block;
 		padding: var(--space-2) var(--space-4);
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		border-radius: var(--radius-md);
 		text-decoration: none;
@@ -344,7 +344,7 @@
 	}
 
 	.create-deck-link:hover {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 		transform: translateY(-1px);
 	}
@@ -448,13 +448,13 @@
 	}
 
 	.btn-primary {
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 	}
 
 	.btn-primary:hover:not(:disabled) {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 		transform: translateY(-1px);
 	}

@@ -1,5 +1,5 @@
 import adapterAuto from '@sveltejs/adapter-auto';
-import adapterNode from '@sveltejs/adapter-node';
+import adapterStatic from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 // Use adapter-node for production/Docker builds, adapter-auto for development
@@ -15,11 +15,12 @@ const config = {
 		// Use adapter-node for Docker/production deployments
 		// Use adapter-auto for development (supports various platforms)
 		adapter: isProduction
-			? adapterNode({
-					// Output directory for the build
-					out: 'build',
-					// Precompress assets
-					precompress: true
+			? adapterStatic({
+					pages: 'build',
+					assets: 'build',
+					fallback: 'index.html', // This must match your nginx try_files
+					precompress: false,
+					strict: true
 				})
 			: adapterAuto()
 	}

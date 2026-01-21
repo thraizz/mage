@@ -71,7 +71,11 @@
 
 	// Setup event listeners
 	onMount(() => {
-		console.log('[AbilitiesPanel] Mounted with:', { cardId, cardName, abilities: abilities.length });
+		console.log('[AbilitiesPanel] Mounted with:', {
+			cardId,
+			cardName,
+			abilities: abilities.length
+		});
 		// Small delay to prevent immediate close from the same click that opened the panel
 		setTimeout(() => {
 			document.addEventListener('click', handleClickOutside);
@@ -99,9 +103,7 @@
 				<h3 id="abilities-title">Activated Abilities</h3>
 				<p class="card-name">{cardName}</p>
 			</div>
-			<button class="close-btn" onclick={onClose} aria-label="Close abilities panel">
-				×
-			</button>
+			<button class="close-btn" onclick={onClose} aria-label="Close abilities panel"> × </button>
 		</div>
 
 		<div class="panel-body">
@@ -312,4 +314,3 @@
 		}
 	}
 </style>
-

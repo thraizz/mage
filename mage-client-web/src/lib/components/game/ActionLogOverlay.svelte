@@ -191,9 +191,7 @@
 			>
 				🗑️
 			</button>
-			<button class="close-btn" onclick={close} title="Close (Esc)">
-				✕
-			</button>
+			<button class="close-btn" onclick={close} title="Close (Esc)"> ✕ </button>
 		</div>
 	</div>
 
@@ -205,7 +203,11 @@
 			</div>
 		{:else}
 			{#each entries as entry (entry.id)}
-				<ActionLogItem action={entry} playerColor={getPlayerColor(entry.playerId)} {onRequestRollback} />
+				<ActionLogItem
+					action={entry}
+					playerColor={getPlayerColor(entry.playerId)}
+					{onRequestRollback}
+				/>
 			{/each}
 		{/if}
 	</div>
@@ -228,8 +230,12 @@
 	}
 
 	@keyframes fade-in {
-		from { opacity: 0; }
-		to { opacity: 1; }
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
 	}
 
 	.action-log-overlay {
@@ -400,6 +406,3 @@
 		}
 	}
 </style>
-
-
-

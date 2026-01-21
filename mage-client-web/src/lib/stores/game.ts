@@ -27,12 +27,7 @@ import type {
 	GameRollbackRequestData,
 	GameRollbackCompleteData
 } from '$lib/generated/mage/v1/websocket';
-import type {
-	GameView,
-	PlayerView,
-	CardView,
-	ManaPoolView
-} from '$lib/generated/mage/v1/models';
+import type { GameView, PlayerView, CardView, ManaPoolView } from '$lib/generated/mage/v1/models';
 
 /**
  * Pending card play action for optimistic updates
@@ -146,8 +141,6 @@ function createGameStore() {
 	function subscribeToGameEvents() {
 		// Unsubscribe from previous subscriptions
 		unsubscribeFromEvents();
-		
-
 
 		// START_GAME - Game is starting
 		unsubscribers.push(
@@ -190,7 +183,7 @@ function createGameStore() {
 						// (server state is source of truth)
 						const newPending = new Map(s.pendingCardPlays);
 						const newPlaying = [...s.cardsBeingPlayed];
-						
+
 						for (const [cardId] of s.pendingCardPlays) {
 							// Check if card is now in battlefield or stack
 							const onBattlefield = normalized.battlefield.some((c) => c.id === cardId);
@@ -207,7 +200,6 @@ function createGameStore() {
 						// Check for pending library search from server
 						let newPrompt = s.pendingPrompt;
 						if (normalized.pendingLibrarySearch) {
-
 							newPrompt = {
 								type: 'librarySearch',
 								message: normalized.pendingLibrarySearch.message || 'Search your library',
@@ -247,13 +239,11 @@ function createGameStore() {
 			})
 		);
 
-
 		// GAME_ERROR - Error message
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_ERROR, (data) => {
 				const errorData = data as GameErrorData;
 
-				
 				// Show toast notification for game errors
 				if (errorData.error) {
 					// Clean up the error message for display
@@ -264,11 +254,11 @@ function createGameStore() {
 					}
 					toast.error(errorMessage);
 				}
-				
+
 				update((s) => {
 					// Rollback all pending card plays on error
 					// The server has rejected the action(s)
-					
+
 					return {
 						...s,
 						error: errorData.error,
@@ -494,7 +484,9 @@ function createGameStore() {
 						targetMessageText: rollbackData.targetMessageText
 					}
 				}));
-				toast.info(`${rollbackData.requestingPlayerName} wants to rollback to: "${rollbackData.targetMessageText}"`);
+				toast.info(
+					`${rollbackData.requestingPlayerName} wants to rollback to: "${rollbackData.targetMessageText}"`
+				);
 			})
 		);
 
@@ -510,8 +502,6 @@ function createGameStore() {
 				toast.success(`Game rolled back by ${completeData.initiatedByName}`);
 			})
 		);
-
-
 	}
 
 	/**
@@ -723,7 +713,6 @@ function createGameStore() {
 			return null;
 		}
 
-
 		// Remove from pending and playing state
 		removePendingCardPlay(cardId);
 
@@ -817,9 +806,7 @@ export const opponents = derived(gameStore, ($game) => {
  */
 export const activePlayer = derived(gameStore, ($game) => {
 	if (!$game.gameView) return null;
-	return (
-		$game.gameView.players.find((p) => p.playerId === $game.gameView!.activePlayerId) || null
-	);
+	return $game.gameView.players.find((p) => p.playerId === $game.gameView!.activePlayerId) || null;
 });
 
 /**

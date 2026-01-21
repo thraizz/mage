@@ -597,13 +597,13 @@
 	}
 
 	.submit-button {
-		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563EB 100%);
+		background: linear-gradient(135deg, var(--ci-jace-cloak) 0%, #2563eb 100%);
 		color: var(--ci-scroll-parchment);
 		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 	}
 
 	.submit-button:hover:not(:disabled) {
-		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 		box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 		transform: translateY(-1px);
 	}

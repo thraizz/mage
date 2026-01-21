@@ -2,7 +2,13 @@
 	import Card from './Card.svelte';
 	import type { GameCard } from '$lib/types/game';
 	import type { CardView } from '$lib/generated/mage/v1/models';
-	import { myHand, selectedCards, gameStore, cardsBeingPlayed, hasPriority } from '$lib/stores/game';
+	import {
+		myHand,
+		selectedCards,
+		gameStore,
+		cardsBeingPlayed,
+		hasPriority
+	} from '$lib/stores/game';
 	import {
 		dragDropStore,
 		isDragging as isDraggingStore,
@@ -401,7 +407,9 @@
 
 	.card-wrapper {
 		flex-shrink: 0;
-		transition: transform 0.2s ease, opacity 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			opacity 0.2s ease;
 		user-select: none;
 		-webkit-user-select: none;
 		-webkit-user-drag: none;

@@ -8,12 +8,27 @@ import { writable, derived, get } from 'svelte/store';
 /**
  * Valid zones for card drops (supports all MTG zones for rules-light mode)
  */
-export type DropZone = 'battlefield' | 'graveyard' | 'exile' | 'hand' | 'library' | 'command' | 'stack' | 'none';
+export type DropZone =
+	| 'battlefield'
+	| 'graveyard'
+	| 'exile'
+	| 'hand'
+	| 'library'
+	| 'command'
+	| 'stack'
+	| 'none';
 
 /**
  * Source zones where cards can be dragged from (all zones in rules-light mode)
  */
-export type SourceZone = 'hand' | 'battlefield' | 'graveyard' | 'exile' | 'library' | 'command' | 'stack';
+export type SourceZone =
+	| 'hand'
+	| 'battlefield'
+	| 'graveyard'
+	| 'exile'
+	| 'library'
+	| 'command'
+	| 'stack';
 
 /**
  * Drag state interface
@@ -146,10 +161,11 @@ function createDragDropStore() {
 
 			const rect = zone.element.getBoundingClientRect();
 			const isInside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-			
+
 			if (isInside) {
 				const state = get({ subscribe });
-				const accepted = state.cardId && state.sourceZone && zone.accepts(state.cardId, state.sourceZone);
+				const accepted =
+					state.cardId && state.sourceZone && zone.accepts(state.cardId, state.sourceZone);
 				if (accepted) {
 					return zone.type;
 				}
@@ -284,7 +300,8 @@ export function getValidDropZonesForCard(
 	if (!hasPriority) return [];
 
 	const isLand = cardType.toLowerCase().includes('land');
-	const isMainPhase = phase.includes('MAIN') || phase === 'PRECOMBAT_MAIN' || phase === 'POSTCOMBAT_MAIN';
+	const isMainPhase =
+		phase.includes('MAIN') || phase === 'PRECOMBAT_MAIN' || phase === 'POSTCOMBAT_MAIN';
 
 	// Lands can only be played during main phase
 	if (isLand) {
@@ -302,8 +319,16 @@ export function getValidDropZonesForCard(
  */
 export function getAllValidDropZones(sourceZone: SourceZone): DropZone[] {
 	// All zones except the source zone (and 'none')
-	const allZones: DropZone[] = ['battlefield', 'graveyard', 'exile', 'hand', 'library', 'command', 'stack'];
-	return allZones.filter(zone => zone !== sourceZone);
+	const allZones: DropZone[] = [
+		'battlefield',
+		'graveyard',
+		'exile',
+		'hand',
+		'library',
+		'command',
+		'stack'
+	];
+	return allZones.filter((zone) => zone !== sourceZone);
 }
 
 /**
@@ -316,10 +341,7 @@ export function zoneToApiFormat(zone: DropZone | SourceZone): string {
 /**
  * Calculate distance between two points
  */
-export function getDistance(
-	p1: { x: number; y: number },
-	p2: { x: number; y: number }
-): number {
+export function getDistance(p1: { x: number; y: number }, p2: { x: number; y: number }): number {
 	return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 }
 
@@ -333,4 +355,3 @@ export function isDragThresholdMet(
 ): boolean {
 	return getDistance(start, current) >= threshold;
 }
-
