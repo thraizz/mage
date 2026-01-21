@@ -152,7 +152,7 @@
 	const isInitialized = $derived($playtestIsInitialized);
 
 	// Selected opponent (auto-select first opponent if not set)
-	const selectedOpponent = $derived(() => {
+	const selectedOpponent = $derived.by(() => {
 		if (otherPlayers.length === 0) return null;
 		if (!selectedOpponentId || !otherPlayers.find((p) => p.playerId === selectedOpponentId)) {
 			// Auto-select first opponent
@@ -163,8 +163,8 @@
 
 	// Split battlefield by controller
 	const myBattlefield = $derived(battlefield.filter((c) => c.controllerId === activeControlSeat));
-	const opponentBattlefield = $derived(() => {
-		const opponent = selectedOpponent();
+	const opponentBattlefield = $derived.by(() => {
+		const opponent = selectedOpponent;
 		return opponent ? battlefield.filter((c) => c.controllerId === opponent.playerId) : [];
 	});
 
@@ -176,11 +176,11 @@
 	// Split battlefield rows: nonlands (top) + lands (bottom)
 	const myBattlefieldNonlands = $derived(myBattlefield.filter((c) => !isLandPermanent(c.type)));
 	const myBattlefieldLands = $derived(myBattlefield.filter((c) => isLandPermanent(c.type)));
-	const opponentBattlefieldNonlands = $derived(() =>
-		opponentBattlefield().filter((c) => !isLandPermanent(c.type))
+	const opponentBattlefieldNonlands = $derived.by(() =>
+		opponentBattlefield.filter((c) => !isLandPermanent(c.type))
 	);
-	const opponentBattlefieldLands = $derived(() =>
-		opponentBattlefield().filter((c) => isLandPermanent(c.type))
+	const opponentBattlefieldLands = $derived.by(() =>
+		opponentBattlefield.filter((c) => isLandPermanent(c.type))
 	);
 
 	// My cards (from controlling player perspective)
@@ -190,21 +190,27 @@
 	);
 
 	// Reactive card lookup for counter dialog
-	const selectedCardForCountersData = $derived(() => {
-		if (!selectedCardForCounters) return null;
+	const selectedCardForCountersData = $derived.by(() => {
+		// 1. Capture the value in a local variable for "Type Narrowing"
+		const currentId = selectedCardForCounters?.id;
+
+		// 2. If no ID exists, exit early
+		if (!currentId) return null;
+
+		// 3. Search through collections
+		// Using the local currentId ensures TS knows it's a string/number, not null
 		const card =
-			$playtestBattlefield.find((c) => c.id === selectedCardForCounters.id) ||
-			me?.hand.find((c) => c.id === selectedCardForCounters.id) ||
-			me?.graveyard.find((c) => c.id === selectedCardForCounters.id) ||
-			me?.exile.find((c) => c.id === selectedCardForCounters.id) ||
-			me?.commandZone.find((c) => c.id === selectedCardForCounters.id) ||
+			$playtestBattlefield.find((c) => c.id === currentId) ||
+			me?.hand.find((c) => c.id === currentId) ||
+			me?.graveyard.find((c) => c.id === currentId) ||
 			null;
+
 		console.log(
-			'[selectedCardForCountersData] Re-evaluated. Card:',
-			card?.name,
-			'Counters:',
-			card?.counters
+			'[selectedCardForCountersData] Re-evaluated.',
+			`Card: ${card?.name}`,
+			`Counters: ${card?.counters}`
 		);
+
 		return card;
 	});
 
@@ -213,13 +219,13 @@
 		hoveredCardId ? battlefield.find((c) => c.id === hoveredCardId) : null
 	);
 
-	const activePlayerName = $derived(() => {
+	const activePlayerName = $derived.by(() => {
 		return players.find((p) => p.playerId === $playtestGameStore.activePlayerId)?.name ?? '';
 	});
 
 	// Playtest store "turn" currently increments each time we advance priority seat.
 	// For display, we want "Turn 2" only when player 1 starts their second turn (i.e. rounds).
-	const turnNumber = $derived(() => {
+	const turnNumber = $derived.by(() => {
 		const step = Math.max(1, $playtestGameStore.turn);
 		const n = players.length;
 		if (n <= 0) return step;
@@ -239,8 +245,8 @@
 	);
 
 	// Opponent command cards
-	const opponentCommandCards = $derived(() => {
-		const opponent = selectedOpponent();
+	const opponentCommandCards = $derived.by(() => {
+		const opponent = selectedOpponent;
 		return opponent
 			? commandCards.filter((c) => (c.ownerId || c.controllerId) === opponent.playerId)
 			: [];
@@ -881,8 +887,8 @@
 
 		// Build game state
 		const gameState = {
-			turnNumber: turnNumber(),
-			activePlayer: activePlayerName() || '',
+			turnNumber: turnNumber,
+			activePlayer: activePlayerName || '',
 			currentPhase: 'N/A', // Playtest doesn't track phases
 			stack: (state.stack || []).map(extractCardDetails)
 		};
@@ -1369,8 +1375,8 @@
 			{players}
 			{activeControlSeat}
 			availableSessions={availableSessions.length}
-			turnNumber={turnNumber()}
-			activePlayerName={activePlayerName()}
+			{turnNumber}
+			{activePlayerName}
 			{showAllHands}
 			onBack={() => goto('/lobby')}
 			onSessionsClick={() => {
@@ -1447,9 +1453,9 @@
 						<div class="menu-section-content">
 							<div class="turn-info">
 								<Clock size={18} />
-								<span>Turn {turnNumber()}</span>
-								{#if activePlayerName()}
-									<span class="active-player">· {activePlayerName()}</span>
+								<span>Turn {turnNumber}</span>
+								{#if activePlayerName}
+									<span class="active-player">· {activePlayerName}</span>
 								{/if}
 							</div>
 							<button class="menu-btn primary" onclick={handleNextTurn}>Next Turn</button>
@@ -1527,14 +1533,14 @@
 			<!-- Opponent Section(s) -->
 			{#if otherPlayers.length === 1}
 				<!-- 1v1 Layout: Single opponent -->
-				{#if selectedOpponent()}
-					{@const opponent = selectedOpponent()!}
+				{#if selectedOpponent}
+					{@const opponent = selectedOpponent}
 					<OpponentSection
 						{opponent}
 						{otherPlayers}
-						battlefieldNonlands={opponentBattlefieldNonlands()}
-						battlefieldLands={opponentBattlefieldLands()}
-						commandCards={opponentCommandCards()}
+						battlefieldNonlands={opponentBattlefieldNonlands}
+						battlefieldLands={opponentBattlefieldLands}
+						commandCards={opponentCommandCards}
 						{isCommanderGame}
 						showLifeMenu={showOpponentLifeMenu}
 						onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
@@ -1581,14 +1587,14 @@
 				</div>
 				<!-- Single opponent with cycling (shown on small screens) -->
 				<div class="opponents-grid-small">
-					{#if selectedOpponent()}
-						{@const opponent = selectedOpponent()!}
+					{#if selectedOpponent}
+						{@const opponent = selectedOpponent}
 						<OpponentSection
 							{opponent}
 							{otherPlayers}
-							battlefieldNonlands={opponentBattlefieldNonlands()}
-							battlefieldLands={opponentBattlefieldLands()}
-							commandCards={opponentCommandCards()}
+							battlefieldNonlands={opponentBattlefieldNonlands}
+							battlefieldLands={opponentBattlefieldLands}
+							commandCards={opponentCommandCards}
 							{isCommanderGame}
 							showLifeMenu={showOpponentLifeMenu}
 							onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
@@ -1684,23 +1690,23 @@
 		{/if}
 
 		<!-- Counter Dialog -->
-		{#if showCounterDialog && selectedCardForCounters && selectedCardForCountersData()}
+		{#if showCounterDialog && selectedCardForCounters && selectedCardForCountersData}
 			<CounterDialog
-				cardName={selectedCardForCountersData().name}
-				cardId={selectedCardForCountersData().id}
-				currentCounters={selectedCardForCountersData().counters}
+				cardName={selectedCardForCountersData.name}
+				cardId={selectedCardForCountersData.id}
+				currentCounters={selectedCardForCountersData.counters}
 				onAddCounter={(counterName, amount) => {
-					const card = selectedCardForCountersData();
+					const card = selectedCardForCountersData;
 					playtestGameStore.addCounter(card.id, counterName, amount);
 					syncPlaytestToGameStore();
 				}}
 				onRemoveCounter={(counterName, amount) => {
-					const card = selectedCardForCountersData();
+					const card = selectedCardForCountersData;
 					playtestGameStore.removeCounter(card.id, counterName, amount);
 					syncPlaytestToGameStore();
 				}}
 				onSetCounter={(counterName, amount) => {
-					const card = selectedCardForCountersData();
+					const card = selectedCardForCountersData;
 					playtestGameStore.setCounter(card.id, counterName, amount);
 					syncPlaytestToGameStore();
 				}}

@@ -77,7 +77,7 @@
 	}
 
 	// Always use game store for cards and selection
-	const handCards = $derived(($myHand || []).map(toGameCard));
+	const handCards = $derived.by(() => ($myHand || []).map(toGameCard));
 	const selectedCardIds = $derived($selectedCards || []);
 
 	/**
@@ -318,7 +318,7 @@
 						imageUrl={card.imageUrl || ''}
 						isTapped={card.isTapped || false}
 						isSelected={isCardSelected(card.id)}
-						counters={card.counters || []}
+						counters={card.counters?.map((c) => ({ name: c.type, count: c.count })) || []}
 						{size}
 						onclick={() => {}}
 						onhover={() => {}}

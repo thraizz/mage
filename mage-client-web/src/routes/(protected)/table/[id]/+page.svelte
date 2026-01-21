@@ -31,7 +31,7 @@
 	// Derived state
 	const currentPlayer = $derived(table?.players.find((p) => p.username === $auth.user?.username));
 	const isHost = $derived(currentPlayer?.isHost ?? false);
-	const hasMinPlayers = $derived((table?.players.length ?? 0) >= 2);
+	const hasMinPlayers = $derived.by(() => (table?.players.length ?? 0) >= 2);
 	const canStartGame = $derived(isHost && hasMinPlayers);
 
 	/**

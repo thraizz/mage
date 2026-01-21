@@ -64,10 +64,10 @@
 		return total;
 	});
 
-	const remainingDamage = $derived(() => prompt.attackerPower - totalAssigned());
+	const remainingDamage = $derived.by(() => prompt.attackerPower - totalAssigned);
 
 	// Sorted blockers by damage order
-	const sortedBlockers = $derived(() => [...prompt.blockers].sort((a, b) => a.order - b.order));
+	const sortedBlockers = $derived.by(() => [...prompt.blockers].sort((a, b) => a.order - b.order));
 
 	/**
 	 * Get damage assigned to a target

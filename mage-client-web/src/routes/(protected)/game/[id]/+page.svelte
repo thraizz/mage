@@ -111,7 +111,7 @@
 	import AssignDamage from '$lib/components/game/AssignDamage.svelte';
 
 	// Direct player control components
-	import CardContextMenu from '$lib/components/game/CardContextMenu.svelte';
+	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte'; // Phase 4: Deck context menu (plan lines 854-858)
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import VisualStack from '$lib/components/game/VisualStack.svelte';
 	import RollbackConsentDialog from '$lib/components/game/RollbackConsentDialog.svelte';
@@ -132,6 +132,7 @@
 		type DamageAssignmentPrompt,
 		type ParsedCombatOptions
 	} from '$lib/types/combat';
+	import CardContextMenu from '$lib/components/game/CardContextMenu.svelte';
 
 	// Page data from load function
 	const { data } = $props();
@@ -147,6 +148,10 @@
 	let showKeyboardShortcuts = $state(false);
 	let showLifeMenu = $state(false);
 	let lifeMenuEl: HTMLDivElement | null = $state(null);
+
+	// Phase 4: Deck context menu state (plan lines 860-864)
+	let showDeckContextMenu = $state(false);
+	let deckContextMenuPosition = $state({ x: 0, y: 0 });
 
 	// Context menu state
 	let contextMenuCard = $state<(typeof battlefieldCards)[0] | null>(null);
@@ -166,27 +171,8 @@
 	const canBlockIds = $derived($canBlockCardIds);
 	const blockingIds = $derived($assignedBlockerIds);
 
-	// Combat phase detection from prompts
-	const combatPromptOptions = $derived<ParsedCombatOptions | null>(() => {
-		if (!prompt) return null;
-		if (prompt.type !== 'choice') return null;
-		const data = prompt.data as { choices?: string[] };
-		if (!data?.choices) return null;
-		const parsed = parseCombatOptions(data.choices);
-		if (parsed.type === 'none') return null;
-		return parsed;
-	});
-
-	const isDeclaringAttackersPhase = $derived(
-		step === 'DECLARE_ATTACKERS' && combatPromptOptions()?.type === 'attack'
-	);
-
-	const isDeclaringBlockersPhase = $derived(
-		step === 'DECLARE_BLOCKERS' && combatPromptOptions()?.type === 'block'
-	);
-
 	// Damage assignment from special prompt (GAME_ASSIGN_DAMAGE)
-	const damageAssignmentPrompt = $derived<DamageAssignmentPrompt | null>(() => {
+	const damageAssignmentPrompt = $derived.by<DamageAssignmentPrompt | null>(() => {
 		if (!prompt) return null;
 		// Check if this is a damage assignment prompt (sent as 'assignDamage' type)
 		if ((prompt as { type: string }).type === 'assignDamage') {
@@ -280,11 +266,13 @@
 	const myBattlefield = $derived($battlefield.filter((c) => c.controllerId === localPlayerId));
 	const myBattlefieldNonlands = $derived(myBattlefield.filter((c) => !isLandPermanent(c.type)));
 	const myBattlefieldLands = $derived(myBattlefield.filter((c) => isLandPermanent(c.type)));
-	const myCommandCards = $derived($command.filter((c) => (c.ownerId || c.controllerId) === localPlayerId));
+	const myCommandCards = $derived(
+		$command.filter((c) => (c.ownerId || c.controllerId) === localPlayerId)
+	);
 	const isCommanderGame = $derived($command.length > 0);
 
 	// Phase 3: OpponentSection derived state - plan lines 668-696
-	const selectedOpponent = $derived(() => {
+	const selectedOpponent = $derived.by(() => {
 		if (otherPlayers.length === 0) return null;
 		if (!selectedOpponentId || !otherPlayers.find((p) => p.playerId === selectedOpponentId)) {
 			return otherPlayers[0];
@@ -292,23 +280,95 @@
 		return otherPlayers.find((p) => p.playerId === selectedOpponentId) || otherPlayers[0];
 	});
 
-	const opponentBattlefield = $derived(() => {
-		const opponent = selectedOpponent();
-		return opponent ? $battlefield.filter((c) => c.controllerId === opponent.playerId) : [];
+	const opponentBattlefield = $derived.by(() => {
+		return selectedOpponent
+			? $battlefield.filter((c) => c.controllerId === selectedOpponent.playerId)
+			: [];
 	});
 
-	const opponentBattlefieldNonlands = $derived(() =>
-		opponentBattlefield().filter((c) => !isLandPermanent(c.type))
+	const opponentBattlefieldNonlands = $derived.by(() =>
+		opponentBattlefield.filter((c) => !isLandPermanent(c.type))
 	);
 
-	const opponentBattlefieldLands = $derived(() =>
-		opponentBattlefield().filter((c) => isLandPermanent(c.type))
+	const opponentBattlefieldLands = $derived.by(() =>
+		opponentBattlefield.filter((c) => isLandPermanent(c.type))
 	);
 
-	const opponentCommandCards = $derived(() => {
-		const opponent = selectedOpponent();
-		return opponent ? $command.filter((c) => (c.ownerId || c.controllerId) === opponent.playerId) : [];
+	const opponentCommandCards = $derived.by(() => {
+		return selectedOpponent
+			? $command.filter((c) => (c.ownerId || c.controllerId) === selectedOpponent.playerId)
+			: [];
 	});
+
+	// Combat phase detection from prompts
+	const combatPromptOptions = $derived.by<ParsedCombatOptions | null>(() => {
+		if (!prompt) return null;
+		if (prompt.type !== 'choice') return null;
+		const data = prompt.data as { choices?: string[] };
+		if (!data?.choices) return null;
+		const parsed = parseCombatOptions(data.choices);
+		if (parsed.type === 'none') return null;
+		return parsed;
+	});
+
+	const isDeclaringAttackersPhase = $derived(
+		step === 'DECLARE_ATTACKERS' && combatPromptOptions?.type === 'attack'
+	);
+
+	const isDeclaringBlockersPhase = $derived(
+		step === 'DECLARE_BLOCKERS' && combatPromptOptions?.type === 'block'
+	);
+
+	// Phase 4: Card+Deck context menu actions (plan lines 876-906)
+	// TODO: Fix this
+	const cardContextMenuActions = $derived.by(() => {
+		return [
+			{
+				label: 'Draw Cards',
+				icon: '🃏',
+				onClick: () => handleDrawN(1)
+			}
+		];
+	});
+	const deckContextMenuActions = $derived.by(() => {
+		type MenuAction = {
+			label?: string;
+			icon?: string;
+			divider?: boolean;
+			submenu?: MenuAction[];
+			onClick?: () => void;
+			disabled?: boolean;
+		};
+
+		const actions: MenuAction[] = [
+			{
+				label: 'Draw Cards',
+				icon: '🃏',
+				submenu: [
+					{ label: 'Draw 1', onClick: () => handleDrawN(1) },
+					{ label: 'Draw 2', onClick: () => handleDrawN(2) },
+					{ label: 'Draw 3', onClick: () => handleDrawN(3) },
+					{ label: 'Draw 5', onClick: () => handleDrawN(5) },
+					{ label: 'Draw 7', onClick: () => handleDrawN(7) }
+					// DO NOT add Custom... option yet (Phase 5)
+				]
+			},
+			{ divider: true },
+			{
+				label: 'Search Library',
+				icon: '🔍',
+				onClick: handleSearchLibrary
+			},
+			{
+				label: 'Shuffle Library',
+				icon: '🔀',
+				onClick: handleShuffleLibrary
+			}
+		];
+
+		return actions;
+	});
+
 	const isGameOver = $derived($gameOver);
 	const gameWinner = $derived($winner);
 	const error = $derived($gameError);
@@ -1243,6 +1303,34 @@
 	}
 
 	/**
+	 * Phase 4: Handle deck context menu (plan lines 866-874)
+	 */
+	function handleDeckContextMenu(event: MouseEvent) {
+		event.preventDefault();
+		deckContextMenuPosition = { x: event.clientX, y: event.clientY };
+		showDeckContextMenu = true;
+	}
+
+	/**
+	 * Phase 4: Draw N cards from library (plan lines 909-915)
+	 */
+	async function handleDrawN(count: number) {
+		if (isActionLoading || !gameId || !localPlayerId) return;
+
+		isActionLoading = true;
+		try {
+			await drawCards(gameId, localPlayerId, count);
+			addLogEntry(`Drew ${count} card${count !== 1 ? 's' : ''}`);
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+			console.error('Failed to draw cards:', err);
+			addLogEntry(`Failed to draw: ${errorMessage}`);
+		} finally {
+			isActionLoading = false;
+		}
+	}
+
+	/**
 	 * Flip card face up/down (J key)
 	 */
 	async function handleFlipCard(cardId: string, currentlyFaceDown: boolean) {
@@ -1363,7 +1451,7 @@
 	 */
 	async function handleBattlefieldCardClick(cardId: string) {
 		// Handle declare attackers phase - toggle attacker on click
-		if (isDeclaringAttackersPhase && combatPromptOptions()) {
+		if (isDeclaringAttackersPhase && combatPromptOptions) {
 			const card = battlefieldCards.find((c) => c.id === cardId);
 			if (!card) return;
 
@@ -1371,8 +1459,8 @@
 			const canAttack = canAttackIds.has(cardId);
 			if (canAttack) {
 				// Get defenders for this attacker
-				const options = combatPromptOptions()!;
-				const validDefenders = options.attackOptions
+				const options = combatPromptOptions;
+				const validDefenders = options!.attackOptions
 					.filter((opt) => opt.cardId === cardId)
 					.map((opt) => opt.defenderId);
 
@@ -1596,7 +1684,7 @@
 				gameStore.setError(result.error || 'Failed to approve rollback');
 			}
 			// Clear the pending request - server will send GAME_ROLLBACK_COMPLETE
-			gameStore.update((s) => ({ ...s, pendingRollbackRequest: null }));
+			gameStore.rollbackCardPlay();
 		} catch (err) {
 			console.error('Failed to approve rollback:', err);
 			gameStore.setError(err instanceof Error ? err.message : 'Failed to approve rollback');
@@ -1951,7 +2039,7 @@
 			if (!lastSyncedStackIds.has(card.id)) {
 				console.log('[GamePage] Syncing server stack item to visual stack:', card.name, card.id);
 				visualStackStore.addItem(card.id, card.name, 'stack', {
-					imageUrl: card.imageUrl || getScryfallImageUrl(card.name),
+					imageUrl: card?.imageUrl || getScryfallImageUrl(card.name),
 					controllerId: card.controllerId,
 					note: 'Spell',
 					// Use server's stack item ID as localId for sync
@@ -2153,10 +2241,10 @@
 		{/if}
 
 		<!-- Combat: Declare Attackers -->
-		{#if isDeclaringAttackersPhase && combatPromptOptions() && gameId}
+		{#if isDeclaringAttackersPhase && combatPromptOptions && gameId}
 			<DeclareAttackers
 				{gameId}
-				options={combatPromptOptions()!}
+				options={combatPromptOptions}
 				battlefieldCards={getPlayerBattlefieldCards(localPlayerId)}
 				defenders={getDefenderTargets()}
 				onComplete={handleCombatComplete}
@@ -2164,10 +2252,10 @@
 		{/if}
 
 		<!-- Combat: Declare Blockers -->
-		{#if isDeclaringBlockersPhase && combatPromptOptions() && gameId}
+		{#if isDeclaringBlockersPhase && combatPromptOptions && gameId}
 			<DeclareBlockers
 				{gameId}
-				options={combatPromptOptions()!}
+				options={combatPromptOptions}
 				{battlefieldCards}
 				attackingCreatures={getAttackingCreatures()}
 				onComplete={handleCombatComplete}
@@ -2175,8 +2263,8 @@
 		{/if}
 
 		<!-- Combat: Assign Damage -->
-		{#if damageAssignmentPrompt() && gameId}
-			<AssignDamage {gameId} prompt={damageAssignmentPrompt()!} onComplete={handleCombatComplete} />
+		{#if damageAssignmentPrompt && gameId}
+			<AssignDamage {gameId} prompt={damageAssignmentPrompt} onComplete={handleCombatComplete} />
 		{/if}
 
 		<!-- Prompt Overlay (non-mana prompts) -->
@@ -2206,68 +2294,17 @@
 		<!-- Main Game Area with Sidebar -->
 		<div class="game-area-wrapper">
 			<main class="game-layout" class:four-player={otherPlayers.length >= 3}>
-			<!-- Phase 3: OpponentSection integration - plan lines 516-594 -->
-			{#if otherPlayers.length === 1}
-				<!-- 1v1 layout - single opponent (plan lines 516-538) -->
-				{#if selectedOpponent()}
-					{@const opponent = selectedOpponent()!}
-					<OpponentSection
-						{opponent}
-						{otherPlayers}
-						battlefieldNonlands={opponentBattlefieldNonlands()}
-						battlefieldLands={opponentBattlefieldLands()}
-						commandCards={opponentCommandCards()}
-						{isCommanderGame}
-						showLifeMenu={showOpponentLifeMenu}
-						onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
-						onLifeChange={handleLifeChange}
-						onPoisonChange={handlePoisonChange}
-						onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
-						onCardContextMenu={(cardId, cardName) => {
-							contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
-							contextMenuPosition = { x: 0, y: 0 };
-						}}
-					/>
-				{/if}
-			{:else}
-				<!-- Multi-opponent layouts (plan lines 542-594) -->
-				<!-- Grid layout for large screens -->
-				<div class="opponents-grid opponents-grid-large">
-					{#each otherPlayers as opponent (opponent.playerId)}
-						{@const oppBattlefield = $battlefield.filter((c) => c.controllerId === opponent.playerId)}
-						{@const oppBattlefieldNonlands = oppBattlefield.filter((c) => !isLandPermanent(c.type))}
-						{@const oppBattlefieldLands = oppBattlefield.filter((c) => isLandPermanent(c.type))}
-						{@const oppCommandCards = $command.filter((c) => (c.ownerId || c.controllerId) === opponent.playerId)}
-						<OpponentSection
-							{opponent}
-							otherPlayers={[]}
-							battlefieldNonlands={oppBattlefieldNonlands}
-							battlefieldLands={oppBattlefieldLands}
-							commandCards={oppCommandCards}
-							{isCommanderGame}
-							showLifeMenu={false}
-							onSelectOpponent={undefined}
-							onLifeChange={handleLifeChange}
-							onPoisonChange={handlePoisonChange}
-							onToggleLifeMenu={() => {}}
-							onCardContextMenu={(cardId, cardName) => {
-								contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
-								contextMenuPosition = { x: 0, y: 0 };
-							}}
-						/>
-					{/each}
-				</div>
-
-				<!-- Single opponent with cycling for small screens -->
-				<div class="opponents-grid-small">
-					{#if selectedOpponent()}
-						{@const opponent = selectedOpponent()!}
+				<!-- Phase 3: OpponentSection integration - plan lines 516-594 -->
+				{#if otherPlayers.length === 1}
+					<!-- 1v1 layout - single opponent (plan lines 516-538) -->
+					{#if selectedOpponent}
+						{@const opponent = selectedOpponent}
 						<OpponentSection
 							{opponent}
 							{otherPlayers}
-							battlefieldNonlands={opponentBattlefieldNonlands()}
-							battlefieldLands={opponentBattlefieldLands()}
-							commandCards={opponentCommandCards()}
+							battlefieldNonlands={opponentBattlefieldNonlands}
+							battlefieldLands={opponentBattlefieldLands}
+							commandCards={opponentCommandCards}
 							{isCommanderGame}
 							showLifeMenu={showOpponentLifeMenu}
 							onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
@@ -2280,9 +2317,65 @@
 							}}
 						/>
 					{/if}
-				</div>
-			{/if}
+				{:else}
+					<!-- Multi-opponent layouts (plan lines 542-594) -->
+					<!-- Grid layout for large screens -->
+					<div class="opponents-grid opponents-grid-large">
+						{#each otherPlayers as opponent (opponent.playerId)}
+							{@const oppBattlefield = $battlefield.filter(
+								(c) => c.controllerId === opponent.playerId
+							)}
+							{@const oppBattlefieldNonlands = oppBattlefield.filter(
+								(c) => !isLandPermanent(c.type)
+							)}
+							{@const oppBattlefieldLands = oppBattlefield.filter((c) => isLandPermanent(c.type))}
+							{@const oppCommandCards = $command.filter(
+								(c) => (c.ownerId || c.controllerId) === opponent.playerId
+							)}
+							<OpponentSection
+								{opponent}
+								otherPlayers={[]}
+								battlefieldNonlands={oppBattlefieldNonlands}
+								battlefieldLands={oppBattlefieldLands}
+								commandCards={oppCommandCards}
+								{isCommanderGame}
+								showLifeMenu={false}
+								onSelectOpponent={undefined}
+								onLifeChange={handleLifeChange}
+								onPoisonChange={handlePoisonChange}
+								onToggleLifeMenu={() => {}}
+								onCardContextMenu={(cardId, cardName) => {
+									contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
+									contextMenuPosition = { x: 0, y: 0 };
+								}}
+							/>
+						{/each}
+					</div>
 
+					<!-- Single opponent with cycling for small screens -->
+					<div class="opponents-grid-small">
+						{#if selectedOpponent}
+							{@const opponent = selectedOpponent}
+							<OpponentSection
+								{opponent}
+								{otherPlayers}
+								battlefieldNonlands={opponentBattlefieldNonlands}
+								battlefieldLands={opponentBattlefieldLands}
+								commandCards={opponentCommandCards}
+								{isCommanderGame}
+								showLifeMenu={showOpponentLifeMenu}
+								onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+								onLifeChange={handleLifeChange}
+								onPoisonChange={handlePoisonChange}
+								onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+								onCardContextMenu={(cardId, cardName) => {
+									contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
+									contextMenuPosition = { x: 0, y: 0 };
+								}}
+							/>
+						{/if}
+					</div>
+				{/if}
 
 				<!-- Central Battlefield Area - Plan document lines 322-343 -->
 				<BattlefieldArea
@@ -2290,9 +2383,9 @@
 					battlefieldLands={myBattlefieldLands}
 					commandCards={myCommandCards}
 					{isCommanderGame}
-					isDragging={isDragging}
-					isOverValidDrop={isOverValidDrop}
-					dropZone={dropZone}
+					{isDragging}
+					{isOverValidDrop}
+					{dropZone}
 					{hoveredCardId}
 					onCardClick={handleBattlefieldCardClick}
 					onCardMouseDown={handleBattlefieldCardMouseDown}
@@ -2422,15 +2515,21 @@
 		<!-- Card Context Menu -->
 		{#if contextMenuCard && gameId}
 			<CardContextMenu
-				{gameId}
-				cardId={contextMenuCard.id}
-				cardName={contextMenuCard.name}
-				isTapped={contextMenuCard.tapped}
-				isFaceDown={contextMenuCard.faceDown ?? false}
-				isToken={contextMenuCard.isToken ?? false}
-				currentZone="BATTLEFIELD"
+				card={contextMenuCard}
 				position={contextMenuPosition}
 				onClose={closeContextMenu}
+				actions={cardContextMenuActions}
+			/>
+		{/if}
+
+		<!-- Phase 4: Deck Context Menu (plan lines 917-927) -->
+		{#if showDeckContextMenu && me}
+			<DeckContextMenu
+				position={deckContextMenuPosition}
+				deckCount={me.libraryCount ?? 0}
+				playerName="You"
+				actions={deckContextMenuActions}
+				onClose={() => (showDeckContextMenu = false)}
 			/>
 		{/if}
 
