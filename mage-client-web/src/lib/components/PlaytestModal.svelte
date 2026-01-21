@@ -149,7 +149,7 @@
 	 * Start playtest session
 	 */
 	async function startPlaytest(): Promise<void> {
-		if (!isValid()) return;
+		if (!isValid) return;
 
 		starting = true;
 		try {
@@ -378,7 +378,7 @@
 					<!-- Action buttons -->
 					<div class="modal-actions">
 						<button class="btn-secondary" onclick={onClose} disabled={starting}> Cancel </button>
-						<button class="btn-primary" onclick={startPlaytest} disabled={!isValid() || starting}>
+						<button class="btn-primary" onclick={startPlaytest} disabled={!isValid || starting}>
 							{starting ? 'Starting...' : 'Start Playtest'}
 						</button>
 					</div>

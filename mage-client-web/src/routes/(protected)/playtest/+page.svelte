@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { gameStore } from '$lib/stores/game';
@@ -38,21 +38,10 @@
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import Clock from '@lucide/svelte/icons/clock';
 	import Copy from '@lucide/svelte/icons/copy';
-	import Menu from '@lucide/svelte/icons/menu';
 	import X from '@lucide/svelte/icons/x';
-	import ArrowDown from '@lucide/svelte/icons/arrow-down';
-	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import Shuffle from '@lucide/svelte/icons/shuffle';
-	import Search from '@lucide/svelte/icons/search';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Hand from '@lucide/svelte/icons/hand';
-	import BookOpen from '@lucide/svelte/icons/book-open';
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
 	import Heart from '@lucide/svelte/icons/heart';
-	import Skull from '@lucide/svelte/icons/skull';
-	import GalleryVertical from '@lucide/svelte/icons/gallery-vertical';
-	import FastForward from '@lucide/svelte/icons/fast-forward';
 	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
 	import {
 		dragDropStore,
@@ -103,7 +92,6 @@
 
 	// Mulligan state
 	let mulliganPlayerIndex = $state<number | null>(null);
-	let mulliganCount = $state(0);
 
 	// Drag-drop state
 	const isDragging = $derived($isDraggingStore);
@@ -298,6 +286,7 @@
 
 			// Initialize the normal game store with playtest data so PlayerHand works
 			gameStore.initGame(gameId, initializedPlayers[0].playerId);
+			console.log('[syncPlaytestToGameStore] Initialized game store');
 			syncPlaytestToGameStore();
 
 			// Set playtestId in URL
@@ -378,17 +367,29 @@
 			landsAllowedThisTurn: 1
 		};
 
-		// Reinitialize the game with the current controlling player
-		gameStore.initGame(state.gameId, activeControlSeat);
-		gameStore.setGameView(gameView);
-	}
+		const currentState = JSON.stringify(state);
+		const newState = JSON.stringify(gameView);
 
-	// Sync playtest state changes to game store
+		// Only update the store if the data is actually different
+		if (currentState !== newState) {
+			// Reinitialize the game with the current controlling player
+			gameStore.initGame(state.gameId, activeControlSeat);
+			gameStore.setGameView(gameView);
+		} else {
+			console.log('[syncPlaytestToGameStore] No changes to game store');
+		}
+	}
 	$effect(() => {
+		// We keep this outside untrack so the effect re-runs when the store changes
+		void $playtestGameStore;
+
 		if (isInitialized) {
-			// React to any state changes by accessing the store
-			void $playtestGameStore;
-			syncPlaytestToGameStore();
+			// We wrap the sync in untrack so that any state changes
+			// inside the sync function don't trigger this effect again.
+			untrack(() => {
+				console.log('[syncPlaytestToGameStore] Syncing...');
+				syncPlaytestToGameStore();
+			});
 		}
 	});
 
@@ -745,8 +746,10 @@
 			// Move from hand to battlefield
 			playtestGameStore.moveCardToZone(cardId, 'BATTLEFIELD');
 			// Sync to game store
+			console.log('[syncPlaytestToGameStore] Syncing after moving card to battlefield');
 			syncPlaytestToGameStore();
 		} else if (sourceZone && sourceZone !== 'battlefield') {
+			console.log('[syncPlaytestToGameStore] Syncing after moving card to zone', sourceZone);
 			playtestGameStore.moveCardToZone(cardId, 'BATTLEFIELD');
 			syncPlaytestToGameStore();
 		}
@@ -757,6 +760,7 @@
 	 */
 	function handleZoneDrop(cardId: string, zone: string): void {
 		playtestGameStore.moveCardToZone(cardId, zone);
+		console.log('[syncPlaytestToGameStore] Syncing after dropping card in zone');
 		syncPlaytestToGameStore();
 	}
 
@@ -1182,10 +1186,10 @@
 			// Restore mulligan phase based on first player who hasn't kept.
 			const idx = players.findIndex((p) => !p.keptHand);
 			mulliganPlayerIndex = idx === -1 ? null : idx;
-			mulliganCount = 0;
 
 			// Ensure the normal game store is initialized for shared components.
 			gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
+			console.log('[syncPlaytestToGameStore] Syncing after restoring session');
 			syncPlaytestToGameStore();
 
 			// Set playtestId in URL
@@ -1216,10 +1220,10 @@
 				// Restore mulligan phase based on first player who hasn't kept.
 				const idx = players.findIndex((p) => !p.keptHand);
 				mulliganPlayerIndex = idx === -1 ? null : idx;
-				mulliganCount = 0;
 
 				// Ensure the normal game store is initialized for shared components.
 				gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
+				console.log('[syncPlaytestToGameStore] Syncing after initializing from playtest id');
 				syncPlaytestToGameStore();
 
 				// URL already has playtestId, but ensure it's set correctly
@@ -1267,10 +1271,10 @@
 			// Restore mulligan phase based on first player who hasn't kept.
 			const idx = players.findIndex((p) => !p.keptHand);
 			mulliganPlayerIndex = idx === -1 ? null : idx;
-			mulliganCount = 0;
 
 			// Ensure the normal game store is initialized for shared components.
 			gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
+			console.log('[syncPlaytestToGameStore] Syncing after initializing from url');
 			syncPlaytestToGameStore();
 
 			// Set playtestId in URL
@@ -1682,6 +1686,7 @@
 			<CreateTokenDialog
 				onCreateToken={(name, types, power, toughness, color) => {
 					playtestGameStore.createToken(name, types, power, toughness, color);
+					console.log('[syncPlaytestToGameStore] Syncing after creating token');
 					syncPlaytestToGameStore();
 					showCreateTokenDialog = false;
 				}}
@@ -1698,16 +1703,19 @@
 				onAddCounter={(counterName, amount) => {
 					const card = selectedCardForCountersData;
 					playtestGameStore.addCounter(card.id, counterName, amount);
+					console.log('[syncPlaytestToGameStore] Syncing after adding counter');
 					syncPlaytestToGameStore();
 				}}
 				onRemoveCounter={(counterName, amount) => {
 					const card = selectedCardForCountersData;
 					playtestGameStore.removeCounter(card.id, counterName, amount);
+					console.log('[syncPlaytestToGameStore] Syncing after removing counter');
 					syncPlaytestToGameStore();
 				}}
 				onSetCounter={(counterName, amount) => {
 					const card = selectedCardForCountersData;
 					playtestGameStore.setCounter(card.id, counterName, amount);
+					console.log('[syncPlaytestToGameStore] Syncing after setting counter');
 					syncPlaytestToGameStore();
 				}}
 				onClose={() => {
@@ -1724,10 +1732,12 @@
 				playerName="You"
 				onMove={(cardId, zone) => {
 					playtestGameStore.moveCardToZone(cardId, zone);
+					console.log('[syncPlaytestToGameStore] Syncing after moving card to zone', zone);
 					syncPlaytestToGameStore();
 				}}
 				onShuffle={() => {
 					playtestGameStore.shuffleLibrary(me.playerId);
+					console.log('[syncPlaytestToGameStore] Syncing after shuffling library');
 					syncPlaytestToGameStore();
 				}}
 				onClose={() => (showDeckSearch = false)}

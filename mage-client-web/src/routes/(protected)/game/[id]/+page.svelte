@@ -112,6 +112,7 @@
 
 	// Direct player control components
 	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte'; // Phase 4: Deck context menu (plan lines 854-858)
+	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte'; // Phase 4: Type import (plan line 857)
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import VisualStack from '$lib/components/game/VisualStack.svelte';
 	import RollbackConsentDialog from '$lib/components/game/RollbackConsentDialog.svelte';
@@ -330,16 +331,8 @@
 			}
 		];
 	});
+	// Phase 4: Deck context menu actions (plan lines 876-915)
 	const deckContextMenuActions = $derived.by(() => {
-		type MenuAction = {
-			label?: string;
-			icon?: string;
-			divider?: boolean;
-			submenu?: MenuAction[];
-			onClick?: () => void;
-			disabled?: boolean;
-		};
-
 		const actions: MenuAction[] = [
 			{
 				label: 'Draw Cards',
@@ -382,7 +375,7 @@
 	const pendingRollbackRequest = $derived(gameState.pendingRollbackRequest);
 
 	// Player name map for display
-	const playerNames = $derived(new Map(allPlayers.map((p) => [p.playerId, p.name])));
+	const playerNames = $derived.by(() => new Map(allPlayers.map((p) => [p.playerId, p.name])));
 
 	// Mulligan phase detection - use server-provided value
 	const isMulliganPhase = $derived(
@@ -2418,7 +2411,7 @@
 						onPoisonChange={handlePoisonChange}
 						onToggleLifeMenu={() => (showLifeMenu = !showLifeMenu)}
 						onSearchLibrary={handleSearchLibrary}
-						onDeckContextMenu={() => {}}
+						onDeckContextMenu={handleDeckContextMenu}
 						libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
 						graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
 						exileDropZoneRef={(el) => (exileDropZoneEl = el)}

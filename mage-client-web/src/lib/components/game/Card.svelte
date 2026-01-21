@@ -302,7 +302,7 @@
 
 <div
 	bind:this={cardElement}
-	class="card {sizeClasses()} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack
+	class="card {sizeClasses} {isTapped ? 'tapped' : ''} {isSelected ? 'selected' : ''} {isCardBack
 		? 'card-back'
 		: ''} {isAnimatingTap ? 'tap-animating' : ''} {isDragging ? 'dragging' : ''} {isBeingPlayed
 		? 'being-played'
