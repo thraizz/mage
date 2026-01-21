@@ -94,6 +94,7 @@
 	import ManaPayment from '$lib/components/game/ManaPayment.svelte';
 	import XManaSelector from '$lib/components/game/XManaSelector.svelte';
 	import LibrarySearch from '$lib/components/game/LibrarySearch.svelte';
+	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
 	import type {
 		GamePlayManaData,
 		GamePlayXManaData,
@@ -205,6 +206,7 @@
 	let battlefieldDropZoneEl: HTMLDivElement | null = $state(null);
 	let graveyardDropZoneEl: HTMLElement | null = $state(null);
 	let exileDropZoneEl: HTMLElement | null = $state(null);
+	let libraryDropZoneEl: HTMLElement | null = $state(null);
 	let handDropZoneEl: HTMLElement | null = $state(null);
 	let visualStackDropZoneEl: HTMLElement | null = $state(null);
 	let dropZoneUnregister: (() => void) | null = null;
@@ -2276,143 +2278,29 @@
 					{/if}
 				</div>
 
-				<!-- Player Info & Zones Row (Compact) -->
-				<div class="player-info-row compact">
-					{#if me}
-						<div class="player-identity">
-							<span class="player-name" class:has-priority={havePriority}>
-								You
-								{#if havePriority}
-									<span class="priority-dot"></span>
-								{/if}
-							</span>
-						</div>
-
-						<!-- Player Stats (Life, Poison, Library) -->
-						<div class="player-stats-inline">
-							<div class="life-group">
-								<button
-									class="stat-btn life-btn minus"
-									onclick={() => handleLifeChange(-1)}
-									title="Lose 1 life">−</button
-								>
-								<button
-									class="stat-display life"
-									onclick={() => (showLifeMenu = !showLifeMenu)}
-									title="Click for more options"
-								>
-									<span class="stat-icon">❤️</span>
-									<span class="stat-value">{me.life}</span>
-								</button>
-								<button
-									class="stat-btn life-btn plus"
-									onclick={() => handleLifeChange(1)}
-									title="Gain 1 life">+</button
-								>
-							</div>
-
-							{#if (me.poison ?? 0) > 0}
-								<div class="stat-display poison" title="Poison counters">
-									<span class="stat-icon">☠️</span>
-									<span class="stat-value">{me.poison}</span>
-								</div>
-							{/if}
-
-							<LibraryZone
-								libraryCount={me.libraryCount ?? 0}
-								playerName="You"
-								onSearch={handleSearchLibrary}
-							/>
-
-							<!-- Life/Library Quick Menu -->
-							{#if showLifeMenu}
-								<!-- svelte-ignore a11y_no_static_element_interactions -->
-								<!-- svelte-ignore a11y_click_events_have_key_events -->
-								<div bind:this={lifeMenuEl} class="quick-menu" onclick={(e) => e.stopPropagation()}>
-									<div class="menu-section">
-										<span class="menu-label">Life</span>
-										<div class="menu-row">
-											<button onclick={() => handleLifeChange(-5)}>−5</button>
-											<button onclick={() => handleLifeChange(-1)}>−1</button>
-											<button onclick={() => handleLifeChange(1)}>+1</button>
-											<button onclick={() => handleLifeChange(5)}>+5</button>
-										</div>
-									</div>
-									<div class="menu-section">
-										<span class="menu-label">Poison</span>
-										<div class="menu-row">
-											<button onclick={() => handlePoisonChange(-1)}>−1</button>
-											<span class="menu-value">{me.poison ?? 0}</span>
-											<button onclick={() => handlePoisonChange(1)}>+1</button>
-										</div>
-									</div>
-									<div class="menu-section">
-										<span class="menu-label">Library</span>
-										<div class="menu-row">
-											<button
-												onclick={() => {
-													handleDrawCard();
-													showLifeMenu = false;
-												}}>Draw 1</button
-											>
-											<button
-												onclick={() => {
-													handleShuffleLibrary();
-													showLifeMenu = false;
-												}}>Shuffle</button
-											>
-										</div>
-										<div class="menu-row" style="margin-top: 0.25rem;">
-											<button
-												onclick={() => {
-													handleSearchLibrary();
-													showLifeMenu = false;
-												}}
-												class="search-btn">🔍 Search</button
-											>
-										</div>
-									</div>
-									<button class="menu-close" onclick={() => (showLifeMenu = false)}>✕</button>
-								</div>
-							{/if}
-						</div>
-
-						<div class="player-zones">
-							<!-- svelte-ignore a11y_no_static_element_interactions -->
-							<div
-								bind:this={graveyardDropZoneEl}
-								class="graveyard-drop-zone"
-								class:drag-active={isDragging}
-								class:drag-valid={isDragging && isOverValidDrop && dropZone === 'graveyard'}
-							>
-								<Graveyard
-									cards={myGrave.map(toGameCard)}
-									playerName="You"
-									isOpponent={false}
-									canDrag={havePriority}
-									onCardClick={handleCardClick}
-								/>
-							</div>
-							<!-- svelte-ignore a11y_no_static_element_interactions -->
-							<div
-								bind:this={exileDropZoneEl}
-								class="exile-drop-zone"
-								class:drag-active={isDragging}
-								class:drag-valid={isDragging && isOverValidDrop && dropZone === 'exile'}
-							>
-								<ExileZone
-									cards={myExile.map(toGameCard)}
-									playerName="You"
-									isOpponent={false}
-									canDrag={havePriority}
-									onCardClick={handleCardClick}
-									compact={true}
-								/>
-							</div>
-							<ManaPool mana={myMana} showEmpty={false} size="small" onManaClick={() => {}} />
-						</div>
-					{/if}
-				</div>
+				<!-- Player Info & Zones Row - Using PlayerInfoRow component (see plan lines 35-51) -->
+				{#if me}
+					<PlayerInfoRow
+						player={{
+							name: 'You',
+							life: me.life,
+							poison: me.poison ?? 0,
+							libraryCount: me.libraryCount ?? 0
+						}}
+						graveyard={myGrave}
+						exile={myExile}
+						mana={myMana}
+						{showLifeMenu}
+						onLifeChange={handleLifeChange}
+						onPoisonChange={handlePoisonChange}
+						onToggleLifeMenu={() => (showLifeMenu = !showLifeMenu)}
+						onSearchLibrary={handleSearchLibrary}
+						onDeckContextMenu={() => {}}
+						libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
+						graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
+						exileDropZoneRef={(el) => (exileDropZoneEl = el)}
+					/>
+				{/if}
 
 				<!-- Player Hand -->
 				<div

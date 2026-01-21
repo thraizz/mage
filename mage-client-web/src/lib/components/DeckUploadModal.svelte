@@ -204,6 +204,11 @@
 						// Reformat: Commander first, then empty line, then main deck
 						const formattedLines = ['Commander:', lastNonEmptyLine, '', ...mainDeckLines];
 
+						// If the deck name is still empty, we write the commanders name to it
+						if (deckName === '') {
+							deckName = `${lastNonEmptyLine.split(' ')[1]} Commander Deck`;
+						}
+
 						deckList = formattedLines.join('\n');
 
 						// Update structured view if active
