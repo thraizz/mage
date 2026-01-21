@@ -85,6 +85,7 @@
 	import ManaPool from '$lib/components/game/ManaPool.svelte';
 	import GameHeader from '$lib/components/game/GameHeader.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
+	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
 
 	import PriorityActionBar from '$lib/components/game/PriorityActionBar.svelte';
 	import ActionLogOverlay from '$lib/components/game/ActionLogOverlay.svelte';
@@ -215,9 +216,11 @@
 	let handDropZoneUnregister: (() => void) | null = null;
 	let visualStackDropZoneUnregister: (() => void) | null = null;
 
-	// Battlefield drag state
+	// Battlefield drag state (plan lines 421-428)
 	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
 	let battlefieldIsDragPending = $state(false);
+	let commandDragStartPosition = $state<{ x: number; y: number } | null>(null);
+	let commandIsDragPending = $state(false);
 	const DRAG_THRESHOLD = 5;
 
 	// Opponent panel states (for collapsing)
@@ -267,6 +270,13 @@
 	const stackCards = $derived($stack);
 	const commandCards = $derived($command);
 	const prompt = $derived($pendingPrompt);
+
+	// Plan document lines 408-419: Derived state for BattlefieldArea component
+	const myBattlefield = $derived($battlefield.filter((c) => c.controllerId === localPlayerId));
+	const myBattlefieldNonlands = $derived(myBattlefield.filter((c) => !isLandPermanent(c.type)));
+	const myBattlefieldLands = $derived(myBattlefield.filter((c) => isLandPermanent(c.type)));
+	const myCommandCards = $derived($command.filter((c) => (c.ownerId || c.controllerId) === localPlayerId));
+	const isCommanderGame = $derived($command.length > 0);
 	const isGameOver = $derived($gameOver);
 	const gameWinner = $derived($winner);
 	const error = $derived($gameError);
@@ -864,6 +874,53 @@
 	 */
 	function handleBattlefieldDragStart(event: DragEvent): void {
 		event.preventDefault();
+	}
+
+	/**
+	 * Plan document lines 687-729: Handle command zone card mouse down with drag threshold
+	 */
+	function handleCommandCardMouseDown(cardId: string, cardName: string, event: MouseEvent): void {
+		if (event.button !== 0) return;
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		commandDragStartPosition = { x: event.clientX, y: event.clientY };
+		commandIsDragPending = true;
+
+		const handleMouseMove = (moveEvent: MouseEvent) => {
+			if (!commandDragStartPosition || !commandIsDragPending) return;
+
+			const dx = moveEvent.clientX - commandDragStartPosition.x;
+			const dy = moveEvent.clientY - commandDragStartPosition.y;
+			const distance = Math.sqrt(dx * dx + dy * dy);
+
+			if (distance >= DRAG_THRESHOLD) {
+				commandIsDragPending = false;
+				const validZones = getAllValidDropZones('command' as SourceZone);
+				dragDropStore.startDrag(
+					cardId,
+					cardName,
+					'command' as SourceZone,
+					moveEvent.clientX,
+					moveEvent.clientY,
+					validZones
+				);
+
+				document.removeEventListener('mousemove', handleMouseMove);
+				document.removeEventListener('mouseup', handleMouseUp);
+			}
+		};
+
+		const handleMouseUp = () => {
+			commandIsDragPending = false;
+			commandDragStartPosition = null;
+			document.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('mouseup', handleMouseUp);
+		};
+
+		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('mouseup', handleMouseUp);
 	}
 
 	/**
@@ -1605,8 +1662,9 @@
 		return battlefieldCards.filter((c) => c.controllerId === playerId);
 	}
 
+	// Plan document lines 408-419: Helper function for battlefield separation
 	function isLandPermanent(cardType?: string | null): boolean {
-		return !!cardType && cardType.toLowerCase().includes('land');
+		return !!cardType && /\bland\b/i.test(cardType);
 	}
 
 	/**
@@ -2125,158 +2183,29 @@
 					{/each}
 				</div>
 
-				<!-- Central Battlefield Area (Drop Zone) -->
-				<div
-					bind:this={battlefieldDropZoneEl}
-					class="battlefield-area"
-					class:drag-active={isDragging}
-					class:drag-valid={isDragging && isOverValidDrop && dropZone === 'battlefield'}
-				>
-					<!-- Command Zone -->
-					{#if commandCards.length > 0}
-						<div class="command-zone">
-							<span class="zone-label">Command Zone</span>
-							<div class="command-cards">
-								{#each commandCards as card (card.id)}
-									<Card
-										cardId={card.id}
-										cardName={card.name}
-										manaCost={card.manaCost}
-										cardType={card.type}
-										power={card.power}
-										toughness={card.toughness}
-										imageUrl=""
-										isTapped={card.tapped}
-										isSelected={gameState.selectedCardIds.includes(card.id)}
-										size="small"
-										onclick={() => handleBattlefieldCardClick(card.id)}
-										hasActivatedAbilities={card.availableActions?.some(
-											(a) =>
-												a.actionType === CardActionType.CARD_ACTION_ACTIVATE_ABILITY ||
-												String(a.actionType) === 'CARD_ACTION_ACTIVATE_ABILITY' ||
-												a.actionType === 3
-										)}
-										summoningSickness={card.summoningSickness}
-									/>
-								{/each}
-							</div>
-						</div>
-					{/if}
-
-					<!-- My Battlefield -->
-					<div class="my-battlefield">
-						<span class="zone-label">Your Battlefield</span>
-						<div class="battlefield-rows">
-							{#if getPlayerBattlefieldCards(localPlayerId).filter((c) => !isLandPermanent(c.type)).length > 0}
-								<div class="battlefield-cards battlefield-row--nonlands">
-									{#each getPlayerBattlefieldCards(localPlayerId).filter((c) => !isLandPermanent(c.type)) as card (card.id)}
-										<!-- svelte-ignore a11y_no_static_element_interactions -->
-										<div
-											class="battlefield-card-wrapper"
-											class:draggable={true}
-											class:is-dragging={isBattlefieldCardDragging(card.id)}
-											class:is-hovered={hoveredCardId === card.id}
-											onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-											ondragstart={handleBattlefieldDragStart}
-											onmouseenter={() => (hoveredCardId = card.id)}
-											onmouseleave={() => {
-												if (hoveredCardId === card.id) hoveredCardId = null;
-											}}
-										>
-											<Card
-												cardId={card.id}
-												cardName={card.name}
-												manaCost={card.manaCost}
-												cardType={card.type}
-												power={card.power}
-												toughness={card.toughness}
-												imageUrl=""
-												isTapped={card.tapped}
-												isSelected={gameState.selectedCardIds.includes(card.id)}
-												size="normal"
-												onclick={() => handleBattlefieldCardClick(card.id)}
-												oncontextmenu={(e) => handleCardContextMenu(e, card)}
-												canAttack={canAttackIds.has(card.id)}
-												isAttacking={attackingIds.has(card.id)}
-												canBlock={canBlockIds.has(card.id)}
-												isBlocking={blockingIds.has(card.id)}
-												summoningSickness={card.summoningSickness}
-												isDragging={isBattlefieldCardDragging(card.id)}
-											/>
-										</div>
-									{/each}
-								</div>
-							{/if}
-
-							{#if getPlayerBattlefieldCards(localPlayerId).filter( (c) => isLandPermanent(c.type) ).length > 0}
-								<div class="battlefield-cards battlefield-row--lands">
-									{#each getPlayerBattlefieldCards(localPlayerId).filter( (c) => isLandPermanent(c.type) ) as card (card.id)}
-										<!-- svelte-ignore a11y_no_static_element_interactions -->
-										<div
-											class="battlefield-card-wrapper"
-											class:draggable={true}
-											class:is-dragging={isBattlefieldCardDragging(card.id)}
-											class:is-hovered={hoveredCardId === card.id}
-											onmousedown={(e) => handleBattlefieldCardMouseDown(card.id, card.name, e)}
-											ondragstart={handleBattlefieldDragStart}
-											onmouseenter={() => (hoveredCardId = card.id)}
-											onmouseleave={() => {
-												if (hoveredCardId === card.id) hoveredCardId = null;
-											}}
-										>
-											<Card
-												cardId={card.id}
-												cardName={card.name}
-												manaCost={card.manaCost}
-												cardType={card.type}
-												power={card.power}
-												toughness={card.toughness}
-												imageUrl=""
-												isTapped={card.tapped}
-												isSelected={gameState.selectedCardIds.includes(card.id)}
-												size="normal"
-												onclick={() => handleBattlefieldCardClick(card.id)}
-												oncontextmenu={(e) => handleCardContextMenu(e, card)}
-												canAttack={canAttackIds.has(card.id)}
-												isAttacking={attackingIds.has(card.id)}
-												canBlock={canBlockIds.has(card.id)}
-												isBlocking={blockingIds.has(card.id)}
-												summoningSickness={card.summoningSickness}
-												isDragging={isBattlefieldCardDragging(card.id)}
-											/>
-										</div>
-									{/each}
-								</div>
-							{/if}
-
-							{#if getPlayerBattlefieldCards(localPlayerId).length === 0}
-								<div class="empty-battlefield">
-									{#if isDragging}
-										<span class="drop-hint">Drop card here to play</span>
-									{:else}
-										No permanents
-									{/if}
-								</div>
-							{/if}
-						</div>
-					</div>
-
-					<!-- Drop zone overlay indicator -->
-					{#if isDragging}
-						<div
-							class="drop-zone-overlay"
-							class:valid={isOverValidDrop && dropZone === 'battlefield'}
-						>
-							<span class="drop-label">
-								{#if isOverValidDrop && dropZone === 'battlefield'}
-									✓ Release to play
-								{:else}
-									Drag card here
-								{/if}
-							</span>
-						</div>
-					{/if}
-				</div>
+				<!-- Central Battlefield Area - Plan document lines 322-343 -->
+				<BattlefieldArea
+					battlefieldNonlands={myBattlefieldNonlands}
+					battlefieldLands={myBattlefieldLands}
+					commandCards={myCommandCards}
+					{isCommanderGame}
+					isDragging={isDragging}
+					isOverValidDrop={isOverValidDrop}
+					dropZone={dropZone}
+					{hoveredCardId}
+					onCardClick={handleBattlefieldCardClick}
+					onCardMouseDown={handleBattlefieldCardMouseDown}
+					onCardContextMenu={(cardId, cardName) => {
+						contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
+						contextMenuPosition = { x: 0, y: 0 };
+					}}
+					onCommandCardMouseDown={handleCommandCardMouseDown}
+					onCardHover={(cardId) => (hoveredCardId = cardId)}
+					battlefieldDropZoneRef={(el) => (battlefieldDropZoneEl = el)}
+					commandDropZoneRef={(el) => {
+						// Command drop zone not currently used in game page
+					}}
+				/>
 
 				<!-- Player Info & Zones Row - Using PlayerInfoRow component (see plan lines 35-51) -->
 				{#if me}
