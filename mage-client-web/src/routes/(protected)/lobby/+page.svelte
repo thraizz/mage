@@ -371,12 +371,12 @@
 				<h1 class="page-title">The Battlefield</h1>
 				{#if !loading && tables.length > 0}
 					<span class="table-count">
-						{filteredTables().length}
-						{#if filteredTables().length !== tables.length}
+						{filteredTables.length}
+						{#if filteredTables.length !== tables.length}
 							<span class="count-divider">/</span>
 							<span class="total-count">{tables.length}</span>
 						{/if}
-						{filteredTables().length === 1 ? 'table' : 'tables'}
+						{filteredTables.length === 1 ? 'table' : 'tables'}
 					</span>
 				{/if}
 				{#if wsState === 'connected'}
@@ -552,7 +552,7 @@
 						</p>
 						<button class="create-table-button" onclick={openCreateModal}>Summon Table</button>
 					</div>
-				{:else if filteredTables().length === 0}
+				{:else if filteredTables.length === 0}
 					<!-- Empty State - No Results -->
 					<div class="empty-container">
 						<div class="empty-icon">🔍</div>
@@ -565,7 +565,7 @@
 				{:else}
 					<!-- Tables Grid -->
 					<div class="tables-grid">
-						{#each filteredTables() as table (table.id)}
+						{#each filteredTables as table (table.id)}
 							<TableCard {table} onClick={handleTableClick} />
 						{/each}
 					</div>

@@ -116,6 +116,7 @@
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import VisualStack from '$lib/components/game/VisualStack.svelte';
 	import RollbackConsentDialog from '$lib/components/game/RollbackConsentDialog.svelte';
+	import NumberInputDialog from '$lib/components/game/NumberInputDialog.svelte'; // Phase 5: Number input dialog (plan lines 1013-1016)
 	import { requestRollback, respondToRollback } from '$lib/api/game';
 	import {
 		combatStore,
@@ -153,6 +154,16 @@
 	// Phase 4: Deck context menu state (plan lines 860-864)
 	let showDeckContextMenu = $state(false);
 	let deckContextMenuPosition = $state({ x: 0, y: 0 });
+
+	// Phase 5: Number input dialog state (plan lines 1018-1028)
+	let showNumberInputDialog = $state(false);
+	let numberInputDialogConfig = $state<{
+		title: string;
+		defaultValue: number;
+		min?: number;
+		max?: number;
+		onConfirm: (value: number) => void;
+	} | null>(null);
 
 	// Context menu state
 	let contextMenuCard = $state<(typeof battlefieldCards)[0] | null>(null);
@@ -342,8 +353,9 @@
 					{ label: 'Draw 2', onClick: () => handleDrawN(2) },
 					{ label: 'Draw 3', onClick: () => handleDrawN(3) },
 					{ label: 'Draw 5', onClick: () => handleDrawN(5) },
-					{ label: 'Draw 7', onClick: () => handleDrawN(7) }
-					// DO NOT add Custom... option yet (Phase 5)
+					{ label: 'Draw 7', onClick: () => handleDrawN(7) },
+					{ divider: true }, // Phase 5: Separator before custom option (plan lines 1048-1060)
+					{ label: 'Custom...', onClick: () => showNumberInput('Draw N Cards', 1, handleDrawN) } // Phase 5: Custom draw option (plan lines 1048-1060)
 				]
 			},
 			{ divider: true },
@@ -1321,6 +1333,23 @@
 		} finally {
 			isActionLoading = false;
 		}
+	}
+
+	/**
+	 * Phase 5: Show number input dialog (plan lines 1030-1046)
+	 * @param title - Dialog title
+	 * @param defaultValue - Initial value
+	 * @param onConfirm - Callback when value is confirmed
+	 */
+	function showNumberInput(title: string, defaultValue: number, onConfirm: (value: number) => void) {
+		numberInputDialogConfig = {
+			title,
+			defaultValue,
+			min: 1,
+			max: 999,
+			onConfirm
+		};
+		showNumberInputDialog = true;
 	}
 
 	/**
@@ -2537,6 +2566,25 @@
 				request={pendingRollbackRequest}
 				onApprove={handleApproveRollback}
 				onDeny={handleDenyRollback}
+			/>
+		{/if}
+
+		<!-- Phase 5: Number Input Dialog (plan lines 1062-1077) -->
+		{#if showNumberInputDialog && numberInputDialogConfig}
+			<NumberInputDialog
+				title={numberInputDialogConfig.title}
+				defaultValue={numberInputDialogConfig.defaultValue}
+				min={numberInputDialogConfig.min}
+				max={numberInputDialogConfig.max}
+				onConfirm={(value) => {
+					numberInputDialogConfig?.onConfirm(value);
+					showNumberInputDialog = false;
+					numberInputDialogConfig = null;
+				}}
+				onCancel={() => {
+					showNumberInputDialog = false;
+					numberInputDialogConfig = null;
+				}}
 			/>
 		{/if}
 
