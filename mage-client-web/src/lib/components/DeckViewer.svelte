@@ -262,7 +262,7 @@
 		<!-- Header -->
 		<div class="viewer-header">
 			<div class="header-left">
-				<button class="btn-back" on:click={handleClose} title="Back to deck list">
+				<button class="btn-back" onclick={handleClose} title="Back to deck list">
 					<ArrowLeft class="icon" size={20} aria-hidden="true" />
 				</button>
 				<div class="header-text">
@@ -274,15 +274,15 @@
 				</div>
 			</div>
 			<div class="header-actions">
-				<button class="btn-copy" on:click={handleCopy} title="Copy deck to clipboard">
+				<button class="btn-copy" onclick={handleCopy} title="Copy deck to clipboard">
 					<Copy class="icon" size={20} aria-hidden="true" />
 					Copy
 				</button>
-				<button class="btn-export" on:click={handleExport}>
+				<button class="btn-export" onclick={handleExport}>
 					<Download class="icon" size={20} aria-hidden="true" />
 					Export
 				</button>
-				<button class="btn-delete" on:click={handleDelete}>
+				<button class="btn-delete" onclick={handleDelete}>
 					<Trash2 class="icon" size={20} aria-hidden="true" />
 					Delete
 				</button>

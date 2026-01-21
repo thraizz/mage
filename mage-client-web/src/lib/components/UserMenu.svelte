@@ -49,7 +49,7 @@
 	<button
 		bind:this={menuButton}
 		class="user-button"
-		on:click={toggleMenu}
+		onclick={toggleMenu}
 		aria-label="User menu"
 		aria-expanded={menuOpen}
 	>
@@ -74,19 +74,19 @@
 
 			<div class="dropdown-divider"></div>
 
-			<a href="/profile" class="dropdown-item" on:click={closeMenu} role="menuitem">
+			<a href="/profile" class="dropdown-item" onclick={closeMenu} role="menuitem">
 				<User size={16} aria-hidden="true" />
 				Profile
 			</a>
 
-			<a href="/decks" class="dropdown-item" on:click={closeMenu} role="menuitem">
+			<a href="/decks" class="dropdown-item" onclick={closeMenu} role="menuitem">
 				<Layers size={16} aria-hidden="true" />
 				My Decks
 			</a>
 
 			<div class="dropdown-divider"></div>
 
-			<button class="dropdown-item logout" on:click={handleLogout} role="menuitem">
+			<button class="dropdown-item logout" onclick={handleLogout} role="menuitem">
 				<LogOut size={16} aria-hidden="true" />
 				Logout
 			</button>

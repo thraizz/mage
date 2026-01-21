@@ -51,7 +51,7 @@
 
 	// Initialize combat store with parsed options
 	$effect(() => {
-		combatStore.enterDeclareAttackersPhase(options, cardNames(), defenders);
+		combatStore.enterDeclareAttackersPhase(options, cardNames, defenders);
 	});
 
 	/**
@@ -212,7 +212,7 @@
 				{#each combatStore.getDeclaredAttackers() as attacker}
 					{@const validDefenders = getValidDefendersForAttacker(attacker.cardId)}
 					<div class="attacker-item">
-						<span class="attacker-name">{cardNames().get(attacker.cardId) || 'Unknown'}</span>
+						<span class="attacker-name">{cardNames.get(attacker.cardId) || 'Unknown'}</span>
 						<span class="attack-arrow">→</span>
 						{#if validDefenders.length > 1}
 							<select

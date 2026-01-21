@@ -25,8 +25,8 @@
 		</div>
 
 		<div class="dialog-actions">
-			<button class="deny-btn" on:click={onDeny}> Deny </button>
-			<button class="approve-btn" on:click={onApprove}> Approve </button>
+			<button class="deny-btn" onclick={onDeny}> Deny </button>
+			<button class="approve-btn" onclick={onApprove}> Approve </button>
 		</div>
 	</div>
 </div>

@@ -52,7 +52,7 @@
 	</div>
 
 	{#if data.dismissible}
-		<button class="toast-dismiss" on:click={handleDismiss} aria-label="Dismiss notification">
+		<button class="toast-dismiss" onclick={handleDismiss} aria-label="Dismiss notification">
 			<X size={16} aria-hidden="true" />
 		</button>
 	{/if}

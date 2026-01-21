@@ -450,7 +450,7 @@ Sideboard:
 		</div>
 
 		<!-- Form -->
-		<form on:submit|preventDefault={handleSubmit}>
+		<form onsubmit|preventDefault={handleSubmit}>
 			<!-- Deck Name -->
 			<div class="form-group">
 				<label for="deck-name">
@@ -487,7 +487,7 @@ Sideboard:
 						<button
 							type="button"
 							class="view-toggle"
-							on:click={() => (viewMode === 'text' ? switchToStructuredView() : switchToTextView())}
+							onclick={() => (viewMode === 'text' ? switchToStructuredView() : switchToTextView())}
 							disabled={loading}
 						>
 							{#if viewMode === 'text'}
@@ -498,7 +498,7 @@ Sideboard:
 								Text
 							{/if}
 						</button>
-						<button type="button" class="example-link" on:click={loadExample} disabled={loading}>
+						<button type="button" class="example-link" onclick={loadExample} disabled={loading}>
 							<BookOpen class="icon" size={14} aria-hidden="true" />
 							Load Example
 						</button>
@@ -509,7 +509,7 @@ Sideboard:
 					<textarea
 						id="deck-list"
 						bind:value={deckList}
-						on:paste={handlePaste}
+						onpaste={handlePaste}
 						placeholder="4 Lightning Bolt&#10;20 Mountain&#10;&#10;Sideboard:&#10;2 Dragon's Claw"
 						rows="12"
 						disabled={loading}
@@ -536,7 +536,7 @@ Sideboard:
 									<button
 										type="button"
 										class="btn-add"
-										on:click={() => addCard('commander')}
+										onclick={() => addCard('commander')}
 										disabled={loading}
 									>
 										<Plus class="icon" size={14} aria-hidden="true" />
@@ -552,14 +552,14 @@ Sideboard:
 												min="1"
 												max="100"
 												bind:value={card.quantity}
-												on:change={() => updateCard(globalIndex, 'quantity', card.quantity)}
+												onchange={() => updateCard(globalIndex, 'quantity', card.quantity)}
 												class="card-quantity"
 												disabled={loading}
 											/>
 											<input
 												type="text"
 												bind:value={card.name}
-												on:input={(e) => updateCard(globalIndex, 'name', e.currentTarget.value)}
+												oninput={(e) => updateCard(globalIndex, 'name', e.currentTarget.value)}
 												placeholder="Card name"
 												class="card-name"
 												disabled={loading}
@@ -567,7 +567,7 @@ Sideboard:
 											<button
 												type="button"
 												class="btn-remove"
-												on:click={() => removeCard(globalIndex)}
+												onclick={() => removeCard(globalIndex)}
 												disabled={loading}
 												aria-label="Remove card"
 												title="Remove"
@@ -590,7 +590,7 @@ Sideboard:
 								<button
 									type="button"
 									class="btn-add"
-									on:click={() => addCard('main')}
+									onclick={() => addCard('main')}
 									disabled={loading}
 								>
 									<Plus class="icon" size={14} aria-hidden="true" />
@@ -606,14 +606,14 @@ Sideboard:
 											min="1"
 											max="100"
 											bind:value={card.quantity}
-											on:change={() => updateCard(globalIndex, 'quantity', card.quantity)}
+											onchange={() => updateCard(globalIndex, 'quantity', card.quantity)}
 											class="card-quantity"
 											disabled={loading}
 										/>
 										<input
 											type="text"
 											bind:value={card.name}
-											on:input={(e) => updateCard(globalIndex, 'name', e.currentTarget.value)}
+											oninput={(e) => updateCard(globalIndex, 'name', e.currentTarget.value)}
 											placeholder="Card name"
 											class="card-name"
 											disabled={loading}
@@ -623,7 +623,7 @@ Sideboard:
 												<button
 													type="button"
 													class="btn-move btn-move-commander"
-													on:click={() => moveCard(globalIndex, 'commander')}
+													onclick={() => moveCard(globalIndex, 'commander')}
 													disabled={loading}
 													title="Set as Commander"
 													aria-label="Set as Commander"
@@ -636,7 +636,7 @@ Sideboard:
 											<button
 												type="button"
 												class="btn-move"
-												on:click={() => moveCard(globalIndex, 'sideboard')}
+												onclick={() => moveCard(globalIndex, 'sideboard')}
 												disabled={loading}
 												title="Move to Sideboard"
 												aria-label="Move to Sideboard"
@@ -647,7 +647,7 @@ Sideboard:
 										<button
 											type="button"
 											class="btn-remove"
-											on:click={() => removeCard(globalIndex)}
+											onclick={() => removeCard(globalIndex)}
 											disabled={loading}
 											aria-label="Remove card"
 											title="Remove"
@@ -670,7 +670,7 @@ Sideboard:
 									<button
 										type="button"
 										class="btn-add"
-										on:click={() => addCard('sideboard')}
+										onclick={() => addCard('sideboard')}
 										disabled={loading}
 									>
 										<Plus class="icon" size={14} aria-hidden="true" />
@@ -686,14 +686,14 @@ Sideboard:
 												min="1"
 												max="100"
 												bind:value={card.quantity}
-												on:change={() => updateCard(globalIndex, 'quantity', card.quantity)}
+												onchange={() => updateCard(globalIndex, 'quantity', card.quantity)}
 												class="card-quantity"
 												disabled={loading}
 											/>
 											<input
 												type="text"
 												bind:value={card.name}
-												on:input={(e) => updateCard(globalIndex, 'name', e.currentTarget.value)}
+												oninput={(e) => updateCard(globalIndex, 'name', e.currentTarget.value)}
 												placeholder="Card name"
 												class="card-name"
 												disabled={loading}
@@ -701,7 +701,7 @@ Sideboard:
 											<button
 												type="button"
 												class="btn-move"
-												on:click={() => moveCard(globalIndex, 'main')}
+												onclick={() => moveCard(globalIndex, 'main')}
 												disabled={loading}
 												title="Move to Main Deck"
 												aria-label="Move to Main Deck"
@@ -711,7 +711,7 @@ Sideboard:
 											<button
 												type="button"
 												class="btn-remove"
-												on:click={() => removeCard(globalIndex)}
+												onclick={() => removeCard(globalIndex)}
 												disabled={loading}
 												aria-label="Remove card"
 												title="Remove"
@@ -787,7 +787,7 @@ Sideboard:
 				<button
 					type="button"
 					class="btn-secondary"
-					on:click={handleClear}
+					onclick={handleClear}
 					disabled={loading || !deckList.trim()}
 				>
 					<Eraser class="icon" size={16} aria-hidden="true" />
@@ -795,7 +795,7 @@ Sideboard:
 				</button>
 
 				<div class="actions-right">
-					<button type="button" class="btn-secondary" on:click={handleClose} disabled={loading}>
+					<button type="button" class="btn-secondary" onclick={handleClose} disabled={loading}>
 						<X class="icon" size={16} aria-hidden="true" />
 						Cancel
 					</button>

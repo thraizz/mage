@@ -113,22 +113,22 @@
 	 */
 	function validateAssignment(): { valid: boolean; error?: string } {
 		// Total must equal attacker power
-		if (totalAssigned() !== prompt.attackerPower) {
+		if (totalAssigned !== prompt.attackerPower) {
 			return {
 				valid: false,
-				error: `Must assign exactly ${prompt.attackerPower} damage (currently ${totalAssigned()})`
+				error: `Must assign exactly ${prompt.attackerPower} damage (currently ${totalAssigned})`
 			};
 		}
 
 		// Check lethal damage ordering
 		let mustAssignLethal = true;
-		for (const blocker of sortedBlockers()) {
+		for (const blocker of sortedBlockers) {
 			const assigned = getDamage(blocker.id);
 			const lethal = getLethalDamage(blocker);
 
 			if (mustAssignLethal && assigned < lethal) {
 				// Check if later targets have damage
-				const laterTargets = [...sortedBlockers().filter((b) => b.order > blocker.order)];
+				const laterTargets = [...sortedBlockers.filter((b) => b.order > blocker.order)];
 				if (prompt.hasTrample) {
 					// Also check defending player
 					const playerDamage = getDamage(prompt.defendingPlayerId);
@@ -140,7 +140,7 @@
 					}
 				}
 
-				for (const later of laterTargets) {
+				for (const later of sortedBlockers.filter((b) => b.order > blocker.order)) {
 					if (getDamage(later.id) > 0) {
 						return {
 							valid: false,
@@ -235,7 +235,7 @@
 			<div class="header-icon">⚔️</div>
 			<div class="header-content">
 				<h3 id="damage-title" class="header-title">Assign Combat Damage</h3>
-				<p class="header-subtitle">{prompt.message || 'Distribute damage among blockers'}</p>
+				<p class="header-subtitle">Distribute damage among blockers</p>
 			</div>
 		</div>
 
@@ -248,15 +248,15 @@
 			<div class="damage-counter">
 				<span
 					class="remaining"
-					class:over={remainingDamage() < 0}
-					class:exact={remainingDamage() === 0}
+					class:over={remainingDamage < 0}
+					class:exact={remainingDamage === 0}
 				>
-					{remainingDamage() >= 0 ? remainingDamage() : Math.abs(remainingDamage())}
+					{remainingDamage >= 0 ? remainingDamage : Math.abs(remainingDamage)}
 				</span>
 				<span class="remaining-label">
-					{#if remainingDamage() > 0}
+					{#if remainingDamage > 0}
 						remaining
-					{:else if remainingDamage() < 0}
+					{:else if remainingDamage < 0}
 						over!
 					{:else}
 						✓ all assigned
@@ -269,7 +269,7 @@
 		<div class="blockers-list">
 			<h4 class="list-title">Blockers (in damage order)</h4>
 
-			{#each sortedBlockers() as blocker, index}
+			{#each sortedBlockers as blocker, index}
 				{@const damage = getDamage(blocker.id)}
 				{@const lethal = getLethalDamage(blocker)}
 				{@const isLethal = damage >= lethal}
@@ -374,7 +374,7 @@
 			<button
 				class="btn-confirm"
 				onclick={handleSubmit}
-				disabled={isSubmitting || remainingDamage() !== 0}
+				disabled={isSubmitting || remainingDamage !== 0}
 				type="button"
 			>
 				{#if isSubmitting}

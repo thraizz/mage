@@ -312,7 +312,7 @@
 			</div>
 		{/if}
 
-		<form class="login-form" on:submit={handleLogin}>
+		<form class="login-form" onsubmit={handleLogin}>
 			<div class="form-group">
 				<label for="username">Username</label>
 				<input
@@ -376,7 +376,7 @@
 			<span>— OR —</span>
 		</div>
 
-		<button type="button" class="btn-secondary" on:click={handleGuestLogin} disabled={isLoading}>
+		<button type="button" class="btn-secondary" onclick={handleGuestLogin} disabled={isLoading}>
 			{#if isLoading}
 				<span class="spinner" aria-hidden="true"></span>
 				Gathering Mana...
@@ -391,7 +391,7 @@
 			</div>
 
 			<div class="dev-login-buttons">
-				<button type="button" class="btn-dev" on:click={handleDevLogin} disabled={isLoading}>
+				<button type="button" class="btn-dev" onclick={handleDevLogin} disabled={isLoading}>
 					{#if isLoading}
 						<span class="spinner" aria-hidden="true"></span>
 						Gathering Mana...
@@ -400,7 +400,7 @@
 					{/if}
 				</button>
 
-				<button type="button" class="btn-dev" on:click={handleDevLogin2} disabled={isLoading}>
+				<button type="button" class="btn-dev" onclick={handleDevLogin2} disabled={isLoading}>
 					{#if isLoading}
 						<span class="spinner" aria-hidden="true"></span>
 						Gathering Mana...
@@ -441,7 +441,7 @@
 					<button
 						type="button"
 						class="copy-button"
-						on:click={() => {
+						onclick={() => {
 							if (typeof navigator !== 'undefined' && navigator.clipboard) {
 								navigator.clipboard.writeText(guestUsername);
 								toast.success('Username copied!');
@@ -461,7 +461,7 @@
 					<button
 						type="button"
 						class="copy-button"
-						on:click={copyPasswordToClipboard}
+						onclick={copyPasswordToClipboard}
 						title="Copy password"
 					>
 						<Copy size={16} aria-hidden="true" />
@@ -471,7 +471,7 @@
 		</div>
 
 		<div class="modal-actions">
-			<button type="button" class="btn-primary" on:click={handleGuestLoginAfterModal}>
+			<button type="button" class="btn-primary" onclick={handleGuestLoginAfterModal}>
 				Continue to Game
 			</button>
 		</div>

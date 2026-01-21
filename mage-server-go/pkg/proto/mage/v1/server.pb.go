@@ -316,8 +316,8 @@ var file_mage_v1_server_proto_depIdxs = []int32{
 	36,  // 36: mage.v1.MageServer.SendPlayerBoolean:input_type -> mage.v1.SendPlayerBooleanRequest
 	37,  // 37: mage.v1.MageServer.SendPlayerInteger:input_type -> mage.v1.SendPlayerIntegerRequest
 	38,  // 38: mage.v1.MageServer.SendPlayerManaType:input_type -> mage.v1.SendPlayerManaTypeRequest
-	39,  // 39: mage.v1.MageServer.SendPlayerAction:input_type -> mage.v1.SendPlayerActionRequest
-	40,  // 40: mage.v1.MageServer.SendSpecialAction:input_type -> mage.v1.SendSpecialActionRequest
+	39,  // 39: mage.v1.MageServer.SendPlayerActioninput_type -> mage.v1.SendPlayerActionRequest
+	40,  // 40: mage.v1.MageServer.SendSpecialActioninput_type -> mage.v1.SendSpecialActionRequest
 	41,  // 41: mage.v1.MageServer.ActivateAbility:input_type -> mage.v1.ActivateAbilityRequest
 	42,  // 42: mage.v1.MageServer.MatchStart:input_type -> mage.v1.MatchStartRequest
 	43,  // 43: mage.v1.MageServer.MatchQuit:input_type -> mage.v1.MatchQuitRequest
@@ -352,7 +352,7 @@ var file_mage_v1_server_proto_depIdxs = []int32{
 	72,  // 72: mage.v1.MageServer.AdminLockUser:input_type -> mage.v1.AdminLockUserRequest
 	73,  // 73: mage.v1.MageServer.AdminActivateUser:input_type -> mage.v1.AdminActivateUserRequest
 	74,  // 74: mage.v1.MageServer.AdminToggleActivateUser:input_type -> mage.v1.AdminToggleActivateUserRequest
-	75,  // 75: mage.v1.MageServer.AdminEndUserSession:input_type -> mage.v1.AdminEndUserSessionRequest
+	75,  // 75: mage.v1.MageServer.AdminEndUserSessioninput_type -> mage.v1.AdminEndUserSessionRequest
 	76,  // 76: mage.v1.MageServer.AdminTableRemove:input_type -> mage.v1.AdminTableRemoveRequest
 	77,  // 77: mage.v1.MageServer.AdminSendBroadcastMessage:input_type -> mage.v1.AdminSendBroadcastMessageRequest
 	78,  // 78: mage.v1.MageServer.AdminGetAllActiveGames:input_type -> mage.v1.AdminGetAllActiveGamesRequest

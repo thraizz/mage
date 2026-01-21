@@ -89,8 +89,8 @@
 
 <div
 	class="connection-status"
-	on:mouseenter={() => (showTooltip = true)}
-	on:mouseleave={() => (showTooltip = false)}
+	onmouseenter={() => (showTooltip = true)}
+	onmouseleave={() => (showTooltip = false)}
 	role="status"
 	aria-live="polite"
 >
@@ -115,13 +115,13 @@
 				{:else if connectionState === 'reconnecting'}
 					<p>Lost connection. Attempting to reconnect</p>
 					<p class="attempt">Attempt {reconnectAttempts} of 10</p>
-					<button class="reconnect-btn" on:click={handleReconnect}>Reconnect Now</button>
+					<button class="reconnect-btn" onclick={handleReconnect}>Reconnect Now</button>
 				{:else}
 					<p>Not connected to server</p>
 					{#if error}
 						<p class="error">{error}</p>
 					{/if}
-					<button class="reconnect-btn" on:click={handleReconnect}>Reconnect</button>
+					<button class="reconnect-btn" onclick={handleReconnect}>Reconnect</button>
 				{/if}
 			</div>
 		</div>

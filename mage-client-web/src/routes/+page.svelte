@@ -195,19 +195,19 @@
 		<div class="test-panel toast-test">
 			<h3>Toast Notification Test</h3>
 			<div class="test-buttons">
-				<button class="btn-secondary test-btn" data-tone="success" on:click={testSuccess}>
+				<button class="btn-secondary test-btn" data-tone="success" onclick={testSuccess}>
 					Success Toast
 				</button>
-				<button class="btn-secondary test-btn" data-tone="error" on:click={testError}
+				<button class="btn-secondary test-btn" data-tone="error" onclick={testError}
 					>Error Toast</button
 				>
-				<button class="btn-secondary test-btn" data-tone="warning" on:click={testWarning}>
+				<button class="btn-secondary test-btn" data-tone="warning" onclick={testWarning}>
 					Warning Toast
 				</button>
-				<button class="btn-secondary test-btn" data-tone="info" on:click={testInfo}
+				<button class="btn-secondary test-btn" data-tone="info" onclick={testInfo}
 					>Info Toast</button
 				>
-				<button class="btn-secondary test-btn" data-tone="multiple" on:click={testMultiple}>
+				<button class="btn-secondary test-btn" data-tone="multiple" onclick={testMultiple}>
 					Multiple Toasts
 				</button>
 			</div>
@@ -220,35 +220,35 @@
 				<button
 					class="btn-secondary test-btn"
 					data-tone="info"
-					on:click={() => (showBasicModal = true)}
+					onclick={() => (showBasicModal = true)}
 				>
 					Basic Modal
 				</button>
 				<button
 					class="btn-secondary test-btn"
 					data-tone="success"
-					on:click={() => (showSmallModal = true)}
+					onclick={() => (showSmallModal = true)}
 				>
 					Small Modal
 				</button>
 				<button
 					class="btn-secondary test-btn"
 					data-tone="warning"
-					on:click={() => (showLargeModal = true)}
+					onclick={() => (showLargeModal = true)}
 				>
 					Large Modal
 				</button>
 				<button
 					class="btn-secondary test-btn"
 					data-tone="error"
-					on:click={() => (showNoBackdropModal = true)}
+					onclick={() => (showNoBackdropModal = true)}
 				>
 					No Backdrop Close
 				</button>
 				<button
 					class="btn-secondary test-btn"
 					data-tone="multiple"
-					on:click={() => (showNoCloseModal = true)}
+					onclick={() => (showNoCloseModal = true)}
 				>
 					No Close Button
 				</button>
@@ -259,19 +259,19 @@
 		<div class="test-panel confirm-test">
 			<h3>Confirmation Dialog Test</h3>
 			<div class="test-buttons">
-				<button class="btn-secondary test-btn" data-tone="info" on:click={testBasicConfirm}>
+				<button class="btn-secondary test-btn" data-tone="info" onclick={testBasicConfirm}>
 					Basic Confirm
 				</button>
-				<button class="btn-secondary test-btn" data-tone="error" on:click={testDestructiveConfirm}>
+				<button class="btn-secondary test-btn" data-tone="error" onclick={testDestructiveConfirm}>
 					Destructive Confirm
 				</button>
-				<button class="btn-secondary test-btn" data-tone="success" on:click={testCustomConfirm}>
+				<button class="btn-secondary test-btn" data-tone="success" onclick={testCustomConfirm}>
 					Custom Text
 				</button>
 				<button
 					class="btn-secondary test-btn"
 					data-tone="multiple"
-					on:click={() => (showComponentConfirm = true)}
+					onclick={() => (showComponentConfirm = true)}
 				>
 					Component-based
 				</button>
@@ -282,20 +282,20 @@
 		<div class="test-panel loading-test">
 			<h3>Loading Spinner Test</h3>
 			<div class="test-buttons">
-				<button class="btn-secondary test-btn" data-tone="info" on:click={testOverlaySpinner}>
+				<button class="btn-secondary test-btn" data-tone="info" onclick={testOverlaySpinner}>
 					Overlay Spinner
 				</button>
 				<button
 					class="btn-secondary test-btn"
 					data-tone="success"
-					on:click={testOverlaySpinnerWithLabel}
+					onclick={testOverlaySpinnerWithLabel}
 				>
 					With Label
 				</button>
 				<button
 					class="btn-secondary test-btn"
 					data-tone="warning"
-					on:click={() => (showInlineSpinners = !showInlineSpinners)}
+					onclick={() => (showInlineSpinners = !showInlineSpinners)}
 				>
 					Toggle Inline
 				</button>
@@ -344,8 +344,8 @@
 	</ul>
 
 	<div slot="footer">
-		<button class="btn-secondary" on:click={() => (showBasicModal = false)}>Cancel</button>
-		<button class="btn-primary" on:click={handleModalAction}>Confirm</button>
+		<button class="btn-secondary" onclick={() => (showBasicModal = false)}>Cancel</button>
+		<button class="btn-primary" onclick={handleModalAction}>Confirm</button>
 	</div>
 </Modal>
 
@@ -353,7 +353,7 @@
 	<p>This is a small modal, perfect for quick confirmations or short messages.</p>
 
 	<div slot="footer">
-		<button class="btn-primary" on:click={() => (showSmallModal = false)}>Got it</button>
+		<button class="btn-primary" onclick={() => (showSmallModal = false)}>Got it</button>
 	</div>
 </Modal>
 
@@ -371,7 +371,7 @@
 	</p>
 
 	<div slot="footer">
-		<button class="btn-secondary" on:click={() => (showLargeModal = false)}>Close</button>
+		<button class="btn-secondary" onclick={() => (showLargeModal = false)}>Close</button>
 	</div>
 </Modal>
 
@@ -380,7 +380,7 @@
 	<p>You must use the close button or press ESC.</p>
 
 	<div slot="footer">
-		<button class="btn-primary" on:click={() => (showNoBackdropModal = false)}>Close</button>
+		<button class="btn-primary" onclick={() => (showNoBackdropModal = false)}>Close</button>
 	</div>
 </Modal>
 
@@ -389,7 +389,7 @@
 	<p>Use the button below to close it.</p>
 
 	<div slot="footer">
-		<button class="btn-primary" on:click={() => (showNoCloseModal = false)}> Close Modal </button>
+		<button class="btn-primary" onclick={() => (showNoCloseModal = false)}> Close Modal </button>
 	</div>
 </Modal>
 

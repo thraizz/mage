@@ -74,7 +74,7 @@
 					<h1>My Decks</h1>
 					<p>Manage your deck collection</p>
 				</div>
-				<button class="btn-upload" on:click={handleUploadNewDeck}>
+				<button class="btn-upload" onclick={handleUploadNewDeck}>
 					<Plus class="icon" size={20} aria-hidden="true" />
 					Upload New Deck
 				</button>
@@ -84,13 +84,13 @@
 		<!-- Filters -->
 		<div class="filters">
 			<label for="format" class="filter-label"> Filter by format: </label>
-			<select id="format" bind:value={selectedFormat} on:change={loadDecks} class="format-select">
+			<select id="format" bind:value={selectedFormat} onchange={loadDecks} class="format-select">
 				<option value="">All Formats</option>
 				{#each formats as format}
 					<option value={format}>{format}</option>
 				{/each}
 			</select>
-			<button on:click={loadDecks} class="btn-refresh" title="Refresh deck list">
+			<button onclick={loadDecks} class="btn-refresh" title="Refresh deck list">
 				<RefreshCw class="refresh-icon" size={16} aria-hidden="true" />
 			</button>
 		</div>
@@ -110,7 +110,7 @@
 					<div class="error-text">
 						<h3>Error loading decks</h3>
 						<p>{error}</p>
-						<button class="btn-retry" on:click={loadDecks}> Try Again </button>
+						<button class="btn-retry" onclick={loadDecks}> Try Again </button>
 					</div>
 				</div>
 			</div>
@@ -124,7 +124,7 @@
 						: 'Get started by uploading your first deck.'}
 				</p>
 				<div class="empty-actions">
-					<button class="btn-upload-empty" on:click={handleUploadNewDeck}>
+					<button class="btn-upload-empty" onclick={handleUploadNewDeck}>
 						<Plus class="icon" size={20} aria-hidden="true" />
 						Upload Deck
 					</button>

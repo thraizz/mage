@@ -91,7 +91,7 @@
 	{:else if error}
 		<div class="error">
 			<p>❌ {error}</p>
-			<button class="btn-primary" on:click={loadMatches}>Retry</button>
+			<button class="btn-primary" onclick={loadMatches}>Retry</button>
 		</div>
 	{:else if matches.length === 0}
 		<div class="empty-state">
@@ -152,21 +152,21 @@
 				<button
 					class="btn-pagination"
 					disabled={currentPage === 1}
-					on:click={() => goToPage(currentPage - 1)}
+					onclick={() => goToPage(currentPage - 1)}
 				>
 					Previous
 				</button>
 
 				<div class="page-numbers">
 					{#if currentPage > 2}
-						<button class="btn-page" on:click={() => goToPage(1)}>1</button>
+						<button class="btn-page" onclick={() => goToPage(1)}>1</button>
 						{#if currentPage > 3}
 							<span class="ellipsis">...</span>
 						{/if}
 					{/if}
 
 					{#if currentPage > 1}
-						<button class="btn-page" on:click={() => goToPage(currentPage - 1)}>
+						<button class="btn-page" onclick={() => goToPage(currentPage - 1)}>
 							{currentPage - 1}
 						</button>
 					{/if}
@@ -174,7 +174,7 @@
 					<button class="btn-page active">{currentPage}</button>
 
 					{#if currentPage < totalPages}
-						<button class="btn-page" on:click={() => goToPage(currentPage + 1)}>
+						<button class="btn-page" onclick={() => goToPage(currentPage + 1)}>
 							{currentPage + 1}
 						</button>
 					{/if}
@@ -183,7 +183,7 @@
 						{#if currentPage < totalPages - 2}
 							<span class="ellipsis">...</span>
 						{/if}
-						<button class="btn-page" on:click={() => goToPage(totalPages)}>
+						<button class="btn-page" onclick={() => goToPage(totalPages)}>
 							{totalPages}
 						</button>
 					{/if}
@@ -192,7 +192,7 @@
 				<button
 					class="btn-pagination"
 					disabled={currentPage === totalPages}
-					on:click={() => goToPage(currentPage + 1)}
+					onclick={() => goToPage(currentPage + 1)}
 				>
 					Next
 				</button>

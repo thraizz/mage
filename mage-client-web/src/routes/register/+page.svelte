@@ -204,7 +204,7 @@
 			</div>
 		{/if}
 
-		<form class="register-form" on:submit={handleRegister}>
+		<form class="register-form" onsubmit={handleRegister}>
 			<div class="form-group">
 				<label for="username">Choose Your Name</label>
 				<input
@@ -212,8 +212,8 @@
 					id="username"
 					name="username"
 					bind:value={username}
-					on:input={handleUsernameInput}
-					on:blur={handleUsernameBlur}
+					oninput={handleUsernameInput}
+					onblur={handleUsernameBlur}
 					placeholder="Enter your planeswalker name"
 					disabled={isLoading}
 					aria-required="true"
@@ -235,8 +235,8 @@
 					id="password"
 					name="password"
 					bind:value={password}
-					on:input={handlePasswordInput}
-					on:blur={handlePasswordBlur}
+					oninput={handlePasswordInput}
+					onblur={handlePasswordBlur}
 					placeholder="Minimum 8 characters"
 					disabled={isLoading}
 					aria-required="true"
@@ -256,8 +256,8 @@
 					id="confirm-password"
 					name="confirm-password"
 					bind:value={confirmPassword}
-					on:input={handleConfirmPasswordInput}
-					on:blur={handleConfirmPasswordBlur}
+					oninput={handleConfirmPasswordInput}
+					onblur={handleConfirmPasswordBlur}
 					placeholder="Re-enter your password"
 					disabled={isLoading}
 					aria-required="true"

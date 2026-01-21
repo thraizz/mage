@@ -31,7 +31,7 @@
 	}
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
 
 <Modal {open} {title} size="small" closeOnBackdrop={false} onClose={handleCancel}>
 	<div class="confirm-message">
@@ -39,10 +39,10 @@
 	</div>
 
 	<div slot="footer" class="confirm-actions">
-		<button class="btn-cancel" on:click={handleCancel}>
+		<button class="btn-cancel" onclick={handleCancel}>
 			{cancelText}
 		</button>
-		<button class="btn-confirm" class:destructive on:click={handleConfirm}>
+		<button class="btn-confirm" class:destructive onclick={handleConfirm}>
 			{confirmText}
 		</button>
 	</div>

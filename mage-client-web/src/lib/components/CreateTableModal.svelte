@@ -127,7 +127,7 @@
 		};
 
 		// Validate
-		if (!isValid()) {
+		if (!isValid) {
 			return;
 		}
 
@@ -363,7 +363,7 @@
 			<button type="button" class="cancel-button" onclick={handleClose} disabled={loading}>
 				Cancel
 			</button>
-			<button type="submit" class="submit-button" disabled={loading || !isValid()}>
+			<button type="submit" class="submit-button" disabled={loading || !isValid}>
 				{#if loading}
 					<LoadingSpinner size="small" color="white" />
 					<span>Creating...</span>

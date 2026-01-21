@@ -115,7 +115,7 @@
 	<!-- Backdrop -->
 	<div
 		class="modal-backdrop"
-		on:click={handleBackdropClick}
+		onclick={handleBackdropClick}
 		transition:fade={{ duration: 200 }}
 		role="presentation"
 	>
@@ -139,7 +139,7 @@
 					{#if showCloseButton}
 						<button
 							class="modal-close-button"
-							on:click={handleClose}
+							onclick={handleClose}
 							aria-label="Close modal"
 							type="button"
 						>

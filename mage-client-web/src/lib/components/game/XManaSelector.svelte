@@ -175,9 +175,9 @@
 			</div>
 
 			<!-- Quick select buttons -->
-			{#if quickAmounts().length > 0}
+			{#if quickAmounts.length > 0}
 				<div class="quick-select">
-					{#each quickAmounts() as amount}
+					{#each quickAmounts as amount}
 						<button
 							class="btn-quick"
 							class:active={selectedAmount === amount}

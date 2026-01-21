@@ -122,7 +122,7 @@
 			</div>
 
 			<!-- Message -->
-			<h2 class="countdown-title">{countdownMessage()}</h2>
+			<h2 class="countdown-title">{countdownMessage}</h2>
 			<p class="countdown-subtitle">Get ready!</p>
 
 			<!-- Cancel Button (optional) -->

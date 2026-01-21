@@ -48,7 +48,7 @@
 			<!-- Mobile Menu Button -->
 			<button
 				class="mobile-menu-button mobile-only"
-				on:click={toggleMobileMenu}
+				onclick={toggleMobileMenu}
 				aria-label="Toggle menu"
 			>
 				<span class="hamburger-line"></span>
@@ -65,7 +65,7 @@
 				href="/lobby"
 				class="mobile-nav-link"
 				class:active={$page.url.pathname === '/lobby'}
-				on:click={closeMobileMenu}
+				onclick={closeMobileMenu}
 			>
 				Lobby
 			</a>
@@ -73,7 +73,7 @@
 				href="/decks"
 				class="mobile-nav-link"
 				class:active={$page.url.pathname === '/decks'}
-				on:click={closeMobileMenu}
+				onclick={closeMobileMenu}
 			>
 				My Decks
 			</a>
@@ -81,7 +81,7 @@
 				href="/profile"
 				class="mobile-nav-link"
 				class:active={$page.url.pathname === '/profile'}
-				on:click={closeMobileMenu}
+				onclick={closeMobileMenu}
 			>
 				Profile
 			</a>

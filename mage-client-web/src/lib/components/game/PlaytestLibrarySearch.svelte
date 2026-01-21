@@ -144,7 +144,7 @@
 			</div>
 
 			<div class="list">
-				{#if filteredCards().length === 0}
+				{#if filteredCards.length === 0}
 					<div class="empty">
 						{#if cards.length === 0}
 							Deck is empty
@@ -153,7 +153,7 @@
 						{/if}
 					</div>
 				{:else}
-					{#each filteredCards() as card (card.id)}
+					{#each filteredCards as card (card.id)}
 						<button
 							class="row"
 							type="button"

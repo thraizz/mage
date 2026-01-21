@@ -75,8 +75,8 @@
 	<div
 		class="table-card clickable"
 		class:full={isFull}
-		on:click={handleClick}
-		on:keypress={(e) => e.key === 'Enter' && handleClick()}
+		onclick={handleClick}
+		onkeypress={(e) => e.key === 'Enter' && handleClick()}
 		role="button"
 		tabindex="0"
 	>

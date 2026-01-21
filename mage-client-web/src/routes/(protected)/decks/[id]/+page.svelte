@@ -83,13 +83,13 @@
 			<h2>Error Loading Deck</h2>
 			<p>{error}</p>
 			<div class="error-actions">
-				<button class="btn-retry" on:click={loadDeck}>Try Again</button>
-				<button class="btn-back" on:click={handleClose}>Back to Decks</button>
+				<button class="btn-retry" onclick={loadDeck}>Try Again</button>
+				<button class="btn-back" onclick={handleClose}>Back to Decks</button>
 			</div>
 		</div>
 	</div>
 {:else if deck}
-	<DeckViewer {deck} {loading} on:close={handleClose} on:delete={handleDeleteClick} />
+	<DeckViewer {deck} {loading} onclose={handleClose} ondelete={handleDeleteClick} />
 {/if}
 
 <!-- Delete Confirmation Dialog -->
