@@ -25,11 +25,7 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      # Mount init script and migrations for database initialization
-      - ./mage-server-go/docker-initdb:/docker-entrypoint-initdb.d:ro
-      - ./mage-server-go/migrations:/docker-entrypoint-initdb.d/migrations:ro
-      # Mount data directory for Scryfall imports (if available)
-      - ./mage-server-go/data:/docker-entrypoint-initdb.d/data:ro
+      - ./mage-server-go:/docker-entrypoint-initdb.d/mage-server-go:ro 
     ports:
       - "5432:5432"
     healthcheck:

@@ -46,7 +46,7 @@
 		mana.white + mana.blue + mana.black + mana.red + mana.green + mana.colorless
 	);
 	const hasAnyMana = $derived(totalMana > 0);
-	const sizeClass = $derived(() => {
+	const sizeClass = $derived.by(() => {
 		switch (size) {
 			case 'small':
 				return 'mana-pool-small';

@@ -22,11 +22,12 @@ function convertDeckInfoToDeck(deckInfo: DeckInfo): Deck {
 		id: deckInfo.id.toString(),
 		name: deckInfo.name,
 		format: deckInfo.format,
-		cardCount: deckInfo.mainDeckCount + deckInfo.sideboardCount,
+		cardCount: deckInfo.mainDeckCount + deckInfo.sideboardCount + (deckInfo.commanderCount || 0),
 		createdAt: deckInfo.createdAt * 1000, // Convert seconds to milliseconds
 		updatedAt: deckInfo.updatedAt * 1000, // Convert seconds to milliseconds
 		isValid: true, // Assume valid if returned from server
 		mainDeck: [], // Summary view doesn't include card details
+		mainDeckCount: deckInfo.mainDeckCount, // Store server-provided count
 		sideboard: [],
 		commanders: [] // Summary view doesn't include commander details
 	};
@@ -332,13 +333,14 @@ export async function uploadDeck(request: DeckUploadRequest): Promise<Deck> {
 	// Calculate total card count from quantities
 	const mainDeckCount = mainDeck.reduce((sum, card) => sum + card.quantity, 0);
 	const sideboardCount = sideboard.reduce((sum, card) => sum + card.quantity, 0);
+	const commanderCount = commanders.reduce((sum, card) => sum + card.quantity, 0);
 
 	// Return a basic deck object - caller should refetch to get full details
 	return {
 		id: response.deckId.toString(),
 		name: request.name,
 		format: request.format,
-		cardCount: mainDeckCount + sideboardCount,
+		cardCount: mainDeckCount + sideboardCount + commanderCount,
 		createdAt: Date.now(),
 		updatedAt: Date.now(),
 		isValid: true,

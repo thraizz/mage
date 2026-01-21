@@ -117,6 +117,11 @@ func (d *Deck) SideboardCount() int {
 	return len(d.Sideboard)
 }
 
+// CommanderCount returns the number of cards in the commander zone
+func (d *Deck) CommanderCount() int {
+	return len(d.Commanders)
+}
+
 // MatchPlayerInfo represents a player's information in a match
 type MatchPlayerInfo struct {
 	UserID   int64  `json:"user_id"`

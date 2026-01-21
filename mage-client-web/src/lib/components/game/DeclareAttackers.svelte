@@ -41,7 +41,7 @@
 	const attackerCount = $derived($declaredAttackerCount);
 
 	// Build a map of card names for display
-	const cardNames = $derived(() => {
+	const cardNames = $derived.by(() => {
 		const map = new Map<string, string>();
 		for (const card of battlefieldCards) {
 			map.set(card.id, card.name);
@@ -158,7 +158,7 @@
 	}
 
 	// Get available attackers (cards that can attack)
-	const availableAttackerIds = $derived(() => {
+	const availableAttackerIds = $derived.by(() => {
 		const ids = new Set<string>();
 		for (const opt of options.attackOptions) {
 			ids.add(opt.cardId);

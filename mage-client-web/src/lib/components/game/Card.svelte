@@ -277,7 +277,7 @@
 	});
 
 	// Derived values
-	const sizeClasses = $derived(() => {
+	const sizeClasses = $derived.by(() => {
 		switch (size) {
 			case 'small':
 				return 'card-small';

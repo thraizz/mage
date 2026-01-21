@@ -42,7 +42,7 @@
 		'planeswalker'
 	] as const;
 
-	const filteredCards = $derived(() => {
+	const filteredCards = $derived.by(() => {
 		let result = [...cards];
 
 		if (searchQuery.trim()) {

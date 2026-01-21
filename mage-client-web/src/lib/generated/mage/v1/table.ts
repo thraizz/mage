@@ -212,6 +212,7 @@ export interface DeckInfo {
 	description: string;
 	mainDeckCount: number;
 	sideboardCount: number;
+	commanderCount: number;
 	/** Unix timestamp */
 	createdAt: number;
 	/** Unix timestamp */
@@ -3228,6 +3229,9 @@ export const DeckInfo: MessageFns<DeckInfo> = {
 		if (message.sideboardCount !== 0) {
 			writer.uint32(48).int32(message.sideboardCount);
 		}
+		if (message.commanderCount !== 0) {
+			writer.uint32(72).int32(message.commanderCount);
+		}
 		if (message.createdAt !== 0) {
 			writer.uint32(56).int64(message.createdAt);
 		}
@@ -3292,6 +3296,14 @@ export const DeckInfo: MessageFns<DeckInfo> = {
 					message.sideboardCount = reader.int32();
 					continue;
 				}
+				case 9: {
+					if (tag !== 72) {
+						break;
+					}
+
+					message.commanderCount = reader.int32();
+					continue;
+				}
 				case 7: {
 					if (tag !== 56) {
 						break;
@@ -3323,9 +3335,10 @@ export const DeckInfo: MessageFns<DeckInfo> = {
 			name: isSet(object.name) ? globalThis.String(object.name) : '',
 			format: isSet(object.format) ? globalThis.String(object.format) : '',
 			description: isSet(object.description) ? globalThis.String(object.description) : '',
-			mainDeckCount: isSet(object.mainDeckCount) ? globalThis.Number(object.mainDeckCount) : 0,
-			sideboardCount: isSet(object.sideboardCount) ? globalThis.Number(object.sideboardCount) : 0,
-			createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
+		mainDeckCount: isSet(object.mainDeckCount) ? globalThis.Number(object.mainDeckCount) : 0,
+		sideboardCount: isSet(object.sideboardCount) ? globalThis.Number(object.sideboardCount) : 0,
+		commanderCount: isSet(object.commanderCount) ? globalThis.Number(object.commanderCount) : 0,
+		createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
 			updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0
 		};
 	},
@@ -3349,6 +3362,9 @@ export const DeckInfo: MessageFns<DeckInfo> = {
 		}
 		if (message.sideboardCount !== 0) {
 			obj.sideboardCount = Math.round(message.sideboardCount);
+		}
+		if (message.commanderCount !== 0) {
+			obj.commanderCount = Math.round(message.commanderCount);
 		}
 		if (message.createdAt !== 0) {
 			obj.createdAt = Math.round(message.createdAt);

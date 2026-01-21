@@ -91,6 +91,7 @@
 	import ActionLogOverlay from '$lib/components/game/ActionLogOverlay.svelte';
 	import GameChatOverlay from '$lib/components/game/GameChatOverlay.svelte';
 	import OpponentPanel from '$lib/components/game/OpponentPanel.svelte';
+	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
 	import DebugOverlay from '$lib/components/game/DebugOverlay.svelte';
 	import ManaPayment from '$lib/components/game/ManaPayment.svelte';
 	import XManaSelector from '$lib/components/game/XManaSelector.svelte';
@@ -226,6 +227,10 @@
 	// Opponent panel states (for collapsing)
 	let opponentExpanded = $state<Record<string, boolean>>({});
 
+	// Phase 3: OpponentSection state - plan lines 662-666
+	let selectedOpponentId = $state<string | null>(null);
+	let showOpponentLifeMenu = $state(false);
+
 	// Auto-pass setting (passes when it's opponent's turn)
 	let autoPass = $state(false);
 
@@ -277,6 +282,33 @@
 	const myBattlefieldLands = $derived(myBattlefield.filter((c) => isLandPermanent(c.type)));
 	const myCommandCards = $derived($command.filter((c) => (c.ownerId || c.controllerId) === localPlayerId));
 	const isCommanderGame = $derived($command.length > 0);
+
+	// Phase 3: OpponentSection derived state - plan lines 668-696
+	const selectedOpponent = $derived(() => {
+		if (otherPlayers.length === 0) return null;
+		if (!selectedOpponentId || !otherPlayers.find((p) => p.playerId === selectedOpponentId)) {
+			return otherPlayers[0];
+		}
+		return otherPlayers.find((p) => p.playerId === selectedOpponentId) || otherPlayers[0];
+	});
+
+	const opponentBattlefield = $derived(() => {
+		const opponent = selectedOpponent();
+		return opponent ? $battlefield.filter((c) => c.controllerId === opponent.playerId) : [];
+	});
+
+	const opponentBattlefieldNonlands = $derived(() =>
+		opponentBattlefield().filter((c) => !isLandPermanent(c.type))
+	);
+
+	const opponentBattlefieldLands = $derived(() =>
+		opponentBattlefield().filter((c) => isLandPermanent(c.type))
+	);
+
+	const opponentCommandCards = $derived(() => {
+		const opponent = selectedOpponent();
+		return opponent ? $command.filter((c) => (c.ownerId || c.controllerId) === opponent.playerId) : [];
+	});
 	const isGameOver = $derived($gameOver);
 	const gameWinner = $derived($winner);
 	const error = $derived($gameError);
@@ -1102,11 +1134,13 @@
 
 	/**
 	 * Handle life change (+ / - buttons)
+	 * Phase 3: Updated to accept optional playerId for opponent life changes - plan lines 736-749
 	 */
-	async function handleLifeChange(delta: number) {
-		if (!gameId || !localPlayerId) return;
+	async function handleLifeChange(delta: number, playerId?: string) {
+		const targetPlayerId = playerId || localPlayerId;
+		if (!gameId || !targetPlayerId) return;
 		try {
-			await modifyLife(gameId, localPlayerId, delta);
+			await modifyLife(gameId, targetPlayerId, delta);
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
 			toast.error(`Failed: ${errorMessage}`);
@@ -1115,13 +1149,17 @@
 
 	/**
 	 * Handle poison counter change
+	 * Phase 3: Updated to accept optional playerId for opponent poison changes - plan lines 736-749
 	 */
-	async function handlePoisonChange(delta: number) {
-		if (!gameId || !localPlayerId) return;
-		const currentPoison = me?.poison ?? 0;
+	async function handlePoisonChange(delta: number, playerId?: string) {
+		const targetPlayerId = playerId || localPlayerId;
+		if (!gameId || !targetPlayerId) return;
+		const player = $players.find((p) => p.playerId === targetPlayerId);
+		if (!player) return;
+		const currentPoison = player.poison ?? 0;
 		const newValue = Math.max(0, currentPoison + delta);
 		try {
-			await setPlayerCounter(gameId, localPlayerId, 'poison', newValue);
+			await setPlayerCounter(gameId, targetPlayerId, 'poison', newValue);
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
 			toast.error(`Failed: ${errorMessage}`);
@@ -2168,20 +2206,83 @@
 		<!-- Main Game Area with Sidebar -->
 		<div class="game-area-wrapper">
 			<main class="game-layout" class:four-player={otherPlayers.length >= 3}>
-				<!-- Opponents Row -->
-				<div class="opponents-row">
-					{#each otherPlayers as opponent, idx (opponent.playerId)}
-						{@const position = getOpponentPosition(idx, otherPlayers.length)}
-						<OpponentPanel
+			<!-- Phase 3: OpponentSection integration - plan lines 516-594 -->
+			{#if otherPlayers.length === 1}
+				<!-- 1v1 layout - single opponent (plan lines 516-538) -->
+				{#if selectedOpponent()}
+					{@const opponent = selectedOpponent()!}
+					<OpponentSection
+						{opponent}
+						{otherPlayers}
+						battlefieldNonlands={opponentBattlefieldNonlands()}
+						battlefieldLands={opponentBattlefieldLands()}
+						commandCards={opponentCommandCards()}
+						{isCommanderGame}
+						showLifeMenu={showOpponentLifeMenu}
+						onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+						onLifeChange={handleLifeChange}
+						onPoisonChange={handlePoisonChange}
+						onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+						onCardContextMenu={(cardId, cardName) => {
+							contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
+							contextMenuPosition = { x: 0, y: 0 };
+						}}
+					/>
+				{/if}
+			{:else}
+				<!-- Multi-opponent layouts (plan lines 542-594) -->
+				<!-- Grid layout for large screens -->
+				<div class="opponents-grid opponents-grid-large">
+					{#each otherPlayers as opponent (opponent.playerId)}
+						{@const oppBattlefield = $battlefield.filter((c) => c.controllerId === opponent.playerId)}
+						{@const oppBattlefieldNonlands = oppBattlefield.filter((c) => !isLandPermanent(c.type))}
+						{@const oppBattlefieldLands = oppBattlefield.filter((c) => isLandPermanent(c.type))}
+						{@const oppCommandCards = $command.filter((c) => (c.ownerId || c.controllerId) === opponent.playerId)}
+						<OpponentSection
 							{opponent}
-							battlefieldCards={getPlayerBattlefieldCards(opponent.playerId)}
-							selectedCardIds={gameState.selectedCardIds}
-							bind:expanded={opponentExpanded[opponent.playerId]}
-							{position}
-							onCardClick={handleBattlefieldCardClick}
+							otherPlayers={[]}
+							battlefieldNonlands={oppBattlefieldNonlands}
+							battlefieldLands={oppBattlefieldLands}
+							commandCards={oppCommandCards}
+							{isCommanderGame}
+							showLifeMenu={false}
+							onSelectOpponent={undefined}
+							onLifeChange={handleLifeChange}
+							onPoisonChange={handlePoisonChange}
+							onToggleLifeMenu={() => {}}
+							onCardContextMenu={(cardId, cardName) => {
+								contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
+								contextMenuPosition = { x: 0, y: 0 };
+							}}
 						/>
 					{/each}
 				</div>
+
+				<!-- Single opponent with cycling for small screens -->
+				<div class="opponents-grid-small">
+					{#if selectedOpponent()}
+						{@const opponent = selectedOpponent()!}
+						<OpponentSection
+							{opponent}
+							{otherPlayers}
+							battlefieldNonlands={opponentBattlefieldNonlands()}
+							battlefieldLands={opponentBattlefieldLands()}
+							commandCards={opponentCommandCards()}
+							{isCommanderGame}
+							showLifeMenu={showOpponentLifeMenu}
+							onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+							onLifeChange={handleLifeChange}
+							onPoisonChange={handlePoisonChange}
+							onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+							onCardContextMenu={(cardId, cardName) => {
+								contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
+								contextMenuPosition = { x: 0, y: 0 };
+							}}
+						/>
+					{/if}
+				</div>
+			{/if}
+
 
 				<!-- Central Battlefield Area - Plan document lines 322-343 -->
 				<BattlefieldArea

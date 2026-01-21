@@ -153,7 +153,7 @@
 	/**
 	 * Filter tables based on current filters
 	 */
-	const filteredTables = $derived(() => {
+	const filteredTables = $derived.by(() => {
 		let result = tables;
 
 		// Filter by format

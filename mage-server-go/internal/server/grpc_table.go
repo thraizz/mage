@@ -14,15 +14,27 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var deckExportSuffixRE = regexp.MustCompile(`\s+\(([a-z0-9]{2,6})\)(?:\s+\d+[a-z]?)?\s*$`)
+var (
+	deckExportSuffixRE = regexp.MustCompile(`\s+\(([a-z0-9]{2,6})\)(?:\s+\d+[a-z]?)?\s*$`)
+	slashNormalizeRE   = regexp.MustCompile(`\s*/\s*`)
+)
 
 // normalizeImportedCardName strips common deck export suffixes like "(EOC) 93" from card names.
+// Also normalizes single-slash split cards to double-slash format for Scryfall compatibility.
 func normalizeImportedCardName(raw string) string {
 	name := strings.TrimSpace(raw)
 	if name == "" {
 		return ""
 	}
 	name = deckExportSuffixRE.ReplaceAllString(name, "")
+	// Normalize single slash to double slash for split cards (Scryfall format)
+	// Handles both "Card / Other" and "Card/Other" formats
+	// Only normalize if it contains a single slash but not already double slash
+	if strings.Contains(name, "/") && !strings.Contains(name, "//") {
+		// Use regex to replace single slash (with optional spaces) with double slash with spaces
+		// This handles: "Card/Other" -> "Card // Other" and "Card / Other" -> "Card // Other"
+		name = slashNormalizeRE.ReplaceAllString(name, " // ")
+	}
 	return strings.TrimSpace(name)
 }
 
@@ -60,9 +72,15 @@ func (s *mageServer) resolveCardNames(ctx context.Context, cardNames []string) (
 		}
 
 		// Fallback for Adventure-style exports: "Brazen Borrower // Petty Theft" (or "Brazen Borrower//Petty Theft")
+		// Also handles single-slash format: "Walk-In Closet/Forgotten Cellar"
 		// Only used if the full name wasn't found.
-		if strings.Contains(normalized, "//") {
-			idx := strings.Index(normalized, "//")
+		if strings.Contains(normalized, "//") || strings.Contains(normalized, "/") {
+			var idx int
+			if strings.Contains(normalized, "//") {
+				idx = strings.Index(normalized, "//")
+			} else {
+				idx = strings.Index(normalized, "/")
+			}
 			left := ""
 			if idx >= 0 {
 				left = strings.TrimSpace(normalized[:idx])
@@ -1318,6 +1336,7 @@ func (s *mageServer) DeckList(ctx context.Context, req *pb.DeckListRequest) (*pb
 			Description:    deck.Description,
 			MainDeckCount:  int32(deck.MainDeckCount()),
 			SideboardCount: int32(deck.SideboardCount()),
+			CommanderCount: int32(deck.CommanderCount()),
 			CreatedAt:      deck.CreatedAt.Unix(),
 			UpdatedAt:      deck.UpdatedAt.Unix(),
 		}
@@ -1532,6 +1551,7 @@ func (s *mageServer) DeckGet(ctx context.Context, req *pb.DeckGetRequest) (*pb.D
 			Description:    deck.Description,
 			MainDeckCount:  int32(deck.MainDeckCount()),
 			SideboardCount: int32(deck.SideboardCount()),
+			CommanderCount: int32(deck.CommanderCount()),
 			CreatedAt:      deck.CreatedAt.Unix(),
 			UpdatedAt:      deck.UpdatedAt.Unix(),
 		},

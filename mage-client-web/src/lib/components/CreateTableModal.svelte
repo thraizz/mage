@@ -52,7 +52,7 @@
 	/**
 	 * Validate form
 	 */
-	const isValid = $derived(() => {
+	const isValid = $derived.by(() => {
 		return selectedFormat !== null && maxPlayers >= 2 && maxPlayers <= 8 && selectedDeck !== null;
 	});
 

@@ -12,6 +12,7 @@ export interface Deck {
 	lastModified?: string; // Human-readable format
 	isValid: boolean;
 	mainDeck: DeckCard[];
+	mainDeckCount?: number; // Server-provided count for summary views
 	sideboard: DeckCard[];
 	commanders: DeckCard[]; // For Commander format
 }

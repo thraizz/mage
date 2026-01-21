@@ -25,7 +25,7 @@
 	const message = $derived(xManaData.message || 'Choose X value');
 
 	// Predefined quick-select amounts
-	const quickAmounts = $derived(() => {
+	const quickAmounts = $derived.by(() => {
 		const amounts: number[] = [];
 		if (maxAmount >= 1) amounts.push(1);
 		if (maxAmount >= 2) amounts.push(2);

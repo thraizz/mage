@@ -135,7 +135,7 @@
 	/**
 	 * Check if form is valid
 	 */
-	const isValid = $derived(() => {
+	const isValid = $derived.by(() => {
 		// Need at least 2 players with selected decks
 		const hasMinimumPlayers = playerCount >= 2;
 		const requiredDecksSelected = selectedDecks

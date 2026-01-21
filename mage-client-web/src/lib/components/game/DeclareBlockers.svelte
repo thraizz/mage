@@ -45,7 +45,7 @@
 	const selectedBlockerId = $derived($selectedBlockerIdStore);
 
 	// Build card name maps
-	const cardNames = $derived(() => {
+	const cardNames = $derived.by(() => {
 		const map = new Map<string, string>();
 		for (const card of battlefieldCards) {
 			map.set(card.id, card.name);
@@ -54,7 +54,7 @@
 	});
 
 	// Get attackers by ID for quick lookup
-	const attackersById = $derived(() => {
+	const attackersById = $derived.by(() => {
 		const map = new Map<string, DeclaredAttacker>();
 		for (const attacker of attackingCreatures) {
 			map.set(attacker.cardId, attacker);
@@ -63,7 +63,7 @@
 	});
 
 	// Get available blockers (cards that can block)
-	const availableBlockerIds = $derived(() => {
+	const availableBlockerIds = $derived.by(() => {
 		const ids = new Set<string>();
 		for (const opt of options.blockOptions) {
 			ids.add(opt.blockerId);
@@ -194,7 +194,7 @@
 	}
 
 	// Get block assignments grouped by attacker
-	const blocksByAttacker = $derived(() => {
+	const blocksByAttacker = $derived.by(() => {
 		const assignments = combatStore.getBlockAssignments();
 		const grouped = new Map<string, string[]>();
 

@@ -56,7 +56,7 @@
 	});
 
 	// Computed values
-	const totalAssigned = $derived(() => {
+	const totalAssigned = $derived.by(() => {
 		let total = 0;
 		for (const damage of assignments.values()) {
 			total += damage;

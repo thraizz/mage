@@ -74,7 +74,7 @@
 	/**
 	 * Get countdown message
 	 */
-	const countdownMessage = $derived(() => {
+	const countdownMessage = $derived.by(() => {
 		if (countdown > 1) {
 			return `Game starting in ${countdown}...`;
 		} else if (countdown === 1) {

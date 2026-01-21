@@ -27,7 +27,7 @@
 
 	// Calculate next hand size after mulligan
 	const nextMulliganCount = $derived(mulliganCount + 1);
-	const nextHandSize = $derived(() => {
+	const nextHandSize = $derived.by(() => {
 		if (nextMulliganCount <= freeMulligans) {
 			return 7; // Free mulligan - draw full 7
 		} else {

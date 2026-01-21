@@ -147,7 +147,7 @@
 	// Derived values
 	const cardCount = $derived(cards.length);
 	const isEmpty = $derived(cardCount === 0);
-	const filteredCards = $derived(() => {
+	const filteredCards = $derived.by(() => {
 		if (!searchQuery.trim()) return cards;
 		const q = searchQuery.toLowerCase();
 		return cards.filter((c) => {

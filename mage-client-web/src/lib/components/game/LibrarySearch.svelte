@@ -60,7 +60,7 @@
 	];
 
 	// Filtered and sorted cards
-	const filteredCards = $derived(() => {
+	const filteredCards = $derived.by(() => {
 		let result = [...cards];
 
 		// Filter by search query
