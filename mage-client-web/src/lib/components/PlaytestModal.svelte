@@ -549,11 +549,6 @@
 		gap: 1rem;
 	}
 
-	.empty-icon {
-		color: #94a3b8;
-		opacity: 0.5;
-	}
-
 	.error-message {
 		color: #ef4444;
 		margin: 0;

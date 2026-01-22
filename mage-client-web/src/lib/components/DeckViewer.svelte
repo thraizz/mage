@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import type { Deck, DeckCard } from '$lib/types/deck';
+	import type { DeckCard } from '$lib/types/deck';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { toast } from '$lib/stores/toast';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
@@ -8,10 +7,7 @@
 	import Download from '@lucide/svelte/icons/download';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
-	export let deck: Deck;
-	export let loading = false;
-
-	const dispatch = createEventDispatcher();
+	const { deck, loading, onclose, ondelete } = $props();
 
 	// Card type grouping
 	interface CardGroup {
@@ -20,10 +16,10 @@
 		totalCount: number;
 	}
 
-	$: cardGroups = groupCardsByType(deck.mainDeck);
-	$: sideboardCards = groupCards(deck.sideboard);
-	$: commanderCards = groupCards(deck.commanders || []);
-	$: deckStats = calculateDeckStats(deck.mainDeck);
+	const cardGroups = $derived(groupCardsByType(deck.mainDeck));
+	const sideboardCards = $derived(groupCards(deck.sideboard));
+	const commanderCards = $derived(groupCards(deck.commanders || []));
+	const deckStats = $derived(calculateDeckStats(deck.mainDeck));
 
 	function groupCardsByType(cards: DeckCard[]): CardGroup[] {
 		// Group cards by type - in a real implementation, we'd need card data with types
@@ -244,11 +240,11 @@
 	}
 
 	function handleDelete() {
-		dispatch('delete');
+		ondelete?.();
 	}
 
 	function handleClose() {
-		dispatch('close');
+		onclose?.();
 	}
 </script>
 
@@ -302,18 +298,24 @@
 				</div>
 				<div class="stat-card">
 					<div class="stat-label">Main Deck</div>
-					<div class="stat-value">{deck.mainDeck.reduce((sum, c) => sum + c.quantity, 0)}</div>
+					<div class="stat-value">
+						{deck.mainDeck.reduce((sum: number, c: DeckCard) => sum + c.quantity, 0)}
+					</div>
 				</div>
 				{#if deck.commanders && deck.commanders.length > 0}
 					<div class="stat-card">
 						<div class="stat-label">Commander{deck.commanders.length > 1 ? 's' : ''}</div>
-						<div class="stat-value">{deck.commanders.reduce((sum, c) => sum + c.quantity, 0)}</div>
+						<div class="stat-value">
+							{deck.commanders.reduce((sum: number, c: DeckCard) => sum + c.quantity, 0)}
+						</div>
 					</div>
 				{/if}
 				{#if deck.sideboard.length > 0}
 					<div class="stat-card">
 						<div class="stat-label">Sideboard</div>
-						<div class="stat-value">{deck.sideboard.reduce((sum, c) => sum + c.quantity, 0)}</div>
+						<div class="stat-value">
+							{deck.sideboard.reduce((sum: number, c: DeckCard) => sum + c.quantity, 0)}
+						</div>
 					</div>
 				{/if}
 			</div>
@@ -363,7 +365,7 @@
 					<div class="card-group">
 						<h3 class="group-header commander-header">
 							Commander{deck.commanders.length > 1 ? 's' : ''} ({deck.commanders.reduce(
-								(sum, c) => sum + c.quantity,
+								(sum: number, c: DeckCard) => sum + c.quantity,
 								0
 							)})
 						</h3>
@@ -397,7 +399,7 @@
 				{#if deck.sideboard.length > 0}
 					<div class="card-group">
 						<h3 class="group-header">
-							Sideboard ({deck.sideboard.reduce((sum, c) => sum + c.quantity, 0)})
+							Sideboard ({deck.sideboard.reduce((sum: number, c: DeckCard) => sum + c.quantity, 0)})
 						</h3>
 						<div class="card-items">
 							{#each sideboardCards as card}

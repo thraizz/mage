@@ -80,7 +80,7 @@
 
 	// Initialize combat store with parsed options
 	$effect(() => {
-		combatStore.enterDeclareBlockersPhase(options, cardNames(), attackingCreatures);
+		combatStore.enterDeclareBlockersPhase(options, cardNames, attackingCreatures);
 	});
 
 	/**
@@ -88,7 +88,7 @@
 	 */
 	function handleBlockerClick(blockerId: string) {
 		if (isSubmitting) return;
-		if (!availableBlockerIds().has(blockerId)) return;
+		if (!availableBlockerIds.has(blockerId)) return;
 
 		// If already blocking, clicking again removes the assignment
 		if (assignedIds.has(blockerId)) {
@@ -112,7 +112,7 @@
 		// Check if selected blocker can block this attacker
 		const canBlock = getBlockableAttackers(selectedBlockerId).includes(attackerId);
 		if (!canBlock) {
-			error = `${cardNames().get(selectedBlockerId) || 'Selected creature'} cannot block ${cardNames().get(attackerId) || 'that attacker'}`;
+			error = `${cardNames.get(selectedBlockerId) || 'Selected creature'} cannot block ${cardNames.get(attackerId) || 'that attacker'}`;
 			return;
 		}
 
@@ -238,9 +238,8 @@
 			<h3 id="blockers-title" class="banner-title">Declare Blockers</h3>
 			{#if selectedBlockerId}
 				<p class="banner-description select-attacker">
-					Now click an <strong>attacker</strong> to block with {cardNames().get(
-						selectedBlockerId
-					) || 'selected creature'}
+					Now click an <strong>attacker</strong> to block with {cardNames.get(selectedBlockerId) ||
+						'selected creature'}
 				</p>
 			{:else}
 				<p class="banner-description">Click a creature you control to select it as a blocker</p>
@@ -269,7 +268,7 @@
 				{#each attackingCreatures as attacker}
 					{@const isBlockable =
 						selectedBlockerId && getBlockableAttackers(selectedBlockerId).includes(attacker.cardId)}
-					{@const blockers = blocksByAttacker().get(attacker.cardId) || []}
+					{@const blockers = blocksByAttacker.get(attacker.cardId) || []}
 					<button
 						class="attacker-card"
 						class:blockable={isBlockable}
@@ -284,7 +283,7 @@
 							<div class="blockers-assigned">
 								<span class="blocked-label">Blocked by:</span>
 								{#each blockers as blockerId}
-									<span class="blocker-chip">{cardNames().get(blockerId) || 'Unknown'}</span>
+									<span class="blocker-chip">{cardNames.get(blockerId) || 'Unknown'}</span>
 								{/each}
 							</div>
 						{:else if isBlockable}
@@ -301,7 +300,7 @@
 		<div class="blockers-section">
 			<h4 class="section-title">Your Creatures</h4>
 			<div class="blocker-cards">
-				{#each battlefieldCards.filter((c) => availableBlockerIds().has(c.id)) as card}
+				{#each battlefieldCards.filter((c) => availableBlockerIds.has(c.id)) as card}
 					{@const isSelected = selectedBlockerId === card.id}
 					{@const isAssigned = assignedIds.has(card.id)}
 					{@const assignedTo = getAssignedAttacker(card.id)}
@@ -318,14 +317,14 @@
 						{/if}
 						{#if isAssigned && assignedTo}
 							<div class="assigned-to">
-								Blocking: {cardNames().get(assignedTo) || 'Unknown'}
+								Blocking: {cardNames.get(assignedTo) || 'Unknown'}
 							</div>
 						{:else if isSelected}
 							<div class="select-hint">Select an attacker to block</div>
 						{/if}
 					</button>
 				{/each}
-				{#if availableBlockerIds().size === 0}
+				{#if availableBlockerIds.size === 0}
 					<div class="no-blockers">No creatures can block</div>
 				{/if}
 			</div>

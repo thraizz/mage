@@ -174,19 +174,21 @@
 				</div>
 
 				<div class="form-row">
-					<label>Color</label>
-					<div class="color-options">
-						{#each colorOptions as option}
-							<button
-								class="color-btn {option.class}"
-								class:selected={color === option.value}
-								onclick={() => (color = option.value)}
-								title={option.label}
-							>
-								{option.label.charAt(0)}
-							</button>
-						{/each}
-					</div>
+					<label
+						>Color
+						<div class="color-options">
+							{#each colorOptions as option}
+								<button
+									class="color-btn {option.class}"
+									class:selected={color === option.value}
+									onclick={() => (color = option.value)}
+									title={option.label}
+								>
+									{option.label.charAt(0)}
+								</button>
+							{/each}
+						</div>
+					</label>
 				</div>
 
 				<div class="form-row">

@@ -67,7 +67,8 @@
 		return validateDeckUtil(deckName, deckList, selectedFormat as DeckFormat, stats);
 	}
 
-	async function handleSubmit() {
+	async function handleSubmit(event: Event) {
+		event.preventDefault();
 		// Validate
 		errors = validateDeck();
 		if (errors.length > 0) {
@@ -450,7 +451,7 @@ Sideboard:
 		</div>
 
 		<!-- Form -->
-		<form onsubmit|preventDefault={handleSubmit}>
+		<form onsubmit={handleSubmit}>
 			<!-- Deck Name -->
 			<div class="form-group">
 				<label for="deck-name">

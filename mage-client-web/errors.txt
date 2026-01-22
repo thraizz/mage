@@ -1,88 +1,6 @@
 Loading svelte-check in workspace: /Users/aron/dev/opensource/mage/mage-client-web
 Getting Svelte diagnostics...
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/generated/mage/v1/table.ts:3200:2
-Error: Property 'commanderCount' is missing in type '{ id: number; name: string; format: string; description: string; mainDeckCount: number; sideboardCount: number; createdAt: number; updatedAt: number; }' but required in type 'DeckInfo'. 
-function createBaseDeckInfo(): DeckInfo {
-	return {
-		id: 0,
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:34:30
-Error: Property 'mockResolvedValue' does not exist on type '() => Promise<string | null>'. 
-		const mockClient = getMageClient();
-		mockClient.ensureSessionId.mockResolvedValue('test-session-id');
-	});
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:42:10
-Error: Property 'commanderCount' is missing in type '{ id: number; name: string; format: string; description: string; mainDeckCount: number; sideboardCount: number; createdAt: number; updatedAt: number; }' but required in type 'DeckInfo'. 
-
-			const mockDeckInfo: DeckInfo = {
-				id: 1,
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:59:20
-Error: Property 'mockResolvedValue' does not exist on type '<TRequest, TResponse>(method: string, request: TRequest) => Promise<TResponse>'. 
-
-			mockClient.call.mockResolvedValue(mockResponse);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:95:20
-Error: Property 'mockResolvedValue' does not exist on type '<TRequest, TResponse>(method: string, request: TRequest) => Promise<TResponse>'. 
-
-			mockClient.call.mockResolvedValue(mockResponse);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:109:31
-Error: Property 'mockResolvedValue' does not exist on type '() => Promise<string | null>'. 
-
-			mockClient.ensureSessionId.mockResolvedValue(null);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:124:20
-Error: Property 'mockResolvedValue' does not exist on type '<TRequest, TResponse>(method: string, request: TRequest) => Promise<TResponse>'. 
-
-			mockClient.call.mockResolvedValue(mockResponse);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:135:10
-Error: Property 'commanderCount' is missing in type '{ id: number; name: string; format: string; description: string; mainDeckCount: number; sideboardCount: number; createdAt: number; updatedAt: number; }' but required in type 'DeckInfo'. 
-
-			const mockDeckInfo: DeckInfo = {
-				id: 1,
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:191:20
-Error: Property 'mockResolvedValue' does not exist on type '<TRequest, TResponse>(method: string, request: TRequest) => Promise<TResponse>'. 
-
-			mockClient.call.mockResolvedValue(mockResponse);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:255:31
-Error: Property 'mockResolvedValue' does not exist on type '() => Promise<string | null>'. 
-
-			mockClient.ensureSessionId.mockResolvedValue(null);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:271:20
-Error: Property 'mockResolvedValue' does not exist on type '<TRequest, TResponse>(method: string, request: TRequest) => Promise<TResponse>'. 
-
-			mockClient.call.mockResolvedValue(mockResponse);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:287:20
-Error: Property 'mockResolvedValue' does not exist on type '<TRequest, TResponse>(method: string, request: TRequest) => Promise<TResponse>'. 
-
-			mockClient.call.mockResolvedValue(mockResponse);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:299:10
-Error: Property 'commanderCount' is missing in type '{ id: number; name: string; format: string; description: string; mainDeckCount: number; sideboardCount: number; createdAt: number; updatedAt: number; }' but required in type 'DeckInfo'. 
-			// Mock fetchUserDecks response (summary only)
-			const mockDeckInfo: DeckInfo = {
-				id: 1,
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:353:20
-Error: Property 'mockResolvedValueOnce' does not exist on type '<TRequest, TResponse>(method: string, request: TRequest) => Promise<TResponse>'. 
-			// First call: fetchUserDecks
-			mockClient.call.mockResolvedValueOnce(mockListResponse);
-			const summaryDecks = await fetchUserDecks();
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/__tests__/decks.test.ts:357:20
-Error: Property 'mockResolvedValueOnce' does not exist on type '<TRequest, TResponse>(method: string, request: TRequest) => Promise<TResponse>'. 
-			// Second call: getDeckDetails
-			mockClient.call.mockResolvedValueOnce(mockGetResponse);
-			const fullDeck = await getDeckDetails('1');
-
 /Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/ui/Input.svelte:166:3
 Warn: Also define the standard property 'appearance' for compatibility (css)
 	.input[type='number'] {
@@ -98,173 +16,18 @@ https://svelte.dev/e/a11y_consider_explicit_label (svelte)
 	</button>
 {:else}
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/CreateTableModal.svelte:130:8
-Error: This expression is not callable.
-  Type 'Boolean' has no call signatures. (ts)
-		// Validate
-		if (!isValid()) {
-			return;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/CreateTableModal.svelte:366:70
-Error: This expression is not callable.
-  Type 'Boolean' has no call signatures. (ts)
-			</button>
-			<button type="submit" class="submit-button" disabled={loading || !isValid()}>
-				{#if loading}
-
 /Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:453:9
-Warn: Using `on:submit` to listen to the submit event is deprecated. Use the event attribute `onsubmit` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
+Error: 'onsubmit|preventDefault' is not a valid attribute name
+https://svelte.dev/e/attribute_invalid_name (svelte)
 		<!-- Form -->
-		<form on:submit|preventDefault={handleSubmit}>
+		<form onsubmit|preventDefault={handleSubmit}>
 			<!-- Deck Name -->
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:490:8
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-							class="view-toggle"
-							on:click={() => (viewMode === 'text' ? switchToStructuredView() : switchToTextView())}
-							disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:501:50
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-						</button>
-						<button type="button" class="example-link" on:click={loadExample} disabled={loading}>
-							<BookOpen class="icon" size={14} aria-hidden="true" />
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:512:7
-Warn: Using `on:paste` to listen to the paste event is deprecated. Use the event attribute `onpaste` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-						bind:value={deckList}
-						on:paste={handlePaste}
-						placeholder="4 Lightning Bolt&#10;20 Mountain&#10;&#10;Sideboard:&#10;2 Dragon's Claw"
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:539:11
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-										class="btn-add"
-										on:click={() => addCard('commander')}
-										disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:555:13
-Warn: Using `on:change` to listen to the change event is deprecated. Use the event attribute `onchange` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-												bind:value={card.quantity}
-												on:change={() => updateCard(globalIndex, 'quantity', card.quantity)}
-												class="card-quantity"
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:562:13
-Warn: Using `on:input` to listen to the input event is deprecated. Use the event attribute `oninput` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-												bind:value={card.name}
-												on:input={(e) => updateCard(globalIndex, 'name', e.currentTarget.value)}
-												placeholder="Card name"
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:570:13
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-												class="btn-remove"
-												on:click={() => removeCard(globalIndex)}
-												disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:593:10
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-									class="btn-add"
-									on:click={() => addCard('main')}
-									disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:609:12
-Warn: Using `on:change` to listen to the change event is deprecated. Use the event attribute `onchange` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-											bind:value={card.quantity}
-											on:change={() => updateCard(globalIndex, 'quantity', card.quantity)}
-											class="card-quantity"
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:616:12
-Warn: Using `on:input` to listen to the input event is deprecated. Use the event attribute `oninput` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-											bind:value={card.name}
-											on:input={(e) => updateCard(globalIndex, 'name', e.currentTarget.value)}
-											placeholder="Card name"
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:626:14
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-													class="btn-move btn-move-commander"
-													on:click={() => moveCard(globalIndex, 'commander')}
-													disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:639:13
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-												class="btn-move"
-												on:click={() => moveCard(globalIndex, 'sideboard')}
-												disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:650:12
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-											class="btn-remove"
-											on:click={() => removeCard(globalIndex)}
-											disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:673:11
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-										class="btn-add"
-										on:click={() => addCard('sideboard')}
-										disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:689:13
-Warn: Using `on:change` to listen to the change event is deprecated. Use the event attribute `onchange` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-												bind:value={card.quantity}
-												on:change={() => updateCard(globalIndex, 'quantity', card.quantity)}
-												class="card-quantity"
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:696:13
-Warn: Using `on:input` to listen to the input event is deprecated. Use the event attribute `oninput` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-												bind:value={card.name}
-												on:input={(e) => updateCard(globalIndex, 'name', e.currentTarget.value)}
-												placeholder="Card name"
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:704:13
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-												class="btn-move"
-												on:click={() => moveCard(globalIndex, 'main')}
-												disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:714:13
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-												class="btn-remove"
-												on:click={() => removeCard(globalIndex)}
-												disabled={loading}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:790:6
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-					class="btn-secondary"
-					on:click={handleClear}
-					disabled={loading || !deckList.trim()}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:798:50
-Warn: Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
-https://svelte.dev/e/event_directive_deprecated (svelte)
-				<div class="actions-right">
-					<button type="button" class="btn-secondary" on:click={handleClose} disabled={loading}>
-						<X class="icon" size={16} aria-hidden="true" />
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/GameStartCountdown.svelte:125:33
-Error: This expression is not callable.
-  Type 'String' has no call signatures. (ts)
-			<!-- Message -->
-			<h2 class="countdown-title">{countdownMessage()}</h2>
-			<p class="countdown-subtitle">Get ready!</p>
+/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/DeckUploadModal.svelte:453:9
+Error: Object literal may only specify known properties, and '"onsubmit|preventDefault"' does not exist in type 'HTMLProps<"form", HTMLAttributes<any>>'. (ts)
+		<!-- Form -->
+		<form onsubmit|preventDefault={handleSubmit}>
+			<!-- Deck Name -->
 
 /Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/PlaytestModal.svelte:552:2
 Warn: Unused CSS selector ".empty-icon"
@@ -278,109 +41,6 @@ Warn: Also define the standard property 'appearance' for compatibility (css)
 		text-align: center;
 		-moz-appearance: textfield;
 	}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:116:7
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-		// Total must equal attacker power
-		if (totalAssigned() !== prompt.attackerPower) {
-			return {
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:119:77
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-				valid: false,
-				error: `Must assign exactly ${prompt.attackerPower} damage (currently ${totalAssigned()})`
-			};
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:125:25
-Error: This expression is not callable.
-  Type 'OrderedBlocker[]' has no call signatures. (ts)
-		let mustAssignLethal = true;
-		for (const blocker of sortedBlockers()) {
-			const assigned = getDamage(blocker.id);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:131:30
-Error: This expression is not callable.
-  Type 'OrderedBlocker[]' has no call signatures. (ts)
-				// Check if later targets have damage
-				const laterTargets = [...sortedBlockers().filter((b) => b.order > blocker.order)];
-				if (prompt.hasTrample) {
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:131:55
-Error: Parameter 'b' implicitly has an 'any' type. (ts)
-				// Check if later targets have damage
-				const laterTargets = [...sortedBlockers().filter((b) => b.order > blocker.order)];
-				if (prompt.hasTrample) {
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:238:40
-Error: Property 'message' does not exist on type 'DamageAssignmentPrompt'. (ts)
-				<h3 id="damage-title" class="header-title">Assign Combat Damage</h3>
-				<p class="header-subtitle">{prompt.message || 'Distribute damage among blockers'}</p>
-			</div>
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:251:18
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-					class="remaining"
-					class:over={remainingDamage() < 0}
-					class:exact={remainingDamage() === 0}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:252:19
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-					class:over={remainingDamage() < 0}
-					class:exact={remainingDamage() === 0}
-				>
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:254:7
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-				>
-					{remainingDamage() >= 0 ? remainingDamage() : Math.abs(remainingDamage())}
-				</span>
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:254:32
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-				>
-					{remainingDamage() >= 0 ? remainingDamage() : Math.abs(remainingDamage())}
-				</span>
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:254:61
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-				>
-					{remainingDamage() >= 0 ? remainingDamage() : Math.abs(remainingDamage())}
-				</span>
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:257:11
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-				<span class="remaining-label">
-					{#if remainingDamage() > 0}
-						remaining
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:259:16
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-						remaining
-					{:else if remainingDamage() < 0}
-						over!
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:272:11
-Error: This expression is not callable.
-  Type 'OrderedBlocker[]' has no call signatures. (ts)
-
-			{#each sortedBlockers() as blocker, index}
-				{@const damage = getDamage(blocker.id)}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/AssignDamage.svelte:377:31
-Error: This expression is not callable.
-  Type 'Number' has no call signatures. (ts)
-				onclick={handleSubmit}
-				disabled={isSubmitting || remainingDamage() !== 0}
-				type="button"
 
 /Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/Card.svelte:792:3
 Warn: Also define the standard property 'line-clamp' for compatibility (css)
@@ -652,20 +312,6 @@ Error: Type 'string | undefined' is not assignable to type 'string | null'.
 		openSubmenu = action.label;
 		submenuPosition = { x, y };
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/DeclareAttackers.svelte:54:51
-Error: This expression is not callable.
-  Type 'Map<string, string>' has no call signatures. (ts)
-	$effect(() => {
-		combatStore.enterDeclareAttackersPhase(options, cardNames(), defenders);
-	});
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/DeclareAttackers.svelte:215:36
-Error: This expression is not callable.
-  Type 'Map<string, string>' has no call signatures. (ts)
-					<div class="attacker-item">
-						<span class="attacker-name">{cardNames().get(attacker.cardId) || 'Unknown'}</span>
-						<span class="attack-arrow">→</span>
-
 /Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/DeclareBlockers.svelte:83:50
 Error: This expression is not callable.
   Type 'Map<string, string>' has no call signatures. (ts)
@@ -742,13 +388,6 @@ Error: This expression is not callable.
 						{#each filteredCards() as card (card.id)}
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/GameHeader.svelte:469:3
-Warn: Unused CSS selector ".concede-btn span"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-		.concede-btn span {
-			display: none;
-
 /Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/Graveyard.svelte:203:14
 Error: This expression is not callable.
   Type 'GameCard[]' has no call signatures. (ts)
@@ -787,27 +426,6 @@ Warn: Also define the standard property 'appearance' for compatibility (css)
 	.number-input[type='number'] {
 		-moz-appearance: textfield;
 	}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/PlayerHand.svelte:422:2
-Warn: Unused CSS selector ".card-wrapper *"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.card-wrapper * {
-		-webkit-user-drag: none;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/PlaytestLibrarySearch.svelte:147:10
-Error: This expression is not callable.
-  Type 'CardView[]' has no call signatures. (ts)
-			<div class="list">
-				{#if filteredCards().length === 0}
-					<div class="empty">
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/PlaytestLibrarySearch.svelte:156:13
-Error: This expression is not callable.
-  Type 'CardView[]' has no call signatures. (ts)
-				{:else}
-					{#each filteredCards() as card (card.id)}
-						<button
 
 /Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/RevealTopDialog.svelte:21:1
 Warn: Elements with the 'dialog' interactive role must have a tabindex value
@@ -942,40 +560,12 @@ Error: Module '"$lib/types/game"' has no exported member 'PendingRollbackRequest
 <script lang="ts">
 	import type { PendingRollbackRequest } from '$lib/types/game';
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/ScryDialog.svelte:229:2
-Warn: Unused CSS selector ".card-preview"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.card-preview {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/ScryDialog.svelte:235:2
-Warn: Unused CSS selector ".card-preview :global(.card)"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.card-preview :global(.card) {
-		width: 100%;
-
 /Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/TokenCreator.svelte:177:6
 Warn: A form label must be associated with a control
 https://svelte.dev/e/a11y_label_has_associated_control (svelte)
 				<div class="form-row">
 					<label>Color</label>
 					<div class="color-options">
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/XManaSelector.svelte:178:9
-Error: This expression is not callable.
-  Type 'number[]' has no call signatures. (ts)
-			<!-- Quick select buttons -->
-			{#if quickAmounts().length > 0}
-				<div class="quick-select">
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/lib/components/game/XManaSelector.svelte:180:13
-Error: This expression is not callable.
-  Type 'number[]' has no call signatures. (ts)
-				<div class="quick-select">
-					{#each quickAmounts() as amount}
-						<button
 
 /Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/+layout.svelte:65:5
 Warn: Using `<slot>` to render parent content is deprecated. Use `{@render ...}` tags instead
@@ -1115,572 +705,47 @@ Error: Property 'deckType' does not exist on type 'Table'. (ts)
 							<span class="table-format">{table.deckType || 'Unknown'}</span>
 							<code class="table-id">{table.id.slice(0, 8)}...</code>
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2848:2
-Warn: Unused CSS selector ".prompt-hint"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.prompt-hint {
-		color: #94a3b8;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2939:2
-Warn: Unused CSS selector ".opponents-row"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Opponents Row */
-	.opponents-row {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2946:2
-Warn: Unused CSS selector ".opponents-row > :global(*)"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.opponents-row > :global(*) {
-		flex: 1;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2953:2
-Warn: Unused CSS selector ".game-layout.four-player .opponents-row"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* For 4 players, use different layout */
-	.game-layout.four-player .opponents-row {
-		justify-content: space-between;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2957:2
-Warn: Unused CSS selector ".game-layout.four-player .opponents-row > :global(*)"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.game-layout.four-player .opponents-row > :global(*) {
-		flex: 1;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2964:2
-Warn: Unused CSS selector ".battlefield-area"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Battlefield Area */
-	.battlefield-area {
-		flex: 1;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2982:2
-Warn: Unused CSS selector ".battlefield-area.drag-active"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Battlefield drag state */
-	.battlefield-area.drag-active {
-		border-color: rgba(102, 126, 234, 0.5);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2987:2
-Warn: Unused CSS selector ".battlefield-area.drag-valid"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.battlefield-area.drag-valid {
-		border-color: #22c55e;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2995:2
-Warn: Unused CSS selector ".drop-zone-overlay"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Drop zone overlay */
-	.drop-zone-overlay {
-		position: absolute;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3008:2
-Warn: Unused CSS selector ".drop-zone-overlay.valid"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.drop-zone-overlay.valid {
-		background: rgba(34, 197, 94, 0.15);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3012:2
-Warn: Unused CSS selector ".drop-label"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.drop-label {
-		font-size: 1.125rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3022:2
-Warn: Unused CSS selector ".drop-zone-overlay.valid .drop-label"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.drop-zone-overlay.valid .drop-label {
-		color: #22c55e;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3027:2
-Warn: Unused CSS selector ".drop-hint"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.drop-hint {
-		color: #667eea;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3042:2
-Warn: Unused CSS selector ".zone-label"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.zone-label {
-		font-size: 0.6875rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3051:2
-Warn: Unused CSS selector ".command-zone"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.command-zone {
-		padding-bottom: 0.75rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3056:2
-Warn: Unused CSS selector ".command-cards"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.command-cards,
-	.battlefield-cards {
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3057:2
-Warn: Unused CSS selector ".battlefield-cards"
-https://svelte.dev/e/css_unused_selector (svelte)
-	.command-cards,
-	.battlefield-cards {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3064:2
-Warn: Unused CSS selector ".battlefield-rows"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.battlefield-rows {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3070:2
-Warn: Unused CSS selector ".battlefield-row--lands"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.battlefield-row--lands {
-		margin-top: 0.25rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3076:2
-Warn: Unused CSS selector ".battlefield-card-wrapper"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.battlefield-card-wrapper {
-		user-select: none;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3084:2
-Warn: Unused CSS selector ".battlefield-card-wrapper.draggable"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.battlefield-card-wrapper.draggable {
-		cursor: grab;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3088:2
-Warn: Unused CSS selector ".battlefield-card-wrapper.draggable:active"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.battlefield-card-wrapper.draggable:active {
-		cursor: grabbing;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3092:2
-Warn: Unused CSS selector ".battlefield-card-wrapper.is-dragging"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.battlefield-card-wrapper.is-dragging {
-		opacity: 0.4;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3097:2
-Warn: Unused CSS selector ".battlefield-card-wrapper.is-hovered"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.battlefield-card-wrapper.is-hovered {
-		/* Subtle glow to indicate keyboard shortcuts are active */
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3102:2
-Warn: Unused CSS selector ".my-battlefield"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.my-battlefield {
-		flex: 1;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3107:2
-Warn: Unused CSS selector ".player-info-row"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Player Info Row */
-	.player-info-row {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3119:2
-Warn: Unused CSS selector ".player-info-row.compact"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Compact Player Info Row */
-	.player-info-row.compact {
-		padding: 0.25rem 0.5rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3126:2
-Warn: Unused CSS selector ".player-identity"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.player-identity {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3132:2
-Warn: Unused CSS selector ".player-info-row.compact .player-identity"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.player-info-row.compact .player-identity {
-		gap: 0.5rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3136:2
-Warn: Unused CSS selector ".player-name"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.player-name {
-		font-weight: 700;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3145:2
-Warn: Unused CSS selector ".player-info-row.compact .player-name"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.player-info-row.compact .player-name {
-		font-size: 0.8125rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3149:2
-Warn: Unused CSS selector ".player-name.has-priority"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.player-name.has-priority {
-		color: #22c55e;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3153:2
-Warn: Unused CSS selector ".priority-dot"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.priority-dot {
-		width: 8px;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3161:2
-Warn: Unused CSS selector ".player-info-row.compact .priority-dot"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.player-info-row.compact .priority-dot {
-		width: 6px;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3178:2
-Warn: Unused CSS selector ".player-zones"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.player-zones {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3184:2
-Warn: Unused CSS selector ".player-info-row.compact .player-zones"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.player-info-row.compact .player-zones {
-		gap: 0.375rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3189:2
-Warn: Unused CSS selector ".player-stats-inline"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Player Stats Inline (Life, Poison, Library) */
-	.player-stats-inline {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3198:2
-Warn: Unused CSS selector ".life-group"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.life-group {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3204:2
-Warn: Unused CSS selector ".stat-btn"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-btn {
-		width: 24px;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3220:2
-Warn: Unused CSS selector ".stat-btn:hover"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-btn:hover {
-		background: rgba(63, 63, 70, 0.6);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3225:2
-Warn: Unused CSS selector ".stat-btn.life-btn.minus:hover"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-btn.life-btn.minus:hover {
-		background: rgba(239, 68, 68, 0.3);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3230:2
-Warn: Unused CSS selector ".stat-btn.life-btn.plus:hover"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-btn.life-btn.plus:hover {
-		background: rgba(34, 197, 94, 0.3);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3235:2
-Warn: Unused CSS selector ".stat-display"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-display {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3249:2
-Warn: Unused CSS selector ".stat-display:hover"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-display:hover {
-		background: rgba(63, 63, 70, 0.3);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3253:2
-Warn: Unused CSS selector ".stat-display.life"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-display.life {
-		color: #f4f4f5;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3257:2
-Warn: Unused CSS selector ".stat-display.poison"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-display.poison {
-		color: #a855f7;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3261:2
-Warn: Unused CSS selector ".stat-icon"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-icon {
-		font-size: 0.75rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3265:2
-Warn: Unused CSS selector ".stat-value"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.stat-value {
-		font-family: 'JetBrains Mono', monospace;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3272:2
-Warn: Unused CSS selector ".quick-menu"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Quick Menu */
-	.quick-menu {
-		position: absolute;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3289:2
-Warn: Unused CSS selector ".menu-section"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-section {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3295:2
-Warn: Unused CSS selector ".menu-label"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-label {
-		font-size: 0.625rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3303:2
-Warn: Unused CSS selector ".menu-row"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-row {
-		display: flex;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3309:2
-Warn: Unused CSS selector ".menu-row button"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-row button {
-		padding: 0.375rem 0.5rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3321:2
-Warn: Unused CSS selector ".menu-row button:hover"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-row button:hover {
-		background: rgba(201, 162, 39, 0.2);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3327:2
-Warn: Unused CSS selector ".menu-row button.search-btn"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-row button.search-btn {
-		flex: 1;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3334:2
-Warn: Unused CSS selector ".menu-row button.search-btn:hover"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-row button.search-btn:hover {
-		background: rgba(139, 92, 246, 0.3);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3340:2
-Warn: Unused CSS selector ".menu-value"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-value {
-		min-width: 24px;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3348:2
-Warn: Unused CSS selector ".menu-close"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-close {
-		position: absolute;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3366:2
-Warn: Unused CSS selector ".menu-close:hover"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.menu-close:hover {
-		background: rgba(63, 63, 70, 0.5);
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3372:2
-Warn: Unused CSS selector ".player-zones > div"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Ensure drop zone wrappers are positioned correctly for hit testing */
-	.player-zones > div {
-		position: relative;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3377:2
-Warn: Unused CSS selector ".graveyard-drop-zone"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Graveyard Drop Zone */
-	.graveyard-drop-zone {
-		transition: all 0.2s ease;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3387:2
-Warn: Unused CSS selector ".graveyard-drop-zone.drag-active"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.graveyard-drop-zone.drag-active {
-		outline: 2px dashed #6b7280;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3392:2
-Warn: Unused CSS selector ".graveyard-drop-zone.drag-valid"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.graveyard-drop-zone.drag-valid {
-		outline-color: #22c55e;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3398:2
-Warn: Unused CSS selector ".exile-drop-zone"
-https://svelte.dev/e/css_unused_selector (svelte)
-	/* Exile Drop Zone */
-	.exile-drop-zone {
-		transition: all 0.2s ease;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3406:2
-Warn: Unused CSS selector ".exile-drop-zone.drag-active"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.exile-drop-zone.drag-active {
-		outline: 2px dashed #6b7280;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3411:2
-Warn: Unused CSS selector ".exile-drop-zone.drag-valid"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-	.exile-drop-zone.drag-valid {
-		outline-color: #a78bfa;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3435:3
-Warn: Unused CSS selector ".opponents-row > :global(*)"
-https://svelte.dev/e/css_unused_selector (svelte)
-	@media (max-width: 900px) {
-		.opponents-row > :global(*) {
-			min-width: 200px;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3457:3
-Warn: Unused CSS selector ".opponents-row > :global(*)"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-		.opponents-row > :global(*) {
-			min-width: 150px;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3462:3
-Warn: Unused CSS selector ".battlefield-area"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-		.battlefield-area {
-			padding: 0.75rem;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3466:3
-Warn: Unused CSS selector ".player-info-row"
-https://svelte.dev/e/css_unused_selector (svelte)
-
-		.player-info-row {
-			flex-wrap: wrap;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:3549:3
-Warn: Also define the standard property 'line-clamp' for compatibility (css)
-		display: -webkit-box;
-		-webkit-line-clamp: 3;
-		-webkit-box-orient: vertical;
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1683:16
+/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/decks/[id]/+page.svelte:92:31
+Error: Object literal may only specify known properties, and '"onclose"' does not exist in type '{ deck: Deck; loading?: boolean | undefined; }'. (ts)
+{:else if deck}
+	<DeckViewer {deck} {loading} onclose={handleClose} ondelete={handleDeleteClick} />
+{/if}
+
+/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1687:16
 Error: Property 'requiresConsent' does not exist on type '{ success: boolean; requestId: string; error?: string | undefined; }'. (ts)
 			if (result.success) {
 				if (result.requiresConsent) {
 					addLogEntry('Rollback request sent to opponent(s)');
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1709:14
+/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1713:14
 Error: Expected 1 arguments, but got 0. (ts)
 			// Clear the pending request - server will send GAME_ROLLBACK_COMPLETE
 			gameStore.rollbackCardPlay();
 		} catch (err) {
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1728:14
+/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1732:14
 Error: Property 'update' does not exist on type '{ subscribe: { (this: void, run: Subscriber<GameStoreState>, invalidate?: (() => void) | undefined): Unsubscriber; (this: void, run: Subscriber<GameStoreState>, invalidate?: (() => void) | undefined): Unsubscriber; }; ... 15 more ...; clearAllPendingPlays: () => void; }'. (ts)
 			// Clear the pending request
 			gameStore.update((s) => ({ ...s, pendingRollbackRequest: null }));
 			addLogEntry('Rollback request denied');
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1728:22
+/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1732:22
 Error: Parameter 's' implicitly has an 'any' type. (ts)
 			// Clear the pending request
 			gameStore.update((s) => ({ ...s, pendingRollbackRequest: null }));
 			addLogEntry('Rollback request denied');
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1888:34
+/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:1892:34
 Error: Property 'contains' does not exist on type 'never'. (ts)
 		const handleClickOutside = (event: MouseEvent) => {
 			if (lifeMenuEl && !lifeMenuEl.contains(event.target as Node)) {
 				showLifeMenu = false;
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2064:22
+/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/game/[id]/+page.svelte:2068:22
 Error: Property 'imageUrl' does not exist on type 'CardView'. (ts)
 				visualStackStore.addItem(card.id, card.name, 'stack', {
 					imageUrl: card?.imageUrl || getScryfallImageUrl(card.name),
 					controllerId: card.controllerId,
 
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/lobby/+page.svelte:374:8
-Error: This expression is not callable.
-  Type 'Table[]' has no call signatures. (ts)
-					<span class="table-count">
-						{filteredTables().length}
-						{#if filteredTables().length !== tables.length}
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/lobby/+page.svelte:375:12
-Error: This expression is not callable.
-  Type 'Table[]' has no call signatures. (ts)
-						{filteredTables().length}
-						{#if filteredTables().length !== tables.length}
-							<span class="count-divider">/</span>
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/lobby/+page.svelte:379:8
-Error: This expression is not callable.
-  Type 'Table[]' has no call signatures. (ts)
-						{/if}
-						{filteredTables().length === 1 ? 'table' : 'tables'}
-					</span>
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/lobby/+page.svelte:555:15
-Error: This expression is not callable.
-  Type 'Table[]' has no call signatures. (ts)
-					</div>
-				{:else if filteredTables().length === 0}
-					<!-- Empty State - No Results -->
-
-/Users/aron/dev/opensource/mage/mage-client-web/src/routes/(protected)/lobby/+page.svelte:568:14
-Error: This expression is not callable.
-  Type 'Table[]' has no call signatures. (ts)
-					<div class="tables-grid">
-						{#each filteredTables() as table (table.id)}
-							<TableCard {table} onClick={handleTableClick} />
-
 ====================================
-svelte-check found 90 errors and 114 warnings in 31 files
+svelte-check found 49 errors and 18 warnings in 21 files

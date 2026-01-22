@@ -7,7 +7,7 @@
 	import { fly, fade } from 'svelte/transition';
 
 	let isChecking = $state(true);
-
+	let { children } = $props();
 	// Check if we're on a game page - hide navbar for immersive experience
 	const isGamePage = $derived(
 		$page.url.pathname.startsWith('/game/') || $page.url.pathname.startsWith('/playtest')
@@ -62,7 +62,7 @@
 				class:no-padding={isGamePage}
 				in:fly={{ y: 20, duration: 300, delay: 100 }}
 			>
-				<slot />
+				{@render children()}
 			</div>
 		</main>
 	</div>

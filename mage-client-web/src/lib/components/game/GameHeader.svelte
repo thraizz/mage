@@ -465,10 +465,6 @@
 			padding: 0.375rem 0.5rem;
 			font-size: 0.75rem;
 		}
-
-		.concede-btn span {
-			display: none;
-		}
 	}
 
 	@media (max-width: 480px) {

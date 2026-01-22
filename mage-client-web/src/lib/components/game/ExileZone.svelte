@@ -230,7 +230,7 @@
 					</div>
 
 					<div class="card-grid">
-						{#each filteredCards() as card (card.id)}
+						{#each filteredCards as card (card.id)}
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
 								class="card-grid-item"

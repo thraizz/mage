@@ -226,17 +226,6 @@
 		transform: translateY(-2px);
 	}
 
-	.card-preview {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.card-preview :global(.card) {
-		width: 100%;
-		max-width: 150px;
-	}
-
 	.card-actions {
 		display: flex;
 		gap: 0.5rem;

@@ -1,11 +1,8 @@
 <script lang="ts">
 	// From playtest/+page.svelte lines 1-110: Imports and setup
-	import { onMount, untrack } from 'svelte';
-	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { auth } from '$lib/stores/auth';
-	import { websocketStore } from '$lib/stores/websocket';
-	import { getSessionIdFromToken } from '$lib/utils/jwt';
 
 	// CHANGE: Import multiplayerGameStore instead of playtestGameStore
 	import {
@@ -26,7 +23,6 @@
 	// Game components (from playtest/+page.svelte lines 20-46)
 	import Card from '$lib/components/game/Card.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
-	import LibrarySearch from '$lib/components/game/LibrarySearch.svelte';
 	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import CreateTokenDialog from '$lib/components/game/CreateTokenDialog.svelte';
 	import CounterDialog from '$lib/components/game/CounterDialog.svelte';
@@ -313,7 +309,9 @@
 	 */
 	function handleNextTurn(): void {
 		multiplayerGameStore.nextTurn();
-		const newActivePlayer = players.find((p) => p.playerId === $multiplayerGameStore.activePlayerId);
+		const newActivePlayer = players.find(
+			(p) => p.playerId === $multiplayerGameStore.activePlayerId
+		);
 		if (newActivePlayer) {
 			toast.info(`${newActivePlayer.name}'s turn`);
 		}
@@ -820,11 +818,11 @@
 		<!-- Template from playtest/+page.svelte lines 1378+ adapted for multiplayer -->
 		<PlaytestHeader
 			{players}
-			activeControlSeat={activeControlSeat}
+			{activeControlSeat}
 			availableSessions={0}
 			{turnNumber}
 			{activePlayerName}
-			showAllHands={showAllHands}
+			{showAllHands}
 			onBack={() => goto('/lobby')}
 			onSessionsClick={() => {}}
 			onSwitchPlayer={(playerId) => multiplayerGameStore.switchControlSeat(playerId)}

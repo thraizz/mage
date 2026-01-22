@@ -207,3 +207,8 @@ export interface ActiveGame {
 }
 
 export type ActiveGameState = 'STARTING' | 'MULLIGAN' | 'IN_PROGRESS' | 'PAUSED' | 'FINISHED';
+
+export interface PendingRollbackRequest {
+	requestingPlayerName: string;
+	targetMessageText: string;
+}

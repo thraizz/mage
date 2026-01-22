@@ -68,6 +68,7 @@
 {#if interactive}
 	<button type="button" class="mana-symbol-wrapper mana-interactive {sizeClass}" {onclick}>
 		<i class="ms ms-cost {manaClass}"></i>
+		<span class="sr-only">Mana symbol: {symbol}</span>
 	</button>
 {:else}
 	<span class="mana-symbol-wrapper {sizeClass}">

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export interface MenuAction {
 		label?: string;
 		icon?: string;
@@ -39,7 +39,7 @@
 				openSubmenu = null;
 				submenuPosition = null;
 			} else {
-				openSubmenu = action.label;
+				openSubmenu = action.label ?? null;
 			}
 		} else if (action.onClick) {
 			action.onClick();
@@ -74,7 +74,7 @@
 			y = window.innerHeight - estimatedHeight - 10;
 		}
 
-		openSubmenu = action.label;
+		openSubmenu = action.label ?? null;
 		submenuPosition = { x, y };
 	}
 

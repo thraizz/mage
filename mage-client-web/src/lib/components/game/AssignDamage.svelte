@@ -635,6 +635,7 @@
 		font-weight: 700;
 		text-align: center;
 		-moz-appearance: textfield;
+		appearance: textfield;
 	}
 
 	.damage-input::-webkit-outer-spin-button,

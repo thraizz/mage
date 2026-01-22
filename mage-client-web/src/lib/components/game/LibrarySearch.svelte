@@ -277,7 +277,7 @@
 			<div class="content-area">
 				<!-- Card list -->
 				<div class="card-list">
-					{#if filteredCards().length === 0}
+					{#if filteredCards.length === 0}
 						<div class="no-results">
 							{#if cards.length === 0}
 								Your library is empty
@@ -286,7 +286,7 @@
 							{/if}
 						</div>
 					{:else}
-						{#each filteredCards() as card (card.id)}
+						{#each filteredCards as card (card.id)}
 							<!-- svelte-ignore a11y_no_static_element_interactions -->
 							<div
 								class="card-item"

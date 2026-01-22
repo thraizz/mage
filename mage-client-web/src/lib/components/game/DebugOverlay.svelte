@@ -111,7 +111,13 @@
 </script>
 
 {#if open}
-	<div class="debug-overlay" role="dialog" aria-modal="true" onkeydown={handleBackdropKeydown}>
+	<div
+		class="debug-overlay"
+		role="dialog"
+		aria-modal="true"
+		onkeydown={handleBackdropKeydown}
+		tabindex="0"
+	>
 		<div class="debug-modal">
 			<header class="debug-header">
 				<div class="debug-header-left">

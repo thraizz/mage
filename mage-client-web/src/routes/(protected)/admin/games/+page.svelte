@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { auth } from '$lib/stores/auth';
 	import { fetchTables } from '$lib/api/lobby';
-	import type { Table } from '$lib/types/table';
+	import type { Table, TableStatus } from '$lib/types/table';
 
 	// State
 	let tables = $state<Table[]>([]);
@@ -14,13 +14,11 @@
 	let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
 	// Computed
-	const activeGames = $derived(
-		tables.filter((t) => t.state === 'PLAYING' || t.state === 'SIDEBOARDING')
-	);
+	const activeGames = $derived(tables.filter((t) => t.status === 'playing'));
 	const waitingTables = $derived(
-		tables.filter((t) => t.state === 'WAITING' || t.state === 'READY')
+		tables.filter((t) => t.status === 'waiting' || t.status === 'ready')
 	);
-	const finishedTables = $derived(tables.filter((t) => t.state === 'FINISHED'));
+	const finishedTables = $derived(tables.filter((t) => t.status === 'finished'));
 
 	/**
 	 * Fetch all tables from the server
@@ -86,20 +84,18 @@
 	/**
 	 * Format table state for display
 	 */
-	function formatState(state: string): { label: string; class: string } {
+	function formatState(state: TableStatus): { label: string; class: string } {
 		switch (state) {
-			case 'PLAYING':
+			case 'playing':
 				return { label: '🎮 Playing', class: 'state-playing' };
-			case 'SIDEBOARDING':
-				return { label: '📋 Sideboarding', class: 'state-sideboard' };
-			case 'WAITING':
+			case 'waiting':
 				return { label: '⏳ Waiting', class: 'state-waiting' };
-			case 'READY':
+			case 'ready':
 				return { label: '✅ Ready', class: 'state-ready' };
-			case 'FINISHED':
+			case 'finished':
 				return { label: '🏁 Finished', class: 'state-finished' };
 			default:
-				return { label: state, class: 'state-unknown' };
+				return { label: 'Unknown', class: 'state-unknown' };
 		}
 	}
 
@@ -191,7 +187,7 @@
 			{:else}
 				<div class="games-grid">
 					{#each activeGames as table (table.id)}
-						{@const stateInfo = formatState(table.state)}
+						{@const stateInfo = formatState(table.status)}
 						<div class="game-card active">
 							<div class="game-header">
 								<span class="game-name">{table.name}</span>
@@ -202,37 +198,37 @@
 									<span class="label">Table ID:</span>
 									<code class="value">{table.id.slice(0, 8)}...</code>
 								</div>
-								{#if table.gameId}
+								{#if table.id}
 									<div class="info-row">
 										<span class="label">Game ID:</span>
-										<code class="value">{table.gameId.slice(0, 8)}...</code>
+										<code class="value">{table.id.slice(0, 8)}...</code>
 									</div>
 								{/if}
 								<div class="info-row">
 									<span class="label">Format:</span>
-									<span class="value">{table.deckType || 'Unknown'}</span>
+									<span class="value">{table.format || 'Unknown'}</span>
 								</div>
 								<div class="info-row">
 									<span class="label">Players:</span>
 									<span class="value"
-										>{table.seats?.filter((s) => s?.player).length || 0}/{table.seats?.length ||
-											0}</span
+										>{table.players?.filter((s) => s?.username).length || 0}/{table.players
+											?.length || 0}</span
 									>
 								</div>
 							</div>
 							<div class="game-players">
-								{#each table.seats || [] as seat}
-									{#if seat?.player}
-										<span class="player-badge">{seat.player.name}</span>
+								{#each table.players || [] as seat}
+									{#if seat?.username}
+										<span class="player-badge">{seat.username}</span>
 									{/if}
 								{/each}
 							</div>
 							<div class="game-actions">
-								{#if table.gameId}
-									<button class="btn-debug" onclick={() => openGameDebug(table.gameId!)}>
+								{#if table.id}
+									<button class="btn-debug" onclick={() => openGameDebug(table.id!)}>
 										🔧 Debug
 									</button>
-									<button class="btn-spectate" onclick={() => openGame(table.gameId!)}>
+									<button class="btn-spectate" onclick={() => openGame(table.id!)}>
 										👁️ View
 									</button>
 								{/if}
@@ -254,13 +250,14 @@
 			{:else}
 				<div class="tables-list">
 					{#each waitingTables as table (table.id)}
-						{@const stateInfo = formatState(table.state)}
+						{@const stateInfo = formatState(table.status)}
 						<div class="table-row">
 							<span class="table-name">{table.name}</span>
 							<span class="table-state {stateInfo.class}">{stateInfo.label}</span>
-							<span class="table-format">{table.deckType || 'Unknown'}</span>
+							<span class="table-format">{table.format || 'Unknown'}</span>
 							<span class="table-players">
-								{table.seats?.filter((s) => s?.player).length || 0}/{table.seats?.length || 0} players
+								{table.players?.filter((s) => s?.username).length || 0}/{table.players?.length || 0}
+								players
 							</span>
 							<code class="table-id">{table.id.slice(0, 8)}...</code>
 						</div>
@@ -280,7 +277,7 @@
 					{#each finishedTables.slice(0, 10) as table (table.id)}
 						<div class="table-row finished">
 							<span class="table-name">{table.name}</span>
-							<span class="table-format">{table.deckType || 'Unknown'}</span>
+							<span class="table-format">{table.format || 'Unknown'}</span>
 							<code class="table-id">{table.id.slice(0, 8)}...</code>
 						</div>
 					{/each}

@@ -746,10 +746,20 @@ function createGameStore() {
 		}));
 	}
 
+	/** Clear pending rollback request */
+	function clearPendingRollbackRequest(): void {
+		update((s) => ({
+			...s,
+			pendingRollbackRequest: null
+		}));
+	}
+
+
 	return {
 		subscribe,
 		initGame,
 		setGameView,
+		clearPendingRollbackRequest,
 		clearPrompt,
 		setError,
 		toggleCardSelection,

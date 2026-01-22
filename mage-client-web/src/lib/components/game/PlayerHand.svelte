@@ -419,10 +419,6 @@
 		cursor: grab;
 	}
 
-	.card-wrapper * {
-		-webkit-user-drag: none;
-	}
-
 	.card-wrapper.draggable:active {
 		cursor: grabbing;
 	}
