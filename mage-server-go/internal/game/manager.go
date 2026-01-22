@@ -369,8 +369,59 @@ func NewEngineAdapter(engine GameEngine, logger *zap.Logger) *EngineAdapter {
 func (ea *EngineAdapter) SetNotificationCallback(callback GameNotificationCallback) {
 	if mageEngine, ok := ea.engine.(*MageEngine); ok {
 		mageEngine.SetNotificationHandler(callback)
-		ea.logger.Info("game notification handler configured")
+		ea.logger.Info("game notification handler configured for MageEngine")
+	} else if engine, ok := ea.engine.(*Engine); ok {
+		// Wrap the callback to adapt NotificationHandler to EngineNotificationHandler
+		engine.SetNotificationHandler(&engineNotificationAdapter{callback: callback})
+		ea.logger.Info("game notification handler configured for Engine")
 	}
+}
+
+// engineNotificationAdapter adapts NotificationHandler to EngineNotificationHandler
+type engineNotificationAdapter struct {
+	callback NotificationHandler
+}
+
+// NotifyGameStateChange implements EngineNotificationHandler
+func (a *engineNotificationAdapter) NotifyGameStateChange(playerID string, gameView interface{}) {
+	// Convert to GameNotification format for the callback
+	if a.callback == nil {
+		return
+	}
+
+	notification := GameNotification{
+		Type:      "GAME_UPDATE",
+		GameID:    "", // Will be set from gameView if available
+		PlayerID:  playerID,
+		Timestamp: time.Now(),
+		Data:      map[string]interface{}{"view": gameView},
+	}
+
+	a.callback(notification)
+}
+
+// NotifyGameEvent implements EngineNotificationHandler
+func (a *engineNotificationAdapter) NotifyGameEvent(gameID string, eventType string, data interface{}) {
+	if a.callback == nil {
+		return
+	}
+
+	dataMap := make(map[string]interface{})
+	if dataDict, ok := data.(map[string]interface{}); ok {
+		dataMap = dataDict
+	} else {
+		dataMap["data"] = data
+	}
+
+	notification := GameNotification{
+		Type:      eventType,
+		GameID:    gameID,
+		PlayerID:  "", // Broadcast to all
+		Timestamp: time.Now(),
+		Data:      dataMap,
+	}
+
+	a.callback(notification)
 }
 
 // ProcessGameActions processes actions from a game's action queue

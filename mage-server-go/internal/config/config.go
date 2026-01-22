@@ -30,6 +30,7 @@ type ServerConfig struct {
 	LeasePeriod    time.Duration   `mapstructure:"lease_period"`
 	MaxIdleSeconds int             `mapstructure:"max_idle_seconds"`
 	MaxGameThreads int             `mapstructure:"max_game_threads"`
+	EngineType     string          `mapstructure:"engine_type"` // "mage" or "playtest"
 }
 
 // GRPCConfig contains gRPC server settings
@@ -201,6 +202,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("server.lease_period", "5s")
 	v.SetDefault("server.max_idle_seconds", 300)
 	v.SetDefault("server.max_game_threads", 10)
+	v.SetDefault("server.engine_type", "mage") // Default to MageEngine for backward compatibility
 
 	// Database defaults
 	v.SetDefault("database.host", "localhost")
@@ -277,6 +279,11 @@ func (c *Config) Validate() error {
 	validLevels := map[string]bool{"debug": true, "info": true, "warn": true, "error": true}
 	if !validLevels[c.Logging.Level] {
 		return fmt.Errorf("logging.level must be one of: debug, info, warn, error")
+	}
+
+	// Validate engine type
+	if c.Server.EngineType != "" && c.Server.EngineType != "mage" && c.Server.EngineType != "playtest" {
+		return fmt.Errorf("server.engine_type must be 'mage' or 'playtest'")
 	}
 
 	return nil

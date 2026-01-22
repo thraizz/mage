@@ -138,25 +138,57 @@ func main() {
 	activeGameRepo := repository.NewActiveGameRepository(db)
 	logger.Info("active game repository initialized")
 
-	// Initialize game engine adapter
-	mageEngine := game.NewMageEngine(logger)
-	mageEngine.SetCardRepository(cardRepo)     // Enable card metadata lookup
-	mageEngine.SetCardBuilder(cards.BuildCard) // Enable Go-implemented cards
+	// Initialize game engine adapter based on configuration
+	var gameEngine game.GameEngine
+	var gameAdapter *game.EngineAdapter
 
-	// Set up persistence for crash recovery
-	persistenceAdapter := game.NewPersistenceAdapter(activeGameRepo)
-	mageEngine.SetPersistenceRepository(persistenceAdapter)
-	logger.Info("game persistence configured")
+	engineType := cfg.Server.EngineType
+	if engineType == "" {
+		engineType = "mage" // Default to MageEngine for backward compatibility
+	}
 
-	// Create game adapter BEFORE restoring games so we can start action processing
-	gameAdapter := game.NewEngineAdapter(mageEngine, logger)
+	logger.Info("initializing game engine",
+		zap.String("engine_type", engineType))
+
+	switch engineType {
+	case "playtest":
+		// Create new rules-light Engine
+		playtestEngine := game.NewEngine(logger)
+		gameEngine = playtestEngine
+		gameAdapter = game.NewEngineAdapter(playtestEngine, logger)
+		logger.Info("playtest engine initialized (rules-light mode)")
+
+	case "mage":
+		fallthrough
+	default:
+		// Create traditional MageEngine with full rules enforcement
+		mageEngine := game.NewMageEngine(logger)
+		mageEngine.SetCardRepository(cardRepo)     // Enable card metadata lookup
+		mageEngine.SetCardBuilder(cards.BuildCard) // Enable Go-implemented cards
+
+		// Set up persistence for crash recovery
+		persistenceAdapter := game.NewPersistenceAdapter(activeGameRepo)
+		mageEngine.SetPersistenceRepository(persistenceAdapter)
+		logger.Info("game persistence configured")
+
+		gameEngine = mageEngine
+		gameAdapter = game.NewEngineAdapter(mageEngine, logger)
+		logger.Info("mage engine initialized (full rules enforcement)")
+	}
 
 	// Restore active games from database (crash recovery)
-	restoredCount := restoreActiveGames(ctx, activeGameRepo, mageEngine, gameMgr, gameAdapter, logger)
-	if restoredCount > 0 {
-		logger.Info("restored active games from persistence",
-			zap.Int("count", restoredCount),
-		)
+	// Only supported for MageEngine
+	if engineType == "mage" {
+		if mageEngine, ok := gameEngine.(*game.MageEngine); ok {
+			restoredCount := restoreActiveGames(ctx, activeGameRepo, mageEngine, gameMgr, gameAdapter, logger)
+			if restoredCount > 0 {
+				logger.Info("restored active games from persistence",
+					zap.Int("count", restoredCount),
+				)
+			}
+		}
+	} else {
+		logger.Info("game restoration skipped (not supported for playtest engine)")
 	}
 
 	// Initialize tournament manager

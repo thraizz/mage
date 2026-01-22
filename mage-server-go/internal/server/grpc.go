@@ -642,55 +642,165 @@ func (s *mageServer) engineViewToProto(engineView interface{}, playerID string) 
 		return nil
 	}
 
-	data, ok := engineView.(*game.EngineGameView)
-	if !ok {
-		return nil
-	}
-
-	view := &pb.GameView{
-		GameId:           data.GameID,
-		State:            data.State.String(),
-		Phase:            data.Phase,
-		Step:             data.Step,
-		Turn:             int32(data.Turn),
-		ActivePlayerId:   data.ActivePlayerID,
-		PriorityPlayerId: data.PriorityPlayer,
-		Players:          enginePlayersToProto(data.Players),
-		Battlefield:      engineCardsToProto(data.Battlefield),
-		Stack:            engineCardsToProto(data.Stack),
-		Exile:            engineCardsToProto(data.Exile),
-		Command:          engineCardsToProto(data.Command),
-		Revealed:         engineRevealedToProto(data.Revealed),
-		LookedAt:         engineLookedAtToProto(data.LookedAt),
-		// Pre-computed display values (server source of truth)
-		ActivePlayerName:     data.ActivePlayerName,
-		PriorityPlayerName:   data.PriorityPlayerName,
-		GameFormat:           data.GameFormat,
-		IsMulliganPhase:      data.IsMulliganPhase,
-		LandsPlayedThisTurn:  int32(data.LandsPlayedThisTurn),
-		LandsAllowedThisTurn: int32(data.LandsAllowedThisTurn),
-	}
-
-	if combat := engineCombatToProto(data.Combat); combat != nil {
-		view.Combat = combat
-	}
-
-	if !data.StartedAt.IsZero() {
-		view.StartTime = timestamppb.New(data.StartedAt)
-	}
-
-	// Include pending library search if present
-	if data.PendingLibrarySearch != nil {
-		view.PendingLibrarySearch = &pb.LibrarySearchView{
-			PlayerId:    data.PendingLibrarySearch.PlayerID,
-			Message:     data.PendingLibrarySearch.Message,
-			Destination: data.PendingLibrarySearch.Destination,
-			Cards:       engineCardsToProto(data.PendingLibrarySearch.Cards),
-			CanCancel:   data.PendingLibrarySearch.CanCancel,
+	// Handle MageEngine views (EngineGameView)
+	if data, ok := engineView.(*game.EngineGameView); ok {
+		view := &pb.GameView{
+			GameId:           data.GameID,
+			State:            data.State.String(),
+			Phase:            data.Phase,
+			Step:             data.Step,
+			Turn:             int32(data.Turn),
+			ActivePlayerId:   data.ActivePlayerID,
+			PriorityPlayerId: data.PriorityPlayer,
+			Players:          enginePlayersToProto(data.Players),
+			Battlefield:      engineCardsToProto(data.Battlefield),
+			Stack:            engineCardsToProto(data.Stack),
+			Exile:            engineCardsToProto(data.Exile),
+			Command:          engineCardsToProto(data.Command),
+			Revealed:         engineRevealedToProto(data.Revealed),
+			LookedAt:         engineLookedAtToProto(data.LookedAt),
+			// Pre-computed display values (server source of truth)
+			ActivePlayerName:     data.ActivePlayerName,
+			PriorityPlayerName:   data.PriorityPlayerName,
+			GameFormat:           data.GameFormat,
+			IsMulliganPhase:      data.IsMulliganPhase,
+			LandsPlayedThisTurn:  int32(data.LandsPlayedThisTurn),
+			LandsAllowedThisTurn: int32(data.LandsAllowedThisTurn),
 		}
+
+		if combat := engineCombatToProto(data.Combat); combat != nil {
+			view.Combat = combat
+		}
+
+		if !data.StartedAt.IsZero() {
+			view.StartTime = timestamppb.New(data.StartedAt)
+		}
+
+		// Include pending library search if present
+		if data.PendingLibrarySearch != nil {
+			view.PendingLibrarySearch = &pb.LibrarySearchView{
+				PlayerId:    data.PendingLibrarySearch.PlayerID,
+				Message:     data.PendingLibrarySearch.Message,
+				Destination: data.PendingLibrarySearch.Destination,
+				Cards:       engineCardsToProto(data.PendingLibrarySearch.Cards),
+				CanCancel:   data.PendingLibrarySearch.CanCancel,
+			}
+		}
+
+		return view
 	}
 
+	// Handle Playtest Engine views (PlaytestGameView)
+	if playtestData, ok := engineView.(*game.PlaytestGameView); ok {
+		return s.playtestViewToProto(playtestData, playerID)
+	}
+
+	// Unknown view type
+	s.logger.Warn("unknown engine view type",
+		zap.String("type", fmt.Sprintf("%T", engineView)),
+	)
+	return nil
+}
+
+// playtestViewToProto converts a PlaytestGameView to protobuf GameView
+func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID string) *pb.GameView {
+	view := &pb.GameView{
+		GameId:         data.GameID,
+		State:          "IN_PROGRESS", // Playtest is always in progress
+		Phase:          "",            // No phase tracking in playtest
+		Step:           "",            // No step tracking in playtest
+		Turn:           int32(data.Turn),
+		ActivePlayerId: data.ActivePlayerID,
+		Battlefield:    playtestEngineCardsToProto(data.Battlefield),
+		Stack:          playtestEngineCardsToProto(data.Stack),
+		Exile:          playtestEngineCardsToProto(data.Exile),
+		Command:        playtestEngineCardsToProto(data.Command),
+	}
+
+	// Convert players
+	players := make([]*pb.PlayerView, 0)
+
+	// Add the viewing player first
+	if data.Me != nil {
+		players = append(players, &pb.PlayerView{
+			PlayerId:     data.Me.PlayerID,
+			Name:         data.Me.Name,
+			Life:         int32(data.Me.Life),
+			Poison:       int32(data.Me.Poison),
+			Energy:       int32(data.Me.Energy),
+			LibraryCount: int32(data.Me.LibraryCount),
+			HandCount:    int32(data.Me.HandCount),
+			Hand:         playtestEngineCardsToProto(data.Me.Hand),
+			Graveyard:    playtestEngineCardsToProto(data.Me.Graveyard),
+		})
+	}
+
+	// Add opponents
+	for _, opponent := range data.Opponents {
+		players = append(players, &pb.PlayerView{
+			PlayerId:     opponent.PlayerID,
+			Name:         opponent.Name,
+			Life:         int32(opponent.Life),
+			Poison:       int32(opponent.Poison),
+			Energy:       int32(opponent.Energy),
+			LibraryCount: int32(opponent.LibraryCount),
+			HandCount:    int32(opponent.HandCount),
+			Hand:         playtestEngineCardsToProto(opponent.Hand), // Empty for opponents
+			Graveyard:    playtestEngineCardsToProto(opponent.Graveyard),
+		})
+	}
+
+	view.Players = players
 	return view
+}
+
+// playtestEngineCardsToProto converts playtest engine cards to protobuf
+func playtestEngineCardsToProto(cards []*game.EngineCard) []*pb.CardView {
+	if cards == nil {
+		return []*pb.CardView{}
+	}
+
+	result := make([]*pb.CardView, 0, len(cards))
+	for _, card := range cards {
+		if card == nil {
+			continue
+		}
+
+		cardView := &pb.CardView{
+			Id:           card.ID,
+			Name:         card.Name,
+			DisplayName:  card.DisplayName,
+			ManaCost:     card.ManaCost,
+			Type:         card.Type,
+			SubTypes:     card.SubTypes,
+			SuperTypes:   card.SuperTypes,
+			Color:        card.Color,
+			Power:        card.Power,
+			Toughness:    card.Toughness,
+			Loyalty:      card.Loyalty,
+			OwnerId:      card.OwnerID,
+			ControllerId: card.ControllerID,
+			Tapped:       card.Tapped,
+			Flipped:      card.Flipped,
+			Transformed:  card.Transformed,
+			FaceDown:     card.FaceDown,
+			RulesText:    card.RulesText,
+		}
+
+		// Convert counters
+		counters := make([]*pb.CounterView, 0, len(card.Counters))
+		for _, counter := range card.Counters {
+			counters = append(counters, &pb.CounterView{
+				Name:  counter.Name,
+				Count: int32(counter.Count),
+			})
+		}
+		cardView.Counters = counters
+
+		result = append(result, cardView)
+	}
+
+	return result
 }
 
 // ==================== Authentication & Connection Methods ====================
