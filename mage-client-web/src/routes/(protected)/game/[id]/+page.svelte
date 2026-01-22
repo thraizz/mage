@@ -1,289 +1,149 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { get } from 'svelte/store';
+	// From playtest/+page.svelte lines 1-110: Imports and setup
+	import { onMount, untrack } from 'svelte';
+	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { auth } from '$lib/stores/auth';
 	import { websocketStore } from '$lib/stores/websocket';
 	import { getSessionIdFromToken } from '$lib/utils/jwt';
+
+	// CHANGE: Import multiplayerGameStore instead of playtestGameStore
 	import {
-		gameStore,
-		players,
-		localPlayer,
-		opponents,
-		hasPriority,
-		currentPhase,
-		currentStep,
-		currentTurn,
-		battlefield,
-		stack,
-		command,
-		exile,
-		myHand,
-		myGraveyard,
-		myManaPool,
-		pendingPrompt,
-		gameOver,
-		winner,
-		gameError,
-		isLoading,
-		getCardById
-	} from '$lib/stores/game';
-	import {
-		joinGame,
-		fetchGameView,
-		passPriority,
-		passUntilNextTurn,
-		concedeGame,
-		sendPlayerBoolean,
-		sendPlayerString,
-		keepHand,
-		mulligan,
-		playLand,
-		advancePhase,
-		activateManaAbility
-	} from '$lib/api/game';
-	import { CardActionType, type CardView } from '$lib/generated/mage/v1/models';
-	import {
-		tapUntap,
-		untapAll,
-		flipCard,
-		transformCard,
-		moveCard as moveCardToZone,
-		modifyCardCounter,
-		drawCards,
-		shuffleLibrary,
-		nextTurn,
-		searchLibrary,
-		addToStack,
-		removeFromStack,
-		modifyLife,
-		setPlayerCounter
-	} from '$lib/api/direct-actions';
-	import type { GameCard, GamePhase } from '$lib/types/game';
+		multiplayerGameStore,
+		multiplayerPlayers,
+		multiplayerLocalPlayer,
+		multiplayerOpponents,
+		multiplayerBattlefield,
+		multiplayerExile,
+		multiplayerActiveControlSeat,
+		multiplayerIsInitialized,
+		type PlaytestPlayer,
+		type ScrySession
+	} from '$lib/stores/multiplayer-game';
+
+	import { toast } from '$lib/stores/toast';
+
+	// Game components (from playtest/+page.svelte lines 20-46)
+	import Card from '$lib/components/game/Card.svelte';
+	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
+	import LibrarySearch from '$lib/components/game/LibrarySearch.svelte';
+	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
+	import CreateTokenDialog from '$lib/components/game/CreateTokenDialog.svelte';
+	import CounterDialog from '$lib/components/game/CounterDialog.svelte';
+	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte';
+	import NumberInputDialog from '$lib/components/game/NumberInputDialog.svelte';
+	import ScryDialog from '$lib/components/game/ScryDialog.svelte';
+	import RevealTopDialog from '$lib/components/game/RevealTopDialog.svelte';
+	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
+	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
+	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
+	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
+	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
+
+	// ADD: Multiplayer components
+	import GameChatOverlay from '$lib/components/game/GameChatOverlay.svelte';
+
+	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
+	import Keyboard from '@lucide/svelte/icons/keyboard';
+	import X from '@lucide/svelte/icons/x';
+	import Eye from '@lucide/svelte/icons/eye';
+	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import Heart from '@lucide/svelte/icons/heart';
+
 	import {
 		dragDropStore,
 		isDragging as isDraggingStore,
-		draggedCardId,
 		draggedCardName,
 		dragPosition,
 		isOverValidDropZone,
 		currentDropZone,
 		getAllValidDropZones,
-		type SourceZone,
-		type DropZone
+		type SourceZone
 	} from '$lib/utils/drag-drop';
-	import { moveCard } from '$lib/api/direct-actions';
-	import { toast } from '$lib/stores/toast';
 	import { getScryfallImageUrl } from '$lib/utils/scryfall';
 
-	// Game components
-	import Card from '$lib/components/game/Card.svelte';
-	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
-	import Graveyard from '$lib/components/game/Graveyard.svelte';
-	import ExileZone from '$lib/components/game/ExileZone.svelte';
-	import LibraryZone from '$lib/components/game/LibraryZone.svelte';
-	import ManaPool from '$lib/components/game/ManaPool.svelte';
-	import GameHeader from '$lib/components/game/GameHeader.svelte';
-	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
-	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
+	// Page data from load function (CHANGE: Initialize from URL params)
+	const { data } = $props<{ data: { gameId: string } }>();
 
-	import PriorityActionBar from '$lib/components/game/PriorityActionBar.svelte';
-	import ActionLogOverlay from '$lib/components/game/ActionLogOverlay.svelte';
-	import GameChatOverlay from '$lib/components/game/GameChatOverlay.svelte';
-	import OpponentPanel from '$lib/components/game/OpponentPanel.svelte';
-	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
-	import DebugOverlay from '$lib/components/game/DebugOverlay.svelte';
-	import ManaPayment from '$lib/components/game/ManaPayment.svelte';
-	import XManaSelector from '$lib/components/game/XManaSelector.svelte';
-	import LibrarySearch from '$lib/components/game/LibrarySearch.svelte';
-	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
-	import type {
-		GamePlayManaData,
-		GamePlayXManaData,
-		GameAssignDamageData
-	} from '$lib/generated/mage/v1/websocket';
-	import Keyboard from '@lucide/svelte/icons/keyboard';
-	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
-
-	// Combat components
-	import DeclareAttackers from '$lib/components/game/DeclareAttackers.svelte';
-	import DeclareBlockers from '$lib/components/game/DeclareBlockers.svelte';
-	import AssignDamage from '$lib/components/game/AssignDamage.svelte';
-
-	// Direct player control components
-	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte'; // Phase 4: Deck context menu (plan lines 854-858)
-	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte'; // Phase 4: Type import (plan line 857)
-	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
-	import VisualStack from '$lib/components/game/VisualStack.svelte';
-	import RollbackConsentDialog from '$lib/components/game/RollbackConsentDialog.svelte';
-	import NumberInputDialog from '$lib/components/game/NumberInputDialog.svelte'; // Phase 5: Number input dialog (plan lines 1013-1016)
-	import { requestRollback, respondToRollback } from '$lib/api/game';
-	import {
-		combatStore,
-		isInCombat,
-		canAttackCardIds,
-		declaredAttackerIds,
-		canBlockCardIds,
-		assignedBlockerIds
-	} from '$lib/stores/combat';
-	import { visualStackStore, visualStackIsOpen, visualStackCount } from '$lib/stores/visual-stack';
-	import {
-		parseCombatOptions,
-		type DeclaredAttacker,
-		type DefenderTarget,
-		type DamageAssignmentPrompt,
-		type ParsedCombatOptions
-	} from '$lib/types/combat';
-	import CardContextMenu from '$lib/components/game/CardContextMenu.svelte';
-
-	// Page data from load function
-	const { data } = $props();
-
-	// Game ID from load function (more reliable than accessing $page.params directly)
-	const gameId = $derived(data.gameId);
-
-	// UI state
-	let showActionLog = $state(false);
-	let showChat = $state(false);
-	let showDebugOverlay = $state(false);
+	// State (from playtest/+page.svelte lines 58-92)
+	let loading = $state(true);
+	let error = $state<string | null>(null);
 	let showTokenCreator = $state(false);
+	let showCreateTokenDialog = $state(false);
+	let showCounterDialog = $state(false);
+	let selectedCardForCounters = $state<{ id: string; name: string } | null>(null);
 	let showKeyboardShortcuts = $state(false);
+	let showAllHands = $state(false);
+	let showMenu = $state(false);
+	let hoveredCardId = $state<string | null>(null);
 	let showLifeMenu = $state(false);
 	let lifeMenuEl: HTMLDivElement | null = $state(null);
+	let showDebugOverlay = $state(false);
+	let selectedOpponentId = $state<string | null>(null);
+	let showOpponentLifeMenu = $state(false);
+	let opponentLifeMenuEl: HTMLDivElement | null = $state(null);
+	let showDeckSearch = $state(false);
 
-	// Phase 4: Deck context menu state (plan lines 860-864)
+	// Deck context menu and dialog state (from playtest/+page.svelte lines 77-92)
 	let showDeckContextMenu = $state(false);
-	let deckContextMenuPosition = $state({ x: 0, y: 0 });
-
-	// Phase 5: Number input dialog state (plan lines 1018-1028)
+	let deckContextMenuPosition = $state<{ x: number; y: number }>({ x: 0, y: 0 });
 	let showNumberInputDialog = $state(false);
 	let numberInputDialogConfig = $state<{
 		title: string;
 		defaultValue: number;
-		min?: number;
-		max?: number;
+		min: number;
+		max: number;
 		onConfirm: (value: number) => void;
 	} | null>(null);
+	let showScryDialog = $state(false);
+	let currentScrySession = $state<ScrySession | null>(null);
+	let showRevealTopDialog = $state(false);
+	let revealedCards = $state<import('$lib/generated/mage/v1/models').CardView[]>([]);
 
-	// Context menu state
-	let contextMenuCard = $state<(typeof battlefieldCards)[0] | null>(null);
-	let contextMenuPosition = $state({ x: 0, y: 0 });
-	let actionLogRef = $state<ActionLogOverlay | undefined>(undefined);
-
-	// Hovered card tracking for keyboard shortcuts
-	let hoveredCardId = $state<string | null>(null);
-	let gameChatRef = $state<GameChatOverlay | undefined>(undefined);
-	let isActionLoading = $state(false);
-	let initialized = $state(false);
-
-	// Combat state (from store)
-	const inCombat = $derived($isInCombat);
-	const canAttackIds = $derived($canAttackCardIds);
-	const attackingIds = $derived($declaredAttackerIds);
-	const canBlockIds = $derived($canBlockCardIds);
-	const blockingIds = $derived($assignedBlockerIds);
-
-	// Damage assignment from special prompt (GAME_ASSIGN_DAMAGE)
-	const damageAssignmentPrompt = $derived.by<DamageAssignmentPrompt | null>(() => {
-		if (!prompt) return null;
-		// Check if this is a damage assignment prompt (sent as 'assignDamage' type)
-		if ((prompt as { type: string }).type === 'assignDamage') {
-			return prompt.data as DamageAssignmentPrompt;
-		}
-		return null;
-	});
-
-	// Drag-drop state (from store)
+	// Drag-drop state (from playtest/+page.svelte lines 96-102)
 	const isDragging = $derived($isDraggingStore);
-
-	const dragCardId = $derived($draggedCardId);
 	const dragCardName = $derived($draggedCardName);
 	const dragPos = $derived($dragPosition);
 	const isOverValidDrop = $derived($isOverValidDropZone);
 	const dropZone = $derived($currentDropZone);
 
-	// Drop zone element references
+	// Game log (from playtest/+page.svelte line 104)
+	const gameLog = $derived($multiplayerGameStore.log || []);
+
+	// Drop zone elements (from playtest/+page.svelte lines 106-118)
 	let battlefieldDropZoneEl: HTMLDivElement | null = $state(null);
 	let graveyardDropZoneEl: HTMLElement | null = $state(null);
 	let exileDropZoneEl: HTMLElement | null = $state(null);
-	let libraryDropZoneEl: HTMLElement | null = $state(null);
 	let handDropZoneEl: HTMLElement | null = $state(null);
-	let visualStackDropZoneEl: HTMLElement | null = $state(null);
+	let libraryDropZoneEl: HTMLElement | null = $state(null);
+	let commandDropZoneEl: HTMLElement | null = $state(null);
 	let dropZoneUnregister: (() => void) | null = null;
 	let graveyardDropZoneUnregister: (() => void) | null = null;
 	let exileDropZoneUnregister: (() => void) | null = null;
 	let handDropZoneUnregister: (() => void) | null = null;
-	let visualStackDropZoneUnregister: (() => void) | null = null;
+	let libraryDropZoneUnregister: (() => void) | null = null;
+	let commandDropZoneUnregister: (() => void) | null = null;
 
-	// Battlefield drag state (plan lines 421-428)
+	// Battlefield drag state (from playtest/+page.svelte lines 120-123)
 	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
 	let battlefieldIsDragPending = $state(false);
-	let commandDragStartPosition = $state<{ x: number; y: number } | null>(null);
-	let commandIsDragPending = $state(false);
 	const DRAG_THRESHOLD = 5;
 
-	// Opponent panel states (for collapsing)
-	let opponentExpanded = $state<Record<string, boolean>>({});
+	// Command zone drag state (from playtest/+page.svelte lines 125-127)
+	let commandDragStartPosition = $state<{ x: number; y: number } | null>(null);
+	let commandIsDragPending = $state(false);
 
-	// Phase 3: OpponentSection state - plan lines 662-666
-	let selectedOpponentId = $state<string | null>(null);
-	let showOpponentLifeMenu = $state(false);
+	// Derived state from stores (from playtest/+page.svelte lines 133-140)
+	// CHANGE: Use multiplayer stores instead of playtest stores
+	const players = $derived($multiplayerPlayers);
+	const me = $derived($multiplayerLocalPlayer);
+	const otherPlayers = $derived($multiplayerOpponents);
+	const battlefield = $derived($multiplayerBattlefield);
+	const exile = $derived($multiplayerExile);
+	const activeControlSeat = $derived($multiplayerActiveControlSeat);
+	const isInitialized = $derived($multiplayerIsInitialized);
 
-	// Auto-pass setting (passes when it's opponent's turn)
-	let autoPass = $state(false);
-
-	// Mulligan state
-	let mulliganCount = $state(0);
-	let isMulliganLoading = $state(false);
-
-	// Guard to prevent double initialization
-	let isInitializing = $state(false);
-
-	// Get local player ID from auth
-	const localPlayerId = $derived($auth.user?.username || '');
-
-	// Derived state from stores
-	const gameState = $derived($gameStore);
-	const allPlayers = $derived($players);
-	const me = $derived($localPlayer);
-	const otherPlayers = $derived($opponents);
-
-	// Ensure opponentExpanded has entries for all opponents (fixes bind:expanded with undefined)
-	$effect(() => {
-		for (const p of otherPlayers) {
-			if (!(p.playerId in opponentExpanded)) {
-				opponentExpanded[p.playerId] = true;
-			}
-		}
-	});
-
-	const myCards = $derived($myHand);
-	const myGrave = $derived($myGraveyard);
-	const myExile = $derived($exile);
-	const myMana = $derived($myManaPool);
-	const havePriority = $derived($hasPriority);
-	const phase = $derived($currentPhase);
-	const step = $derived($currentStep);
-	const turn = $derived($currentTurn);
-	const battlefieldCards = $derived($battlefield);
-	// Hovered card (for keyboard shortcuts) - derived after battlefieldCards is defined
-	const hoveredCard = $derived(
-		hoveredCardId ? battlefieldCards.find((c) => c.id === hoveredCardId) : null
-	);
-	const stackCards = $derived($stack);
-	const commandCards = $derived($command);
-	const prompt = $derived($pendingPrompt);
-
-	// Plan document lines 408-419: Derived state for BattlefieldArea component
-	const myBattlefield = $derived($battlefield.filter((c) => c.controllerId === localPlayerId));
-	const myBattlefieldNonlands = $derived(myBattlefield.filter((c) => !isLandPermanent(c.type)));
-	const myBattlefieldLands = $derived(myBattlefield.filter((c) => isLandPermanent(c.type)));
-	const myCommandCards = $derived(
-		$command.filter((c) => (c.ownerId || c.controllerId) === localPlayerId)
-	);
-	const isCommanderGame = $derived($command.length > 0);
-
-	// Phase 3: OpponentSection derived state - plan lines 668-696
+	// Selected opponent (from playtest/+page.svelte lines 142-150)
 	const selectedOpponent = $derived.by(() => {
 		if (otherPlayers.length === 0) return null;
 		if (!selectedOpponentId || !otherPlayers.find((p) => p.playerId === selectedOpponentId)) {
@@ -292,638 +152,326 @@
 		return otherPlayers.find((p) => p.playerId === selectedOpponentId) || otherPlayers[0];
 	});
 
+	// Split battlefield by controller (from playtest/+page.svelte lines 152-172)
+	const myBattlefield = $derived(battlefield.filter((c) => c.controllerId === activeControlSeat));
 	const opponentBattlefield = $derived.by(() => {
-		return selectedOpponent
-			? $battlefield.filter((c) => c.controllerId === selectedOpponent.playerId)
-			: [];
+		const opponent = selectedOpponent;
+		return opponent ? battlefield.filter((c) => c.controllerId === opponent.playerId) : [];
 	});
 
+	function isLandPermanent(cardType?: string | null): boolean {
+		return !!cardType && /\bland\b/i.test(cardType);
+	}
+
+	const myBattlefieldNonlands = $derived(myBattlefield.filter((c) => !isLandPermanent(c.type)));
+	const myBattlefieldLands = $derived(myBattlefield.filter((c) => isLandPermanent(c.type)));
 	const opponentBattlefieldNonlands = $derived.by(() =>
 		opponentBattlefield.filter((c) => !isLandPermanent(c.type))
 	);
-
 	const opponentBattlefieldLands = $derived.by(() =>
 		opponentBattlefield.filter((c) => isLandPermanent(c.type))
 	);
 
+	// My cards (from playtest/+page.svelte lines 174-178)
+	const myGrave = $derived(me?.graveyard || []);
+	const myMana = $derived(
+		me?.manaPool || { white: 0, blue: 0, black: 0, red: 0, green: 0, colorless: 0 }
+	);
+
+	// Reactive card lookup for counter dialog (from playtest/+page.svelte lines 180-203)
+	const selectedCardForCountersData = $derived.by(() => {
+		const currentId = selectedCardForCounters?.id;
+		if (!currentId) return null;
+
+		const card =
+			$multiplayerBattlefield.find((c) => c.id === currentId) ||
+			me?.hand.find((c) => c.id === currentId) ||
+			me?.graveyard.find((c) => c.id === currentId) ||
+			null;
+
+		return card;
+	});
+
+	// Hovered card (from playtest/+page.svelte lines 205-208)
+	const hoveredCard = $derived(
+		hoveredCardId ? battlefield.find((c) => c.id === hoveredCardId) : null
+	);
+
+	const activePlayerName = $derived.by(() => {
+		return players.find((p) => p.playerId === $multiplayerGameStore.activePlayerId)?.name ?? '';
+	});
+
+	const turnNumber = $derived.by(() => {
+		const step = Math.max(1, $multiplayerGameStore.turn);
+		const n = players.length;
+		if (n <= 0) return step;
+		return Math.floor((step - 1) / n) + 1;
+	});
+
+	// Command zone (from playtest/+page.svelte lines 229-244)
+	const commandCards = $derived($multiplayerGameStore.command || []);
+	const myCommandCards = $derived(
+		commandCards.filter((c) => (c.ownerId || c.controllerId) === activeControlSeat)
+	);
+
 	const opponentCommandCards = $derived.by(() => {
-		return selectedOpponent
-			? $command.filter((c) => (c.ownerId || c.controllerId) === selectedOpponent.playerId)
+		const opponent = selectedOpponent;
+		return opponent
+			? commandCards.filter((c) => (c.ownerId || c.controllerId) === opponent.playerId)
 			: [];
 	});
 
-	// Combat phase detection from prompts
-	const combatPromptOptions = $derived.by<ParsedCombatOptions | null>(() => {
-		if (!prompt) return null;
-		if (prompt.type !== 'choice') return null;
-		const data = prompt.data as { choices?: string[] };
-		if (!data?.choices) return null;
-		const parsed = parseCombatOptions(data.choices);
-		if (parsed.type === 'none') return null;
-		return parsed;
-	});
+	const isCommanderGame = $derived(commandCards.length > 0);
 
-	const isDeclaringAttackersPhase = $derived(
-		step === 'DECLARE_ATTACKERS' && combatPromptOptions?.type === 'attack'
-	);
+	/**
+	 * Initialize from game ID (CHANGE: Server-based initialization)
+	 */
+	async function initializeFromGameId(): Promise<void> {
+		loading = true;
+		error = null;
 
-	const isDeclaringBlockersPhase = $derived(
-		step === 'DECLARE_BLOCKERS' && combatPromptOptions?.type === 'block'
-	);
-
-	// Phase 4: Card+Deck context menu actions (plan lines 876-906)
-	// TODO: Fix this
-	const cardContextMenuActions = $derived.by(() => {
-		return [
-			{
-				label: 'Draw Cards',
-				icon: '🃏',
-				onClick: () => handleDrawN(1)
+		try {
+			// Check authentication
+			if (!$auth.user?.id) {
+				error = 'Not authenticated';
+				return;
 			}
-		];
-	});
-	// Phase 4: Deck context menu actions (plan lines 876-915)
-	const deckContextMenuActions = $derived.by(() => {
-		const actions: MenuAction[] = [
-			{
-				label: 'Draw Cards',
-				icon: '🃏',
-				submenu: [
-					{ label: 'Draw 1', onClick: () => handleDrawN(1) },
-					{ label: 'Draw 2', onClick: () => handleDrawN(2) },
-					{ label: 'Draw 3', onClick: () => handleDrawN(3) },
-					{ label: 'Draw 5', onClick: () => handleDrawN(5) },
-					{ label: 'Draw 7', onClick: () => handleDrawN(7) },
-					{ divider: true }, // Phase 5: Separator before custom option (plan lines 1048-1060)
-					{ label: 'Custom...', onClick: () => showNumberInput('Draw N Cards', 1, handleDrawN) } // Phase 5: Custom draw option (plan lines 1048-1060)
+
+			console.log('[Multiplayer] Initializing with game ID:', data.gameId);
+
+			// CHANGE: Initialize multiplayer store with game ID (only takes gameId)
+			await multiplayerGameStore.initialize(data.gameId);
+
+			loading = false;
+		} catch (err) {
+			console.error('[Multiplayer] Initialization failed:', err);
+			error = err instanceof Error ? err.message : 'Failed to initialize game';
+			loading = false;
+
+			setTimeout(() => {
+				goto('/lobby');
+			}, 3000);
+		}
+	}
+
+	/**
+	 * Handle life change (from playtest/+page.svelte lines 439-443)
+	 * CHANGE: Use multiplayerGameStore
+	 */
+	function handleLifeChange(delta: number, playerId?: string): void {
+		const targetPlayerId = playerId || me?.playerId;
+		if (!targetPlayerId) return;
+		multiplayerGameStore.modifyLife(targetPlayerId, delta);
+	}
+
+	/**
+	 * Handle poison counter change (from playtest/+page.svelte lines 446-456)
+	 * CHANGE: Use multiplayerGameStore
+	 */
+	function handlePoisonChange(delta: number, playerId?: string): void {
+		const targetPlayerId = playerId || me?.playerId;
+		if (!targetPlayerId) return;
+		const player = players.find((p) => p.playerId === targetPlayerId);
+		if (!player) return;
+		const newValue = Math.max(0, (player.poison || 0) + delta);
+		multiplayerGameStore.setPlayerCounter(targetPlayerId, 'poison', newValue);
+	}
+
+	/**
+	 * Draw a card (from playtest/+page.svelte lines 459-465)
+	 * CHANGE: Use multiplayerGameStore
+	 */
+	function handleDrawCard(): void {
+		if (!me) return;
+		multiplayerGameStore.drawCards(me.playerId, 1);
+		toast.success('Drew a card');
+	}
+
+	/**
+	 * Shuffle library (from playtest/+page.svelte lines 467-474)
+	 * CHANGE: Use multiplayerGameStore
+	 */
+	function handleShuffleLibrary(): void {
+		if (!me) return;
+		multiplayerGameStore.shuffleLibrary(me.playerId);
+		toast.success('Shuffled library');
+	}
+
+	/**
+	 * Untap all permanents (from playtest/+page.svelte lines 476-483)
+	 * CHANGE: Use multiplayerGameStore
+	 */
+	function handleUntapAll(): void {
+		if (!me) return;
+		multiplayerGameStore.untapAll(me.playerId);
+		toast.success('Untapped all');
+	}
+
+	/**
+	 * Next turn (from playtest/+page.svelte lines 485-494)
+	 * CHANGE: Use multiplayerGameStore
+	 */
+	function handleNextTurn(): void {
+		multiplayerGameStore.nextTurn();
+		const newActivePlayer = players.find((p) => p.playerId === $multiplayerGameStore.activePlayerId);
+		if (newActivePlayer) {
+			toast.info(`${newActivePlayer.name}'s turn`);
+		}
+	}
+
+	/**
+	 * Deck context menu handlers (from playtest/+page.svelte lines 497-626)
+	 * CHANGE: Use multiplayerGameStore
+	 */
+	function handleDeckContextMenu(event: MouseEvent): void {
+		if (!me) return;
+		deckContextMenuPosition = { x: event.clientX, y: event.clientY };
+		showDeckContextMenu = true;
+	}
+
+	function handleDrawN(count: number): void {
+		if (!me) return;
+		multiplayerGameStore.drawCards(me.playerId, count);
+		toast.success(`Drew ${count} card(s)`);
+	}
+
+	function handleMill(count: number): void {
+		if (!me) return;
+		multiplayerGameStore.millCards(me.playerId, count);
+		toast.success(`Milled ${count} card(s)`);
+	}
+
+	function handleScry(count: number): void {
+		if (!me) return;
+		const session = multiplayerGameStore.scryCards(me.playerId, count);
+		if (session) {
+			currentScrySession = session;
+			showScryDialog = true;
+		} else {
+			toast.error('No cards to scry');
+		}
+	}
+
+	function handleScryComplete(
+		keepOnTop: import('$lib/generated/mage/v1/models').CardView[],
+		putToBottom: import('$lib/generated/mage/v1/models').CardView[]
+	): void {
+		if (!me || !currentScrySession) return;
+		const scryCount = currentScrySession.cards.length;
+		multiplayerGameStore.applyScryDecision(me.playerId, scryCount, keepOnTop, putToBottom);
+		showScryDialog = false;
+		currentScrySession = null;
+		toast.success(`Scry ${scryCount} complete`);
+	}
+
+	function handleRevealTop(count: number): void {
+		if (!me) return;
+		const cards = multiplayerGameStore.revealTopCards(me.playerId, count);
+		revealedCards = cards;
+		showRevealTopDialog = true;
+	}
+
+	function handleToggleRevealedTop(): void {
+		if (!me) return;
+		const willReveal = !me.revealedTopCard;
+		multiplayerGameStore.setRevealedTop(me.playerId, willReveal);
+		toast.info(willReveal ? 'Top card revealed permanently' : 'Top card hidden');
+	}
+
+	function showNumberInput(
+		title: string,
+		defaultValue: number,
+		onConfirm: (value: number) => void
+	): void {
+		numberInputDialogConfig = {
+			title,
+			defaultValue,
+			min: 1,
+			max: 99,
+			onConfirm: (value) => {
+				onConfirm(value);
+				showNumberInputDialog = false;
+				numberInputDialogConfig = null;
+			}
+		};
+		showNumberInputDialog = true;
+	}
+
+	const deckContextMenuActions = $derived<MenuAction[]>(
+		!me
+			? []
+			: [
+					{
+						label: 'Draw Cards',
+						submenu: [
+							{ label: '1 Card', onClick: () => handleDrawN(1) },
+							{ label: '2 Cards', onClick: () => handleDrawN(2) },
+							{ label: '3 Cards', onClick: () => handleDrawN(3) },
+							{ label: '7 Cards', onClick: () => handleDrawN(7) },
+							{ label: 'Custom...', onClick: () => showNumberInput('Draw N Cards', 1, handleDrawN) }
+						]
+					},
+					{
+						label: 'Scry',
+						submenu: [
+							{ label: '1 Card', onClick: () => handleScry(1) },
+							{ label: '2 Cards', onClick: () => handleScry(2) },
+							{ label: '3 Cards', onClick: () => handleScry(3) },
+							{ label: 'Custom...', onClick: () => showNumberInput('Scry N Cards', 1, handleScry) }
+						]
+					},
+					{
+						label: 'Mill Cards',
+						submenu: [
+							{ label: '1 Card', onClick: () => handleMill(1) },
+							{ label: '2 Cards', onClick: () => handleMill(2) },
+							{ label: '3 Cards', onClick: () => handleMill(3) },
+							{ label: '5 Cards', onClick: () => handleMill(5) },
+							{ label: 'Custom...', onClick: () => showNumberInput('Mill N Cards', 1, handleMill) }
+						]
+					},
+					{ divider: true },
+					{
+						label: 'Reveal Top Card',
+						onClick: () => handleRevealTop(1)
+					},
+					{
+						label: me.revealedTopCard ? 'Hide Revealed Top' : 'Reveal Top Permanently',
+						onClick: handleToggleRevealedTop
+					},
+					{ divider: true },
+					{
+						label: 'Search Library',
+						onClick: () => {
+							showDeckSearch = true;
+						}
+					},
+					{
+						label: 'Shuffle Library',
+						onClick: handleShuffleLibrary
+					}
 				]
-			},
-			{ divider: true },
-			{
-				label: 'Search Library',
-				icon: '🔍',
-				onClick: handleSearchLibrary
-			},
-			{
-				label: 'Shuffle Library',
-				icon: '🔀',
-				onClick: handleShuffleLibrary
-			}
-		];
-
-		return actions;
-	});
-
-	const isGameOver = $derived($gameOver);
-	const gameWinner = $derived($winner);
-	const error = $derived($gameError);
-	const loading = $derived($isLoading);
-
-	// Visual stack state (client-side only)
-	const showVisualStack = $derived($visualStackIsOpen);
-	const visualStackItemCount = $derived($visualStackCount);
-
-	// Rollback request state
-	const pendingRollbackRequest = $derived(gameState.pendingRollbackRequest);
-
-	// Player name map for display
-	const playerNames = $derived.by(() => new Map(allPlayers.map((p) => [p.playerId, p.name])));
-
-	// Mulligan phase detection - use server-provided value
-	const isMulliganPhase = $derived(
-		gameState.gameView?.isMulliganPhase ?? gameState.gameView?.state?.toLowerCase() === 'mulligan'
-	);
-
-	// Check if local player has already kept their hand (waiting for other players)
-	const hasKeptHand = $derived(me?.keptHand ?? false);
-
-	// Is it the local player's turn?
-	const isYourTurn = $derived(gameState.gameView?.activePlayerId === localPlayerId);
-
-	// Does the local player have any available actions? (server-computed)
-	const myHasAvailableActions = $derived(me?.hasAvailableActions ?? false);
-
-	// Get active player name - use server-provided value
-	const activePlayerName = $derived(gameState.gameView?.activePlayerName || 'Unknown');
-
-	// Game format - use server-provided value
-	const gameFormat = $derived(gameState.gameView?.gameFormat || 'Game');
-
-	// Priority player name - who currently has priority
-	const priorityPlayerName = $derived(
-		gameState.gameView?.priorityPlayerId
-			? playerNames.get(gameState.gameView.priorityPlayerId) || gameState.gameView.priorityPlayerId
-			: ''
 	);
 
 	/**
-	 * Convert CardView from proto to GameCard for components
+	 * Handle battlefield card click (from playtest/+page.svelte lines 629-638)
+	 * CHANGE: Use multiplayerGameStore
 	 */
-	function toGameCard(card: CardView): GameCard {
-		return {
-			id: card.id,
-			name: card.name,
-			manaCost: card.manaCost,
-			cardType: card.type,
-			power: card.power,
-			toughness: card.toughness,
-			imageUrl: '',
-			isTapped: card.tapped,
-			isSelected: false,
-			ownerId: card.ownerId,
-			controllerId: card.controllerId
-		};
+	function handleBattlefieldCardClick(cardId: string): void {
+		const card = battlefield.find((c) => c.id === cardId);
+		if (!card) return;
+		multiplayerGameStore.tapCard(cardId, !card.tapped);
 	}
 
 	/**
-	 * Convert phase/step string to GamePhase type
-	 * Maps server step names to client phase keys for PhaseIndicator
-	 *
-	 * Server sends steps like: UNTAP, UPKEEP, DRAW, MAIN1, BEGIN_COMBAT, etc.
-	 * Client expects: UNTAP, UPKEEP, DRAW, PRECOMBAT_MAIN, COMBAT, etc.
-	 */
-	function toGamePhase(phaseOrStep: string): GamePhase {
-		const mapping: Record<string, GamePhase> = {
-			// Direct matches (server step = client key)
-			UNTAP: 'UNTAP',
-			UPKEEP: 'UPKEEP',
-			DRAW: 'DRAW',
-			DECLARE_ATTACKERS: 'DECLARE_ATTACKERS',
-			DECLARE_BLOCKERS: 'DECLARE_BLOCKERS',
-			COMBAT_DAMAGE: 'COMBAT_DAMAGE',
-			END: 'END',
-			CLEANUP: 'CLEANUP',
-
-			// Server step names that need mapping to client keys
-			MAIN1: 'PRECOMBAT_MAIN',
-			BEGIN_COMBAT: 'COMBAT',
-			END_COMBAT: 'END_OF_COMBAT',
-			MAIN2: 'POSTCOMBAT_MAIN',
-
-			// Client-only keys (for backwards compatibility)
-			BEGINNING: 'BEGINNING',
-			PRECOMBAT_MAIN: 'PRECOMBAT_MAIN',
-			COMBAT: 'COMBAT',
-			END_OF_COMBAT: 'END_OF_COMBAT',
-			POSTCOMBAT_MAIN: 'POSTCOMBAT_MAIN',
-			END_OF_TURN: 'END_OF_TURN',
-
-			// Phase names (fallback when step not available)
-			ENDING: 'END'
-		};
-		return mapping[phaseOrStep] || 'PRECOMBAT_MAIN';
-	}
-
-	/**
-	 * Parse error message to provide user-friendly feedback
-	 */
-	function parseGameError(err: unknown): { title: string; message: string } {
-		const errorMsg = err instanceof Error ? err.message : String(err);
-		const lowerMsg = errorMsg.toLowerCase();
-
-		// Game has ended (found in match history)
-		if (lowerMsg.includes('game has ended')) {
-			return {
-				title: 'Game Has Ended',
-				message: 'This game has already finished. You can view your match history from the lobby.'
-			};
-		}
-
-		// Game not found errors
-		if (lowerMsg.includes('game not found') || lowerMsg.includes('no game data')) {
-			return {
-				title: 'Game Not Found',
-				message: 'This game does not exist. The link may be invalid or the game was never created.'
-			};
-		}
-
-		// Player not in game
-		if (lowerMsg.includes('not part of this game')) {
-			return {
-				title: 'Access Denied',
-				message:
-					'You are not a participant in this game. You may need to join as a spectator instead.'
-			};
-		}
-
-		// Session/auth errors
-		if (lowerMsg.includes('session') || lowerMsg.includes('login') || lowerMsg.includes('auth')) {
-			return {
-				title: 'Session Expired',
-				message: 'Your session has expired. Please log in again to continue.'
-			};
-		}
-
-		// WebSocket/connection errors
-		if (lowerMsg.includes('websocket') || lowerMsg.includes('connection')) {
-			return {
-				title: 'Connection Failed',
-				message:
-					'Unable to connect to the game server. Please check your internet connection and try again.'
-			};
-		}
-
-		// Default error
-		return {
-			title: 'Error Loading Game',
-			message: errorMsg || 'An unexpected error occurred while loading the game.'
-		};
-	}
-
-	/**
-	 * Initialize game connection
-	 */
-	async function initializeGame() {
-		// Guard against double initialization
-		if (isInitializing || initialized) {
-			console.log('[GamePage] Skipping initialization - already in progress or completed');
-			return;
-		}
-		isInitializing = true;
-
-		// Read player ID directly from auth store to avoid timing issues with $derived
-		const playerId = $auth.user?.username || '';
-
-		console.log('[GamePage] initializeGame called', {
-			gameId,
-			playerId,
-			localPlayerId,
-			authUser: $auth.user,
-			isAuthenticated: $auth.isAuthenticated
-		});
-
-		if (!playerId || !gameId) {
-			console.error('[GamePage] Missing player ID or game ID', { playerId, gameId });
-			isInitializing = false;
-			return;
-		}
-
-		try {
-			console.log('[GamePage] Starting game initialization...', { gameId, playerId });
-
-			// Initialize game store first
-			console.log('[GamePage] Initializing game store...');
-			gameStore.initGame(gameId, playerId);
-
-			// Try to join the game first (via HTTP) to verify it exists
-			// This gives us a cleaner error if the game doesn't exist
-			console.log('[GamePage] Joining game...');
-			try {
-				await joinGame(gameId);
-				console.log('[GamePage] Joined game successfully');
-			} catch (joinErr) {
-				// Re-throw with context about the game not being found
-				const errorMsg = joinErr instanceof Error ? joinErr.message : String(joinErr);
-				if (errorMsg.toLowerCase().includes('game not found')) {
-					throw new Error('Game not found');
-				}
-				throw joinErr;
-			}
-
-			// Now connect WebSocket for real-time updates
-			const wsState = $websocketStore;
-			if (wsState.state !== 'connected') {
-				const token = $auth.token;
-				const sessionId = token ? getSessionIdFromToken(token) : null;
-				if (sessionId) {
-					console.log('[GamePage] Connecting to WebSocket...');
-					await websocketStore.connect(sessionId);
-					console.log('[GamePage] WebSocket connected');
-				} else {
-					throw new Error('No session ID available - please log in again');
-				}
-			}
-
-			console.log('[GamePage] Fetching initial game state...');
-			const gameView = await fetchGameView(gameId, playerId);
-			console.log('[GamePage] Got game state:', {
-				players: gameView.players?.length,
-				turn: gameView.turn,
-				phase: gameView.phase,
-				priorityPlayerId: gameView.priorityPlayerId
-			});
-			gameStore.setGameView(gameView);
-
-			// Initialize opponent expanded states
-			otherPlayers.forEach((p) => {
-				opponentExpanded[p.playerId] = true;
-			});
-
-			initialized = true;
-			console.log('[GamePage] Game initialization complete');
-		} catch (err) {
-			console.error('[GamePage] Failed to initialize game:', err);
-			const parsedError = parseGameError(err);
-			gameStore.setError(`${parsedError.title}: ${parsedError.message}`);
-		} finally {
-			isInitializing = false;
-		}
-	}
-
-	/**
-	 * Handle pass priority
-	 */
-	async function handlePassPriority() {
-		if (!havePriority || isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await passPriority(gameId);
-			addLogEntry('You passed priority');
-		} catch (err) {
-			console.error('Failed to pass priority:', err);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Handle pass until end of turn (F6)
-	 */
-	/**
-	 * Handle pass turn - passes through remaining phases until next turn begins
-	 * This skips all remaining phases of your turn and lets the next player start fresh
-	 */
-	async function handlePassUntilEOT() {
-		if (!havePriority || isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await passUntilNextTurn(gameId);
-			addLogEntry('You will pass until the next turn');
-		} catch (err) {
-			console.error('Failed to pass until next turn:', err);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Handle cast spell / play land - uses server-provided availableActions
-	 */
-	async function handleCastSpell() {
-		console.log('[handleCastSpell] Called', {
-			havePriority,
-			isActionLoading,
-			gameId,
-			selectedCardIds: gameState.selectedCardIds,
-			myCardsCount: myCards.length
-		});
-
-		if (!havePriority) {
-			console.log('[handleCastSpell] No priority, returning');
-			return;
-		}
-		if (isActionLoading) {
-			console.log('[handleCastSpell] Action loading, returning');
-			return;
-		}
-		if (!gameId) {
-			console.log('[handleCastSpell] No gameId, returning');
-			return;
-		}
-
-		const selectedIds = gameState.selectedCardIds;
-		console.log('[handleCastSpell] Selected IDs:', selectedIds);
-
-		if (selectedIds.length === 0) {
-			console.log('[handleCastSpell] No cards selected');
-			addLogEntry('No card selected');
-			return;
-		}
-
-		const cardId = selectedIds[0];
-		console.log('[handleCastSpell] Looking for card:', cardId);
-		console.log(
-			'[handleCastSpell] myCards:',
-			myCards.map((c) => ({ id: c.id, name: c.name, type: c.type, actions: c.availableActions }))
-		);
-
-		const card = myCards.find((c) => c.id === cardId);
-		if (!card) {
-			console.log('[handleCastSpell] Card not found in hand');
-			addLogEntry('Selected card not found in hand');
-			return;
-		}
-
-		console.log('[handleCastSpell] Found card:', {
-			id: card.id,
-			name: card.name,
-			type: card.type,
-			actions: card.availableActions
-		});
-
-		// Use server-provided availableActions to determine action type
-		const playLandAction = card.availableActions?.find(
-			(a) => a.actionType === CardActionType.CARD_ACTION_PLAY_LAND
-		);
-		const castSpellAction = card.availableActions?.find(
-			(a) => a.actionType === CardActionType.CARD_ACTION_CAST_SPELL
-		);
-
-		// Check if action is enabled
-		if (playLandAction && !playLandAction.isEnabled) {
-			console.log('[handleCastSpell] Play land action disabled:', playLandAction.disabledReason);
-			addLogEntry(`Cannot play land: ${playLandAction.disabledReason}`);
-			return;
-		}
-		if (castSpellAction && !castSpellAction.isEnabled) {
-			console.log('[handleCastSpell] Cast spell action disabled:', castSpellAction.disabledReason);
-			addLogEntry(`Cannot cast spell: ${castSpellAction.disabledReason}`);
-			return;
-		}
-
-		isActionLoading = true;
-		try {
-			// Use server-provided action type, fall back to type check for backward compatibility
-			const isLand =
-				playLandAction !== undefined ||
-				(!castSpellAction && card.type.toLowerCase().includes('land'));
-			console.log(
-				'[handleCastSpell] isLand:',
-				isLand,
-				'playLandAction:',
-				!!playLandAction,
-				'castSpellAction:',
-				!!castSpellAction
-			);
-
-			if (isLand) {
-				console.log('[handleCastSpell] Calling playLand with gameId:', gameId, 'cardId:', cardId);
-				await playLand(gameId, cardId);
-				console.log('[handleCastSpell] playLand returned successfully');
-				addLogEntry(`Playing land: ${card.name}`);
-			} else {
-				console.log('[handleCastSpell] Calling sendPlayerString with:', card.name);
-				await sendPlayerString(gameId, card.name);
-				console.log('[handleCastSpell] sendPlayerString returned successfully');
-				addLogEntry(`Casting spell: ${card.name}`);
-			}
-			gameStore.clearSelection();
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('[handleCastSpell] Failed:', err);
-			addLogEntry(`Failed: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Play a card with optimistic UI update (used by drag-drop)
-	 * Shows the card as "being played" immediately while waiting for server confirmation
-	 */
-	async function playCardOptimistic(cardId: string): Promise<void> {
-		console.log('[playCardOptimistic] Playing card:', cardId);
-
-		if (!havePriority || isActionLoading || !gameId) {
-			console.log('[playCardOptimistic] Cannot play - no priority or loading');
-			return;
-		}
-
-		const card = getCardById(cardId);
-		if (!card) {
-			console.log('[playCardOptimistic] Card not found:', cardId);
-			toast.error('Card not found');
-			return;
-		}
-
-		// Start optimistic update
-		gameStore.addPendingCardPlay(cardId, card, 'hand', 'battlefield');
-		gameStore.clearSelection();
-		isActionLoading = true;
-
-		try {
-			// Determine if it's a land or spell
-			const isLand = card.type?.toLowerCase().includes('land');
-
-			if (isLand) {
-				console.log('[playCardOptimistic] Playing land:', card.name);
-				await playLand(gameId, cardId);
-				addLogEntry(`Playing land: ${card.name}`);
-			} else {
-				console.log('[playCardOptimistic] Casting spell:', card.name);
-				await sendPlayerString(gameId, card.name);
-				addLogEntry(`Casting spell: ${card.name}`);
-			}
-			// Server will send GAME_UPDATE which clears the pending state
-		} catch (err) {
-			console.error('[playCardOptimistic] Failed to play card:', err);
-			// Rollback on error
-			gameStore.rollbackCardPlay(cardId);
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			toast.error(`Failed to play ${card.name}: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Handle card drop on battlefield
-	 */
-	function handleBattlefieldDrop(cardId: string): void {
-		console.log('[handleBattlefieldDrop] Card dropped:', cardId);
-		// Get the source zone from drag state
-		const dragState = get(dragDropStore);
-		const sourceZone = dragState.sourceZone;
-
-		if (sourceZone === 'hand') {
-			// Playing from hand - use existing play logic
-			playCardOptimistic(cardId);
-		} else if (sourceZone && sourceZone !== 'battlefield') {
-			// Moving from another zone (graveyard, exile, etc.) - use direct move
-			handleZoneDrop(cardId, 'battlefield');
-		}
-	}
-
-	/**
-	 * Handle card drop on graveyard
-	 */
-	function handleGraveyardDrop(cardId: string): void {
-		console.log('[handleGraveyardDrop] Card dropped:', cardId);
-		handleZoneDrop(cardId, 'graveyard');
-	}
-
-	/**
-	 * Handle card drop on exile
-	 */
-	function handleExileDrop(cardId: string): void {
-		console.log('[handleExileDrop] Card dropped:', cardId);
-		handleZoneDrop(cardId, 'exile');
-	}
-
-	/**
-	 * Handle card drop on hand
-	 */
-	function handleHandDrop(cardId: string): void {
-		console.log('[handleHandDrop] Card dropped:', cardId);
-		handleZoneDrop(cardId, 'hand');
-	}
-
-	/**
-	 * Handle card drop on stack - adds to visual stack without moving the card.
-	 * The card stays in its current zone but appears on the stack for all players.
-	 */
-	async function handleVisualStackDrop(cardId: string): Promise<void> {
-		console.log('[handleVisualStackDrop] Card dropped:', cardId);
-		if (!gameId) return;
-
-		const card = getCardById(cardId);
-		try {
-			await addToStack(gameId, cardId);
-			addLogEntry(`Added ${card?.name || cardId} to stack`);
-		} catch (err) {
-			console.error('[handleVisualStackDrop] Failed to add to stack:', err);
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			toast.error(`Failed to add to stack: ${errorMessage}`);
-		}
-	}
-
-	/**
-	 * Handle stack item resolve/remove - sends to server to remove from stack
-	 */
-	async function handleStackItemRemove(itemId: string): Promise<void> {
-		console.log('[handleStackItemRemove] Removing stack item:', itemId);
-		if (!gameId) return;
-
-		try {
-			await removeFromStack(gameId, itemId);
-			addLogEntry('Resolved stack item');
-		} catch (err) {
-			console.error('[handleStackItemRemove] Failed to remove from stack:', err);
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			toast.error(`Failed to remove from stack: ${errorMessage}`);
-		}
-	}
-
-	/**
-	 * Handle card drop on any zone - uses moveCard API
-	 */
-	async function handleZoneDrop(cardId: string, targetZone: DropZone): Promise<void> {
-		if (!gameId) return;
-
-		console.log(`[handleZoneDrop] Moving card ${cardId} to ${targetZone}`);
-		try {
-			await moveCard(gameId, cardId, targetZone.toUpperCase());
-			addLogEntry(`Moved card to ${targetZone}`);
-		} catch (err) {
-			console.error('[handleZoneDrop] Failed to move card:', err);
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			toast.error(`Failed to move card: ${errorMessage}`);
-		}
-	}
-
-	/**
-	 * Handle mouse down on battlefield card - start drag tracking
-	 * Note: No priority check - players can always drag battlefield cards
-	 * to manage game state (e.g., moving destroyed creatures to graveyard)
+	 * Handle battlefield card mouse down (from playtest/+page.svelte lines 640-689)
 	 */
 	function handleBattlefieldCardMouseDown(
 		cardId: string,
 		cardName: string,
 		event: MouseEvent
 	): void {
-		if (event.button !== 0) return; // Only left click
+		if (event.button !== 0) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -967,14 +515,7 @@
 	}
 
 	/**
-	 * Prevent native drag events on battlefield cards
-	 */
-	function handleBattlefieldDragStart(event: DragEvent): void {
-		event.preventDefault();
-	}
-
-	/**
-	 * Plan document lines 687-729: Handle command zone card mouse down with drag threshold
+	 * Handle command zone card mouse down (from playtest/+page.svelte lines 691-736)
 	 */
 	function handleCommandCardMouseDown(cardId: string, cardName: string, event: MouseEvent): void {
 		if (event.button !== 0) return;
@@ -1021,902 +562,133 @@
 	}
 
 	/**
-	 * Check if a battlefield card is being dragged
+	 * Handle battlefield drop (from playtest/+page.svelte lines 738-756)
+	 * CHANGE: Use multiplayerGameStore
 	 */
-	function isBattlefieldCardDragging(cardId: string): boolean {
-		return isDragging && dragCardId === cardId;
-	}
+	function handleBattlefieldDrop(cardId: string): void {
+		const dragState = $dragDropStore;
+		const sourceZone = dragState.sourceZone;
 
-	/**
-	 * Handle advancing to the next phase/step
-	 */
-	async function handleAdvancePhase() {
-		if (!havePriority || isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await advancePhase(gameId);
-			addLogEntry('Advanced to next phase');
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to advance phase:', err);
-			addLogEntry(`Failed to advance phase: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
+		if (sourceZone === 'hand') {
+			multiplayerGameStore.moveCardToZone(cardId, 'BATTLEFIELD');
+		} else if (sourceZone && sourceZone !== 'battlefield') {
+			multiplayerGameStore.moveCardToZone(cardId, 'BATTLEFIELD');
 		}
 	}
 
 	/**
-	 * Handle untap all permanents (X key shortcut)
+	 * Handle zone drop (from playtest/+page.svelte lines 758-765)
+	 * CHANGE: Use multiplayerGameStore
 	 */
-	async function handleUntapAll() {
-		if (isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await untapAll(gameId);
-			addLogEntry('Untapped all permanents');
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to untap all:', err);
-			addLogEntry(`Failed to untap all: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
+	function handleZoneDrop(cardId: string, zone: string): void {
+		multiplayerGameStore.moveCardToZone(cardId, zone);
 	}
 
 	/**
-	 * Handle global keyboard shortcuts
-	 * Based on untap.in shortcuts
+	 * Handle keyboard shortcuts (from playtest/+page.svelte lines 954-1057)
 	 */
-	function handleGlobalKeydown(event: KeyboardEvent) {
-		// Ignore if typing in an input
+	function handleGlobalKeydown(event: KeyboardEvent): void {
 		if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
 			return;
 		}
 
 		const key = event.key.toLowerCase();
 
-		// === GLOBAL HOTKEYS (no card needed) ===
 		switch (key) {
+			case 'm':
+				showMenu = !showMenu;
+				event.preventDefault();
+				break;
+			case 'escape':
+				if (showMenu) {
+					showMenu = false;
+					event.preventDefault();
+				} else if (showKeyboardShortcuts) {
+					showKeyboardShortcuts = false;
+					event.preventDefault();
+				} else if (showTokenCreator) {
+					showTokenCreator = false;
+					event.preventDefault();
+				} else if (showCreateTokenDialog) {
+					showCreateTokenDialog = false;
+					event.preventDefault();
+				} else if (showCounterDialog) {
+					showCounterDialog = false;
+					selectedCardForCounters = null;
+					event.preventDefault();
+				}
+				break;
 			case '?':
-				// ? - Keyboard shortcuts
 				showKeyboardShortcuts = !showKeyboardShortcuts;
 				event.preventDefault();
-				return;
-
+				break;
+			case 'f':
+				showDeckSearch = true;
+				event.preventDefault();
+				break;
 			case 'x':
-				// X - Untap all permanents
 				handleUntapAll();
 				event.preventDefault();
-				return;
-
+				break;
 			case 'c':
-				// C - Draw a card from deck
 				handleDrawCard();
 				event.preventDefault();
-				return;
-
+				break;
 			case 'v':
-				// V - Shuffle your deck
 				handleShuffleLibrary();
 				event.preventDefault();
-				return;
-
-			case 'm':
-				// M - Mulligan hand (only in mulligan phase)
-				if (isMulliganPhase && !hasKeptHand) {
-					handleMulligan();
-					event.preventDefault();
-				}
-				return;
-
-			case 'b':
-				// B - Focus chat input
-				showChat = true;
-				// Focus will happen when chat opens
-				event.preventDefault();
-				return;
-
-			case 'n':
-				// N - Next phase of turn
-				handleAdvancePhase();
-				event.preventDefault();
-				return;
-
+				break;
 			case 'e':
-				// E - End Turn (pass until next turn)
-				handleEndTurn();
+				handleNextTurn();
 				event.preventDefault();
-				return;
-
+				break;
 			case 'w':
-				// W - Insert token or card (show token creator)
-				showTokenCreator = true;
+				showCreateTokenDialog = true;
 				event.preventDefault();
-				return;
-
-			case 'f':
-				// F - Find a card in your main deck (search library)
-				handleSearchLibrary();
-				event.preventDefault();
-				return;
+				break;
 		}
 
-		// === HOVER CARD HOTKEYS (need a hovered card) ===
-		if (hoveredCard && gameId) {
+		// Hover card shortcuts (from playtest/+page.svelte lines 1032-1056)
+		if (hoveredCard) {
 			switch (key) {
-				case 'j':
-					// J - Face Down/Up
-					handleFlipCard(hoveredCard.id, hoveredCard.faceDown ?? false);
-					event.preventDefault();
-					return;
-
-				case 'l':
-					// L - Alt/Default Face (Transform)
-					handleTransformCard(hoveredCard.id);
-					event.preventDefault();
-					return;
-
 				case 'd':
-					// D - Send card to Graveyard
-					handleMoveCard(hoveredCard.id, 'GRAVEYARD');
+					multiplayerGameStore.moveCardToZone(hoveredCard.id, 'GRAVEYARD');
 					event.preventDefault();
-					return;
-
+					break;
 				case 's':
-					// S - Send card to Exile
-					handleMoveCard(hoveredCard.id, 'EXILE');
+					multiplayerGameStore.moveCardToZone(hoveredCard.id, 'EXILE');
 					event.preventDefault();
-					return;
-
+					break;
 				case 'r':
-					// R - Send card to hand
-					handleMoveCard(hoveredCard.id, 'HAND');
+					multiplayerGameStore.moveCardToZone(hoveredCard.id, 'HAND');
 					event.preventDefault();
-					return;
-
+					break;
 				case 't':
-					// T - Send card to top of Deck
-					handleMoveCard(hoveredCard.id, 'LIBRARY');
+					multiplayerGameStore.moveCardToZone(hoveredCard.id, 'LIBRARY');
 					event.preventDefault();
-					return;
-
-				case '.':
-					// . - Send card to bottom of Deck
-					handleMoveCard(hoveredCard.id, 'LIBRARY_BOTTOM');
+					break;
+				case 'k':
+					selectedCardForCounters = { id: hoveredCard.id, name: hoveredCard.name };
+					showCounterDialog = true;
 					event.preventDefault();
-					return;
-
-				case 'u':
-					// U - Add +1/+1 counter
-					handleAddCounter(hoveredCard.id);
-					event.preventDefault();
-					return;
+					break;
 			}
 		}
 	}
 
 	/**
-	 * Handle life change (+ / - buttons)
-	 * Phase 3: Updated to accept optional playerId for opponent life changes - plan lines 736-749
+	 * Register drop zones (from playtest/+page.svelte lines 1059-1168)
 	 */
-	async function handleLifeChange(delta: number, playerId?: string) {
-		const targetPlayerId = playerId || localPlayerId;
-		if (!gameId || !targetPlayerId) return;
-		try {
-			await modifyLife(gameId, targetPlayerId, delta);
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			toast.error(`Failed: ${errorMessage}`);
-		}
-	}
-
-	/**
-	 * Handle poison counter change
-	 * Phase 3: Updated to accept optional playerId for opponent poison changes - plan lines 736-749
-	 */
-	async function handlePoisonChange(delta: number, playerId?: string) {
-		const targetPlayerId = playerId || localPlayerId;
-		if (!gameId || !targetPlayerId) return;
-		const player = $players.find((p) => p.playerId === targetPlayerId);
-		if (!player) return;
-		const currentPoison = player.poison ?? 0;
-		const newValue = Math.max(0, currentPoison + delta);
-		try {
-			await setPlayerCounter(gameId, targetPlayerId, 'poison', newValue);
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			toast.error(`Failed: ${errorMessage}`);
-		}
-	}
-
-	/**
-	 * Draw a card from deck (C key)
-	 */
-	async function handleDrawCard() {
-		if (isActionLoading || !gameId || !localPlayerId) return;
-
-		isActionLoading = true;
-		try {
-			await drawCards(gameId, localPlayerId, 1);
-			addLogEntry('Drew a card');
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to draw card:', err);
-			addLogEntry(`Failed to draw: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Shuffle library (V key)
-	 */
-	async function handleShuffleLibrary() {
-		if (isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await shuffleLibrary(gameId, localPlayerId);
-			addLogEntry('Shuffled library');
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to shuffle:', err);
-			addLogEntry(`Failed to shuffle: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * End turn (E key)
-	 */
-	async function handleEndTurn() {
-		if (isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await nextTurn(gameId);
-			addLogEntry('Ended turn');
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to end turn:', err);
-			addLogEntry(`Failed to end turn: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Search library (F key)
-	 */
-	async function handleSearchLibrary() {
-		if (isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await searchLibrary(gameId, 'hand', true);
-			addLogEntry('Searching library...');
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to search library:', err);
-			addLogEntry(`Failed to search: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Phase 4: Handle deck context menu (plan lines 866-874)
-	 */
-	function handleDeckContextMenu(event: MouseEvent) {
-		event.preventDefault();
-		deckContextMenuPosition = { x: event.clientX, y: event.clientY };
-		showDeckContextMenu = true;
-	}
-
-	/**
-	 * Phase 4: Draw N cards from library (plan lines 909-915)
-	 */
-	async function handleDrawN(count: number) {
-		if (isActionLoading || !gameId || !localPlayerId) return;
-
-		isActionLoading = true;
-		try {
-			await drawCards(gameId, localPlayerId, count);
-			addLogEntry(`Drew ${count} card${count !== 1 ? 's' : ''}`);
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to draw cards:', err);
-			addLogEntry(`Failed to draw: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Phase 5: Show number input dialog (plan lines 1030-1046)
-	 * @param title - Dialog title
-	 * @param defaultValue - Initial value
-	 * @param onConfirm - Callback when value is confirmed
-	 */
-	function showNumberInput(title: string, defaultValue: number, onConfirm: (value: number) => void) {
-		numberInputDialogConfig = {
-			title,
-			defaultValue,
-			min: 1,
-			max: 999,
-			onConfirm
-		};
-		showNumberInputDialog = true;
-	}
-
-	/**
-	 * Flip card face up/down (J key)
-	 */
-	async function handleFlipCard(cardId: string, currentlyFaceDown: boolean) {
-		if (isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await flipCard(gameId, cardId, !currentlyFaceDown);
-			addLogEntry(currentlyFaceDown ? 'Turned card face up' : 'Turned card face down');
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to flip card:', err);
-			addLogEntry(`Failed to flip: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Transform card (L key)
-	 */
-	async function handleTransformCard(cardId: string) {
-		if (isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await transformCard(gameId, cardId);
-			addLogEntry('Transformed card');
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to transform card:', err);
-			addLogEntry(`Failed to transform: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Move card to zone (D/S/R/T/. keys)
-	 */
-	async function handleMoveCard(cardId: string, zone: string) {
-		if (isActionLoading || !gameId) return;
-
-		const zoneNames: Record<string, string> = {
-			GRAVEYARD: 'graveyard',
-			EXILE: 'exile',
-			HAND: 'hand',
-			LIBRARY: 'top of library',
-			LIBRARY_BOTTOM: 'bottom of library'
-		};
-
-		isActionLoading = true;
-		try {
-			await moveCardToZone(gameId, cardId, zone);
-			addLogEntry(`Moved card to ${zoneNames[zone] || zone}`);
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to move card:', err);
-			addLogEntry(`Failed to move: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Add +1/+1 counter to card (U key)
-	 */
-	async function handleAddCounter(cardId: string) {
-		if (isActionLoading || !gameId) return;
-
-		isActionLoading = true;
-		try {
-			await modifyCardCounter(gameId, cardId, '+1/+1', 1);
-			addLogEntry('Added +1/+1 counter');
-		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-			console.error('Failed to add counter:', err);
-			addLogEntry(`Failed to add counter: ${errorMessage}`);
-		} finally {
-			isActionLoading = false;
-		}
-	}
-
-	/**
-	 * Handle concede
-	 */
-	async function handleConcede() {
-		if (!gameId) return;
-
-		const confirmed = window.confirm(
-			'Are you sure you want to concede? This action cannot be undone.'
-		);
-		if (!confirmed) return;
-
-		try {
-			await concedeGame(gameId);
-			goto('/lobby');
-		} catch (err) {
-			console.error('Failed to concede:', err);
-			alert('Failed to concede game');
-		}
-	}
-
-	/**
-	 * Handle card click (for selection)
-	 * Note: PlayerHand already handles selection toggle via gameStore.toggleCardSelection
-	 * This handler is for additional logic (logging)
-	 */
-	function handleCardClick(cardId: string) {
-		const card = myCards.find((c) => c.id === cardId);
-		if (card) {
-			addLogEntry(`Selected: ${card.name}`);
-		}
-	}
-
-	/**
-	 * Handle battlefield card click
-	 */
-	async function handleBattlefieldCardClick(cardId: string) {
-		// Handle declare attackers phase - toggle attacker on click
-		if (isDeclaringAttackersPhase && combatPromptOptions) {
-			const card = battlefieldCards.find((c) => c.id === cardId);
-			if (!card) return;
-
-			// Check if this card can attack
-			const canAttack = canAttackIds.has(cardId);
-			if (canAttack) {
-				// Get defenders for this attacker
-				const options = combatPromptOptions;
-				const validDefenders = options!.attackOptions
-					.filter((opt) => opt.cardId === cardId)
-					.map((opt) => opt.defenderId);
-
-				if (validDefenders.length > 0) {
-					const isCurrentlyAttacking = attackingIds.has(cardId);
-					combatStore.toggleAttacker(cardId, validDefenders[0]);
-
-					if (isCurrentlyAttacking) {
-						addLogEntry(`${card.name} will not attack`);
-					} else {
-						// Get defender name for log
-						const defenders = getDefenderTargets();
-						const defenderName =
-							defenders.find((d) => d.id === validDefenders[0])?.name || 'opponent';
-						addLogEntry(`${card.name} attacks ${defenderName}`);
-					}
-				}
-			}
-			return;
-		}
-
-		// Find the card on the battlefield
-		const card = battlefieldCards.find((c) => c.id === cardId);
-		if (!card) {
-			console.log('[handleBattlefieldCardClick] Card not found:', cardId);
-			return;
-		}
-
-		// Debug: Log card info for mana ability checking
-		console.log('[handleBattlefieldCardClick] Clicked card:', {
-			id: card.id,
-			name: card.name,
-			type: card.type,
-			tapped: card.tapped,
-			controllerId: card.controllerId,
-			availableActions: card.availableActions,
-			availableActionsLength: card.availableActions?.length,
-			availableActionsJSON: JSON.stringify(card.availableActions),
-			havePriority,
-			isActionLoading,
-			gameId
-		});
-
-		// Log each action for debugging
-		if (card.availableActions && card.availableActions.length > 0) {
-			card.availableActions.forEach((action, i) => {
-				console.log(`[handleBattlefieldCardClick] Action ${i}:`, {
-					actionType: action.actionType,
-					actionTypeValue: typeof action.actionType,
-					expectedManaAbilityType: CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY,
-					isMatch: action.actionType === CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY,
-					displayText: action.displayText,
-					isEnabled: action.isEnabled
-				});
-			});
-		} else {
-			console.log('[handleBattlefieldCardClick] No available actions on card');
-		}
-
-		// Check for mana ability activation
-		// Only for cards we control, and only if we have priority
-		if (havePriority && !isActionLoading && gameId) {
-			// Note: actionType can be either a number (enum) or string (JSON serialized)
-			// so we check for both using string comparison
-			const manaAbilityAction = card.availableActions?.find(
-				(a) =>
-					(a.actionType === CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY ||
-						String(a.actionType) === 'CARD_ACTION_ACTIVATE_MANA_ABILITY') &&
-					a.isEnabled
-			);
-
-			console.log('[handleBattlefieldCardClick] Mana ability action found:', manaAbilityAction);
-
-			if (manaAbilityAction) {
-				isActionLoading = true;
-				try {
-					await activateManaAbility(gameId, cardId);
-					addLogEntry(`${card.name} - ${manaAbilityAction.displayText}`);
-				} catch (err) {
-					const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-					console.error('Failed to activate mana ability:', err);
-					addLogEntry(`Failed to tap for mana: ${errorMessage}`);
-				} finally {
-					isActionLoading = false;
-				}
-				return;
-			}
-		}
-
-		// Default behavior: tap/untap the permanent
-		if (gameId) {
-			try {
-				await tapUntap(gameId, cardId, !card.tapped);
-				addLogEntry(`${card.tapped ? 'Untapped' : 'Tapped'} ${card.name}`);
-			} catch (err) {
-				const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-				console.error('Failed to tap/untap:', err);
-				addLogEntry(`Failed to tap/untap: ${errorMessage}`);
-			}
-		}
-	}
-
-	/**
-	 * Handle right-click context menu on battlefield cards
-	 */
-	function handleCardContextMenu(event: MouseEvent, card: (typeof battlefieldCards)[0]) {
-		event.preventDefault();
-		contextMenuCard = card;
-		contextMenuPosition = { x: event.clientX, y: event.clientY };
-	}
-
-	/**
-	 * Close context menu
-	 */
-	function closeContextMenu() {
-		contextMenuCard = null;
-	}
-
-	/**
-	 * Handle prompt responses
-	 */
-	async function handlePromptYes() {
-		if (prompt?.type === 'ask' && gameId) {
-			await sendPlayerBoolean(gameId, true);
-			gameStore.clearPrompt();
-		}
-	}
-
-	async function handlePromptNo() {
-		if (prompt?.type === 'ask' && gameId) {
-			await sendPlayerBoolean(gameId, false);
-			gameStore.clearPrompt();
-		}
-	}
-
-	async function handleChoiceSelect(choice: string) {
-		if (prompt?.type === 'choice' && gameId) {
-			await sendPlayerString(gameId, choice);
-			gameStore.clearPrompt();
-		}
-	}
-
-	/**
-	 * Handle keeping hand during mulligan
-	 */
-	async function handleKeepHand() {
-		if (!gameId || isMulliganLoading) return;
-
-		isMulliganLoading = true;
-		try {
-			await keepHand(gameId);
-			addLogEntry('You kept your hand');
-		} catch (err) {
-			console.error('Failed to keep hand:', err);
-			gameStore.setError(err instanceof Error ? err.message : 'Failed to keep hand');
-		} finally {
-			isMulliganLoading = false;
-		}
-	}
-
-	/**
-	 * Handle mulligan
-	 */
-	async function handleMulligan() {
-		if (!gameId || isMulliganLoading) return;
-
-		isMulliganLoading = true;
-		try {
-			await mulligan(gameId);
-			mulliganCount++;
-			addLogEntry(`You took mulligan #${mulliganCount}`);
-		} catch (err) {
-			console.error('Failed to mulligan:', err);
-			gameStore.setError(err instanceof Error ? err.message : 'Failed to mulligan');
-		} finally {
-			isMulliganLoading = false;
-		}
-	}
-
-	/**
-	 * Add message to action log
-	 */
-	function addLogEntry(message: string) {
-		if (actionLogRef) {
-			actionLogRef.addAction('system', message, { type: 'system' });
-		}
-	}
-
-	/**
-	 * Handle rollback request from action log
-	 */
-	async function handleRequestRollback(messageId: number) {
-		if (!gameId) return;
-
-		try {
-			const result = await requestRollback(gameId, messageId);
-			if (result.success) {
-				if (result.requiresConsent) {
-					addLogEntry('Rollback request sent to opponent(s)');
-				} else {
-					addLogEntry('Rollback performed');
-				}
-			} else {
-				gameStore.setError(result.error || 'Failed to request rollback');
-			}
-		} catch (err) {
-			console.error('Failed to request rollback:', err);
-			gameStore.setError(err instanceof Error ? err.message : 'Failed to request rollback');
-		}
-	}
-
-	/**
-	 * Handle rollback consent response (approve)
-	 */
-	async function handleApproveRollback() {
-		if (!gameId || !pendingRollbackRequest) return;
-
-		try {
-			const result = await respondToRollback(gameId, pendingRollbackRequest.requestId, true);
-			if (!result.success) {
-				gameStore.setError(result.error || 'Failed to approve rollback');
-			}
-			// Clear the pending request - server will send GAME_ROLLBACK_COMPLETE
-			gameStore.rollbackCardPlay();
-		} catch (err) {
-			console.error('Failed to approve rollback:', err);
-			gameStore.setError(err instanceof Error ? err.message : 'Failed to approve rollback');
-		}
-	}
-
-	/**
-	 * Handle rollback consent response (deny)
-	 */
-	async function handleDenyRollback() {
-		if (!gameId || !pendingRollbackRequest) return;
-
-		try {
-			const result = await respondToRollback(gameId, pendingRollbackRequest.requestId, false);
-			if (!result.success) {
-				gameStore.setError(result.error || 'Failed to deny rollback');
-			}
-			// Clear the pending request
-			gameStore.update((s) => ({ ...s, pendingRollbackRequest: null }));
-			addLogEntry('Rollback request denied');
-		} catch (err) {
-			console.error('Failed to deny rollback:', err);
-			gameStore.setError(err instanceof Error ? err.message : 'Failed to deny rollback');
-		}
-	}
-
-	/**
-	 * Handle combat phase completion
-	 */
-	function handleCombatComplete() {
-		// Clear any pending prompt after combat action
-		gameStore.clearPrompt();
-		addLogEntry('Combat action completed');
-	}
-
-	/**
-	 * Get defender targets for declare attackers phase
-	 */
-	function getDefenderTargets(): DefenderTarget[] {
-		const defenders: DefenderTarget[] = [];
-
-		// Add opponents as defenders
-		for (const opponent of otherPlayers) {
-			defenders.push({
-				id: opponent.playerId,
-				name: opponent.name,
-				type: 'player',
-				life: opponent.life
-			});
-		}
-
-		// Add planeswalkers controlled by opponents
-		for (const card of battlefieldCards) {
-			if (
-				card.type?.toLowerCase().includes('planeswalker') &&
-				card.controllerId !== localPlayerId
-			) {
-				defenders.push({
-					id: card.id,
-					name: card.name,
-					type: 'planeswalker',
-					loyalty: parseInt(card.loyalty || '0', 10)
-				});
-			}
-		}
-
-		return defenders;
-	}
-
-	/**
-	 * Get attacking creatures info for blockers phase
-	 */
-	function getAttackingCreatures(): DeclaredAttacker[] {
-		const attackers: DeclaredAttacker[] = [];
-
-		// Get combat info from game view if available
-		const combatView = gameState.gameView?.combat;
-		if (combatView?.groups) {
-			for (const group of combatView.groups) {
-				for (const attackerId of group.attackers || []) {
-					const card = battlefieldCards.find((c) => c.id === attackerId);
-					if (card) {
-						attackers.push({
-							cardId: attackerId,
-							cardName: card.name,
-							defenderId: group.defendingPlayerId || '',
-							defenderName: playerNames.get(group.defendingPlayerId || '') || 'Unknown'
-						});
-					}
-				}
-			}
-		}
-
-		return attackers;
-	}
-
-	/**
-	 * Get cards controlled by a specific player on battlefield
-	 */
-	function getPlayerBattlefieldCards(playerId: string): CardView[] {
-		return battlefieldCards.filter((c) => c.controllerId === playerId);
-	}
-
-	// Plan document lines 408-419: Helper function for battlefield separation
-	function isLandPermanent(cardType?: string | null): boolean {
-		return !!cardType && /\bland\b/i.test(cardType);
-	}
-
-	/**
-	 * Format life total
-	 */
-	function formatLife(life: number): string {
-		return life.toString();
-	}
-
-	/**
-	 * Get opponent position for layout
-	 */
-	function getOpponentPosition(index: number, total: number): 'top' | 'left' | 'right' {
-		if (total === 1) return 'top';
-		if (total === 2) return index === 0 ? 'left' : 'right';
-		if (total === 3) {
-			if (index === 0) return 'left';
-			if (index === 1) return 'top';
-			return 'right';
-		}
-		return 'top';
-	}
-
-	// Track if we're in the middle of an auto-pass to prevent double-triggers
-	let isAutoPassPending = $state(false);
-
-	/**
-	 * Auto-pass effect - passes priority on opponent's turn
-	 *
-	 * This is a rules-light auto-pass: it only checks whose turn it is,
-	 * not what actions are available (which would require rules enforcement).
-	 */
-	$effect(() => {
-		// Skip if not ready for auto-pass
-		if (!initialized || isMulliganPhase || isActionLoading || isAutoPassPending || !gameId) {
-			return;
-		}
-
-		// Must have priority to pass
-		if (!havePriority) {
-			return;
-		}
-
-		// Auto-pass on opponent's turn
-		if (autoPass && !isYourTurn) {
-			console.log("[AutoPass] Triggering auto-pass: opponent's turn");
-			isAutoPassPending = true;
-
-			// Capture gameId in local scope for the async callback
-			const currentGameId = gameId;
-
-			// Use setTimeout to avoid synchronous state updates in effect
-			setTimeout(async () => {
-				try {
-					if (currentGameId) {
-						await passPriority(currentGameId);
-						addLogEntry('Auto-passed');
-					}
-				} catch (err) {
-					console.error('[AutoPass] Failed to auto-pass:', err);
-				} finally {
-					isAutoPassPending = false;
-				}
-			}, 50); // Small delay for smoother UX
-		}
-	});
-
-	// Click outside handler for life menu
-	$effect(() => {
-		if (!showLifeMenu) return;
-
-		const handleClickOutside = (event: MouseEvent) => {
-			if (lifeMenuEl && !lifeMenuEl.contains(event.target as Node)) {
-				showLifeMenu = false;
-			}
-		};
-
-		// Delay to prevent immediate close from the click that opened it
-		const timeoutId = setTimeout(() => {
-			document.addEventListener('click', handleClickOutside);
-		}, 10);
-
-		return () => {
-			clearTimeout(timeoutId);
-			document.removeEventListener('click', handleClickOutside);
-		};
-	});
-
-	// Register battlefield drop zone when element is available
 	$effect(() => {
 		if (battlefieldDropZoneEl && !dropZoneUnregister) {
-			console.log('[GamePage] Registering battlefield drop zone');
 			dropZoneUnregister = dragDropStore.registerDropZone({
 				id: 'battlefield',
 				type: 'battlefield',
 				element: battlefieldDropZoneEl,
-				accepts: (_cardId, sourceZone) => {
-					// Accept cards from any zone except battlefield when player has priority
-					return sourceZone !== 'battlefield' && havePriority;
-				},
+				accepts: (_cardId, sourceZone) => sourceZone !== 'battlefield',
 				onDrop: handleBattlefieldDrop
 			});
 		}
-
 		return () => {
 			if (dropZoneUnregister) {
 				dropZoneUnregister();
@@ -1925,32 +697,16 @@
 		};
 	});
 
-	// Register graveyard drop zone
 	$effect(() => {
 		if (graveyardDropZoneEl && !graveyardDropZoneUnregister) {
-			console.log('[GamePage] Registering graveyard drop zone', {
-				element: graveyardDropZoneEl,
-				rect: graveyardDropZoneEl.getBoundingClientRect()
-			});
 			graveyardDropZoneUnregister = dragDropStore.registerDropZone({
 				id: 'graveyard',
 				type: 'graveyard',
 				element: graveyardDropZoneEl,
-				accepts: (_cardId, sourceZone) => {
-					// Accept cards from any zone except graveyard when player has priority
-					// Use get() to read current store value at call time
-					const hasPrio = get(hasPriority);
-					console.log('[Graveyard accepts]', {
-						sourceZone,
-						hasPrio,
-						result: sourceZone !== 'graveyard' && hasPrio
-					});
-					return sourceZone !== 'graveyard' && hasPrio;
-				},
-				onDrop: handleGraveyardDrop
+				accepts: (_cardId, sourceZone) => sourceZone !== 'graveyard',
+				onDrop: (cardId) => handleZoneDrop(cardId, 'GRAVEYARD')
 			});
 		}
-
 		return () => {
 			if (graveyardDropZoneUnregister) {
 				graveyardDropZoneUnregister();
@@ -1959,32 +715,16 @@
 		};
 	});
 
-	// Register exile drop zone
 	$effect(() => {
 		if (exileDropZoneEl && !exileDropZoneUnregister) {
-			console.log('[GamePage] Registering exile drop zone', {
-				element: exileDropZoneEl,
-				rect: exileDropZoneEl.getBoundingClientRect()
-			});
 			exileDropZoneUnregister = dragDropStore.registerDropZone({
 				id: 'exile',
 				type: 'exile',
 				element: exileDropZoneEl,
-				accepts: (_cardId, sourceZone) => {
-					// Accept cards from any zone except exile when player has priority
-					// Use get() to read current store value at call time
-					const hasPrio = get(hasPriority);
-					console.log('[Exile accepts]', {
-						sourceZone,
-						hasPrio,
-						result: sourceZone !== 'exile' && hasPrio
-					});
-					return sourceZone !== 'exile' && hasPrio;
-				},
-				onDrop: handleExileDrop
+				accepts: (_cardId, sourceZone) => sourceZone !== 'exile',
+				onDrop: (cardId) => handleZoneDrop(cardId, 'EXILE')
 			});
 		}
-
 		return () => {
 			if (exileDropZoneUnregister) {
 				exileDropZoneUnregister();
@@ -1993,22 +733,16 @@
 		};
 	});
 
-	// Register hand drop zone
 	$effect(() => {
 		if (handDropZoneEl && !handDropZoneUnregister) {
-			console.log('[GamePage] Registering hand drop zone');
 			handDropZoneUnregister = dragDropStore.registerDropZone({
 				id: 'hand',
 				type: 'hand',
 				element: handDropZoneEl,
-				accepts: (_cardId, sourceZone) => {
-					// Accept cards from any zone except hand when player has priority
-					return sourceZone !== 'hand' && havePriority;
-				},
-				onDrop: handleHandDrop
+				accepts: (_cardId, sourceZone) => sourceZone !== 'hand',
+				onDrop: (cardId) => handleZoneDrop(cardId, 'HAND')
 			});
 		}
-
 		return () => {
 			if (handDropZoneUnregister) {
 				handDropZoneUnregister();
@@ -2017,308 +751,244 @@
 		};
 	});
 
-	// Register visual stack drop zone
 	$effect(() => {
-		if (visualStackDropZoneEl && !visualStackDropZoneUnregister) {
-			console.log('[GamePage] Registering visual stack drop zone');
-			visualStackDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'visual-stack',
-				type: 'stack',
-				element: visualStackDropZoneEl,
-				accepts: (_cardId, sourceZone) => {
-					// Accept cards from any zone except stack when player has priority
-					return sourceZone !== 'stack' && havePriority;
-				},
-				onDrop: handleVisualStackDrop
+		if (libraryDropZoneEl && !libraryDropZoneUnregister) {
+			libraryDropZoneUnregister = dragDropStore.registerDropZone({
+				id: 'library',
+				type: 'library',
+				element: libraryDropZoneEl,
+				accepts: (_cardId, sourceZone) => sourceZone !== 'library',
+				onDrop: (cardId) => handleZoneDrop(cardId, 'LIBRARY')
 			});
 		}
-
 		return () => {
-			if (visualStackDropZoneUnregister) {
-				visualStackDropZoneUnregister();
-				visualStackDropZoneUnregister = null;
+			if (libraryDropZoneUnregister) {
+				libraryDropZoneUnregister();
+				libraryDropZoneUnregister = null;
 			}
 		};
 	});
 
-	// Track which server stack item IDs have been synced to visual stack
-	let lastSyncedStackIds = new Set<string>();
-	let stackUnsubscribe: (() => void) | null = null;
-
-	// Sync server stack cards to visual stack - using store subscription for reliability
-	function syncServerStackToVisualStack(currentStack: typeof stackCards) {
-		console.log(
-			'[GamePage] Server stack sync running, cards:',
-			currentStack.length,
-			currentStack.map((c) => ({ id: c.id, name: c.name }))
-		);
-		console.log('[GamePage] Already synced IDs:', [...lastSyncedStackIds]);
-
-		const serverIds = new Set(currentStack.map((c) => c.id));
-
-		// Add new server stack items to visual stack
-		for (const card of currentStack) {
-			if (!lastSyncedStackIds.has(card.id)) {
-				console.log('[GamePage] Syncing server stack item to visual stack:', card.name, card.id);
-				visualStackStore.addItem(card.id, card.name, 'stack', {
-					imageUrl: card?.imageUrl || getScryfallImageUrl(card.name),
-					controllerId: card.controllerId,
-					note: 'Spell',
-					// Use server's stack item ID as localId for sync
-					localId: card.id
-				});
-				lastSyncedStackIds.add(card.id);
-
-				// Auto-open visual stack when items are added
-				visualStackStore.setOpen(true);
+	$effect(() => {
+		if (commandDropZoneEl && !commandDropZoneUnregister) {
+			commandDropZoneUnregister = dragDropStore.registerDropZone({
+				id: 'command',
+				type: 'command',
+				element: commandDropZoneEl,
+				accepts: (_cardId, sourceZone) => sourceZone !== 'command',
+				onDrop: (cardId) => handleZoneDrop(cardId, 'COMMAND')
+			});
+		}
+		return () => {
+			if (commandDropZoneUnregister) {
+				commandDropZoneUnregister();
+				commandDropZoneUnregister = null;
 			}
-		}
-
-		// Remove items from visual stack that are no longer on server stack
-		for (const id of lastSyncedStackIds) {
-			if (!serverIds.has(id)) {
-				console.log('[GamePage] Removing resolved stack item from visual stack:', id);
-				visualStackStore.removeItem(id);
-				lastSyncedStackIds.delete(id);
-			}
-		}
-	}
-
-	// Initialize on mount
-	onMount(() => {
-		console.log('[GamePage] onMount called', {
-			isAuthenticated: $auth.isAuthenticated,
-			user: $auth.user,
-			gameId,
-			localPlayerId
-		});
-
-		if (!$auth.isAuthenticated) {
-			console.log('[GamePage] Not authenticated, redirecting to login');
-			goto('/login');
-			return;
-		}
-
-		// Initialize game - gameId should always be available from load function
-		initializeGame();
-
-		// Subscribe to stack changes to sync with visual stack
-		console.log('[GamePage] Setting up stack subscription');
-		stackUnsubscribe = stack.subscribe((currentStack) => {
-			console.log('[GamePage] Stack subscription triggered, stack length:', currentStack.length);
-			syncServerStackToVisualStack(currentStack);
-		});
+		};
 	});
 
-	// Cleanup on destroy
-	onDestroy(() => {
-		gameStore.reset();
-		if (stackUnsubscribe) {
-			stackUnsubscribe();
-			stackUnsubscribe = null;
-		}
+	// Initialize on mount (CHANGE: Server-based initialization)
+	onMount(() => {
+		initializeFromGameId();
 	});
 </script>
 
 <svelte:window onkeydown={handleGlobalKeydown} />
 
 <svelte:head>
-	<title>{gameId ? `Game ${gameId}` : 'Loading Game'} - MAGE</title>
+	<title>Multiplayer Game - MAGE</title>
 </svelte:head>
 
-<div class="game-container" class:has-priority={havePriority}>
-	{#if loading && !initialized}
+<div class="game-container">
+	{#if loading}
 		<div class="loading-overlay">
 			<div class="spinner"></div>
 			<p>Loading game...</p>
 		</div>
-	{:else if error && !gameState.gameView}
-		{@const parsedError = (() => {
-			// Check if error already includes title: message format
-			if (error.includes(': ')) {
-				const [title, ...rest] = error.split(': ');
-				return { title, message: rest.join(': ') };
-			}
-			return parseGameError(new Error(error));
-		})()}
+	{:else if error}
 		<div class="error-overlay">
-			<div class="error-icon">
-				{#if parsedError.title.toLowerCase().includes('has ended')}
-					🏁
-				{:else if parsedError.title.toLowerCase().includes('not found')}
-					❓
-				{:else if parsedError.title.toLowerCase().includes('access denied')}
-					🚫
-				{:else if parsedError.title.toLowerCase().includes('session') || parsedError.title
-						.toLowerCase()
-						.includes('expired')}
-					🔐
-				{:else if parsedError.title.toLowerCase().includes('connection')}
-					📡
-				{:else}
-					⚠️
-				{/if}
-			</div>
-			<h2 class="error-title">{parsedError.title}</h2>
-			<p class="error-message">{parsedError.message}</p>
-			<div class="error-actions">
-				<button class="btn-primary" onclick={() => goto('/lobby')}>Return to Lobby</button>
-				{#if parsedError.title.toLowerCase().includes('connection')}
-					<button
-						class="btn-secondary"
-						onclick={() => {
-							isInitializing = false;
-							initialized = false;
-							initializeGame();
-						}}
-					>
-						Try Again
-					</button>
-				{/if}
-			</div>
+			<div class="error-icon">⚠️</div>
+			<h2>Error</h2>
+			<p>{error}</p>
+			<button class="btn-primary" onclick={() => goto('/lobby')}> Return to Lobby </button>
 		</div>
-	{:else if isGameOver}
-		<div class="game-over-overlay">
-			<div class="game-over-content">
-				<h2>Game Over</h2>
-				<p class="winner-text">
-					{gameWinner ? `Winner: ${playerNames.get(gameWinner) || gameWinner}` : 'Draw'}
-				</p>
-				<button class="btn-primary" onclick={() => goto('/lobby')}>Return to Lobby</button>
-			</div>
+	{:else if !isInitialized}
+		<div class="loading-overlay">
+			<p>Initializing game state...</p>
 		</div>
-	{:else if isMulliganPhase}
-		<MulliganDialog
-			cards={myCards}
-			{mulliganCount}
-			onKeep={handleKeepHand}
-			onMulligan={handleMulligan}
-			isLoading={isMulliganLoading}
-			{hasKeptHand}
-		/>
 	{:else}
-		<!-- Game Header - Clean UX answering key questions -->
-		<GameHeader
-			{turn}
+		<!-- Template from playtest/+page.svelte lines 1378+ adapted for multiplayer -->
+		<PlaytestHeader
+			{players}
+			activeControlSeat={activeControlSeat}
+			availableSessions={0}
+			{turnNumber}
 			{activePlayerName}
-			{priorityPlayerName}
-			localPlayerName={localPlayerId}
-			hasPriority={havePriority}
-			currentPhase={toGamePhase(step || phase)}
-			onLogClick={() => (showActionLog = true)}
-			onConcedeClick={handleConcede}
+			showAllHands={showAllHands}
+			onBack={() => goto('/lobby')}
+			onSessionsClick={() => {}}
+			onSwitchPlayer={(playerId) => multiplayerGameStore.switchControlSeat(playerId)}
+			onToggleAllHands={() => (showAllHands = !showAllHands)}
+			onDrawCard={handleDrawCard}
+			onUntapAll={handleUntapAll}
+			onShuffleLibrary={handleShuffleLibrary}
+			onSearchLibrary={() => (showDeckSearch = true)}
+			onCreateToken={() => (showCreateTokenDialog = true)}
+			onNextTurn={handleNextTurn}
+			onShowKeyboardShortcuts={() => (showKeyboardShortcuts = true)}
+			onShowDebug={() => (showDebugOverlay = true)}
+			onToggleMenu={() => (showMenu = !showMenu)}
 		/>
 
-		<!-- Floating action buttons -->
-		<div class="floating-actions">
-			<button
-				class="floating-btn stack-btn"
-				class:has-items={visualStackItemCount > 0 || stackCards.length > 0}
-				onclick={() => visualStackStore.toggleOpen()}
-				title="Stack ({visualStackItemCount} items)"
-			>
-				📚 {#if visualStackItemCount > 0 || stackCards.length > 0}<span class="badge"
-						>{visualStackItemCount || stackCards.length}</span
-					>{/if}
-			</button>
-			<button class="floating-btn" onclick={() => (showChat = true)} title="Game Chat"> 💬 </button>
-			<button
-				class="floating-btn"
-				onclick={() => (showKeyboardShortcuts = true)}
-				title="Keyboard shortcuts (?)"
-				aria-label="Keyboard shortcuts"
-			>
-				<Keyboard size={18} aria-hidden="true" />
-			</button>
-		</div>
+		<!-- Menu Overlay (from playtest/+page.svelte lines 1403-1514) -->
+		{#if showMenu}
+			<div
+				class="menu-backdrop"
+				role="button"
+				tabindex="0"
+				onclick={() => (showMenu = false)}
+				onkeydown={(e) => e.key === 'Escape' && (showMenu = false)}
+			></div>
 
-		<!-- Mana Payment Modal -->
-		{#if prompt && prompt.type === 'mana' && gameId}
-			<ManaPayment
-				{gameId}
-				manaData={prompt.data as GamePlayManaData}
-				onComplete={() => gameStore.clearPrompt()}
-				onCancel={() => gameStore.clearPrompt()}
-			/>
-		{/if}
+			<div class="menu-overlay open">
+				<div class="menu-header">
+					<h2>Menu</h2>
+					<button class="menu-close-btn" onclick={() => (showMenu = false)} aria-label="Close menu">
+						<X size={24} />
+					</button>
+				</div>
 
-		<!-- X Mana Selector Modal -->
-		{#if prompt && prompt.type === 'xmana' && gameId}
-			<XManaSelector
-				{gameId}
-				xManaData={prompt.data as GamePlayXManaData}
-				onComplete={() => gameStore.clearPrompt()}
-				onCancel={() => gameStore.clearPrompt()}
-			/>
-		{/if}
+				<div class="menu-content">
+					<div class="menu-section">
+						<h3 class="menu-section-title">Controls</h3>
+						<div class="menu-section-content">
+							<label>
+								<span class="menu-label">Controlling:</span>
+								<select
+									class="control-select"
+									value={activeControlSeat}
+									onchange={(e) => multiplayerGameStore.switchControlSeat(e.currentTarget.value)}
+								>
+									{#each players as player}
+										<option value={player.playerId}>{player.name}</option>
+									{/each}
+								</select>
+							</label>
 
-		<!-- Library Search Modal -->
-		{#if prompt && prompt.type === 'librarySearch' && gameId}
-			<LibrarySearch
-				{gameId}
-				librarySearchData={prompt.data as import('$lib/generated/mage/v1/models').LibrarySearchView}
-				onComplete={() => gameStore.clearPrompt()}
-				onCancel={() => gameStore.clearPrompt()}
-			/>
-		{/if}
-
-		<!-- Combat: Declare Attackers -->
-		{#if isDeclaringAttackersPhase && combatPromptOptions && gameId}
-			<DeclareAttackers
-				{gameId}
-				options={combatPromptOptions}
-				battlefieldCards={getPlayerBattlefieldCards(localPlayerId)}
-				defenders={getDefenderTargets()}
-				onComplete={handleCombatComplete}
-			/>
-		{/if}
-
-		<!-- Combat: Declare Blockers -->
-		{#if isDeclaringBlockersPhase && combatPromptOptions && gameId}
-			<DeclareBlockers
-				{gameId}
-				options={combatPromptOptions}
-				{battlefieldCards}
-				attackingCreatures={getAttackingCreatures()}
-				onComplete={handleCombatComplete}
-			/>
-		{/if}
-
-		<!-- Combat: Assign Damage -->
-		{#if damageAssignmentPrompt && gameId}
-			<AssignDamage {gameId} prompt={damageAssignmentPrompt} onComplete={handleCombatComplete} />
-		{/if}
-
-		<!-- Prompt Overlay (non-mana prompts) -->
-		{#if prompt && !['mana', 'xmana'].includes(prompt.type)}
-			<div class="prompt-overlay">
-				<div class="prompt-content">
-					<p class="prompt-message">{prompt.message}</p>
-					{#if prompt.type === 'ask'}
-						<div class="prompt-buttons">
-							<button class="btn-yes" onclick={handlePromptYes}>Yes</button>
-							<button class="btn-no" onclick={handlePromptNo}>No</button>
+							<button class="menu-btn" onclick={() => (showAllHands = !showAllHands)}>
+								{#if showAllHands}
+									<EyeOff size={16} />
+									Hide
+								{:else}
+									<Eye size={16} />
+									Show
+								{/if}
+								All Hands
+							</button>
 						</div>
-					{:else if prompt.type === 'choice'}
-						{@const choiceData = prompt.data as { choices: string[] }}
-						<div class="choice-buttons">
-							{#each choiceData.choices as choice}
-								<button class="btn-choice" onclick={() => handleChoiceSelect(choice)}>
-									{choice}
-								</button>
-							{/each}
+					</div>
+
+					<div class="menu-section">
+						<h3 class="menu-section-title">Utilities</h3>
+						<div class="menu-section-content">
+							<button
+								class="menu-btn"
+								onclick={() => {
+									showKeyboardShortcuts = true;
+									showMenu = false;
+								}}
+							>
+								<Keyboard size={18} />
+								Keyboard Shortcuts
+							</button>
 						</div>
-					{/if}
+					</div>
+
+					<div class="menu-section">
+						<h3 class="menu-section-title">Navigation</h3>
+						<div class="menu-section-content">
+							<button class="menu-btn" onclick={() => goto('/lobby')}> ← Back to Lobby </button>
+						</div>
+					</div>
 				</div>
 			</div>
 		{/if}
 
-		<!-- Main Game Area with Sidebar -->
-		<div class="game-area-wrapper">
-			<main class="game-layout" class:four-player={otherPlayers.length >= 3}>
-				<!-- Phase 3: OpponentSection integration - plan lines 516-594 -->
-				{#if otherPlayers.length === 1}
-					<!-- 1v1 layout - single opponent (plan lines 516-538) -->
+		<!-- All Hands Overlay (from playtest/+page.svelte lines 1516-1533) -->
+		{#if showAllHands}
+			<div class="all-hands-overlay">
+				{#each players as player}
+					<div class="player-hand-compact" class:active={player.playerId === activeControlSeat}>
+						<div class="compact-header">
+							<span class="player-name-compact">{player.name}</span>
+							<span class="life-compact"><Heart size={14} /> {player.life}</span>
+						</div>
+						<div class="cards-compact">
+							{#each player.hand as card}
+								<Card cardId={card.id} cardName={card.name} size="large" manaCost={card.manaCost} />
+							{/each}
+						</div>
+					</div>
+				{/each}
+			</div>
+		{/if}
+
+		<!-- Main Game Area (from playtest/+page.svelte lines 1535-1677) -->
+		<main class="game-layout">
+			<!-- Opponent Section(s) -->
+			{#if otherPlayers.length === 1}
+				{#if selectedOpponent}
+					{@const opponent = selectedOpponent}
+					<OpponentSection
+						{opponent}
+						{otherPlayers}
+						battlefieldNonlands={opponentBattlefieldNonlands}
+						battlefieldLands={opponentBattlefieldLands}
+						commandCards={opponentCommandCards}
+						{isCommanderGame}
+						showLifeMenu={showOpponentLifeMenu}
+						onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+						onLifeChange={handleLifeChange}
+						onPoisonChange={handlePoisonChange}
+						onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+						onCardContextMenu={(cardId, cardName) => {
+							selectedCardForCounters = { id: cardId, name: cardName };
+							showCounterDialog = true;
+						}}
+					/>
+				{/if}
+			{:else}
+				<!-- Multiplayer grid -->
+				<div class="opponents-grid opponents-grid-large">
+					{#each otherPlayers as opponent (opponent.playerId)}
+						{@const oppBattlefield = battlefield.filter(
+							(c) => c.controllerId === opponent.playerId
+						)}
+						{@const oppBattlefieldNonlands = oppBattlefield.filter((c) => !isLandPermanent(c.type))}
+						{@const oppBattlefieldLands = oppBattlefield.filter((c) => isLandPermanent(c.type))}
+						{@const oppCommandCards = commandCards.filter(
+							(c) => (c.ownerId || c.controllerId) === opponent.playerId
+						)}
+						<OpponentSection
+							{opponent}
+							otherPlayers={[]}
+							battlefieldNonlands={oppBattlefieldNonlands}
+							battlefieldLands={oppBattlefieldLands}
+							commandCards={oppCommandCards}
+							{isCommanderGame}
+							showLifeMenu={false}
+							onSelectOpponent={undefined}
+							onLifeChange={handleLifeChange}
+							onPoisonChange={handlePoisonChange}
+							onToggleLifeMenu={() => {}}
+							onCardContextMenu={(cardId, cardName) => {
+								selectedCardForCounters = { id: cardId, name: cardName };
+								showCounterDialog = true;
+							}}
+						/>
+					{/each}
+				</div>
+				<div class="opponents-grid-small">
 					{#if selectedOpponent}
 						{@const opponent = selectedOpponent}
 						<OpponentSection
@@ -2334,253 +1004,154 @@
 							onPoisonChange={handlePoisonChange}
 							onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
 							onCardContextMenu={(cardId, cardName) => {
-								contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
-								contextMenuPosition = { x: 0, y: 0 };
+								selectedCardForCounters = { id: cardId, name: cardName };
+								showCounterDialog = true;
 							}}
 						/>
 					{/if}
-				{:else}
-					<!-- Multi-opponent layouts (plan lines 542-594) -->
-					<!-- Grid layout for large screens -->
-					<div class="opponents-grid opponents-grid-large">
-						{#each otherPlayers as opponent (opponent.playerId)}
-							{@const oppBattlefield = $battlefield.filter(
-								(c) => c.controllerId === opponent.playerId
-							)}
-							{@const oppBattlefieldNonlands = oppBattlefield.filter(
-								(c) => !isLandPermanent(c.type)
-							)}
-							{@const oppBattlefieldLands = oppBattlefield.filter((c) => isLandPermanent(c.type))}
-							{@const oppCommandCards = $command.filter(
-								(c) => (c.ownerId || c.controllerId) === opponent.playerId
-							)}
-							<OpponentSection
-								{opponent}
-								otherPlayers={[]}
-								battlefieldNonlands={oppBattlefieldNonlands}
-								battlefieldLands={oppBattlefieldLands}
-								commandCards={oppCommandCards}
-								{isCommanderGame}
-								showLifeMenu={false}
-								onSelectOpponent={undefined}
-								onLifeChange={handleLifeChange}
-								onPoisonChange={handlePoisonChange}
-								onToggleLifeMenu={() => {}}
-								onCardContextMenu={(cardId, cardName) => {
-									contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
-									contextMenuPosition = { x: 0, y: 0 };
-								}}
-							/>
-						{/each}
-					</div>
-
-					<!-- Single opponent with cycling for small screens -->
-					<div class="opponents-grid-small">
-						{#if selectedOpponent}
-							{@const opponent = selectedOpponent}
-							<OpponentSection
-								{opponent}
-								{otherPlayers}
-								battlefieldNonlands={opponentBattlefieldNonlands}
-								battlefieldLands={opponentBattlefieldLands}
-								commandCards={opponentCommandCards}
-								{isCommanderGame}
-								showLifeMenu={showOpponentLifeMenu}
-								onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
-								onLifeChange={handleLifeChange}
-								onPoisonChange={handlePoisonChange}
-								onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
-								onCardContextMenu={(cardId, cardName) => {
-									contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
-									contextMenuPosition = { x: 0, y: 0 };
-								}}
-							/>
-						{/if}
-					</div>
-				{/if}
-
-				<!-- Central Battlefield Area - Plan document lines 322-343 -->
-				<BattlefieldArea
-					battlefieldNonlands={myBattlefieldNonlands}
-					battlefieldLands={myBattlefieldLands}
-					commandCards={myCommandCards}
-					{isCommanderGame}
-					{isDragging}
-					{isOverValidDrop}
-					{dropZone}
-					{hoveredCardId}
-					onCardClick={handleBattlefieldCardClick}
-					onCardMouseDown={handleBattlefieldCardMouseDown}
-					onCardContextMenu={(cardId, cardName) => {
-						contextMenuCard = battlefieldCards.find((c) => c.id === cardId) || null;
-						contextMenuPosition = { x: 0, y: 0 };
-					}}
-					onCommandCardMouseDown={handleCommandCardMouseDown}
-					onCardHover={(cardId) => (hoveredCardId = cardId)}
-					battlefieldDropZoneRef={(el) => (battlefieldDropZoneEl = el)}
-					commandDropZoneRef={(el) => {
-						// Command drop zone not currently used in game page
-					}}
-				/>
-
-				<!-- Player Info & Zones Row - Using PlayerInfoRow component (see plan lines 35-51) -->
-				{#if me}
-					<PlayerInfoRow
-						player={{
-							name: 'You',
-							life: me.life,
-							poison: me.poison ?? 0,
-							libraryCount: me.libraryCount ?? 0
-						}}
-						graveyard={myGrave}
-						exile={myExile}
-						mana={myMana}
-						{showLifeMenu}
-						onLifeChange={handleLifeChange}
-						onPoisonChange={handlePoisonChange}
-						onToggleLifeMenu={() => (showLifeMenu = !showLifeMenu)}
-						onSearchLibrary={handleSearchLibrary}
-						onDeckContextMenu={handleDeckContextMenu}
-						libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
-						graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
-						exileDropZoneRef={(el) => (exileDropZoneEl = el)}
-					/>
-				{/if}
-
-				<!-- Player Hand -->
-				<div
-					bind:this={handDropZoneEl}
-					class="hand-area"
-					class:drag-active={isDragging}
-					class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
-				>
-					<PlayerHand
-						onCardClick={handleCardClick}
-						size="normal"
-						currentPhase={step || phase}
-						canDrag={havePriority}
-					/>
 				</div>
-			</main>
+			{/if}
 
-			<!-- Visual Stack Sidebar (inline, not overlay) -->
+			<!-- My Battlefield Area -->
+			<BattlefieldArea
+				battlefieldNonlands={myBattlefieldNonlands}
+				battlefieldLands={myBattlefieldLands}
+				commandCards={myCommandCards}
+				{isCommanderGame}
+				{isDragging}
+				{isOverValidDrop}
+				{dropZone}
+				{hoveredCardId}
+				onCardClick={handleBattlefieldCardClick}
+				onCardMouseDown={handleBattlefieldCardMouseDown}
+				onCardContextMenu={(cardId, cardName) => {
+					selectedCardForCounters = { id: cardId, name: cardName };
+					showCounterDialog = true;
+				}}
+				onCommandCardMouseDown={handleCommandCardMouseDown}
+				onCardHover={(cardId) => (hoveredCardId = cardId)}
+				battlefieldDropZoneRef={(el) => (battlefieldDropZoneEl = el)}
+				commandDropZoneRef={(el) => (commandDropZoneEl = el)}
+			/>
+
+			<!-- Player Info Row -->
+			{#if me}
+				<PlayerInfoRow
+					player={{
+						name: me.name,
+						life: me.life,
+						poison: me.poison,
+						libraryCount: me.libraryCount
+					}}
+					graveyard={myGrave}
+					{exile}
+					mana={myMana}
+					{showLifeMenu}
+					onLifeChange={handleLifeChange}
+					onPoisonChange={handlePoisonChange}
+					onToggleLifeMenu={() => (showLifeMenu = !showLifeMenu)}
+					onSearchLibrary={() => (showDeckSearch = true)}
+					onDeckContextMenu={handleDeckContextMenu}
+					libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
+					graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
+					exileDropZoneRef={(el) => (exileDropZoneEl = el)}
+				/>
+			{/if}
+
+			<!-- Player Hand -->
 			<div
-				bind:this={visualStackDropZoneEl}
-				class="visual-stack-sidebar-container"
+				bind:this={handDropZoneEl}
+				class="hand-area"
 				class:drag-active={isDragging}
-				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'stack'}
+				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
 			>
-				<VisualStack
-					isOpen={showVisualStack}
-					onResolve={handleStackItemRemove}
-					onRemove={handleStackItemRemove}
+				<PlayerHand
+					onCardClick={() => {}}
+					size="normal"
+					currentPhase="PRECOMBAT_MAIN"
+					canDrag={true}
 				/>
 			</div>
-		</div>
-		<!-- End game-area-wrapper -->
+		</main>
 
-		<!-- Overlay Panels -->
-		<ActionLogOverlay
-			bind:this={actionLogRef}
-			bind:open={showActionLog}
-			onRequestRollback={handleRequestRollback}
-		/>
-		<GameChatOverlay bind:this={gameChatRef} gameId={gameId || ''} bind:open={showChat} />
-		<KeyboardShortcutsModal bind:open={showKeyboardShortcuts} mode="game" />
+		<!-- Token Creator -->
+		{#if showTokenCreator}
+			<TokenCreator gameId={data.gameId} onClose={() => (showTokenCreator = false)} />
+		{/if}
 
-		<!-- Priority Action Bar (Docked at bottom) -->
-		<PriorityActionBar
-			{gameId}
-			hasPriority={havePriority}
-			activePlayerId={gameState.gameView?.activePlayerId || ''}
-			{localPlayerId}
-			{activePlayerName}
-			currentPhase={phase}
-			canPassPriority={havePriority}
-			isLoading={isActionLoading}
-			onPassPriority={handlePassPriority}
-			onPassUntilEOT={handlePassUntilEOT}
-			onCastSpell={handleCastSpell}
-			onAdvancePhase={handleAdvancePhase}
-			onCreateToken={() => (showTokenCreator = true)}
-			bind:autoPass
-		/>
-
-		<!-- Floating Debug Button -->
-		<button class="debug-fab" onclick={() => (showDebugOverlay = true)} title="Open Debug View">
-			🔧
-		</button>
-
-		<!-- Debug Overlay Modal -->
-		<DebugOverlay
-			bind:open={showDebugOverlay}
-			gameId={gameId || ''}
-			{localPlayerId}
-			{gameState}
-			{allPlayers}
-			{battlefieldCards}
-			{stackCards}
-			{commandCards}
-			{turn}
-			{phase}
-			{havePriority}
-			{isMulliganPhase}
-			{gameFormat}
-			{isGameOver}
-			{gameWinner}
-			{activePlayerName}
-			{prompt}
-			{error}
-			onClose={() => (showDebugOverlay = false)}
-		/>
-
-		<!-- Card Context Menu -->
-		{#if contextMenuCard && gameId}
-			<CardContextMenu
-				card={contextMenuCard}
-				position={contextMenuPosition}
-				onClose={closeContextMenu}
-				actions={cardContextMenuActions}
+		<!-- Create Token Dialog -->
+		{#if showCreateTokenDialog}
+			<CreateTokenDialog
+				onCreateToken={(name, types, power, toughness, color) => {
+					multiplayerGameStore.createToken(name, types, power, toughness, color);
+					showCreateTokenDialog = false;
+				}}
+				onClose={() => (showCreateTokenDialog = false)}
 			/>
 		{/if}
 
-		<!-- Phase 4: Deck Context Menu (plan lines 917-927) -->
-		{#if showDeckContextMenu && me}
+		<!-- Counter Dialog -->
+		{#if showCounterDialog && selectedCardForCounters && selectedCardForCountersData}
+			<CounterDialog
+				cardName={selectedCardForCountersData.name}
+				cardId={selectedCardForCountersData.id}
+				currentCounters={selectedCardForCountersData.counters}
+				onAddCounter={(counterName, amount) => {
+					const card = selectedCardForCountersData;
+					multiplayerGameStore.addCounter(card.id, counterName, amount);
+				}}
+				onRemoveCounter={(counterName, amount) => {
+					const card = selectedCardForCountersData;
+					multiplayerGameStore.removeCounter(card.id, counterName, amount);
+				}}
+				onSetCounter={(counterName, amount) => {
+					const card = selectedCardForCountersData;
+					multiplayerGameStore.setCounter(card.id, counterName, amount);
+				}}
+				onClose={() => {
+					showCounterDialog = false;
+					selectedCardForCounters = null;
+				}}
+			/>
+		{/if}
+
+		<!-- Deck Search -->
+		<!-- TODO: Re-enable when LibrarySearch component supports local data or when server-side library search is implemented
+		{#if showDeckSearch && me}
+			<LibrarySearch
+				gameId={data.gameId}
+				librarySearchData={{
+					playerId: me.playerId,
+					message: 'Search your library',
+					destination: 'hand',
+					cards: me.library,
+					canCancel: true
+				}}
+				onComplete={() => (showDeckSearch = false)}
+				onCancel={() => (showDeckSearch = false)}
+			/>
+		{/if}
+		-->
+
+		<!-- Deck Context Menu -->
+		{#if showDeckContextMenu}
 			<DeckContextMenu
 				position={deckContextMenuPosition}
-				deckCount={me.libraryCount ?? 0}
-				playerName="You"
-				actions={deckContextMenuActions}
+				deckCount={me?.libraryCount || 0}
+				playerName={me?.name || 'You'}
 				onClose={() => (showDeckContextMenu = false)}
+				actions={deckContextMenuActions}
 			/>
 		{/if}
 
-		<!-- Token Creator Dialog -->
-		{#if showTokenCreator && gameId}
-			<TokenCreator {gameId} onClose={() => (showTokenCreator = false)} />
-		{/if}
-
-		<!-- Rollback Consent Dialog -->
-		{#if pendingRollbackRequest}
-			<RollbackConsentDialog
-				request={pendingRollbackRequest}
-				onApprove={handleApproveRollback}
-				onDeny={handleDenyRollback}
-			/>
-		{/if}
-
-		<!-- Phase 5: Number Input Dialog (plan lines 1062-1077) -->
+		<!-- Number Input Dialog -->
 		{#if showNumberInputDialog && numberInputDialogConfig}
 			<NumberInputDialog
 				title={numberInputDialogConfig.title}
 				defaultValue={numberInputDialogConfig.defaultValue}
 				min={numberInputDialogConfig.min}
 				max={numberInputDialogConfig.max}
-				onConfirm={(value) => {
-					numberInputDialogConfig?.onConfirm(value);
-					showNumberInputDialog = false;
-					numberInputDialogConfig = null;
-				}}
+				onConfirm={numberInputDialogConfig.onConfirm}
 				onCancel={() => {
 					showNumberInputDialog = false;
 					numberInputDialogConfig = null;
@@ -2588,7 +1159,35 @@
 			/>
 		{/if}
 
-		<!-- Drag Ghost - Card following the cursor during drag -->
+		<!-- Scry Dialog -->
+		{#if showScryDialog && currentScrySession}
+			<ScryDialog
+				cards={currentScrySession.cards}
+				onComplete={handleScryComplete}
+				onCancel={() => {
+					showScryDialog = false;
+					currentScrySession = null;
+				}}
+			/>
+		{/if}
+
+		<!-- Reveal Top Dialog -->
+		{#if showRevealTopDialog}
+			<RevealTopDialog
+				cards={revealedCards}
+				onClose={() => {
+					showRevealTopDialog = false;
+					revealedCards = [];
+				}}
+			/>
+		{/if}
+
+		<KeyboardShortcutsModal bind:open={showKeyboardShortcuts} mode="game" />
+
+		<!-- ADD: GameChatOverlay for multiplayer -->
+		<GameChatOverlay gameId={data.gameId} />
+
+		<!-- Drag Ghost (from playtest/+page.svelte lines 1978-1990) -->
 		{#if isDragging && dragCardName}
 			{@const dragImageUrl = getScryfallImageUrl(dragCardName, 'small')}
 			<div class="drag-ghost" style="left: {dragPos.x}px; top: {dragPos.y}px;">
@@ -2605,65 +1204,39 @@
 </div>
 
 <style>
-	/* Container with priority glow effect */
+	/* Copy styles from playtest page */
 	.game-container {
-		position: fixed;
-		inset: 0;
-		background: #0a0d12;
-		color: white;
-		display: flex;
-		flex-direction: column;
+		width: 100vw;
+		height: 100vh;
 		overflow: hidden;
-		transition: box-shadow 0.5s ease;
+		background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+		position: relative;
 	}
 
-	/* Full-screen priority glow */
-	.game-container.has-priority {
-		box-shadow: inset 0 0 80px rgba(251, 191, 36, 0.08);
-	}
-
-	.game-container.has-priority::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		border: 2px solid rgba(251, 191, 36, 0.25);
-		pointer-events: none;
-		z-index: 1000;
-		animation: priority-border-pulse 2s ease-in-out infinite;
-	}
-
-	@keyframes priority-border-pulse {
-		0%,
-		100% {
-			border-color: rgba(251, 191, 36, 0.25);
-		}
-		50% {
-			border-color: rgba(251, 191, 36, 0.5);
-		}
-	}
-
-	/* Loading & Error & Game Over States */
 	.loading-overlay,
-	.error-overlay,
-	.game-over-overlay {
-		position: absolute;
-		inset: 0;
+	.error-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		background: #0a0d12;
-		z-index: 100;
-		gap: 1rem;
+		background: rgba(0, 0, 0, 0.9);
+		z-index: 10000;
+		color: white;
 	}
 
 	.spinner {
-		width: 48px;
-		height: 48px;
-		border: 4px solid #2a2a2a;
-		border-top-color: #667eea;
+		width: 50px;
+		height: 50px;
+		border: 4px solid rgba(255, 255, 255, 0.1);
+		border-top-color: #4a90e2;
 		border-radius: 50%;
-		animation: spin 0.8s linear infinite;
+		animation: spin 1s linear infinite;
+		margin-bottom: 20px;
 	}
 
 	@keyframes spin {
@@ -2674,881 +1247,258 @@
 
 	.error-icon {
 		font-size: 4rem;
-		margin-bottom: 0.5rem;
-		opacity: 0.9;
-	}
-
-	.error-title {
-		font-size: 1.5rem;
-		color: #f8fafc;
-		margin: 0 0 0.5rem;
-		font-weight: 600;
-	}
-
-	.error-message {
-		color: #94a3b8;
-		max-width: 400px;
-		text-align: center;
-		line-height: 1.6;
-		margin: 0;
-	}
-
-	.error-actions {
-		display: flex;
-		gap: 0.75rem;
-		margin-top: 1rem;
-	}
-
-	.btn-secondary {
-		padding: 0.75rem 1.5rem;
-		border-radius: 8px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s;
-		background: transparent;
-		border: 1px solid #374151;
-		color: #9ca3af;
-	}
-
-	.btn-secondary:hover {
-		background: #1f2937;
-		border-color: #4b5563;
-		color: #f8fafc;
-	}
-
-	.game-over-content {
-		text-align: center;
-		background: #1a1f2e;
-		padding: 2rem 3rem;
-		border-radius: 12px;
-		border: 2px solid #667eea;
-	}
-
-	.game-over-content h2 {
-		font-size: 2rem;
-		margin-bottom: 1rem;
-	}
-
-	.winner-text {
-		font-size: 1.25rem;
-		color: #fbbf24;
-		margin-bottom: 1.5rem;
-	}
-
-	/* Floating action buttons */
-	.floating-actions {
-		position: fixed;
-		top: 100px;
-		right: 16px;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		z-index: 50;
-	}
-
-	.floating-btn {
-		width: 44px;
-		height: 44px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(26, 31, 46, 0.95);
-		border: 1px solid #2a3441;
-		border-radius: 10px;
-		font-size: 1.25rem;
-		cursor: pointer;
-		transition: all 0.2s;
-		color: #fff;
-		position: relative;
-		background: rgba(0, 0, 0, 0.85);
-	}
-
-	.floating-btn:hover {
-		background: #2a3441;
-		border-color: #374151;
-		transform: scale(1.05);
-	}
-
-	.floating-btn .badge {
-		position: absolute;
-		top: -4px;
-		right: -4px;
-		min-width: 18px;
-		height: 18px;
-		padding: 0 4px;
-		background: #ef4444;
-		border-radius: 9px;
-		font-size: 0.625rem;
-		font-weight: 700;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.floating-btn.stack-btn {
-		background: rgba(102, 126, 234, 0.15);
-		border-color: rgba(102, 126, 234, 0.3);
-	}
-
-	.floating-btn.stack-btn:hover {
-		background: rgba(102, 126, 234, 0.25);
-		border-color: rgba(102, 126, 234, 0.5);
-	}
-
-	.floating-btn.stack-btn.has-items {
-		background: rgba(251, 191, 36, 0.2);
-		border-color: rgba(251, 191, 36, 0.4);
-	}
-
-	.floating-btn.stack-btn.has-items:hover {
-		background: rgba(251, 191, 36, 0.3);
-		border-color: rgba(251, 191, 36, 0.6);
+		margin-bottom: 20px;
 	}
 
 	.btn-primary {
-		padding: 0.75rem 1.5rem;
-		background: #667eea;
+		margin-top: 20px;
+		padding: 10px 20px;
+		background: #4a90e2;
 		color: white;
 		border: none;
-		border-radius: 6px;
-		font-weight: 600;
+		border-radius: 4px;
 		cursor: pointer;
-		transition: background 0.2s;
+		font-size: 16px;
 	}
 
 	.btn-primary:hover {
-		background: #5568d3;
+		background: #357abd;
 	}
 
-	/* Prompt Overlay */
-	.prompt-overlay {
+	.menu-backdrop {
 		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.85);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 50;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 999;
 	}
 
-	.prompt-content {
-		background: #1a1f2e;
-		padding: 2rem;
-		border-radius: 12px;
-		border: 2px solid #667eea;
-		max-width: 400px;
-		text-align: center;
+	.menu-overlay {
+		position: fixed;
+		top: 0;
+		right: -400px;
+		width: 400px;
+		height: 100vh;
+		background: #1a1a2e;
+		box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+		z-index: 1000;
+		transition: right 0.3s ease;
+		overflow-y: auto;
 	}
 
-	.prompt-message {
-		font-size: 1.125rem;
-		margin-bottom: 1.5rem;
+	.menu-overlay.open {
+		right: 0;
 	}
 
-	.prompt-hint {
-		color: #94a3b8;
-		font-size: 0.875rem;
-	}
-
-	.prompt-buttons,
-	.choice-buttons {
-		display: flex;
-		gap: 1rem;
-		justify-content: center;
-		flex-wrap: wrap;
-	}
-
-	.btn-yes {
-		background: #22c55e;
-		color: white;
-		padding: 0.75rem 2rem;
-		border: none;
-		border-radius: 6px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: background 0.2s;
-	}
-
-	.btn-yes:hover {
-		background: #16a34a;
-	}
-
-	.btn-no {
-		background: #ef4444;
-		color: white;
-		padding: 0.75rem 2rem;
-		border: none;
-		border-radius: 6px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: background 0.2s;
-	}
-
-	.btn-no:hover {
-		background: #dc2626;
-	}
-
-	.btn-choice {
-		background: #374151;
-		color: white;
-		padding: 0.5rem 1rem;
-		border: none;
-		border-radius: 6px;
-		cursor: pointer;
-		transition: background 0.2s;
-	}
-
-	.btn-choice:hover {
-		background: #4b5563;
-	}
-
-	/* Game Area Wrapper - contains game layout + sidebar */
-	.game-area-wrapper {
-		flex: 1;
-		display: flex;
-		overflow: hidden;
-	}
-
-	/* Main Game Layout - Full Width */
-	.game-layout {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 0.75rem;
-		padding-bottom: 80px; /* Space for action bar */
-		gap: 0.75rem;
-		overflow: hidden;
-		min-width: 0; /* Allow shrinking */
-	}
-
-	/* Visual Stack Sidebar Container */
-	.visual-stack-sidebar-container {
-		height: 100%;
-		transition: all 0.2s ease-out;
-	}
-
-	.visual-stack-sidebar-container.drag-active {
-		background: rgba(102, 126, 234, 0.05);
-	}
-
-	.visual-stack-sidebar-container.drag-valid {
-		background: rgba(102, 126, 234, 0.15);
-	}
-
-	/* Opponents Row */
-	.opponents-row {
-		display: flex;
-		gap: 0.75rem;
-		flex-wrap: wrap;
-		justify-content: center;
-	}
-
-	.opponents-row > :global(*) {
-		flex: 1;
-		min-width: 250px;
-		max-width: 400px;
-	}
-
-	/* For 4 players, use different layout */
-	.game-layout.four-player .opponents-row {
-		justify-content: space-between;
-	}
-
-	.game-layout.four-player .opponents-row > :global(*) {
-		flex: 1;
-		min-width: 200px;
-		max-width: 350px;
-	}
-
-	/* Battlefield Area */
-	.battlefield-area {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		background: linear-gradient(135deg, #0d1117, #141821);
-		border: 1px solid #2a3441;
-		border-radius: 12px;
-		padding: 1rem;
-		overflow: auto;
-		min-height: 200px;
-		position: relative;
-		transition:
-			border-color 0.2s,
-			box-shadow 0.2s;
-	}
-
-	/* Battlefield drag state */
-	.battlefield-area.drag-active {
-		border-color: rgba(102, 126, 234, 0.5);
-		box-shadow: inset 0 0 30px rgba(102, 126, 234, 0.1);
-	}
-
-	.battlefield-area.drag-valid {
-		border-color: #22c55e;
-		box-shadow:
-			inset 0 0 40px rgba(34, 197, 94, 0.15),
-			0 0 0 2px rgba(34, 197, 94, 0.3);
-	}
-
-	/* Drop zone overlay */
-	.drop-zone-overlay {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(102, 126, 234, 0.1);
-		border-radius: 12px;
-		pointer-events: none;
-		z-index: 10;
-		transition: background 0.2s;
-	}
-
-	.drop-zone-overlay.valid {
-		background: rgba(34, 197, 94, 0.15);
-	}
-
-	.drop-label {
-		font-size: 1.125rem;
-		font-weight: 600;
-		color: #667eea;
-		padding: 0.75rem 1.5rem;
-		background: rgba(26, 31, 46, 0.9);
-		border-radius: 8px;
-		border: 2px dashed rgba(102, 126, 234, 0.5);
-	}
-
-	.drop-zone-overlay.valid .drop-label {
-		color: #22c55e;
-		border-color: rgba(34, 197, 94, 0.5);
-	}
-
-	.drop-hint {
-		color: #667eea;
-		animation: drop-hint-pulse 1.5s ease-in-out infinite;
-	}
-
-	@keyframes drop-hint-pulse {
-		0%,
-		100% {
-			opacity: 0.7;
-		}
-		50% {
-			opacity: 1;
-		}
-	}
-
-	.zone-label {
-		font-size: 0.6875rem;
-		color: #6b7280;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		font-weight: 600;
-		margin-bottom: 0.5rem;
-	}
-
-	.command-zone {
-		padding-bottom: 0.75rem;
-		border-bottom: 1px solid #2a3441;
-	}
-
-	.command-cards,
-	.battlefield-cards {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		align-content: flex-start;
-	}
-
-	.battlefield-rows {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.battlefield-row--lands {
-		margin-top: 0.25rem;
-		padding-top: 0.5rem;
-		border-top: 1px dashed rgba(148, 163, 184, 0.25);
-	}
-
-	.battlefield-card-wrapper {
-		user-select: none;
-		-webkit-user-select: none;
-		transition:
-			transform 0.2s ease,
-			opacity 0.2s ease;
-	}
-
-	.battlefield-card-wrapper.draggable {
-		cursor: grab;
-	}
-
-	.battlefield-card-wrapper.draggable:active {
-		cursor: grabbing;
-	}
-
-	.battlefield-card-wrapper.is-dragging {
-		opacity: 0.4;
-		transform: scale(0.95);
-	}
-
-	.battlefield-card-wrapper.is-hovered {
-		/* Subtle glow to indicate keyboard shortcuts are active */
-		filter: drop-shadow(0 0 4px rgba(100, 200, 255, 0.5));
-	}
-
-	.my-battlefield {
-		flex: 1;
-	}
-
-	/* Player Info Row */
-	.player-info-row {
+	.menu-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		gap: 0.75rem;
-		padding: 0.375rem 0.75rem;
-		background: rgba(26, 31, 46, 0.8);
-		border-radius: 8px;
-		border: 1px solid #2a3441;
+		padding: 20px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
-	/* Compact Player Info Row */
-	.player-info-row.compact {
-		padding: 0.25rem 0.5rem;
-		gap: 0.5rem;
-		min-height: 36px;
-		background: rgba(26, 31, 46, 0.9);
+	.menu-header h2 {
+		margin: 0;
+		color: white;
+		font-size: 24px;
 	}
 
-	.player-identity {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.player-info-row.compact .player-identity {
-		gap: 0.5rem;
-	}
-
-	.player-name {
-		font-weight: 700;
-		font-size: 0.9375rem;
-		display: flex;
-		align-items: center;
-		gap: 0.375rem;
-		white-space: nowrap;
-	}
-
-	.player-info-row.compact .player-name {
-		font-size: 0.8125rem;
-	}
-
-	.player-name.has-priority {
-		color: #22c55e;
-	}
-
-	.priority-dot {
-		width: 8px;
-		height: 8px;
-		background: #22c55e;
-		border-radius: 50%;
-		animation: pulse 1.5s infinite;
-	}
-
-	.player-info-row.compact .priority-dot {
-		width: 6px;
-		height: 6px;
-	}
-
-	@keyframes pulse {
-		0%,
-		100% {
-			opacity: 1;
-			transform: scale(1);
-		}
-		50% {
-			opacity: 0.6;
-			transform: scale(1.2);
-		}
-	}
-
-	.player-zones {
-		display: flex;
-		gap: 0.5rem;
-		align-items: center;
-	}
-
-	.player-info-row.compact .player-zones {
-		gap: 0.375rem;
-	}
-
-	/* Player Stats Inline (Life, Poison, Library) */
-	.player-stats-inline {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		position: relative;
-		margin-left: auto;
-		margin-right: 0.5rem;
-	}
-
-	.life-group {
-		display: flex;
-		align-items: center;
-		gap: 0.125rem;
-	}
-
-	.stat-btn {
-		width: 24px;
-		height: 24px;
-		border: 1px solid rgba(63, 63, 70, 0.4);
-		border-radius: 4px;
-		background: rgba(36, 40, 51, 0.6);
-		color: #a1a1aa;
-		font-size: 14px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.15s ease;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.stat-btn:hover {
-		background: rgba(63, 63, 70, 0.6);
-		color: #f4f4f5;
-	}
-
-	.stat-btn.life-btn.minus:hover {
-		background: rgba(239, 68, 68, 0.3);
-		color: #ef4444;
-	}
-
-	.stat-btn.life-btn.plus:hover {
-		background: rgba(34, 197, 94, 0.3);
-		color: #22c55e;
-	}
-
-	.stat-display {
-		display: flex;
-		align-items: center;
-		gap: 0.25rem;
-		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		background: transparent;
+	.menu-close-btn {
+		background: none;
 		border: none;
+		color: white;
 		cursor: pointer;
-		transition: background 0.15s ease;
+		padding: 5px;
 	}
 
-	.stat-display:hover {
-		background: rgba(63, 63, 70, 0.3);
-	}
-
-	.stat-display.life {
-		color: #f4f4f5;
-	}
-
-	.stat-display.poison {
-		color: #a855f7;
-	}
-
-	.stat-icon {
-		font-size: 0.75rem;
-	}
-
-	.stat-value {
-		font-family: 'JetBrains Mono', monospace;
-		min-width: 20px;
-		text-align: center;
-	}
-
-	/* Quick Menu */
-	.quick-menu {
-		position: absolute;
-		bottom: calc(100% + 8px);
-		left: 50%;
-		transform: translateX(-50%);
-		min-width: 200px;
-		background: rgba(18, 20, 26, 0.98);
-		border: 1px solid rgba(63, 63, 70, 0.6);
-		border-radius: 8px;
-		padding: 0.75rem;
-		box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
-		display: flex;
-		flex-direction: column;
-		gap: 0.625rem;
-		z-index: 100;
+	.menu-content {
+		padding: 20px;
 	}
 
 	.menu-section {
+		margin-bottom: 30px;
+	}
+
+	.menu-section-title {
+		color: #4a90e2;
+		font-size: 14px;
+		text-transform: uppercase;
+		margin-bottom: 10px;
+		letter-spacing: 1px;
+	}
+
+	.menu-section-content {
 		display: flex;
 		flex-direction: column;
-		gap: 0.25rem;
+		gap: 10px;
+	}
+
+	.menu-btn {
+		padding: 10px 15px;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 4px;
+		color: white;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		transition: background 0.2s;
+	}
+
+	.menu-btn:hover {
+		background: rgba(255, 255, 255, 0.2);
 	}
 
 	.menu-label {
-		font-size: 0.625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: #71717a;
+		color: #aaa;
+		font-size: 14px;
+		margin-bottom: 5px;
+		display: block;
 	}
 
-	.menu-row {
-		display: flex;
-		gap: 0.25rem;
-		align-items: center;
-	}
-
-	.menu-row button {
-		padding: 0.375rem 0.5rem;
-		border: 1px solid rgba(63, 63, 70, 0.5);
+	.control-select {
+		width: 100%;
+		padding: 8px;
+		background: rgba(0, 0, 0, 0.3);
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 4px;
-		background: rgba(36, 40, 51, 0.8);
-		color: #a1a1aa;
-		font-size: 0.75rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.15s ease;
+		color: white;
+		font-size: 14px;
 	}
 
-	.menu-row button:hover {
-		background: rgba(201, 162, 39, 0.2);
-		border-color: rgba(201, 162, 39, 0.4);
-		color: #f4f4f5;
-	}
-
-	.menu-row button.search-btn {
-		flex: 1;
-		background: rgba(139, 92, 246, 0.2);
-		border-color: rgba(139, 92, 246, 0.4);
-		color: #a78bfa;
-	}
-
-	.menu-row button.search-btn:hover {
-		background: rgba(139, 92, 246, 0.3);
-		border-color: rgba(139, 92, 246, 0.5);
-		color: #c4b5fd;
-	}
-
-	.menu-value {
-		min-width: 24px;
-		text-align: center;
-		font-weight: 600;
-		color: #f4f4f5;
-		font-family: 'JetBrains Mono', monospace;
-	}
-
-	.menu-close {
-		position: absolute;
-		top: 0.375rem;
-		right: 0.375rem;
-		width: 20px;
-		height: 20px;
+	.all-hands-overlay {
+		position: fixed;
+		top: 80px;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.95);
+		z-index: 900;
+		padding: 20px;
+		overflow-y: auto;
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: transparent;
-		border: none;
-		color: #71717a;
-		font-size: 0.75rem;
-		cursor: pointer;
-		border-radius: 4px;
-		transition: all 0.15s ease;
+		flex-direction: column;
+		gap: 20px;
 	}
 
-	.menu-close:hover {
-		background: rgba(63, 63, 70, 0.5);
-		color: #f4f4f5;
-	}
-
-	/* Ensure drop zone wrappers are positioned correctly for hit testing */
-	.player-zones > div {
-		position: relative;
-	}
-
-	/* Graveyard Drop Zone */
-	.graveyard-drop-zone {
-		transition: all 0.2s ease;
-		border-radius: 6px;
-		/* Ensure minimum drop target size for drag-drop detection */
-		min-width: 70px;
-		min-height: 32px;
-		/* Ensure element receives pointer events for drop detection */
-		position: relative;
-	}
-
-	.graveyard-drop-zone.drag-active {
-		outline: 2px dashed #6b7280;
-		outline-offset: 2px;
-	}
-
-	.graveyard-drop-zone.drag-valid {
-		outline-color: #22c55e;
-		background: rgba(34, 197, 94, 0.1);
-	}
-
-	/* Exile Drop Zone */
-	.exile-drop-zone {
-		transition: all 0.2s ease;
-		border-radius: 6px;
-		/* Ensure minimum drop target size for drag-drop detection */
-		min-width: 70px;
-		min-height: 32px;
-	}
-
-	.exile-drop-zone.drag-active {
-		outline: 2px dashed #6b7280;
-		outline-offset: 2px;
-	}
-
-	.exile-drop-zone.drag-valid {
-		outline-color: #a78bfa;
-		background: rgba(167, 139, 250, 0.1);
-	}
-
-	/* Hand Area */
-	.hand-area {
-		flex-shrink: 0;
-		transition: all 0.2s ease;
+	.player-hand-compact {
+		background: rgba(255, 255, 255, 0.05);
+		border: 2px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px;
+		padding: 15px;
+	}
+
+	.player-hand-compact.active {
+		border-color: #4a90e2;
+	}
+
+	.compact-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10px;
+	}
+
+	.player-name-compact {
+		color: white;
+		font-weight: bold;
+		font-size: 18px;
+	}
+
+	.life-compact {
+		color: #ff6b6b;
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		font-size: 16px;
+	}
+
+	.cards-compact {
+		display: flex;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.game-layout {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		padding-top: 60px;
+	}
+
+	.opponents-grid {
+		padding: 10px;
+	}
+
+	.opponents-grid-large {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 10px;
+	}
+
+	.opponents-grid-small {
+		display: none;
+	}
+
+	@media (max-width: 1024px) {
+		.opponents-grid-large {
+			display: none;
+		}
+
+		.opponents-grid-small {
+			display: block;
+		}
+	}
+
+	.hand-area {
+		position: relative;
+		min-height: 150px;
+		transition: background 0.2s;
 	}
 
 	.hand-area.drag-active {
-		outline: 2px dashed #6b7280;
-		outline-offset: 2px;
+		background: rgba(255, 255, 255, 0.05);
 	}
 
 	.hand-area.drag-valid {
-		outline-color: #22c55e;
-		background: rgba(34, 197, 94, 0.1);
+		background: rgba(74, 144, 226, 0.2);
+		border: 2px dashed #4a90e2;
 	}
 
-	/* Responsive */
-	@media (max-width: 900px) {
-		.opponents-row > :global(*) {
-			min-width: 200px;
-		}
-
-		.floating-actions {
-			top: 80px;
-			right: 8px;
-		}
-
-		.floating-btn {
-			width: 38px;
-			height: 38px;
-			font-size: 1.125rem;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.game-layout {
-			padding: 0.5rem;
-			padding-bottom: 70px;
-		}
-
-		.opponents-row > :global(*) {
-			min-width: 150px;
-			max-width: none;
-		}
-
-		.battlefield-area {
-			padding: 0.75rem;
-		}
-
-		.player-info-row {
-			flex-wrap: wrap;
-			justify-content: center;
-		}
-	}
-
-	/* Debug FAB Button */
-	.debug-fab {
-		position: fixed;
-		bottom: 100px;
-		right: 20px;
-		width: 48px;
-		height: 48px;
-		border-radius: 50%;
-		background: linear-gradient(135deg, #1a1a2e, #16213e);
-		border: 2px solid #00ff00;
-		color: #00ff00;
-		font-size: 1.25rem;
-		cursor: pointer;
-		z-index: 500;
-		box-shadow: 0 4px 20px rgba(0, 255, 0, 0.2);
-		transition: all 0.2s;
-	}
-
-	.debug-fab:hover {
-		transform: scale(1.1);
-		box-shadow: 0 6px 30px rgba(0, 255, 0, 0.4);
-	}
-
-	/* Drag Ghost - Card following cursor */
 	.drag-ghost {
 		position: fixed;
 		pointer-events: none;
 		z-index: 10000;
-		transform: translate(-50%, -60%);
+		transform: translate(-50%, -50%);
 	}
 
 	.drag-ghost-card {
-		width: 80px;
-		height: 112px;
-		background: linear-gradient(135deg, #1a1f2e, #0d1117);
-		border: 2px solid #667eea;
-		border-radius: 6px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		overflow: hidden;
-		box-shadow:
-			0 15px 40px rgba(0, 0, 0, 0.6),
-			0 0 0 1px rgba(102, 126, 234, 0.3),
-			0 0 30px rgba(102, 126, 234, 0.2);
-		opacity: 0.95;
-		transform: scale(1.1) rotate(-5deg);
-		transition:
-			border-color 0.15s,
-			transform 0.15s,
-			box-shadow 0.15s;
+		opacity: 0.8;
+		transition: opacity 0.2s;
 	}
 
 	.drag-ghost-card.valid {
-		border-color: #22c55e;
-		box-shadow:
-			0 15px 40px rgba(0, 0, 0, 0.6),
-			0 0 30px rgba(34, 197, 94, 0.5),
-			0 0 60px rgba(34, 197, 94, 0.2);
-		transform: scale(1.15) rotate(0deg);
+		opacity: 1;
 	}
 
 	.drag-ghost-image {
-		width: 100%;
-		height: 100%;
+		width: 100px;
+		height: 140px;
 		object-fit: cover;
-		border-radius: 4px;
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 	}
 
 	.drag-ghost-name {
-		font-size: 0.625rem;
-		font-weight: 600;
+		display: block;
+		padding: 10px;
+		background: rgba(0, 0, 0, 0.9);
 		color: white;
-		text-align: center;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		display: -webkit-box;
-		-webkit-line-clamp: 3;
-		-webkit-box-orient: vertical;
-		line-height: 1.3;
-		padding: 0.25rem;
+		border-radius: 4px;
+		font-size: 14px;
 	}
 </style>
