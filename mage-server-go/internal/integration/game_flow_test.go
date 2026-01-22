@@ -58,6 +58,7 @@ func newGameServerEnv(t testing.TB) *gameServerEnv {
 		nil, // deckRepo
 		nil, // cardRepo
 		nil, // matchHistoryRepo
+		nil, // activeGameRepo
 		roomMgr,
 		chatMgr,
 		tableMgr,
