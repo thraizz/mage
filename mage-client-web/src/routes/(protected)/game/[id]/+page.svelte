@@ -604,6 +604,21 @@
 				} else if (showKeyboardShortcuts) {
 					showKeyboardShortcuts = false;
 					event.preventDefault();
+				} else if (showScryDialog) {
+					showScryDialog = false;
+					currentScrySession = null;
+					event.preventDefault();
+				} else if (showRevealTopDialog) {
+					showRevealTopDialog = false;
+					revealedCards = [];
+					event.preventDefault();
+				} else if (showNumberInputDialog) {
+					showNumberInputDialog = false;
+					numberInputDialogConfig = null;
+					event.preventDefault();
+				} else if (showDeckContextMenu) {
+					showDeckContextMenu = false;
+					event.preventDefault();
 				} else if (showTokenCreator) {
 					showTokenCreator = false;
 					event.preventDefault();
