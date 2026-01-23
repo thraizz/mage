@@ -31,27 +31,12 @@ The Mage game engine uses a **rules-light, player-controlled architecture** insp
 
 **Key Components:**
 
-#### Engine Selection (manager.go)
+#### GameEngine (game_engine.go)
 
-The game manager supports two engine implementations:
-
-```go
-// Engine selection via config
-if config.UsePlaytestEngine {
-    engine := NewPlaytestEngine(logger, cardRepo)
-} else {
-    engine := NewMageEngine(logger, cardRepo) // Legacy rules-enforced
-}
-```
-
-Both engines implement the `GameEngine` interface, allowing seamless switching via configuration.
-
-#### Playtest Engine (playtest_engine.go)
-
-The rules-light engine with minimal state management:
+The single rules-light engine with minimal state management:
 
 ```go
-type PlaytestEngine struct {
+type GameEngine struct {
     mu          sync.RWMutex
     games       map[string]*GameState
     notifyFn    NotificationHandler
@@ -68,7 +53,7 @@ type GameState struct {
 }
 ```
 
-**Operations** (playtest_actions.go):
+**Operations** (actions.go):
 - `TapCard(cardId, tapped)` - Toggle tap state
 - `MoveCard(cardId, zone)` - Move between zones
 - `DrawCards(playerId, count)` - Draw from library
@@ -80,12 +65,12 @@ type GameState struct {
 - `MillCards(playerId, count)` - Move top N to graveyard
 - `NextTurn()` - Advance turn counter
 
-#### Hidden Information Filtering (playtest_view.go)
+#### Hidden Information Filtering (view.go)
 
 Server filters game state per player:
 
 ```go
-func (e *PlaytestEngine) GetGameView(gameID, playerID string) *GameView {
+func (e *GameEngine) GetGameView(gameID, playerID string) *GameView {
     view := &GameView{
         MyHand:       getPlayerCards(state, playerID, "hand"),      // Full cards
         MyLibrary:    getLibraryCount(state, playerID),             // Count only
@@ -103,7 +88,7 @@ func getOpponentViews(state *GameState, viewerID string) []*OpponentView {
 }
 ```
 
-#### Rollback System (playtest_rollback.go)
+#### Rollback System (rollback.go)
 
 State snapshots for mistake recovery:
 
@@ -115,8 +100,8 @@ type Bookmark struct {
     Timestamp time.Time
 }
 
-func (e *PlaytestEngine) BookmarkState(gameID string) string
-func (e *PlaytestEngine) RestoreState(gameID, bookmarkID string) error
+func (e *GameEngine) BookmarkState(gameID string) string
+func (e *GameEngine) RestoreState(gameID, bookmarkID string) error
 ```
 
 **Automatic bookmarks**: Created at turn boundaries
@@ -261,10 +246,10 @@ export async function moveCard(
 }
 ```
 
-**Backend parsing** (mage_engine.go lines 2590-2740):
+**Backend parsing** (actions.go):
 ```go
 // ProcessPlayerString handles direct action commands
-func (e *Engine) ProcessPlayerString(gameID, playerID, command string) error {
+func (e *GameEngine) ProcessPlayerString(gameID, playerID, command string) error {
     parts := strings.Split(command, ":")
 
     switch parts[0] {
@@ -284,7 +269,7 @@ func (e *Engine) ProcessPlayerString(gameID, playerID, command string) error {
 ### Game Start Flow
 
 1. **Client** → `POST /api/games/start` → **Server**
-2. **Server** → `PlaytestEngine.StartGame()` → Creates GameState
+2. **Server** → `GameEngine.StartGame()` → Creates GameState
 3. **Server** → Broadcast initial state → **All Clients**
 4. **Clients** → `multiplayerGameStore.update()` → Render UI
 
@@ -292,7 +277,7 @@ func (e *Engine) ProcessPlayerString(gameID, playerID, command string) error {
 
 1. **Client** → User taps card → `tapCard(cardId, true)`
 2. **Client** → `directActions.tapUntap()` → `SendPlayerString("TAP:cardId")`
-3. **Server** → Parse command → `PlaytestEngine.TapCard()`
+3. **Server** → Parse command → `GameEngine.TapCard()`
 4. **Server** → Update state → Log action → Broadcast
 5. **All Clients** → WebSocket message → `multiplayerGameStore.update()`
 6. **All Clients** → Reactive UI updates → Show tap animation
@@ -359,76 +344,54 @@ func (e *Engine) ProcessPlayerString(gameID, playerID, command string) error {
 - Library order preserved unless shuffled
 - Graveyard order preserved (can be important)
 
-## Engine Selection
+## Engine Architecture
 
-### Configuration
+### Single Engine Design
 
-Backend supports both engines simultaneously:
-
-```yaml
-# config.yaml
-game:
-  default_engine: "playtest"  # or "mage"
-```
-
-**PlaytestEngine**: Rules-light, player-controlled (default)
-**MageEngine**: Rules-enforced, automatic validation (legacy)
-
-### Interface Compatibility
-
-Both engines implement `GameEngine` interface:
+The backend uses a single rules-light game engine:
 
 ```go
-type GameEngine interface {
-    StartGame(gameId string, players []Player, config GameConfig) error
-    StartGameWithDecks(gameId string, decks []Deck) error
-    ProcessAction(gameId, playerId string, action Action) error
-    GetGameView(gameId, playerId string) (*GameView, error)
-    EndGame(gameId string) error
+type GameEngine struct {
+    mu       sync.RWMutex
+    games    map[string]*GameState
+    notifyFn NotificationHandler
+    logger   *zap.Logger
 }
 ```
 
-This allows:
-- Seamless engine switching via config
-- Per-game engine selection (future)
-- A/B testing between engines
-- Gradual migration path
+**GameEngine**: Rules-light, player-controlled architecture inspired by Untap.in
 
-### Migration Path
+### Migration Complete
 
-**Current State** (Phase 7 Complete):
-1. Both engines exist in backend
-2. Frontend unified on playtest UI
-3. Default config uses PlaytestEngine
-4. Old game store renamed to `game.legacy.ts`
+**Status** (January 2026):
+1. MageEngine (legacy rules-enforced engine) has been completely removed
+2. Single GameEngine architecture for all games
+3. Frontend unified on playtest-based UI
+4. Backend code reduced by ~57%
+5. Simplified configuration with no engine selection needed
 
-**Future Options**:
-1. Delete MageEngine entirely (simplify codebase)
-2. Keep both engines for different game modes
-3. Add engine selection in game creation UI
+**Benefits**:
+- Clear, single architecture path
+- Reduced code complexity
+- Easier maintenance
+- Consistent player experience
 
 ## Code Organization
 
 ### Backend Files
 
-**Playtest Engine**:
-- `playtest_engine.go` - Core engine and state management
-- `playtest_actions.go` - All game operations
-- `playtest_rollback.go` - Bookmark/restore system
-- `playtest_view.go` - Hidden information filtering
-- `playtest_state.go` - State structures and helpers
+**Game Engine** (`internal/game/`):
+- `game_engine.go` - Core engine and state management
+- `actions.go` - All game operations
+- `rollback.go` - Bookmark/restore system
+- `view.go` - Hidden information filtering
+- `state.go` - State structures and helpers
+- `manager.go` - Game lifecycle management
+- `card.go` - Card structures and helpers
 
-**Legacy Rules Engine**:
-- `mage_engine.go` - Full rules enforcement
-- `engine_combat.go` - Combat system
-- `engine_priority.go` - Priority system
-- `engine_stack.go` - Stack resolution
-- `engine_layers.go` - Continuous effects
-- `engine_events.go` - Triggered abilities
-
-**Shared**:
-- `manager.go` - Game lifecycle, engine selection
+**Server** (`internal/server/`):
 - `grpc_game.go` - gRPC API handlers
+- `grpc.go` - Server initialization
 
 ### Frontend Files
 
@@ -459,8 +422,9 @@ This allows:
 
 ### Simplicity
 
-**Backend**: ~2,500 lines (playtest engine) vs 13,786 lines (mage engine)
-- 82% code reduction
+**Backend**: ~2,500 lines (rules-light game engine)
+- 57% reduction from original codebase (~85,000 LOC → ~36,500 LOC)
+- Single engine architecture
 - Easier to understand and maintain
 - Fewer bugs and edge cases
 
@@ -586,8 +550,14 @@ This allows:
 
 ## Version History
 
+- **v2.0** (2026-01-23): Complete migration to single-engine architecture
+  - MageEngine completely removed
+  - Single GameEngine (rules-light) for all games
+  - Backend code reduced by ~57%
+  - Simplified configuration and deployment
+  - Phase 9 cleanup completed
 - **v1.0** (2026-01-23): Initial architecture documentation
   - Playtest engine backend implemented
   - Frontend unified on playtest UI
-  - Both engines coexist via config
+  - Dual-engine architecture (deprecated)
   - Phase 7 cleanup completed

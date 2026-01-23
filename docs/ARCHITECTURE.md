@@ -13,7 +13,7 @@
 │   Go Server (mage-server-go)                │
 │  ┌──────────────┐    ┌──────────────────┐   │
 │  │ grpc.go &    │───→│ WebSocket Server │   │
-│  │ grpc_table.go│    │ (websocket.go)   │   │
+│  │ grpc_game.go │    │ (websocket.go)   │   │
 │  └──────┬───────┘    └────────┬─────────┘   │
 │         │                     │             │
 │         ↓                     ↓             │
@@ -22,8 +22,8 @@
 │  └──────────────┬───────────────────────┘   │
 │                 ↓                           │
 │  ┌──────────────────────────────────────┐   │
-│  │   MageEngine (mage_engine.go)        │   │
-│  │   - Game Logic & Rules Engine        │   │
+│  │   GameEngine (game_engine.go)        │   │
+│  │   - Rules-Light Game Logic           │   │
 │  └──────────────────────────────────────┘   │
 └─────────────────────────────────────────────┘
 ```
@@ -36,39 +36,43 @@
 
 ## Server as Source of Truth
 
-The server owns all game logic. The client is a thin presentation layer.
+The server owns game state. The client is a player-controlled interface.
 
 **Server provides:**
-- `CardView.availableActions[]` - Per-card actions with `isEnabled` and `disabledReason`
-- `GameView.activePlayerName`, `priorityPlayerName`, `gameFormat` - Pre-computed display values
-- `GameView.landsPlayedThisTurn`, `landsAllowedThisTurn` - Rule state for UI feedback
+- Game state synchronization across all players
+- Hidden information filtering (opponent hands/libraries)
+- Action logging and rollback capability
+- Turn and phase tracking (cosmetic, not enforced)
 
 **Client behavior:**
-- Uses `availableActions` to determine available buttons and show disabled reasons
-- Never infers game rules (no `card.type.includes('land')` checks)
+- Players have direct control over game state
+- No automatic rules enforcement
+- Manual combat and spell resolution
+- Flexible, Untap.in-style gameplay
 
 ## Data Flow
 
 **Player Action:**
 ```
-Web Client → HTTP/gRPC → grpc.go → Manager → MageEngine.ProcessAction()
+Web Client → HTTP/gRPC → grpc_game.go → Manager → GameEngine.ProcessAction()
 ```
 
 **State Update:**
 ```
-MageEngine.emitNotification() → handleGameNotification() → WebSocket → Web Client
+GameEngine.emitNotification() → handleGameNotification() → WebSocket → Web Client
 ```
 
 ## Key Components
 
-| Component        | Location                          | Responsibility                                     |
-| ---------------- | --------------------------------- | -------------------------------------------------- |
-| `grpc_table.go`  | `internal/server/`                | Table/lobby management (pre-game)                  |
-| `manager.go`     | `internal/game/`                  | Game lifecycle + `GameEngine` interface            |
-| `mage_engine.go` | `internal/game/`                  | MTG rules engine + state management                |
-| `websocket.go`   | `internal/server/`                | Real-time push to clients                          |
-| `game.ts`        | `src/lib/stores/`                 | Game state store, WebSocket event subscription     |
-| `game.ts`        | `src/lib/api/`                    | Game API functions                                 |
+| Component          | Location                          | Responsibility                                     |
+| ------------------ | --------------------------------- | -------------------------------------------------- |
+| `grpc.go`          | `internal/server/`                | Server initialization                              |
+| `grpc_game.go`     | `internal/server/`                | Game gRPC handlers                                 |
+| `manager.go`       | `internal/game/`                  | Game lifecycle management                          |
+| `game_engine.go`   | `internal/game/`                  | Rules-light game engine + state management         |
+| `websocket.go`     | `internal/server/`                | Real-time push to clients                          |
+| `multiplayer-game.ts` | `src/lib/stores/`              | Multiplayer game state store                       |
+| `direct-actions.ts`| `src/lib/api/`                   | Direct game actions API                            |
 
 ## GameEngine Interface
 

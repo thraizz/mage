@@ -1,12 +1,12 @@
 # Code Path Verification Results
 
-**Phase:** 6 - Integration Testing
-**Date:** January 22, 2026
-**Status:** ✅ VERIFIED
+**Phase:** 9 - Complete Cleanup
+**Date:** January 23, 2026
+**Status:** ✅ VERIFIED - Migration Complete
 
 ## Executive Summary
 
-All critical code paths for multiplayer playtest-first architecture have been verified to exist and are properly wired. This document provides evidence of correct implementation across backend and frontend.
+All critical code paths for the rules-light game engine architecture have been verified. MageEngine has been completely removed, and the codebase now uses a single GameEngine for all games. This document reflects the final state after complete cleanup.
 
 ---
 
@@ -16,61 +16,23 @@ All critical code paths for multiplayer playtest-first architecture have been ve
 
 **File:** `/Users/aron/dev/opensource/mage/mage-server-go/cmd/server/main.go`
 
-#### Configuration Reading (Lines 145-151)
+#### GameEngine Initialization (Simplified)
 
 ```go
-engineType := cfg.Server.EngineType
-if engineType == "" {
-    engineType = "mage" // Default to MageEngine for backward compatibility
-}
+// Create rules-light game engine (only engine)
+gameEngine := game.NewEngine(logger)
+gameEngine.SetNotificationHandler(notificationAdapter)
 
-logger.Info("initializing game engine",
-    zap.String("engine_type", engineType))
+gameAdapter := game.NewEngineAdapter(gameEngine)
+
+logger.Info("game engine initialized (rules-light mode)")
 ```
 
 **Status:** ✅ **VERIFIED**
-- Reads `config.Server.EngineType` from YAML config
-- Defaults to "mage" if not specified
-- Logs engine type selection
-
-#### Playtest Engine Creation (Lines 154-159)
-
-```go
-case "playtest":
-    // Create new rules-light Engine
-    playtestEngine := game.NewEngine(logger)
-    gameEngine = playtestEngine
-    gameAdapter = game.NewEngineAdapter(playtestEngine, logger)
-    logger.Info("playtest engine initialized (rules-light mode)")
-```
-
-**Status:** ✅ **VERIFIED**
-- Creates `Engine` instance (rules-light)
-- Wraps in `EngineAdapter`
-- Logs successful initialization
-
-#### MageEngine Creation (Lines 161-177)
-
-```go
-case "mage":
-    fallthrough
-default:
-    // Create traditional MageEngine with full rules enforcement
-    mageEngine := game.NewMageEngine(logger)
-    mageEngine.SetCardRepository(cardRepo)
-    mageEngine.SetCardBuilder(cards.BuildCard)
-    persistenceAdapter := game.NewPersistenceAdapter(activeGameRepo)
-    mageEngine.SetPersistenceRepository(persistenceAdapter)
-    gameEngine = mageEngine
-    gameAdapter = game.NewEngineAdapter(mageEngine, logger)
-    logger.Info("mage engine initialized (full rules enforcement)")
-```
-
-**Status:** ✅ **VERIFIED**
-- Creates `MageEngine` instance (rules-enforced)
-- Sets up card repository and builder
-- Configures persistence for crash recovery
-- Wraps in `EngineAdapter`
+- Creates `GameEngine` instance (rules-light)
+- Sets notification handler for WebSocket sync
+- Wraps in adapter for manager integration
+- Single engine, no configuration needed
 
 #### Adapter Injection into Server (Lines 211-233)
 

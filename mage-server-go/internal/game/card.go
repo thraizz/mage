@@ -5,9 +5,10 @@ import (
 	"github.com/magefree/mage-server-go/internal/game/counters"
 )
 
-// Card represents a Magic card with its game state
-// This is the public-facing Card type used by the card factory system
-type Card struct {
+// LegacyCard represents a Magic card with its game state
+// This is the legacy Card type used by the card factory system
+// TODO: This type is deprecated and should be migrated to the playtest Card type
+type LegacyCard struct {
 	// Identity
 	ID      uuid.UUID
 	Name    string
@@ -66,8 +67,8 @@ const (
 )
 
 // NewCard creates a new card with basic initialization
-func NewCard(ownerID uuid.UUID, name string) *Card {
-	return &Card{
+func NewCard(ownerID uuid.UUID, name string) *LegacyCard {
+	return &LegacyCard{
 		ID:            uuid.New(),
 		Name:          name,
 		OwnerID:       ownerID,
@@ -81,67 +82,70 @@ func NewCard(ownerID uuid.UUID, name string) *Card {
 }
 
 // IsCreature returns true if this is a creature
-func (c *Card) IsCreature() bool {
+func (c *LegacyCard) IsCreature() bool {
 	return contains(c.Types, "CREATURE")
 }
 
 // IsInstant returns true if this is an instant
-func (c *Card) IsInstant() bool {
+func (c *LegacyCard) IsInstant() bool {
 	return contains(c.Types, "INSTANT")
 }
 
 // IsSorcery returns true if this is a sorcery
-func (c *Card) IsSorcery() bool {
+func (c *LegacyCard) IsSorcery() bool {
 	return contains(c.Types, "SORCERY")
 }
 
 // IsLand returns true if this is a land
-func (c *Card) IsLand() bool {
+func (c *LegacyCard) IsLand() bool {
 	return contains(c.Types, "LAND")
 }
 
 // IsArtifact returns true if this is an artifact
-func (c *Card) IsArtifact() bool {
+func (c *LegacyCard) IsArtifact() bool {
 	return contains(c.Types, "ARTIFACT")
 }
 
 // IsEnchantment returns true if this is an enchantment
-func (c *Card) IsEnchantment() bool {
+func (c *LegacyCard) IsEnchantment() bool {
 	return contains(c.Types, "ENCHANTMENT")
 }
 
 // IsPlaneswalker returns true if this is a planeswalker
-func (c *Card) IsPlaneswalker() bool {
+func (c *LegacyCard) IsPlaneswalker() bool {
 	return contains(c.Types, "PLANESWALKER")
 }
 
 // IsLegendary returns true if this is legendary
-func (c *Card) IsLegendary() bool {
+func (c *LegacyCard) IsLegendary() bool {
 	return contains(c.Supertypes, "LEGENDARY")
 }
 
 // IsBasic returns true if this is a basic land
-func (c *Card) IsBasic() bool {
+func (c *LegacyCard) IsBasic() bool {
 	return contains(c.Supertypes, "BASIC")
 }
 
 // AddAbility adds an ability to this card
-func (c *Card) AddAbility(ability interface{}) {
+func (c *LegacyCard) AddAbility(ability interface{}) {
 	c.Abilities = append(c.Abilities, ability)
 }
 
 // GetAbilities returns all abilities of this card
-func (c *Card) GetAbilities() []interface{} {
+func (c *LegacyCard) GetAbilities() []interface{} {
 	return c.Abilities
 }
 
 // GetAbilityCount returns the number of abilities on this card
-func (c *Card) GetAbilityCount() int {
+func (c *LegacyCard) GetAbilityCount() int {
 	return len(c.Abilities)
 }
 
 // ToInternal converts this Card to the internal engine format
-func (c *Card) ToInternal() *internalCard {
+// TODO: Phase 8 - Remove this method, it's only used by the removed MageEngine
+// Commented out because internalCard and EngineAbilityView types no longer exist
+/*
+func (c *LegacyCard) ToInternal() *internalCard {
 	return &internalCard{
 		ID:                c.ID.String(),
 		Name:              c.Name,
@@ -177,6 +181,7 @@ func (c *Card) ToInternal() *internalCard {
 		Abilities: []EngineAbilityView{},
 	}
 }
+*/
 
 // Helper functions
 

@@ -14,7 +14,7 @@ import (
 // Factory creates card instances from card names and database metadata
 type Factory interface {
 	// CreateCard creates a new card instance by name
-	CreateCard(ctx context.Context, name string, ownerID uuid.UUID) (*game.Card, error)
+	CreateCard(ctx context.Context, name string, ownerID uuid.UUID) (*game.LegacyCard, error)
 
 	// IsImplemented returns true if a card has an implementation
 	IsImplemented(name string) bool
@@ -48,7 +48,7 @@ func NewFactory(cardRepo *repository.CardRepository, logger *zap.Logger) Factory
 }
 
 // CreateCard creates a new card instance by name
-func (f *factory) CreateCard(ctx context.Context, name string, ownerID uuid.UUID) (*game.Card, error) {
+func (f *factory) CreateCard(ctx context.Context, name string, ownerID uuid.UUID) (*game.LegacyCard, error) {
 	// 1. Check if card is implemented
 	builder, ok := f.registry.Get(name)
 	if !ok {

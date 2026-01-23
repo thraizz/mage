@@ -500,40 +500,10 @@ func (s *mageServer) RoomLeaveTableOrTournament(ctx context.Context, req *pb.Roo
 		return &pb.RoomLeaveTableOrTournamentResponse{Success: true}, nil
 	}
 
-	if tournament, ok := s.tournamentMgr.GetTournament(targetID); ok {
-		leftAsPlayer := true
-		if err := tournament.RemovePlayer(username); err != nil {
-			if !tournament.RemoveWatcher(username) {
-				return &pb.RoomLeaveTableOrTournamentResponse{
-					Success: false,
-					Error:   err.Error(),
-				}, nil
-			}
-			leftAsPlayer = false
-		}
-
-		if tournament.RoomID != "" {
-			s.roomMgr.UserLeaveRoom(tournament.RoomID, username)
-		}
-
-		if leftAsPlayer {
-			s.logger.Info("user left tournament",
-				zap.String("tournament_id", tournament.ID),
-				zap.String("username", username),
-			)
-		} else {
-			s.logger.Info("user stopped watching tournament",
-				zap.String("tournament_id", tournament.ID),
-				zap.String("username", username),
-			)
-		}
-
-		return &pb.RoomLeaveTableOrTournamentResponse{Success: true}, nil
-	}
-
+	// Tournament feature removed - only tables supported now
 	return &pb.RoomLeaveTableOrTournamentResponse{
 		Success: false,
-		Error:   "table or tournament not found",
+		Error:   "table not found",
 	}, nil
 }
 
@@ -745,242 +715,27 @@ func (s *mageServer) TableIsOwner(ctx context.Context, req *pb.TableIsOwnerReque
 	}, nil
 }
 
+// Tournament feature removed - stub implementation
 func (s *mageServer) RoomCreateTournament(ctx context.Context, req *pb.RoomCreateTournamentRequest) (*pb.RoomCreateTournamentResponse, error) {
-	sessionID := strings.TrimSpace(req.GetSessionId())
-	if sessionID == "" {
-		return &pb.RoomCreateTournamentResponse{
-			Success: false,
-			Error:   "session_id is required",
-		}, nil
-	}
-
-	sess, ok := s.sessionMgr.GetSession(sessionID)
-	if !ok {
-		return &pb.RoomCreateTournamentResponse{
-			Success: false,
-			Error:   "session not found",
-		}, nil
-	}
-
-	controller := sess.GetUserID()
-	if controller == "" {
-		return &pb.RoomCreateTournamentResponse{
-			Success: false,
-			Error:   "session not associated with a user",
-		}, nil
-	}
-
-	roomID := strings.TrimSpace(req.GetRoomId())
-	if roomID == "" {
-		roomID = s.roomMgr.GetMainRoomID()
-	}
-
-	if _, exists := s.roomMgr.GetRoom(roomID); !exists {
-		s.roomMgr.CreateRoom(roomID, fmt.Sprintf("Room %s", roomID))
-	}
-
-	opts := req.GetTournamentOptions()
-
-	name := fmt.Sprintf("%s's tournament", controller)
-	if opts != nil && strings.TrimSpace(opts.GetName()) != "" {
-		name = opts.GetName()
-	}
-
-	tournamentType := "Constructed"
-	if opts != nil && strings.TrimSpace(opts.GetTournamentType()) != "" {
-		tournamentType = opts.GetTournamentType()
-	}
-
-	numRounds := int32(3)
-	if opts != nil && opts.GetNumRounds() > 0 {
-		numRounds = opts.GetNumRounds()
-	}
-
-	winsRequired := int32(2)
-	if opts != nil && opts.GetNumWins() > 0 {
-		winsRequired = opts.GetNumWins()
-	}
-
-	tournament := s.tournamentMgr.CreateTournament(
-		name,
-		tournamentType,
-		controller,
-		roomID,
-		int(numRounds),
-		int(winsRequired),
-	)
-
-	if err := tournament.AddPlayer(controller); err != nil {
-		s.logger.Warn("failed to add controller to tournament",
-			zap.String("tournament_id", tournament.ID),
-			zap.String("controller", controller),
-			zap.Error(err),
-		)
-	}
-
-	if err := s.roomMgr.UserJoinRoom(roomID, controller); err != nil {
-		s.logger.Debug("failed to ensure controller present in room",
-			zap.String("room_id", roomID),
-			zap.String("controller", controller),
-			zap.Error(err),
-		)
-	}
-
-	s.logger.Info("tournament created",
-		zap.String("tournament_id", tournament.ID),
-		zap.String("room_id", roomID),
-		zap.String("controller", controller),
-		zap.String("name", tournament.Name),
-		zap.String("type", tournament.TournamentTypeStr),
-	)
-
 	return &pb.RoomCreateTournamentResponse{
-		Success:      true,
-		TournamentId: tournament.ID,
+		Success: false,
+		Error:   "Tournament feature has been removed",
 	}, nil
 }
 
+// Tournament feature removed - stub implementation
 func (s *mageServer) RoomJoinTournament(ctx context.Context, req *pb.RoomJoinTournamentRequest) (*pb.RoomJoinTournamentResponse, error) {
-	sessionID := strings.TrimSpace(req.GetSessionId())
-	if sessionID == "" {
-		return &pb.RoomJoinTournamentResponse{
-			Success: false,
-			Error:   "session_id is required",
-		}, nil
-	}
-
-	sess, ok := s.sessionMgr.GetSession(sessionID)
-	if !ok {
-		return &pb.RoomJoinTournamentResponse{
-			Success: false,
-			Error:   "session not found",
-		}, nil
-	}
-
-	username := sess.GetUserID()
-	if username == "" {
-		return &pb.RoomJoinTournamentResponse{
-			Success: false,
-			Error:   "session not associated with a user",
-		}, nil
-	}
-
-	tournamentID := strings.TrimSpace(req.GetTournamentId())
-	if tournamentID == "" {
-		return &pb.RoomJoinTournamentResponse{
-			Success: false,
-			Error:   "tournament_id is required",
-		}, nil
-	}
-
-	tournament, ok := s.tournamentMgr.GetTournament(tournamentID)
-	if !ok {
-		return &pb.RoomJoinTournamentResponse{
-			Success: false,
-			Error:   "tournament not found",
-		}, nil
-	}
-
-	if requestedRoom := strings.TrimSpace(req.GetRoomId()); requestedRoom != "" && tournament.RoomID != requestedRoom {
-		return &pb.RoomJoinTournamentResponse{
-			Success: false,
-			Error:   "tournament not found in requested room",
-		}, nil
-	}
-
-	if err := tournament.AddPlayer(username); err != nil {
-		return &pb.RoomJoinTournamentResponse{
-			Success: false,
-			Error:   err.Error(),
-		}, nil
-	}
-
-	if err := s.roomMgr.UserJoinRoom(tournament.RoomID, username); err != nil {
-		s.logger.Debug("failed to ensure player present in room",
-			zap.String("room_id", tournament.RoomID),
-			zap.String("username", username),
-			zap.Error(err),
-		)
-	}
-
-	s.logger.Info("user joined tournament",
-		zap.String("tournament_id", tournament.ID),
-		zap.String("room_id", tournament.RoomID),
-		zap.String("username", username),
-		zap.String("player_type", strings.TrimSpace(req.GetPlayerType())),
-	)
-
 	return &pb.RoomJoinTournamentResponse{
-		Success: true,
+		Success: false,
+		Error:   "Tournament feature has been removed",
 	}, nil
 }
 
+// Tournament feature removed - stub implementation
 func (s *mageServer) RoomWatchTournament(ctx context.Context, req *pb.RoomWatchTournamentRequest) (*pb.RoomWatchTournamentResponse, error) {
-	sessionID := strings.TrimSpace(req.GetSessionId())
-	if sessionID == "" {
-		return &pb.RoomWatchTournamentResponse{
-			Success: false,
-			Error:   "session_id is required",
-		}, nil
-	}
-
-	sess, ok := s.sessionMgr.GetSession(sessionID)
-	if !ok {
-		return &pb.RoomWatchTournamentResponse{
-			Success: false,
-			Error:   "session not found",
-		}, nil
-	}
-
-	username := sess.GetUserID()
-	if username == "" {
-		return &pb.RoomWatchTournamentResponse{
-			Success: false,
-			Error:   "session not associated with a user",
-		}, nil
-	}
-
-	tournamentID := strings.TrimSpace(req.GetTournamentId())
-	if tournamentID == "" {
-		return &pb.RoomWatchTournamentResponse{
-			Success: false,
-			Error:   "tournament_id is required",
-		}, nil
-	}
-
-	tournament, ok := s.tournamentMgr.GetTournament(tournamentID)
-	if !ok {
-		return &pb.RoomWatchTournamentResponse{
-			Success: false,
-			Error:   "tournament not found",
-		}, nil
-	}
-
-	if requestedRoom := strings.TrimSpace(req.GetRoomId()); requestedRoom != "" && tournament.RoomID != requestedRoom {
-		return &pb.RoomWatchTournamentResponse{
-			Success: false,
-			Error:   "tournament not found in requested room",
-		}, nil
-	}
-
-	tournament.AddWatcher(username)
-
-	if err := s.roomMgr.UserJoinRoom(tournament.RoomID, username); err != nil {
-		s.logger.Debug("failed to ensure watcher present in room",
-			zap.String("room_id", tournament.RoomID),
-			zap.String("username", username),
-			zap.Error(err),
-		)
-	}
-
-	s.logger.Info("user watching tournament",
-		zap.String("tournament_id", tournament.ID),
-		zap.String("room_id", tournament.RoomID),
-		zap.String("username", username),
-	)
-
 	return &pb.RoomWatchTournamentResponse{
-		Success: true,
+		Success: false,
+		Error:   "Tournament feature has been removed",
 	}, nil
 }
 
@@ -1113,8 +868,6 @@ func (s *mageServer) DeckSubmit(ctx context.Context, req *pb.DeckSubmitRequest) 
 		Success: true,
 	}, nil
 }
-
-const maxSavedDecksPerUser = 20
 
 // DeckSave saves a deck list to the database for later reuse.
 func (s *mageServer) DeckSave(ctx context.Context, req *pb.DeckSaveRequest) (*pb.DeckSaveResponse, error) {
@@ -1561,60 +1314,6 @@ func (s *mageServer) DeckGet(ctx context.Context, req *pb.DeckGetRequest) (*pb.D
 			Commanders: commanderCards,
 		},
 	}, nil
-}
-
-// validateCardNames checks that all card names exist in the database
-func (s *mageServer) validateCardNames(ctx context.Context, cardNames []string) error {
-	if len(cardNames) == 0 {
-		return nil
-	}
-
-	// Get unique card names to avoid duplicate database queries
-	// Use lowercase for deduplication but preserve original name for search
-	uniqueNames := make(map[string]string) // lowercase -> original
-	for _, name := range cardNames {
-		trimmed := normalizeImportedCardName(name)
-		if trimmed != "" {
-			key := strings.ToLower(trimmed)
-			if _, exists := uniqueNames[key]; !exists {
-				uniqueNames[key] = trimmed
-			}
-		}
-	}
-
-	// Validate each unique card name (case-insensitive search with original name)
-	var invalidCards []string
-	for _, originalName := range uniqueNames {
-		// Search using the ORIGINAL name (with apostrophes etc.) - database has original names
-		cards, err := s.cardRepo.GetByNameCaseInsensitive(ctx, originalName)
-		if err != nil {
-			s.logger.Warn("failed to validate card",
-				zap.String("card_name", originalName),
-				zap.Error(err),
-			)
-			invalidCards = append(invalidCards, originalName)
-			continue
-		}
-
-		if len(cards) == 0 {
-			s.logger.Info("card not found in database",
-				zap.String("card_name", originalName),
-				zap.Int("name_length", len(originalName)),
-			)
-			invalidCards = append(invalidCards, originalName)
-		} else {
-			s.logger.Debug("card found in database",
-				zap.String("card_name", originalName),
-				zap.Int("matches", len(cards)),
-			)
-		}
-	}
-
-	if len(invalidCards) > 0 {
-		return fmt.Errorf("invalid card names: %s", strings.Join(invalidCards, ", "))
-	}
-
-	return nil
 }
 
 // buildDeckCardsWithMetadata converts card names to DeckCard messages with full metadata

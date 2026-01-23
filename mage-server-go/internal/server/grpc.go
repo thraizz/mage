@@ -13,14 +13,12 @@ import (
 	"github.com/magefree/mage-server-go/internal/auth"
 	"github.com/magefree/mage-server-go/internal/chat"
 	"github.com/magefree/mage-server-go/internal/config"
-	"github.com/magefree/mage-server-go/internal/draft"
 	"github.com/magefree/mage-server-go/internal/game"
 	"github.com/magefree/mage-server-go/internal/mail"
 	"github.com/magefree/mage-server-go/internal/repository"
 	"github.com/magefree/mage-server-go/internal/room"
 	"github.com/magefree/mage-server-go/internal/session"
 	"github.com/magefree/mage-server-go/internal/table"
-	"github.com/magefree/mage-server-go/internal/tournament"
 	"github.com/magefree/mage-server-go/internal/user"
 	pb "github.com/magefree/mage-server-go/pkg/proto/mage/v1"
 	"go.uber.org/zap"
@@ -46,13 +44,10 @@ type mageServer struct {
 	deckRepo         *repository.DeckRepository
 	cardRepo         *repository.CardRepository
 	matchHistoryRepo *repository.MatchHistoryRepository
-	activeGameRepo   *repository.ActiveGameRepository
 	roomMgr          *room.Manager
 	chatMgr          *chat.Manager
 	tableMgr         *table.Manager
 	gameMgr          *game.Manager
-	tournamentMgr    *tournament.Manager
-	draftMgr         *draft.Manager
 
 	tokenStore *auth.TokenStore
 	mailClient mail.Client
@@ -79,13 +74,10 @@ func NewMageServer(
 	deckRepo *repository.DeckRepository,
 	cardRepo *repository.CardRepository,
 	matchHistoryRepo *repository.MatchHistoryRepository,
-	activeGameRepo *repository.ActiveGameRepository,
 	roomMgr *room.Manager,
 	chatMgr *chat.Manager,
 	tableMgr *table.Manager,
 	gameMgr *game.Manager,
-	tournamentMgr *tournament.Manager,
-	draftMgr *draft.Manager,
 	tokenStore *auth.TokenStore,
 	mailClient mail.Client,
 	serverVersion string,
@@ -103,13 +95,10 @@ func NewMageServer(
 		deckRepo:         deckRepo,
 		cardRepo:         cardRepo,
 		matchHistoryRepo: matchHistoryRepo,
-		activeGameRepo:   activeGameRepo,
 		roomMgr:          roomMgr,
 		chatMgr:          chatMgr,
 		tableMgr:         tableMgr,
 		gameMgr:          gameMgr,
-		tournamentMgr:    tournamentMgr,
-		draftMgr:         draftMgr,
 		tokenStore:       tokenStore,
 		mailClient:       mailClient,
 		db:               db,
@@ -637,60 +626,13 @@ func (s *mageServer) sendGameChoiceToPlayer(gameID, playerName string, choiceDat
 }
 
 // engineViewToProto converts an engine view to protobuf GameView
+// Phase 8: Simplified to only handle PlaytestGameView (MageEngine removed)
 func (s *mageServer) engineViewToProto(engineView interface{}, playerID string) *pb.GameView {
 	if engineView == nil {
 		return nil
 	}
 
-	// Handle MageEngine views (EngineGameView)
-	if data, ok := engineView.(*game.EngineGameView); ok {
-		view := &pb.GameView{
-			GameId:           data.GameID,
-			State:            data.State.String(),
-			Phase:            data.Phase,
-			Step:             data.Step,
-			Turn:             int32(data.Turn),
-			ActivePlayerId:   data.ActivePlayerID,
-			PriorityPlayerId: data.PriorityPlayer,
-			Players:          enginePlayersToProto(data.Players),
-			Battlefield:      engineCardsToProto(data.Battlefield),
-			Stack:            engineCardsToProto(data.Stack),
-			Exile:            engineCardsToProto(data.Exile),
-			Command:          engineCardsToProto(data.Command),
-			Revealed:         engineRevealedToProto(data.Revealed),
-			LookedAt:         engineLookedAtToProto(data.LookedAt),
-			// Pre-computed display values (server source of truth)
-			ActivePlayerName:     data.ActivePlayerName,
-			PriorityPlayerName:   data.PriorityPlayerName,
-			GameFormat:           data.GameFormat,
-			IsMulliganPhase:      data.IsMulliganPhase,
-			LandsPlayedThisTurn:  int32(data.LandsPlayedThisTurn),
-			LandsAllowedThisTurn: int32(data.LandsAllowedThisTurn),
-		}
-
-		if combat := engineCombatToProto(data.Combat); combat != nil {
-			view.Combat = combat
-		}
-
-		if !data.StartedAt.IsZero() {
-			view.StartTime = timestamppb.New(data.StartedAt)
-		}
-
-		// Include pending library search if present
-		if data.PendingLibrarySearch != nil {
-			view.PendingLibrarySearch = &pb.LibrarySearchView{
-				PlayerId:    data.PendingLibrarySearch.PlayerID,
-				Message:     data.PendingLibrarySearch.Message,
-				Destination: data.PendingLibrarySearch.Destination,
-				Cards:       engineCardsToProto(data.PendingLibrarySearch.Cards),
-				CanCancel:   data.PendingLibrarySearch.CanCancel,
-			}
-		}
-
-		return view
-	}
-
-	// Handle Playtest Engine views (PlaytestGameView)
+	// Only handle PlaytestGameView now (MageEngine support removed)
 	if playtestData, ok := engineView.(*game.PlaytestGameView); ok {
 		return s.playtestViewToProto(playtestData, playerID)
 	}
@@ -755,7 +697,7 @@ func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID s
 }
 
 // playtestEngineCardsToProto converts playtest engine cards to protobuf
-func playtestEngineCardsToProto(cards []*game.EngineCard) []*pb.CardView {
+func playtestEngineCardsToProto(cards []*game.Card) []*pb.CardView {
 	if cards == nil {
 		return []*pb.CardView{}
 	}
@@ -1120,7 +1062,7 @@ func (s *mageServer) GetServerState(ctx context.Context, req *pb.GetServerStateR
 	serverState := &pb.ServerState{
 		ActivePlayers:     int32(s.sessionMgr.GetActiveSessions()),
 		ActiveGames:       int32(s.gameMgr.GetActiveGameCount()),
-		ActiveTournaments: int32(s.tournamentMgr.GetActiveTournamentCount()),
+		ActiveTournaments: 0, // Tournament feature removed
 		ActiveTables:      int32(s.tableMgr.GetActiveTableCount()),
 		NumberOfThreads:   int32(runtime.NumGoroutine()),
 		ServerVersion:     s.serverVersion,

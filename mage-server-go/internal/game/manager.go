@@ -9,28 +9,28 @@ import (
 	"go.uber.org/zap"
 )
 
-// GameState represents the state of a game
-type GameState int
+// GamePhase represents the lifecycle phase of a game
+type GamePhase int
 
 const (
-	GameStateStarting GameState = iota
-	GameStateMulligan
-	GameStateInProgress
-	GameStatePaused
-	GameStateFinished
+	GamePhaseStarting GamePhase = iota
+	GamePhaseMulligan
+	GamePhaseInProgress
+	GamePhasePaused
+	GamePhaseFinished
 )
 
-func (s GameState) String() string {
+func (s GamePhase) String() string {
 	switch s {
-	case GameStateStarting:
+	case GamePhaseStarting:
 		return "STARTING"
-	case GameStateMulligan:
+	case GamePhaseMulligan:
 		return "MULLIGAN"
-	case GameStateInProgress:
+	case GamePhaseInProgress:
 		return "IN_PROGRESS"
-	case GameStatePaused:
+	case GamePhasePaused:
 		return "PAUSED"
-	case GameStateFinished:
+	case GamePhaseFinished:
 		return "FINISHED"
 	default:
 		return "UNKNOWN"
@@ -50,7 +50,7 @@ type Game struct {
 	ID             string
 	TableID        string
 	GameType       string
-	State          GameState
+	State          GamePhase
 	Players        []string
 	ActivePlayerID string
 	PriorityPlayer string
@@ -69,7 +69,7 @@ func NewGame(tableID, gameType string, players []string) *Game {
 		ID:          uuid.New().String(),
 		TableID:     tableID,
 		GameType:    gameType,
-		State:       GameStateStarting,
+		State:       GamePhaseStarting,
 		Players:     players,
 		Turn:        1,
 		StartTime:   time.Now(),
@@ -105,19 +105,19 @@ func (g *Game) GetWatchers() []string {
 }
 
 // SetState sets the game state
-func (g *Game) SetState(state GameState) {
+func (g *Game) SetState(state GamePhase) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
 	g.State = state
-	if state == GameStateFinished {
+	if state == GamePhaseFinished {
 		now := time.Now()
 		g.EndTime = &now
 	}
 }
 
 // GetState returns the current game state
-func (g *Game) GetState() GameState {
+func (g *Game) GetState() GamePhase {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 	return g.State
@@ -173,7 +173,7 @@ func (m *Manager) CreateGame(tableID, gameType string, players []string) *Game {
 }
 
 // RestoreGame restores a game with a specific ID (for crash recovery)
-func (m *Manager) RestoreGame(gameID, tableID, gameType string, players []string, state GameState) *Game {
+func (m *Manager) RestoreGame(gameID, tableID, gameType string, players []string, state GamePhase) *Game {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -267,7 +267,7 @@ func (m *Manager) GetActiveGames() []*Game {
 
 	games := make([]*Game, 0)
 	for _, game := range m.games {
-		if game.State != GameStateFinished {
+		if game.State != GamePhaseFinished {
 			games = append(games, game)
 		}
 	}
@@ -281,7 +281,7 @@ func (m *Manager) GetActiveGameCount() int {
 
 	count := 0
 	for _, game := range m.games {
-		if game.State != GameStateFinished {
+		if game.State != GamePhaseFinished {
 			count++
 		}
 	}
@@ -314,9 +314,9 @@ func (m *Manager) SendPlayerAction(gameID, playerID, actionType string, data int
 	}
 }
 
-// GameEngine interface defines the contract for game engine implementations
-// This allows the Go server to integrate with different game engines
-type GameEngine interface {
+// EngineInterface defines the contract for game engine implementations.
+// This allows the Go server to integrate with different game engines.
+type EngineInterface interface {
 	// StartGame initializes and starts a game (without decks - for backwards compatibility)
 	StartGame(gameID string, players []string, gameType string) error
 
@@ -346,18 +346,26 @@ type DeckList struct {
 	Commanders []string
 }
 
-// GameNotificationCallback is called when the engine emits a notification
-// This is an alias for NotificationHandler to enable type compatibility
-type GameNotificationCallback = NotificationHandler
+// GameNotification represents a notification that can be sent to UI/websocket clients
+type GameNotification struct {
+	Type      string                 // Type of notification (e.g., "PRIORITY_CHANGE", "STACK_UPDATE", "COMBAT_UPDATE")
+	GameID    string                 // Game ID
+	PlayerID  string                 // Target player ID (empty for broadcast)
+	Timestamp time.Time              // When the notification was created
+	Data      map[string]interface{} // Notification-specific data
+}
+
+// GameNotificationCallback is a function that handles game notifications
+type GameNotificationCallback func(notification GameNotification)
 
 // EngineAdapter adapts the game engine to the server
 type EngineAdapter struct {
-	engine GameEngine
+	engine EngineInterface
 	logger *zap.Logger
 }
 
 // NewEngineAdapter creates a new engine adapter
-func NewEngineAdapter(engine GameEngine, logger *zap.Logger) *EngineAdapter {
+func NewEngineAdapter(engine EngineInterface, logger *zap.Logger) *EngineAdapter {
 	return &EngineAdapter{
 		engine: engine,
 		logger: logger,
@@ -367,19 +375,16 @@ func NewEngineAdapter(engine GameEngine, logger *zap.Logger) *EngineAdapter {
 // SetNotificationCallback sets a callback for game notifications
 // This should be called after creating the adapter to wire up WebSocket notifications
 func (ea *EngineAdapter) SetNotificationCallback(callback GameNotificationCallback) {
-	if mageEngine, ok := ea.engine.(*MageEngine); ok {
-		mageEngine.SetNotificationHandler(callback)
-		ea.logger.Info("game notification handler configured for MageEngine")
-	} else if engine, ok := ea.engine.(*Engine); ok {
-		// Wrap the callback to adapt NotificationHandler to EngineNotificationHandler
-		engine.SetNotificationHandler(&engineNotificationAdapter{callback: callback})
-		ea.logger.Info("game notification handler configured for Engine")
-	}
+	// Only support playtest GameEngine (MageEngine removed)
+	e := ea.engine.(*GameEngine)
+	adapter := &engineNotificationAdapter{callback: callback}
+	e.SetNotificationHandler(adapter)
+	ea.logger.Info("game notification handler configured")
 }
 
-// engineNotificationAdapter adapts NotificationHandler to EngineNotificationHandler
+// engineNotificationAdapter adapts GameNotificationCallback to the game engine's NotificationHandler interface
 type engineNotificationAdapter struct {
-	callback NotificationHandler
+	callback GameNotificationCallback
 }
 
 // NotifyGameStateChange implements EngineNotificationHandler
@@ -473,17 +478,4 @@ func (ea *EngineAdapter) GetGameView(gameID, playerID string) (interface{}, erro
 		return nil, nil
 	}
 	return ea.engine.GetGameView(gameID, playerID)
-}
-
-// GetMageEngine returns the underlying MageEngine if available.
-// This is used for advanced operations like rollback that require
-// direct access to the MageEngine's methods.
-func (ea *EngineAdapter) GetMageEngine() *MageEngine {
-	if ea == nil || ea.engine == nil {
-		return nil
-	}
-	if mageEngine, ok := ea.engine.(*MageEngine); ok {
-		return mageEngine
-	}
-	return nil
 }

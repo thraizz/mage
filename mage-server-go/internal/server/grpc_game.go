@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/magefree/mage-server-go/internal/game"
@@ -353,62 +352,21 @@ func (s *mageServer) GameGetView(ctx context.Context, req *pb.GameGetViewRequest
 		playerID = sess.GetUserID()
 	}
 
-	if s.gameAdapter != nil {
-		s.logger.Info("GameGetView calling gameAdapter.GetGameView",
-			zap.String("game_id", gameInstance.ID),
-			zap.String("player_id", playerID),
-		)
-		if engineView, engineErr := s.gameAdapter.GetGameView(gameInstance.ID, playerID); engineErr == nil && engineView != nil {
-			s.logger.Info("GameGetView got engine view")
-			switch data := engineView.(type) {
-			case *game.EngineGameView:
-				if data.GameID != "" {
-					view.GameId = data.GameID
-				}
-				view.State = data.State.String()
-				view.Phase = data.Phase
-				view.Step = data.Step
-				view.Turn = int32(data.Turn)
-				view.ActivePlayerId = data.ActivePlayerID
-				view.PriorityPlayerId = data.PriorityPlayer
-				view.Players = enginePlayersToProto(data.Players)
-				view.Battlefield = engineCardsToProto(data.Battlefield)
-				view.Stack = engineCardsToProto(data.Stack)
-				view.Exile = engineCardsToProto(data.Exile)
-				view.Command = engineCardsToProto(data.Command)
-				view.Revealed = engineRevealedToProto(data.Revealed)
-				view.LookedAt = engineLookedAtToProto(data.LookedAt)
-				if combat := engineCombatToProto(data.Combat); combat != nil {
-					view.Combat = combat
-				}
-				if !data.StartedAt.IsZero() {
-					view.StartTime = timestamppb.New(data.StartedAt)
-				}
-
-				// Add pre-computed display values (server source of truth)
-				view.ActivePlayerName = data.ActivePlayerName
-				view.PriorityPlayerName = data.PriorityPlayerName
-				view.GameFormat = data.GameFormat
-				view.IsMulliganPhase = data.IsMulliganPhase
-				view.LandsPlayedThisTurn = int32(data.LandsPlayedThisTurn)
-				view.LandsAllowedThisTurn = int32(data.LandsAllowedThisTurn)
-
-				nextID := int32(len(view.Messages) + 1)
-				engineMessages := engineMessagesToProto(data.Messages, nextID)
-				view.Messages = append(view.Messages, engineMessages...)
-				nextID += int32(len(engineMessages))
-				view.Messages = append(view.Messages, enginePromptsToMessages(data.Prompts, nextID)...)
-			case game.NullGameView:
-				for idx, action := range data.Actions {
-					view.Messages = append(view.Messages, &pb.GameMessage{
-						Id:   int32(idx + 1),
-						Text: fmt.Sprintf("%s %s %v", action.PlayerID, action.ActionType, action.Data),
-						Time: timestamppb.New(action.Timestamp),
-					})
-				}
+	// TODO: Phase 8 - Implement engine view conversion
+	// The following code is commented out until EngineGameView and related view types are implemented
+	// See ticket 004-final-action-check.md Phase 8
+	/*
+		if s.gameAdapter != nil {
+			s.logger.Info("GameGetView calling gameAdapter.GetGameView",
+				zap.String("game_id", gameInstance.ID),
+				zap.String("player_id", playerID),
+			)
+			if engineView, engineErr := s.gameAdapter.GetGameView(gameInstance.ID, playerID); engineErr == nil && engineView != nil {
+				s.logger.Info("GameGetView got engine view")
+				// Engine view conversion will be implemented in Phase 8
 			}
 		}
-	}
+	*/
 
 	return &pb.GameGetViewResponse{
 		Game: view,
@@ -691,6 +649,9 @@ func (s *mageServer) resolveGameAccess(sessionID, gameID string, allowWatcher bo
 	return sess, gameInstance, nil
 }
 
+// TODO: Phase 8 - Implement engine view conversion helpers
+// Commented out until EnginePlayerView type is implemented
+/*
 func enginePlayersToProto(players []game.EnginePlayerView) []*pb.PlayerView {
 	if len(players) == 0 {
 		return nil
@@ -729,7 +690,11 @@ func enginePlayersToProto(players []game.EnginePlayerView) []*pb.PlayerView {
 	}
 	return result
 }
+*/
 
+// TODO: Phase 8 - Implement engine view conversion helpers
+// Commented out until EngineCardView type is implemented
+/*
 func engineCardsToProto(cards []game.EngineCardView) []*pb.CardView {
 	if len(cards) == 0 {
 		return nil
@@ -799,7 +764,11 @@ func engineCardsToProto(cards []game.EngineCardView) []*pb.CardView {
 
 	return result
 }
+*/
 
+// TODO: Phase 8 - Implement engine view conversion helpers
+// Commented out until EngineRevealedView type is implemented
+/*
 func engineRevealedToProto(entries []game.EngineRevealedView) []*pb.RevealedView {
 	if len(entries) == 0 {
 		return nil
@@ -813,7 +782,11 @@ func engineRevealedToProto(entries []game.EngineRevealedView) []*pb.RevealedView
 	}
 	return result
 }
+*/
 
+// TODO: Phase 8 - Implement engine view conversion helpers
+// Commented out until EngineLookedAtView type is implemented
+/*
 func engineLookedAtToProto(entries []game.EngineLookedAtView) []*pb.LookedAtView {
 	if len(entries) == 0 {
 		return nil
@@ -827,7 +800,11 @@ func engineLookedAtToProto(entries []game.EngineLookedAtView) []*pb.LookedAtView
 	}
 	return result
 }
+*/
 
+// TODO: Phase 8 - Implement engine view conversion helpers
+// Commented out until EngineCombatView type is implemented
+/*
 func engineCombatToProto(combat game.EngineCombatView) *pb.CombatView {
 	if combat.AttackingPlayerID == "" && len(combat.Groups) == 0 {
 		return nil
@@ -845,7 +822,11 @@ func engineCombatToProto(combat game.EngineCombatView) *pb.CombatView {
 		Groups:            groups,
 	}
 }
+*/
 
+// TODO: Phase 8 - Implement engine view conversion helpers
+// Commented out until EngineMessage type is implemented
+/*
 func engineMessagesToProto(messages []game.EngineMessage, startID int32) []*pb.GameMessage {
 	if len(messages) == 0 {
 		return nil
@@ -869,7 +850,11 @@ func engineMessagesToProto(messages []game.EngineMessage, startID int32) []*pb.G
 	}
 	return result
 }
+*/
 
+// TODO: Phase 8 - Implement engine view conversion helpers
+// Commented out until EnginePrompt type is implemented
+/*
 func enginePromptsToMessages(prompts []game.EnginePrompt, startID int32) []*pb.GameMessage {
 	if len(prompts) == 0 {
 		return nil
@@ -895,24 +880,11 @@ func enginePromptsToMessages(prompts []game.EnginePrompt, startID int32) []*pb.G
 	}
 	return result
 }
+*/
 
-func engineColorToString(color string) string {
-	switch strings.ToLower(strings.TrimSpace(color)) {
-	case "action":
-		return "ORANGE"
-	case "prompt":
-		return "YELLOW"
-	case "life":
-		return "GREEN"
-	case "mana":
-		return "BLUE"
-	case "status":
-		return "BLACK"
-	default:
-		return "BLACK"
-	}
-}
-
+// TODO: Phase 8 - Implement engine view conversion helpers
+// Commented out until EngineCardAction type is implemented
+/*
 func engineCardActionsToProto(actions []game.EngineCardAction) []*pb.CardAction {
 	if len(actions) == 0 {
 		return nil
@@ -930,21 +902,7 @@ func engineCardActionsToProto(actions []game.EngineCardAction) []*pb.CardAction 
 	}
 	return result
 }
-
-func stringToCardActionType(actionType string) pb.CardActionType {
-	switch actionType {
-	case "CAST_SPELL":
-		return pb.CardActionType_CARD_ACTION_CAST_SPELL
-	case "PLAY_LAND":
-		return pb.CardActionType_CARD_ACTION_PLAY_LAND
-	case "ACTIVATE_ABILITY":
-		return pb.CardActionType_CARD_ACTION_ACTIVATE_ABILITY
-	case "ACTIVATE_MANA_ABILITY":
-		return pb.CardActionType_CARD_ACTION_ACTIVATE_MANA_ABILITY
-	default:
-		return pb.CardActionType_CARD_ACTION_UNSPECIFIED
-	}
-}
+*/
 
 // ==================== Replay Methods (Stubs) ====================
 
@@ -1048,35 +1006,34 @@ func (s *mageServer) GetMyActiveGames(ctx context.Context, req *pb.GetMyActiveGa
 		return &pb.GetMyActiveGamesResponse{Games: nil}, nil
 	}
 
-	// Query active games from database
-	if s.activeGameRepo == nil {
-		s.logger.Warn("GetMyActiveGames called but activeGameRepo is nil")
-		return &pb.GetMyActiveGamesResponse{Games: nil}, nil
-	}
+	// Query active games from memory (playtest engine is memory-only)
+	memoryGames := s.gameMgr.ListGames()
 
-	activeGames, err := s.activeGameRepo.GetActiveGamesForPlayer(ctx, username)
-	if err != nil {
-		s.logger.Error("failed to get active games for player",
-			zap.String("username", username),
-			zap.Error(err),
-		)
-		return &pb.GetMyActiveGamesResponse{Games: nil}, nil
-	}
-
-	// Convert to proto format
-	games := make([]*pb.ActiveGameInfo, 0, len(activeGames))
-	for _, ag := range activeGames {
-		gameInfo := &pb.ActiveGameInfo{
-			GameId:     ag.GameID,
-			TableId:    ag.TableID,
-			GameType:   ag.GameType,
-			Players:    ag.Players,
-			TurnNumber: int32(ag.TurnNumber),
-			State:      ag.State,
-			CreatedAt:  ag.CreatedAt.Format("2006-01-02T15:04:05Z"),
-			UpdatedAt:  ag.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+	// Filter games where the player is participating
+	games := make([]*pb.ActiveGameInfo, 0)
+	for _, g := range memoryGames {
+		// Check if username is in the players list
+		isPlayer := false
+		for _, player := range g.Players {
+			if player == username {
+				isPlayer = true
+				break
+			}
 		}
-		games = append(games, gameInfo)
+
+		if isPlayer {
+			gameInfo := &pb.ActiveGameInfo{
+				GameId:     g.ID,
+				TableId:    g.TableID,
+				GameType:   g.GameType,
+				Players:    g.Players,
+				TurnNumber: int32(g.Turn),
+				State:      g.State.String(),
+				CreatedAt:  "", // Would need to track creation time in Game struct
+				UpdatedAt:  "", // Would need to track update time in Game struct
+			}
+			games = append(games, gameInfo)
+		}
 	}
 
 	s.logger.Info("returned active games for player",
@@ -1092,7 +1049,7 @@ func (s *mageServer) GetMyActiveGames(ctx context.Context, req *pb.GetMyActiveGa
 // RequestRollback initiates a rollback request to a specific message in the game log.
 // This requires opponent consent in multiplayer games.
 func (s *mageServer) RequestRollback(ctx context.Context, req *pb.RequestRollbackRequest) (*pb.RequestRollbackResponse, error) {
-	player, gameInstance, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
+	_, _, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
 	if errMsg != "" {
 		return &pb.RequestRollbackResponse{Success: false, Error: errMsg}, nil
 	}
@@ -1102,39 +1059,17 @@ func (s *mageServer) RequestRollback(ctx context.Context, req *pb.RequestRollbac
 		return &pb.RequestRollbackResponse{Success: false, Error: "message_id is required"}, nil
 	}
 
-	// Get the underlying MageEngine from the adapter
-	mageEngine := s.gameAdapter.GetMageEngine()
-	if mageEngine == nil {
-		return &pb.RequestRollbackResponse{Success: false, Error: "game engine not available"}, nil
-	}
-
-	requestID, err := mageEngine.RequestRollback(gameInstance.ID, player, int(messageID))
-	if err != nil {
-		s.logger.Warn("rollback request failed",
-			zap.String("game_id", gameInstance.ID),
-			zap.String("player", player),
-			zap.Int32("message_id", messageID),
-			zap.Error(err),
-		)
-		return &pb.RequestRollbackResponse{Success: false, Error: err.Error()}, nil
-	}
-
-	s.logger.Info("rollback request initiated",
-		zap.String("game_id", gameInstance.ID),
-		zap.String("player", player),
-		zap.Int32("message_id", messageID),
-		zap.String("request_id", requestID),
-	)
-
+	// TODO: Phase 8 - Implement rollback using new engine
+	// MageEngine has been removed, need to implement rollback in the new playtest engine
 	return &pb.RequestRollbackResponse{
-		Success:   true,
-		RequestId: requestID,
+		Success: false,
+		Error:   "Rollback functionality not yet implemented in playtest engine",
 	}, nil
 }
 
 // RespondToRollback handles a player's response to a pending rollback request.
 func (s *mageServer) RespondToRollback(ctx context.Context, req *pb.RespondToRollbackRequest) (*pb.RespondToRollbackResponse, error) {
-	player, gameInstance, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
+	_, _, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
 	if errMsg != "" {
 		return &pb.RespondToRollbackResponse{Success: false, Error: errMsg}, nil
 	}
@@ -1144,55 +1079,25 @@ func (s *mageServer) RespondToRollback(ctx context.Context, req *pb.RespondToRol
 		return &pb.RespondToRollbackResponse{Success: false, Error: "request_id is required"}, nil
 	}
 
-	// Get the underlying MageEngine from the adapter
-	mageEngine := s.gameAdapter.GetMageEngine()
-	if mageEngine == nil {
-		return &pb.RespondToRollbackResponse{Success: false, Error: "game engine not available"}, nil
-	}
-
-	err := mageEngine.RespondToRollback(gameInstance.ID, player, requestID, req.GetApproved())
-	if err != nil {
-		s.logger.Warn("rollback response failed",
-			zap.String("game_id", gameInstance.ID),
-			zap.String("player", player),
-			zap.String("request_id", requestID),
-			zap.Bool("approved", req.GetApproved()),
-			zap.Error(err),
-		)
-		return &pb.RespondToRollbackResponse{Success: false, Error: err.Error()}, nil
-	}
-
-	s.logger.Info("rollback response processed",
-		zap.String("game_id", gameInstance.ID),
-		zap.String("player", player),
-		zap.String("request_id", requestID),
-		zap.Bool("approved", req.GetApproved()),
-	)
-
-	return &pb.RespondToRollbackResponse{Success: true}, nil
+	// TODO: Phase 8 - Implement rollback using new engine
+	// MageEngine has been removed, need to implement rollback in the new playtest engine
+	return &pb.RespondToRollbackResponse{
+		Success: false,
+		Error:   "Rollback functionality not yet implemented in playtest engine",
+	}, nil
 }
 
 // CancelRollback cancels a pending rollback request.
 func (s *mageServer) CancelRollback(ctx context.Context, req *pb.CancelRollbackRequest) (*pb.CancelRollbackResponse, error) {
-	_, gameInstance, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
+	_, _, errMsg := s.resolveGamePlayer(req.GetSessionId(), req.GetGameId())
 	if errMsg != "" {
 		return &pb.CancelRollbackResponse{Success: false, Error: errMsg}, nil
 	}
 
-	// Get the underlying MageEngine from the adapter
-	mageEngine := s.gameAdapter.GetMageEngine()
-	if mageEngine == nil {
-		return &pb.CancelRollbackResponse{Success: false, Error: "game engine not available"}, nil
-	}
-
-	err := mageEngine.CancelRollbackRequest(gameInstance.ID)
-	if err != nil {
-		return &pb.CancelRollbackResponse{Success: false, Error: err.Error()}, nil
-	}
-
-	s.logger.Info("rollback request cancelled",
-		zap.String("game_id", gameInstance.ID),
-	)
-
-	return &pb.CancelRollbackResponse{Success: true}, nil
+	// TODO: Phase 8 - Implement rollback using new engine
+	// MageEngine has been removed, need to implement rollback in the new playtest engine
+	return &pb.CancelRollbackResponse{
+		Success: false,
+		Error:   "Rollback functionality not yet implemented in playtest engine",
+	}, nil
 }

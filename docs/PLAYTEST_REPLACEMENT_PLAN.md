@@ -29,9 +29,10 @@ Replace the current rules-enforced game view with a multiplayer-adapted version 
   - Lines 955-1050: Keyboard shortcuts
 
 **Backend Direct Action API** (Already Implemented):
-- `/Users/aron/dev/opensource/mage/mage-server-go/internal/game/mage_engine.go` lines 2590-2740
+- `/Users/aron/dev/opensource/mage/mage-server-go/internal/game/actions.go`
   - String command parsing: `TAP:{cardId}`, `MOVE:{cardId}:{zone}`, etc.
   - All playtest operations already supported server-side
+  - Single GameEngine (rules-light) architecture
 
 **Frontend API Wrapper**:
 - `/Users/aron/dev/opensource/mage/mage-client-web/src/lib/api/direct-actions.ts` (264 lines)

@@ -387,18 +387,240 @@ grep -r "mage.*engine" api/proto/
 
 #### Verification Checklist
 
-- [ ] All MageEngine files deleted
-- [ ] Engine selection logic removed from main.go
-- [ ] Config simplified (no engine_type validation)
-- [ ] Rules system deleted (rules/, effects/)
-- [ ] Abilities system cleaned (complex implementations removed)
-- [ ] Combat tests deleted
-- [ ] Persistence layer removed
-- [ ] Unused features deleted (draft/tournament/replay if not used)
-- [ ] Server handlers simplified
-- [ ] All tests pass: `go test ./...`
-- [ ] Server compiles: `go build ./cmd/server/...`
-- [ ] Server runs: `./server` starts without errors
+- [x] All MageEngine files deleted (7 files, ~14,000 LOC)
+- [x] Engine selection logic removed from main.go
+- [x] Config simplified (no engine_type validation)
+- [x] Rules system deleted (rules/, effects/ - 38 files, ~22,000 LOC)
+- [x] Abilities system cleaned (complex implementations removed - ~10 files, ~3,000 LOC)
+- [x] Combat tests deleted (45 files, ~8,500 LOC)
+- [x] Persistence layer removed (3 files, ~1,000 LOC)
+- [x] Unused features deleted (draft/tournament - ~2,000 LOC)
+- [x] Server handlers simplified (~50 LOC)
+- [ ] Engine renamed for clarity (GameEngine, game_engine.go) - Phase 10
+- [x] All tests pass: `go test ./...` (16 test files passing)
+- [x] Server compiles: `go build ./cmd/server/...` (28MB binary)
+- [ ] Server runs: `./server` starts without errors - Not verified (requires DB)
+
+---
+
+### Phase 10: Rename Engine for Clarity
+
+**Now that only one engine exists, remove confusing naming.**
+
+Since we deleted MageEngine and only have the playtest/rules-light engine, the current naming is confusing:
+- File: `engine.go` (generic name)
+- Struct: `Engine` (too generic)
+- State: `EngineGameState`, `EngineCard`, etc. (why "Engine" prefix?)
+
+**Goal**: Clear, self-documenting names that reflect "rules-light game engine" purpose.
+
+#### File Rename
+
+```bash
+cd internal/game
+
+# Rename main engine file
+mv engine.go game_engine.go
+
+# Rename state file for consistency
+mv state.go game_state.go
+```
+
+#### Struct Renames
+
+**File: `game_engine.go`**
+
+Rename `Engine` → `GameEngine`:
+```go
+// Before
+type Engine struct {
+    mu       sync.RWMutex
+    games    map[string]*EngineGameState
+    notifyFn EngineNotificationHandler
+    logger   *zap.Logger
+}
+
+// After
+type GameEngine struct {
+    mu       sync.RWMutex
+    games    map[string]*GameState
+    notifyFn NotificationHandler
+    logger   *zap.Logger
+}
+```
+
+Constructor rename:
+```go
+// Before
+func NewEngine(logger *zap.Logger) *Engine
+
+// After
+func NewGameEngine(logger *zap.Logger) *GameEngine
+```
+
+#### Handler Interface Renames
+
+**File: `game_engine.go`**
+
+```go
+// Before
+type EngineNotificationHandler interface {
+    NotifyGameStateChange(playerID string, gameView interface{})
+    NotifyGameEvent(gameID string, eventType string, data interface{})
+}
+
+// After
+type NotificationHandler interface {
+    NotifyGameStateChange(playerID string, gameView interface{})
+    NotifyGameEvent(gameID string, eventType string, data interface{})
+}
+```
+
+#### State Structure Renames
+
+**File: `game_state.go`**
+
+Remove "Engine" prefix from all structures (no longer needed for disambiguation):
+
+```go
+// Before
+type EngineGameState struct { ... }
+type EngineCard struct { ... }
+type EnginePlayer struct { ... }
+type EngineCounter struct { ... }
+type EngineDeckList struct { ... }
+
+// After
+type GameState struct { ... }
+type Card struct { ... }
+type Player struct { ... }
+type Counter struct { ... }
+type DeckList struct { ... }
+```
+
+#### Update All References
+
+**Files to update**:
+1. `cmd/server/main.go` - Constructor call
+2. `internal/game/manager.go` - EngineAdapter references
+3. `internal/game/actions.go` - Method receivers and parameters
+4. `internal/server/grpc.go` - View conversion functions
+5. All test files in `internal/game/*_test.go`
+
+**Search and replace pattern**:
+```bash
+# Find all Engine references
+grep -r "type Engine struct\|*Engine\|NewEngine" internal/game --include="*.go"
+
+# After manual review, use sed or IDE refactor tool
+# Example for method receivers:
+# (e *Engine) → (e *GameEngine)
+```
+
+#### Update Manager Integration
+
+**File: `manager.go`**
+
+Update EngineAdapter to use new names:
+```go
+// Before
+type EngineAdapter struct {
+    engine interface{} // Could be *Engine or *MageEngine
+}
+
+func NewEngineAdapter(engine interface{}) *EngineAdapter {
+    return &EngineAdapter{engine: engine}
+}
+
+func (a *EngineAdapter) SetNotificationCallback(callback func(GameNotification)) {
+    if e, ok := a.engine.(*Engine); ok {
+        adapter := &engineNotificationAdapter{callback: callback}
+        e.SetNotificationHandler(adapter)
+    }
+}
+
+// After
+type EngineAdapter struct {
+    engine *GameEngine // Only one engine type now
+}
+
+func NewEngineAdapter(engine *GameEngine) *EngineAdapter {
+    return &EngineAdapter{engine: engine}
+}
+
+func (a *EngineAdapter) SetNotificationCallback(callback func(GameNotification)) {
+    adapter := &notificationAdapter{callback: callback}
+    a.engine.SetNotificationHandler(adapter)
+}
+```
+
+#### Update Main Server
+
+**File: `cmd/server/main.go`**
+
+```go
+// Before
+engine := game.NewEngine(logger, cardRepo)
+engine.SetNotificationHandler(notificationAdapter)
+gameAdapter := game.NewEngineAdapter(engine)
+
+// After
+gameEngine := game.NewGameEngine(logger)
+gameEngine.SetNotificationHandler(notificationAdapter)
+gameAdapter := game.NewEngineAdapter(gameEngine)
+```
+
+#### Documentation Comments
+
+Update all package and struct comments to reflect single-engine architecture:
+
+```go
+// Package game implements a rules-light Magic: The Gathering game engine.
+// Players have direct control over game state with no automatic rules enforcement.
+package game
+
+// GameEngine manages multiplayer games with server-side state synchronization.
+// Based on playtest-game.ts patterns, adapted for multiplayer.
+type GameEngine struct { ... }
+
+// GameState represents the complete state of a game.
+// All zones, players, and cards in one structure.
+type GameState struct { ... }
+```
+
+#### Verification
+
+```bash
+# Check for any remaining "Engine" prefix confusion
+grep -r "EngineGameState\|EngineCard\|EnginePlayer" internal/game --include="*.go"
+# Expected: No results (all renamed to GameState, Card, Player)
+
+# Verify no old Engine struct references
+grep -r "type Engine struct" internal/game --include="*.go"
+# Expected: No results
+
+# Build and test
+go build ./...
+go test ./internal/game/...
+```
+
+**Checklist**:
+- [ ] Rename `engine.go` → `game_engine.go`
+- [ ] Rename `state.go` → `game_state.go`
+- [ ] Rename `Engine` → `GameEngine`
+- [ ] Rename `NewEngine` → `NewGameEngine`
+- [ ] Remove "Engine" prefix from state structs (EngineGameState → GameState, etc.)
+- [ ] Remove "Engine" prefix from interfaces (EngineNotificationHandler → NotificationHandler)
+- [ ] Update all method receivers
+- [ ] Update manager.go integration
+- [ ] Update main.go constructor calls
+- [ ] Update server handlers
+- [ ] Update all test files
+- [ ] Update package documentation
+- [ ] Verify build: `go build ./...`
+- [ ] Verify tests: `go test ./...`
+
+**Impact**: ~200 LOC touched (mostly renames), much clearer naming
 
 ---
 
@@ -425,7 +647,8 @@ grep -r "mage.*engine" api/proto/
 ### After Cleanup
 - Total files: ~132-138 Go files
 - Backend LOC: ~34,500-36,500
-- Engine options: 1 (PlaytestEngine only)
+- Engine options: 1 (GameEngine only)
+- Clear naming: game_engine.go, GameState, GameEngine
 
 **Code reduction: ~57% smaller codebase**
 
@@ -470,8 +693,9 @@ grep -r "mage.*engine" api/proto/
 ### Day 3: Final Polish
 10. ✅ Phase 8: Simplify server handlers
 11. ✅ Phase 9: Final cleanup and verification
-12. ✅ Update documentation
-13. ✅ Test complete system end-to-end
+12. ✅ Phase 10: Rename engine for clarity (GameEngine, game_engine.go)
+13. ✅ Update documentation
+14. ✅ Test complete system end-to-end
 
 ---
 
@@ -540,7 +764,8 @@ After cleanup, update these docs:
 ## Success Criteria
 
 - ✅ MageEngine completely removed
-- ✅ Single playtest engine only
+- ✅ Single game engine only (GameEngine)
+- ✅ Clear, unambiguous naming (game_engine.go, GameState, etc.)
 - ✅ ~50,000 LOC deleted
 - ✅ All tests pass
 - ✅ Server compiles and runs
@@ -624,8 +849,9 @@ Day 2:
 - [ ] Verify build succeeds
 
 Day 3:
-- [ ] Phase 8: Simplify handlers
-- [ ] Phase 9: Final cleanup
+- [x] Phase 8: Simplify handlers
+- [x] Phase 9: Final cleanup (97% complete, see 004-phase-9-verification-report.md)
+- [ ] Phase 10: Rename engine (game_engine.go, GameEngine struct)
 - [ ] Update docs
 - [ ] End-to-end testing
 - [ ] Git commits and push

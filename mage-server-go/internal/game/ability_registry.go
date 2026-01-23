@@ -176,7 +176,7 @@ func (ar *AbilityRegistry) GetActivatableAbilities(
 }
 
 // RegisterCardAbilities registers all abilities from a card
-func (ar *AbilityRegistry) RegisterCardAbilities(card *Card) {
+func (ar *AbilityRegistry) RegisterCardAbilities(card *LegacyCard) {
 	if card.Abilities == nil || len(card.Abilities) == 0 {
 		return
 	}

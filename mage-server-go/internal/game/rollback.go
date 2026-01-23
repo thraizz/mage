@@ -13,12 +13,12 @@ import (
 
 // Bookmark represents a saved game state snapshot
 type Bookmark struct {
-	ID        string           `json:"id"`
-	GameID    string           `json:"gameId"`
-	State     *EngineGameState `json:"state"`
-	Timestamp time.Time        `json:"timestamp"`
-	Label     string           `json:"label"`
-	CreatedBy string           `json:"createdBy"`
+	ID        string     `json:"id"`
+	GameID    string     `json:"gameId"`
+	State     *GameState `json:"state"`
+	Timestamp time.Time  `json:"timestamp"`
+	Label     string     `json:"label"`
+	CreatedBy string     `json:"createdBy"`
 }
 
 // bookmarks stores all bookmarks for all games
@@ -31,7 +31,7 @@ var globalBookmarkManager = &bookmarkManager{
 }
 
 // BookmarkState creates a snapshot of the current game state
-func (e *Engine) BookmarkState(gameID, playerID, label string) (string, error) {
+func (e *GameEngine) BookmarkState(gameID, playerID, label string) (string, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -78,7 +78,7 @@ func (e *Engine) BookmarkState(gameID, playerID, label string) (string, error) {
 }
 
 // RestoreState restores game state from a bookmark
-func (e *Engine) RestoreState(gameID, bookmarkID string) error {
+func (e *GameEngine) RestoreState(gameID, bookmarkID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -118,7 +118,7 @@ func (e *Engine) RestoreState(gameID, bookmarkID string) error {
 }
 
 // ListBookmarks returns all bookmarks for a game
-func (e *Engine) ListBookmarks(gameID string) ([]*Bookmark, error) {
+func (e *GameEngine) ListBookmarks(gameID string) ([]*Bookmark, error) {
 	bookmarks := globalBookmarkManager.bookmarks[gameID]
 	if bookmarks == nil {
 		return make([]*Bookmark, 0), nil
@@ -141,7 +141,7 @@ func (e *Engine) ListBookmarks(gameID string) ([]*Bookmark, error) {
 }
 
 // DeleteBookmark deletes a bookmark
-func (e *Engine) DeleteBookmark(gameID, bookmarkID string) error {
+func (e *GameEngine) DeleteBookmark(gameID, bookmarkID string) error {
 	bookmarks := globalBookmarkManager.bookmarks[gameID]
 	if bookmarks == nil {
 		return fmt.Errorf("no bookmarks found for game: %s", gameID)
@@ -172,7 +172,7 @@ func (e *Engine) DeleteBookmark(gameID, bookmarkID string) error {
 }
 
 // CleanupBookmarks removes all bookmarks for a game (called when game ends)
-func (e *Engine) CleanupBookmarks(gameID string) {
+func (e *GameEngine) CleanupBookmarks(gameID string) {
 	delete(globalBookmarkManager.bookmarks, gameID)
 
 	e.logger.Info("bookmarks cleaned up",
@@ -180,7 +180,7 @@ func (e *Engine) CleanupBookmarks(gameID string) {
 }
 
 // AutoBookmark creates automatic bookmarks at turn boundaries
-func (e *Engine) AutoBookmark(gameID, playerID string) error {
+func (e *GameEngine) AutoBookmark(gameID, playerID string) error {
 	state := e.games[gameID]
 	if state == nil {
 		return fmt.Errorf("game not found: %s", gameID)
@@ -193,7 +193,7 @@ func (e *Engine) AutoBookmark(gameID, playerID string) error {
 
 // deepCopyState creates a deep copy of game state using JSON serialization
 // This ensures complete independence between original and copy
-func deepCopyState(state *EngineGameState) (*EngineGameState, error) {
+func deepCopyState(state *GameState) (*GameState, error) {
 	// Serialize to JSON
 	data, err := json.Marshal(state)
 	if err != nil {
@@ -201,7 +201,7 @@ func deepCopyState(state *EngineGameState) (*EngineGameState, error) {
 	}
 
 	// Deserialize to new object
-	var copy EngineGameState
+	var copy GameState
 	if err := json.Unmarshal(data, &copy); err != nil {
 		return nil, err
 	}
@@ -210,7 +210,7 @@ func deepCopyState(state *EngineGameState) (*EngineGameState, error) {
 }
 
 // GetBookmark retrieves a specific bookmark
-func (e *Engine) GetBookmark(gameID, bookmarkID string) (*Bookmark, error) {
+func (e *GameEngine) GetBookmark(gameID, bookmarkID string) (*Bookmark, error) {
 	bookmarks := globalBookmarkManager.bookmarks[gameID]
 	if bookmarks == nil {
 		return nil, fmt.Errorf("no bookmarks found for game: %s", gameID)
@@ -237,7 +237,7 @@ type ConsentRequest struct {
 var consentRequests = make(map[string]*ConsentRequest) // bookmarkID -> consent request
 
 // RequestRestore requests restoration of a bookmark with player consent
-func (e *Engine) RequestRestore(gameID, bookmarkID, playerID string) error {
+func (e *GameEngine) RequestRestore(gameID, bookmarkID, playerID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -276,7 +276,7 @@ func (e *Engine) RequestRestore(gameID, bookmarkID, playerID string) error {
 }
 
 // ConsentToRestore records a player's consent to restore
-func (e *Engine) ConsentToRestore(gameID, bookmarkID, playerID string) error {
+func (e *GameEngine) ConsentToRestore(gameID, bookmarkID, playerID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -308,7 +308,7 @@ func (e *Engine) ConsentToRestore(gameID, bookmarkID, playerID string) error {
 }
 
 // DenyRestore denies a restore request
-func (e *Engine) DenyRestore(gameID, bookmarkID, playerID string) error {
+func (e *GameEngine) DenyRestore(gameID, bookmarkID, playerID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 

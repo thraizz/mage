@@ -14,11 +14,7 @@ import (
 	"github.com/magefree/mage-server-go/internal/auth"
 	"github.com/magefree/mage-server-go/internal/chat"
 	"github.com/magefree/mage-server-go/internal/config"
-	"github.com/magefree/mage-server-go/internal/draft"
 	"github.com/magefree/mage-server-go/internal/game"
-	"github.com/magefree/mage-server-go/internal/game/cards"
-
-	_ "github.com/magefree/mage-server-go/internal/game/cards/manual" // Manual card implementations (~8 cards)
 	"github.com/magefree/mage-server-go/internal/mail"
 	_ "github.com/magefree/mage-server-go/internal/plugin" // Import to register game types
 	"github.com/magefree/mage-server-go/internal/repository"
@@ -26,7 +22,6 @@ import (
 	"github.com/magefree/mage-server-go/internal/server"
 	"github.com/magefree/mage-server-go/internal/session"
 	"github.com/magefree/mage-server-go/internal/table"
-	"github.com/magefree/mage-server-go/internal/tournament"
 	"github.com/magefree/mage-server-go/internal/user"
 	pb "github.com/magefree/mage-server-go/pkg/proto/mage/v1"
 	"github.com/rs/cors"
@@ -135,69 +130,11 @@ func main() {
 	logger.Info("game manager initialized")
 
 	// Initialize active game repository for persistence
-	activeGameRepo := repository.NewActiveGameRepository(db)
-	logger.Info("active game repository initialized")
 
-	// Initialize game engine adapter based on configuration
-	var gameEngine game.GameEngine
-	var gameAdapter *game.EngineAdapter
-
-	engineType := cfg.Server.EngineType
-	if engineType == "" {
-		engineType = "mage" // Default to MageEngine for backward compatibility
-	}
-
-	logger.Info("initializing game engine",
-		zap.String("engine_type", engineType))
-
-	switch engineType {
-	case "playtest":
-		// Create new rules-light Engine
-		playtestEngine := game.NewEngine(logger)
-		gameEngine = playtestEngine
-		gameAdapter = game.NewEngineAdapter(playtestEngine, logger)
-		logger.Info("playtest engine initialized (rules-light mode)")
-
-	case "mage":
-		fallthrough
-	default:
-		// Create traditional MageEngine with full rules enforcement
-		mageEngine := game.NewMageEngine(logger)
-		mageEngine.SetCardRepository(cardRepo)     // Enable card metadata lookup
-		mageEngine.SetCardBuilder(cards.BuildCard) // Enable Go-implemented cards
-
-		// Set up persistence for crash recovery
-		persistenceAdapter := game.NewPersistenceAdapter(activeGameRepo)
-		mageEngine.SetPersistenceRepository(persistenceAdapter)
-		logger.Info("game persistence configured")
-
-		gameEngine = mageEngine
-		gameAdapter = game.NewEngineAdapter(mageEngine, logger)
-		logger.Info("mage engine initialized (full rules enforcement)")
-	}
-
-	// Restore active games from database (crash recovery)
-	// Only supported for MageEngine
-	if engineType == "mage" {
-		if mageEngine, ok := gameEngine.(*game.MageEngine); ok {
-			restoredCount := restoreActiveGames(ctx, activeGameRepo, mageEngine, gameMgr, gameAdapter, logger)
-			if restoredCount > 0 {
-				logger.Info("restored active games from persistence",
-					zap.Int("count", restoredCount),
-				)
-			}
-		}
-	} else {
-		logger.Info("game restoration skipped (not supported for playtest engine)")
-	}
-
-	// Initialize tournament manager
-	tournamentMgr := tournament.NewManager(logger)
-	logger.Info("tournament manager initialized")
-
-	// Initialize draft manager
-	draftMgr := draft.NewManager(logger)
-	logger.Info("draft manager initialized")
+	// Create game engine (playtest engine - only engine)
+	gameEngine := game.NewGameEngine(logger)
+	gameAdapter := game.NewEngineAdapter(gameEngine, logger)
+	logger.Info("game engine initialized")
 
 	// Initialize email client
 	mailClient, err := mail.NewClient(cfg.Mail, logger)
@@ -218,13 +155,10 @@ func main() {
 		deckRepo,
 		cardRepo,
 		matchHistoryRepo,
-		activeGameRepo,
 		roomMgr,
 		chatMgr,
 		tableMgr,
 		gameMgr,
-		tournamentMgr,
-		draftMgr,
 		tokenStore,
 		mailClient,
 		version,
@@ -397,88 +331,4 @@ func initLogger(cfg config.LoggingConfig) (*zap.Logger, error) {
 	zapCfg.Level = zap.NewAtomicLevelAt(level)
 
 	return zapCfg.Build()
-}
-
-// restoreActiveGames loads and restores active games from the database
-// This enables crash recovery - games survive server restarts
-func restoreActiveGames(
-	ctx context.Context,
-	activeGameRepo *repository.ActiveGameRepository,
-	mageEngine *game.MageEngine,
-	gameMgr *game.Manager,
-	gameAdapter *game.EngineAdapter,
-	logger *zap.Logger,
-) int {
-	// Load all active games from database
-	activeGames, err := activeGameRepo.LoadAllActiveGames(ctx)
-	if err != nil {
-		logger.Error("failed to load active games from database", zap.Error(err))
-		return 0
-	}
-
-	if len(activeGames) == 0 {
-		logger.Debug("no active games to restore")
-		return 0
-	}
-
-	restoredCount := 0
-	for _, ag := range activeGames {
-		// Skip finished games (shouldn't be in DB, but just in case)
-		if ag.State == "FINISHED" {
-			logger.Debug("skipping finished game during restore",
-				zap.String("game_id", ag.GameID),
-			)
-			continue
-		}
-
-		// Restore the game in the engine
-		err := mageEngine.LoadGameFromSnapshot(
-			ag.GameID,
-			ag.TableID,
-			ag.GameType,
-			ag.Players,
-			ag.GameState,
-		)
-		if err != nil {
-			logger.Error("failed to restore game from persistence",
-				zap.String("game_id", ag.GameID),
-				zap.Error(err),
-			)
-			continue
-		}
-
-		// Also register the game in the game manager with the original ID
-		gameState := game.GameStateInProgress
-		switch ag.State {
-		case "STARTING":
-			gameState = game.GameStateStarting
-		case "MULLIGAN":
-			gameState = game.GameStateMulligan
-		case "IN_PROGRESS":
-			gameState = game.GameStateInProgress
-		case "PAUSED":
-			gameState = game.GameStatePaused
-		}
-		restoredGame := gameMgr.RestoreGame(ag.GameID, ag.TableID, ag.GameType, ag.Players, gameState)
-
-		// CRITICAL: Start the action processing goroutine for restored games
-		// Without this, player actions (like "KEEP" for mulligan) won't be processed!
-		if restoredGame != nil && gameAdapter != nil {
-			go gameAdapter.ProcessGameActions(restoredGame)
-			logger.Info("started action processing for restored game",
-				zap.String("game_id", ag.GameID),
-			)
-		}
-
-		logger.Info("restored game from persistence",
-			zap.String("game_id", ag.GameID),
-			zap.String("game_type", ag.GameType),
-			zap.Int("turn", ag.TurnNumber),
-			zap.Strings("players", ag.Players),
-		)
-
-		restoredCount++
-	}
-
-	return restoredCount
 }

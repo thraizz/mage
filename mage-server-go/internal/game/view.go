@@ -16,57 +16,57 @@ type PlaytestGameView struct {
 	ActiveControlSeat string                  `json:"activeControlSeat"`
 	Me                *PlaytestPlayerView     `json:"me"`
 	Opponents         []*PlaytestOpponentView `json:"opponents"`
-	Battlefield       []*EngineCard           `json:"battlefield"`
-	Exile             []*EngineCard           `json:"exile"`
-	Stack             []*EngineCard           `json:"stack"`
-	Command           []*EngineCard           `json:"command"`
+	Battlefield       []*Card                 `json:"battlefield"`
+	Exile             []*Card                 `json:"exile"`
+	Stack             []*Card                 `json:"stack"`
+	Command           []*Card                 `json:"command"`
 	Turn              int                     `json:"turn"`
 	ActivePlayerID    string                  `json:"activePlayerId"`
 	IsInitialized     bool                    `json:"isInitialized"`
-	Log               []EngineLogEntry        `json:"log"`
+	Log               []LogEntry              `json:"log"`
 	MulliganType      string                  `json:"mulliganType"`
 	FreeMulligans     int                     `json:"freeMulligans"`
 }
 
 // PlaytestPlayerView represents the viewing player's full state
 type PlaytestPlayerView struct {
-	PlayerID        string          `json:"playerId"`
-	Name            string          `json:"name"`
-	Life            int             `json:"life"`
-	Poison          int             `json:"poison"`
-	Energy          int             `json:"energy"`
-	LibraryCount    int             `json:"libraryCount"`
-	HandCount       int             `json:"handCount"`
-	Hand            []*EngineCard   `json:"hand"`    // Full visibility of own hand
-	Library         []*EngineCard   `json:"library"` // Full visibility of own library
-	Graveyard       []*EngineCard   `json:"graveyard"`
-	ManaPool        *EngineManaPool `json:"manaPool"`
-	KeptHand        bool            `json:"keptHand"`
-	MulliganCount   int             `json:"mulliganCount"`
-	RevealedTopCard bool            `json:"revealedTopCard"`
+	PlayerID        string    `json:"playerId"`
+	Name            string    `json:"name"`
+	Life            int       `json:"life"`
+	Poison          int       `json:"poison"`
+	Energy          int       `json:"energy"`
+	LibraryCount    int       `json:"libraryCount"`
+	HandCount       int       `json:"handCount"`
+	Hand            []*Card   `json:"hand"`    // Full visibility of own hand
+	Library         []*Card   `json:"library"` // Full visibility of own library
+	Graveyard       []*Card   `json:"graveyard"`
+	ManaPool        *ManaPool `json:"manaPool"`
+	KeptHand        bool      `json:"keptHand"`
+	MulliganCount   int       `json:"mulliganCount"`
+	RevealedTopCard bool      `json:"revealedTopCard"`
 }
 
 // PlaytestOpponentView represents an opponent with hidden information
 type PlaytestOpponentView struct {
-	PlayerID        string          `json:"playerId"`
-	Name            string          `json:"name"`
-	Life            int             `json:"life"`
-	Poison          int             `json:"poison"`
-	Energy          int             `json:"energy"`
-	LibraryCount    int             `json:"libraryCount"` // Count only
-	HandCount       int             `json:"handCount"`    // Count only
-	Hand            []*EngineCard   `json:"hand"`         // Empty - hidden
-	Library         []*EngineCard   `json:"library"`      // Empty - hidden
-	TopCard         *EngineCard     `json:"topCard"`      // Only if revealed
-	Graveyard       []*EngineCard   `json:"graveyard"`    // Public
-	ManaPool        *EngineManaPool `json:"manaPool"`
-	KeptHand        bool            `json:"keptHand"`
-	MulliganCount   int             `json:"mulliganCount"`
-	RevealedTopCard bool            `json:"revealedTopCard"`
+	PlayerID        string    `json:"playerId"`
+	Name            string    `json:"name"`
+	Life            int       `json:"life"`
+	Poison          int       `json:"poison"`
+	Energy          int       `json:"energy"`
+	LibraryCount    int       `json:"libraryCount"` // Count only
+	HandCount       int       `json:"handCount"`    // Count only
+	Hand            []*Card   `json:"hand"`         // Empty - hidden
+	Library         []*Card   `json:"library"`      // Empty - hidden
+	TopCard         *Card     `json:"topCard"`      // Only if revealed
+	Graveyard       []*Card   `json:"graveyard"`    // Public
+	ManaPool        *ManaPool `json:"manaPool"`
+	KeptHand        bool      `json:"keptHand"`
+	MulliganCount   int       `json:"mulliganCount"`
+	RevealedTopCard bool      `json:"revealedTopCard"`
 }
 
 // buildGameView creates a player-specific game view with hidden information filtering
-func (e *Engine) buildGameView(state *EngineGameState, viewerID string) *PlaytestGameView {
+func (e *GameEngine) buildGameView(state *GameState, viewerID string) *PlaytestGameView {
 	view := &PlaytestGameView{
 		GameID:            state.GameID,
 		ViewerID:          viewerID,
@@ -112,11 +112,11 @@ func (e *Engine) buildGameView(state *EngineGameState, viewerID string) *Playtes
 				Life:            player.Life,
 				Poison:          player.Poison,
 				Energy:          player.Energy,
-				LibraryCount:    player.LibraryCount,    // Count only
-				HandCount:       player.HandCount,       // Count only
-				Hand:            make([]*EngineCard, 0), // Hidden
-				Library:         make([]*EngineCard, 0), // Hidden
-				Graveyard:       player.Graveyard,       // Public
+				LibraryCount:    player.LibraryCount, // Count only
+				HandCount:       player.HandCount,    // Count only
+				Hand:            make([]*Card, 0),    // Hidden
+				Library:         make([]*Card, 0),    // Hidden
+				Graveyard:       player.Graveyard,    // Public
 				ManaPool:        player.ManaPool,
 				KeptHand:        player.KeptHand,
 				MulliganCount:   player.MulliganCount,
@@ -137,7 +137,7 @@ func (e *Engine) buildGameView(state *EngineGameState, viewerID string) *Playtes
 
 // findCardInState finds a card in any zone of the game state
 // From playtest-helpers.ts lines 30-63
-func (e *Engine) findCardInState(state *EngineGameState, cardID string) (*EngineCard, string) {
+func (e *GameEngine) findCardInState(state *GameState, cardID string) (*Card, string) {
 	// Check battlefield
 	for _, card := range state.Battlefield {
 		if card.ID == cardID {
@@ -192,9 +192,9 @@ func (e *Engine) findCardInState(state *EngineGameState, cardID string) (*Engine
 
 // removeCardFromZone removes a card from its source zone
 // From playtest-helpers.ts lines 120-170
-func (e *Engine) removeCardFromZone(state *EngineGameState, cardID, sourceZone string) {
+func (e *GameEngine) removeCardFromZone(state *GameState, cardID, sourceZone string) {
 	if sourceZone == ZoneBattlefieldStr {
-		newBattlefield := make([]*EngineCard, 0, len(state.Battlefield))
+		newBattlefield := make([]*Card, 0, len(state.Battlefield))
 		for _, card := range state.Battlefield {
 			if card.ID != cardID {
 				newBattlefield = append(newBattlefield, card)
@@ -205,7 +205,7 @@ func (e *Engine) removeCardFromZone(state *EngineGameState, cardID, sourceZone s
 	}
 
 	if sourceZone == ZoneExileStr {
-		newExile := make([]*EngineCard, 0, len(state.Exile))
+		newExile := make([]*Card, 0, len(state.Exile))
 		for _, card := range state.Exile {
 			if card.ID != cardID {
 				newExile = append(newExile, card)
@@ -216,7 +216,7 @@ func (e *Engine) removeCardFromZone(state *EngineGameState, cardID, sourceZone s
 	}
 
 	if sourceZone == ZoneCommandStr {
-		newCommand := make([]*EngineCard, 0, len(state.Command))
+		newCommand := make([]*Card, 0, len(state.Command))
 		for _, card := range state.Command {
 			if card.ID != cardID {
 				newCommand = append(newCommand, card)
@@ -227,7 +227,7 @@ func (e *Engine) removeCardFromZone(state *EngineGameState, cardID, sourceZone s
 	}
 
 	if sourceZone == ZoneStackStr {
-		newStack := make([]*EngineCard, 0, len(state.Stack))
+		newStack := make([]*Card, 0, len(state.Stack))
 		for _, card := range state.Stack {
 			if card.ID != cardID {
 				newStack = append(newStack, card)
@@ -241,7 +241,7 @@ func (e *Engine) removeCardFromZone(state *EngineGameState, cardID, sourceZone s
 	if len(sourceZone) > 5 && sourceZone[:5] == "hand:" {
 		playerID := sourceZone[5:]
 		if player, ok := state.Players[playerID]; ok {
-			newHand := make([]*EngineCard, 0, len(player.Hand))
+			newHand := make([]*Card, 0, len(player.Hand))
 			for _, card := range player.Hand {
 				if card.ID != cardID {
 					newHand = append(newHand, card)
@@ -256,7 +256,7 @@ func (e *Engine) removeCardFromZone(state *EngineGameState, cardID, sourceZone s
 	if len(sourceZone) > 8 && sourceZone[:8] == "library:" {
 		playerID := sourceZone[8:]
 		if player, ok := state.Players[playerID]; ok {
-			newLibrary := make([]*EngineCard, 0, len(player.Library))
+			newLibrary := make([]*Card, 0, len(player.Library))
 			for _, card := range player.Library {
 				if card.ID != cardID {
 					newLibrary = append(newLibrary, card)
@@ -271,7 +271,7 @@ func (e *Engine) removeCardFromZone(state *EngineGameState, cardID, sourceZone s
 	if len(sourceZone) > 10 && sourceZone[:10] == "graveyard:" {
 		playerID := sourceZone[10:]
 		if player, ok := state.Players[playerID]; ok {
-			newGraveyard := make([]*EngineCard, 0, len(player.Graveyard))
+			newGraveyard := make([]*Card, 0, len(player.Graveyard))
 			for _, card := range player.Graveyard {
 				if card.ID != cardID {
 					newGraveyard = append(newGraveyard, card)
@@ -285,7 +285,7 @@ func (e *Engine) removeCardFromZone(state *EngineGameState, cardID, sourceZone s
 
 // addCardToZone adds a card to a target zone
 // From playtest-helpers.ts lines 175-243
-func (e *Engine) addCardToZone(state *EngineGameState, card *EngineCard, targetZone, controllerID string) {
+func (e *GameEngine) addCardToZone(state *GameState, card *Card, targetZone, controllerID string) {
 	if card == nil {
 		return
 	}
@@ -334,13 +334,13 @@ func (e *Engine) addCardToZone(state *EngineGameState, card *EngineCard, targetZ
 			// Check for position specifiers (TOP, BOTTOM)
 			if targetZone == "LIBRARY_TOP" || targetZone == "LIBRARY" {
 				// Add to top of library
-				player.Library = append([]*EngineCard{card}, player.Library...)
+				player.Library = append([]*Card{card}, player.Library...)
 			} else if targetZone == "LIBRARY_BOTTOM" {
 				// Add to bottom of library
 				player.Library = append(player.Library, card)
 			} else {
 				// Default to top
-				player.Library = append([]*EngineCard{card}, player.Library...)
+				player.Library = append([]*Card{card}, player.Library...)
 			}
 			player.LibraryCount = len(player.Library)
 		}

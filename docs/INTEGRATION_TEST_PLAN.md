@@ -1,8 +1,8 @@
-# Integration Test Plan: Multiplayer Playtest-First Architecture
+# Integration Test Plan: Rules-Light Game Engine Architecture
 
-**Document Version:** 1.0
-**Date:** January 22, 2026
-**Status:** Phase 6 - Integration Testing
+**Document Version:** 2.0
+**Date:** January 23, 2026
+**Status:** Phase 9 - Migration Complete
 
 ## Table of Contents
 
@@ -20,11 +20,13 @@
 
 ## Overview
 
-This document provides a comprehensive test plan for verifying the integration of the playtest-first multiplayer architecture. The system consists of:
+This document provides a comprehensive test plan for verifying the integration of the rules-light game engine architecture. The system consists of:
 
-- **Backend**: Go server with Engine (rules-light) or MageEngine (rules-enforced)
+- **Backend**: Go server with GameEngine (single rules-light engine)
 - **Frontend**: SvelteKit client with multiplayerGameStore
 - **Communication**: WebSocket for state sync, gRPC for actions
+
+**Note**: MageEngine has been completely removed. The system now uses a single GameEngine for all games.
 
 ### Test Objectives
 
@@ -43,11 +45,11 @@ This document provides a comprehensive test plan for verifying the integration o
 
 #### 1. Server Initialization (`/Users/aron/dev/opensource/mage/mage-server-go/cmd/server/main.go`)
 
-**Lines 145-177: Engine Selection**
+**GameEngine Initialization**
 
-- [x] Reads `config.Server.EngineType` from config file
-- [x] Creates `Engine` when `engine_type="playtest"` (line 156)
-- [x] Creates `MageEngine` when `engine_type="mage"` (line 165)
+- [x] Creates single `GameEngine` instance (rules-light)
+- [x] Sets notification handler for WebSocket sync
+- [x] No configuration needed (single engine)
 - [x] Wraps engine in `EngineAdapter` (lines 158, 175)
 - [x] Passes adapter to `NewMageServer` (line 232)
 

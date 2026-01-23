@@ -10,7 +10,7 @@ import (
 )
 
 // CardBuilder is a function that creates a new card instance
-type CardBuilder func(ownerID uuid.UUID, cardInfo *CardInfo) (*game.Card, error)
+type CardBuilder func(ownerID uuid.UUID, cardInfo *CardInfo) (*game.LegacyCard, error)
 
 // Registry is the global card implementation registry
 // Cards self-register via init() functions in their package
@@ -154,7 +154,7 @@ func (r *cardRegistry) Clear() {
 // This function is designed to be passed to MageEngine.SetCardBuilder
 // to avoid import cycles (game cannot import cards, but cards imports game)
 // Returns (nil, nil) if card is not implemented in registry (not an error)
-func BuildCard(cardName string, ownerID uuid.UUID) (*game.Card, error) {
+func BuildCard(cardName string, ownerID uuid.UUID) (*game.LegacyCard, error) {
 	builder, ok := Registry.Get(cardName)
 	if !ok {
 		// Card not in registry - this is not an error, just not implemented

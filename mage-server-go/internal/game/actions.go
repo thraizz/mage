@@ -12,7 +12,7 @@ import (
 
 // DrawCards draws N cards from a player's library to their hand
 // From playtest-game.ts lines 492-527
-func (e *Engine) DrawCards(gameID, playerID string, count int) error {
+func (e *GameEngine) DrawCards(gameID, playerID string, count int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -30,7 +30,7 @@ func (e *Engine) DrawCards(gameID, playerID string, count int) error {
 	actualCount := min(count, len(player.Library))
 
 	// Draw cards from top of library
-	drawn := make([]*EngineCard, actualCount)
+	drawn := make([]*Card, actualCount)
 	copy(drawn, player.Library[:actualCount])
 	player.Library = player.Library[actualCount:]
 
@@ -58,7 +58,7 @@ func (e *Engine) DrawCards(gameID, playerID string, count int) error {
 
 // PlayCard moves a card from hand to battlefield
 // From playtest-game.ts lines 532-568
-func (e *Engine) PlayCard(gameID, playerID, cardID string, tapped bool) error {
+func (e *GameEngine) PlayCard(gameID, playerID, cardID string, tapped bool) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -74,7 +74,7 @@ func (e *Engine) PlayCard(gameID, playerID, cardID string, tapped bool) error {
 
 	// Find card in hand
 	cardIndex := -1
-	var card *EngineCard
+	var card *Card
 	for i, c := range player.Hand {
 		if c.ID == cardID {
 			cardIndex = i
@@ -113,7 +113,7 @@ func (e *Engine) PlayCard(gameID, playerID, cardID string, tapped bool) error {
 
 // MoveCard moves a card to a different zone
 // From playtest-game.ts lines 574-607
-func (e *Engine) MoveCard(gameID, playerID, cardID, targetZone string) error {
+func (e *GameEngine) MoveCard(gameID, playerID, cardID, targetZone string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -154,7 +154,7 @@ func (e *Engine) MoveCard(gameID, playerID, cardID, targetZone string) error {
 
 // TapCard taps or untaps a card
 // From playtest-game.ts lines 612-630
-func (e *Engine) TapCard(gameID, playerID, cardID string, tapped bool) error {
+func (e *GameEngine) TapCard(gameID, playerID, cardID string, tapped bool) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -164,7 +164,7 @@ func (e *Engine) TapCard(gameID, playerID, cardID string, tapped bool) error {
 	}
 
 	// Find card on battlefield
-	var card *EngineCard
+	var card *Card
 	for _, c := range state.Battlefield {
 		if c.ID == cardID {
 			card = c
@@ -190,7 +190,7 @@ func (e *Engine) TapCard(gameID, playerID, cardID string, tapped bool) error {
 
 // UntapAll untaps all permanents controlled by a player
 // From playtest-game.ts lines 635-646
-func (e *Engine) UntapAll(gameID, playerID string) error {
+func (e *GameEngine) UntapAll(gameID, playerID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -213,7 +213,7 @@ func (e *Engine) UntapAll(gameID, playerID string) error {
 
 // FlipCard flips a card face up/down
 // From playtest-game.ts lines 651-663
-func (e *Engine) FlipCard(gameID, playerID, cardID string, faceDown bool) error {
+func (e *GameEngine) FlipCard(gameID, playerID, cardID string, faceDown bool) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -222,7 +222,7 @@ func (e *Engine) FlipCard(gameID, playerID, cardID string, faceDown bool) error 
 		return fmt.Errorf("game not found: %s", gameID)
 	}
 
-	var card *EngineCard
+	var card *Card
 	for _, c := range state.Battlefield {
 		if c.ID == cardID {
 			card = c
@@ -248,7 +248,7 @@ func (e *Engine) FlipCard(gameID, playerID, cardID string, faceDown bool) error 
 
 // ModifyLife modifies a player's life total
 // From playtest-game.ts lines 668-679
-func (e *Engine) ModifyLife(gameID, playerID string, delta int) error {
+func (e *GameEngine) ModifyLife(gameID, playerID string, delta int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -272,7 +272,7 @@ func (e *Engine) ModifyLife(gameID, playerID string, delta int) error {
 
 // SetPlayerCounter sets a player counter (poison, energy, etc.)
 // From playtest-game.ts lines 684-700
-func (e *Engine) SetPlayerCounter(gameID, playerID, counterType string, value int) error {
+func (e *GameEngine) SetPlayerCounter(gameID, playerID, counterType string, value int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -303,7 +303,7 @@ func (e *Engine) SetPlayerCounter(gameID, playerID, counterType string, value in
 
 // ShuffleLibrary shuffles a player's library using Fisher-Yates algorithm
 // From playtest-game.ts lines 705-717
-func (e *Engine) ShuffleLibrary(gameID, playerID string) error {
+func (e *GameEngine) ShuffleLibrary(gameID, playerID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -334,7 +334,7 @@ func (e *Engine) ShuffleLibrary(gameID, playerID string) error {
 
 // CreateToken creates a token on the battlefield
 // From playtest-game.ts lines 759-805
-func (e *Engine) CreateToken(gameID, playerID, name, types, power, toughness, color string) error {
+func (e *GameEngine) CreateToken(gameID, playerID, name, types, power, toughness, color string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -346,7 +346,7 @@ func (e *Engine) CreateToken(gameID, playerID, name, types, power, toughness, co
 	// Generate unique token ID
 	tokenID := fmt.Sprintf("token-%d-%d", time.Now().UnixNano(), rand.Intn(1000000))
 
-	token := &EngineCard{
+	token := &Card{
 		ID:                tokenID,
 		Name:              name,
 		DisplayName:       name,
@@ -369,7 +369,7 @@ func (e *Engine) CreateToken(gameID, playerID, name, types, power, toughness, co
 		Flipped:           false,
 		Transformed:       false,
 		FaceDown:          false,
-		Counters:          make([]EngineCounter, 0),
+		Counters:          make([]Counter, 0),
 		AttachedTo:        make([]string, 0),
 		SummoningSickness: true,
 	}
@@ -384,7 +384,7 @@ func (e *Engine) CreateToken(gameID, playerID, name, types, power, toughness, co
 
 // AddCounter adds counters to a card
 // From playtest-game.ts lines 810-840
-func (e *Engine) AddCounter(gameID, playerID, cardID, counterName string, amount int) error {
+func (e *GameEngine) AddCounter(gameID, playerID, cardID, counterName string, amount int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -409,7 +409,7 @@ func (e *Engine) AddCounter(gameID, playerID, cardID, counterName string, amount
 	}
 
 	if !found {
-		card.Counters = append(card.Counters, EngineCounter{
+		card.Counters = append(card.Counters, Counter{
 			Name:  counterName,
 			Count: amount,
 		})
@@ -423,7 +423,7 @@ func (e *Engine) AddCounter(gameID, playerID, cardID, counterName string, amount
 
 // RemoveCounter removes counters from a card
 // From playtest-game.ts lines 845-882
-func (e *Engine) RemoveCounter(gameID, playerID, cardID, counterName string, amount int) error {
+func (e *GameEngine) RemoveCounter(gameID, playerID, cardID, counterName string, amount int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -459,7 +459,7 @@ func (e *Engine) RemoveCounter(gameID, playerID, cardID, counterName string, amo
 
 // SetCounter sets a counter to a specific value
 // From playtest-game.ts lines 887-918
-func (e *Engine) SetCounter(gameID, playerID, cardID, counterName string, amount int) error {
+func (e *GameEngine) SetCounter(gameID, playerID, cardID, counterName string, amount int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -492,7 +492,7 @@ func (e *Engine) SetCounter(gameID, playerID, cardID, counterName string, amount
 			}
 		}
 		if !found {
-			card.Counters = append(card.Counters, EngineCounter{
+			card.Counters = append(card.Counters, Counter{
 				Name:  counterName,
 				Count: amount,
 			})
@@ -507,7 +507,7 @@ func (e *Engine) SetCounter(gameID, playerID, cardID, counterName string, amount
 
 // MillCards moves top N cards from library to graveyard
 // From playtest-game.ts lines 923-957
-func (e *Engine) MillCards(gameID, playerID string, count int) error {
+func (e *GameEngine) MillCards(gameID, playerID string, count int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -525,7 +525,7 @@ func (e *Engine) MillCards(gameID, playerID string, count int) error {
 	actualCount := min(count, len(player.Library))
 
 	// Mill cards from top of library
-	milled := make([]*EngineCard, actualCount)
+	milled := make([]*Card, actualCount)
 	copy(milled, player.Library[:actualCount])
 	player.Library = player.Library[actualCount:]
 
@@ -548,7 +548,7 @@ func (e *Engine) MillCards(gameID, playerID string, count int) error {
 
 // ScryCards implements scry by reordering library cards
 // From playtest-game.ts lines 1016-1053
-func (e *Engine) ScryCards(gameID, playerID string, scryCount int, keepOnTop, putToBottom []string) error {
+func (e *GameEngine) ScryCards(gameID, playerID string, scryCount int, keepOnTop, putToBottom []string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -572,9 +572,9 @@ func (e *Engine) ScryCards(gameID, playerID string, scryCount int, keepOnTop, pu
 	}
 
 	// Separate scried cards from remaining library
-	keepCards := make([]*EngineCard, 0)
-	bottomCards := make([]*EngineCard, 0)
-	remaining := make([]*EngineCard, 0)
+	keepCards := make([]*Card, 0)
+	bottomCards := make([]*Card, 0)
+	remaining := make([]*Card, 0)
 
 	for _, card := range player.Library {
 		if scryCardIDs[card.ID] {
@@ -601,7 +601,7 @@ func (e *Engine) ScryCards(gameID, playerID string, scryCount int, keepOnTop, pu
 	}
 
 	// Rebuild library: keep on top, remaining cards, put to bottom
-	player.Library = make([]*EngineCard, 0, len(keepCards)+len(remaining)+len(bottomCards))
+	player.Library = make([]*Card, 0, len(keepCards)+len(remaining)+len(bottomCards))
 	player.Library = append(player.Library, keepCards...)
 	player.Library = append(player.Library, remaining...)
 	player.Library = append(player.Library, bottomCards...)
@@ -615,7 +615,7 @@ func (e *Engine) ScryCards(gameID, playerID string, scryCount int, keepOnTop, pu
 
 // SetRevealedTop sets whether the top card of library is revealed
 // From playtest-game.ts lines 1058-1071
-func (e *Engine) SetRevealedTop(gameID, playerID string, revealed bool) error {
+func (e *GameEngine) SetRevealedTop(gameID, playerID string, revealed bool) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -643,7 +643,7 @@ func (e *Engine) SetRevealedTop(gameID, playerID string, revealed bool) error {
 
 // NextTurn advances to the next player's turn
 // From playtest-game.ts lines 1076-1090
-func (e *Engine) NextTurn(gameID, playerID string) error {
+func (e *GameEngine) NextTurn(gameID, playerID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -682,7 +682,7 @@ func (e *Engine) NextTurn(gameID, playerID string) error {
 
 // Mulligan performs a mulligan for a player
 // From playtest-game.ts lines 1095-1146
-func (e *Engine) Mulligan(gameID, playerID string) error {
+func (e *GameEngine) Mulligan(gameID, playerID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -723,7 +723,7 @@ func (e *Engine) Mulligan(gameID, playerID string) error {
 
 	// Draw new hand
 	actualHandSize := min(newHandSize, len(player.Library))
-	newHand := make([]*EngineCard, actualHandSize)
+	newHand := make([]*Card, actualHandSize)
 	copy(newHand, player.Library[:actualHandSize])
 	player.Library = player.Library[actualHandSize:]
 
@@ -746,7 +746,7 @@ func (e *Engine) Mulligan(gameID, playerID string) error {
 
 // KeepHand marks that a player is keeping their hand
 // From playtest-game.ts lines 1151-1163
-func (e *Engine) KeepHand(gameID, playerID string) error {
+func (e *GameEngine) KeepHand(gameID, playerID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -770,8 +770,8 @@ func (e *Engine) KeepHand(gameID, playerID string) error {
 
 // Helper functions
 
-func (e *Engine) appendLog(state *EngineGameState, kind, message string) {
-	entry := EngineLogEntry{
+func (e *GameEngine) appendLog(state *GameState, kind, message string) {
+	entry := LogEntry{
 		Kind:      kind,
 		Message:   message,
 		Timestamp: time.Now(),
@@ -779,7 +779,7 @@ func (e *Engine) appendLog(state *EngineGameState, kind, message string) {
 	state.Log = append(state.Log, entry)
 }
 
-func (e *Engine) getPlayerName(state *EngineGameState, playerID string) string {
+func (e *GameEngine) getPlayerName(state *GameState, playerID string) string {
 	if player, ok := state.Players[playerID]; ok {
 		return player.Name
 	}

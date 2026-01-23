@@ -16,8 +16,8 @@ func TestRegistry(t *testing.T) {
 
 	t.Run("Register and Get card", func(t *testing.T) {
 		// Register a test card
-		testBuilder := func(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
-			return &game.Card{ID: uuid.New(), Name: "Test Card"}, nil
+		testBuilder := func(ownerID uuid.UUID, info *cards.CardInfo) (*game.LegacyCard, error) {
+			return &game.LegacyCard{ID: uuid.New(), Name: "Test Card"}, nil
 		}
 
 		cards.Register("Test Card", testBuilder)
@@ -40,8 +40,8 @@ func TestRegistry(t *testing.T) {
 		assert.False(t, cards.Registry.IsImplemented("Lightning Bolt"))
 
 		// Register it
-		cards.Register("Lightning Bolt", func(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
-			return &game.Card{ID: uuid.New(), Name: "Lightning Bolt"}, nil
+		cards.Register("Lightning Bolt", func(ownerID uuid.UUID, info *cards.CardInfo) (*game.LegacyCard, error) {
+			return &game.LegacyCard{ID: uuid.New(), Name: "Lightning Bolt"}, nil
 		})
 
 		// Now it's implemented
@@ -100,8 +100,8 @@ func TestRegistry(t *testing.T) {
 }
 
 // dummyBuilder is a simple builder for testing
-func dummyBuilder(ownerID uuid.UUID, info *cards.CardInfo) (*game.Card, error) {
-	return &game.Card{
+func dummyBuilder(ownerID uuid.UUID, info *cards.CardInfo) (*game.LegacyCard, error) {
+	return &game.LegacyCard{
 		ID:   uuid.New(),
 		Name: info.Name,
 	}, nil

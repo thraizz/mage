@@ -12,10 +12,9 @@ import (
 )
 
 const (
-	chatPrefixRoom       = "room"
-	chatPrefixTable      = "table"
-	chatPrefixGame       = "game"
-	chatPrefixTournament = "tournament"
+	chatPrefixRoom  = "room"
+	chatPrefixTable = "table"
+	chatPrefixGame  = "game"
 )
 
 func formatChatRoomID(prefix, id string) string {
@@ -152,20 +151,9 @@ func (s *mageServer) ChatFindByGame(ctx context.Context, req *pb.ChatFindByGameR
 	}, nil
 }
 
-// ChatFindByTournament returns the chat identifier for the specified tournament.
+// Tournament feature removed - stub implementation
 func (s *mageServer) ChatFindByTournament(ctx context.Context, req *pb.ChatFindByTournamentRequest) (*pb.ChatFindByTournamentResponse, error) {
-	tournamentID := strings.TrimSpace(req.GetTournamentId())
-	if tournamentID == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "tournament_id is required")
-	}
-
-	if _, ok := s.tournamentMgr.GetTournament(tournamentID); !ok {
-		return nil, status.Errorf(codes.NotFound, "tournament not found")
-	}
-
-	return &pb.ChatFindByTournamentResponse{
-		ChatId: formatChatRoomID(chatPrefixTournament, tournamentID),
-	}, nil
+	return nil, status.Errorf(codes.Unimplemented, "Tournament feature has been removed")
 }
 
 // ChatFindByRoom returns the chat identifier for the specified room.

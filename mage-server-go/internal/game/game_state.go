@@ -4,29 +4,31 @@ import (
 	"time"
 )
 
-// From playtest-game.ts lines 25-59: State structure
+// game_state.go defines the core game state structures for the playtest engine.
+// Based on playtest-game.ts lines 25-59: State structure
 
-// EngineGameState represents the complete game state for the rules-light engine
-type EngineGameState struct {
+// GameState represents the complete game state for the rules-light game engine.
+// All zones, players, and cards in one synchronized structure.
+type GameState struct {
 	GameID            string                   `json:"gameId"`
 	ActiveControlSeat string                   `json:"activeControlSeat"` // Which player perspective is controlling
-	Players           map[string]*EnginePlayer `json:"players"`
-	Battlefield       []*EngineCard            `json:"battlefield"`
-	Exile             []*EngineCard            `json:"exile"`
-	Stack             []*EngineCard            `json:"stack"`
-	Command           []*EngineCard            `json:"command"`
+	Players           map[string]*Player `json:"players"`
+	Battlefield       []*Card            `json:"battlefield"`
+	Exile             []*Card            `json:"exile"`
+	Stack             []*Card            `json:"stack"`
+	Command           []*Card            `json:"command"`
 	Turn              int                      `json:"turn"`
 	ActivePlayerID    string                   `json:"activePlayerId"`
 	IsInitialized     bool                     `json:"isInitialized"`
-	Log               []EngineLogEntry         `json:"log"`
+	Log               []LogEntry         `json:"log"`
 	MulliganType      string                   `json:"mulliganType"` // "london"
 	FreeMulligans     int                      `json:"freeMulligans"`
 	StartedAt         time.Time                `json:"startedAt"`
 }
 
-// EnginePlayer represents a player in the rules-light engine
-// From playtest-game.ts lines 25-40
-type EnginePlayer struct {
+// Player represents a player in the game engine.
+// Based on playtest-game.ts lines 25-40
+type Player struct {
 	PlayerID        string          `json:"playerId"`
 	Name            string          `json:"name"`
 	Life            int             `json:"life"`
@@ -34,18 +36,18 @@ type EnginePlayer struct {
 	Energy          int             `json:"energy"`
 	LibraryCount    int             `json:"libraryCount"`
 	HandCount       int             `json:"handCount"`
-	Hand            []*EngineCard   `json:"hand"`
-	Library         []*EngineCard   `json:"library"`
-	Graveyard       []*EngineCard   `json:"graveyard"`
-	ManaPool        *EngineManaPool `json:"manaPool"`
+	Hand            []*Card   `json:"hand"`
+	Library         []*Card   `json:"library"`
+	Graveyard       []*Card   `json:"graveyard"`
+	ManaPool        *ManaPool `json:"manaPool"`
 	KeptHand        bool            `json:"keptHand"`
 	MulliganCount   int             `json:"mulliganCount"`
 	RevealedTopCard bool            `json:"revealedTopCard"` // When true, top card is visible
 }
 
-// EngineCard represents a card in the rules-light engine
-// Simplified from Card type - no rules enforcement
-type EngineCard struct {
+// Card represents a card in the game engine.
+// Simplified from LegacyCard type - no rules enforcement, direct player control.
+type Card struct {
 	// Identity
 	ID          string `json:"id"`
 	Name        string `json:"name"`
@@ -73,7 +75,7 @@ type EngineCard struct {
 	Flipped      bool            `json:"flipped"`
 	Transformed  bool            `json:"transformed"`
 	FaceDown     bool            `json:"faceDown"`
-	Counters     []EngineCounter `json:"counters"`
+	Counters     []Counter `json:"counters"`
 
 	// Combat state (manual tracking, no enforcement)
 	Attacking         bool `json:"attacking"`
@@ -84,14 +86,14 @@ type EngineCard struct {
 	AttachedTo []string `json:"attachedTo"`
 }
 
-// EngineCounter represents a counter on a card
-type EngineCounter struct {
+// Counter represents a counter on a card
+type Counter struct {
 	Name  string `json:"name"`
 	Count int    `json:"count"`
 }
 
-// EngineManaPool represents a player's mana pool (client-side tracking only)
-type EngineManaPool struct {
+// ManaPool represents a player's mana pool (client-side tracking only)
+type ManaPool struct {
 	White     int `json:"white"`
 	Blue      int `json:"blue"`
 	Black     int `json:"black"`
@@ -100,8 +102,8 @@ type EngineManaPool struct {
 	Colorless int `json:"colorless"`
 }
 
-// EngineLogEntry represents a log entry in the game
-type EngineLogEntry struct {
+// LogEntry represents a log entry in the game
+type LogEntry struct {
 	Kind      string    `json:"kind"` // draw, play, tap, etc.
 	Message   string    `json:"message"`
 	Timestamp time.Time `json:"timestamp"`
@@ -118,18 +120,18 @@ const (
 	ZoneCommandStr     = "COMMAND"
 )
 
-// NewEngineGameState creates a new empty game state
-func NewEngineGameState(gameID string, playerIDs []string, playerNames map[string]string) *EngineGameState {
-	state := &EngineGameState{
+// NewGameState creates a new empty game state
+func NewGameState(gameID string, playerIDs []string, playerNames map[string]string) *GameState {
+	state := &GameState{
 		GameID:        gameID,
-		Players:       make(map[string]*EnginePlayer),
-		Battlefield:   make([]*EngineCard, 0),
-		Exile:         make([]*EngineCard, 0),
-		Stack:         make([]*EngineCard, 0),
-		Command:       make([]*EngineCard, 0),
+		Players:       make(map[string]*Player),
+		Battlefield:   make([]*Card, 0),
+		Exile:         make([]*Card, 0),
+		Stack:         make([]*Card, 0),
+		Command:       make([]*Card, 0),
 		Turn:          1,
 		IsInitialized: false,
-		Log:           make([]EngineLogEntry, 0),
+		Log:           make([]LogEntry, 0),
 		MulliganType:  "london",
 		FreeMulligans: 1, // Standard is 1 free mulligan
 		StartedAt:     time.Now(),
@@ -141,7 +143,7 @@ func NewEngineGameState(gameID string, playerIDs []string, playerNames map[strin
 		if name == "" {
 			name = playerID
 		}
-		state.Players[playerID] = &EnginePlayer{
+		state.Players[playerID] = &Player{
 			PlayerID:        playerID,
 			Name:            name,
 			Life:            20, // Default starting life
@@ -149,10 +151,10 @@ func NewEngineGameState(gameID string, playerIDs []string, playerNames map[strin
 			Energy:          0,
 			LibraryCount:    0,
 			HandCount:       0,
-			Hand:            make([]*EngineCard, 0),
-			Library:         make([]*EngineCard, 0),
-			Graveyard:       make([]*EngineCard, 0),
-			ManaPool:        &EngineManaPool{},
+			Hand:            make([]*Card, 0),
+			Library:         make([]*Card, 0),
+			Graveyard:       make([]*Card, 0),
+			ManaPool:        &ManaPool{},
 			KeptHand:        false,
 			MulliganCount:   0,
 			RevealedTopCard: false,
@@ -168,14 +170,14 @@ func NewEngineGameState(gameID string, playerIDs []string, playerNames map[strin
 	return state
 }
 
-// ConvertCardToEngineCard converts a Card to an EngineCard
+// ConvertLegacyCardToCard converts a LegacyCard to a Card (playtest engine card)
 // From playtest-game.ts card structure
-func ConvertCardToEngineCard(card *Card) *EngineCard {
-	engineCounters := make([]EngineCounter, 0)
+func ConvertLegacyCardToCard(card *LegacyCard) *Card {
+	engineCounters := make([]Counter, 0)
 	if card.Counters != nil {
 		for name, counter := range card.Counters.GetAll() {
 			if counter != nil && counter.Count > 0 {
-				engineCounters = append(engineCounters, EngineCounter{
+				engineCounters = append(engineCounters, Counter{
 					Name:  name,
 					Count: counter.Count,
 				})
@@ -183,7 +185,7 @@ func ConvertCardToEngineCard(card *Card) *EngineCard {
 		}
 	}
 
-	return &EngineCard{
+	return &Card{
 		ID:                card.ID.String(),
 		Name:              card.Name,
 		DisplayName:       card.Name,

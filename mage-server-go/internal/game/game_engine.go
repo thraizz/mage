@@ -1,3 +1,6 @@
+// Package game implements a rules-light Magic: The Gathering game engine.
+// Players have direct control over game state with no automatic rules enforcement.
+// State is synchronized across clients via server-side notification system.
 package game
 
 import (
@@ -7,31 +10,32 @@ import (
 	"go.uber.org/zap"
 )
 
-// Engine implements the rules-light game engine
-// Copied from playtest-game.ts patterns, adapted for multiplayer server sync
-type Engine struct {
+// GameEngine implements the rules-light game engine.
+// Provides direct player control over game state with server-side state synchronization.
+// Based on playtest-game.ts patterns, adapted for multiplayer.
+type GameEngine struct {
 	mu       sync.RWMutex
-	games    map[string]*EngineGameState
-	notifyFn EngineNotificationHandler
+	games    map[string]*GameState
+	notifyFn NotificationHandler
 	logger   *zap.Logger
 }
 
-// EngineNotificationHandler is called when the engine needs to broadcast state changes
-type EngineNotificationHandler interface {
+// NotificationHandler is called when the engine needs to broadcast state changes
+type NotificationHandler interface {
 	NotifyGameStateChange(playerID string, gameView interface{})
 	NotifyGameEvent(gameID string, eventType string, data interface{})
 }
 
-// NewEngine creates a new rules-light engine
-func NewEngine(logger *zap.Logger) *Engine {
-	return &Engine{
-		games:  make(map[string]*EngineGameState),
+// NewGameEngine creates a new rules-light game engine
+func NewGameEngine(logger *zap.Logger) *GameEngine {
+	return &GameEngine{
+		games:  make(map[string]*GameState),
 		logger: logger,
 	}
 }
 
 // SetNotificationHandler sets the callback for game notifications
-func (e *Engine) SetNotificationHandler(handler EngineNotificationHandler) {
+func (e *GameEngine) SetNotificationHandler(handler NotificationHandler) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.notifyFn = handler
@@ -39,7 +43,7 @@ func (e *Engine) SetNotificationHandler(handler EngineNotificationHandler) {
 
 // StartGame initializes and starts a game (without decks - for backwards compatibility)
 // Implements GameEngine interface
-func (e *Engine) StartGame(gameID string, players []string, gameType string) error {
+func (e *GameEngine) StartGame(gameID string, players []string, gameType string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -49,7 +53,7 @@ func (e *Engine) StartGame(gameID string, players []string, gameType string) err
 		playerNames[playerID] = playerID
 	}
 
-	state := NewEngineGameState(gameID, players, playerNames)
+	state := NewGameState(gameID, players, playerNames)
 	state.IsInitialized = true
 	e.games[gameID] = state
 
@@ -65,7 +69,7 @@ func (e *Engine) StartGame(gameID string, players []string, gameType string) err
 
 // StartGameWithDecks initializes and starts a game with player-submitted decks
 // Implements GameEngine interface
-func (e *Engine) StartGameWithDecks(gameID string, players []string, gameType string, decks map[string]DeckList) error {
+func (e *GameEngine) StartGameWithDecks(gameID string, players []string, gameType string, decks map[string]DeckList) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -75,7 +79,7 @@ func (e *Engine) StartGameWithDecks(gameID string, players []string, gameType st
 		playerNames[playerID] = playerID
 	}
 
-	state := NewEngineGameState(gameID, players, playerNames)
+	state := NewGameState(gameID, players, playerNames)
 
 	// Load decks into each player's library
 	for playerID, deck := range decks {
@@ -86,10 +90,10 @@ func (e *Engine) StartGameWithDecks(gameID string, players []string, gameType st
 
 		// Create cards from deck list (main deck + commanders)
 		allCards := append(deck.MainDeck, deck.Commanders...)
-		library := make([]*EngineCard, 0, len(allCards))
+		library := make([]*Card, 0, len(allCards))
 
 		for _, cardName := range allCards {
-			card := &EngineCard{
+			card := &Card{
 				ID:           fmt.Sprintf("%s-%s-%d", gameID, playerID, len(library)),
 				Name:         cardName,
 				DisplayName:  cardName,
@@ -97,7 +101,7 @@ func (e *Engine) StartGameWithDecks(gameID string, players []string, gameType st
 				ControllerID: playerID,
 				Zone:         ZoneLibraryStr,
 				FaceDown:     true,
-				Counters:     make([]EngineCounter, 0),
+				Counters:     make([]Counter, 0),
 				AttachedTo:   make([]string, 0),
 			}
 			library = append(library, card)
@@ -112,7 +116,7 @@ func (e *Engine) StartGameWithDecks(gameID string, players []string, gameType st
 			handSize = len(player.Library)
 		}
 
-		openingHand := make([]*EngineCard, handSize)
+		openingHand := make([]*Card, handSize)
 		copy(openingHand, player.Library[:handSize])
 		player.Library = player.Library[handSize:]
 
@@ -141,7 +145,7 @@ func (e *Engine) StartGameWithDecks(gameID string, players []string, gameType st
 
 // ProcessAction processes a player action
 // Implements GameEngine interface
-func (e *Engine) ProcessAction(gameID string, action PlayerAction) error {
+func (e *GameEngine) ProcessAction(gameID string, action PlayerAction) error {
 	// Route action to appropriate handler based on ActionType
 	// This is where direct-actions commands would be parsed and dispatched
 
@@ -252,7 +256,7 @@ func (e *Engine) ProcessAction(gameID string, action PlayerAction) error {
 
 // GetGameView returns the current game view for a player
 // Implements GameEngine interface
-func (e *Engine) GetGameView(gameID, playerID string) (interface{}, error) {
+func (e *GameEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 	e.mu.RLock()
 	defer e.mu.RUnlock()
 
@@ -267,7 +271,7 @@ func (e *Engine) GetGameView(gameID, playerID string) (interface{}, error) {
 
 // EndGame ends a game
 // Implements GameEngine interface
-func (e *Engine) EndGame(gameID string, winner string) error {
+func (e *GameEngine) EndGame(gameID string, winner string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -289,7 +293,7 @@ func (e *Engine) EndGame(gameID string, winner string) error {
 
 // PauseGame pauses a game
 // Implements GameEngine interface
-func (e *Engine) PauseGame(gameID string) error {
+func (e *GameEngine) PauseGame(gameID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -307,7 +311,7 @@ func (e *Engine) PauseGame(gameID string) error {
 
 // ResumeGame resumes a paused game
 // Implements GameEngine interface
-func (e *Engine) ResumeGame(gameID string) error {
+func (e *GameEngine) ResumeGame(gameID string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -324,7 +328,7 @@ func (e *Engine) ResumeGame(gameID string) error {
 }
 
 // broadcast sends game state updates to all players
-func (e *Engine) broadcast(gameID string) {
+func (e *GameEngine) broadcast(gameID string) {
 	if e.notifyFn == nil {
 		return
 	}
