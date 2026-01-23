@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { websocketStore } from '$lib/stores/websocket';
-	import type { GameStoreState } from '$lib/stores/game';
+	import type { GameStoreState } from '$lib/stores/game.legacy';
 	import type { PlayerView, CardView } from '$lib/generated/mage/v1/models';
 
 	interface Props {

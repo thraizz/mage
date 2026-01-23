@@ -8,7 +8,7 @@
 		gameStore,
 		cardsBeingPlayed,
 		hasPriority
-	} from '$lib/stores/game';
+	} from '$lib/stores/game.legacy';
 	import {
 		dragDropStore,
 		isDragging as isDraggingStore,

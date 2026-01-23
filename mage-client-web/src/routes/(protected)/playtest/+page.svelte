@@ -1,8 +1,10 @@
 <script lang="ts">
+	import GameStateLog from './GameStateLog.svelte';
+
 	import { onMount, untrack } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { gameStore } from '$lib/stores/game';
+	import { gameStore } from '$lib/stores/game.legacy';
 	import {
 		playtestGameStore,
 		playtestPlayers,
@@ -67,11 +69,9 @@
 	let showMenu = $state(false);
 	let hoveredCardId = $state<string | null>(null);
 	let showLifeMenu = $state(false);
-	let lifeMenuEl: HTMLDivElement | null = $state(null);
 	let showDebugOverlay = $state(false);
 	let selectedOpponentId = $state<string | null>(null);
 	let showOpponentLifeMenu = $state(false);
-	let opponentLifeMenuEl: HTMLDivElement | null = $state(null);
 	let showDeckSearch = $state(false);
 
 	// Deck context menu and dialog state
@@ -1532,65 +1532,12 @@
 			</div>
 		{/if}
 
-		<!-- Main Game Area -->
-		<main class="game-layout">
-			<!-- Opponent Section(s) -->
-			{#if otherPlayers.length === 1}
-				<!-- 1v1 Layout: Single opponent -->
-				{#if selectedOpponent}
-					{@const opponent = selectedOpponent}
-					<OpponentSection
-						{opponent}
-						{otherPlayers}
-						battlefieldNonlands={opponentBattlefieldNonlands}
-						battlefieldLands={opponentBattlefieldLands}
-						commandCards={opponentCommandCards}
-						{isCommanderGame}
-						showLifeMenu={showOpponentLifeMenu}
-						onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
-						onLifeChange={handleLifeChange}
-						onPoisonChange={handlePoisonChange}
-						onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
-						onCardContextMenu={(cardId, cardName) => {
-							selectedCardForCounters = { id: cardId, name: cardName };
-							showCounterDialog = true;
-						}}
-					/>
-				{/if}
-			{:else}
-				<!-- Multiplayer (3-4 players): Grid on large screens, cycling on small -->
-				<!-- Grid layout (shown on large screens) -->
-				<div class="opponents-grid opponents-grid-large">
-					{#each otherPlayers as opponent (opponent.playerId)}
-						{@const oppBattlefield = battlefield.filter(
-							(c) => c.controllerId === opponent.playerId
-						)}
-						{@const oppBattlefieldNonlands = oppBattlefield.filter((c) => !isLandPermanent(c.type))}
-						{@const oppBattlefieldLands = oppBattlefield.filter((c) => isLandPermanent(c.type))}
-						{@const oppCommandCards = commandCards.filter(
-							(c) => (c.ownerId || c.controllerId) === opponent.playerId
-						)}
-						<OpponentSection
-							{opponent}
-							otherPlayers={[]}
-							battlefieldNonlands={oppBattlefieldNonlands}
-							battlefieldLands={oppBattlefieldLands}
-							commandCards={oppCommandCards}
-							{isCommanderGame}
-							showLifeMenu={false}
-							onSelectOpponent={undefined}
-							onLifeChange={handleLifeChange}
-							onPoisonChange={handlePoisonChange}
-							onToggleLifeMenu={() => {}}
-							onCardContextMenu={(cardId, cardName) => {
-								selectedCardForCounters = { id: cardId, name: cardName };
-								showCounterDialog = true;
-							}}
-						/>
-					{/each}
-				</div>
-				<!-- Single opponent with cycling (shown on small screens) -->
-				<div class="opponents-grid-small">
+		<div class="game-and-log-container">
+			<!-- Main Game Area -->
+			<main class="game-layout">
+				<!-- Opponent Section(s) -->
+				{#if otherPlayers.length === 1}
+					<!-- 1v1 Layout: Single opponent -->
 					{#if selectedOpponent}
 						{@const opponent = selectedOpponent}
 						<OpponentSection
@@ -1611,70 +1558,130 @@
 							}}
 						/>
 					{/if}
-				</div>
-			{/if}
+				{:else}
+					<!-- Multiplayer (3-4 players): Grid on large screens, cycling on small -->
+					<!-- Grid layout (shown on large screens) -->
+					<div class="opponents-grid opponents-grid-large">
+						{#each otherPlayers as opponent (opponent.playerId)}
+							{@const oppBattlefield = battlefield.filter(
+								(c) => c.controllerId === opponent.playerId
+							)}
+							{@const oppBattlefieldNonlands = oppBattlefield.filter(
+								(c) => !isLandPermanent(c.type)
+							)}
+							{@const oppBattlefieldLands = oppBattlefield.filter((c) => isLandPermanent(c.type))}
+							{@const oppCommandCards = commandCards.filter(
+								(c) => (c.ownerId || c.controllerId) === opponent.playerId
+							)}
+							<OpponentSection
+								{opponent}
+								otherPlayers={[]}
+								battlefieldNonlands={oppBattlefieldNonlands}
+								battlefieldLands={oppBattlefieldLands}
+								commandCards={oppCommandCards}
+								{isCommanderGame}
+								showLifeMenu={false}
+								onSelectOpponent={undefined}
+								onLifeChange={handleLifeChange}
+								onPoisonChange={handlePoisonChange}
+								onToggleLifeMenu={() => {}}
+								onCardContextMenu={(cardId, cardName) => {
+									selectedCardForCounters = { id: cardId, name: cardName };
+									showCounterDialog = true;
+								}}
+							/>
+						{/each}
+					</div>
+					<!-- Single opponent with cycling (shown on small screens) -->
+					<div class="opponents-grid-small">
+						{#if selectedOpponent}
+							{@const opponent = selectedOpponent}
+							<OpponentSection
+								{opponent}
+								{otherPlayers}
+								battlefieldNonlands={opponentBattlefieldNonlands}
+								battlefieldLands={opponentBattlefieldLands}
+								commandCards={opponentCommandCards}
+								{isCommanderGame}
+								showLifeMenu={showOpponentLifeMenu}
+								onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+								onLifeChange={handleLifeChange}
+								onPoisonChange={handlePoisonChange}
+								onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+								onCardContextMenu={(cardId, cardName) => {
+									selectedCardForCounters = { id: cardId, name: cardName };
+									showCounterDialog = true;
+								}}
+							/>
+						{/if}
+					</div>
+				{/if}
 
-			<!-- My Battlefield Area (Editable) -->
-			<BattlefieldArea
-				battlefieldNonlands={myBattlefieldNonlands}
-				battlefieldLands={myBattlefieldLands}
-				commandCards={myCommandCards}
-				{isCommanderGame}
-				{isDragging}
-				{isOverValidDrop}
-				{dropZone}
-				{hoveredCardId}
-				onCardClick={handleBattlefieldCardClick}
-				onCardMouseDown={handleBattlefieldCardMouseDown}
-				onCardContextMenu={(cardId, cardName) => {
-					selectedCardForCounters = { id: cardId, name: cardName };
-					showCounterDialog = true;
-				}}
-				onCommandCardMouseDown={handleCommandCardMouseDown}
-				onCardHover={(cardId) => (hoveredCardId = cardId)}
-				battlefieldDropZoneRef={(el) => (battlefieldDropZoneEl = el)}
-				commandDropZoneRef={(el) => (commandDropZoneEl = el)}
-			/>
-
-			<!-- Player Info Row -->
-			{#if me}
-				<PlayerInfoRow
-					player={{
-						name: me.name,
-						life: me.life,
-						poison: me.poison,
-						libraryCount: me.libraryCount
+				<!-- My Battlefield Area (Editable) -->
+				<BattlefieldArea
+					battlefieldNonlands={myBattlefieldNonlands}
+					battlefieldLands={myBattlefieldLands}
+					commandCards={myCommandCards}
+					{isCommanderGame}
+					{isDragging}
+					{isOverValidDrop}
+					{dropZone}
+					{hoveredCardId}
+					onCardClick={handleBattlefieldCardClick}
+					onCardMouseDown={handleBattlefieldCardMouseDown}
+					onCardContextMenu={(cardId, cardName) => {
+						selectedCardForCounters = { id: cardId, name: cardName };
+						showCounterDialog = true;
 					}}
-					graveyard={myGrave}
-					{exile}
-					mana={myMana}
-					{showLifeMenu}
-					onLifeChange={handleLifeChange}
-					onPoisonChange={handlePoisonChange}
-					onToggleLifeMenu={() => (showLifeMenu = !showLifeMenu)}
-					onSearchLibrary={() => (showDeckSearch = true)}
-					onDeckContextMenu={handleDeckContextMenu}
-					libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
-					graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
-					exileDropZoneRef={(el) => (exileDropZoneEl = el)}
+					onCommandCardMouseDown={handleCommandCardMouseDown}
+					onCardHover={(cardId) => (hoveredCardId = cardId)}
+					battlefieldDropZoneRef={(el) => (battlefieldDropZoneEl = el)}
+					commandDropZoneRef={(el) => (commandDropZoneEl = el)}
 				/>
-			{/if}
 
-			<!-- Player Hand -->
-			<div
-				bind:this={handDropZoneEl}
-				class="hand-area"
-				class:drag-active={isDragging}
-				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
-			>
-				<PlayerHand
-					onCardClick={() => {}}
-					size="normal"
-					currentPhase="PRECOMBAT_MAIN"
-					canDrag={true}
-				/>
+				<!-- Player Info Row -->
+				{#if me}
+					<PlayerInfoRow
+						player={{
+							name: me.name,
+							life: me.life,
+							poison: me.poison,
+							libraryCount: me.libraryCount
+						}}
+						graveyard={myGrave}
+						{exile}
+						mana={myMana}
+						{showLifeMenu}
+						onLifeChange={handleLifeChange}
+						onPoisonChange={handlePoisonChange}
+						onToggleLifeMenu={() => (showLifeMenu = !showLifeMenu)}
+						onSearchLibrary={() => (showDeckSearch = true)}
+						onDeckContextMenu={handleDeckContextMenu}
+						libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
+						graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
+						exileDropZoneRef={(el) => (exileDropZoneEl = el)}
+					/>
+				{/if}
+
+				<!-- Player Hand -->
+				<div
+					bind:this={handDropZoneEl}
+					class="hand-area"
+					class:drag-active={isDragging}
+					class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
+				>
+					<PlayerHand
+						onCardClick={() => {}}
+						size="normal"
+						currentPhase="PRECOMBAT_MAIN"
+						canDrag={true}
+					/>
+				</div>
+			</main>
+			<div class="game-log-container">
+				<GameStateLog />
 			</div>
-		</main>
+		</div>
 
 		<!-- Token Creator -->
 		{#if showTokenCreator}
@@ -1854,42 +1861,7 @@
 						</section>
 
 						<!-- Game State Log -->
-						<section class="debug-section">
-							<div class="debug-section-header">
-								<span>Game State Log ({gameLog.length} events)</span>
-								<button
-									class="debug-copy-btn"
-									onclick={handleCopyLog}
-									title="Copy log to clipboard"
-									aria-label="Copy log to clipboard"
-								>
-									<Copy size={16} aria-hidden="true" />
-									<span>Copy</span>
-								</button>
-							</div>
-							<div class="debug-log-container">
-								{#if gameLog.length === 0}
-									<div class="debug-log-empty">No events logged yet</div>
-								{:else}
-									<div class="debug-log-entries">
-										{#each gameLog.slice().reverse() as entry (entry.id)}
-											<div class="debug-log-entry">
-												<span class="debug-log-time">
-													{new Date(entry.at).toLocaleTimeString([], {
-														hour: '2-digit',
-														minute: '2-digit',
-														second: '2-digit'
-													})}
-												</span>
-												<span class="debug-log-turn">T{entry.turn}</span>
-												<span class="debug-log-kind">{entry.kind}</span>
-												<span class="debug-log-message">{entry.message}</span>
-											</div>
-										{/each}
-									</div>
-								{/if}
-							</div>
-						</section>
+						<GameStateLog />
 
 						<!-- Players -->
 						<section class="debug-section">

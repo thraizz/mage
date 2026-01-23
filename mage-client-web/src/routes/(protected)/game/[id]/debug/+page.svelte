@@ -24,7 +24,7 @@
 		winner,
 		gameError,
 		isLoading
-	} from '$lib/stores/game';
+	} from '$lib/stores/game.legacy';
 	import { joinGame, fetchGameView } from '$lib/api/game';
 
 	// Game ID from route params
