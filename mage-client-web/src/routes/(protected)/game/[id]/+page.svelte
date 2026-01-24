@@ -20,26 +20,16 @@
 	import { toast } from '$lib/stores/toast';
 	// Game components (from playtest/+page.svelte lines 20-46)
 	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
-	import CounterDialog from '$lib/components/game/CounterDialog.svelte';
-	import CreateTokenDialog from '$lib/components/game/CreateTokenDialog.svelte';
-	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte';
-	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
-	import NumberInputDialog from '$lib/components/game/NumberInputDialog.svelte';
 	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
 	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
 	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
-	import RevealTopDialog from '$lib/components/game/RevealTopDialog.svelte';
-	import ScryDialog from '$lib/components/game/ScryDialog.svelte';
-	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
-	// ADD: Multiplayer components
-	import GameChatOverlay from '$lib/components/game/GameChatOverlay.svelte';
+	import GameDialogs from '$lib/components/game/GameDialogs.svelte';
 
 	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import X from '@lucide/svelte/icons/x';
 
-	import LibrarySearch from '$lib/components/game/LibrarySearch.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import {
 		currentDropZone,
@@ -944,113 +934,7 @@
 			</div>
 		</main>
 
-		<!-- Token Creator -->
-		{#if uiState.showTokenCreator}
-			<TokenCreator gameId={data.gameId} onClose={() => (uiState.showTokenCreator = false)} />
-		{/if}
-
-		<!-- Create Token Dialog -->
-		{#if uiState.showCreateTokenDialog}
-			<CreateTokenDialog
-				onCreateToken={(name, types, power, toughness, color) => {
-					multiplayerGameStore.createToken(name, types, power, toughness, color);
-					uiState.showCreateTokenDialog = false;
-				}}
-				onClose={() => (uiState.showCreateTokenDialog = false)}
-			/>
-		{/if}
-
-		<!-- Counter Dialog -->
-		{#if uiState.showCounterDialog && uiState.selectedCardForCounters && selectedCardForCountersData}
-			<CounterDialog
-				cardName={selectedCardForCountersData.name}
-				cardId={selectedCardForCountersData.id}
-				currentCounters={selectedCardForCountersData.counters}
-				onAddCounter={(counterName, amount) => {
-					const card = selectedCardForCountersData;
-					multiplayerGameStore.addCounter(card.id, counterName, amount);
-				}}
-				onRemoveCounter={(counterName, amount) => {
-					const card = selectedCardForCountersData;
-					multiplayerGameStore.removeCounter(card.id, counterName, amount);
-				}}
-				onSetCounter={(counterName, amount) => {
-					const card = selectedCardForCountersData;
-					multiplayerGameStore.setCounter(card.id, counterName, amount);
-				}}
-				onClose={() => {
-					uiState.showCounterDialog = false;
-					uiState.selectedCardForCounters = null;
-				}}
-			/>
-		{/if}
-
-		<!-- Deck Search -->
-		{#if uiState.showDeckSearch && me}
-			<LibrarySearch
-				gameId={data.gameId}
-				librarySearchData={{
-					playerId: me.playerId,
-					message: 'Search your library',
-					destination: 'hand',
-					cards: me.library,
-					canCancel: true
-				}}
-				onComplete={() => (uiState.showDeckSearch = false)}
-				onCancel={() => (uiState.showDeckSearch = false)}
-			/>
-		{/if}
-
-		<!-- Deck Context Menu -->
-		{#if uiState.showDeckContextMenu}
-			<DeckContextMenu
-				position={uiState.deckContextMenuPosition}
-				deckCount={me?.libraryCount || 0}
-				playerName={me?.name || 'You'}
-				onClose={() => (uiState.showDeckContextMenu = false)}
-				actions={deckContextMenuActions}
-			/>
-		{/if}
-
-		<!-- Number Input Dialog -->
-		{#if uiState.showNumberInputDialog && uiState.numberInputDialogConfig}
-			<NumberInputDialog
-				title={uiState.numberInputDialogConfig.title}
-				defaultValue={uiState.numberInputDialogConfig.defaultValue}
-				min={uiState.numberInputDialogConfig.min}
-				max={uiState.numberInputDialogConfig.max}
-				onConfirm={uiState.numberInputDialogConfig.onConfirm}
-				onCancel={() => {
-					uiState.showNumberInputDialog = false;
-					uiState.numberInputDialogConfig = null;
-				}}
-			/>
-		{/if}
-
-		<!-- Scry Dialog -->
-		{#if uiState.showScryDialog && uiState.currentScrySession}
-			<ScryDialog
-				cards={uiState.currentScrySession.cards}
-				onComplete={handleScryComplete}
-				onCancel={() => {
-					uiState.showScryDialog = false;
-					uiState.currentScrySession = null;
-				}}
-			/>
-		{/if}
-
-		<!-- Reveal Top Dialog -->
-		{#if uiState.showRevealTopDialog}
-			<RevealTopDialog
-				cards={uiState.revealedCards}
-				onClose={() => {
-					uiState.showRevealTopDialog = false;
-					uiState.revealedCards = [];
-				}}
-			/>
-		{/if}
-
-		<!-- Mulligan Dialog -->
+		<!-- Mulligan Dialog (not part of GameDialogs - shown before game starts) -->
 		{#if showMulliganDialog && me}
 			<MulliganDialog
 				cards={me.hand}
@@ -1063,10 +947,34 @@
 			/>
 		{/if}
 
-		<KeyboardShortcutsModal bind:open={uiState.showKeyboardShortcuts} mode="game" />
-
-		<!-- ADD: GameChatOverlay for multiplayer -->
-		<GameChatOverlay gameId={data.gameId} />
+		<!-- Game Dialogs Component -->
+		<GameDialogs
+			{uiState}
+			gameId={data.gameId}
+			{me}
+			{selectedCardForCountersData}
+			{deckContextMenuActions}
+			onCreateToken={(name, types, power, toughness, color) => {
+				multiplayerGameStore.createToken(name, types, power, toughness, color);
+				uiState.showCreateTokenDialog = false;
+			}}
+			onAddCounter={(cardId, counterName, amount) =>
+				multiplayerGameStore.addCounter(cardId, counterName, amount)}
+			onRemoveCounter={(cardId, counterName, amount) =>
+				multiplayerGameStore.removeCounter(cardId, counterName, amount)}
+			onSetCounter={(cardId, counterName, amount) =>
+				multiplayerGameStore.setCounter(cardId, counterName, amount)}
+			onScryComplete={handleScryComplete}
+			onNumberConfirm={(value) => {
+				uiState.numberInputDialogConfig?.onConfirm(value);
+				uiState.showNumberInputDialog = false;
+			}}
+			keyboardShortcutsMode="game"
+			librarySearchVariant="multiplayer"
+			showGameChatOverlay={true}
+			onLibraryComplete={() => (uiState.showDeckSearch = false)}
+			onLibraryCancel={() => (uiState.showDeckSearch = false)}
+		/>
 
 		<!-- Drag Ghost (from playtest/+page.svelte lines 1978-1990) -->
 		{#if isDragging && dragCardName}
