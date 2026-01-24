@@ -9,7 +9,6 @@
 
 	// Props
 	let {
-		 
 		cardId,
 		cardName,
 		manaCost = '',

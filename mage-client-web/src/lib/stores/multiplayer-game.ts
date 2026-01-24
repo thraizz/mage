@@ -15,7 +15,7 @@ import * as directActions from '$lib/api/direct-actions';
 import { joinGame, fetchGameView } from '$lib/api/game';
 import { auth } from './auth';
 import { goto } from '$app/navigation';
-import type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
+import type { Player, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
 
 /**
  * Multiplayer game state
@@ -25,7 +25,7 @@ import type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/g
 export interface MultiplayerGameState {
 	gameId: string;
 	activeControlSeat: string; // Which player perspective you're controlling (only the logged-in player in multiplayer mode, but other perspectives in playtest mode)
-	players: PlaytestPlayer[];
+	players: Player[];
 	battlefield: CardView[];
 	exile: CardView[];
 	stack: CardView[];
@@ -47,7 +47,7 @@ export interface MultiplayerGameState {
  * Handles differences between proto structure and client expectations.
  * From Task 1.3 - Proto GameView to State Mapping
  */
-function convertPlayerViewToPlaytestPlayer(pv: PlayerView): PlaytestPlayer {
+function convertPlayerViewToPlaytestPlayer(pv: PlayerView): Player {
 	return {
 		playerId: pv.playerId || '',
 		name: pv.name || '',
@@ -777,4 +777,4 @@ export const multiplayerIsInitialized = derived(
 export const multiplayerIsConnected = derived(multiplayerGameStore, ($game) => $game.isConnected);
 
 // Re-export types for backward compatibility
-export type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
+export type { Player as PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';

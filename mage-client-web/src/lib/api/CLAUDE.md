@@ -7,15 +7,16 @@ This is the src/lib/api folder, you have to run bun run proto:generate to regene
 
 ### Jan 19, 2026
 
-| ID | Time | T | Title | Read |
-|----|------|---|-------|------|
-| #681 | 7:57 PM | ⚖️ | Component integration planning deferred - documentation phase complete | ~519 |
-| #604 | 6:21 PM | 🔵 | Client-Side Game API Layer with Combat and Rollback Support | ~626 |
+| ID   | Time    | T   | Title                                                                  | Read |
+| ---- | ------- | --- | ---------------------------------------------------------------------- | ---- |
+| #681 | 7:57 PM | ⚖️  | Component integration planning deferred - documentation phase complete | ~519 |
+| #604 | 6:21 PM | 🔵  | Client-Side Game API Layer with Combat and Rollback Support            | ~626 |
 
 ### Jan 21, 2026
 
-| ID | Time | T | Title | Read |
-|----|------|---|-------|------|
-| #1411 | 11:42 PM | 🔵 | Direct Actions API Already Implements Rules-Light Commands | ~352 |
-| #1409 | " | 🔵 | Game API Module Implements Rules-Enforced gRPC Calls | ~308 |
+| ID    | Time     | T   | Title                                                      | Read |
+| ----- | -------- | --- | ---------------------------------------------------------- | ---- |
+| #1411 | 11:42 PM | 🔵  | Direct Actions API Already Implements Rules-Light Commands | ~352 |
+| #1409 | "        | 🔵  | Game API Module Implements Rules-Enforced gRPC Calls       | ~308 |
+
 </claude-mem-context>

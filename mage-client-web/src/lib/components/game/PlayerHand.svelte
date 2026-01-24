@@ -24,13 +24,12 @@
 		onSelectCard = (cardId: string, isMultiSelect: boolean) => {},
 		onClearSelection = () => {},
 
-		 
 		onCardClick = (cardId: string) => {},
-		 
+
 		onCardHover = (cardId: string) => {},
-		 
+
 		onCardDragStart = (cardId: string) => {},
-		 
+
 		onCardDragEnd = (cardId: string, dropped: boolean) => {},
 		size = 'normal',
 		currentPhase = '',
@@ -43,13 +42,13 @@
 		hasPriority: boolean;
 		onSelectCard?: (cardId: string, isMultiSelect: boolean) => void;
 		onClearSelection?: () => void;
-		 
+
 		onCardClick?: (cardId: string) => void;
-		 
+
 		onCardHover?: (cardId: string) => void;
-		 
+
 		onCardDragStart?: (cardId: string) => void;
-		 
+
 		onCardDragEnd?: (cardId: string, dropped: boolean) => void;
 		size?: 'small' | 'normal' | 'large';
 		currentPhase?: string;

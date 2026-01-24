@@ -3,7 +3,7 @@
 
 	// Props
 	export let table: Table;
-	 
+
 	export let onClick: ((table: Table) => void) | undefined = undefined;
 
 	function getStatusColor(): string {

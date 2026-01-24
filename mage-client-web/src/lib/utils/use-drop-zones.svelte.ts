@@ -27,10 +27,7 @@ export interface DropZoneHandlers {
  * Sets up all 6 drop zones with automatic cleanup
  * Call once in component with refs getter and handlers
  */
-export function useDropZones(
-	getRefs: () => DropZoneRefs,
-	handlers: DropZoneHandlers
-): void {
+export function useDropZones(getRefs: () => DropZoneRefs, handlers: DropZoneHandlers): void {
 	// Battlefield drop zone
 	let battlefieldUnregister: (() => void) | null = null;
 	$effect(() => {

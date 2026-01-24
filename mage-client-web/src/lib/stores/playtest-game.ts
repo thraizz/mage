@@ -18,7 +18,7 @@ import {
 	getNextPlayer,
 	updateCardInZone
 } from '$lib/utils/playtest-helpers';
-import type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
+import type { Player, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
 
 /**
  * Playtest game state
@@ -26,7 +26,7 @@ import type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/g
 export interface PlaytestGameState {
 	gameId: string;
 	activeControlSeat: string; // Which player perspective you're controlling
-	players: PlaytestPlayer[];
+	players: Player[];
 	battlefield: CardView[];
 	exile: CardView[];
 	stack: CardView[];
@@ -40,7 +40,7 @@ export interface PlaytestGameState {
 }
 
 // Re-export types for backward compatibility
-export type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
+export type { Player as PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
 
 const initialState: PlaytestGameState = {
 	gameId: '',
@@ -379,7 +379,7 @@ function createPlaytestGameStore() {
 	 */
 	function initialize(
 		gameId: string,
-		players: PlaytestPlayer[],
+		players: Player[],
 		options?: {
 			mulliganType?: 'london';
 			freeMulligans?: number;
@@ -689,7 +689,7 @@ function createPlaytestGameStore() {
 	 */
 	function setPlayerCounter(playerId: string, counterType: string, value: number): void {
 		update((state) => {
-			const updates: Partial<PlaytestPlayer> = {};
+			const updates: Partial<Player> = {};
 			if (counterType === 'poison') {
 				updates.poison = Math.max(0, value);
 			} else if (counterType === 'energy') {

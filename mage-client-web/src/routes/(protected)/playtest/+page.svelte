@@ -23,6 +23,7 @@
 	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
 	import Card from '$lib/components/game/Card.svelte';
 	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
+	import DragGhost from '$lib/components/game/DragGhost.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
@@ -38,7 +39,6 @@
 		isOverValidDropZone,
 		type SourceZone
 	} from '$lib/utils/drag-drop';
-	import { getScryfallImageUrl } from '$lib/utils/scryfall';
 	import { useDropZones } from '$lib/utils/use-drop-zones.svelte';
 	import Clock from '@lucide/svelte/icons/clock';
 	import Copy from '@lucide/svelte/icons/copy';
@@ -1477,17 +1477,12 @@
 		{/if}
 
 		<!-- Drag Ghost -->
-		{#if isDragging && dragCardName}
-			{@const dragImageUrl = getScryfallImageUrl(dragCardName, 'small')}
-			<div class="drag-ghost" style="left: {dragPos.x}px; top: {dragPos.y}px;">
-				<div class="drag-ghost-card" class:valid={isOverValidDrop}>
-					{#if dragImageUrl}
-						<img src={dragImageUrl} alt={dragCardName} class="drag-ghost-image" draggable="false" />
-					{:else}
-						<span class="drag-ghost-name">{dragCardName}</span>
-					{/if}
-				</div>
-			</div>
-		{/if}
+		<DragGhost
+			{isDragging}
+			cardName={dragCardName}
+			position={dragPos}
+			{isOverValidDrop}
+			imageSize="small"
+		/>
 	{/if}
 </div>

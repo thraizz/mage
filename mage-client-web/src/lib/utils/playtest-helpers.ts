@@ -5,8 +5,8 @@
  * Reduces duplication in playtest-game.ts store operations.
  */
 
-import type { AbilityView, CardAction, CardView, CounterView } from '$lib/generated/mage/v1/models';
-import type { PlaytestPlayer, PlaytestLogEntry } from '$lib/types/gamestore';
+import type { CardView } from '$lib/generated/mage/v1/models';
+import type { Player } from '$lib/types/gamestore';
 import type { PlaytestGameState } from '$lib/stores/playtest-game';
 import { ZoneId, isLibraryTop, isLibraryBottom, normalizeZoneName } from './zones';
 
@@ -14,10 +14,10 @@ import { ZoneId, isLibraryTop, isLibraryBottom, normalizeZoneName } from './zone
  * Update a specific player in the players array
  */
 export function updatePlayer(
-	players: PlaytestPlayer[],
+	players: Player[],
 	playerId: string,
-	updater: (player: PlaytestPlayer) => Partial<PlaytestPlayer>
-): PlaytestPlayer[] {
+	updater: (player: Player) => Partial<Player>
+): Player[] {
 	return players.map((p) => (p.playerId === playerId ? { ...p, ...updater(p) } : p));
 }
 
@@ -198,13 +198,14 @@ export function addCardToZone(
 			newState.battlefield = [...newState.battlefield, cardCopy];
 			break;
 
-		case 'GRAVEYARD':
+		case 'GRAVEYARD': {
 			cardCopy.zone = ZoneId.GRAVEYARD;
 			const graveyardOwner = cardCopy.ownerId || controllerId;
 			newState.players = newState.players.map((p) =>
 				p.playerId === graveyardOwner ? { ...p, graveyard: [...p.graveyard, cardCopy] } : p
 			);
 			break;
+		}
 
 		case 'EXILE':
 			cardCopy.zone = ZoneId.EXILE;
@@ -248,7 +249,7 @@ function addCardToLibrary(
 	cardCopy.zone = ZoneId.LIBRARY;
 	cardCopy.faceDown = true;
 	const libraryOwner = cardCopy.ownerId || controllerId;
-	const addToTop = isLibraryTop(upperTargetZone);
+	const _addToTop = isLibraryTop(upperTargetZone);
 	const addToBottom = isLibraryBottom(upperTargetZone);
 
 	return newState.players.map((p) => {
@@ -287,10 +288,7 @@ export function updateCardZone(card: CardView, zoneId: ZoneId, faceDown: boolean
 /**
  * Find the next player in turn order
  */
-export function getNextPlayer(
-	players: PlaytestPlayer[],
-	currentPlayerId: string
-): PlaytestPlayer | null {
+export function getNextPlayer(players: Player[], currentPlayerId: string): Player | null {
 	if (players.length === 0) return null;
 
 	const currentIndex = players.findIndex((p) => p.playerId === currentPlayerId);

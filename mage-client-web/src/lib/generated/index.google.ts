@@ -3,6 +3,4 @@
 //   protoc-gen-ts_proto  v2.8.3
 //   protoc               v6.33.4
 
- 
-
-export * as protobuf from "./index.google.protobuf";
+export * as protobuf from './index.google.protobuf';

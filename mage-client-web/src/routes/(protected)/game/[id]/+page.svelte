@@ -20,11 +20,12 @@
 	import { toast } from '$lib/stores/toast';
 	// Game components (from playtest/+page.svelte lines 20-46)
 	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
+	import DragGhost from '$lib/components/game/DragGhost.svelte';
+	import GameDialogs from '$lib/components/game/GameDialogs.svelte';
 	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
 	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
 	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
-	import GameDialogs from '$lib/components/game/GameDialogs.svelte';
 
 	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
@@ -976,19 +977,14 @@
 			onLibraryCancel={() => (uiState.showDeckSearch = false)}
 		/>
 
-		<!-- Drag Ghost (from playtest/+page.svelte lines 1978-1990) -->
-		{#if isDragging && dragCardName}
-			{@const dragImageUrl = getScryfallImageUrl(dragCardName, 'normal')}
-			<div class="drag-ghost" style="left: {dragPos.x}px; top: {dragPos.y}px;">
-				<div class="drag-ghost-card" class:valid={isOverValidDrop}>
-					{#if dragImageUrl}
-						<img src={dragImageUrl} alt={dragCardName} class="drag-ghost-image" draggable="false" />
-					{:else}
-						<span class="drag-ghost-name">{dragCardName}</span>
-					{/if}
-				</div>
-			</div>
-		{/if}
+		<!-- Drag Ghost -->
+		<DragGhost
+			{isDragging}
+			cardName={dragCardName}
+			position={dragPos}
+			{isOverValidDrop}
+			imageSize="normal"
+		/>
 	{/if}
 </div>
 
@@ -1256,38 +1252,5 @@
 	.hand-area.drag-valid {
 		background: rgba(74, 144, 226, 0.2);
 		border: 2px dashed #4a90e2;
-	}
-
-	.drag-ghost {
-		position: fixed;
-		pointer-events: none;
-		z-index: 10000;
-		transform: translate(-50%, -50%);
-	}
-
-	.drag-ghost-card {
-		opacity: 0.8;
-		transition: opacity 0.2s;
-	}
-
-	.drag-ghost-card.valid {
-		opacity: 1;
-	}
-
-	.drag-ghost-image {
-		width: 100px;
-		height: 140px;
-		object-fit: cover;
-		border-radius: 8px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-	}
-
-	.drag-ghost-name {
-		display: block;
-		padding: 10px;
-		background: rgba(0, 0, 0, 0.9);
-		color: white;
-		border-radius: 4px;
-		font-size: 14px;
 	}
 </style>

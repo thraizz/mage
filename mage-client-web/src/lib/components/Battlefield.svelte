@@ -5,7 +5,7 @@
 	interface Props {
 		cards: CardType[];
 		title: string;
-		 
+
 		onCardClick?: (cardItem: CardType) => void;
 	}
 

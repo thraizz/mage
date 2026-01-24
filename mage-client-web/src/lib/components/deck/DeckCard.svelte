@@ -53,7 +53,9 @@
 						<div class="stat-label">Total</div>
 					</div>
 					<div class="stat">
-						<div class="stat-value">{deck.mainDeckCount ?? deck.mainDeck.reduce((sum, card) => sum + card.quantity, 0)}</div>
+						<div class="stat-value">
+							{deck.mainDeckCount ?? deck.mainDeck.reduce((sum, card) => sum + card.quantity, 0)}
+						</div>
 						<div class="stat-label">Main</div>
 					</div>
 					{#if deck.sideboard && deck.sideboard.length > 0}

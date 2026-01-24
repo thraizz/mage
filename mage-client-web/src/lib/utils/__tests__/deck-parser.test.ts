@@ -3,12 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-	parseStructuredCards,
-	parseDeckList,
-	structuredCardsToText,
-	type DeckFormat
-} from '../deck-parser';
+import { parseStructuredCards, parseDeckList, structuredCardsToText } from '../deck-parser';
 
 describe('Deck Parser - Format Support', () => {
 	describe('Standard Moxfield Format', () => {

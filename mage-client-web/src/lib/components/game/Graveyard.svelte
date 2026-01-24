@@ -16,22 +16,22 @@
 		playerName = 'Player',
 		isOpponent = false,
 		canDrag = false,
-		 
+
 		onCardClick = (cardId: string) => {},
-		 
+
 		onCardDragStart = (cardId: string) => {},
-		 
+
 		onCardDragEnd = (cardId: string, dropped: boolean) => {}
 	}: {
 		cards?: GameCard[];
 		playerName?: string;
 		isOpponent?: boolean;
 		canDrag?: boolean;
-		 
+
 		onCardClick?: (cardId: string) => void;
-		 
+
 		onCardDragStart?: (cardId: string) => void;
-		 
+
 		onCardDragEnd?: (cardId: string, dropped: boolean) => void;
 	} = $props();
 

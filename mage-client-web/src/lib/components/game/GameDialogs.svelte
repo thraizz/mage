@@ -1,53 +1,20 @@
 <script lang="ts">
-	import type { CardView, CounterView } from '$lib/generated/mage/v1/models';
+	import type { CardView } from '$lib/generated/mage/v1/models';
 	import type { MenuAction } from './DeckContextMenu.svelte';
-
 	// Dialog components
-	import TokenCreator from './TokenCreator.svelte';
-	import CreateTokenDialog from './CreateTokenDialog.svelte';
+	import type { GameUIState } from '$lib/stores/game-ui-state.svelte';
+	import type { Player } from '$lib/types/gamestore';
 	import CounterDialog from './CounterDialog.svelte';
-	import LibrarySearch from './LibrarySearch.svelte';
-	import PlaytestLibrarySearch from './PlaytestLibrarySearch.svelte';
+	import CreateTokenDialog from './CreateTokenDialog.svelte';
 	import DeckContextMenu from './DeckContextMenu.svelte';
-	import NumberInputDialog from './NumberInputDialog.svelte';
-	import ScryDialog from './ScryDialog.svelte';
-	import RevealTopDialog from './RevealTopDialog.svelte';
-	import KeyboardShortcutsModal from './KeyboardShortcutsModal.svelte';
 	import GameChatOverlay from './GameChatOverlay.svelte';
-
-	// Types
-	interface Player {
-		playerId: string;
-		name: string;
-		library: CardView[];
-		libraryCount: number;
-		hand: CardView[];
-	}
-
-	interface GameUIState {
-		showTokenCreator: boolean;
-		showCreateTokenDialog: boolean;
-		showCounterDialog: boolean;
-		selectedCardForCounters: { id: string; name: string } | null;
-		showDeckSearch: boolean;
-		showDeckContextMenu: boolean;
-		deckContextMenuPosition: { x: number; y: number };
-		showNumberInputDialog: boolean;
-		numberInputDialogConfig: {
-			title: string;
-			defaultValue: number;
-			min: number;
-			max: number;
-			onConfirm: (value: number) => void;
-		} | null;
-		showScryDialog: boolean;
-		currentScrySession: {
-			cards: CardView[];
-		} | null;
-		showRevealTopDialog: boolean;
-		revealedCards: CardView[];
-		showKeyboardShortcuts: boolean;
-	}
+	import KeyboardShortcutsModal from './KeyboardShortcutsModal.svelte';
+	import LibrarySearch from './LibrarySearch.svelte';
+	import NumberInputDialog from './NumberInputDialog.svelte';
+	import PlaytestLibrarySearch from './PlaytestLibrarySearch.svelte';
+	import RevealTopDialog from './RevealTopDialog.svelte';
+	import ScryDialog from './ScryDialog.svelte';
+	import TokenCreator from './TokenCreator.svelte';
 
 	interface Props {
 		// UI State
@@ -60,7 +27,13 @@
 		deckContextMenuActions: MenuAction[];
 
 		// Event handlers
-		onCreateToken: (name: string, types: string, power: string, toughness: string, color: string) => void;
+		onCreateToken: (
+			name: string,
+			types: string,
+			power: string,
+			toughness: string,
+			color: string
+		) => void;
 		onAddCounter: (cardId: string, counterName: string, amount: number) => void;
 		onRemoveCounter: (cardId: string, counterName: string, amount: number) => void;
 		onSetCounter: (cardId: string, counterName: string, amount: number) => void;
@@ -114,10 +87,7 @@
 
 <!-- Create Token Dialog -->
 {#if uiState.showCreateTokenDialog}
-	<CreateTokenDialog
-		{onCreateToken}
-		onClose={() => (uiState.showCreateTokenDialog = false)}
-	/>
+	<CreateTokenDialog {onCreateToken} onClose={() => (uiState.showCreateTokenDialog = false)} />
 {/if}
 
 <!-- Counter Dialog -->

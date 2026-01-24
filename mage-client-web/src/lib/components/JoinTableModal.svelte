@@ -17,7 +17,7 @@
 	}: {
 		open: boolean;
 		table: Table | null;
-		 
+
 		onSuccess: (tableId: string) => void;
 	} = $props();
 

@@ -6,13 +6,13 @@
 
 import type { Deck } from '$lib/types/deck';
 import type { CardView } from '$lib/generated/mage/v1/models';
-import type { PlaytestPlayer } from '$lib/types/gamestore';
+import type { Player } from '$lib/types/gamestore';
 import { getDeckDetails } from '$lib/api/decks';
 import { ZoneId } from '$lib/utils/zones';
 import { shuffleArray } from '$lib/utils/playtest-helpers';
 
 export type PlaytestInitResult = {
-	players: PlaytestPlayer[];
+	players: Player[];
 	command: CardView[];
 };
 
@@ -53,7 +53,7 @@ export async function initializePlaytest(deckIds: string[]): Promise<PlaytestIni
 
 	// Create players from decks
 	const perDeck = decks.map((deck, index) => createPlayerFromDeck(deck, index + 1));
-	const players: PlaytestPlayer[] = perDeck.map((x) => x.player);
+	const players: Player[] = perDeck.map((x) => x.player);
 	const command: CardView[] = perDeck.flatMap((x) => x.commanders);
 
 	// Shuffle each player's library
@@ -84,7 +84,7 @@ export async function initializePlaytest(deckIds: string[]): Promise<PlaytestIni
 function createPlayerFromDeck(
 	deck: Deck,
 	playerNumber: number
-): { player: PlaytestPlayer; commanders: CardView[] } {
+): { player: Player; commanders: CardView[] } {
 	const playerId = `player${playerNumber}`;
 
 	// Create card objects from deck list
@@ -114,7 +114,7 @@ function createPlayerFromDeck(
 	// Determine starting life based on format
 	const startingLife = getStartingLife(deck.format);
 
-	const player: PlaytestPlayer = {
+	const player: Player = {
 		playerId,
 		name: `${deck.name} (P${playerNumber})`,
 		life: startingLife,

@@ -5,5394 +5,5492 @@
 // source: mage/v1/models.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import { Timestamp } from "../../google/protobuf/timestamp";
+import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
+import { Timestamp } from '../../google/protobuf/timestamp';
 
 /** CardActionType enumerates possible card actions */
 export enum CardActionType {
-  CARD_ACTION_UNSPECIFIED = 0,
-  CARD_ACTION_CAST_SPELL = 1,
-  CARD_ACTION_PLAY_LAND = 2,
-  CARD_ACTION_ACTIVATE_ABILITY = 3,
-  CARD_ACTION_ACTIVATE_MANA_ABILITY = 4,
-  UNRECOGNIZED = -1,
+	CARD_ACTION_UNSPECIFIED = 0,
+	CARD_ACTION_CAST_SPELL = 1,
+	CARD_ACTION_PLAY_LAND = 2,
+	CARD_ACTION_ACTIVATE_ABILITY = 3,
+	CARD_ACTION_ACTIVATE_MANA_ABILITY = 4,
+	UNRECOGNIZED = -1
 }
 
 export function cardActionTypeFromJSON(object: any): CardActionType {
-  switch (object) {
-    case 0:
-    case "CARD_ACTION_UNSPECIFIED":
-      return CardActionType.CARD_ACTION_UNSPECIFIED;
-    case 1:
-    case "CARD_ACTION_CAST_SPELL":
-      return CardActionType.CARD_ACTION_CAST_SPELL;
-    case 2:
-    case "CARD_ACTION_PLAY_LAND":
-      return CardActionType.CARD_ACTION_PLAY_LAND;
-    case 3:
-    case "CARD_ACTION_ACTIVATE_ABILITY":
-      return CardActionType.CARD_ACTION_ACTIVATE_ABILITY;
-    case 4:
-    case "CARD_ACTION_ACTIVATE_MANA_ABILITY":
-      return CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return CardActionType.UNRECOGNIZED;
-  }
+	switch (object) {
+		case 0:
+		case 'CARD_ACTION_UNSPECIFIED':
+			return CardActionType.CARD_ACTION_UNSPECIFIED;
+		case 1:
+		case 'CARD_ACTION_CAST_SPELL':
+			return CardActionType.CARD_ACTION_CAST_SPELL;
+		case 2:
+		case 'CARD_ACTION_PLAY_LAND':
+			return CardActionType.CARD_ACTION_PLAY_LAND;
+		case 3:
+		case 'CARD_ACTION_ACTIVATE_ABILITY':
+			return CardActionType.CARD_ACTION_ACTIVATE_ABILITY;
+		case 4:
+		case 'CARD_ACTION_ACTIVATE_MANA_ABILITY':
+			return CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY;
+		case -1:
+		case 'UNRECOGNIZED':
+		default:
+			return CardActionType.UNRECOGNIZED;
+	}
 }
 
 export function cardActionTypeToJSON(object: CardActionType): string {
-  switch (object) {
-    case CardActionType.CARD_ACTION_UNSPECIFIED:
-      return "CARD_ACTION_UNSPECIFIED";
-    case CardActionType.CARD_ACTION_CAST_SPELL:
-      return "CARD_ACTION_CAST_SPELL";
-    case CardActionType.CARD_ACTION_PLAY_LAND:
-      return "CARD_ACTION_PLAY_LAND";
-    case CardActionType.CARD_ACTION_ACTIVATE_ABILITY:
-      return "CARD_ACTION_ACTIVATE_ABILITY";
-    case CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY:
-      return "CARD_ACTION_ACTIVATE_MANA_ABILITY";
-    case CardActionType.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
+	switch (object) {
+		case CardActionType.CARD_ACTION_UNSPECIFIED:
+			return 'CARD_ACTION_UNSPECIFIED';
+		case CardActionType.CARD_ACTION_CAST_SPELL:
+			return 'CARD_ACTION_CAST_SPELL';
+		case CardActionType.CARD_ACTION_PLAY_LAND:
+			return 'CARD_ACTION_PLAY_LAND';
+		case CardActionType.CARD_ACTION_ACTIVATE_ABILITY:
+			return 'CARD_ACTION_ACTIVATE_ABILITY';
+		case CardActionType.CARD_ACTION_ACTIVATE_MANA_ABILITY:
+			return 'CARD_ACTION_ACTIVATE_MANA_ABILITY';
+		case CardActionType.UNRECOGNIZED:
+		default:
+			return 'UNRECOGNIZED';
+	}
 }
 
 export enum MessageColor {
-  MESSAGE_COLOR_UNSPECIFIED = 0,
-  BLACK = 1,
-  GREEN = 2,
-  ORANGE = 3,
-  BLUE = 4,
-  RED = 5,
-  YELLOW = 6,
-  UNRECOGNIZED = -1,
+	MESSAGE_COLOR_UNSPECIFIED = 0,
+	BLACK = 1,
+	GREEN = 2,
+	ORANGE = 3,
+	BLUE = 4,
+	RED = 5,
+	YELLOW = 6,
+	UNRECOGNIZED = -1
 }
 
 export function messageColorFromJSON(object: any): MessageColor {
-  switch (object) {
-    case 0:
-    case "MESSAGE_COLOR_UNSPECIFIED":
-      return MessageColor.MESSAGE_COLOR_UNSPECIFIED;
-    case 1:
-    case "BLACK":
-      return MessageColor.BLACK;
-    case 2:
-    case "GREEN":
-      return MessageColor.GREEN;
-    case 3:
-    case "ORANGE":
-      return MessageColor.ORANGE;
-    case 4:
-    case "BLUE":
-      return MessageColor.BLUE;
-    case 5:
-    case "RED":
-      return MessageColor.RED;
-    case 6:
-    case "YELLOW":
-      return MessageColor.YELLOW;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return MessageColor.UNRECOGNIZED;
-  }
+	switch (object) {
+		case 0:
+		case 'MESSAGE_COLOR_UNSPECIFIED':
+			return MessageColor.MESSAGE_COLOR_UNSPECIFIED;
+		case 1:
+		case 'BLACK':
+			return MessageColor.BLACK;
+		case 2:
+		case 'GREEN':
+			return MessageColor.GREEN;
+		case 3:
+		case 'ORANGE':
+			return MessageColor.ORANGE;
+		case 4:
+		case 'BLUE':
+			return MessageColor.BLUE;
+		case 5:
+		case 'RED':
+			return MessageColor.RED;
+		case 6:
+		case 'YELLOW':
+			return MessageColor.YELLOW;
+		case -1:
+		case 'UNRECOGNIZED':
+		default:
+			return MessageColor.UNRECOGNIZED;
+	}
 }
 
 export function messageColorToJSON(object: MessageColor): string {
-  switch (object) {
-    case MessageColor.MESSAGE_COLOR_UNSPECIFIED:
-      return "MESSAGE_COLOR_UNSPECIFIED";
-    case MessageColor.BLACK:
-      return "BLACK";
-    case MessageColor.GREEN:
-      return "GREEN";
-    case MessageColor.ORANGE:
-      return "ORANGE";
-    case MessageColor.BLUE:
-      return "BLUE";
-    case MessageColor.RED:
-      return "RED";
-    case MessageColor.YELLOW:
-      return "YELLOW";
-    case MessageColor.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
+	switch (object) {
+		case MessageColor.MESSAGE_COLOR_UNSPECIFIED:
+			return 'MESSAGE_COLOR_UNSPECIFIED';
+		case MessageColor.BLACK:
+			return 'BLACK';
+		case MessageColor.GREEN:
+			return 'GREEN';
+		case MessageColor.ORANGE:
+			return 'ORANGE';
+		case MessageColor.BLUE:
+			return 'BLUE';
+		case MessageColor.RED:
+			return 'RED';
+		case MessageColor.YELLOW:
+			return 'YELLOW';
+		case MessageColor.UNRECOGNIZED:
+		default:
+			return 'UNRECOGNIZED';
+	}
 }
 
 export enum MessageType {
-  MESSAGE_TYPE_UNSPECIFIED = 0,
-  TALK = 1,
-  WHISPER = 2,
-  STATUS = 3,
-  USER_INFO = 4,
-  UNRECOGNIZED = -1,
+	MESSAGE_TYPE_UNSPECIFIED = 0,
+	TALK = 1,
+	WHISPER = 2,
+	STATUS = 3,
+	USER_INFO = 4,
+	UNRECOGNIZED = -1
 }
 
 export function messageTypeFromJSON(object: any): MessageType {
-  switch (object) {
-    case 0:
-    case "MESSAGE_TYPE_UNSPECIFIED":
-      return MessageType.MESSAGE_TYPE_UNSPECIFIED;
-    case 1:
-    case "TALK":
-      return MessageType.TALK;
-    case 2:
-    case "WHISPER":
-      return MessageType.WHISPER;
-    case 3:
-    case "STATUS":
-      return MessageType.STATUS;
-    case 4:
-    case "USER_INFO":
-      return MessageType.USER_INFO;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return MessageType.UNRECOGNIZED;
-  }
+	switch (object) {
+		case 0:
+		case 'MESSAGE_TYPE_UNSPECIFIED':
+			return MessageType.MESSAGE_TYPE_UNSPECIFIED;
+		case 1:
+		case 'TALK':
+			return MessageType.TALK;
+		case 2:
+		case 'WHISPER':
+			return MessageType.WHISPER;
+		case 3:
+		case 'STATUS':
+			return MessageType.STATUS;
+		case 4:
+		case 'USER_INFO':
+			return MessageType.USER_INFO;
+		case -1:
+		case 'UNRECOGNIZED':
+		default:
+			return MessageType.UNRECOGNIZED;
+	}
 }
 
 export function messageTypeToJSON(object: MessageType): string {
-  switch (object) {
-    case MessageType.MESSAGE_TYPE_UNSPECIFIED:
-      return "MESSAGE_TYPE_UNSPECIFIED";
-    case MessageType.TALK:
-      return "TALK";
-    case MessageType.WHISPER:
-      return "WHISPER";
-    case MessageType.STATUS:
-      return "STATUS";
-    case MessageType.USER_INFO:
-      return "USER_INFO";
-    case MessageType.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
+	switch (object) {
+		case MessageType.MESSAGE_TYPE_UNSPECIFIED:
+			return 'MESSAGE_TYPE_UNSPECIFIED';
+		case MessageType.TALK:
+			return 'TALK';
+		case MessageType.WHISPER:
+			return 'WHISPER';
+		case MessageType.STATUS:
+			return 'STATUS';
+		case MessageType.USER_INFO:
+			return 'USER_INFO';
+		case MessageType.UNRECOGNIZED:
+		default:
+			return 'UNRECOGNIZED';
+	}
 }
 
 /** TableView represents a game table in the lobby */
 export interface TableView {
-  tableId: string;
-  gameType: string;
-  tableName: string;
-  controllerName: string;
-  tableStateText: string;
-  numSeats: number;
-  seats: SeatView[];
-  matchOptions?: MatchOptions | undefined;
-  createTime?: Date | undefined;
-  isTournament: boolean;
-  tournamentId: string;
-  deckValidator?: DeckValidator | undefined;
-  password: string;
-  specTatorshipAllowed: boolean;
+	tableId: string;
+	gameType: string;
+	tableName: string;
+	controllerName: string;
+	tableStateText: string;
+	numSeats: number;
+	seats: SeatView[];
+	matchOptions?: MatchOptions | undefined;
+	createTime?: Date | undefined;
+	isTournament: boolean;
+	tournamentId: string;
+	deckValidator?: DeckValidator | undefined;
+	password: string;
+	specTatorshipAllowed: boolean;
 }
 
 /** SeatView represents a player seat at a table */
 export interface SeatView {
-  seatNumber: number;
-  playerName: string;
-  playerType: string;
-  locked: boolean;
+	seatNumber: number;
+	playerName: string;
+	playerType: string;
+	locked: boolean;
 }
 
 /** MatchOptions defines match configuration */
 export interface MatchOptions {
-  name: string;
-  gameType: string;
-  deckType: string;
-  limited: boolean;
-  winsNeeded: number;
-  freeMulligans: number;
-  timeLimit?: MatchTimeLimit | undefined;
-  priorityTime: number;
-  rated: boolean;
-  banlist: string[];
-  skillLevel: string;
-  rangeOfInfluence: boolean;
-  planeChase: boolean;
-  rollbackTurnsAllowed: boolean;
-  embedDeckInSavedGame: number;
+	name: string;
+	gameType: string;
+	deckType: string;
+	limited: boolean;
+	winsNeeded: number;
+	freeMulligans: number;
+	timeLimit?: MatchTimeLimit | undefined;
+	priorityTime: number;
+	rated: boolean;
+	banlist: string[];
+	skillLevel: string;
+	rangeOfInfluence: boolean;
+	planeChase: boolean;
+	rollbackTurnsAllowed: boolean;
+	embedDeckInSavedGame: number;
 }
 
 /** MatchTimeLimit defines time limits for matches */
 export interface MatchTimeLimit {
-  minutes: number;
+	minutes: number;
 }
 
 /** DeckValidator specifies deck validation rules */
 export interface DeckValidator {
-  name: string;
-  minDeckSize: number;
-  maxDeckSize: number;
-  singleton: boolean;
-  legalSets: string[];
-  bannedCards: string[];
-  restrictedCards: string[];
+	name: string;
+	minDeckSize: number;
+	maxDeckSize: number;
+	singleton: boolean;
+	legalSets: string[];
+	bannedCards: string[];
+	restrictedCards: string[];
 }
 
 /** GameView represents the current game state */
 export interface GameView {
-  gameId: string;
-  state: string;
-  players: PlayerView[];
-  activePlayerId: string;
-  priorityPlayerId: string;
-  turn: number;
-  phase: string;
-  step: string;
-  messages: GameMessage[];
-  battlefield: CardView[];
-  stack: CardView[];
-  exile: CardView[];
-  command: CardView[];
-  revealed: RevealedView[];
-  lookedAt: LookedAtView[];
-  combat?: CombatView | undefined;
-  special: boolean;
-  startTime?:
-    | Date
-    | undefined;
-  /** Field 19: Which player perspective this view is for (their own player ID) */
-  activeControlSeat: string;
-  /** Pre-computed display values (server source of truth) */
-  activePlayerName: string;
-  priorityPlayerName: string;
-  gameFormat: string;
-  isMulliganPhase: boolean;
-  landsPlayedThisTurn: number;
-  landsAllowedThisTurn: number;
-  /** Pending library search (if any) - only visible to the searching player */
-  pendingLibrarySearch?: LibrarySearchView | undefined;
+	gameId: string;
+	state: string;
+	players: PlayerView[];
+	activePlayerId: string;
+	priorityPlayerId: string;
+	turn: number;
+	phase: string;
+	step: string;
+	messages: GameMessage[];
+	battlefield: CardView[];
+	stack: CardView[];
+	exile: CardView[];
+	command: CardView[];
+	revealed: RevealedView[];
+	lookedAt: LookedAtView[];
+	combat?: CombatView | undefined;
+	special: boolean;
+	startTime?: Date | undefined;
+	/** Field 19: Which player perspective this view is for (their own player ID) */
+	activeControlSeat: string;
+	/** Pre-computed display values (server source of truth) */
+	activePlayerName: string;
+	priorityPlayerName: string;
+	gameFormat: string;
+	isMulliganPhase: boolean;
+	landsPlayedThisTurn: number;
+	landsAllowedThisTurn: number;
+	/** Pending library search (if any) - only visible to the searching player */
+	pendingLibrarySearch?: LibrarySearchView | undefined;
 }
 
 /** LibrarySearchView represents a pending library search interaction */
 export interface LibrarySearchView {
-  playerId: string;
-  message: string;
-  /** "hand", "battlefield", "top", "graveyard" */
-  destination: string;
-  cards: CardView[];
-  canCancel: boolean;
+	playerId: string;
+	message: string;
+	/** "hand", "battlefield", "top", "graveyard" */
+	destination: string;
+	cards: CardView[];
+	canCancel: boolean;
 }
 
 /** PlayerView represents a player's state */
 export interface PlayerView {
-  playerId: string;
-  name: string;
-  life: number;
-  poison: number;
-  energy: number;
-  libraryCount: number;
-  handCount: number;
-  hand: CardView[];
-  graveyard: CardView[];
-  /** Only populated for viewing player, empty for opponents */
-  library: CardView[];
-  manaPool?: ManaPoolView | undefined;
-  hasPriority: boolean;
-  passed: boolean;
-  stateOrdinal: number;
-  lost: boolean;
-  left: boolean;
-  wins: number;
-  /** Whether player has kept their hand during mulligan phase */
-  keptHand: boolean;
-  /** Server-computed: does this player have any legal actions right now? */
-  hasAvailableActions: boolean;
-  /** Number of times this player has mulliganed this game */
-  mulliganCount: number;
+	playerId: string;
+	name: string;
+	life: number;
+	poison: number;
+	energy: number;
+	libraryCount: number;
+	handCount: number;
+	hand: CardView[];
+	graveyard: CardView[];
+	/** Only populated for viewing player, empty for opponents */
+	library: CardView[];
+	manaPool?: ManaPoolView | undefined;
+	hasPriority: boolean;
+	passed: boolean;
+	stateOrdinal: number;
+	lost: boolean;
+	left: boolean;
+	wins: number;
+	/** Whether player has kept their hand during mulligan phase */
+	keptHand: boolean;
+	/** Server-computed: does this player have any legal actions right now? */
+	hasAvailableActions: boolean;
+	/** Number of times this player has mulliganed this game */
+	mulliganCount: number;
 }
 
 /** CardView represents a card */
 export interface CardView {
-  id: string;
-  name: string;
-  displayName: string;
-  manaCost: string;
-  type: string;
-  subTypes: string;
-  superTypes: string;
-  color: string;
-  power: string;
-  toughness: string;
-  loyalty: string;
-  cardNumber: number;
-  expansionSetCode: string;
-  rarity: string;
-  rulesText: string;
-  abilities: AbilityView[];
-  tapped: boolean;
-  flipped: boolean;
-  transformed: boolean;
-  faceDown: boolean;
-  zone: number;
-  controllerId: string;
-  ownerId: string;
-  counters: CounterView[];
-  attachedTo: string[];
-  /** Creature has summoning sickness (can't attack/tap) */
-  summoningSickness: boolean;
-  /** Available actions for this card (context-aware, server source of truth) */
-  availableActions: CardAction[];
+	id: string;
+	name: string;
+	displayName: string;
+	manaCost: string;
+	type: string;
+	subTypes: string;
+	superTypes: string;
+	color: string;
+	power: string;
+	toughness: string;
+	loyalty: string;
+	cardNumber: number;
+	expansionSetCode: string;
+	rarity: string;
+	rulesText: string;
+	abilities: AbilityView[];
+	tapped: boolean;
+	flipped: boolean;
+	transformed: boolean;
+	faceDown: boolean;
+	zone: number;
+	controllerId: string;
+	ownerId: string;
+	counters: CounterView[];
+	attachedTo: string[];
+	/** Creature has summoning sickness (can't attack/tap) */
+	summoningSickness: boolean;
+	/** Available actions for this card (context-aware, server source of truth) */
+	availableActions: CardAction[];
 }
 
 /** AbilityView represents a card ability */
 export interface AbilityView {
-  id: string;
-  text: string;
-  rule: string;
+	id: string;
+	text: string;
+	rule: string;
 }
 
 /** CardAction represents an action available for a card */
 export interface CardAction {
-  actionType: CardActionType;
-  /** For abilities with multiple options */
-  actionId: string;
-  /** "Cast", "Play Land", "Tap: Add {G}" */
-  displayText: string;
-  /** Can perform right now? */
-  isEnabled: boolean;
-  /** "Not enough mana", "Wrong phase" */
-  disabledReason: string;
+	actionType: CardActionType;
+	/** For abilities with multiple options */
+	actionId: string;
+	/** "Cast", "Play Land", "Tap: Add {G}" */
+	displayText: string;
+	/** Can perform right now? */
+	isEnabled: boolean;
+	/** "Not enough mana", "Wrong phase" */
+	disabledReason: string;
 }
 
 /** CounterView represents a counter on a card */
 export interface CounterView {
-  name: string;
-  count: number;
+	name: string;
+	count: number;
 }
 
 /** ManaPoolView represents a player's mana pool */
 export interface ManaPoolView {
-  white: number;
-  blue: number;
-  black: number;
-  red: number;
-  green: number;
-  colorless: number;
+	white: number;
+	blue: number;
+	black: number;
+	red: number;
+	green: number;
+	colorless: number;
 }
 
 /** GameMessage represents a message in the game log */
 export interface GameMessage {
-  id: number;
-  text: string;
-  color: string;
-  time?:
-    | Date
-    | undefined;
-  /** Snapshot ID for this point in time (0 = no snapshot) */
-  bookmarkId: number;
-  /** Whether rollback is allowed to this point */
-  rollbackAvailable: boolean;
+	id: number;
+	text: string;
+	color: string;
+	time?: Date | undefined;
+	/** Snapshot ID for this point in time (0 = no snapshot) */
+	bookmarkId: number;
+	/** Whether rollback is allowed to this point */
+	rollbackAvailable: boolean;
 }
 
 /** CombatView represents combat state */
 export interface CombatView {
-  attackingPlayerId: string;
-  groups: CombatGroupView[];
+	attackingPlayerId: string;
+	groups: CombatGroupView[];
 }
 
 /** CombatGroupView represents a combat group */
 export interface CombatGroupView {
-  attackers: string[];
-  blockers: string[];
-  defendingPlayerId: string;
+	attackers: string[];
+	blockers: string[];
+	defendingPlayerId: string;
 }
 
 /** RevealedView represents revealed cards */
 export interface RevealedView {
-  name: string;
-  cards: CardView[];
+	name: string;
+	cards: CardView[];
 }
 
 /** LookedAtView represents looked at cards */
 export interface LookedAtView {
-  name: string;
-  cards: CardView[];
+	name: string;
+	cards: CardView[];
 }
 
 /** TournamentView represents a tournament */
 export interface TournamentView {
-  tournamentId: string;
-  tournamentName: string;
-  tournamentType: string;
-  state: string;
-  numPlayers: number;
-  numRounds: number;
-  currentRound: number;
-  players: TournamentPlayerView[];
-  rounds: RoundView[];
-  startTime?: Date | undefined;
-  endTime?: Date | undefined;
+	tournamentId: string;
+	tournamentName: string;
+	tournamentType: string;
+	state: string;
+	numPlayers: number;
+	numRounds: number;
+	currentRound: number;
+	players: TournamentPlayerView[];
+	rounds: RoundView[];
+	startTime?: Date | undefined;
+	endTime?: Date | undefined;
 }
 
 /** TournamentPlayerView represents a tournament participant */
 export interface TournamentPlayerView {
-  playerName: string;
-  points: number;
-  wins: number;
-  losses: number;
-  draws: number;
-  eliminated: boolean;
-  quit: boolean;
-  state: string;
+	playerName: string;
+	points: number;
+	wins: number;
+	losses: number;
+	draws: number;
+	eliminated: boolean;
+	quit: boolean;
+	state: string;
 }
 
 /** RoundView represents a tournament round */
 export interface RoundView {
-  roundNumber: number;
-  pairings: PairingView[];
-  state: string;
+	roundNumber: number;
+	pairings: PairingView[];
+	state: string;
 }
 
 /** PairingView represents a match pairing */
 export interface PairingView {
-  player1: string;
-  player2: string;
-  tableId: string;
-  player1Wins: number;
-  player2Wins: number;
+	player1: string;
+	player2: string;
+	tableId: string;
+	player1Wins: number;
+	player2Wins: number;
 }
 
 /** DraftPickView represents a draft pick state */
 export interface DraftPickView {
-  draftId: string;
-  booster: CardView[];
-  picks: CardView[];
-  pickNumber: number;
-  boosterNumber: number;
-  message: string;
+	draftId: string;
+	booster: CardView[];
+	picks: CardView[];
+	pickNumber: number;
+	boosterNumber: number;
+	message: string;
 }
 
 /** UserView represents user information */
 export interface UserView {
-  userName: string;
-  state: string;
-  matchHistory: string;
-  tournamentHistory: string;
-  stats?: UserStatsView | undefined;
-  connectedAt?: Date | undefined;
-  admin: boolean;
+	userName: string;
+	state: string;
+	matchHistory: string;
+	tournamentHistory: string;
+	stats?: UserStatsView | undefined;
+	connectedAt?: Date | undefined;
+	admin: boolean;
 }
 
 /** UserStatsView represents user statistics */
 export interface UserStatsView {
-  matches: number;
-  tournaments: number;
-  wins: number;
-  losses: number;
-  rating: number;
-  tourneysWon: number;
-  tourneysSecond: number;
-  quitRatio: number;
+	matches: number;
+	tournaments: number;
+	wins: number;
+	losses: number;
+	rating: number;
+	tourneysWon: number;
+	tourneysSecond: number;
+	quitRatio: number;
 }
 
 /** ChatMessage represents a chat message */
 export interface ChatMessage {
-  userName: string;
-  message: string;
-  time?: Date | undefined;
-  color: MessageColor;
-  messageType: MessageType;
+	userName: string;
+	message: string;
+	time?: Date | undefined;
+	color: MessageColor;
+	messageType: MessageType;
 }
 
 /** ServerState represents server information */
 export interface ServerState {
-  activePlayers: number;
-  activeGames: number;
-  activeTournaments: number;
-  activeTables: number;
-  numberOfThreads: number;
-  serverVersion: string;
-  serverTime?: Date | undefined;
+	activePlayers: number;
+	activeGames: number;
+	activeTournaments: number;
+	activeTables: number;
+	numberOfThreads: number;
+	serverVersion: string;
+	serverTime?: Date | undefined;
 }
 
 /** MatchQueueView represents a match queue entry */
 export interface MatchQueueView {
-  matchName: string;
-  matchOptions?: MatchOptions | undefined;
-  playersWaiting: number;
+	matchName: string;
+	matchOptions?: MatchOptions | undefined;
+	playersWaiting: number;
 }
 
 function createBaseTableView(): TableView {
-  return {
-    tableId: "",
-    gameType: "",
-    tableName: "",
-    controllerName: "",
-    tableStateText: "",
-    numSeats: 0,
-    seats: [],
-    matchOptions: undefined,
-    createTime: undefined,
-    isTournament: false,
-    tournamentId: "",
-    deckValidator: undefined,
-    password: "",
-    specTatorshipAllowed: false,
-  };
+	return {
+		tableId: '',
+		gameType: '',
+		tableName: '',
+		controllerName: '',
+		tableStateText: '',
+		numSeats: 0,
+		seats: [],
+		matchOptions: undefined,
+		createTime: undefined,
+		isTournament: false,
+		tournamentId: '',
+		deckValidator: undefined,
+		password: '',
+		specTatorshipAllowed: false
+	};
 }
 
 export const TableView: MessageFns<TableView> = {
-  encode(message: TableView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.tableId !== "") {
-      writer.uint32(10).string(message.tableId);
-    }
-    if (message.gameType !== "") {
-      writer.uint32(18).string(message.gameType);
-    }
-    if (message.tableName !== "") {
-      writer.uint32(26).string(message.tableName);
-    }
-    if (message.controllerName !== "") {
-      writer.uint32(34).string(message.controllerName);
-    }
-    if (message.tableStateText !== "") {
-      writer.uint32(42).string(message.tableStateText);
-    }
-    if (message.numSeats !== 0) {
-      writer.uint32(48).int32(message.numSeats);
-    }
-    for (const v of message.seats) {
-      SeatView.encode(v!, writer.uint32(58).fork()).join();
-    }
-    if (message.matchOptions !== undefined) {
-      MatchOptions.encode(message.matchOptions, writer.uint32(66).fork()).join();
-    }
-    if (message.createTime !== undefined) {
-      Timestamp.encode(toTimestamp(message.createTime), writer.uint32(74).fork()).join();
-    }
-    if (message.isTournament !== false) {
-      writer.uint32(80).bool(message.isTournament);
-    }
-    if (message.tournamentId !== "") {
-      writer.uint32(90).string(message.tournamentId);
-    }
-    if (message.deckValidator !== undefined) {
-      DeckValidator.encode(message.deckValidator, writer.uint32(98).fork()).join();
-    }
-    if (message.password !== "") {
-      writer.uint32(106).string(message.password);
-    }
-    if (message.specTatorshipAllowed !== false) {
-      writer.uint32(112).bool(message.specTatorshipAllowed);
-    }
-    return writer;
-  },
+	encode(message: TableView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.tableId !== '') {
+			writer.uint32(10).string(message.tableId);
+		}
+		if (message.gameType !== '') {
+			writer.uint32(18).string(message.gameType);
+		}
+		if (message.tableName !== '') {
+			writer.uint32(26).string(message.tableName);
+		}
+		if (message.controllerName !== '') {
+			writer.uint32(34).string(message.controllerName);
+		}
+		if (message.tableStateText !== '') {
+			writer.uint32(42).string(message.tableStateText);
+		}
+		if (message.numSeats !== 0) {
+			writer.uint32(48).int32(message.numSeats);
+		}
+		for (const v of message.seats) {
+			SeatView.encode(v!, writer.uint32(58).fork()).join();
+		}
+		if (message.matchOptions !== undefined) {
+			MatchOptions.encode(message.matchOptions, writer.uint32(66).fork()).join();
+		}
+		if (message.createTime !== undefined) {
+			Timestamp.encode(toTimestamp(message.createTime), writer.uint32(74).fork()).join();
+		}
+		if (message.isTournament !== false) {
+			writer.uint32(80).bool(message.isTournament);
+		}
+		if (message.tournamentId !== '') {
+			writer.uint32(90).string(message.tournamentId);
+		}
+		if (message.deckValidator !== undefined) {
+			DeckValidator.encode(message.deckValidator, writer.uint32(98).fork()).join();
+		}
+		if (message.password !== '') {
+			writer.uint32(106).string(message.password);
+		}
+		if (message.specTatorshipAllowed !== false) {
+			writer.uint32(112).bool(message.specTatorshipAllowed);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): TableView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTableView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): TableView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseTableView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.tableId = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.tableId = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.gameType = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.gameType = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.tableName = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
+					message.tableName = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 34) {
+						break;
+					}
 
-          message.controllerName = reader.string();
-          continue;
-        }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
+					message.controllerName = reader.string();
+					continue;
+				}
+				case 5: {
+					if (tag !== 42) {
+						break;
+					}
 
-          message.tableStateText = reader.string();
-          continue;
-        }
-        case 6: {
-          if (tag !== 48) {
-            break;
-          }
+					message.tableStateText = reader.string();
+					continue;
+				}
+				case 6: {
+					if (tag !== 48) {
+						break;
+					}
 
-          message.numSeats = reader.int32();
-          continue;
-        }
-        case 7: {
-          if (tag !== 58) {
-            break;
-          }
+					message.numSeats = reader.int32();
+					continue;
+				}
+				case 7: {
+					if (tag !== 58) {
+						break;
+					}
 
-          message.seats.push(SeatView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 8: {
-          if (tag !== 66) {
-            break;
-          }
+					message.seats.push(SeatView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 8: {
+					if (tag !== 66) {
+						break;
+					}
 
-          message.matchOptions = MatchOptions.decode(reader, reader.uint32());
-          continue;
-        }
-        case 9: {
-          if (tag !== 74) {
-            break;
-          }
+					message.matchOptions = MatchOptions.decode(reader, reader.uint32());
+					continue;
+				}
+				case 9: {
+					if (tag !== 74) {
+						break;
+					}
 
-          message.createTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 10: {
-          if (tag !== 80) {
-            break;
-          }
+					message.createTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 10: {
+					if (tag !== 80) {
+						break;
+					}
 
-          message.isTournament = reader.bool();
-          continue;
-        }
-        case 11: {
-          if (tag !== 90) {
-            break;
-          }
+					message.isTournament = reader.bool();
+					continue;
+				}
+				case 11: {
+					if (tag !== 90) {
+						break;
+					}
 
-          message.tournamentId = reader.string();
-          continue;
-        }
-        case 12: {
-          if (tag !== 98) {
-            break;
-          }
+					message.tournamentId = reader.string();
+					continue;
+				}
+				case 12: {
+					if (tag !== 98) {
+						break;
+					}
 
-          message.deckValidator = DeckValidator.decode(reader, reader.uint32());
-          continue;
-        }
-        case 13: {
-          if (tag !== 106) {
-            break;
-          }
+					message.deckValidator = DeckValidator.decode(reader, reader.uint32());
+					continue;
+				}
+				case 13: {
+					if (tag !== 106) {
+						break;
+					}
 
-          message.password = reader.string();
-          continue;
-        }
-        case 14: {
-          if (tag !== 112) {
-            break;
-          }
+					message.password = reader.string();
+					continue;
+				}
+				case 14: {
+					if (tag !== 112) {
+						break;
+					}
 
-          message.specTatorshipAllowed = reader.bool();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.specTatorshipAllowed = reader.bool();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): TableView {
-    return {
-      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
-      gameType: isSet(object.gameType) ? globalThis.String(object.gameType) : "",
-      tableName: isSet(object.tableName) ? globalThis.String(object.tableName) : "",
-      controllerName: isSet(object.controllerName) ? globalThis.String(object.controllerName) : "",
-      tableStateText: isSet(object.tableStateText) ? globalThis.String(object.tableStateText) : "",
-      numSeats: isSet(object.numSeats) ? globalThis.Number(object.numSeats) : 0,
-      seats: globalThis.Array.isArray(object?.seats) ? object.seats.map((e: any) => SeatView.fromJSON(e)) : [],
-      matchOptions: isSet(object.matchOptions) ? MatchOptions.fromJSON(object.matchOptions) : undefined,
-      createTime: isSet(object.createTime) ? fromJsonTimestamp(object.createTime) : undefined,
-      isTournament: isSet(object.isTournament) ? globalThis.Boolean(object.isTournament) : false,
-      tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : "",
-      deckValidator: isSet(object.deckValidator) ? DeckValidator.fromJSON(object.deckValidator) : undefined,
-      password: isSet(object.password) ? globalThis.String(object.password) : "",
-      specTatorshipAllowed: isSet(object.specTatorshipAllowed)
-        ? globalThis.Boolean(object.specTatorshipAllowed)
-        : false,
-    };
-  },
+	fromJSON(object: any): TableView {
+		return {
+			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : '',
+			gameType: isSet(object.gameType) ? globalThis.String(object.gameType) : '',
+			tableName: isSet(object.tableName) ? globalThis.String(object.tableName) : '',
+			controllerName: isSet(object.controllerName) ? globalThis.String(object.controllerName) : '',
+			tableStateText: isSet(object.tableStateText) ? globalThis.String(object.tableStateText) : '',
+			numSeats: isSet(object.numSeats) ? globalThis.Number(object.numSeats) : 0,
+			seats: globalThis.Array.isArray(object?.seats)
+				? object.seats.map((e: any) => SeatView.fromJSON(e))
+				: [],
+			matchOptions: isSet(object.matchOptions)
+				? MatchOptions.fromJSON(object.matchOptions)
+				: undefined,
+			createTime: isSet(object.createTime) ? fromJsonTimestamp(object.createTime) : undefined,
+			isTournament: isSet(object.isTournament) ? globalThis.Boolean(object.isTournament) : false,
+			tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : '',
+			deckValidator: isSet(object.deckValidator)
+				? DeckValidator.fromJSON(object.deckValidator)
+				: undefined,
+			password: isSet(object.password) ? globalThis.String(object.password) : '',
+			specTatorshipAllowed: isSet(object.specTatorshipAllowed)
+				? globalThis.Boolean(object.specTatorshipAllowed)
+				: false
+		};
+	},
 
-  toJSON(message: TableView): unknown {
-    const obj: any = {};
-    if (message.tableId !== "") {
-      obj.tableId = message.tableId;
-    }
-    if (message.gameType !== "") {
-      obj.gameType = message.gameType;
-    }
-    if (message.tableName !== "") {
-      obj.tableName = message.tableName;
-    }
-    if (message.controllerName !== "") {
-      obj.controllerName = message.controllerName;
-    }
-    if (message.tableStateText !== "") {
-      obj.tableStateText = message.tableStateText;
-    }
-    if (message.numSeats !== 0) {
-      obj.numSeats = Math.round(message.numSeats);
-    }
-    if (message.seats?.length) {
-      obj.seats = message.seats.map((e) => SeatView.toJSON(e));
-    }
-    if (message.matchOptions !== undefined) {
-      obj.matchOptions = MatchOptions.toJSON(message.matchOptions);
-    }
-    if (message.createTime !== undefined) {
-      obj.createTime = message.createTime.toISOString();
-    }
-    if (message.isTournament !== false) {
-      obj.isTournament = message.isTournament;
-    }
-    if (message.tournamentId !== "") {
-      obj.tournamentId = message.tournamentId;
-    }
-    if (message.deckValidator !== undefined) {
-      obj.deckValidator = DeckValidator.toJSON(message.deckValidator);
-    }
-    if (message.password !== "") {
-      obj.password = message.password;
-    }
-    if (message.specTatorshipAllowed !== false) {
-      obj.specTatorshipAllowed = message.specTatorshipAllowed;
-    }
-    return obj;
-  },
+	toJSON(message: TableView): unknown {
+		const obj: any = {};
+		if (message.tableId !== '') {
+			obj.tableId = message.tableId;
+		}
+		if (message.gameType !== '') {
+			obj.gameType = message.gameType;
+		}
+		if (message.tableName !== '') {
+			obj.tableName = message.tableName;
+		}
+		if (message.controllerName !== '') {
+			obj.controllerName = message.controllerName;
+		}
+		if (message.tableStateText !== '') {
+			obj.tableStateText = message.tableStateText;
+		}
+		if (message.numSeats !== 0) {
+			obj.numSeats = Math.round(message.numSeats);
+		}
+		if (message.seats?.length) {
+			obj.seats = message.seats.map((e) => SeatView.toJSON(e));
+		}
+		if (message.matchOptions !== undefined) {
+			obj.matchOptions = MatchOptions.toJSON(message.matchOptions);
+		}
+		if (message.createTime !== undefined) {
+			obj.createTime = message.createTime.toISOString();
+		}
+		if (message.isTournament !== false) {
+			obj.isTournament = message.isTournament;
+		}
+		if (message.tournamentId !== '') {
+			obj.tournamentId = message.tournamentId;
+		}
+		if (message.deckValidator !== undefined) {
+			obj.deckValidator = DeckValidator.toJSON(message.deckValidator);
+		}
+		if (message.password !== '') {
+			obj.password = message.password;
+		}
+		if (message.specTatorshipAllowed !== false) {
+			obj.specTatorshipAllowed = message.specTatorshipAllowed;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<TableView>): TableView {
-    return TableView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<TableView>): TableView {
-    const message = createBaseTableView();
-    message.tableId = object.tableId ?? "";
-    message.gameType = object.gameType ?? "";
-    message.tableName = object.tableName ?? "";
-    message.controllerName = object.controllerName ?? "";
-    message.tableStateText = object.tableStateText ?? "";
-    message.numSeats = object.numSeats ?? 0;
-    message.seats = object.seats?.map((e) => SeatView.fromPartial(e)) || [];
-    message.matchOptions = (object.matchOptions !== undefined && object.matchOptions !== null)
-      ? MatchOptions.fromPartial(object.matchOptions)
-      : undefined;
-    message.createTime = object.createTime ?? undefined;
-    message.isTournament = object.isTournament ?? false;
-    message.tournamentId = object.tournamentId ?? "";
-    message.deckValidator = (object.deckValidator !== undefined && object.deckValidator !== null)
-      ? DeckValidator.fromPartial(object.deckValidator)
-      : undefined;
-    message.password = object.password ?? "";
-    message.specTatorshipAllowed = object.specTatorshipAllowed ?? false;
-    return message;
-  },
+	create(base?: DeepPartial<TableView>): TableView {
+		return TableView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<TableView>): TableView {
+		const message = createBaseTableView();
+		message.tableId = object.tableId ?? '';
+		message.gameType = object.gameType ?? '';
+		message.tableName = object.tableName ?? '';
+		message.controllerName = object.controllerName ?? '';
+		message.tableStateText = object.tableStateText ?? '';
+		message.numSeats = object.numSeats ?? 0;
+		message.seats = object.seats?.map((e) => SeatView.fromPartial(e)) || [];
+		message.matchOptions =
+			object.matchOptions !== undefined && object.matchOptions !== null
+				? MatchOptions.fromPartial(object.matchOptions)
+				: undefined;
+		message.createTime = object.createTime ?? undefined;
+		message.isTournament = object.isTournament ?? false;
+		message.tournamentId = object.tournamentId ?? '';
+		message.deckValidator =
+			object.deckValidator !== undefined && object.deckValidator !== null
+				? DeckValidator.fromPartial(object.deckValidator)
+				: undefined;
+		message.password = object.password ?? '';
+		message.specTatorshipAllowed = object.specTatorshipAllowed ?? false;
+		return message;
+	}
 };
 
 function createBaseSeatView(): SeatView {
-  return { seatNumber: 0, playerName: "", playerType: "", locked: false };
+	return { seatNumber: 0, playerName: '', playerType: '', locked: false };
 }
 
 export const SeatView: MessageFns<SeatView> = {
-  encode(message: SeatView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.seatNumber !== 0) {
-      writer.uint32(8).int32(message.seatNumber);
-    }
-    if (message.playerName !== "") {
-      writer.uint32(18).string(message.playerName);
-    }
-    if (message.playerType !== "") {
-      writer.uint32(26).string(message.playerType);
-    }
-    if (message.locked !== false) {
-      writer.uint32(32).bool(message.locked);
-    }
-    return writer;
-  },
+	encode(message: SeatView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.seatNumber !== 0) {
+			writer.uint32(8).int32(message.seatNumber);
+		}
+		if (message.playerName !== '') {
+			writer.uint32(18).string(message.playerName);
+		}
+		if (message.playerType !== '') {
+			writer.uint32(26).string(message.playerType);
+		}
+		if (message.locked !== false) {
+			writer.uint32(32).bool(message.locked);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): SeatView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSeatView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): SeatView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseSeatView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 8) {
+						break;
+					}
 
-          message.seatNumber = reader.int32();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.seatNumber = reader.int32();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.playerName = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.playerName = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.playerType = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.playerType = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.locked = reader.bool();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.locked = reader.bool();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): SeatView {
-    return {
-      seatNumber: isSet(object.seatNumber) ? globalThis.Number(object.seatNumber) : 0,
-      playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : "",
-      playerType: isSet(object.playerType) ? globalThis.String(object.playerType) : "",
-      locked: isSet(object.locked) ? globalThis.Boolean(object.locked) : false,
-    };
-  },
+	fromJSON(object: any): SeatView {
+		return {
+			seatNumber: isSet(object.seatNumber) ? globalThis.Number(object.seatNumber) : 0,
+			playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : '',
+			playerType: isSet(object.playerType) ? globalThis.String(object.playerType) : '',
+			locked: isSet(object.locked) ? globalThis.Boolean(object.locked) : false
+		};
+	},
 
-  toJSON(message: SeatView): unknown {
-    const obj: any = {};
-    if (message.seatNumber !== 0) {
-      obj.seatNumber = Math.round(message.seatNumber);
-    }
-    if (message.playerName !== "") {
-      obj.playerName = message.playerName;
-    }
-    if (message.playerType !== "") {
-      obj.playerType = message.playerType;
-    }
-    if (message.locked !== false) {
-      obj.locked = message.locked;
-    }
-    return obj;
-  },
+	toJSON(message: SeatView): unknown {
+		const obj: any = {};
+		if (message.seatNumber !== 0) {
+			obj.seatNumber = Math.round(message.seatNumber);
+		}
+		if (message.playerName !== '') {
+			obj.playerName = message.playerName;
+		}
+		if (message.playerType !== '') {
+			obj.playerType = message.playerType;
+		}
+		if (message.locked !== false) {
+			obj.locked = message.locked;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<SeatView>): SeatView {
-    return SeatView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<SeatView>): SeatView {
-    const message = createBaseSeatView();
-    message.seatNumber = object.seatNumber ?? 0;
-    message.playerName = object.playerName ?? "";
-    message.playerType = object.playerType ?? "";
-    message.locked = object.locked ?? false;
-    return message;
-  },
+	create(base?: DeepPartial<SeatView>): SeatView {
+		return SeatView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<SeatView>): SeatView {
+		const message = createBaseSeatView();
+		message.seatNumber = object.seatNumber ?? 0;
+		message.playerName = object.playerName ?? '';
+		message.playerType = object.playerType ?? '';
+		message.locked = object.locked ?? false;
+		return message;
+	}
 };
 
 function createBaseMatchOptions(): MatchOptions {
-  return {
-    name: "",
-    gameType: "",
-    deckType: "",
-    limited: false,
-    winsNeeded: 0,
-    freeMulligans: 0,
-    timeLimit: undefined,
-    priorityTime: 0,
-    rated: false,
-    banlist: [],
-    skillLevel: "",
-    rangeOfInfluence: false,
-    planeChase: false,
-    rollbackTurnsAllowed: false,
-    embedDeckInSavedGame: 0,
-  };
+	return {
+		name: '',
+		gameType: '',
+		deckType: '',
+		limited: false,
+		winsNeeded: 0,
+		freeMulligans: 0,
+		timeLimit: undefined,
+		priorityTime: 0,
+		rated: false,
+		banlist: [],
+		skillLevel: '',
+		rangeOfInfluence: false,
+		planeChase: false,
+		rollbackTurnsAllowed: false,
+		embedDeckInSavedGame: 0
+	};
 }
 
 export const MatchOptions: MessageFns<MatchOptions> = {
-  encode(message: MatchOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    if (message.gameType !== "") {
-      writer.uint32(18).string(message.gameType);
-    }
-    if (message.deckType !== "") {
-      writer.uint32(26).string(message.deckType);
-    }
-    if (message.limited !== false) {
-      writer.uint32(32).bool(message.limited);
-    }
-    if (message.winsNeeded !== 0) {
-      writer.uint32(40).int32(message.winsNeeded);
-    }
-    if (message.freeMulligans !== 0) {
-      writer.uint32(48).int32(message.freeMulligans);
-    }
-    if (message.timeLimit !== undefined) {
-      MatchTimeLimit.encode(message.timeLimit, writer.uint32(58).fork()).join();
-    }
-    if (message.priorityTime !== 0) {
-      writer.uint32(64).int32(message.priorityTime);
-    }
-    if (message.rated !== false) {
-      writer.uint32(72).bool(message.rated);
-    }
-    for (const v of message.banlist) {
-      writer.uint32(82).string(v!);
-    }
-    if (message.skillLevel !== "") {
-      writer.uint32(90).string(message.skillLevel);
-    }
-    if (message.rangeOfInfluence !== false) {
-      writer.uint32(96).bool(message.rangeOfInfluence);
-    }
-    if (message.planeChase !== false) {
-      writer.uint32(104).bool(message.planeChase);
-    }
-    if (message.rollbackTurnsAllowed !== false) {
-      writer.uint32(112).bool(message.rollbackTurnsAllowed);
-    }
-    if (message.embedDeckInSavedGame !== 0) {
-      writer.uint32(120).int32(message.embedDeckInSavedGame);
-    }
-    return writer;
-  },
+	encode(message: MatchOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.name !== '') {
+			writer.uint32(10).string(message.name);
+		}
+		if (message.gameType !== '') {
+			writer.uint32(18).string(message.gameType);
+		}
+		if (message.deckType !== '') {
+			writer.uint32(26).string(message.deckType);
+		}
+		if (message.limited !== false) {
+			writer.uint32(32).bool(message.limited);
+		}
+		if (message.winsNeeded !== 0) {
+			writer.uint32(40).int32(message.winsNeeded);
+		}
+		if (message.freeMulligans !== 0) {
+			writer.uint32(48).int32(message.freeMulligans);
+		}
+		if (message.timeLimit !== undefined) {
+			MatchTimeLimit.encode(message.timeLimit, writer.uint32(58).fork()).join();
+		}
+		if (message.priorityTime !== 0) {
+			writer.uint32(64).int32(message.priorityTime);
+		}
+		if (message.rated !== false) {
+			writer.uint32(72).bool(message.rated);
+		}
+		for (const v of message.banlist) {
+			writer.uint32(82).string(v!);
+		}
+		if (message.skillLevel !== '') {
+			writer.uint32(90).string(message.skillLevel);
+		}
+		if (message.rangeOfInfluence !== false) {
+			writer.uint32(96).bool(message.rangeOfInfluence);
+		}
+		if (message.planeChase !== false) {
+			writer.uint32(104).bool(message.planeChase);
+		}
+		if (message.rollbackTurnsAllowed !== false) {
+			writer.uint32(112).bool(message.rollbackTurnsAllowed);
+		}
+		if (message.embedDeckInSavedGame !== 0) {
+			writer.uint32(120).int32(message.embedDeckInSavedGame);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): MatchOptions {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMatchOptions();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): MatchOptions {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseMatchOptions();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.name = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.name = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.gameType = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.gameType = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.deckType = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.deckType = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.limited = reader.bool();
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.limited = reader.bool();
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.winsNeeded = reader.int32();
-          continue;
-        }
-        case 6: {
-          if (tag !== 48) {
-            break;
-          }
+					message.winsNeeded = reader.int32();
+					continue;
+				}
+				case 6: {
+					if (tag !== 48) {
+						break;
+					}
 
-          message.freeMulligans = reader.int32();
-          continue;
-        }
-        case 7: {
-          if (tag !== 58) {
-            break;
-          }
+					message.freeMulligans = reader.int32();
+					continue;
+				}
+				case 7: {
+					if (tag !== 58) {
+						break;
+					}
 
-          message.timeLimit = MatchTimeLimit.decode(reader, reader.uint32());
-          continue;
-        }
-        case 8: {
-          if (tag !== 64) {
-            break;
-          }
+					message.timeLimit = MatchTimeLimit.decode(reader, reader.uint32());
+					continue;
+				}
+				case 8: {
+					if (tag !== 64) {
+						break;
+					}
 
-          message.priorityTime = reader.int32();
-          continue;
-        }
-        case 9: {
-          if (tag !== 72) {
-            break;
-          }
+					message.priorityTime = reader.int32();
+					continue;
+				}
+				case 9: {
+					if (tag !== 72) {
+						break;
+					}
 
-          message.rated = reader.bool();
-          continue;
-        }
-        case 10: {
-          if (tag !== 82) {
-            break;
-          }
+					message.rated = reader.bool();
+					continue;
+				}
+				case 10: {
+					if (tag !== 82) {
+						break;
+					}
 
-          message.banlist.push(reader.string());
-          continue;
-        }
-        case 11: {
-          if (tag !== 90) {
-            break;
-          }
+					message.banlist.push(reader.string());
+					continue;
+				}
+				case 11: {
+					if (tag !== 90) {
+						break;
+					}
 
-          message.skillLevel = reader.string();
-          continue;
-        }
-        case 12: {
-          if (tag !== 96) {
-            break;
-          }
+					message.skillLevel = reader.string();
+					continue;
+				}
+				case 12: {
+					if (tag !== 96) {
+						break;
+					}
 
-          message.rangeOfInfluence = reader.bool();
-          continue;
-        }
-        case 13: {
-          if (tag !== 104) {
-            break;
-          }
+					message.rangeOfInfluence = reader.bool();
+					continue;
+				}
+				case 13: {
+					if (tag !== 104) {
+						break;
+					}
 
-          message.planeChase = reader.bool();
-          continue;
-        }
-        case 14: {
-          if (tag !== 112) {
-            break;
-          }
+					message.planeChase = reader.bool();
+					continue;
+				}
+				case 14: {
+					if (tag !== 112) {
+						break;
+					}
 
-          message.rollbackTurnsAllowed = reader.bool();
-          continue;
-        }
-        case 15: {
-          if (tag !== 120) {
-            break;
-          }
+					message.rollbackTurnsAllowed = reader.bool();
+					continue;
+				}
+				case 15: {
+					if (tag !== 120) {
+						break;
+					}
 
-          message.embedDeckInSavedGame = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.embedDeckInSavedGame = reader.int32();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): MatchOptions {
-    return {
-      name: isSet(object.name) ? globalThis.String(object.name) : "",
-      gameType: isSet(object.gameType) ? globalThis.String(object.gameType) : "",
-      deckType: isSet(object.deckType) ? globalThis.String(object.deckType) : "",
-      limited: isSet(object.limited) ? globalThis.Boolean(object.limited) : false,
-      winsNeeded: isSet(object.winsNeeded) ? globalThis.Number(object.winsNeeded) : 0,
-      freeMulligans: isSet(object.freeMulligans) ? globalThis.Number(object.freeMulligans) : 0,
-      timeLimit: isSet(object.timeLimit) ? MatchTimeLimit.fromJSON(object.timeLimit) : undefined,
-      priorityTime: isSet(object.priorityTime) ? globalThis.Number(object.priorityTime) : 0,
-      rated: isSet(object.rated) ? globalThis.Boolean(object.rated) : false,
-      banlist: globalThis.Array.isArray(object?.banlist) ? object.banlist.map((e: any) => globalThis.String(e)) : [],
-      skillLevel: isSet(object.skillLevel) ? globalThis.String(object.skillLevel) : "",
-      rangeOfInfluence: isSet(object.rangeOfInfluence) ? globalThis.Boolean(object.rangeOfInfluence) : false,
-      planeChase: isSet(object.planeChase) ? globalThis.Boolean(object.planeChase) : false,
-      rollbackTurnsAllowed: isSet(object.rollbackTurnsAllowed)
-        ? globalThis.Boolean(object.rollbackTurnsAllowed)
-        : false,
-      embedDeckInSavedGame: isSet(object.embedDeckInSavedGame) ? globalThis.Number(object.embedDeckInSavedGame) : 0,
-    };
-  },
+	fromJSON(object: any): MatchOptions {
+		return {
+			name: isSet(object.name) ? globalThis.String(object.name) : '',
+			gameType: isSet(object.gameType) ? globalThis.String(object.gameType) : '',
+			deckType: isSet(object.deckType) ? globalThis.String(object.deckType) : '',
+			limited: isSet(object.limited) ? globalThis.Boolean(object.limited) : false,
+			winsNeeded: isSet(object.winsNeeded) ? globalThis.Number(object.winsNeeded) : 0,
+			freeMulligans: isSet(object.freeMulligans) ? globalThis.Number(object.freeMulligans) : 0,
+			timeLimit: isSet(object.timeLimit) ? MatchTimeLimit.fromJSON(object.timeLimit) : undefined,
+			priorityTime: isSet(object.priorityTime) ? globalThis.Number(object.priorityTime) : 0,
+			rated: isSet(object.rated) ? globalThis.Boolean(object.rated) : false,
+			banlist: globalThis.Array.isArray(object?.banlist)
+				? object.banlist.map((e: any) => globalThis.String(e))
+				: [],
+			skillLevel: isSet(object.skillLevel) ? globalThis.String(object.skillLevel) : '',
+			rangeOfInfluence: isSet(object.rangeOfInfluence)
+				? globalThis.Boolean(object.rangeOfInfluence)
+				: false,
+			planeChase: isSet(object.planeChase) ? globalThis.Boolean(object.planeChase) : false,
+			rollbackTurnsAllowed: isSet(object.rollbackTurnsAllowed)
+				? globalThis.Boolean(object.rollbackTurnsAllowed)
+				: false,
+			embedDeckInSavedGame: isSet(object.embedDeckInSavedGame)
+				? globalThis.Number(object.embedDeckInSavedGame)
+				: 0
+		};
+	},
 
-  toJSON(message: MatchOptions): unknown {
-    const obj: any = {};
-    if (message.name !== "") {
-      obj.name = message.name;
-    }
-    if (message.gameType !== "") {
-      obj.gameType = message.gameType;
-    }
-    if (message.deckType !== "") {
-      obj.deckType = message.deckType;
-    }
-    if (message.limited !== false) {
-      obj.limited = message.limited;
-    }
-    if (message.winsNeeded !== 0) {
-      obj.winsNeeded = Math.round(message.winsNeeded);
-    }
-    if (message.freeMulligans !== 0) {
-      obj.freeMulligans = Math.round(message.freeMulligans);
-    }
-    if (message.timeLimit !== undefined) {
-      obj.timeLimit = MatchTimeLimit.toJSON(message.timeLimit);
-    }
-    if (message.priorityTime !== 0) {
-      obj.priorityTime = Math.round(message.priorityTime);
-    }
-    if (message.rated !== false) {
-      obj.rated = message.rated;
-    }
-    if (message.banlist?.length) {
-      obj.banlist = message.banlist;
-    }
-    if (message.skillLevel !== "") {
-      obj.skillLevel = message.skillLevel;
-    }
-    if (message.rangeOfInfluence !== false) {
-      obj.rangeOfInfluence = message.rangeOfInfluence;
-    }
-    if (message.planeChase !== false) {
-      obj.planeChase = message.planeChase;
-    }
-    if (message.rollbackTurnsAllowed !== false) {
-      obj.rollbackTurnsAllowed = message.rollbackTurnsAllowed;
-    }
-    if (message.embedDeckInSavedGame !== 0) {
-      obj.embedDeckInSavedGame = Math.round(message.embedDeckInSavedGame);
-    }
-    return obj;
-  },
+	toJSON(message: MatchOptions): unknown {
+		const obj: any = {};
+		if (message.name !== '') {
+			obj.name = message.name;
+		}
+		if (message.gameType !== '') {
+			obj.gameType = message.gameType;
+		}
+		if (message.deckType !== '') {
+			obj.deckType = message.deckType;
+		}
+		if (message.limited !== false) {
+			obj.limited = message.limited;
+		}
+		if (message.winsNeeded !== 0) {
+			obj.winsNeeded = Math.round(message.winsNeeded);
+		}
+		if (message.freeMulligans !== 0) {
+			obj.freeMulligans = Math.round(message.freeMulligans);
+		}
+		if (message.timeLimit !== undefined) {
+			obj.timeLimit = MatchTimeLimit.toJSON(message.timeLimit);
+		}
+		if (message.priorityTime !== 0) {
+			obj.priorityTime = Math.round(message.priorityTime);
+		}
+		if (message.rated !== false) {
+			obj.rated = message.rated;
+		}
+		if (message.banlist?.length) {
+			obj.banlist = message.banlist;
+		}
+		if (message.skillLevel !== '') {
+			obj.skillLevel = message.skillLevel;
+		}
+		if (message.rangeOfInfluence !== false) {
+			obj.rangeOfInfluence = message.rangeOfInfluence;
+		}
+		if (message.planeChase !== false) {
+			obj.planeChase = message.planeChase;
+		}
+		if (message.rollbackTurnsAllowed !== false) {
+			obj.rollbackTurnsAllowed = message.rollbackTurnsAllowed;
+		}
+		if (message.embedDeckInSavedGame !== 0) {
+			obj.embedDeckInSavedGame = Math.round(message.embedDeckInSavedGame);
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<MatchOptions>): MatchOptions {
-    return MatchOptions.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<MatchOptions>): MatchOptions {
-    const message = createBaseMatchOptions();
-    message.name = object.name ?? "";
-    message.gameType = object.gameType ?? "";
-    message.deckType = object.deckType ?? "";
-    message.limited = object.limited ?? false;
-    message.winsNeeded = object.winsNeeded ?? 0;
-    message.freeMulligans = object.freeMulligans ?? 0;
-    message.timeLimit = (object.timeLimit !== undefined && object.timeLimit !== null)
-      ? MatchTimeLimit.fromPartial(object.timeLimit)
-      : undefined;
-    message.priorityTime = object.priorityTime ?? 0;
-    message.rated = object.rated ?? false;
-    message.banlist = object.banlist?.map((e) => e) || [];
-    message.skillLevel = object.skillLevel ?? "";
-    message.rangeOfInfluence = object.rangeOfInfluence ?? false;
-    message.planeChase = object.planeChase ?? false;
-    message.rollbackTurnsAllowed = object.rollbackTurnsAllowed ?? false;
-    message.embedDeckInSavedGame = object.embedDeckInSavedGame ?? 0;
-    return message;
-  },
+	create(base?: DeepPartial<MatchOptions>): MatchOptions {
+		return MatchOptions.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<MatchOptions>): MatchOptions {
+		const message = createBaseMatchOptions();
+		message.name = object.name ?? '';
+		message.gameType = object.gameType ?? '';
+		message.deckType = object.deckType ?? '';
+		message.limited = object.limited ?? false;
+		message.winsNeeded = object.winsNeeded ?? 0;
+		message.freeMulligans = object.freeMulligans ?? 0;
+		message.timeLimit =
+			object.timeLimit !== undefined && object.timeLimit !== null
+				? MatchTimeLimit.fromPartial(object.timeLimit)
+				: undefined;
+		message.priorityTime = object.priorityTime ?? 0;
+		message.rated = object.rated ?? false;
+		message.banlist = object.banlist?.map((e) => e) || [];
+		message.skillLevel = object.skillLevel ?? '';
+		message.rangeOfInfluence = object.rangeOfInfluence ?? false;
+		message.planeChase = object.planeChase ?? false;
+		message.rollbackTurnsAllowed = object.rollbackTurnsAllowed ?? false;
+		message.embedDeckInSavedGame = object.embedDeckInSavedGame ?? 0;
+		return message;
+	}
 };
 
 function createBaseMatchTimeLimit(): MatchTimeLimit {
-  return { minutes: 0 };
+	return { minutes: 0 };
 }
 
 export const MatchTimeLimit: MessageFns<MatchTimeLimit> = {
-  encode(message: MatchTimeLimit, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.minutes !== 0) {
-      writer.uint32(8).int32(message.minutes);
-    }
-    return writer;
-  },
+	encode(message: MatchTimeLimit, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.minutes !== 0) {
+			writer.uint32(8).int32(message.minutes);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): MatchTimeLimit {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMatchTimeLimit();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): MatchTimeLimit {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseMatchTimeLimit();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 8) {
+						break;
+					}
 
-          message.minutes = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.minutes = reader.int32();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): MatchTimeLimit {
-    return { minutes: isSet(object.minutes) ? globalThis.Number(object.minutes) : 0 };
-  },
+	fromJSON(object: any): MatchTimeLimit {
+		return { minutes: isSet(object.minutes) ? globalThis.Number(object.minutes) : 0 };
+	},
 
-  toJSON(message: MatchTimeLimit): unknown {
-    const obj: any = {};
-    if (message.minutes !== 0) {
-      obj.minutes = Math.round(message.minutes);
-    }
-    return obj;
-  },
+	toJSON(message: MatchTimeLimit): unknown {
+		const obj: any = {};
+		if (message.minutes !== 0) {
+			obj.minutes = Math.round(message.minutes);
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<MatchTimeLimit>): MatchTimeLimit {
-    return MatchTimeLimit.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<MatchTimeLimit>): MatchTimeLimit {
-    const message = createBaseMatchTimeLimit();
-    message.minutes = object.minutes ?? 0;
-    return message;
-  },
+	create(base?: DeepPartial<MatchTimeLimit>): MatchTimeLimit {
+		return MatchTimeLimit.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<MatchTimeLimit>): MatchTimeLimit {
+		const message = createBaseMatchTimeLimit();
+		message.minutes = object.minutes ?? 0;
+		return message;
+	}
 };
 
 function createBaseDeckValidator(): DeckValidator {
-  return {
-    name: "",
-    minDeckSize: 0,
-    maxDeckSize: 0,
-    singleton: false,
-    legalSets: [],
-    bannedCards: [],
-    restrictedCards: [],
-  };
+	return {
+		name: '',
+		minDeckSize: 0,
+		maxDeckSize: 0,
+		singleton: false,
+		legalSets: [],
+		bannedCards: [],
+		restrictedCards: []
+	};
 }
 
 export const DeckValidator: MessageFns<DeckValidator> = {
-  encode(message: DeckValidator, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    if (message.minDeckSize !== 0) {
-      writer.uint32(16).int32(message.minDeckSize);
-    }
-    if (message.maxDeckSize !== 0) {
-      writer.uint32(24).int32(message.maxDeckSize);
-    }
-    if (message.singleton !== false) {
-      writer.uint32(32).bool(message.singleton);
-    }
-    for (const v of message.legalSets) {
-      writer.uint32(42).string(v!);
-    }
-    for (const v of message.bannedCards) {
-      writer.uint32(50).string(v!);
-    }
-    for (const v of message.restrictedCards) {
-      writer.uint32(58).string(v!);
-    }
-    return writer;
-  },
+	encode(message: DeckValidator, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.name !== '') {
+			writer.uint32(10).string(message.name);
+		}
+		if (message.minDeckSize !== 0) {
+			writer.uint32(16).int32(message.minDeckSize);
+		}
+		if (message.maxDeckSize !== 0) {
+			writer.uint32(24).int32(message.maxDeckSize);
+		}
+		if (message.singleton !== false) {
+			writer.uint32(32).bool(message.singleton);
+		}
+		for (const v of message.legalSets) {
+			writer.uint32(42).string(v!);
+		}
+		for (const v of message.bannedCards) {
+			writer.uint32(50).string(v!);
+		}
+		for (const v of message.restrictedCards) {
+			writer.uint32(58).string(v!);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): DeckValidator {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDeckValidator();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): DeckValidator {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseDeckValidator();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.name = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
+					message.name = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 16) {
+						break;
+					}
 
-          message.minDeckSize = reader.int32();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
+					message.minDeckSize = reader.int32();
+					continue;
+				}
+				case 3: {
+					if (tag !== 24) {
+						break;
+					}
 
-          message.maxDeckSize = reader.int32();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.maxDeckSize = reader.int32();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.singleton = reader.bool();
-          continue;
-        }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
+					message.singleton = reader.bool();
+					continue;
+				}
+				case 5: {
+					if (tag !== 42) {
+						break;
+					}
 
-          message.legalSets.push(reader.string());
-          continue;
-        }
-        case 6: {
-          if (tag !== 50) {
-            break;
-          }
+					message.legalSets.push(reader.string());
+					continue;
+				}
+				case 6: {
+					if (tag !== 50) {
+						break;
+					}
 
-          message.bannedCards.push(reader.string());
-          continue;
-        }
-        case 7: {
-          if (tag !== 58) {
-            break;
-          }
+					message.bannedCards.push(reader.string());
+					continue;
+				}
+				case 7: {
+					if (tag !== 58) {
+						break;
+					}
 
-          message.restrictedCards.push(reader.string());
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.restrictedCards.push(reader.string());
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): DeckValidator {
-    return {
-      name: isSet(object.name) ? globalThis.String(object.name) : "",
-      minDeckSize: isSet(object.minDeckSize) ? globalThis.Number(object.minDeckSize) : 0,
-      maxDeckSize: isSet(object.maxDeckSize) ? globalThis.Number(object.maxDeckSize) : 0,
-      singleton: isSet(object.singleton) ? globalThis.Boolean(object.singleton) : false,
-      legalSets: globalThis.Array.isArray(object?.legalSets)
-        ? object.legalSets.map((e: any) => globalThis.String(e))
-        : [],
-      bannedCards: globalThis.Array.isArray(object?.bannedCards)
-        ? object.bannedCards.map((e: any) => globalThis.String(e))
-        : [],
-      restrictedCards: globalThis.Array.isArray(object?.restrictedCards)
-        ? object.restrictedCards.map((e: any) => globalThis.String(e))
-        : [],
-    };
-  },
+	fromJSON(object: any): DeckValidator {
+		return {
+			name: isSet(object.name) ? globalThis.String(object.name) : '',
+			minDeckSize: isSet(object.minDeckSize) ? globalThis.Number(object.minDeckSize) : 0,
+			maxDeckSize: isSet(object.maxDeckSize) ? globalThis.Number(object.maxDeckSize) : 0,
+			singleton: isSet(object.singleton) ? globalThis.Boolean(object.singleton) : false,
+			legalSets: globalThis.Array.isArray(object?.legalSets)
+				? object.legalSets.map((e: any) => globalThis.String(e))
+				: [],
+			bannedCards: globalThis.Array.isArray(object?.bannedCards)
+				? object.bannedCards.map((e: any) => globalThis.String(e))
+				: [],
+			restrictedCards: globalThis.Array.isArray(object?.restrictedCards)
+				? object.restrictedCards.map((e: any) => globalThis.String(e))
+				: []
+		};
+	},
 
-  toJSON(message: DeckValidator): unknown {
-    const obj: any = {};
-    if (message.name !== "") {
-      obj.name = message.name;
-    }
-    if (message.minDeckSize !== 0) {
-      obj.minDeckSize = Math.round(message.minDeckSize);
-    }
-    if (message.maxDeckSize !== 0) {
-      obj.maxDeckSize = Math.round(message.maxDeckSize);
-    }
-    if (message.singleton !== false) {
-      obj.singleton = message.singleton;
-    }
-    if (message.legalSets?.length) {
-      obj.legalSets = message.legalSets;
-    }
-    if (message.bannedCards?.length) {
-      obj.bannedCards = message.bannedCards;
-    }
-    if (message.restrictedCards?.length) {
-      obj.restrictedCards = message.restrictedCards;
-    }
-    return obj;
-  },
+	toJSON(message: DeckValidator): unknown {
+		const obj: any = {};
+		if (message.name !== '') {
+			obj.name = message.name;
+		}
+		if (message.minDeckSize !== 0) {
+			obj.minDeckSize = Math.round(message.minDeckSize);
+		}
+		if (message.maxDeckSize !== 0) {
+			obj.maxDeckSize = Math.round(message.maxDeckSize);
+		}
+		if (message.singleton !== false) {
+			obj.singleton = message.singleton;
+		}
+		if (message.legalSets?.length) {
+			obj.legalSets = message.legalSets;
+		}
+		if (message.bannedCards?.length) {
+			obj.bannedCards = message.bannedCards;
+		}
+		if (message.restrictedCards?.length) {
+			obj.restrictedCards = message.restrictedCards;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<DeckValidator>): DeckValidator {
-    return DeckValidator.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<DeckValidator>): DeckValidator {
-    const message = createBaseDeckValidator();
-    message.name = object.name ?? "";
-    message.minDeckSize = object.minDeckSize ?? 0;
-    message.maxDeckSize = object.maxDeckSize ?? 0;
-    message.singleton = object.singleton ?? false;
-    message.legalSets = object.legalSets?.map((e) => e) || [];
-    message.bannedCards = object.bannedCards?.map((e) => e) || [];
-    message.restrictedCards = object.restrictedCards?.map((e) => e) || [];
-    return message;
-  },
+	create(base?: DeepPartial<DeckValidator>): DeckValidator {
+		return DeckValidator.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<DeckValidator>): DeckValidator {
+		const message = createBaseDeckValidator();
+		message.name = object.name ?? '';
+		message.minDeckSize = object.minDeckSize ?? 0;
+		message.maxDeckSize = object.maxDeckSize ?? 0;
+		message.singleton = object.singleton ?? false;
+		message.legalSets = object.legalSets?.map((e) => e) || [];
+		message.bannedCards = object.bannedCards?.map((e) => e) || [];
+		message.restrictedCards = object.restrictedCards?.map((e) => e) || [];
+		return message;
+	}
 };
 
 function createBaseGameView(): GameView {
-  return {
-    gameId: "",
-    state: "",
-    players: [],
-    activePlayerId: "",
-    priorityPlayerId: "",
-    turn: 0,
-    phase: "",
-    step: "",
-    messages: [],
-    battlefield: [],
-    stack: [],
-    exile: [],
-    command: [],
-    revealed: [],
-    lookedAt: [],
-    combat: undefined,
-    special: false,
-    startTime: undefined,
-    activeControlSeat: "",
-    activePlayerName: "",
-    priorityPlayerName: "",
-    gameFormat: "",
-    isMulliganPhase: false,
-    landsPlayedThisTurn: 0,
-    landsAllowedThisTurn: 0,
-    pendingLibrarySearch: undefined,
-  };
+	return {
+		gameId: '',
+		state: '',
+		players: [],
+		activePlayerId: '',
+		priorityPlayerId: '',
+		turn: 0,
+		phase: '',
+		step: '',
+		messages: [],
+		battlefield: [],
+		stack: [],
+		exile: [],
+		command: [],
+		revealed: [],
+		lookedAt: [],
+		combat: undefined,
+		special: false,
+		startTime: undefined,
+		activeControlSeat: '',
+		activePlayerName: '',
+		priorityPlayerName: '',
+		gameFormat: '',
+		isMulliganPhase: false,
+		landsPlayedThisTurn: 0,
+		landsAllowedThisTurn: 0,
+		pendingLibrarySearch: undefined
+	};
 }
 
 export const GameView: MessageFns<GameView> = {
-  encode(message: GameView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.gameId !== "") {
-      writer.uint32(10).string(message.gameId);
-    }
-    if (message.state !== "") {
-      writer.uint32(18).string(message.state);
-    }
-    for (const v of message.players) {
-      PlayerView.encode(v!, writer.uint32(26).fork()).join();
-    }
-    if (message.activePlayerId !== "") {
-      writer.uint32(34).string(message.activePlayerId);
-    }
-    if (message.priorityPlayerId !== "") {
-      writer.uint32(42).string(message.priorityPlayerId);
-    }
-    if (message.turn !== 0) {
-      writer.uint32(48).int32(message.turn);
-    }
-    if (message.phase !== "") {
-      writer.uint32(58).string(message.phase);
-    }
-    if (message.step !== "") {
-      writer.uint32(66).string(message.step);
-    }
-    for (const v of message.messages) {
-      GameMessage.encode(v!, writer.uint32(74).fork()).join();
-    }
-    for (const v of message.battlefield) {
-      CardView.encode(v!, writer.uint32(82).fork()).join();
-    }
-    for (const v of message.stack) {
-      CardView.encode(v!, writer.uint32(90).fork()).join();
-    }
-    for (const v of message.exile) {
-      CardView.encode(v!, writer.uint32(98).fork()).join();
-    }
-    for (const v of message.command) {
-      CardView.encode(v!, writer.uint32(106).fork()).join();
-    }
-    for (const v of message.revealed) {
-      RevealedView.encode(v!, writer.uint32(114).fork()).join();
-    }
-    for (const v of message.lookedAt) {
-      LookedAtView.encode(v!, writer.uint32(122).fork()).join();
-    }
-    if (message.combat !== undefined) {
-      CombatView.encode(message.combat, writer.uint32(130).fork()).join();
-    }
-    if (message.special !== false) {
-      writer.uint32(136).bool(message.special);
-    }
-    if (message.startTime !== undefined) {
-      Timestamp.encode(toTimestamp(message.startTime), writer.uint32(146).fork()).join();
-    }
-    if (message.activeControlSeat !== "") {
-      writer.uint32(154).string(message.activeControlSeat);
-    }
-    if (message.activePlayerName !== "") {
-      writer.uint32(162).string(message.activePlayerName);
-    }
-    if (message.priorityPlayerName !== "") {
-      writer.uint32(170).string(message.priorityPlayerName);
-    }
-    if (message.gameFormat !== "") {
-      writer.uint32(178).string(message.gameFormat);
-    }
-    if (message.isMulliganPhase !== false) {
-      writer.uint32(184).bool(message.isMulliganPhase);
-    }
-    if (message.landsPlayedThisTurn !== 0) {
-      writer.uint32(192).int32(message.landsPlayedThisTurn);
-    }
-    if (message.landsAllowedThisTurn !== 0) {
-      writer.uint32(200).int32(message.landsAllowedThisTurn);
-    }
-    if (message.pendingLibrarySearch !== undefined) {
-      LibrarySearchView.encode(message.pendingLibrarySearch, writer.uint32(242).fork()).join();
-    }
-    return writer;
-  },
+	encode(message: GameView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.gameId !== '') {
+			writer.uint32(10).string(message.gameId);
+		}
+		if (message.state !== '') {
+			writer.uint32(18).string(message.state);
+		}
+		for (const v of message.players) {
+			PlayerView.encode(v!, writer.uint32(26).fork()).join();
+		}
+		if (message.activePlayerId !== '') {
+			writer.uint32(34).string(message.activePlayerId);
+		}
+		if (message.priorityPlayerId !== '') {
+			writer.uint32(42).string(message.priorityPlayerId);
+		}
+		if (message.turn !== 0) {
+			writer.uint32(48).int32(message.turn);
+		}
+		if (message.phase !== '') {
+			writer.uint32(58).string(message.phase);
+		}
+		if (message.step !== '') {
+			writer.uint32(66).string(message.step);
+		}
+		for (const v of message.messages) {
+			GameMessage.encode(v!, writer.uint32(74).fork()).join();
+		}
+		for (const v of message.battlefield) {
+			CardView.encode(v!, writer.uint32(82).fork()).join();
+		}
+		for (const v of message.stack) {
+			CardView.encode(v!, writer.uint32(90).fork()).join();
+		}
+		for (const v of message.exile) {
+			CardView.encode(v!, writer.uint32(98).fork()).join();
+		}
+		for (const v of message.command) {
+			CardView.encode(v!, writer.uint32(106).fork()).join();
+		}
+		for (const v of message.revealed) {
+			RevealedView.encode(v!, writer.uint32(114).fork()).join();
+		}
+		for (const v of message.lookedAt) {
+			LookedAtView.encode(v!, writer.uint32(122).fork()).join();
+		}
+		if (message.combat !== undefined) {
+			CombatView.encode(message.combat, writer.uint32(130).fork()).join();
+		}
+		if (message.special !== false) {
+			writer.uint32(136).bool(message.special);
+		}
+		if (message.startTime !== undefined) {
+			Timestamp.encode(toTimestamp(message.startTime), writer.uint32(146).fork()).join();
+		}
+		if (message.activeControlSeat !== '') {
+			writer.uint32(154).string(message.activeControlSeat);
+		}
+		if (message.activePlayerName !== '') {
+			writer.uint32(162).string(message.activePlayerName);
+		}
+		if (message.priorityPlayerName !== '') {
+			writer.uint32(170).string(message.priorityPlayerName);
+		}
+		if (message.gameFormat !== '') {
+			writer.uint32(178).string(message.gameFormat);
+		}
+		if (message.isMulliganPhase !== false) {
+			writer.uint32(184).bool(message.isMulliganPhase);
+		}
+		if (message.landsPlayedThisTurn !== 0) {
+			writer.uint32(192).int32(message.landsPlayedThisTurn);
+		}
+		if (message.landsAllowedThisTurn !== 0) {
+			writer.uint32(200).int32(message.landsAllowedThisTurn);
+		}
+		if (message.pendingLibrarySearch !== undefined) {
+			LibrarySearchView.encode(message.pendingLibrarySearch, writer.uint32(242).fork()).join();
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GameView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGameView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): GameView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseGameView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.gameId = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.gameId = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.state = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.state = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.players.push(PlayerView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
+					message.players.push(PlayerView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 4: {
+					if (tag !== 34) {
+						break;
+					}
 
-          message.activePlayerId = reader.string();
-          continue;
-        }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
+					message.activePlayerId = reader.string();
+					continue;
+				}
+				case 5: {
+					if (tag !== 42) {
+						break;
+					}
 
-          message.priorityPlayerId = reader.string();
-          continue;
-        }
-        case 6: {
-          if (tag !== 48) {
-            break;
-          }
+					message.priorityPlayerId = reader.string();
+					continue;
+				}
+				case 6: {
+					if (tag !== 48) {
+						break;
+					}
 
-          message.turn = reader.int32();
-          continue;
-        }
-        case 7: {
-          if (tag !== 58) {
-            break;
-          }
+					message.turn = reader.int32();
+					continue;
+				}
+				case 7: {
+					if (tag !== 58) {
+						break;
+					}
 
-          message.phase = reader.string();
-          continue;
-        }
-        case 8: {
-          if (tag !== 66) {
-            break;
-          }
+					message.phase = reader.string();
+					continue;
+				}
+				case 8: {
+					if (tag !== 66) {
+						break;
+					}
 
-          message.step = reader.string();
-          continue;
-        }
-        case 9: {
-          if (tag !== 74) {
-            break;
-          }
+					message.step = reader.string();
+					continue;
+				}
+				case 9: {
+					if (tag !== 74) {
+						break;
+					}
 
-          message.messages.push(GameMessage.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 10: {
-          if (tag !== 82) {
-            break;
-          }
+					message.messages.push(GameMessage.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 10: {
+					if (tag !== 82) {
+						break;
+					}
 
-          message.battlefield.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 11: {
-          if (tag !== 90) {
-            break;
-          }
+					message.battlefield.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 11: {
+					if (tag !== 90) {
+						break;
+					}
 
-          message.stack.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 12: {
-          if (tag !== 98) {
-            break;
-          }
+					message.stack.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 12: {
+					if (tag !== 98) {
+						break;
+					}
 
-          message.exile.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 13: {
-          if (tag !== 106) {
-            break;
-          }
+					message.exile.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 13: {
+					if (tag !== 106) {
+						break;
+					}
 
-          message.command.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 14: {
-          if (tag !== 114) {
-            break;
-          }
+					message.command.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 14: {
+					if (tag !== 114) {
+						break;
+					}
 
-          message.revealed.push(RevealedView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 15: {
-          if (tag !== 122) {
-            break;
-          }
+					message.revealed.push(RevealedView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 15: {
+					if (tag !== 122) {
+						break;
+					}
 
-          message.lookedAt.push(LookedAtView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 16: {
-          if (tag !== 130) {
-            break;
-          }
+					message.lookedAt.push(LookedAtView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 16: {
+					if (tag !== 130) {
+						break;
+					}
 
-          message.combat = CombatView.decode(reader, reader.uint32());
-          continue;
-        }
-        case 17: {
-          if (tag !== 136) {
-            break;
-          }
+					message.combat = CombatView.decode(reader, reader.uint32());
+					continue;
+				}
+				case 17: {
+					if (tag !== 136) {
+						break;
+					}
 
-          message.special = reader.bool();
-          continue;
-        }
-        case 18: {
-          if (tag !== 146) {
-            break;
-          }
+					message.special = reader.bool();
+					continue;
+				}
+				case 18: {
+					if (tag !== 146) {
+						break;
+					}
 
-          message.startTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 19: {
-          if (tag !== 154) {
-            break;
-          }
+					message.startTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 19: {
+					if (tag !== 154) {
+						break;
+					}
 
-          message.activeControlSeat = reader.string();
-          continue;
-        }
-        case 20: {
-          if (tag !== 162) {
-            break;
-          }
+					message.activeControlSeat = reader.string();
+					continue;
+				}
+				case 20: {
+					if (tag !== 162) {
+						break;
+					}
 
-          message.activePlayerName = reader.string();
-          continue;
-        }
-        case 21: {
-          if (tag !== 170) {
-            break;
-          }
+					message.activePlayerName = reader.string();
+					continue;
+				}
+				case 21: {
+					if (tag !== 170) {
+						break;
+					}
 
-          message.priorityPlayerName = reader.string();
-          continue;
-        }
-        case 22: {
-          if (tag !== 178) {
-            break;
-          }
+					message.priorityPlayerName = reader.string();
+					continue;
+				}
+				case 22: {
+					if (tag !== 178) {
+						break;
+					}
 
-          message.gameFormat = reader.string();
-          continue;
-        }
-        case 23: {
-          if (tag !== 184) {
-            break;
-          }
+					message.gameFormat = reader.string();
+					continue;
+				}
+				case 23: {
+					if (tag !== 184) {
+						break;
+					}
 
-          message.isMulliganPhase = reader.bool();
-          continue;
-        }
-        case 24: {
-          if (tag !== 192) {
-            break;
-          }
+					message.isMulliganPhase = reader.bool();
+					continue;
+				}
+				case 24: {
+					if (tag !== 192) {
+						break;
+					}
 
-          message.landsPlayedThisTurn = reader.int32();
-          continue;
-        }
-        case 25: {
-          if (tag !== 200) {
-            break;
-          }
+					message.landsPlayedThisTurn = reader.int32();
+					continue;
+				}
+				case 25: {
+					if (tag !== 200) {
+						break;
+					}
 
-          message.landsAllowedThisTurn = reader.int32();
-          continue;
-        }
-        case 30: {
-          if (tag !== 242) {
-            break;
-          }
+					message.landsAllowedThisTurn = reader.int32();
+					continue;
+				}
+				case 30: {
+					if (tag !== 242) {
+						break;
+					}
 
-          message.pendingLibrarySearch = LibrarySearchView.decode(reader, reader.uint32());
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.pendingLibrarySearch = LibrarySearchView.decode(reader, reader.uint32());
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): GameView {
-    return {
-      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : "",
-      state: isSet(object.state) ? globalThis.String(object.state) : "",
-      players: globalThis.Array.isArray(object?.players) ? object.players.map((e: any) => PlayerView.fromJSON(e)) : [],
-      activePlayerId: isSet(object.activePlayerId) ? globalThis.String(object.activePlayerId) : "",
-      priorityPlayerId: isSet(object.priorityPlayerId) ? globalThis.String(object.priorityPlayerId) : "",
-      turn: isSet(object.turn) ? globalThis.Number(object.turn) : 0,
-      phase: isSet(object.phase) ? globalThis.String(object.phase) : "",
-      step: isSet(object.step) ? globalThis.String(object.step) : "",
-      messages: globalThis.Array.isArray(object?.messages)
-        ? object.messages.map((e: any) => GameMessage.fromJSON(e))
-        : [],
-      battlefield: globalThis.Array.isArray(object?.battlefield)
-        ? object.battlefield.map((e: any) => CardView.fromJSON(e))
-        : [],
-      stack: globalThis.Array.isArray(object?.stack) ? object.stack.map((e: any) => CardView.fromJSON(e)) : [],
-      exile: globalThis.Array.isArray(object?.exile) ? object.exile.map((e: any) => CardView.fromJSON(e)) : [],
-      command: globalThis.Array.isArray(object?.command) ? object.command.map((e: any) => CardView.fromJSON(e)) : [],
-      revealed: globalThis.Array.isArray(object?.revealed)
-        ? object.revealed.map((e: any) => RevealedView.fromJSON(e))
-        : [],
-      lookedAt: globalThis.Array.isArray(object?.lookedAt)
-        ? object.lookedAt.map((e: any) => LookedAtView.fromJSON(e))
-        : [],
-      combat: isSet(object.combat) ? CombatView.fromJSON(object.combat) : undefined,
-      special: isSet(object.special) ? globalThis.Boolean(object.special) : false,
-      startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
-      activeControlSeat: isSet(object.activeControlSeat) ? globalThis.String(object.activeControlSeat) : "",
-      activePlayerName: isSet(object.activePlayerName) ? globalThis.String(object.activePlayerName) : "",
-      priorityPlayerName: isSet(object.priorityPlayerName) ? globalThis.String(object.priorityPlayerName) : "",
-      gameFormat: isSet(object.gameFormat) ? globalThis.String(object.gameFormat) : "",
-      isMulliganPhase: isSet(object.isMulliganPhase) ? globalThis.Boolean(object.isMulliganPhase) : false,
-      landsPlayedThisTurn: isSet(object.landsPlayedThisTurn) ? globalThis.Number(object.landsPlayedThisTurn) : 0,
-      landsAllowedThisTurn: isSet(object.landsAllowedThisTurn) ? globalThis.Number(object.landsAllowedThisTurn) : 0,
-      pendingLibrarySearch: isSet(object.pendingLibrarySearch)
-        ? LibrarySearchView.fromJSON(object.pendingLibrarySearch)
-        : undefined,
-    };
-  },
+	fromJSON(object: any): GameView {
+		return {
+			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+			state: isSet(object.state) ? globalThis.String(object.state) : '',
+			players: globalThis.Array.isArray(object?.players)
+				? object.players.map((e: any) => PlayerView.fromJSON(e))
+				: [],
+			activePlayerId: isSet(object.activePlayerId) ? globalThis.String(object.activePlayerId) : '',
+			priorityPlayerId: isSet(object.priorityPlayerId)
+				? globalThis.String(object.priorityPlayerId)
+				: '',
+			turn: isSet(object.turn) ? globalThis.Number(object.turn) : 0,
+			phase: isSet(object.phase) ? globalThis.String(object.phase) : '',
+			step: isSet(object.step) ? globalThis.String(object.step) : '',
+			messages: globalThis.Array.isArray(object?.messages)
+				? object.messages.map((e: any) => GameMessage.fromJSON(e))
+				: [],
+			battlefield: globalThis.Array.isArray(object?.battlefield)
+				? object.battlefield.map((e: any) => CardView.fromJSON(e))
+				: [],
+			stack: globalThis.Array.isArray(object?.stack)
+				? object.stack.map((e: any) => CardView.fromJSON(e))
+				: [],
+			exile: globalThis.Array.isArray(object?.exile)
+				? object.exile.map((e: any) => CardView.fromJSON(e))
+				: [],
+			command: globalThis.Array.isArray(object?.command)
+				? object.command.map((e: any) => CardView.fromJSON(e))
+				: [],
+			revealed: globalThis.Array.isArray(object?.revealed)
+				? object.revealed.map((e: any) => RevealedView.fromJSON(e))
+				: [],
+			lookedAt: globalThis.Array.isArray(object?.lookedAt)
+				? object.lookedAt.map((e: any) => LookedAtView.fromJSON(e))
+				: [],
+			combat: isSet(object.combat) ? CombatView.fromJSON(object.combat) : undefined,
+			special: isSet(object.special) ? globalThis.Boolean(object.special) : false,
+			startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
+			activeControlSeat: isSet(object.activeControlSeat)
+				? globalThis.String(object.activeControlSeat)
+				: '',
+			activePlayerName: isSet(object.activePlayerName)
+				? globalThis.String(object.activePlayerName)
+				: '',
+			priorityPlayerName: isSet(object.priorityPlayerName)
+				? globalThis.String(object.priorityPlayerName)
+				: '',
+			gameFormat: isSet(object.gameFormat) ? globalThis.String(object.gameFormat) : '',
+			isMulliganPhase: isSet(object.isMulliganPhase)
+				? globalThis.Boolean(object.isMulliganPhase)
+				: false,
+			landsPlayedThisTurn: isSet(object.landsPlayedThisTurn)
+				? globalThis.Number(object.landsPlayedThisTurn)
+				: 0,
+			landsAllowedThisTurn: isSet(object.landsAllowedThisTurn)
+				? globalThis.Number(object.landsAllowedThisTurn)
+				: 0,
+			pendingLibrarySearch: isSet(object.pendingLibrarySearch)
+				? LibrarySearchView.fromJSON(object.pendingLibrarySearch)
+				: undefined
+		};
+	},
 
-  toJSON(message: GameView): unknown {
-    const obj: any = {};
-    if (message.gameId !== "") {
-      obj.gameId = message.gameId;
-    }
-    if (message.state !== "") {
-      obj.state = message.state;
-    }
-    if (message.players?.length) {
-      obj.players = message.players.map((e) => PlayerView.toJSON(e));
-    }
-    if (message.activePlayerId !== "") {
-      obj.activePlayerId = message.activePlayerId;
-    }
-    if (message.priorityPlayerId !== "") {
-      obj.priorityPlayerId = message.priorityPlayerId;
-    }
-    if (message.turn !== 0) {
-      obj.turn = Math.round(message.turn);
-    }
-    if (message.phase !== "") {
-      obj.phase = message.phase;
-    }
-    if (message.step !== "") {
-      obj.step = message.step;
-    }
-    if (message.messages?.length) {
-      obj.messages = message.messages.map((e) => GameMessage.toJSON(e));
-    }
-    if (message.battlefield?.length) {
-      obj.battlefield = message.battlefield.map((e) => CardView.toJSON(e));
-    }
-    if (message.stack?.length) {
-      obj.stack = message.stack.map((e) => CardView.toJSON(e));
-    }
-    if (message.exile?.length) {
-      obj.exile = message.exile.map((e) => CardView.toJSON(e));
-    }
-    if (message.command?.length) {
-      obj.command = message.command.map((e) => CardView.toJSON(e));
-    }
-    if (message.revealed?.length) {
-      obj.revealed = message.revealed.map((e) => RevealedView.toJSON(e));
-    }
-    if (message.lookedAt?.length) {
-      obj.lookedAt = message.lookedAt.map((e) => LookedAtView.toJSON(e));
-    }
-    if (message.combat !== undefined) {
-      obj.combat = CombatView.toJSON(message.combat);
-    }
-    if (message.special !== false) {
-      obj.special = message.special;
-    }
-    if (message.startTime !== undefined) {
-      obj.startTime = message.startTime.toISOString();
-    }
-    if (message.activeControlSeat !== "") {
-      obj.activeControlSeat = message.activeControlSeat;
-    }
-    if (message.activePlayerName !== "") {
-      obj.activePlayerName = message.activePlayerName;
-    }
-    if (message.priorityPlayerName !== "") {
-      obj.priorityPlayerName = message.priorityPlayerName;
-    }
-    if (message.gameFormat !== "") {
-      obj.gameFormat = message.gameFormat;
-    }
-    if (message.isMulliganPhase !== false) {
-      obj.isMulliganPhase = message.isMulliganPhase;
-    }
-    if (message.landsPlayedThisTurn !== 0) {
-      obj.landsPlayedThisTurn = Math.round(message.landsPlayedThisTurn);
-    }
-    if (message.landsAllowedThisTurn !== 0) {
-      obj.landsAllowedThisTurn = Math.round(message.landsAllowedThisTurn);
-    }
-    if (message.pendingLibrarySearch !== undefined) {
-      obj.pendingLibrarySearch = LibrarySearchView.toJSON(message.pendingLibrarySearch);
-    }
-    return obj;
-  },
+	toJSON(message: GameView): unknown {
+		const obj: any = {};
+		if (message.gameId !== '') {
+			obj.gameId = message.gameId;
+		}
+		if (message.state !== '') {
+			obj.state = message.state;
+		}
+		if (message.players?.length) {
+			obj.players = message.players.map((e) => PlayerView.toJSON(e));
+		}
+		if (message.activePlayerId !== '') {
+			obj.activePlayerId = message.activePlayerId;
+		}
+		if (message.priorityPlayerId !== '') {
+			obj.priorityPlayerId = message.priorityPlayerId;
+		}
+		if (message.turn !== 0) {
+			obj.turn = Math.round(message.turn);
+		}
+		if (message.phase !== '') {
+			obj.phase = message.phase;
+		}
+		if (message.step !== '') {
+			obj.step = message.step;
+		}
+		if (message.messages?.length) {
+			obj.messages = message.messages.map((e) => GameMessage.toJSON(e));
+		}
+		if (message.battlefield?.length) {
+			obj.battlefield = message.battlefield.map((e) => CardView.toJSON(e));
+		}
+		if (message.stack?.length) {
+			obj.stack = message.stack.map((e) => CardView.toJSON(e));
+		}
+		if (message.exile?.length) {
+			obj.exile = message.exile.map((e) => CardView.toJSON(e));
+		}
+		if (message.command?.length) {
+			obj.command = message.command.map((e) => CardView.toJSON(e));
+		}
+		if (message.revealed?.length) {
+			obj.revealed = message.revealed.map((e) => RevealedView.toJSON(e));
+		}
+		if (message.lookedAt?.length) {
+			obj.lookedAt = message.lookedAt.map((e) => LookedAtView.toJSON(e));
+		}
+		if (message.combat !== undefined) {
+			obj.combat = CombatView.toJSON(message.combat);
+		}
+		if (message.special !== false) {
+			obj.special = message.special;
+		}
+		if (message.startTime !== undefined) {
+			obj.startTime = message.startTime.toISOString();
+		}
+		if (message.activeControlSeat !== '') {
+			obj.activeControlSeat = message.activeControlSeat;
+		}
+		if (message.activePlayerName !== '') {
+			obj.activePlayerName = message.activePlayerName;
+		}
+		if (message.priorityPlayerName !== '') {
+			obj.priorityPlayerName = message.priorityPlayerName;
+		}
+		if (message.gameFormat !== '') {
+			obj.gameFormat = message.gameFormat;
+		}
+		if (message.isMulliganPhase !== false) {
+			obj.isMulliganPhase = message.isMulliganPhase;
+		}
+		if (message.landsPlayedThisTurn !== 0) {
+			obj.landsPlayedThisTurn = Math.round(message.landsPlayedThisTurn);
+		}
+		if (message.landsAllowedThisTurn !== 0) {
+			obj.landsAllowedThisTurn = Math.round(message.landsAllowedThisTurn);
+		}
+		if (message.pendingLibrarySearch !== undefined) {
+			obj.pendingLibrarySearch = LibrarySearchView.toJSON(message.pendingLibrarySearch);
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<GameView>): GameView {
-    return GameView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<GameView>): GameView {
-    const message = createBaseGameView();
-    message.gameId = object.gameId ?? "";
-    message.state = object.state ?? "";
-    message.players = object.players?.map((e) => PlayerView.fromPartial(e)) || [];
-    message.activePlayerId = object.activePlayerId ?? "";
-    message.priorityPlayerId = object.priorityPlayerId ?? "";
-    message.turn = object.turn ?? 0;
-    message.phase = object.phase ?? "";
-    message.step = object.step ?? "";
-    message.messages = object.messages?.map((e) => GameMessage.fromPartial(e)) || [];
-    message.battlefield = object.battlefield?.map((e) => CardView.fromPartial(e)) || [];
-    message.stack = object.stack?.map((e) => CardView.fromPartial(e)) || [];
-    message.exile = object.exile?.map((e) => CardView.fromPartial(e)) || [];
-    message.command = object.command?.map((e) => CardView.fromPartial(e)) || [];
-    message.revealed = object.revealed?.map((e) => RevealedView.fromPartial(e)) || [];
-    message.lookedAt = object.lookedAt?.map((e) => LookedAtView.fromPartial(e)) || [];
-    message.combat = (object.combat !== undefined && object.combat !== null)
-      ? CombatView.fromPartial(object.combat)
-      : undefined;
-    message.special = object.special ?? false;
-    message.startTime = object.startTime ?? undefined;
-    message.activeControlSeat = object.activeControlSeat ?? "";
-    message.activePlayerName = object.activePlayerName ?? "";
-    message.priorityPlayerName = object.priorityPlayerName ?? "";
-    message.gameFormat = object.gameFormat ?? "";
-    message.isMulliganPhase = object.isMulliganPhase ?? false;
-    message.landsPlayedThisTurn = object.landsPlayedThisTurn ?? 0;
-    message.landsAllowedThisTurn = object.landsAllowedThisTurn ?? 0;
-    message.pendingLibrarySearch = (object.pendingLibrarySearch !== undefined && object.pendingLibrarySearch !== null)
-      ? LibrarySearchView.fromPartial(object.pendingLibrarySearch)
-      : undefined;
-    return message;
-  },
+	create(base?: DeepPartial<GameView>): GameView {
+		return GameView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<GameView>): GameView {
+		const message = createBaseGameView();
+		message.gameId = object.gameId ?? '';
+		message.state = object.state ?? '';
+		message.players = object.players?.map((e) => PlayerView.fromPartial(e)) || [];
+		message.activePlayerId = object.activePlayerId ?? '';
+		message.priorityPlayerId = object.priorityPlayerId ?? '';
+		message.turn = object.turn ?? 0;
+		message.phase = object.phase ?? '';
+		message.step = object.step ?? '';
+		message.messages = object.messages?.map((e) => GameMessage.fromPartial(e)) || [];
+		message.battlefield = object.battlefield?.map((e) => CardView.fromPartial(e)) || [];
+		message.stack = object.stack?.map((e) => CardView.fromPartial(e)) || [];
+		message.exile = object.exile?.map((e) => CardView.fromPartial(e)) || [];
+		message.command = object.command?.map((e) => CardView.fromPartial(e)) || [];
+		message.revealed = object.revealed?.map((e) => RevealedView.fromPartial(e)) || [];
+		message.lookedAt = object.lookedAt?.map((e) => LookedAtView.fromPartial(e)) || [];
+		message.combat =
+			object.combat !== undefined && object.combat !== null
+				? CombatView.fromPartial(object.combat)
+				: undefined;
+		message.special = object.special ?? false;
+		message.startTime = object.startTime ?? undefined;
+		message.activeControlSeat = object.activeControlSeat ?? '';
+		message.activePlayerName = object.activePlayerName ?? '';
+		message.priorityPlayerName = object.priorityPlayerName ?? '';
+		message.gameFormat = object.gameFormat ?? '';
+		message.isMulliganPhase = object.isMulliganPhase ?? false;
+		message.landsPlayedThisTurn = object.landsPlayedThisTurn ?? 0;
+		message.landsAllowedThisTurn = object.landsAllowedThisTurn ?? 0;
+		message.pendingLibrarySearch =
+			object.pendingLibrarySearch !== undefined && object.pendingLibrarySearch !== null
+				? LibrarySearchView.fromPartial(object.pendingLibrarySearch)
+				: undefined;
+		return message;
+	}
 };
 
 function createBaseLibrarySearchView(): LibrarySearchView {
-  return { playerId: "", message: "", destination: "", cards: [], canCancel: false };
+	return { playerId: '', message: '', destination: '', cards: [], canCancel: false };
 }
 
 export const LibrarySearchView: MessageFns<LibrarySearchView> = {
-  encode(message: LibrarySearchView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.playerId !== "") {
-      writer.uint32(10).string(message.playerId);
-    }
-    if (message.message !== "") {
-      writer.uint32(18).string(message.message);
-    }
-    if (message.destination !== "") {
-      writer.uint32(26).string(message.destination);
-    }
-    for (const v of message.cards) {
-      CardView.encode(v!, writer.uint32(34).fork()).join();
-    }
-    if (message.canCancel !== false) {
-      writer.uint32(40).bool(message.canCancel);
-    }
-    return writer;
-  },
+	encode(message: LibrarySearchView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.playerId !== '') {
+			writer.uint32(10).string(message.playerId);
+		}
+		if (message.message !== '') {
+			writer.uint32(18).string(message.message);
+		}
+		if (message.destination !== '') {
+			writer.uint32(26).string(message.destination);
+		}
+		for (const v of message.cards) {
+			CardView.encode(v!, writer.uint32(34).fork()).join();
+		}
+		if (message.canCancel !== false) {
+			writer.uint32(40).bool(message.canCancel);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): LibrarySearchView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLibrarySearchView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): LibrarySearchView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseLibrarySearchView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.playerId = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.playerId = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.message = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.message = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.destination = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
+					message.destination = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 34) {
+						break;
+					}
 
-          message.cards.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.cards.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.canCancel = reader.bool();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.canCancel = reader.bool();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): LibrarySearchView {
-    return {
-      playerId: isSet(object.playerId) ? globalThis.String(object.playerId) : "",
-      message: isSet(object.message) ? globalThis.String(object.message) : "",
-      destination: isSet(object.destination) ? globalThis.String(object.destination) : "",
-      cards: globalThis.Array.isArray(object?.cards) ? object.cards.map((e: any) => CardView.fromJSON(e)) : [],
-      canCancel: isSet(object.canCancel) ? globalThis.Boolean(object.canCancel) : false,
-    };
-  },
+	fromJSON(object: any): LibrarySearchView {
+		return {
+			playerId: isSet(object.playerId) ? globalThis.String(object.playerId) : '',
+			message: isSet(object.message) ? globalThis.String(object.message) : '',
+			destination: isSet(object.destination) ? globalThis.String(object.destination) : '',
+			cards: globalThis.Array.isArray(object?.cards)
+				? object.cards.map((e: any) => CardView.fromJSON(e))
+				: [],
+			canCancel: isSet(object.canCancel) ? globalThis.Boolean(object.canCancel) : false
+		};
+	},
 
-  toJSON(message: LibrarySearchView): unknown {
-    const obj: any = {};
-    if (message.playerId !== "") {
-      obj.playerId = message.playerId;
-    }
-    if (message.message !== "") {
-      obj.message = message.message;
-    }
-    if (message.destination !== "") {
-      obj.destination = message.destination;
-    }
-    if (message.cards?.length) {
-      obj.cards = message.cards.map((e) => CardView.toJSON(e));
-    }
-    if (message.canCancel !== false) {
-      obj.canCancel = message.canCancel;
-    }
-    return obj;
-  },
+	toJSON(message: LibrarySearchView): unknown {
+		const obj: any = {};
+		if (message.playerId !== '') {
+			obj.playerId = message.playerId;
+		}
+		if (message.message !== '') {
+			obj.message = message.message;
+		}
+		if (message.destination !== '') {
+			obj.destination = message.destination;
+		}
+		if (message.cards?.length) {
+			obj.cards = message.cards.map((e) => CardView.toJSON(e));
+		}
+		if (message.canCancel !== false) {
+			obj.canCancel = message.canCancel;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<LibrarySearchView>): LibrarySearchView {
-    return LibrarySearchView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<LibrarySearchView>): LibrarySearchView {
-    const message = createBaseLibrarySearchView();
-    message.playerId = object.playerId ?? "";
-    message.message = object.message ?? "";
-    message.destination = object.destination ?? "";
-    message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
-    message.canCancel = object.canCancel ?? false;
-    return message;
-  },
+	create(base?: DeepPartial<LibrarySearchView>): LibrarySearchView {
+		return LibrarySearchView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<LibrarySearchView>): LibrarySearchView {
+		const message = createBaseLibrarySearchView();
+		message.playerId = object.playerId ?? '';
+		message.message = object.message ?? '';
+		message.destination = object.destination ?? '';
+		message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
+		message.canCancel = object.canCancel ?? false;
+		return message;
+	}
 };
 
 function createBasePlayerView(): PlayerView {
-  return {
-    playerId: "",
-    name: "",
-    life: 0,
-    poison: 0,
-    energy: 0,
-    libraryCount: 0,
-    handCount: 0,
-    hand: [],
-    graveyard: [],
-    library: [],
-    manaPool: undefined,
-    hasPriority: false,
-    passed: false,
-    stateOrdinal: 0,
-    lost: false,
-    left: false,
-    wins: 0,
-    keptHand: false,
-    hasAvailableActions: false,
-    mulliganCount: 0,
-  };
+	return {
+		playerId: '',
+		name: '',
+		life: 0,
+		poison: 0,
+		energy: 0,
+		libraryCount: 0,
+		handCount: 0,
+		hand: [],
+		graveyard: [],
+		library: [],
+		manaPool: undefined,
+		hasPriority: false,
+		passed: false,
+		stateOrdinal: 0,
+		lost: false,
+		left: false,
+		wins: 0,
+		keptHand: false,
+		hasAvailableActions: false,
+		mulliganCount: 0
+	};
 }
 
 export const PlayerView: MessageFns<PlayerView> = {
-  encode(message: PlayerView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.playerId !== "") {
-      writer.uint32(10).string(message.playerId);
-    }
-    if (message.name !== "") {
-      writer.uint32(18).string(message.name);
-    }
-    if (message.life !== 0) {
-      writer.uint32(24).int32(message.life);
-    }
-    if (message.poison !== 0) {
-      writer.uint32(32).int32(message.poison);
-    }
-    if (message.energy !== 0) {
-      writer.uint32(40).int32(message.energy);
-    }
-    if (message.libraryCount !== 0) {
-      writer.uint32(48).int32(message.libraryCount);
-    }
-    if (message.handCount !== 0) {
-      writer.uint32(56).int32(message.handCount);
-    }
-    for (const v of message.hand) {
-      CardView.encode(v!, writer.uint32(66).fork()).join();
-    }
-    for (const v of message.graveyard) {
-      CardView.encode(v!, writer.uint32(74).fork()).join();
-    }
-    for (const v of message.library) {
-      CardView.encode(v!, writer.uint32(154).fork()).join();
-    }
-    if (message.manaPool !== undefined) {
-      ManaPoolView.encode(message.manaPool, writer.uint32(82).fork()).join();
-    }
-    if (message.hasPriority !== false) {
-      writer.uint32(88).bool(message.hasPriority);
-    }
-    if (message.passed !== false) {
-      writer.uint32(96).bool(message.passed);
-    }
-    if (message.stateOrdinal !== 0) {
-      writer.uint32(104).int32(message.stateOrdinal);
-    }
-    if (message.lost !== false) {
-      writer.uint32(112).bool(message.lost);
-    }
-    if (message.left !== false) {
-      writer.uint32(120).bool(message.left);
-    }
-    if (message.wins !== 0) {
-      writer.uint32(128).int32(message.wins);
-    }
-    if (message.keptHand !== false) {
-      writer.uint32(136).bool(message.keptHand);
-    }
-    if (message.hasAvailableActions !== false) {
-      writer.uint32(144).bool(message.hasAvailableActions);
-    }
-    if (message.mulliganCount !== 0) {
-      writer.uint32(160).int32(message.mulliganCount);
-    }
-    return writer;
-  },
+	encode(message: PlayerView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.playerId !== '') {
+			writer.uint32(10).string(message.playerId);
+		}
+		if (message.name !== '') {
+			writer.uint32(18).string(message.name);
+		}
+		if (message.life !== 0) {
+			writer.uint32(24).int32(message.life);
+		}
+		if (message.poison !== 0) {
+			writer.uint32(32).int32(message.poison);
+		}
+		if (message.energy !== 0) {
+			writer.uint32(40).int32(message.energy);
+		}
+		if (message.libraryCount !== 0) {
+			writer.uint32(48).int32(message.libraryCount);
+		}
+		if (message.handCount !== 0) {
+			writer.uint32(56).int32(message.handCount);
+		}
+		for (const v of message.hand) {
+			CardView.encode(v!, writer.uint32(66).fork()).join();
+		}
+		for (const v of message.graveyard) {
+			CardView.encode(v!, writer.uint32(74).fork()).join();
+		}
+		for (const v of message.library) {
+			CardView.encode(v!, writer.uint32(154).fork()).join();
+		}
+		if (message.manaPool !== undefined) {
+			ManaPoolView.encode(message.manaPool, writer.uint32(82).fork()).join();
+		}
+		if (message.hasPriority !== false) {
+			writer.uint32(88).bool(message.hasPriority);
+		}
+		if (message.passed !== false) {
+			writer.uint32(96).bool(message.passed);
+		}
+		if (message.stateOrdinal !== 0) {
+			writer.uint32(104).int32(message.stateOrdinal);
+		}
+		if (message.lost !== false) {
+			writer.uint32(112).bool(message.lost);
+		}
+		if (message.left !== false) {
+			writer.uint32(120).bool(message.left);
+		}
+		if (message.wins !== 0) {
+			writer.uint32(128).int32(message.wins);
+		}
+		if (message.keptHand !== false) {
+			writer.uint32(136).bool(message.keptHand);
+		}
+		if (message.hasAvailableActions !== false) {
+			writer.uint32(144).bool(message.hasAvailableActions);
+		}
+		if (message.mulliganCount !== 0) {
+			writer.uint32(160).int32(message.mulliganCount);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): PlayerView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePlayerView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): PlayerView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBasePlayerView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.playerId = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.playerId = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.name = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
+					message.name = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 24) {
+						break;
+					}
 
-          message.life = reader.int32();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.life = reader.int32();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.poison = reader.int32();
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.poison = reader.int32();
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.energy = reader.int32();
-          continue;
-        }
-        case 6: {
-          if (tag !== 48) {
-            break;
-          }
+					message.energy = reader.int32();
+					continue;
+				}
+				case 6: {
+					if (tag !== 48) {
+						break;
+					}
 
-          message.libraryCount = reader.int32();
-          continue;
-        }
-        case 7: {
-          if (tag !== 56) {
-            break;
-          }
+					message.libraryCount = reader.int32();
+					continue;
+				}
+				case 7: {
+					if (tag !== 56) {
+						break;
+					}
 
-          message.handCount = reader.int32();
-          continue;
-        }
-        case 8: {
-          if (tag !== 66) {
-            break;
-          }
+					message.handCount = reader.int32();
+					continue;
+				}
+				case 8: {
+					if (tag !== 66) {
+						break;
+					}
 
-          message.hand.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 9: {
-          if (tag !== 74) {
-            break;
-          }
+					message.hand.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 9: {
+					if (tag !== 74) {
+						break;
+					}
 
-          message.graveyard.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 19: {
-          if (tag !== 154) {
-            break;
-          }
+					message.graveyard.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 19: {
+					if (tag !== 154) {
+						break;
+					}
 
-          message.library.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 10: {
-          if (tag !== 82) {
-            break;
-          }
+					message.library.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 10: {
+					if (tag !== 82) {
+						break;
+					}
 
-          message.manaPool = ManaPoolView.decode(reader, reader.uint32());
-          continue;
-        }
-        case 11: {
-          if (tag !== 88) {
-            break;
-          }
+					message.manaPool = ManaPoolView.decode(reader, reader.uint32());
+					continue;
+				}
+				case 11: {
+					if (tag !== 88) {
+						break;
+					}
 
-          message.hasPriority = reader.bool();
-          continue;
-        }
-        case 12: {
-          if (tag !== 96) {
-            break;
-          }
+					message.hasPriority = reader.bool();
+					continue;
+				}
+				case 12: {
+					if (tag !== 96) {
+						break;
+					}
 
-          message.passed = reader.bool();
-          continue;
-        }
-        case 13: {
-          if (tag !== 104) {
-            break;
-          }
+					message.passed = reader.bool();
+					continue;
+				}
+				case 13: {
+					if (tag !== 104) {
+						break;
+					}
 
-          message.stateOrdinal = reader.int32();
-          continue;
-        }
-        case 14: {
-          if (tag !== 112) {
-            break;
-          }
+					message.stateOrdinal = reader.int32();
+					continue;
+				}
+				case 14: {
+					if (tag !== 112) {
+						break;
+					}
 
-          message.lost = reader.bool();
-          continue;
-        }
-        case 15: {
-          if (tag !== 120) {
-            break;
-          }
+					message.lost = reader.bool();
+					continue;
+				}
+				case 15: {
+					if (tag !== 120) {
+						break;
+					}
 
-          message.left = reader.bool();
-          continue;
-        }
-        case 16: {
-          if (tag !== 128) {
-            break;
-          }
+					message.left = reader.bool();
+					continue;
+				}
+				case 16: {
+					if (tag !== 128) {
+						break;
+					}
 
-          message.wins = reader.int32();
-          continue;
-        }
-        case 17: {
-          if (tag !== 136) {
-            break;
-          }
+					message.wins = reader.int32();
+					continue;
+				}
+				case 17: {
+					if (tag !== 136) {
+						break;
+					}
 
-          message.keptHand = reader.bool();
-          continue;
-        }
-        case 18: {
-          if (tag !== 144) {
-            break;
-          }
+					message.keptHand = reader.bool();
+					continue;
+				}
+				case 18: {
+					if (tag !== 144) {
+						break;
+					}
 
-          message.hasAvailableActions = reader.bool();
-          continue;
-        }
-        case 20: {
-          if (tag !== 160) {
-            break;
-          }
+					message.hasAvailableActions = reader.bool();
+					continue;
+				}
+				case 20: {
+					if (tag !== 160) {
+						break;
+					}
 
-          message.mulliganCount = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.mulliganCount = reader.int32();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): PlayerView {
-    return {
-      playerId: isSet(object.playerId) ? globalThis.String(object.playerId) : "",
-      name: isSet(object.name) ? globalThis.String(object.name) : "",
-      life: isSet(object.life) ? globalThis.Number(object.life) : 0,
-      poison: isSet(object.poison) ? globalThis.Number(object.poison) : 0,
-      energy: isSet(object.energy) ? globalThis.Number(object.energy) : 0,
-      libraryCount: isSet(object.libraryCount) ? globalThis.Number(object.libraryCount) : 0,
-      handCount: isSet(object.handCount) ? globalThis.Number(object.handCount) : 0,
-      hand: globalThis.Array.isArray(object?.hand) ? object.hand.map((e: any) => CardView.fromJSON(e)) : [],
-      graveyard: globalThis.Array.isArray(object?.graveyard)
-        ? object.graveyard.map((e: any) => CardView.fromJSON(e))
-        : [],
-      library: globalThis.Array.isArray(object?.library) ? object.library.map((e: any) => CardView.fromJSON(e)) : [],
-      manaPool: isSet(object.manaPool) ? ManaPoolView.fromJSON(object.manaPool) : undefined,
-      hasPriority: isSet(object.hasPriority) ? globalThis.Boolean(object.hasPriority) : false,
-      passed: isSet(object.passed) ? globalThis.Boolean(object.passed) : false,
-      stateOrdinal: isSet(object.stateOrdinal) ? globalThis.Number(object.stateOrdinal) : 0,
-      lost: isSet(object.lost) ? globalThis.Boolean(object.lost) : false,
-      left: isSet(object.left) ? globalThis.Boolean(object.left) : false,
-      wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
-      keptHand: isSet(object.keptHand) ? globalThis.Boolean(object.keptHand) : false,
-      hasAvailableActions: isSet(object.hasAvailableActions) ? globalThis.Boolean(object.hasAvailableActions) : false,
-      mulliganCount: isSet(object.mulliganCount) ? globalThis.Number(object.mulliganCount) : 0,
-    };
-  },
+	fromJSON(object: any): PlayerView {
+		return {
+			playerId: isSet(object.playerId) ? globalThis.String(object.playerId) : '',
+			name: isSet(object.name) ? globalThis.String(object.name) : '',
+			life: isSet(object.life) ? globalThis.Number(object.life) : 0,
+			poison: isSet(object.poison) ? globalThis.Number(object.poison) : 0,
+			energy: isSet(object.energy) ? globalThis.Number(object.energy) : 0,
+			libraryCount: isSet(object.libraryCount) ? globalThis.Number(object.libraryCount) : 0,
+			handCount: isSet(object.handCount) ? globalThis.Number(object.handCount) : 0,
+			hand: globalThis.Array.isArray(object?.hand)
+				? object.hand.map((e: any) => CardView.fromJSON(e))
+				: [],
+			graveyard: globalThis.Array.isArray(object?.graveyard)
+				? object.graveyard.map((e: any) => CardView.fromJSON(e))
+				: [],
+			library: globalThis.Array.isArray(object?.library)
+				? object.library.map((e: any) => CardView.fromJSON(e))
+				: [],
+			manaPool: isSet(object.manaPool) ? ManaPoolView.fromJSON(object.manaPool) : undefined,
+			hasPriority: isSet(object.hasPriority) ? globalThis.Boolean(object.hasPriority) : false,
+			passed: isSet(object.passed) ? globalThis.Boolean(object.passed) : false,
+			stateOrdinal: isSet(object.stateOrdinal) ? globalThis.Number(object.stateOrdinal) : 0,
+			lost: isSet(object.lost) ? globalThis.Boolean(object.lost) : false,
+			left: isSet(object.left) ? globalThis.Boolean(object.left) : false,
+			wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
+			keptHand: isSet(object.keptHand) ? globalThis.Boolean(object.keptHand) : false,
+			hasAvailableActions: isSet(object.hasAvailableActions)
+				? globalThis.Boolean(object.hasAvailableActions)
+				: false,
+			mulliganCount: isSet(object.mulliganCount) ? globalThis.Number(object.mulliganCount) : 0
+		};
+	},
 
-  toJSON(message: PlayerView): unknown {
-    const obj: any = {};
-    if (message.playerId !== "") {
-      obj.playerId = message.playerId;
-    }
-    if (message.name !== "") {
-      obj.name = message.name;
-    }
-    if (message.life !== 0) {
-      obj.life = Math.round(message.life);
-    }
-    if (message.poison !== 0) {
-      obj.poison = Math.round(message.poison);
-    }
-    if (message.energy !== 0) {
-      obj.energy = Math.round(message.energy);
-    }
-    if (message.libraryCount !== 0) {
-      obj.libraryCount = Math.round(message.libraryCount);
-    }
-    if (message.handCount !== 0) {
-      obj.handCount = Math.round(message.handCount);
-    }
-    if (message.hand?.length) {
-      obj.hand = message.hand.map((e) => CardView.toJSON(e));
-    }
-    if (message.graveyard?.length) {
-      obj.graveyard = message.graveyard.map((e) => CardView.toJSON(e));
-    }
-    if (message.library?.length) {
-      obj.library = message.library.map((e) => CardView.toJSON(e));
-    }
-    if (message.manaPool !== undefined) {
-      obj.manaPool = ManaPoolView.toJSON(message.manaPool);
-    }
-    if (message.hasPriority !== false) {
-      obj.hasPriority = message.hasPriority;
-    }
-    if (message.passed !== false) {
-      obj.passed = message.passed;
-    }
-    if (message.stateOrdinal !== 0) {
-      obj.stateOrdinal = Math.round(message.stateOrdinal);
-    }
-    if (message.lost !== false) {
-      obj.lost = message.lost;
-    }
-    if (message.left !== false) {
-      obj.left = message.left;
-    }
-    if (message.wins !== 0) {
-      obj.wins = Math.round(message.wins);
-    }
-    if (message.keptHand !== false) {
-      obj.keptHand = message.keptHand;
-    }
-    if (message.hasAvailableActions !== false) {
-      obj.hasAvailableActions = message.hasAvailableActions;
-    }
-    if (message.mulliganCount !== 0) {
-      obj.mulliganCount = Math.round(message.mulliganCount);
-    }
-    return obj;
-  },
+	toJSON(message: PlayerView): unknown {
+		const obj: any = {};
+		if (message.playerId !== '') {
+			obj.playerId = message.playerId;
+		}
+		if (message.name !== '') {
+			obj.name = message.name;
+		}
+		if (message.life !== 0) {
+			obj.life = Math.round(message.life);
+		}
+		if (message.poison !== 0) {
+			obj.poison = Math.round(message.poison);
+		}
+		if (message.energy !== 0) {
+			obj.energy = Math.round(message.energy);
+		}
+		if (message.libraryCount !== 0) {
+			obj.libraryCount = Math.round(message.libraryCount);
+		}
+		if (message.handCount !== 0) {
+			obj.handCount = Math.round(message.handCount);
+		}
+		if (message.hand?.length) {
+			obj.hand = message.hand.map((e) => CardView.toJSON(e));
+		}
+		if (message.graveyard?.length) {
+			obj.graveyard = message.graveyard.map((e) => CardView.toJSON(e));
+		}
+		if (message.library?.length) {
+			obj.library = message.library.map((e) => CardView.toJSON(e));
+		}
+		if (message.manaPool !== undefined) {
+			obj.manaPool = ManaPoolView.toJSON(message.manaPool);
+		}
+		if (message.hasPriority !== false) {
+			obj.hasPriority = message.hasPriority;
+		}
+		if (message.passed !== false) {
+			obj.passed = message.passed;
+		}
+		if (message.stateOrdinal !== 0) {
+			obj.stateOrdinal = Math.round(message.stateOrdinal);
+		}
+		if (message.lost !== false) {
+			obj.lost = message.lost;
+		}
+		if (message.left !== false) {
+			obj.left = message.left;
+		}
+		if (message.wins !== 0) {
+			obj.wins = Math.round(message.wins);
+		}
+		if (message.keptHand !== false) {
+			obj.keptHand = message.keptHand;
+		}
+		if (message.hasAvailableActions !== false) {
+			obj.hasAvailableActions = message.hasAvailableActions;
+		}
+		if (message.mulliganCount !== 0) {
+			obj.mulliganCount = Math.round(message.mulliganCount);
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<PlayerView>): PlayerView {
-    return PlayerView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<PlayerView>): PlayerView {
-    const message = createBasePlayerView();
-    message.playerId = object.playerId ?? "";
-    message.name = object.name ?? "";
-    message.life = object.life ?? 0;
-    message.poison = object.poison ?? 0;
-    message.energy = object.energy ?? 0;
-    message.libraryCount = object.libraryCount ?? 0;
-    message.handCount = object.handCount ?? 0;
-    message.hand = object.hand?.map((e) => CardView.fromPartial(e)) || [];
-    message.graveyard = object.graveyard?.map((e) => CardView.fromPartial(e)) || [];
-    message.library = object.library?.map((e) => CardView.fromPartial(e)) || [];
-    message.manaPool = (object.manaPool !== undefined && object.manaPool !== null)
-      ? ManaPoolView.fromPartial(object.manaPool)
-      : undefined;
-    message.hasPriority = object.hasPriority ?? false;
-    message.passed = object.passed ?? false;
-    message.stateOrdinal = object.stateOrdinal ?? 0;
-    message.lost = object.lost ?? false;
-    message.left = object.left ?? false;
-    message.wins = object.wins ?? 0;
-    message.keptHand = object.keptHand ?? false;
-    message.hasAvailableActions = object.hasAvailableActions ?? false;
-    message.mulliganCount = object.mulliganCount ?? 0;
-    return message;
-  },
+	create(base?: DeepPartial<PlayerView>): PlayerView {
+		return PlayerView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<PlayerView>): PlayerView {
+		const message = createBasePlayerView();
+		message.playerId = object.playerId ?? '';
+		message.name = object.name ?? '';
+		message.life = object.life ?? 0;
+		message.poison = object.poison ?? 0;
+		message.energy = object.energy ?? 0;
+		message.libraryCount = object.libraryCount ?? 0;
+		message.handCount = object.handCount ?? 0;
+		message.hand = object.hand?.map((e) => CardView.fromPartial(e)) || [];
+		message.graveyard = object.graveyard?.map((e) => CardView.fromPartial(e)) || [];
+		message.library = object.library?.map((e) => CardView.fromPartial(e)) || [];
+		message.manaPool =
+			object.manaPool !== undefined && object.manaPool !== null
+				? ManaPoolView.fromPartial(object.manaPool)
+				: undefined;
+		message.hasPriority = object.hasPriority ?? false;
+		message.passed = object.passed ?? false;
+		message.stateOrdinal = object.stateOrdinal ?? 0;
+		message.lost = object.lost ?? false;
+		message.left = object.left ?? false;
+		message.wins = object.wins ?? 0;
+		message.keptHand = object.keptHand ?? false;
+		message.hasAvailableActions = object.hasAvailableActions ?? false;
+		message.mulliganCount = object.mulliganCount ?? 0;
+		return message;
+	}
 };
 
 function createBaseCardView(): CardView {
-  return {
-    id: "",
-    name: "",
-    displayName: "",
-    manaCost: "",
-    type: "",
-    subTypes: "",
-    superTypes: "",
-    color: "",
-    power: "",
-    toughness: "",
-    loyalty: "",
-    cardNumber: 0,
-    expansionSetCode: "",
-    rarity: "",
-    rulesText: "",
-    abilities: [],
-    tapped: false,
-    flipped: false,
-    transformed: false,
-    faceDown: false,
-    zone: 0,
-    controllerId: "",
-    ownerId: "",
-    counters: [],
-    attachedTo: [],
-    summoningSickness: false,
-    availableActions: [],
-  };
+	return {
+		id: '',
+		name: '',
+		displayName: '',
+		manaCost: '',
+		type: '',
+		subTypes: '',
+		superTypes: '',
+		color: '',
+		power: '',
+		toughness: '',
+		loyalty: '',
+		cardNumber: 0,
+		expansionSetCode: '',
+		rarity: '',
+		rulesText: '',
+		abilities: [],
+		tapped: false,
+		flipped: false,
+		transformed: false,
+		faceDown: false,
+		zone: 0,
+		controllerId: '',
+		ownerId: '',
+		counters: [],
+		attachedTo: [],
+		summoningSickness: false,
+		availableActions: []
+	};
 }
 
 export const CardView: MessageFns<CardView> = {
-  encode(message: CardView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.name !== "") {
-      writer.uint32(18).string(message.name);
-    }
-    if (message.displayName !== "") {
-      writer.uint32(26).string(message.displayName);
-    }
-    if (message.manaCost !== "") {
-      writer.uint32(34).string(message.manaCost);
-    }
-    if (message.type !== "") {
-      writer.uint32(42).string(message.type);
-    }
-    if (message.subTypes !== "") {
-      writer.uint32(50).string(message.subTypes);
-    }
-    if (message.superTypes !== "") {
-      writer.uint32(58).string(message.superTypes);
-    }
-    if (message.color !== "") {
-      writer.uint32(66).string(message.color);
-    }
-    if (message.power !== "") {
-      writer.uint32(74).string(message.power);
-    }
-    if (message.toughness !== "") {
-      writer.uint32(82).string(message.toughness);
-    }
-    if (message.loyalty !== "") {
-      writer.uint32(90).string(message.loyalty);
-    }
-    if (message.cardNumber !== 0) {
-      writer.uint32(96).int32(message.cardNumber);
-    }
-    if (message.expansionSetCode !== "") {
-      writer.uint32(106).string(message.expansionSetCode);
-    }
-    if (message.rarity !== "") {
-      writer.uint32(114).string(message.rarity);
-    }
-    if (message.rulesText !== "") {
-      writer.uint32(122).string(message.rulesText);
-    }
-    for (const v of message.abilities) {
-      AbilityView.encode(v!, writer.uint32(130).fork()).join();
-    }
-    if (message.tapped !== false) {
-      writer.uint32(136).bool(message.tapped);
-    }
-    if (message.flipped !== false) {
-      writer.uint32(144).bool(message.flipped);
-    }
-    if (message.transformed !== false) {
-      writer.uint32(152).bool(message.transformed);
-    }
-    if (message.faceDown !== false) {
-      writer.uint32(160).bool(message.faceDown);
-    }
-    if (message.zone !== 0) {
-      writer.uint32(168).int32(message.zone);
-    }
-    if (message.controllerId !== "") {
-      writer.uint32(178).string(message.controllerId);
-    }
-    if (message.ownerId !== "") {
-      writer.uint32(186).string(message.ownerId);
-    }
-    for (const v of message.counters) {
-      CounterView.encode(v!, writer.uint32(194).fork()).join();
-    }
-    for (const v of message.attachedTo) {
-      writer.uint32(202).string(v!);
-    }
-    if (message.summoningSickness !== false) {
-      writer.uint32(208).bool(message.summoningSickness);
-    }
-    for (const v of message.availableActions) {
-      CardAction.encode(v!, writer.uint32(242).fork()).join();
-    }
-    return writer;
-  },
+	encode(message: CardView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.id !== '') {
+			writer.uint32(10).string(message.id);
+		}
+		if (message.name !== '') {
+			writer.uint32(18).string(message.name);
+		}
+		if (message.displayName !== '') {
+			writer.uint32(26).string(message.displayName);
+		}
+		if (message.manaCost !== '') {
+			writer.uint32(34).string(message.manaCost);
+		}
+		if (message.type !== '') {
+			writer.uint32(42).string(message.type);
+		}
+		if (message.subTypes !== '') {
+			writer.uint32(50).string(message.subTypes);
+		}
+		if (message.superTypes !== '') {
+			writer.uint32(58).string(message.superTypes);
+		}
+		if (message.color !== '') {
+			writer.uint32(66).string(message.color);
+		}
+		if (message.power !== '') {
+			writer.uint32(74).string(message.power);
+		}
+		if (message.toughness !== '') {
+			writer.uint32(82).string(message.toughness);
+		}
+		if (message.loyalty !== '') {
+			writer.uint32(90).string(message.loyalty);
+		}
+		if (message.cardNumber !== 0) {
+			writer.uint32(96).int32(message.cardNumber);
+		}
+		if (message.expansionSetCode !== '') {
+			writer.uint32(106).string(message.expansionSetCode);
+		}
+		if (message.rarity !== '') {
+			writer.uint32(114).string(message.rarity);
+		}
+		if (message.rulesText !== '') {
+			writer.uint32(122).string(message.rulesText);
+		}
+		for (const v of message.abilities) {
+			AbilityView.encode(v!, writer.uint32(130).fork()).join();
+		}
+		if (message.tapped !== false) {
+			writer.uint32(136).bool(message.tapped);
+		}
+		if (message.flipped !== false) {
+			writer.uint32(144).bool(message.flipped);
+		}
+		if (message.transformed !== false) {
+			writer.uint32(152).bool(message.transformed);
+		}
+		if (message.faceDown !== false) {
+			writer.uint32(160).bool(message.faceDown);
+		}
+		if (message.zone !== 0) {
+			writer.uint32(168).int32(message.zone);
+		}
+		if (message.controllerId !== '') {
+			writer.uint32(178).string(message.controllerId);
+		}
+		if (message.ownerId !== '') {
+			writer.uint32(186).string(message.ownerId);
+		}
+		for (const v of message.counters) {
+			CounterView.encode(v!, writer.uint32(194).fork()).join();
+		}
+		for (const v of message.attachedTo) {
+			writer.uint32(202).string(v!);
+		}
+		if (message.summoningSickness !== false) {
+			writer.uint32(208).bool(message.summoningSickness);
+		}
+		for (const v of message.availableActions) {
+			CardAction.encode(v!, writer.uint32(242).fork()).join();
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CardView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCardView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): CardView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseCardView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.id = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.id = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.name = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.name = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.displayName = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
+					message.displayName = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 34) {
+						break;
+					}
 
-          message.manaCost = reader.string();
-          continue;
-        }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
+					message.manaCost = reader.string();
+					continue;
+				}
+				case 5: {
+					if (tag !== 42) {
+						break;
+					}
 
-          message.type = reader.string();
-          continue;
-        }
-        case 6: {
-          if (tag !== 50) {
-            break;
-          }
+					message.type = reader.string();
+					continue;
+				}
+				case 6: {
+					if (tag !== 50) {
+						break;
+					}
 
-          message.subTypes = reader.string();
-          continue;
-        }
-        case 7: {
-          if (tag !== 58) {
-            break;
-          }
+					message.subTypes = reader.string();
+					continue;
+				}
+				case 7: {
+					if (tag !== 58) {
+						break;
+					}
 
-          message.superTypes = reader.string();
-          continue;
-        }
-        case 8: {
-          if (tag !== 66) {
-            break;
-          }
+					message.superTypes = reader.string();
+					continue;
+				}
+				case 8: {
+					if (tag !== 66) {
+						break;
+					}
 
-          message.color = reader.string();
-          continue;
-        }
-        case 9: {
-          if (tag !== 74) {
-            break;
-          }
+					message.color = reader.string();
+					continue;
+				}
+				case 9: {
+					if (tag !== 74) {
+						break;
+					}
 
-          message.power = reader.string();
-          continue;
-        }
-        case 10: {
-          if (tag !== 82) {
-            break;
-          }
+					message.power = reader.string();
+					continue;
+				}
+				case 10: {
+					if (tag !== 82) {
+						break;
+					}
 
-          message.toughness = reader.string();
-          continue;
-        }
-        case 11: {
-          if (tag !== 90) {
-            break;
-          }
+					message.toughness = reader.string();
+					continue;
+				}
+				case 11: {
+					if (tag !== 90) {
+						break;
+					}
 
-          message.loyalty = reader.string();
-          continue;
-        }
-        case 12: {
-          if (tag !== 96) {
-            break;
-          }
+					message.loyalty = reader.string();
+					continue;
+				}
+				case 12: {
+					if (tag !== 96) {
+						break;
+					}
 
-          message.cardNumber = reader.int32();
-          continue;
-        }
-        case 13: {
-          if (tag !== 106) {
-            break;
-          }
+					message.cardNumber = reader.int32();
+					continue;
+				}
+				case 13: {
+					if (tag !== 106) {
+						break;
+					}
 
-          message.expansionSetCode = reader.string();
-          continue;
-        }
-        case 14: {
-          if (tag !== 114) {
-            break;
-          }
+					message.expansionSetCode = reader.string();
+					continue;
+				}
+				case 14: {
+					if (tag !== 114) {
+						break;
+					}
 
-          message.rarity = reader.string();
-          continue;
-        }
-        case 15: {
-          if (tag !== 122) {
-            break;
-          }
+					message.rarity = reader.string();
+					continue;
+				}
+				case 15: {
+					if (tag !== 122) {
+						break;
+					}
 
-          message.rulesText = reader.string();
-          continue;
-        }
-        case 16: {
-          if (tag !== 130) {
-            break;
-          }
+					message.rulesText = reader.string();
+					continue;
+				}
+				case 16: {
+					if (tag !== 130) {
+						break;
+					}
 
-          message.abilities.push(AbilityView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 17: {
-          if (tag !== 136) {
-            break;
-          }
+					message.abilities.push(AbilityView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 17: {
+					if (tag !== 136) {
+						break;
+					}
 
-          message.tapped = reader.bool();
-          continue;
-        }
-        case 18: {
-          if (tag !== 144) {
-            break;
-          }
+					message.tapped = reader.bool();
+					continue;
+				}
+				case 18: {
+					if (tag !== 144) {
+						break;
+					}
 
-          message.flipped = reader.bool();
-          continue;
-        }
-        case 19: {
-          if (tag !== 152) {
-            break;
-          }
+					message.flipped = reader.bool();
+					continue;
+				}
+				case 19: {
+					if (tag !== 152) {
+						break;
+					}
 
-          message.transformed = reader.bool();
-          continue;
-        }
-        case 20: {
-          if (tag !== 160) {
-            break;
-          }
+					message.transformed = reader.bool();
+					continue;
+				}
+				case 20: {
+					if (tag !== 160) {
+						break;
+					}
 
-          message.faceDown = reader.bool();
-          continue;
-        }
-        case 21: {
-          if (tag !== 168) {
-            break;
-          }
+					message.faceDown = reader.bool();
+					continue;
+				}
+				case 21: {
+					if (tag !== 168) {
+						break;
+					}
 
-          message.zone = reader.int32();
-          continue;
-        }
-        case 22: {
-          if (tag !== 178) {
-            break;
-          }
+					message.zone = reader.int32();
+					continue;
+				}
+				case 22: {
+					if (tag !== 178) {
+						break;
+					}
 
-          message.controllerId = reader.string();
-          continue;
-        }
-        case 23: {
-          if (tag !== 186) {
-            break;
-          }
+					message.controllerId = reader.string();
+					continue;
+				}
+				case 23: {
+					if (tag !== 186) {
+						break;
+					}
 
-          message.ownerId = reader.string();
-          continue;
-        }
-        case 24: {
-          if (tag !== 194) {
-            break;
-          }
+					message.ownerId = reader.string();
+					continue;
+				}
+				case 24: {
+					if (tag !== 194) {
+						break;
+					}
 
-          message.counters.push(CounterView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 25: {
-          if (tag !== 202) {
-            break;
-          }
+					message.counters.push(CounterView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 25: {
+					if (tag !== 202) {
+						break;
+					}
 
-          message.attachedTo.push(reader.string());
-          continue;
-        }
-        case 26: {
-          if (tag !== 208) {
-            break;
-          }
+					message.attachedTo.push(reader.string());
+					continue;
+				}
+				case 26: {
+					if (tag !== 208) {
+						break;
+					}
 
-          message.summoningSickness = reader.bool();
-          continue;
-        }
-        case 30: {
-          if (tag !== 242) {
-            break;
-          }
+					message.summoningSickness = reader.bool();
+					continue;
+				}
+				case 30: {
+					if (tag !== 242) {
+						break;
+					}
 
-          message.availableActions.push(CardAction.decode(reader, reader.uint32()));
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.availableActions.push(CardAction.decode(reader, reader.uint32()));
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): CardView {
-    return {
-      id: isSet(object.id) ? globalThis.String(object.id) : "",
-      name: isSet(object.name) ? globalThis.String(object.name) : "",
-      displayName: isSet(object.displayName) ? globalThis.String(object.displayName) : "",
-      manaCost: isSet(object.manaCost) ? globalThis.String(object.manaCost) : "",
-      type: isSet(object.type) ? globalThis.String(object.type) : "",
-      subTypes: isSet(object.subTypes) ? globalThis.String(object.subTypes) : "",
-      superTypes: isSet(object.superTypes) ? globalThis.String(object.superTypes) : "",
-      color: isSet(object.color) ? globalThis.String(object.color) : "",
-      power: isSet(object.power) ? globalThis.String(object.power) : "",
-      toughness: isSet(object.toughness) ? globalThis.String(object.toughness) : "",
-      loyalty: isSet(object.loyalty) ? globalThis.String(object.loyalty) : "",
-      cardNumber: isSet(object.cardNumber) ? globalThis.Number(object.cardNumber) : 0,
-      expansionSetCode: isSet(object.expansionSetCode) ? globalThis.String(object.expansionSetCode) : "",
-      rarity: isSet(object.rarity) ? globalThis.String(object.rarity) : "",
-      rulesText: isSet(object.rulesText) ? globalThis.String(object.rulesText) : "",
-      abilities: globalThis.Array.isArray(object?.abilities)
-        ? object.abilities.map((e: any) => AbilityView.fromJSON(e))
-        : [],
-      tapped: isSet(object.tapped) ? globalThis.Boolean(object.tapped) : false,
-      flipped: isSet(object.flipped) ? globalThis.Boolean(object.flipped) : false,
-      transformed: isSet(object.transformed) ? globalThis.Boolean(object.transformed) : false,
-      faceDown: isSet(object.faceDown) ? globalThis.Boolean(object.faceDown) : false,
-      zone: isSet(object.zone) ? globalThis.Number(object.zone) : 0,
-      controllerId: isSet(object.controllerId) ? globalThis.String(object.controllerId) : "",
-      ownerId: isSet(object.ownerId) ? globalThis.String(object.ownerId) : "",
-      counters: globalThis.Array.isArray(object?.counters)
-        ? object.counters.map((e: any) => CounterView.fromJSON(e))
-        : [],
-      attachedTo: globalThis.Array.isArray(object?.attachedTo)
-        ? object.attachedTo.map((e: any) => globalThis.String(e))
-        : [],
-      summoningSickness: isSet(object.summoningSickness) ? globalThis.Boolean(object.summoningSickness) : false,
-      availableActions: globalThis.Array.isArray(object?.availableActions)
-        ? object.availableActions.map((e: any) => CardAction.fromJSON(e))
-        : [],
-    };
-  },
+	fromJSON(object: any): CardView {
+		return {
+			id: isSet(object.id) ? globalThis.String(object.id) : '',
+			name: isSet(object.name) ? globalThis.String(object.name) : '',
+			displayName: isSet(object.displayName) ? globalThis.String(object.displayName) : '',
+			manaCost: isSet(object.manaCost) ? globalThis.String(object.manaCost) : '',
+			type: isSet(object.type) ? globalThis.String(object.type) : '',
+			subTypes: isSet(object.subTypes) ? globalThis.String(object.subTypes) : '',
+			superTypes: isSet(object.superTypes) ? globalThis.String(object.superTypes) : '',
+			color: isSet(object.color) ? globalThis.String(object.color) : '',
+			power: isSet(object.power) ? globalThis.String(object.power) : '',
+			toughness: isSet(object.toughness) ? globalThis.String(object.toughness) : '',
+			loyalty: isSet(object.loyalty) ? globalThis.String(object.loyalty) : '',
+			cardNumber: isSet(object.cardNumber) ? globalThis.Number(object.cardNumber) : 0,
+			expansionSetCode: isSet(object.expansionSetCode)
+				? globalThis.String(object.expansionSetCode)
+				: '',
+			rarity: isSet(object.rarity) ? globalThis.String(object.rarity) : '',
+			rulesText: isSet(object.rulesText) ? globalThis.String(object.rulesText) : '',
+			abilities: globalThis.Array.isArray(object?.abilities)
+				? object.abilities.map((e: any) => AbilityView.fromJSON(e))
+				: [],
+			tapped: isSet(object.tapped) ? globalThis.Boolean(object.tapped) : false,
+			flipped: isSet(object.flipped) ? globalThis.Boolean(object.flipped) : false,
+			transformed: isSet(object.transformed) ? globalThis.Boolean(object.transformed) : false,
+			faceDown: isSet(object.faceDown) ? globalThis.Boolean(object.faceDown) : false,
+			zone: isSet(object.zone) ? globalThis.Number(object.zone) : 0,
+			controllerId: isSet(object.controllerId) ? globalThis.String(object.controllerId) : '',
+			ownerId: isSet(object.ownerId) ? globalThis.String(object.ownerId) : '',
+			counters: globalThis.Array.isArray(object?.counters)
+				? object.counters.map((e: any) => CounterView.fromJSON(e))
+				: [],
+			attachedTo: globalThis.Array.isArray(object?.attachedTo)
+				? object.attachedTo.map((e: any) => globalThis.String(e))
+				: [],
+			summoningSickness: isSet(object.summoningSickness)
+				? globalThis.Boolean(object.summoningSickness)
+				: false,
+			availableActions: globalThis.Array.isArray(object?.availableActions)
+				? object.availableActions.map((e: any) => CardAction.fromJSON(e))
+				: []
+		};
+	},
 
-  toJSON(message: CardView): unknown {
-    const obj: any = {};
-    if (message.id !== "") {
-      obj.id = message.id;
-    }
-    if (message.name !== "") {
-      obj.name = message.name;
-    }
-    if (message.displayName !== "") {
-      obj.displayName = message.displayName;
-    }
-    if (message.manaCost !== "") {
-      obj.manaCost = message.manaCost;
-    }
-    if (message.type !== "") {
-      obj.type = message.type;
-    }
-    if (message.subTypes !== "") {
-      obj.subTypes = message.subTypes;
-    }
-    if (message.superTypes !== "") {
-      obj.superTypes = message.superTypes;
-    }
-    if (message.color !== "") {
-      obj.color = message.color;
-    }
-    if (message.power !== "") {
-      obj.power = message.power;
-    }
-    if (message.toughness !== "") {
-      obj.toughness = message.toughness;
-    }
-    if (message.loyalty !== "") {
-      obj.loyalty = message.loyalty;
-    }
-    if (message.cardNumber !== 0) {
-      obj.cardNumber = Math.round(message.cardNumber);
-    }
-    if (message.expansionSetCode !== "") {
-      obj.expansionSetCode = message.expansionSetCode;
-    }
-    if (message.rarity !== "") {
-      obj.rarity = message.rarity;
-    }
-    if (message.rulesText !== "") {
-      obj.rulesText = message.rulesText;
-    }
-    if (message.abilities?.length) {
-      obj.abilities = message.abilities.map((e) => AbilityView.toJSON(e));
-    }
-    if (message.tapped !== false) {
-      obj.tapped = message.tapped;
-    }
-    if (message.flipped !== false) {
-      obj.flipped = message.flipped;
-    }
-    if (message.transformed !== false) {
-      obj.transformed = message.transformed;
-    }
-    if (message.faceDown !== false) {
-      obj.faceDown = message.faceDown;
-    }
-    if (message.zone !== 0) {
-      obj.zone = Math.round(message.zone);
-    }
-    if (message.controllerId !== "") {
-      obj.controllerId = message.controllerId;
-    }
-    if (message.ownerId !== "") {
-      obj.ownerId = message.ownerId;
-    }
-    if (message.counters?.length) {
-      obj.counters = message.counters.map((e) => CounterView.toJSON(e));
-    }
-    if (message.attachedTo?.length) {
-      obj.attachedTo = message.attachedTo;
-    }
-    if (message.summoningSickness !== false) {
-      obj.summoningSickness = message.summoningSickness;
-    }
-    if (message.availableActions?.length) {
-      obj.availableActions = message.availableActions.map((e) => CardAction.toJSON(e));
-    }
-    return obj;
-  },
+	toJSON(message: CardView): unknown {
+		const obj: any = {};
+		if (message.id !== '') {
+			obj.id = message.id;
+		}
+		if (message.name !== '') {
+			obj.name = message.name;
+		}
+		if (message.displayName !== '') {
+			obj.displayName = message.displayName;
+		}
+		if (message.manaCost !== '') {
+			obj.manaCost = message.manaCost;
+		}
+		if (message.type !== '') {
+			obj.type = message.type;
+		}
+		if (message.subTypes !== '') {
+			obj.subTypes = message.subTypes;
+		}
+		if (message.superTypes !== '') {
+			obj.superTypes = message.superTypes;
+		}
+		if (message.color !== '') {
+			obj.color = message.color;
+		}
+		if (message.power !== '') {
+			obj.power = message.power;
+		}
+		if (message.toughness !== '') {
+			obj.toughness = message.toughness;
+		}
+		if (message.loyalty !== '') {
+			obj.loyalty = message.loyalty;
+		}
+		if (message.cardNumber !== 0) {
+			obj.cardNumber = Math.round(message.cardNumber);
+		}
+		if (message.expansionSetCode !== '') {
+			obj.expansionSetCode = message.expansionSetCode;
+		}
+		if (message.rarity !== '') {
+			obj.rarity = message.rarity;
+		}
+		if (message.rulesText !== '') {
+			obj.rulesText = message.rulesText;
+		}
+		if (message.abilities?.length) {
+			obj.abilities = message.abilities.map((e) => AbilityView.toJSON(e));
+		}
+		if (message.tapped !== false) {
+			obj.tapped = message.tapped;
+		}
+		if (message.flipped !== false) {
+			obj.flipped = message.flipped;
+		}
+		if (message.transformed !== false) {
+			obj.transformed = message.transformed;
+		}
+		if (message.faceDown !== false) {
+			obj.faceDown = message.faceDown;
+		}
+		if (message.zone !== 0) {
+			obj.zone = Math.round(message.zone);
+		}
+		if (message.controllerId !== '') {
+			obj.controllerId = message.controllerId;
+		}
+		if (message.ownerId !== '') {
+			obj.ownerId = message.ownerId;
+		}
+		if (message.counters?.length) {
+			obj.counters = message.counters.map((e) => CounterView.toJSON(e));
+		}
+		if (message.attachedTo?.length) {
+			obj.attachedTo = message.attachedTo;
+		}
+		if (message.summoningSickness !== false) {
+			obj.summoningSickness = message.summoningSickness;
+		}
+		if (message.availableActions?.length) {
+			obj.availableActions = message.availableActions.map((e) => CardAction.toJSON(e));
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<CardView>): CardView {
-    return CardView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<CardView>): CardView {
-    const message = createBaseCardView();
-    message.id = object.id ?? "";
-    message.name = object.name ?? "";
-    message.displayName = object.displayName ?? "";
-    message.manaCost = object.manaCost ?? "";
-    message.type = object.type ?? "";
-    message.subTypes = object.subTypes ?? "";
-    message.superTypes = object.superTypes ?? "";
-    message.color = object.color ?? "";
-    message.power = object.power ?? "";
-    message.toughness = object.toughness ?? "";
-    message.loyalty = object.loyalty ?? "";
-    message.cardNumber = object.cardNumber ?? 0;
-    message.expansionSetCode = object.expansionSetCode ?? "";
-    message.rarity = object.rarity ?? "";
-    message.rulesText = object.rulesText ?? "";
-    message.abilities = object.abilities?.map((e) => AbilityView.fromPartial(e)) || [];
-    message.tapped = object.tapped ?? false;
-    message.flipped = object.flipped ?? false;
-    message.transformed = object.transformed ?? false;
-    message.faceDown = object.faceDown ?? false;
-    message.zone = object.zone ?? 0;
-    message.controllerId = object.controllerId ?? "";
-    message.ownerId = object.ownerId ?? "";
-    message.counters = object.counters?.map((e) => CounterView.fromPartial(e)) || [];
-    message.attachedTo = object.attachedTo?.map((e) => e) || [];
-    message.summoningSickness = object.summoningSickness ?? false;
-    message.availableActions = object.availableActions?.map((e) => CardAction.fromPartial(e)) || [];
-    return message;
-  },
+	create(base?: DeepPartial<CardView>): CardView {
+		return CardView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<CardView>): CardView {
+		const message = createBaseCardView();
+		message.id = object.id ?? '';
+		message.name = object.name ?? '';
+		message.displayName = object.displayName ?? '';
+		message.manaCost = object.manaCost ?? '';
+		message.type = object.type ?? '';
+		message.subTypes = object.subTypes ?? '';
+		message.superTypes = object.superTypes ?? '';
+		message.color = object.color ?? '';
+		message.power = object.power ?? '';
+		message.toughness = object.toughness ?? '';
+		message.loyalty = object.loyalty ?? '';
+		message.cardNumber = object.cardNumber ?? 0;
+		message.expansionSetCode = object.expansionSetCode ?? '';
+		message.rarity = object.rarity ?? '';
+		message.rulesText = object.rulesText ?? '';
+		message.abilities = object.abilities?.map((e) => AbilityView.fromPartial(e)) || [];
+		message.tapped = object.tapped ?? false;
+		message.flipped = object.flipped ?? false;
+		message.transformed = object.transformed ?? false;
+		message.faceDown = object.faceDown ?? false;
+		message.zone = object.zone ?? 0;
+		message.controllerId = object.controllerId ?? '';
+		message.ownerId = object.ownerId ?? '';
+		message.counters = object.counters?.map((e) => CounterView.fromPartial(e)) || [];
+		message.attachedTo = object.attachedTo?.map((e) => e) || [];
+		message.summoningSickness = object.summoningSickness ?? false;
+		message.availableActions = object.availableActions?.map((e) => CardAction.fromPartial(e)) || [];
+		return message;
+	}
 };
 
 function createBaseAbilityView(): AbilityView {
-  return { id: "", text: "", rule: "" };
+	return { id: '', text: '', rule: '' };
 }
 
 export const AbilityView: MessageFns<AbilityView> = {
-  encode(message: AbilityView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.text !== "") {
-      writer.uint32(18).string(message.text);
-    }
-    if (message.rule !== "") {
-      writer.uint32(26).string(message.rule);
-    }
-    return writer;
-  },
+	encode(message: AbilityView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.id !== '') {
+			writer.uint32(10).string(message.id);
+		}
+		if (message.text !== '') {
+			writer.uint32(18).string(message.text);
+		}
+		if (message.rule !== '') {
+			writer.uint32(26).string(message.rule);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): AbilityView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAbilityView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): AbilityView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseAbilityView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.id = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.id = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.text = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.text = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.rule = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.rule = reader.string();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): AbilityView {
-    return {
-      id: isSet(object.id) ? globalThis.String(object.id) : "",
-      text: isSet(object.text) ? globalThis.String(object.text) : "",
-      rule: isSet(object.rule) ? globalThis.String(object.rule) : "",
-    };
-  },
+	fromJSON(object: any): AbilityView {
+		return {
+			id: isSet(object.id) ? globalThis.String(object.id) : '',
+			text: isSet(object.text) ? globalThis.String(object.text) : '',
+			rule: isSet(object.rule) ? globalThis.String(object.rule) : ''
+		};
+	},
 
-  toJSON(message: AbilityView): unknown {
-    const obj: any = {};
-    if (message.id !== "") {
-      obj.id = message.id;
-    }
-    if (message.text !== "") {
-      obj.text = message.text;
-    }
-    if (message.rule !== "") {
-      obj.rule = message.rule;
-    }
-    return obj;
-  },
+	toJSON(message: AbilityView): unknown {
+		const obj: any = {};
+		if (message.id !== '') {
+			obj.id = message.id;
+		}
+		if (message.text !== '') {
+			obj.text = message.text;
+		}
+		if (message.rule !== '') {
+			obj.rule = message.rule;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<AbilityView>): AbilityView {
-    return AbilityView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<AbilityView>): AbilityView {
-    const message = createBaseAbilityView();
-    message.id = object.id ?? "";
-    message.text = object.text ?? "";
-    message.rule = object.rule ?? "";
-    return message;
-  },
+	create(base?: DeepPartial<AbilityView>): AbilityView {
+		return AbilityView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<AbilityView>): AbilityView {
+		const message = createBaseAbilityView();
+		message.id = object.id ?? '';
+		message.text = object.text ?? '';
+		message.rule = object.rule ?? '';
+		return message;
+	}
 };
 
 function createBaseCardAction(): CardAction {
-  return { actionType: 0, actionId: "", displayText: "", isEnabled: false, disabledReason: "" };
+	return { actionType: 0, actionId: '', displayText: '', isEnabled: false, disabledReason: '' };
 }
 
 export const CardAction: MessageFns<CardAction> = {
-  encode(message: CardAction, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.actionType !== 0) {
-      writer.uint32(8).int32(message.actionType);
-    }
-    if (message.actionId !== "") {
-      writer.uint32(18).string(message.actionId);
-    }
-    if (message.displayText !== "") {
-      writer.uint32(26).string(message.displayText);
-    }
-    if (message.isEnabled !== false) {
-      writer.uint32(32).bool(message.isEnabled);
-    }
-    if (message.disabledReason !== "") {
-      writer.uint32(42).string(message.disabledReason);
-    }
-    return writer;
-  },
+	encode(message: CardAction, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.actionType !== 0) {
+			writer.uint32(8).int32(message.actionType);
+		}
+		if (message.actionId !== '') {
+			writer.uint32(18).string(message.actionId);
+		}
+		if (message.displayText !== '') {
+			writer.uint32(26).string(message.displayText);
+		}
+		if (message.isEnabled !== false) {
+			writer.uint32(32).bool(message.isEnabled);
+		}
+		if (message.disabledReason !== '') {
+			writer.uint32(42).string(message.disabledReason);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CardAction {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCardAction();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): CardAction {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseCardAction();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 8) {
+						break;
+					}
 
-          message.actionType = reader.int32() as any;
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.actionType = reader.int32() as any;
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.actionId = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.actionId = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.displayText = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.displayText = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.isEnabled = reader.bool();
-          continue;
-        }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
+					message.isEnabled = reader.bool();
+					continue;
+				}
+				case 5: {
+					if (tag !== 42) {
+						break;
+					}
 
-          message.disabledReason = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.disabledReason = reader.string();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): CardAction {
-    return {
-      actionType: isSet(object.actionType) ? cardActionTypeFromJSON(object.actionType) : 0,
-      actionId: isSet(object.actionId) ? globalThis.String(object.actionId) : "",
-      displayText: isSet(object.displayText) ? globalThis.String(object.displayText) : "",
-      isEnabled: isSet(object.isEnabled) ? globalThis.Boolean(object.isEnabled) : false,
-      disabledReason: isSet(object.disabledReason) ? globalThis.String(object.disabledReason) : "",
-    };
-  },
+	fromJSON(object: any): CardAction {
+		return {
+			actionType: isSet(object.actionType) ? cardActionTypeFromJSON(object.actionType) : 0,
+			actionId: isSet(object.actionId) ? globalThis.String(object.actionId) : '',
+			displayText: isSet(object.displayText) ? globalThis.String(object.displayText) : '',
+			isEnabled: isSet(object.isEnabled) ? globalThis.Boolean(object.isEnabled) : false,
+			disabledReason: isSet(object.disabledReason) ? globalThis.String(object.disabledReason) : ''
+		};
+	},
 
-  toJSON(message: CardAction): unknown {
-    const obj: any = {};
-    if (message.actionType !== 0) {
-      obj.actionType = cardActionTypeToJSON(message.actionType);
-    }
-    if (message.actionId !== "") {
-      obj.actionId = message.actionId;
-    }
-    if (message.displayText !== "") {
-      obj.displayText = message.displayText;
-    }
-    if (message.isEnabled !== false) {
-      obj.isEnabled = message.isEnabled;
-    }
-    if (message.disabledReason !== "") {
-      obj.disabledReason = message.disabledReason;
-    }
-    return obj;
-  },
+	toJSON(message: CardAction): unknown {
+		const obj: any = {};
+		if (message.actionType !== 0) {
+			obj.actionType = cardActionTypeToJSON(message.actionType);
+		}
+		if (message.actionId !== '') {
+			obj.actionId = message.actionId;
+		}
+		if (message.displayText !== '') {
+			obj.displayText = message.displayText;
+		}
+		if (message.isEnabled !== false) {
+			obj.isEnabled = message.isEnabled;
+		}
+		if (message.disabledReason !== '') {
+			obj.disabledReason = message.disabledReason;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<CardAction>): CardAction {
-    return CardAction.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<CardAction>): CardAction {
-    const message = createBaseCardAction();
-    message.actionType = object.actionType ?? 0;
-    message.actionId = object.actionId ?? "";
-    message.displayText = object.displayText ?? "";
-    message.isEnabled = object.isEnabled ?? false;
-    message.disabledReason = object.disabledReason ?? "";
-    return message;
-  },
+	create(base?: DeepPartial<CardAction>): CardAction {
+		return CardAction.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<CardAction>): CardAction {
+		const message = createBaseCardAction();
+		message.actionType = object.actionType ?? 0;
+		message.actionId = object.actionId ?? '';
+		message.displayText = object.displayText ?? '';
+		message.isEnabled = object.isEnabled ?? false;
+		message.disabledReason = object.disabledReason ?? '';
+		return message;
+	}
 };
 
 function createBaseCounterView(): CounterView {
-  return { name: "", count: 0 };
+	return { name: '', count: 0 };
 }
 
 export const CounterView: MessageFns<CounterView> = {
-  encode(message: CounterView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    if (message.count !== 0) {
-      writer.uint32(16).int32(message.count);
-    }
-    return writer;
-  },
+	encode(message: CounterView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.name !== '') {
+			writer.uint32(10).string(message.name);
+		}
+		if (message.count !== 0) {
+			writer.uint32(16).int32(message.count);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CounterView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCounterView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): CounterView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseCounterView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.name = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
+					message.name = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 16) {
+						break;
+					}
 
-          message.count = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.count = reader.int32();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): CounterView {
-    return {
-      name: isSet(object.name) ? globalThis.String(object.name) : "",
-      count: isSet(object.count) ? globalThis.Number(object.count) : 0,
-    };
-  },
+	fromJSON(object: any): CounterView {
+		return {
+			name: isSet(object.name) ? globalThis.String(object.name) : '',
+			count: isSet(object.count) ? globalThis.Number(object.count) : 0
+		};
+	},
 
-  toJSON(message: CounterView): unknown {
-    const obj: any = {};
-    if (message.name !== "") {
-      obj.name = message.name;
-    }
-    if (message.count !== 0) {
-      obj.count = Math.round(message.count);
-    }
-    return obj;
-  },
+	toJSON(message: CounterView): unknown {
+		const obj: any = {};
+		if (message.name !== '') {
+			obj.name = message.name;
+		}
+		if (message.count !== 0) {
+			obj.count = Math.round(message.count);
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<CounterView>): CounterView {
-    return CounterView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<CounterView>): CounterView {
-    const message = createBaseCounterView();
-    message.name = object.name ?? "";
-    message.count = object.count ?? 0;
-    return message;
-  },
+	create(base?: DeepPartial<CounterView>): CounterView {
+		return CounterView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<CounterView>): CounterView {
+		const message = createBaseCounterView();
+		message.name = object.name ?? '';
+		message.count = object.count ?? 0;
+		return message;
+	}
 };
 
 function createBaseManaPoolView(): ManaPoolView {
-  return { white: 0, blue: 0, black: 0, red: 0, green: 0, colorless: 0 };
+	return { white: 0, blue: 0, black: 0, red: 0, green: 0, colorless: 0 };
 }
 
 export const ManaPoolView: MessageFns<ManaPoolView> = {
-  encode(message: ManaPoolView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.white !== 0) {
-      writer.uint32(8).int32(message.white);
-    }
-    if (message.blue !== 0) {
-      writer.uint32(16).int32(message.blue);
-    }
-    if (message.black !== 0) {
-      writer.uint32(24).int32(message.black);
-    }
-    if (message.red !== 0) {
-      writer.uint32(32).int32(message.red);
-    }
-    if (message.green !== 0) {
-      writer.uint32(40).int32(message.green);
-    }
-    if (message.colorless !== 0) {
-      writer.uint32(48).int32(message.colorless);
-    }
-    return writer;
-  },
+	encode(message: ManaPoolView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.white !== 0) {
+			writer.uint32(8).int32(message.white);
+		}
+		if (message.blue !== 0) {
+			writer.uint32(16).int32(message.blue);
+		}
+		if (message.black !== 0) {
+			writer.uint32(24).int32(message.black);
+		}
+		if (message.red !== 0) {
+			writer.uint32(32).int32(message.red);
+		}
+		if (message.green !== 0) {
+			writer.uint32(40).int32(message.green);
+		}
+		if (message.colorless !== 0) {
+			writer.uint32(48).int32(message.colorless);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ManaPoolView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseManaPoolView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): ManaPoolView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseManaPoolView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 8) {
+						break;
+					}
 
-          message.white = reader.int32();
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
+					message.white = reader.int32();
+					continue;
+				}
+				case 2: {
+					if (tag !== 16) {
+						break;
+					}
 
-          message.blue = reader.int32();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
+					message.blue = reader.int32();
+					continue;
+				}
+				case 3: {
+					if (tag !== 24) {
+						break;
+					}
 
-          message.black = reader.int32();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.black = reader.int32();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.red = reader.int32();
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.red = reader.int32();
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.green = reader.int32();
-          continue;
-        }
-        case 6: {
-          if (tag !== 48) {
-            break;
-          }
+					message.green = reader.int32();
+					continue;
+				}
+				case 6: {
+					if (tag !== 48) {
+						break;
+					}
 
-          message.colorless = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.colorless = reader.int32();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): ManaPoolView {
-    return {
-      white: isSet(object.white) ? globalThis.Number(object.white) : 0,
-      blue: isSet(object.blue) ? globalThis.Number(object.blue) : 0,
-      black: isSet(object.black) ? globalThis.Number(object.black) : 0,
-      red: isSet(object.red) ? globalThis.Number(object.red) : 0,
-      green: isSet(object.green) ? globalThis.Number(object.green) : 0,
-      colorless: isSet(object.colorless) ? globalThis.Number(object.colorless) : 0,
-    };
-  },
+	fromJSON(object: any): ManaPoolView {
+		return {
+			white: isSet(object.white) ? globalThis.Number(object.white) : 0,
+			blue: isSet(object.blue) ? globalThis.Number(object.blue) : 0,
+			black: isSet(object.black) ? globalThis.Number(object.black) : 0,
+			red: isSet(object.red) ? globalThis.Number(object.red) : 0,
+			green: isSet(object.green) ? globalThis.Number(object.green) : 0,
+			colorless: isSet(object.colorless) ? globalThis.Number(object.colorless) : 0
+		};
+	},
 
-  toJSON(message: ManaPoolView): unknown {
-    const obj: any = {};
-    if (message.white !== 0) {
-      obj.white = Math.round(message.white);
-    }
-    if (message.blue !== 0) {
-      obj.blue = Math.round(message.blue);
-    }
-    if (message.black !== 0) {
-      obj.black = Math.round(message.black);
-    }
-    if (message.red !== 0) {
-      obj.red = Math.round(message.red);
-    }
-    if (message.green !== 0) {
-      obj.green = Math.round(message.green);
-    }
-    if (message.colorless !== 0) {
-      obj.colorless = Math.round(message.colorless);
-    }
-    return obj;
-  },
+	toJSON(message: ManaPoolView): unknown {
+		const obj: any = {};
+		if (message.white !== 0) {
+			obj.white = Math.round(message.white);
+		}
+		if (message.blue !== 0) {
+			obj.blue = Math.round(message.blue);
+		}
+		if (message.black !== 0) {
+			obj.black = Math.round(message.black);
+		}
+		if (message.red !== 0) {
+			obj.red = Math.round(message.red);
+		}
+		if (message.green !== 0) {
+			obj.green = Math.round(message.green);
+		}
+		if (message.colorless !== 0) {
+			obj.colorless = Math.round(message.colorless);
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<ManaPoolView>): ManaPoolView {
-    return ManaPoolView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<ManaPoolView>): ManaPoolView {
-    const message = createBaseManaPoolView();
-    message.white = object.white ?? 0;
-    message.blue = object.blue ?? 0;
-    message.black = object.black ?? 0;
-    message.red = object.red ?? 0;
-    message.green = object.green ?? 0;
-    message.colorless = object.colorless ?? 0;
-    return message;
-  },
+	create(base?: DeepPartial<ManaPoolView>): ManaPoolView {
+		return ManaPoolView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<ManaPoolView>): ManaPoolView {
+		const message = createBaseManaPoolView();
+		message.white = object.white ?? 0;
+		message.blue = object.blue ?? 0;
+		message.black = object.black ?? 0;
+		message.red = object.red ?? 0;
+		message.green = object.green ?? 0;
+		message.colorless = object.colorless ?? 0;
+		return message;
+	}
 };
 
 function createBaseGameMessage(): GameMessage {
-  return { id: 0, text: "", color: "", time: undefined, bookmarkId: 0, rollbackAvailable: false };
+	return { id: 0, text: '', color: '', time: undefined, bookmarkId: 0, rollbackAvailable: false };
 }
 
 export const GameMessage: MessageFns<GameMessage> = {
-  encode(message: GameMessage, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== 0) {
-      writer.uint32(8).int32(message.id);
-    }
-    if (message.text !== "") {
-      writer.uint32(18).string(message.text);
-    }
-    if (message.color !== "") {
-      writer.uint32(26).string(message.color);
-    }
-    if (message.time !== undefined) {
-      Timestamp.encode(toTimestamp(message.time), writer.uint32(34).fork()).join();
-    }
-    if (message.bookmarkId !== 0) {
-      writer.uint32(40).int32(message.bookmarkId);
-    }
-    if (message.rollbackAvailable !== false) {
-      writer.uint32(48).bool(message.rollbackAvailable);
-    }
-    return writer;
-  },
+	encode(message: GameMessage, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.id !== 0) {
+			writer.uint32(8).int32(message.id);
+		}
+		if (message.text !== '') {
+			writer.uint32(18).string(message.text);
+		}
+		if (message.color !== '') {
+			writer.uint32(26).string(message.color);
+		}
+		if (message.time !== undefined) {
+			Timestamp.encode(toTimestamp(message.time), writer.uint32(34).fork()).join();
+		}
+		if (message.bookmarkId !== 0) {
+			writer.uint32(40).int32(message.bookmarkId);
+		}
+		if (message.rollbackAvailable !== false) {
+			writer.uint32(48).bool(message.rollbackAvailable);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GameMessage {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGameMessage();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): GameMessage {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseGameMessage();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 8) {
+						break;
+					}
 
-          message.id = reader.int32();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.id = reader.int32();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.text = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.text = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.color = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
+					message.color = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 34) {
+						break;
+					}
 
-          message.time = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.time = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.bookmarkId = reader.int32();
-          continue;
-        }
-        case 6: {
-          if (tag !== 48) {
-            break;
-          }
+					message.bookmarkId = reader.int32();
+					continue;
+				}
+				case 6: {
+					if (tag !== 48) {
+						break;
+					}
 
-          message.rollbackAvailable = reader.bool();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.rollbackAvailable = reader.bool();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): GameMessage {
-    return {
-      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
-      text: isSet(object.text) ? globalThis.String(object.text) : "",
-      color: isSet(object.color) ? globalThis.String(object.color) : "",
-      time: isSet(object.time) ? fromJsonTimestamp(object.time) : undefined,
-      bookmarkId: isSet(object.bookmarkId) ? globalThis.Number(object.bookmarkId) : 0,
-      rollbackAvailable: isSet(object.rollbackAvailable) ? globalThis.Boolean(object.rollbackAvailable) : false,
-    };
-  },
+	fromJSON(object: any): GameMessage {
+		return {
+			id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+			text: isSet(object.text) ? globalThis.String(object.text) : '',
+			color: isSet(object.color) ? globalThis.String(object.color) : '',
+			time: isSet(object.time) ? fromJsonTimestamp(object.time) : undefined,
+			bookmarkId: isSet(object.bookmarkId) ? globalThis.Number(object.bookmarkId) : 0,
+			rollbackAvailable: isSet(object.rollbackAvailable)
+				? globalThis.Boolean(object.rollbackAvailable)
+				: false
+		};
+	},
 
-  toJSON(message: GameMessage): unknown {
-    const obj: any = {};
-    if (message.id !== 0) {
-      obj.id = Math.round(message.id);
-    }
-    if (message.text !== "") {
-      obj.text = message.text;
-    }
-    if (message.color !== "") {
-      obj.color = message.color;
-    }
-    if (message.time !== undefined) {
-      obj.time = message.time.toISOString();
-    }
-    if (message.bookmarkId !== 0) {
-      obj.bookmarkId = Math.round(message.bookmarkId);
-    }
-    if (message.rollbackAvailable !== false) {
-      obj.rollbackAvailable = message.rollbackAvailable;
-    }
-    return obj;
-  },
+	toJSON(message: GameMessage): unknown {
+		const obj: any = {};
+		if (message.id !== 0) {
+			obj.id = Math.round(message.id);
+		}
+		if (message.text !== '') {
+			obj.text = message.text;
+		}
+		if (message.color !== '') {
+			obj.color = message.color;
+		}
+		if (message.time !== undefined) {
+			obj.time = message.time.toISOString();
+		}
+		if (message.bookmarkId !== 0) {
+			obj.bookmarkId = Math.round(message.bookmarkId);
+		}
+		if (message.rollbackAvailable !== false) {
+			obj.rollbackAvailable = message.rollbackAvailable;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<GameMessage>): GameMessage {
-    return GameMessage.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<GameMessage>): GameMessage {
-    const message = createBaseGameMessage();
-    message.id = object.id ?? 0;
-    message.text = object.text ?? "";
-    message.color = object.color ?? "";
-    message.time = object.time ?? undefined;
-    message.bookmarkId = object.bookmarkId ?? 0;
-    message.rollbackAvailable = object.rollbackAvailable ?? false;
-    return message;
-  },
+	create(base?: DeepPartial<GameMessage>): GameMessage {
+		return GameMessage.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<GameMessage>): GameMessage {
+		const message = createBaseGameMessage();
+		message.id = object.id ?? 0;
+		message.text = object.text ?? '';
+		message.color = object.color ?? '';
+		message.time = object.time ?? undefined;
+		message.bookmarkId = object.bookmarkId ?? 0;
+		message.rollbackAvailable = object.rollbackAvailable ?? false;
+		return message;
+	}
 };
 
 function createBaseCombatView(): CombatView {
-  return { attackingPlayerId: "", groups: [] };
+	return { attackingPlayerId: '', groups: [] };
 }
 
 export const CombatView: MessageFns<CombatView> = {
-  encode(message: CombatView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.attackingPlayerId !== "") {
-      writer.uint32(10).string(message.attackingPlayerId);
-    }
-    for (const v of message.groups) {
-      CombatGroupView.encode(v!, writer.uint32(18).fork()).join();
-    }
-    return writer;
-  },
+	encode(message: CombatView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.attackingPlayerId !== '') {
+			writer.uint32(10).string(message.attackingPlayerId);
+		}
+		for (const v of message.groups) {
+			CombatGroupView.encode(v!, writer.uint32(18).fork()).join();
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CombatView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCombatView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): CombatView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseCombatView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.attackingPlayerId = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.attackingPlayerId = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.groups.push(CombatGroupView.decode(reader, reader.uint32()));
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.groups.push(CombatGroupView.decode(reader, reader.uint32()));
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): CombatView {
-    return {
-      attackingPlayerId: isSet(object.attackingPlayerId) ? globalThis.String(object.attackingPlayerId) : "",
-      groups: globalThis.Array.isArray(object?.groups)
-        ? object.groups.map((e: any) => CombatGroupView.fromJSON(e))
-        : [],
-    };
-  },
+	fromJSON(object: any): CombatView {
+		return {
+			attackingPlayerId: isSet(object.attackingPlayerId)
+				? globalThis.String(object.attackingPlayerId)
+				: '',
+			groups: globalThis.Array.isArray(object?.groups)
+				? object.groups.map((e: any) => CombatGroupView.fromJSON(e))
+				: []
+		};
+	},
 
-  toJSON(message: CombatView): unknown {
-    const obj: any = {};
-    if (message.attackingPlayerId !== "") {
-      obj.attackingPlayerId = message.attackingPlayerId;
-    }
-    if (message.groups?.length) {
-      obj.groups = message.groups.map((e) => CombatGroupView.toJSON(e));
-    }
-    return obj;
-  },
+	toJSON(message: CombatView): unknown {
+		const obj: any = {};
+		if (message.attackingPlayerId !== '') {
+			obj.attackingPlayerId = message.attackingPlayerId;
+		}
+		if (message.groups?.length) {
+			obj.groups = message.groups.map((e) => CombatGroupView.toJSON(e));
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<CombatView>): CombatView {
-    return CombatView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<CombatView>): CombatView {
-    const message = createBaseCombatView();
-    message.attackingPlayerId = object.attackingPlayerId ?? "";
-    message.groups = object.groups?.map((e) => CombatGroupView.fromPartial(e)) || [];
-    return message;
-  },
+	create(base?: DeepPartial<CombatView>): CombatView {
+		return CombatView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<CombatView>): CombatView {
+		const message = createBaseCombatView();
+		message.attackingPlayerId = object.attackingPlayerId ?? '';
+		message.groups = object.groups?.map((e) => CombatGroupView.fromPartial(e)) || [];
+		return message;
+	}
 };
 
 function createBaseCombatGroupView(): CombatGroupView {
-  return { attackers: [], blockers: [], defendingPlayerId: "" };
+	return { attackers: [], blockers: [], defendingPlayerId: '' };
 }
 
 export const CombatGroupView: MessageFns<CombatGroupView> = {
-  encode(message: CombatGroupView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    for (const v of message.attackers) {
-      writer.uint32(10).string(v!);
-    }
-    for (const v of message.blockers) {
-      writer.uint32(18).string(v!);
-    }
-    if (message.defendingPlayerId !== "") {
-      writer.uint32(26).string(message.defendingPlayerId);
-    }
-    return writer;
-  },
+	encode(message: CombatGroupView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		for (const v of message.attackers) {
+			writer.uint32(10).string(v!);
+		}
+		for (const v of message.blockers) {
+			writer.uint32(18).string(v!);
+		}
+		if (message.defendingPlayerId !== '') {
+			writer.uint32(26).string(message.defendingPlayerId);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CombatGroupView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCombatGroupView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): CombatGroupView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseCombatGroupView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.attackers.push(reader.string());
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.attackers.push(reader.string());
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.blockers.push(reader.string());
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.blockers.push(reader.string());
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.defendingPlayerId = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.defendingPlayerId = reader.string();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): CombatGroupView {
-    return {
-      attackers: globalThis.Array.isArray(object?.attackers)
-        ? object.attackers.map((e: any) => globalThis.String(e))
-        : [],
-      blockers: globalThis.Array.isArray(object?.blockers) ? object.blockers.map((e: any) => globalThis.String(e)) : [],
-      defendingPlayerId: isSet(object.defendingPlayerId) ? globalThis.String(object.defendingPlayerId) : "",
-    };
-  },
+	fromJSON(object: any): CombatGroupView {
+		return {
+			attackers: globalThis.Array.isArray(object?.attackers)
+				? object.attackers.map((e: any) => globalThis.String(e))
+				: [],
+			blockers: globalThis.Array.isArray(object?.blockers)
+				? object.blockers.map((e: any) => globalThis.String(e))
+				: [],
+			defendingPlayerId: isSet(object.defendingPlayerId)
+				? globalThis.String(object.defendingPlayerId)
+				: ''
+		};
+	},
 
-  toJSON(message: CombatGroupView): unknown {
-    const obj: any = {};
-    if (message.attackers?.length) {
-      obj.attackers = message.attackers;
-    }
-    if (message.blockers?.length) {
-      obj.blockers = message.blockers;
-    }
-    if (message.defendingPlayerId !== "") {
-      obj.defendingPlayerId = message.defendingPlayerId;
-    }
-    return obj;
-  },
+	toJSON(message: CombatGroupView): unknown {
+		const obj: any = {};
+		if (message.attackers?.length) {
+			obj.attackers = message.attackers;
+		}
+		if (message.blockers?.length) {
+			obj.blockers = message.blockers;
+		}
+		if (message.defendingPlayerId !== '') {
+			obj.defendingPlayerId = message.defendingPlayerId;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<CombatGroupView>): CombatGroupView {
-    return CombatGroupView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<CombatGroupView>): CombatGroupView {
-    const message = createBaseCombatGroupView();
-    message.attackers = object.attackers?.map((e) => e) || [];
-    message.blockers = object.blockers?.map((e) => e) || [];
-    message.defendingPlayerId = object.defendingPlayerId ?? "";
-    return message;
-  },
+	create(base?: DeepPartial<CombatGroupView>): CombatGroupView {
+		return CombatGroupView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<CombatGroupView>): CombatGroupView {
+		const message = createBaseCombatGroupView();
+		message.attackers = object.attackers?.map((e) => e) || [];
+		message.blockers = object.blockers?.map((e) => e) || [];
+		message.defendingPlayerId = object.defendingPlayerId ?? '';
+		return message;
+	}
 };
 
 function createBaseRevealedView(): RevealedView {
-  return { name: "", cards: [] };
+	return { name: '', cards: [] };
 }
 
 export const RevealedView: MessageFns<RevealedView> = {
-  encode(message: RevealedView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    for (const v of message.cards) {
-      CardView.encode(v!, writer.uint32(18).fork()).join();
-    }
-    return writer;
-  },
+	encode(message: RevealedView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.name !== '') {
+			writer.uint32(10).string(message.name);
+		}
+		for (const v of message.cards) {
+			CardView.encode(v!, writer.uint32(18).fork()).join();
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): RevealedView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRevealedView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): RevealedView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseRevealedView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.name = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.name = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.cards.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.cards.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): RevealedView {
-    return {
-      name: isSet(object.name) ? globalThis.String(object.name) : "",
-      cards: globalThis.Array.isArray(object?.cards) ? object.cards.map((e: any) => CardView.fromJSON(e)) : [],
-    };
-  },
+	fromJSON(object: any): RevealedView {
+		return {
+			name: isSet(object.name) ? globalThis.String(object.name) : '',
+			cards: globalThis.Array.isArray(object?.cards)
+				? object.cards.map((e: any) => CardView.fromJSON(e))
+				: []
+		};
+	},
 
-  toJSON(message: RevealedView): unknown {
-    const obj: any = {};
-    if (message.name !== "") {
-      obj.name = message.name;
-    }
-    if (message.cards?.length) {
-      obj.cards = message.cards.map((e) => CardView.toJSON(e));
-    }
-    return obj;
-  },
+	toJSON(message: RevealedView): unknown {
+		const obj: any = {};
+		if (message.name !== '') {
+			obj.name = message.name;
+		}
+		if (message.cards?.length) {
+			obj.cards = message.cards.map((e) => CardView.toJSON(e));
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<RevealedView>): RevealedView {
-    return RevealedView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<RevealedView>): RevealedView {
-    const message = createBaseRevealedView();
-    message.name = object.name ?? "";
-    message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
-    return message;
-  },
+	create(base?: DeepPartial<RevealedView>): RevealedView {
+		return RevealedView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<RevealedView>): RevealedView {
+		const message = createBaseRevealedView();
+		message.name = object.name ?? '';
+		message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
+		return message;
+	}
 };
 
 function createBaseLookedAtView(): LookedAtView {
-  return { name: "", cards: [] };
+	return { name: '', cards: [] };
 }
 
 export const LookedAtView: MessageFns<LookedAtView> = {
-  encode(message: LookedAtView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    for (const v of message.cards) {
-      CardView.encode(v!, writer.uint32(18).fork()).join();
-    }
-    return writer;
-  },
+	encode(message: LookedAtView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.name !== '') {
+			writer.uint32(10).string(message.name);
+		}
+		for (const v of message.cards) {
+			CardView.encode(v!, writer.uint32(18).fork()).join();
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): LookedAtView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLookedAtView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): LookedAtView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseLookedAtView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.name = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.name = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.cards.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.cards.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): LookedAtView {
-    return {
-      name: isSet(object.name) ? globalThis.String(object.name) : "",
-      cards: globalThis.Array.isArray(object?.cards) ? object.cards.map((e: any) => CardView.fromJSON(e)) : [],
-    };
-  },
+	fromJSON(object: any): LookedAtView {
+		return {
+			name: isSet(object.name) ? globalThis.String(object.name) : '',
+			cards: globalThis.Array.isArray(object?.cards)
+				? object.cards.map((e: any) => CardView.fromJSON(e))
+				: []
+		};
+	},
 
-  toJSON(message: LookedAtView): unknown {
-    const obj: any = {};
-    if (message.name !== "") {
-      obj.name = message.name;
-    }
-    if (message.cards?.length) {
-      obj.cards = message.cards.map((e) => CardView.toJSON(e));
-    }
-    return obj;
-  },
+	toJSON(message: LookedAtView): unknown {
+		const obj: any = {};
+		if (message.name !== '') {
+			obj.name = message.name;
+		}
+		if (message.cards?.length) {
+			obj.cards = message.cards.map((e) => CardView.toJSON(e));
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<LookedAtView>): LookedAtView {
-    return LookedAtView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<LookedAtView>): LookedAtView {
-    const message = createBaseLookedAtView();
-    message.name = object.name ?? "";
-    message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
-    return message;
-  },
+	create(base?: DeepPartial<LookedAtView>): LookedAtView {
+		return LookedAtView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<LookedAtView>): LookedAtView {
+		const message = createBaseLookedAtView();
+		message.name = object.name ?? '';
+		message.cards = object.cards?.map((e) => CardView.fromPartial(e)) || [];
+		return message;
+	}
 };
 
 function createBaseTournamentView(): TournamentView {
-  return {
-    tournamentId: "",
-    tournamentName: "",
-    tournamentType: "",
-    state: "",
-    numPlayers: 0,
-    numRounds: 0,
-    currentRound: 0,
-    players: [],
-    rounds: [],
-    startTime: undefined,
-    endTime: undefined,
-  };
+	return {
+		tournamentId: '',
+		tournamentName: '',
+		tournamentType: '',
+		state: '',
+		numPlayers: 0,
+		numRounds: 0,
+		currentRound: 0,
+		players: [],
+		rounds: [],
+		startTime: undefined,
+		endTime: undefined
+	};
 }
 
 export const TournamentView: MessageFns<TournamentView> = {
-  encode(message: TournamentView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.tournamentId !== "") {
-      writer.uint32(10).string(message.tournamentId);
-    }
-    if (message.tournamentName !== "") {
-      writer.uint32(18).string(message.tournamentName);
-    }
-    if (message.tournamentType !== "") {
-      writer.uint32(26).string(message.tournamentType);
-    }
-    if (message.state !== "") {
-      writer.uint32(34).string(message.state);
-    }
-    if (message.numPlayers !== 0) {
-      writer.uint32(40).int32(message.numPlayers);
-    }
-    if (message.numRounds !== 0) {
-      writer.uint32(48).int32(message.numRounds);
-    }
-    if (message.currentRound !== 0) {
-      writer.uint32(56).int32(message.currentRound);
-    }
-    for (const v of message.players) {
-      TournamentPlayerView.encode(v!, writer.uint32(66).fork()).join();
-    }
-    for (const v of message.rounds) {
-      RoundView.encode(v!, writer.uint32(74).fork()).join();
-    }
-    if (message.startTime !== undefined) {
-      Timestamp.encode(toTimestamp(message.startTime), writer.uint32(82).fork()).join();
-    }
-    if (message.endTime !== undefined) {
-      Timestamp.encode(toTimestamp(message.endTime), writer.uint32(90).fork()).join();
-    }
-    return writer;
-  },
+	encode(message: TournamentView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.tournamentId !== '') {
+			writer.uint32(10).string(message.tournamentId);
+		}
+		if (message.tournamentName !== '') {
+			writer.uint32(18).string(message.tournamentName);
+		}
+		if (message.tournamentType !== '') {
+			writer.uint32(26).string(message.tournamentType);
+		}
+		if (message.state !== '') {
+			writer.uint32(34).string(message.state);
+		}
+		if (message.numPlayers !== 0) {
+			writer.uint32(40).int32(message.numPlayers);
+		}
+		if (message.numRounds !== 0) {
+			writer.uint32(48).int32(message.numRounds);
+		}
+		if (message.currentRound !== 0) {
+			writer.uint32(56).int32(message.currentRound);
+		}
+		for (const v of message.players) {
+			TournamentPlayerView.encode(v!, writer.uint32(66).fork()).join();
+		}
+		for (const v of message.rounds) {
+			RoundView.encode(v!, writer.uint32(74).fork()).join();
+		}
+		if (message.startTime !== undefined) {
+			Timestamp.encode(toTimestamp(message.startTime), writer.uint32(82).fork()).join();
+		}
+		if (message.endTime !== undefined) {
+			Timestamp.encode(toTimestamp(message.endTime), writer.uint32(90).fork()).join();
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): TournamentView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTournamentView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): TournamentView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseTournamentView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.tournamentId = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.tournamentId = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.tournamentName = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.tournamentName = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.tournamentType = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
+					message.tournamentType = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 34) {
+						break;
+					}
 
-          message.state = reader.string();
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.state = reader.string();
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.numPlayers = reader.int32();
-          continue;
-        }
-        case 6: {
-          if (tag !== 48) {
-            break;
-          }
+					message.numPlayers = reader.int32();
+					continue;
+				}
+				case 6: {
+					if (tag !== 48) {
+						break;
+					}
 
-          message.numRounds = reader.int32();
-          continue;
-        }
-        case 7: {
-          if (tag !== 56) {
-            break;
-          }
+					message.numRounds = reader.int32();
+					continue;
+				}
+				case 7: {
+					if (tag !== 56) {
+						break;
+					}
 
-          message.currentRound = reader.int32();
-          continue;
-        }
-        case 8: {
-          if (tag !== 66) {
-            break;
-          }
+					message.currentRound = reader.int32();
+					continue;
+				}
+				case 8: {
+					if (tag !== 66) {
+						break;
+					}
 
-          message.players.push(TournamentPlayerView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 9: {
-          if (tag !== 74) {
-            break;
-          }
+					message.players.push(TournamentPlayerView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 9: {
+					if (tag !== 74) {
+						break;
+					}
 
-          message.rounds.push(RoundView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 10: {
-          if (tag !== 82) {
-            break;
-          }
+					message.rounds.push(RoundView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 10: {
+					if (tag !== 82) {
+						break;
+					}
 
-          message.startTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 11: {
-          if (tag !== 90) {
-            break;
-          }
+					message.startTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 11: {
+					if (tag !== 90) {
+						break;
+					}
 
-          message.endTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.endTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): TournamentView {
-    return {
-      tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : "",
-      tournamentName: isSet(object.tournamentName) ? globalThis.String(object.tournamentName) : "",
-      tournamentType: isSet(object.tournamentType) ? globalThis.String(object.tournamentType) : "",
-      state: isSet(object.state) ? globalThis.String(object.state) : "",
-      numPlayers: isSet(object.numPlayers) ? globalThis.Number(object.numPlayers) : 0,
-      numRounds: isSet(object.numRounds) ? globalThis.Number(object.numRounds) : 0,
-      currentRound: isSet(object.currentRound) ? globalThis.Number(object.currentRound) : 0,
-      players: globalThis.Array.isArray(object?.players)
-        ? object.players.map((e: any) => TournamentPlayerView.fromJSON(e))
-        : [],
-      rounds: globalThis.Array.isArray(object?.rounds) ? object.rounds.map((e: any) => RoundView.fromJSON(e)) : [],
-      startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
-      endTime: isSet(object.endTime) ? fromJsonTimestamp(object.endTime) : undefined,
-    };
-  },
+	fromJSON(object: any): TournamentView {
+		return {
+			tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : '',
+			tournamentName: isSet(object.tournamentName) ? globalThis.String(object.tournamentName) : '',
+			tournamentType: isSet(object.tournamentType) ? globalThis.String(object.tournamentType) : '',
+			state: isSet(object.state) ? globalThis.String(object.state) : '',
+			numPlayers: isSet(object.numPlayers) ? globalThis.Number(object.numPlayers) : 0,
+			numRounds: isSet(object.numRounds) ? globalThis.Number(object.numRounds) : 0,
+			currentRound: isSet(object.currentRound) ? globalThis.Number(object.currentRound) : 0,
+			players: globalThis.Array.isArray(object?.players)
+				? object.players.map((e: any) => TournamentPlayerView.fromJSON(e))
+				: [],
+			rounds: globalThis.Array.isArray(object?.rounds)
+				? object.rounds.map((e: any) => RoundView.fromJSON(e))
+				: [],
+			startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
+			endTime: isSet(object.endTime) ? fromJsonTimestamp(object.endTime) : undefined
+		};
+	},
 
-  toJSON(message: TournamentView): unknown {
-    const obj: any = {};
-    if (message.tournamentId !== "") {
-      obj.tournamentId = message.tournamentId;
-    }
-    if (message.tournamentName !== "") {
-      obj.tournamentName = message.tournamentName;
-    }
-    if (message.tournamentType !== "") {
-      obj.tournamentType = message.tournamentType;
-    }
-    if (message.state !== "") {
-      obj.state = message.state;
-    }
-    if (message.numPlayers !== 0) {
-      obj.numPlayers = Math.round(message.numPlayers);
-    }
-    if (message.numRounds !== 0) {
-      obj.numRounds = Math.round(message.numRounds);
-    }
-    if (message.currentRound !== 0) {
-      obj.currentRound = Math.round(message.currentRound);
-    }
-    if (message.players?.length) {
-      obj.players = message.players.map((e) => TournamentPlayerView.toJSON(e));
-    }
-    if (message.rounds?.length) {
-      obj.rounds = message.rounds.map((e) => RoundView.toJSON(e));
-    }
-    if (message.startTime !== undefined) {
-      obj.startTime = message.startTime.toISOString();
-    }
-    if (message.endTime !== undefined) {
-      obj.endTime = message.endTime.toISOString();
-    }
-    return obj;
-  },
+	toJSON(message: TournamentView): unknown {
+		const obj: any = {};
+		if (message.tournamentId !== '') {
+			obj.tournamentId = message.tournamentId;
+		}
+		if (message.tournamentName !== '') {
+			obj.tournamentName = message.tournamentName;
+		}
+		if (message.tournamentType !== '') {
+			obj.tournamentType = message.tournamentType;
+		}
+		if (message.state !== '') {
+			obj.state = message.state;
+		}
+		if (message.numPlayers !== 0) {
+			obj.numPlayers = Math.round(message.numPlayers);
+		}
+		if (message.numRounds !== 0) {
+			obj.numRounds = Math.round(message.numRounds);
+		}
+		if (message.currentRound !== 0) {
+			obj.currentRound = Math.round(message.currentRound);
+		}
+		if (message.players?.length) {
+			obj.players = message.players.map((e) => TournamentPlayerView.toJSON(e));
+		}
+		if (message.rounds?.length) {
+			obj.rounds = message.rounds.map((e) => RoundView.toJSON(e));
+		}
+		if (message.startTime !== undefined) {
+			obj.startTime = message.startTime.toISOString();
+		}
+		if (message.endTime !== undefined) {
+			obj.endTime = message.endTime.toISOString();
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<TournamentView>): TournamentView {
-    return TournamentView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<TournamentView>): TournamentView {
-    const message = createBaseTournamentView();
-    message.tournamentId = object.tournamentId ?? "";
-    message.tournamentName = object.tournamentName ?? "";
-    message.tournamentType = object.tournamentType ?? "";
-    message.state = object.state ?? "";
-    message.numPlayers = object.numPlayers ?? 0;
-    message.numRounds = object.numRounds ?? 0;
-    message.currentRound = object.currentRound ?? 0;
-    message.players = object.players?.map((e) => TournamentPlayerView.fromPartial(e)) || [];
-    message.rounds = object.rounds?.map((e) => RoundView.fromPartial(e)) || [];
-    message.startTime = object.startTime ?? undefined;
-    message.endTime = object.endTime ?? undefined;
-    return message;
-  },
+	create(base?: DeepPartial<TournamentView>): TournamentView {
+		return TournamentView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<TournamentView>): TournamentView {
+		const message = createBaseTournamentView();
+		message.tournamentId = object.tournamentId ?? '';
+		message.tournamentName = object.tournamentName ?? '';
+		message.tournamentType = object.tournamentType ?? '';
+		message.state = object.state ?? '';
+		message.numPlayers = object.numPlayers ?? 0;
+		message.numRounds = object.numRounds ?? 0;
+		message.currentRound = object.currentRound ?? 0;
+		message.players = object.players?.map((e) => TournamentPlayerView.fromPartial(e)) || [];
+		message.rounds = object.rounds?.map((e) => RoundView.fromPartial(e)) || [];
+		message.startTime = object.startTime ?? undefined;
+		message.endTime = object.endTime ?? undefined;
+		return message;
+	}
 };
 
 function createBaseTournamentPlayerView(): TournamentPlayerView {
-  return { playerName: "", points: 0, wins: 0, losses: 0, draws: 0, eliminated: false, quit: false, state: "" };
+	return {
+		playerName: '',
+		points: 0,
+		wins: 0,
+		losses: 0,
+		draws: 0,
+		eliminated: false,
+		quit: false,
+		state: ''
+	};
 }
 
 export const TournamentPlayerView: MessageFns<TournamentPlayerView> = {
-  encode(message: TournamentPlayerView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.playerName !== "") {
-      writer.uint32(10).string(message.playerName);
-    }
-    if (message.points !== 0) {
-      writer.uint32(16).int32(message.points);
-    }
-    if (message.wins !== 0) {
-      writer.uint32(24).int32(message.wins);
-    }
-    if (message.losses !== 0) {
-      writer.uint32(32).int32(message.losses);
-    }
-    if (message.draws !== 0) {
-      writer.uint32(40).int32(message.draws);
-    }
-    if (message.eliminated !== false) {
-      writer.uint32(48).bool(message.eliminated);
-    }
-    if (message.quit !== false) {
-      writer.uint32(56).bool(message.quit);
-    }
-    if (message.state !== "") {
-      writer.uint32(66).string(message.state);
-    }
-    return writer;
-  },
+	encode(message: TournamentPlayerView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.playerName !== '') {
+			writer.uint32(10).string(message.playerName);
+		}
+		if (message.points !== 0) {
+			writer.uint32(16).int32(message.points);
+		}
+		if (message.wins !== 0) {
+			writer.uint32(24).int32(message.wins);
+		}
+		if (message.losses !== 0) {
+			writer.uint32(32).int32(message.losses);
+		}
+		if (message.draws !== 0) {
+			writer.uint32(40).int32(message.draws);
+		}
+		if (message.eliminated !== false) {
+			writer.uint32(48).bool(message.eliminated);
+		}
+		if (message.quit !== false) {
+			writer.uint32(56).bool(message.quit);
+		}
+		if (message.state !== '') {
+			writer.uint32(66).string(message.state);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): TournamentPlayerView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTournamentPlayerView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): TournamentPlayerView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseTournamentPlayerView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.playerName = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
+					message.playerName = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 16) {
+						break;
+					}
 
-          message.points = reader.int32();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
+					message.points = reader.int32();
+					continue;
+				}
+				case 3: {
+					if (tag !== 24) {
+						break;
+					}
 
-          message.wins = reader.int32();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.wins = reader.int32();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.losses = reader.int32();
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.losses = reader.int32();
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.draws = reader.int32();
-          continue;
-        }
-        case 6: {
-          if (tag !== 48) {
-            break;
-          }
+					message.draws = reader.int32();
+					continue;
+				}
+				case 6: {
+					if (tag !== 48) {
+						break;
+					}
 
-          message.eliminated = reader.bool();
-          continue;
-        }
-        case 7: {
-          if (tag !== 56) {
-            break;
-          }
+					message.eliminated = reader.bool();
+					continue;
+				}
+				case 7: {
+					if (tag !== 56) {
+						break;
+					}
 
-          message.quit = reader.bool();
-          continue;
-        }
-        case 8: {
-          if (tag !== 66) {
-            break;
-          }
+					message.quit = reader.bool();
+					continue;
+				}
+				case 8: {
+					if (tag !== 66) {
+						break;
+					}
 
-          message.state = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.state = reader.string();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): TournamentPlayerView {
-    return {
-      playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : "",
-      points: isSet(object.points) ? globalThis.Number(object.points) : 0,
-      wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
-      losses: isSet(object.losses) ? globalThis.Number(object.losses) : 0,
-      draws: isSet(object.draws) ? globalThis.Number(object.draws) : 0,
-      eliminated: isSet(object.eliminated) ? globalThis.Boolean(object.eliminated) : false,
-      quit: isSet(object.quit) ? globalThis.Boolean(object.quit) : false,
-      state: isSet(object.state) ? globalThis.String(object.state) : "",
-    };
-  },
+	fromJSON(object: any): TournamentPlayerView {
+		return {
+			playerName: isSet(object.playerName) ? globalThis.String(object.playerName) : '',
+			points: isSet(object.points) ? globalThis.Number(object.points) : 0,
+			wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
+			losses: isSet(object.losses) ? globalThis.Number(object.losses) : 0,
+			draws: isSet(object.draws) ? globalThis.Number(object.draws) : 0,
+			eliminated: isSet(object.eliminated) ? globalThis.Boolean(object.eliminated) : false,
+			quit: isSet(object.quit) ? globalThis.Boolean(object.quit) : false,
+			state: isSet(object.state) ? globalThis.String(object.state) : ''
+		};
+	},
 
-  toJSON(message: TournamentPlayerView): unknown {
-    const obj: any = {};
-    if (message.playerName !== "") {
-      obj.playerName = message.playerName;
-    }
-    if (message.points !== 0) {
-      obj.points = Math.round(message.points);
-    }
-    if (message.wins !== 0) {
-      obj.wins = Math.round(message.wins);
-    }
-    if (message.losses !== 0) {
-      obj.losses = Math.round(message.losses);
-    }
-    if (message.draws !== 0) {
-      obj.draws = Math.round(message.draws);
-    }
-    if (message.eliminated !== false) {
-      obj.eliminated = message.eliminated;
-    }
-    if (message.quit !== false) {
-      obj.quit = message.quit;
-    }
-    if (message.state !== "") {
-      obj.state = message.state;
-    }
-    return obj;
-  },
+	toJSON(message: TournamentPlayerView): unknown {
+		const obj: any = {};
+		if (message.playerName !== '') {
+			obj.playerName = message.playerName;
+		}
+		if (message.points !== 0) {
+			obj.points = Math.round(message.points);
+		}
+		if (message.wins !== 0) {
+			obj.wins = Math.round(message.wins);
+		}
+		if (message.losses !== 0) {
+			obj.losses = Math.round(message.losses);
+		}
+		if (message.draws !== 0) {
+			obj.draws = Math.round(message.draws);
+		}
+		if (message.eliminated !== false) {
+			obj.eliminated = message.eliminated;
+		}
+		if (message.quit !== false) {
+			obj.quit = message.quit;
+		}
+		if (message.state !== '') {
+			obj.state = message.state;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<TournamentPlayerView>): TournamentPlayerView {
-    return TournamentPlayerView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<TournamentPlayerView>): TournamentPlayerView {
-    const message = createBaseTournamentPlayerView();
-    message.playerName = object.playerName ?? "";
-    message.points = object.points ?? 0;
-    message.wins = object.wins ?? 0;
-    message.losses = object.losses ?? 0;
-    message.draws = object.draws ?? 0;
-    message.eliminated = object.eliminated ?? false;
-    message.quit = object.quit ?? false;
-    message.state = object.state ?? "";
-    return message;
-  },
+	create(base?: DeepPartial<TournamentPlayerView>): TournamentPlayerView {
+		return TournamentPlayerView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<TournamentPlayerView>): TournamentPlayerView {
+		const message = createBaseTournamentPlayerView();
+		message.playerName = object.playerName ?? '';
+		message.points = object.points ?? 0;
+		message.wins = object.wins ?? 0;
+		message.losses = object.losses ?? 0;
+		message.draws = object.draws ?? 0;
+		message.eliminated = object.eliminated ?? false;
+		message.quit = object.quit ?? false;
+		message.state = object.state ?? '';
+		return message;
+	}
 };
 
 function createBaseRoundView(): RoundView {
-  return { roundNumber: 0, pairings: [], state: "" };
+	return { roundNumber: 0, pairings: [], state: '' };
 }
 
 export const RoundView: MessageFns<RoundView> = {
-  encode(message: RoundView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.roundNumber !== 0) {
-      writer.uint32(8).int32(message.roundNumber);
-    }
-    for (const v of message.pairings) {
-      PairingView.encode(v!, writer.uint32(18).fork()).join();
-    }
-    if (message.state !== "") {
-      writer.uint32(26).string(message.state);
-    }
-    return writer;
-  },
+	encode(message: RoundView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.roundNumber !== 0) {
+			writer.uint32(8).int32(message.roundNumber);
+		}
+		for (const v of message.pairings) {
+			PairingView.encode(v!, writer.uint32(18).fork()).join();
+		}
+		if (message.state !== '') {
+			writer.uint32(26).string(message.state);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): RoundView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRoundView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): RoundView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseRoundView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 8) {
+						break;
+					}
 
-          message.roundNumber = reader.int32();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.roundNumber = reader.int32();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.pairings.push(PairingView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.pairings.push(PairingView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.state = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.state = reader.string();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): RoundView {
-    return {
-      roundNumber: isSet(object.roundNumber) ? globalThis.Number(object.roundNumber) : 0,
-      pairings: globalThis.Array.isArray(object?.pairings)
-        ? object.pairings.map((e: any) => PairingView.fromJSON(e))
-        : [],
-      state: isSet(object.state) ? globalThis.String(object.state) : "",
-    };
-  },
+	fromJSON(object: any): RoundView {
+		return {
+			roundNumber: isSet(object.roundNumber) ? globalThis.Number(object.roundNumber) : 0,
+			pairings: globalThis.Array.isArray(object?.pairings)
+				? object.pairings.map((e: any) => PairingView.fromJSON(e))
+				: [],
+			state: isSet(object.state) ? globalThis.String(object.state) : ''
+		};
+	},
 
-  toJSON(message: RoundView): unknown {
-    const obj: any = {};
-    if (message.roundNumber !== 0) {
-      obj.roundNumber = Math.round(message.roundNumber);
-    }
-    if (message.pairings?.length) {
-      obj.pairings = message.pairings.map((e) => PairingView.toJSON(e));
-    }
-    if (message.state !== "") {
-      obj.state = message.state;
-    }
-    return obj;
-  },
+	toJSON(message: RoundView): unknown {
+		const obj: any = {};
+		if (message.roundNumber !== 0) {
+			obj.roundNumber = Math.round(message.roundNumber);
+		}
+		if (message.pairings?.length) {
+			obj.pairings = message.pairings.map((e) => PairingView.toJSON(e));
+		}
+		if (message.state !== '') {
+			obj.state = message.state;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<RoundView>): RoundView {
-    return RoundView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<RoundView>): RoundView {
-    const message = createBaseRoundView();
-    message.roundNumber = object.roundNumber ?? 0;
-    message.pairings = object.pairings?.map((e) => PairingView.fromPartial(e)) || [];
-    message.state = object.state ?? "";
-    return message;
-  },
+	create(base?: DeepPartial<RoundView>): RoundView {
+		return RoundView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<RoundView>): RoundView {
+		const message = createBaseRoundView();
+		message.roundNumber = object.roundNumber ?? 0;
+		message.pairings = object.pairings?.map((e) => PairingView.fromPartial(e)) || [];
+		message.state = object.state ?? '';
+		return message;
+	}
 };
 
 function createBasePairingView(): PairingView {
-  return { player1: "", player2: "", tableId: "", player1Wins: 0, player2Wins: 0 };
+	return { player1: '', player2: '', tableId: '', player1Wins: 0, player2Wins: 0 };
 }
 
 export const PairingView: MessageFns<PairingView> = {
-  encode(message: PairingView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.player1 !== "") {
-      writer.uint32(10).string(message.player1);
-    }
-    if (message.player2 !== "") {
-      writer.uint32(18).string(message.player2);
-    }
-    if (message.tableId !== "") {
-      writer.uint32(26).string(message.tableId);
-    }
-    if (message.player1Wins !== 0) {
-      writer.uint32(32).int32(message.player1Wins);
-    }
-    if (message.player2Wins !== 0) {
-      writer.uint32(40).int32(message.player2Wins);
-    }
-    return writer;
-  },
+	encode(message: PairingView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.player1 !== '') {
+			writer.uint32(10).string(message.player1);
+		}
+		if (message.player2 !== '') {
+			writer.uint32(18).string(message.player2);
+		}
+		if (message.tableId !== '') {
+			writer.uint32(26).string(message.tableId);
+		}
+		if (message.player1Wins !== 0) {
+			writer.uint32(32).int32(message.player1Wins);
+		}
+		if (message.player2Wins !== 0) {
+			writer.uint32(40).int32(message.player2Wins);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): PairingView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePairingView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): PairingView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBasePairingView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.player1 = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.player1 = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.player2 = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.player2 = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.tableId = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.tableId = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.player1Wins = reader.int32();
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.player1Wins = reader.int32();
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.player2Wins = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.player2Wins = reader.int32();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): PairingView {
-    return {
-      player1: isSet(object.player1) ? globalThis.String(object.player1) : "",
-      player2: isSet(object.player2) ? globalThis.String(object.player2) : "",
-      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : "",
-      player1Wins: isSet(object.player1Wins) ? globalThis.Number(object.player1Wins) : 0,
-      player2Wins: isSet(object.player2Wins) ? globalThis.Number(object.player2Wins) : 0,
-    };
-  },
+	fromJSON(object: any): PairingView {
+		return {
+			player1: isSet(object.player1) ? globalThis.String(object.player1) : '',
+			player2: isSet(object.player2) ? globalThis.String(object.player2) : '',
+			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : '',
+			player1Wins: isSet(object.player1Wins) ? globalThis.Number(object.player1Wins) : 0,
+			player2Wins: isSet(object.player2Wins) ? globalThis.Number(object.player2Wins) : 0
+		};
+	},
 
-  toJSON(message: PairingView): unknown {
-    const obj: any = {};
-    if (message.player1 !== "") {
-      obj.player1 = message.player1;
-    }
-    if (message.player2 !== "") {
-      obj.player2 = message.player2;
-    }
-    if (message.tableId !== "") {
-      obj.tableId = message.tableId;
-    }
-    if (message.player1Wins !== 0) {
-      obj.player1Wins = Math.round(message.player1Wins);
-    }
-    if (message.player2Wins !== 0) {
-      obj.player2Wins = Math.round(message.player2Wins);
-    }
-    return obj;
-  },
+	toJSON(message: PairingView): unknown {
+		const obj: any = {};
+		if (message.player1 !== '') {
+			obj.player1 = message.player1;
+		}
+		if (message.player2 !== '') {
+			obj.player2 = message.player2;
+		}
+		if (message.tableId !== '') {
+			obj.tableId = message.tableId;
+		}
+		if (message.player1Wins !== 0) {
+			obj.player1Wins = Math.round(message.player1Wins);
+		}
+		if (message.player2Wins !== 0) {
+			obj.player2Wins = Math.round(message.player2Wins);
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<PairingView>): PairingView {
-    return PairingView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<PairingView>): PairingView {
-    const message = createBasePairingView();
-    message.player1 = object.player1 ?? "";
-    message.player2 = object.player2 ?? "";
-    message.tableId = object.tableId ?? "";
-    message.player1Wins = object.player1Wins ?? 0;
-    message.player2Wins = object.player2Wins ?? 0;
-    return message;
-  },
+	create(base?: DeepPartial<PairingView>): PairingView {
+		return PairingView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<PairingView>): PairingView {
+		const message = createBasePairingView();
+		message.player1 = object.player1 ?? '';
+		message.player2 = object.player2 ?? '';
+		message.tableId = object.tableId ?? '';
+		message.player1Wins = object.player1Wins ?? 0;
+		message.player2Wins = object.player2Wins ?? 0;
+		return message;
+	}
 };
 
 function createBaseDraftPickView(): DraftPickView {
-  return { draftId: "", booster: [], picks: [], pickNumber: 0, boosterNumber: 0, message: "" };
+	return { draftId: '', booster: [], picks: [], pickNumber: 0, boosterNumber: 0, message: '' };
 }
 
 export const DraftPickView: MessageFns<DraftPickView> = {
-  encode(message: DraftPickView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.draftId !== "") {
-      writer.uint32(10).string(message.draftId);
-    }
-    for (const v of message.booster) {
-      CardView.encode(v!, writer.uint32(18).fork()).join();
-    }
-    for (const v of message.picks) {
-      CardView.encode(v!, writer.uint32(26).fork()).join();
-    }
-    if (message.pickNumber !== 0) {
-      writer.uint32(32).int32(message.pickNumber);
-    }
-    if (message.boosterNumber !== 0) {
-      writer.uint32(40).int32(message.boosterNumber);
-    }
-    if (message.message !== "") {
-      writer.uint32(50).string(message.message);
-    }
-    return writer;
-  },
+	encode(message: DraftPickView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.draftId !== '') {
+			writer.uint32(10).string(message.draftId);
+		}
+		for (const v of message.booster) {
+			CardView.encode(v!, writer.uint32(18).fork()).join();
+		}
+		for (const v of message.picks) {
+			CardView.encode(v!, writer.uint32(26).fork()).join();
+		}
+		if (message.pickNumber !== 0) {
+			writer.uint32(32).int32(message.pickNumber);
+		}
+		if (message.boosterNumber !== 0) {
+			writer.uint32(40).int32(message.boosterNumber);
+		}
+		if (message.message !== '') {
+			writer.uint32(50).string(message.message);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): DraftPickView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDraftPickView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): DraftPickView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseDraftPickView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.draftId = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.draftId = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.booster.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.booster.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.picks.push(CardView.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.picks.push(CardView.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.pickNumber = reader.int32();
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.pickNumber = reader.int32();
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.boosterNumber = reader.int32();
-          continue;
-        }
-        case 6: {
-          if (tag !== 50) {
-            break;
-          }
+					message.boosterNumber = reader.int32();
+					continue;
+				}
+				case 6: {
+					if (tag !== 50) {
+						break;
+					}
 
-          message.message = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.message = reader.string();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): DraftPickView {
-    return {
-      draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : "",
-      booster: globalThis.Array.isArray(object?.booster) ? object.booster.map((e: any) => CardView.fromJSON(e)) : [],
-      picks: globalThis.Array.isArray(object?.picks) ? object.picks.map((e: any) => CardView.fromJSON(e)) : [],
-      pickNumber: isSet(object.pickNumber) ? globalThis.Number(object.pickNumber) : 0,
-      boosterNumber: isSet(object.boosterNumber) ? globalThis.Number(object.boosterNumber) : 0,
-      message: isSet(object.message) ? globalThis.String(object.message) : "",
-    };
-  },
+	fromJSON(object: any): DraftPickView {
+		return {
+			draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : '',
+			booster: globalThis.Array.isArray(object?.booster)
+				? object.booster.map((e: any) => CardView.fromJSON(e))
+				: [],
+			picks: globalThis.Array.isArray(object?.picks)
+				? object.picks.map((e: any) => CardView.fromJSON(e))
+				: [],
+			pickNumber: isSet(object.pickNumber) ? globalThis.Number(object.pickNumber) : 0,
+			boosterNumber: isSet(object.boosterNumber) ? globalThis.Number(object.boosterNumber) : 0,
+			message: isSet(object.message) ? globalThis.String(object.message) : ''
+		};
+	},
 
-  toJSON(message: DraftPickView): unknown {
-    const obj: any = {};
-    if (message.draftId !== "") {
-      obj.draftId = message.draftId;
-    }
-    if (message.booster?.length) {
-      obj.booster = message.booster.map((e) => CardView.toJSON(e));
-    }
-    if (message.picks?.length) {
-      obj.picks = message.picks.map((e) => CardView.toJSON(e));
-    }
-    if (message.pickNumber !== 0) {
-      obj.pickNumber = Math.round(message.pickNumber);
-    }
-    if (message.boosterNumber !== 0) {
-      obj.boosterNumber = Math.round(message.boosterNumber);
-    }
-    if (message.message !== "") {
-      obj.message = message.message;
-    }
-    return obj;
-  },
+	toJSON(message: DraftPickView): unknown {
+		const obj: any = {};
+		if (message.draftId !== '') {
+			obj.draftId = message.draftId;
+		}
+		if (message.booster?.length) {
+			obj.booster = message.booster.map((e) => CardView.toJSON(e));
+		}
+		if (message.picks?.length) {
+			obj.picks = message.picks.map((e) => CardView.toJSON(e));
+		}
+		if (message.pickNumber !== 0) {
+			obj.pickNumber = Math.round(message.pickNumber);
+		}
+		if (message.boosterNumber !== 0) {
+			obj.boosterNumber = Math.round(message.boosterNumber);
+		}
+		if (message.message !== '') {
+			obj.message = message.message;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<DraftPickView>): DraftPickView {
-    return DraftPickView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<DraftPickView>): DraftPickView {
-    const message = createBaseDraftPickView();
-    message.draftId = object.draftId ?? "";
-    message.booster = object.booster?.map((e) => CardView.fromPartial(e)) || [];
-    message.picks = object.picks?.map((e) => CardView.fromPartial(e)) || [];
-    message.pickNumber = object.pickNumber ?? 0;
-    message.boosterNumber = object.boosterNumber ?? 0;
-    message.message = object.message ?? "";
-    return message;
-  },
+	create(base?: DeepPartial<DraftPickView>): DraftPickView {
+		return DraftPickView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<DraftPickView>): DraftPickView {
+		const message = createBaseDraftPickView();
+		message.draftId = object.draftId ?? '';
+		message.booster = object.booster?.map((e) => CardView.fromPartial(e)) || [];
+		message.picks = object.picks?.map((e) => CardView.fromPartial(e)) || [];
+		message.pickNumber = object.pickNumber ?? 0;
+		message.boosterNumber = object.boosterNumber ?? 0;
+		message.message = object.message ?? '';
+		return message;
+	}
 };
 
 function createBaseUserView(): UserView {
-  return {
-    userName: "",
-    state: "",
-    matchHistory: "",
-    tournamentHistory: "",
-    stats: undefined,
-    connectedAt: undefined,
-    admin: false,
-  };
+	return {
+		userName: '',
+		state: '',
+		matchHistory: '',
+		tournamentHistory: '',
+		stats: undefined,
+		connectedAt: undefined,
+		admin: false
+	};
 }
 
 export const UserView: MessageFns<UserView> = {
-  encode(message: UserView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.userName !== "") {
-      writer.uint32(10).string(message.userName);
-    }
-    if (message.state !== "") {
-      writer.uint32(18).string(message.state);
-    }
-    if (message.matchHistory !== "") {
-      writer.uint32(26).string(message.matchHistory);
-    }
-    if (message.tournamentHistory !== "") {
-      writer.uint32(34).string(message.tournamentHistory);
-    }
-    if (message.stats !== undefined) {
-      UserStatsView.encode(message.stats, writer.uint32(42).fork()).join();
-    }
-    if (message.connectedAt !== undefined) {
-      Timestamp.encode(toTimestamp(message.connectedAt), writer.uint32(50).fork()).join();
-    }
-    if (message.admin !== false) {
-      writer.uint32(56).bool(message.admin);
-    }
-    return writer;
-  },
+	encode(message: UserView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.userName !== '') {
+			writer.uint32(10).string(message.userName);
+		}
+		if (message.state !== '') {
+			writer.uint32(18).string(message.state);
+		}
+		if (message.matchHistory !== '') {
+			writer.uint32(26).string(message.matchHistory);
+		}
+		if (message.tournamentHistory !== '') {
+			writer.uint32(34).string(message.tournamentHistory);
+		}
+		if (message.stats !== undefined) {
+			UserStatsView.encode(message.stats, writer.uint32(42).fork()).join();
+		}
+		if (message.connectedAt !== undefined) {
+			Timestamp.encode(toTimestamp(message.connectedAt), writer.uint32(50).fork()).join();
+		}
+		if (message.admin !== false) {
+			writer.uint32(56).bool(message.admin);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UserView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUserView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): UserView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseUserView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.userName = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.userName = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.state = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.state = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.matchHistory = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
+					message.matchHistory = reader.string();
+					continue;
+				}
+				case 4: {
+					if (tag !== 34) {
+						break;
+					}
 
-          message.tournamentHistory = reader.string();
-          continue;
-        }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
+					message.tournamentHistory = reader.string();
+					continue;
+				}
+				case 5: {
+					if (tag !== 42) {
+						break;
+					}
 
-          message.stats = UserStatsView.decode(reader, reader.uint32());
-          continue;
-        }
-        case 6: {
-          if (tag !== 50) {
-            break;
-          }
+					message.stats = UserStatsView.decode(reader, reader.uint32());
+					continue;
+				}
+				case 6: {
+					if (tag !== 50) {
+						break;
+					}
 
-          message.connectedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 7: {
-          if (tag !== 56) {
-            break;
-          }
+					message.connectedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 7: {
+					if (tag !== 56) {
+						break;
+					}
 
-          message.admin = reader.bool();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.admin = reader.bool();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): UserView {
-    return {
-      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
-      state: isSet(object.state) ? globalThis.String(object.state) : "",
-      matchHistory: isSet(object.matchHistory) ? globalThis.String(object.matchHistory) : "",
-      tournamentHistory: isSet(object.tournamentHistory) ? globalThis.String(object.tournamentHistory) : "",
-      stats: isSet(object.stats) ? UserStatsView.fromJSON(object.stats) : undefined,
-      connectedAt: isSet(object.connectedAt) ? fromJsonTimestamp(object.connectedAt) : undefined,
-      admin: isSet(object.admin) ? globalThis.Boolean(object.admin) : false,
-    };
-  },
+	fromJSON(object: any): UserView {
+		return {
+			userName: isSet(object.userName) ? globalThis.String(object.userName) : '',
+			state: isSet(object.state) ? globalThis.String(object.state) : '',
+			matchHistory: isSet(object.matchHistory) ? globalThis.String(object.matchHistory) : '',
+			tournamentHistory: isSet(object.tournamentHistory)
+				? globalThis.String(object.tournamentHistory)
+				: '',
+			stats: isSet(object.stats) ? UserStatsView.fromJSON(object.stats) : undefined,
+			connectedAt: isSet(object.connectedAt) ? fromJsonTimestamp(object.connectedAt) : undefined,
+			admin: isSet(object.admin) ? globalThis.Boolean(object.admin) : false
+		};
+	},
 
-  toJSON(message: UserView): unknown {
-    const obj: any = {};
-    if (message.userName !== "") {
-      obj.userName = message.userName;
-    }
-    if (message.state !== "") {
-      obj.state = message.state;
-    }
-    if (message.matchHistory !== "") {
-      obj.matchHistory = message.matchHistory;
-    }
-    if (message.tournamentHistory !== "") {
-      obj.tournamentHistory = message.tournamentHistory;
-    }
-    if (message.stats !== undefined) {
-      obj.stats = UserStatsView.toJSON(message.stats);
-    }
-    if (message.connectedAt !== undefined) {
-      obj.connectedAt = message.connectedAt.toISOString();
-    }
-    if (message.admin !== false) {
-      obj.admin = message.admin;
-    }
-    return obj;
-  },
+	toJSON(message: UserView): unknown {
+		const obj: any = {};
+		if (message.userName !== '') {
+			obj.userName = message.userName;
+		}
+		if (message.state !== '') {
+			obj.state = message.state;
+		}
+		if (message.matchHistory !== '') {
+			obj.matchHistory = message.matchHistory;
+		}
+		if (message.tournamentHistory !== '') {
+			obj.tournamentHistory = message.tournamentHistory;
+		}
+		if (message.stats !== undefined) {
+			obj.stats = UserStatsView.toJSON(message.stats);
+		}
+		if (message.connectedAt !== undefined) {
+			obj.connectedAt = message.connectedAt.toISOString();
+		}
+		if (message.admin !== false) {
+			obj.admin = message.admin;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<UserView>): UserView {
-    return UserView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<UserView>): UserView {
-    const message = createBaseUserView();
-    message.userName = object.userName ?? "";
-    message.state = object.state ?? "";
-    message.matchHistory = object.matchHistory ?? "";
-    message.tournamentHistory = object.tournamentHistory ?? "";
-    message.stats = (object.stats !== undefined && object.stats !== null)
-      ? UserStatsView.fromPartial(object.stats)
-      : undefined;
-    message.connectedAt = object.connectedAt ?? undefined;
-    message.admin = object.admin ?? false;
-    return message;
-  },
+	create(base?: DeepPartial<UserView>): UserView {
+		return UserView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<UserView>): UserView {
+		const message = createBaseUserView();
+		message.userName = object.userName ?? '';
+		message.state = object.state ?? '';
+		message.matchHistory = object.matchHistory ?? '';
+		message.tournamentHistory = object.tournamentHistory ?? '';
+		message.stats =
+			object.stats !== undefined && object.stats !== null
+				? UserStatsView.fromPartial(object.stats)
+				: undefined;
+		message.connectedAt = object.connectedAt ?? undefined;
+		message.admin = object.admin ?? false;
+		return message;
+	}
 };
 
 function createBaseUserStatsView(): UserStatsView {
-  return { matches: 0, tournaments: 0, wins: 0, losses: 0, rating: 0, tourneysWon: 0, tourneysSecond: 0, quitRatio: 0 };
+	return {
+		matches: 0,
+		tournaments: 0,
+		wins: 0,
+		losses: 0,
+		rating: 0,
+		tourneysWon: 0,
+		tourneysSecond: 0,
+		quitRatio: 0
+	};
 }
 
 export const UserStatsView: MessageFns<UserStatsView> = {
-  encode(message: UserStatsView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.matches !== 0) {
-      writer.uint32(8).int32(message.matches);
-    }
-    if (message.tournaments !== 0) {
-      writer.uint32(16).int32(message.tournaments);
-    }
-    if (message.wins !== 0) {
-      writer.uint32(24).int32(message.wins);
-    }
-    if (message.losses !== 0) {
-      writer.uint32(32).int32(message.losses);
-    }
-    if (message.rating !== 0) {
-      writer.uint32(41).double(message.rating);
-    }
-    if (message.tourneysWon !== 0) {
-      writer.uint32(48).int32(message.tourneysWon);
-    }
-    if (message.tourneysSecond !== 0) {
-      writer.uint32(56).int32(message.tourneysSecond);
-    }
-    if (message.quitRatio !== 0) {
-      writer.uint32(65).double(message.quitRatio);
-    }
-    return writer;
-  },
+	encode(message: UserStatsView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.matches !== 0) {
+			writer.uint32(8).int32(message.matches);
+		}
+		if (message.tournaments !== 0) {
+			writer.uint32(16).int32(message.tournaments);
+		}
+		if (message.wins !== 0) {
+			writer.uint32(24).int32(message.wins);
+		}
+		if (message.losses !== 0) {
+			writer.uint32(32).int32(message.losses);
+		}
+		if (message.rating !== 0) {
+			writer.uint32(41).double(message.rating);
+		}
+		if (message.tourneysWon !== 0) {
+			writer.uint32(48).int32(message.tourneysWon);
+		}
+		if (message.tourneysSecond !== 0) {
+			writer.uint32(56).int32(message.tourneysSecond);
+		}
+		if (message.quitRatio !== 0) {
+			writer.uint32(65).double(message.quitRatio);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UserStatsView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUserStatsView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): UserStatsView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseUserStatsView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 8) {
+						break;
+					}
 
-          message.matches = reader.int32();
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
+					message.matches = reader.int32();
+					continue;
+				}
+				case 2: {
+					if (tag !== 16) {
+						break;
+					}
 
-          message.tournaments = reader.int32();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
+					message.tournaments = reader.int32();
+					continue;
+				}
+				case 3: {
+					if (tag !== 24) {
+						break;
+					}
 
-          message.wins = reader.int32();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.wins = reader.int32();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.losses = reader.int32();
-          continue;
-        }
-        case 5: {
-          if (tag !== 41) {
-            break;
-          }
+					message.losses = reader.int32();
+					continue;
+				}
+				case 5: {
+					if (tag !== 41) {
+						break;
+					}
 
-          message.rating = reader.double();
-          continue;
-        }
-        case 6: {
-          if (tag !== 48) {
-            break;
-          }
+					message.rating = reader.double();
+					continue;
+				}
+				case 6: {
+					if (tag !== 48) {
+						break;
+					}
 
-          message.tourneysWon = reader.int32();
-          continue;
-        }
-        case 7: {
-          if (tag !== 56) {
-            break;
-          }
+					message.tourneysWon = reader.int32();
+					continue;
+				}
+				case 7: {
+					if (tag !== 56) {
+						break;
+					}
 
-          message.tourneysSecond = reader.int32();
-          continue;
-        }
-        case 8: {
-          if (tag !== 65) {
-            break;
-          }
+					message.tourneysSecond = reader.int32();
+					continue;
+				}
+				case 8: {
+					if (tag !== 65) {
+						break;
+					}
 
-          message.quitRatio = reader.double();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.quitRatio = reader.double();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): UserStatsView {
-    return {
-      matches: isSet(object.matches) ? globalThis.Number(object.matches) : 0,
-      tournaments: isSet(object.tournaments) ? globalThis.Number(object.tournaments) : 0,
-      wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
-      losses: isSet(object.losses) ? globalThis.Number(object.losses) : 0,
-      rating: isSet(object.rating) ? globalThis.Number(object.rating) : 0,
-      tourneysWon: isSet(object.tourneysWon) ? globalThis.Number(object.tourneysWon) : 0,
-      tourneysSecond: isSet(object.tourneysSecond) ? globalThis.Number(object.tourneysSecond) : 0,
-      quitRatio: isSet(object.quitRatio) ? globalThis.Number(object.quitRatio) : 0,
-    };
-  },
+	fromJSON(object: any): UserStatsView {
+		return {
+			matches: isSet(object.matches) ? globalThis.Number(object.matches) : 0,
+			tournaments: isSet(object.tournaments) ? globalThis.Number(object.tournaments) : 0,
+			wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
+			losses: isSet(object.losses) ? globalThis.Number(object.losses) : 0,
+			rating: isSet(object.rating) ? globalThis.Number(object.rating) : 0,
+			tourneysWon: isSet(object.tourneysWon) ? globalThis.Number(object.tourneysWon) : 0,
+			tourneysSecond: isSet(object.tourneysSecond) ? globalThis.Number(object.tourneysSecond) : 0,
+			quitRatio: isSet(object.quitRatio) ? globalThis.Number(object.quitRatio) : 0
+		};
+	},
 
-  toJSON(message: UserStatsView): unknown {
-    const obj: any = {};
-    if (message.matches !== 0) {
-      obj.matches = Math.round(message.matches);
-    }
-    if (message.tournaments !== 0) {
-      obj.tournaments = Math.round(message.tournaments);
-    }
-    if (message.wins !== 0) {
-      obj.wins = Math.round(message.wins);
-    }
-    if (message.losses !== 0) {
-      obj.losses = Math.round(message.losses);
-    }
-    if (message.rating !== 0) {
-      obj.rating = message.rating;
-    }
-    if (message.tourneysWon !== 0) {
-      obj.tourneysWon = Math.round(message.tourneysWon);
-    }
-    if (message.tourneysSecond !== 0) {
-      obj.tourneysSecond = Math.round(message.tourneysSecond);
-    }
-    if (message.quitRatio !== 0) {
-      obj.quitRatio = message.quitRatio;
-    }
-    return obj;
-  },
+	toJSON(message: UserStatsView): unknown {
+		const obj: any = {};
+		if (message.matches !== 0) {
+			obj.matches = Math.round(message.matches);
+		}
+		if (message.tournaments !== 0) {
+			obj.tournaments = Math.round(message.tournaments);
+		}
+		if (message.wins !== 0) {
+			obj.wins = Math.round(message.wins);
+		}
+		if (message.losses !== 0) {
+			obj.losses = Math.round(message.losses);
+		}
+		if (message.rating !== 0) {
+			obj.rating = message.rating;
+		}
+		if (message.tourneysWon !== 0) {
+			obj.tourneysWon = Math.round(message.tourneysWon);
+		}
+		if (message.tourneysSecond !== 0) {
+			obj.tourneysSecond = Math.round(message.tourneysSecond);
+		}
+		if (message.quitRatio !== 0) {
+			obj.quitRatio = message.quitRatio;
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<UserStatsView>): UserStatsView {
-    return UserStatsView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<UserStatsView>): UserStatsView {
-    const message = createBaseUserStatsView();
-    message.matches = object.matches ?? 0;
-    message.tournaments = object.tournaments ?? 0;
-    message.wins = object.wins ?? 0;
-    message.losses = object.losses ?? 0;
-    message.rating = object.rating ?? 0;
-    message.tourneysWon = object.tourneysWon ?? 0;
-    message.tourneysSecond = object.tourneysSecond ?? 0;
-    message.quitRatio = object.quitRatio ?? 0;
-    return message;
-  },
+	create(base?: DeepPartial<UserStatsView>): UserStatsView {
+		return UserStatsView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<UserStatsView>): UserStatsView {
+		const message = createBaseUserStatsView();
+		message.matches = object.matches ?? 0;
+		message.tournaments = object.tournaments ?? 0;
+		message.wins = object.wins ?? 0;
+		message.losses = object.losses ?? 0;
+		message.rating = object.rating ?? 0;
+		message.tourneysWon = object.tourneysWon ?? 0;
+		message.tourneysSecond = object.tourneysSecond ?? 0;
+		message.quitRatio = object.quitRatio ?? 0;
+		return message;
+	}
 };
 
 function createBaseChatMessage(): ChatMessage {
-  return { userName: "", message: "", time: undefined, color: 0, messageType: 0 };
+	return { userName: '', message: '', time: undefined, color: 0, messageType: 0 };
 }
 
 export const ChatMessage: MessageFns<ChatMessage> = {
-  encode(message: ChatMessage, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.userName !== "") {
-      writer.uint32(10).string(message.userName);
-    }
-    if (message.message !== "") {
-      writer.uint32(18).string(message.message);
-    }
-    if (message.time !== undefined) {
-      Timestamp.encode(toTimestamp(message.time), writer.uint32(26).fork()).join();
-    }
-    if (message.color !== 0) {
-      writer.uint32(32).int32(message.color);
-    }
-    if (message.messageType !== 0) {
-      writer.uint32(40).int32(message.messageType);
-    }
-    return writer;
-  },
+	encode(message: ChatMessage, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.userName !== '') {
+			writer.uint32(10).string(message.userName);
+		}
+		if (message.message !== '') {
+			writer.uint32(18).string(message.message);
+		}
+		if (message.time !== undefined) {
+			Timestamp.encode(toTimestamp(message.time), writer.uint32(26).fork()).join();
+		}
+		if (message.color !== 0) {
+			writer.uint32(32).int32(message.color);
+		}
+		if (message.messageType !== 0) {
+			writer.uint32(40).int32(message.messageType);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ChatMessage {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseChatMessage();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): ChatMessage {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseChatMessage();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.userName = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.userName = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.message = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
+					message.message = reader.string();
+					continue;
+				}
+				case 3: {
+					if (tag !== 26) {
+						break;
+					}
 
-          message.time = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.time = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.color = reader.int32() as any;
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.color = reader.int32() as any;
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.messageType = reader.int32() as any;
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.messageType = reader.int32() as any;
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): ChatMessage {
-    return {
-      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
-      message: isSet(object.message) ? globalThis.String(object.message) : "",
-      time: isSet(object.time) ? fromJsonTimestamp(object.time) : undefined,
-      color: isSet(object.color) ? messageColorFromJSON(object.color) : 0,
-      messageType: isSet(object.messageType) ? messageTypeFromJSON(object.messageType) : 0,
-    };
-  },
+	fromJSON(object: any): ChatMessage {
+		return {
+			userName: isSet(object.userName) ? globalThis.String(object.userName) : '',
+			message: isSet(object.message) ? globalThis.String(object.message) : '',
+			time: isSet(object.time) ? fromJsonTimestamp(object.time) : undefined,
+			color: isSet(object.color) ? messageColorFromJSON(object.color) : 0,
+			messageType: isSet(object.messageType) ? messageTypeFromJSON(object.messageType) : 0
+		};
+	},
 
-  toJSON(message: ChatMessage): unknown {
-    const obj: any = {};
-    if (message.userName !== "") {
-      obj.userName = message.userName;
-    }
-    if (message.message !== "") {
-      obj.message = message.message;
-    }
-    if (message.time !== undefined) {
-      obj.time = message.time.toISOString();
-    }
-    if (message.color !== 0) {
-      obj.color = messageColorToJSON(message.color);
-    }
-    if (message.messageType !== 0) {
-      obj.messageType = messageTypeToJSON(message.messageType);
-    }
-    return obj;
-  },
+	toJSON(message: ChatMessage): unknown {
+		const obj: any = {};
+		if (message.userName !== '') {
+			obj.userName = message.userName;
+		}
+		if (message.message !== '') {
+			obj.message = message.message;
+		}
+		if (message.time !== undefined) {
+			obj.time = message.time.toISOString();
+		}
+		if (message.color !== 0) {
+			obj.color = messageColorToJSON(message.color);
+		}
+		if (message.messageType !== 0) {
+			obj.messageType = messageTypeToJSON(message.messageType);
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<ChatMessage>): ChatMessage {
-    return ChatMessage.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<ChatMessage>): ChatMessage {
-    const message = createBaseChatMessage();
-    message.userName = object.userName ?? "";
-    message.message = object.message ?? "";
-    message.time = object.time ?? undefined;
-    message.color = object.color ?? 0;
-    message.messageType = object.messageType ?? 0;
-    return message;
-  },
+	create(base?: DeepPartial<ChatMessage>): ChatMessage {
+		return ChatMessage.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<ChatMessage>): ChatMessage {
+		const message = createBaseChatMessage();
+		message.userName = object.userName ?? '';
+		message.message = object.message ?? '';
+		message.time = object.time ?? undefined;
+		message.color = object.color ?? 0;
+		message.messageType = object.messageType ?? 0;
+		return message;
+	}
 };
 
 function createBaseServerState(): ServerState {
-  return {
-    activePlayers: 0,
-    activeGames: 0,
-    activeTournaments: 0,
-    activeTables: 0,
-    numberOfThreads: 0,
-    serverVersion: "",
-    serverTime: undefined,
-  };
+	return {
+		activePlayers: 0,
+		activeGames: 0,
+		activeTournaments: 0,
+		activeTables: 0,
+		numberOfThreads: 0,
+		serverVersion: '',
+		serverTime: undefined
+	};
 }
 
 export const ServerState: MessageFns<ServerState> = {
-  encode(message: ServerState, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.activePlayers !== 0) {
-      writer.uint32(8).int32(message.activePlayers);
-    }
-    if (message.activeGames !== 0) {
-      writer.uint32(16).int32(message.activeGames);
-    }
-    if (message.activeTournaments !== 0) {
-      writer.uint32(24).int32(message.activeTournaments);
-    }
-    if (message.activeTables !== 0) {
-      writer.uint32(32).int32(message.activeTables);
-    }
-    if (message.numberOfThreads !== 0) {
-      writer.uint32(40).int32(message.numberOfThreads);
-    }
-    if (message.serverVersion !== "") {
-      writer.uint32(50).string(message.serverVersion);
-    }
-    if (message.serverTime !== undefined) {
-      Timestamp.encode(toTimestamp(message.serverTime), writer.uint32(58).fork()).join();
-    }
-    return writer;
-  },
+	encode(message: ServerState, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.activePlayers !== 0) {
+			writer.uint32(8).int32(message.activePlayers);
+		}
+		if (message.activeGames !== 0) {
+			writer.uint32(16).int32(message.activeGames);
+		}
+		if (message.activeTournaments !== 0) {
+			writer.uint32(24).int32(message.activeTournaments);
+		}
+		if (message.activeTables !== 0) {
+			writer.uint32(32).int32(message.activeTables);
+		}
+		if (message.numberOfThreads !== 0) {
+			writer.uint32(40).int32(message.numberOfThreads);
+		}
+		if (message.serverVersion !== '') {
+			writer.uint32(50).string(message.serverVersion);
+		}
+		if (message.serverTime !== undefined) {
+			Timestamp.encode(toTimestamp(message.serverTime), writer.uint32(58).fork()).join();
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ServerState {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseServerState();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): ServerState {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseServerState();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 8) {
+						break;
+					}
 
-          message.activePlayers = reader.int32();
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
+					message.activePlayers = reader.int32();
+					continue;
+				}
+				case 2: {
+					if (tag !== 16) {
+						break;
+					}
 
-          message.activeGames = reader.int32();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
+					message.activeGames = reader.int32();
+					continue;
+				}
+				case 3: {
+					if (tag !== 24) {
+						break;
+					}
 
-          message.activeTournaments = reader.int32();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
+					message.activeTournaments = reader.int32();
+					continue;
+				}
+				case 4: {
+					if (tag !== 32) {
+						break;
+					}
 
-          message.activeTables = reader.int32();
-          continue;
-        }
-        case 5: {
-          if (tag !== 40) {
-            break;
-          }
+					message.activeTables = reader.int32();
+					continue;
+				}
+				case 5: {
+					if (tag !== 40) {
+						break;
+					}
 
-          message.numberOfThreads = reader.int32();
-          continue;
-        }
-        case 6: {
-          if (tag !== 50) {
-            break;
-          }
+					message.numberOfThreads = reader.int32();
+					continue;
+				}
+				case 6: {
+					if (tag !== 50) {
+						break;
+					}
 
-          message.serverVersion = reader.string();
-          continue;
-        }
-        case 7: {
-          if (tag !== 58) {
-            break;
-          }
+					message.serverVersion = reader.string();
+					continue;
+				}
+				case 7: {
+					if (tag !== 58) {
+						break;
+					}
 
-          message.serverTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.serverTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): ServerState {
-    return {
-      activePlayers: isSet(object.activePlayers) ? globalThis.Number(object.activePlayers) : 0,
-      activeGames: isSet(object.activeGames) ? globalThis.Number(object.activeGames) : 0,
-      activeTournaments: isSet(object.activeTournaments) ? globalThis.Number(object.activeTournaments) : 0,
-      activeTables: isSet(object.activeTables) ? globalThis.Number(object.activeTables) : 0,
-      numberOfThreads: isSet(object.numberOfThreads) ? globalThis.Number(object.numberOfThreads) : 0,
-      serverVersion: isSet(object.serverVersion) ? globalThis.String(object.serverVersion) : "",
-      serverTime: isSet(object.serverTime) ? fromJsonTimestamp(object.serverTime) : undefined,
-    };
-  },
+	fromJSON(object: any): ServerState {
+		return {
+			activePlayers: isSet(object.activePlayers) ? globalThis.Number(object.activePlayers) : 0,
+			activeGames: isSet(object.activeGames) ? globalThis.Number(object.activeGames) : 0,
+			activeTournaments: isSet(object.activeTournaments)
+				? globalThis.Number(object.activeTournaments)
+				: 0,
+			activeTables: isSet(object.activeTables) ? globalThis.Number(object.activeTables) : 0,
+			numberOfThreads: isSet(object.numberOfThreads)
+				? globalThis.Number(object.numberOfThreads)
+				: 0,
+			serverVersion: isSet(object.serverVersion) ? globalThis.String(object.serverVersion) : '',
+			serverTime: isSet(object.serverTime) ? fromJsonTimestamp(object.serverTime) : undefined
+		};
+	},
 
-  toJSON(message: ServerState): unknown {
-    const obj: any = {};
-    if (message.activePlayers !== 0) {
-      obj.activePlayers = Math.round(message.activePlayers);
-    }
-    if (message.activeGames !== 0) {
-      obj.activeGames = Math.round(message.activeGames);
-    }
-    if (message.activeTournaments !== 0) {
-      obj.activeTournaments = Math.round(message.activeTournaments);
-    }
-    if (message.activeTables !== 0) {
-      obj.activeTables = Math.round(message.activeTables);
-    }
-    if (message.numberOfThreads !== 0) {
-      obj.numberOfThreads = Math.round(message.numberOfThreads);
-    }
-    if (message.serverVersion !== "") {
-      obj.serverVersion = message.serverVersion;
-    }
-    if (message.serverTime !== undefined) {
-      obj.serverTime = message.serverTime.toISOString();
-    }
-    return obj;
-  },
+	toJSON(message: ServerState): unknown {
+		const obj: any = {};
+		if (message.activePlayers !== 0) {
+			obj.activePlayers = Math.round(message.activePlayers);
+		}
+		if (message.activeGames !== 0) {
+			obj.activeGames = Math.round(message.activeGames);
+		}
+		if (message.activeTournaments !== 0) {
+			obj.activeTournaments = Math.round(message.activeTournaments);
+		}
+		if (message.activeTables !== 0) {
+			obj.activeTables = Math.round(message.activeTables);
+		}
+		if (message.numberOfThreads !== 0) {
+			obj.numberOfThreads = Math.round(message.numberOfThreads);
+		}
+		if (message.serverVersion !== '') {
+			obj.serverVersion = message.serverVersion;
+		}
+		if (message.serverTime !== undefined) {
+			obj.serverTime = message.serverTime.toISOString();
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<ServerState>): ServerState {
-    return ServerState.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<ServerState>): ServerState {
-    const message = createBaseServerState();
-    message.activePlayers = object.activePlayers ?? 0;
-    message.activeGames = object.activeGames ?? 0;
-    message.activeTournaments = object.activeTournaments ?? 0;
-    message.activeTables = object.activeTables ?? 0;
-    message.numberOfThreads = object.numberOfThreads ?? 0;
-    message.serverVersion = object.serverVersion ?? "";
-    message.serverTime = object.serverTime ?? undefined;
-    return message;
-  },
+	create(base?: DeepPartial<ServerState>): ServerState {
+		return ServerState.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<ServerState>): ServerState {
+		const message = createBaseServerState();
+		message.activePlayers = object.activePlayers ?? 0;
+		message.activeGames = object.activeGames ?? 0;
+		message.activeTournaments = object.activeTournaments ?? 0;
+		message.activeTables = object.activeTables ?? 0;
+		message.numberOfThreads = object.numberOfThreads ?? 0;
+		message.serverVersion = object.serverVersion ?? '';
+		message.serverTime = object.serverTime ?? undefined;
+		return message;
+	}
 };
 
 function createBaseMatchQueueView(): MatchQueueView {
-  return { matchName: "", matchOptions: undefined, playersWaiting: 0 };
+	return { matchName: '', matchOptions: undefined, playersWaiting: 0 };
 }
 
 export const MatchQueueView: MessageFns<MatchQueueView> = {
-  encode(message: MatchQueueView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.matchName !== "") {
-      writer.uint32(10).string(message.matchName);
-    }
-    if (message.matchOptions !== undefined) {
-      MatchOptions.encode(message.matchOptions, writer.uint32(18).fork()).join();
-    }
-    if (message.playersWaiting !== 0) {
-      writer.uint32(24).int32(message.playersWaiting);
-    }
-    return writer;
-  },
+	encode(message: MatchQueueView, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+		if (message.matchName !== '') {
+			writer.uint32(10).string(message.matchName);
+		}
+		if (message.matchOptions !== undefined) {
+			MatchOptions.encode(message.matchOptions, writer.uint32(18).fork()).join();
+		}
+		if (message.playersWaiting !== 0) {
+			writer.uint32(24).int32(message.playersWaiting);
+		}
+		return writer;
+	},
 
-  decode(input: BinaryReader | Uint8Array, length?: number): MatchQueueView {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMatchQueueView();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
+	decode(input: BinaryReader | Uint8Array, length?: number): MatchQueueView {
+		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+		const end = length === undefined ? reader.len : reader.pos + length;
+		const message = createBaseMatchQueueView();
+		while (reader.pos < end) {
+			const tag = reader.uint32();
+			switch (tag >>> 3) {
+				case 1: {
+					if (tag !== 10) {
+						break;
+					}
 
-          message.matchName = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
+					message.matchName = reader.string();
+					continue;
+				}
+				case 2: {
+					if (tag !== 18) {
+						break;
+					}
 
-          message.matchOptions = MatchOptions.decode(reader, reader.uint32());
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
+					message.matchOptions = MatchOptions.decode(reader, reader.uint32());
+					continue;
+				}
+				case 3: {
+					if (tag !== 24) {
+						break;
+					}
 
-          message.playersWaiting = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
+					message.playersWaiting = reader.int32();
+					continue;
+				}
+			}
+			if ((tag & 7) === 4 || tag === 0) {
+				break;
+			}
+			reader.skip(tag & 7);
+		}
+		return message;
+	},
 
-  fromJSON(object: any): MatchQueueView {
-    return {
-      matchName: isSet(object.matchName) ? globalThis.String(object.matchName) : "",
-      matchOptions: isSet(object.matchOptions) ? MatchOptions.fromJSON(object.matchOptions) : undefined,
-      playersWaiting: isSet(object.playersWaiting) ? globalThis.Number(object.playersWaiting) : 0,
-    };
-  },
+	fromJSON(object: any): MatchQueueView {
+		return {
+			matchName: isSet(object.matchName) ? globalThis.String(object.matchName) : '',
+			matchOptions: isSet(object.matchOptions)
+				? MatchOptions.fromJSON(object.matchOptions)
+				: undefined,
+			playersWaiting: isSet(object.playersWaiting) ? globalThis.Number(object.playersWaiting) : 0
+		};
+	},
 
-  toJSON(message: MatchQueueView): unknown {
-    const obj: any = {};
-    if (message.matchName !== "") {
-      obj.matchName = message.matchName;
-    }
-    if (message.matchOptions !== undefined) {
-      obj.matchOptions = MatchOptions.toJSON(message.matchOptions);
-    }
-    if (message.playersWaiting !== 0) {
-      obj.playersWaiting = Math.round(message.playersWaiting);
-    }
-    return obj;
-  },
+	toJSON(message: MatchQueueView): unknown {
+		const obj: any = {};
+		if (message.matchName !== '') {
+			obj.matchName = message.matchName;
+		}
+		if (message.matchOptions !== undefined) {
+			obj.matchOptions = MatchOptions.toJSON(message.matchOptions);
+		}
+		if (message.playersWaiting !== 0) {
+			obj.playersWaiting = Math.round(message.playersWaiting);
+		}
+		return obj;
+	},
 
-  create(base?: DeepPartial<MatchQueueView>): MatchQueueView {
-    return MatchQueueView.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<MatchQueueView>): MatchQueueView {
-    const message = createBaseMatchQueueView();
-    message.matchName = object.matchName ?? "";
-    message.matchOptions = (object.matchOptions !== undefined && object.matchOptions !== null)
-      ? MatchOptions.fromPartial(object.matchOptions)
-      : undefined;
-    message.playersWaiting = object.playersWaiting ?? 0;
-    return message;
-  },
+	create(base?: DeepPartial<MatchQueueView>): MatchQueueView {
+		return MatchQueueView.fromPartial(base ?? {});
+	},
+	fromPartial(object: DeepPartial<MatchQueueView>): MatchQueueView {
+		const message = createBaseMatchQueueView();
+		message.matchName = object.matchName ?? '';
+		message.matchOptions =
+			object.matchOptions !== undefined && object.matchOptions !== null
+				? MatchOptions.fromPartial(object.matchOptions)
+				: undefined;
+		message.playersWaiting = object.playersWaiting ?? 0;
+		return message;
+	}
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin ? T
-  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+type DeepPartial<T> = T extends Builtin
+	? T
+	: T extends globalThis.Array<infer U>
+		? globalThis.Array<DeepPartial<U>>
+		: T extends ReadonlyArray<infer U>
+			? ReadonlyArray<DeepPartial<U>>
+			: T extends {}
+				? { [K in keyof T]?: DeepPartial<T[K]> }
+				: Partial<T>;
 
 function toTimestamp(date: Date): Timestamp {
-  const seconds = Math.trunc(date.getTime() / 1_000);
-  const nanos = (date.getTime() % 1_000) * 1_000_000;
-  return { seconds, nanos };
+	const seconds = Math.trunc(date.getTime() / 1_000);
+	const nanos = (date.getTime() % 1_000) * 1_000_000;
+	return { seconds, nanos };
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = (t.seconds || 0) * 1_000;
-  millis += (t.nanos || 0) / 1_000_000;
-  return new globalThis.Date(millis);
+	let millis = (t.seconds || 0) * 1_000;
+	millis += (t.nanos || 0) / 1_000_000;
+	return new globalThis.Date(millis);
 }
 
 function fromJsonTimestamp(o: any): Date {
-  if (o instanceof globalThis.Date) {
-    return o;
-  } else if (typeof o === "string") {
-    return new globalThis.Date(o);
-  } else {
-    return fromTimestamp(Timestamp.fromJSON(o));
-  }
+	if (o instanceof globalThis.Date) {
+		return o;
+	} else if (typeof o === 'string') {
+		return new globalThis.Date(o);
+	} else {
+		return fromTimestamp(Timestamp.fromJSON(o));
+	}
 }
 
 function isSet(value: any): boolean {
-  return value !== null && value !== undefined;
+	return value !== null && value !== undefined;
 }
 
 interface MessageFns<T> {
-  encode(message: T, writer?: BinaryWriter): BinaryWriter;
-  decode(input: BinaryReader | Uint8Array, length?: number): T;
-  fromJSON(object: any): T;
-  toJSON(message: T): unknown;
-  create(base?: DeepPartial<T>): T;
-  fromPartial(object: DeepPartial<T>): T;
+	encode(message: T, writer?: BinaryWriter): BinaryWriter;
+	decode(input: BinaryReader | Uint8Array, length?: number): T;
+	fromJSON(object: any): T;
+	toJSON(message: T): unknown;
+	create(base?: DeepPartial<T>): T;
+	fromPartial(object: DeepPartial<T>): T;
 }

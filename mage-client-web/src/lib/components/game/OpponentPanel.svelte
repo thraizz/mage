@@ -22,7 +22,7 @@
 		selectedCardIds?: string[];
 		expanded?: boolean;
 		position?: 'top' | 'left' | 'right';
-		 
+
 		onCardClick?: (cardId: string) => void;
 	} = $props();
 

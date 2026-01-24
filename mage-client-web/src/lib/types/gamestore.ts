@@ -9,7 +9,7 @@ import type { CardView, ManaPoolView } from '$lib/generated/mage/v1/models';
 /**
  * Player state for game stores
  */
-export interface PlaytestPlayer {
+export interface Player {
 	playerId: string;
 	name: string;
 	life: number;
@@ -54,7 +54,7 @@ export type ScrySession = {
 export interface BaseGameState {
 	gameId: string;
 	activeControlSeat: string; // Which player perspective you're controlling
-	players: PlaytestPlayer[];
+	players: Player[];
 	battlefield: CardView[];
 	exile: CardView[];
 	stack: CardView[];

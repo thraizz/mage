@@ -1,6 +1,6 @@
 <script lang="ts">
+	import type { CardView, GameView, PlayerView } from '$lib/generated/mage/v1/models';
 	import { websocketStore } from '$lib/stores/websocket';
-	import type { PlayerView, CardView, GameView } from '$lib/generated/mage/v1/models';
 
 	// Legacy game store state shape for debug overlay
 	interface GameStoreState {
@@ -265,7 +265,10 @@
 									<pre><code
 											>{gameState.gameView?.exile?.length
 												? formatJson(
-														gameState.gameView.exile.map((c: CardView) => ({ id: c.id, name: c.name }))
+														gameState.gameView.exile.map((c: CardView) => ({
+															id: c.id,
+															name: c.name
+														}))
 													)
 												: '[]'}</code
 										></pre>

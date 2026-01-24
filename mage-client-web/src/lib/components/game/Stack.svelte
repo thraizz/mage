@@ -5,12 +5,12 @@
 	let {
 		stackObjects = [],
 		playerNames = new Map<string, string>(),
-		 
+
 		onStackObjectClick = (stackId: string) => {}
 	}: {
 		stackObjects?: StackObject[];
 		playerNames?: Map<string, string>;
-		 
+
 		onStackObjectClick?: (stackId: string) => void;
 	} = $props();
 
