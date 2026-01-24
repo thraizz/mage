@@ -647,16 +647,17 @@ func (s *mageServer) engineViewToProto(engineView interface{}, playerID string) 
 // playtestViewToProto converts a PlaytestGameView to protobuf GameView
 func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID string) *pb.GameView {
 	view := &pb.GameView{
-		GameId:         data.GameID,
-		State:          "IN_PROGRESS", // Playtest is always in progress
-		Phase:          "",            // No phase tracking in playtest
-		Step:           "",            // No step tracking in playtest
-		Turn:           int32(data.Turn),
-		ActivePlayerId: data.ActivePlayerID,
-		Battlefield:    playtestEngineCardsToProto(data.Battlefield),
-		Stack:          playtestEngineCardsToProto(data.Stack),
-		Exile:          playtestEngineCardsToProto(data.Exile),
-		Command:        playtestEngineCardsToProto(data.Command),
+		GameId:            data.GameID,
+		State:             "IN_PROGRESS", // Playtest is always in progress
+		Phase:             "",            // No phase tracking in playtest
+		Step:              "",            // No step tracking in playtest
+		Turn:              int32(data.Turn),
+		ActivePlayerId:    data.ActivePlayerID,
+		ActiveControlSeat: playerID, // Viewing player's ID (from Task 1.2)
+		Battlefield:       playtestEngineCardsToProto(data.Battlefield),
+		Stack:             playtestEngineCardsToProto(data.Stack),
+		Exile:             playtestEngineCardsToProto(data.Exile),
+		Command:           playtestEngineCardsToProto(data.Command),
 	}
 
 	// Convert players
@@ -673,6 +674,7 @@ func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID s
 			LibraryCount: int32(data.Me.LibraryCount),
 			HandCount:    int32(data.Me.HandCount),
 			Hand:         playtestEngineCardsToProto(data.Me.Hand),
+			Library:      playtestEngineCardsToProto(data.Me.Library), // Task 1.6: Include library for viewing player
 			Graveyard:    playtestEngineCardsToProto(data.Me.Graveyard),
 		})
 	}

@@ -7,11 +7,13 @@
  */
 
 import { writable, derived, get } from 'svelte/store';
-import type { CardView, ManaPoolView } from '$lib/generated/mage/v1/models';
+import type { CardView, ManaPoolView, GameView, PlayerView } from '$lib/generated/mage/v1/models';
 import { CallbackMethod } from '$lib/generated/mage/v1/websocket';
-import type { GameUpdateData, GameInitData } from '$lib/generated/mage/v1/websocket';
+import type { GameUpdateData, GameInitData, StartGameData } from '$lib/generated/mage/v1/websocket';
 import { websocketStore } from './websocket';
 import * as directActions from '$lib/api/direct-actions';
+import { joinGame, fetchGameView } from '$lib/api/game';
+import { auth } from './auth';
 
 /**
  * Player state for multiplayer game
@@ -83,6 +85,75 @@ export interface MultiplayerGameState {
 	pendingActions: string[];
 }
 
+/**
+ * Converts a proto PlayerView to a PlaytestPlayer object.
+ * Handles differences between proto structure and client expectations.
+ * From Task 1.3 - Proto GameView to State Mapping
+ */
+function convertPlayerViewToPlaytestPlayer(pv: PlayerView): PlaytestPlayer {
+	return {
+		playerId: pv.playerId || '',
+		name: pv.name || '',
+		life: Number(pv.life) || 0,
+		poison: Number(pv.poison) || 0,
+		energy: Number(pv.energy) || 0,
+		libraryCount: Number(pv.libraryCount) || 0,
+		handCount: Number(pv.handCount) || 0,
+		hand: pv.hand || [],
+		library: pv.library || [], // Will be populated for viewing player, empty for opponents
+		graveyard: pv.graveyard || [],
+		manaPool: pv.manaPool || {
+			white: 0,
+			blue: 0,
+			black: 0,
+			red: 0,
+			green: 0,
+			colorless: 0
+		},
+		keptHand: pv.keptHand || false,
+		mulliganCount: 0, // Not in proto yet, default to 0
+		revealedTopCard: false // Not in proto yet, default to false
+	};
+}
+
+/**
+ * Normalizes a proto GameView by ensuring all array fields are initialized.
+ * Proto messages omit empty arrays, so we need to provide defaults.
+ * From Task 1.3 - Proto GameView to State Mapping
+ */
+function normalizeProtoGameView(game: GameView): GameView {
+	return {
+		...game,
+		players: game.players || [],
+		battlefield: game.battlefield || [],
+		stack: game.stack || [],
+		exile: game.exile || [],
+		command: game.command || []
+	};
+}
+
+/**
+ * Maps a normalized proto GameView to MultiplayerGameState structure.
+ * Converts proto PlayerView[] to PlaytestPlayer[] and maps all fields.
+ * From Task 1.3 - Proto GameView to State Mapping
+ */
+function mapProtoGameViewToState(game: GameView): Partial<MultiplayerGameState> {
+	return {
+		gameId: game.gameId || '',
+		turn: Number(game.turn) || 0,
+		activePlayerId: game.activePlayerId || '',
+		activeControlSeat: game.activeControlSeat || '', // From Phase 1 Task 1.1
+		battlefield: game.battlefield || [],
+		exile: game.exile || [],
+		stack: game.stack || [],
+		command: game.command || [],
+		players: (game.players || []).map(convertPlayerViewToPlaytestPlayer),
+		mulliganType: 'london', // Default, could be in proto later
+		freeMulligans: 0, // Default, could be in proto later
+		log: [] // Not in current proto, default to empty
+	};
+}
+
 const initialState: MultiplayerGameState = {
 	gameId: '',
 	activeControlSeat: '',
@@ -113,13 +184,29 @@ function createMultiplayerGameStore() {
 
 	/**
 	 * Subscribe to WebSocket game state updates
-	 * Pattern from game.ts lines 140-200
+	 * Pattern from game.legacy.ts lines 140-200
 	 */
 	function subscribeToGameEvents() {
 		// Unsubscribe from previous subscriptions
 		unsubscribeFromEvents();
 
-		// GAME_INIT - Initial game state
+		// START_GAME - Game is starting (from game.legacy.ts lines 147-156)
+		unsubscribers.push(
+			websocketStore.on(CallbackMethod.START_GAME, (data) => {
+				const startData = data as StartGameData;
+				console.log('[MultiplayerGame] START_GAME received:', startData);
+
+				// Prepare for initialization - game is starting
+				update((state) => ({
+					...state,
+					isInitialized: false,
+					isConnected: false
+				}));
+			})
+		);
+
+		// GAME_INIT - Initial game state (from game.legacy.ts lines 158-174)
+		// Note: Server may not send this, but we handle it for compatibility
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_INIT, (data) => {
 				const initData = data as GameInitData;
@@ -139,19 +226,26 @@ function createMultiplayerGameStore() {
 			})
 		);
 
-		// GAME_UPDATE - State update
+		// GAME_UPDATE - State update (from game.legacy.ts lines 176-226)
 		unsubscribers.push(
 			websocketStore.on(CallbackMethod.GAME_UPDATE, (data) => {
 				const updateData = data as GameUpdateData;
 				console.log('[MultiplayerGame] GAME_UPDATE received:', updateData);
 
 				if (updateData.game) {
+					// Normalize proto GameView (handle empty arrays)
+					const normalized = normalizeProtoGameView(updateData.game);
+
+					// Map proto structure to our state structure
+					const mappedState = mapProtoGameViewToState(normalized);
+
 					// Apply server state to store
 					update((state) => ({
 						...state,
-						// Map server GameView to our state structure
-						// TODO: Implement full mapping when server GameView is available
+						...mappedState,
 						isConnected: true,
+						isInitialized: true,
+						// Clear pending actions (server is source of truth)
 						pendingActions: []
 					}));
 				}
@@ -170,9 +264,10 @@ function createMultiplayerGameStore() {
 	/**
 	 * Initialize game state
 	 * From playtest-game.ts lines 418-467
-	 * Modified: Initialization happens server-side, we just subscribe
+	 * Modified: Initialization happens server-side, we subscribe and join the game
+	 * Pattern from debug/+page.svelte lines 87-127
 	 */
-	function initialize(gameId: string): void {
+	async function initialize(gameId: string): Promise<void> {
 		update((state) => ({
 			...state,
 			gameId,
@@ -182,6 +277,52 @@ function createMultiplayerGameStore() {
 
 		// Subscribe to WebSocket updates for this game
 		subscribeToGameEvents();
+
+		try {
+			console.log('[MultiplayerGame] Joining game:', gameId);
+			// Join the game to register with the server
+			await joinGame(gameId);
+			console.log('[MultiplayerGame] Joined game successfully');
+
+			// Fetch initial game view to get current state
+			// This ensures we have state even if we missed the START_GAME event
+			const currentAuth = get(auth);
+			const playerId = currentAuth.user?.username || currentAuth.user?.id || '';
+			if (playerId) {
+				console.log('[MultiplayerGame] Fetching initial game view...');
+				const gameView = await fetchGameView(gameId, playerId);
+				console.log('[MultiplayerGame] Got initial game view:', gameView);
+
+				if (gameView) {
+					// Normalize and map the fetched GameView
+					const normalized = normalizeProtoGameView(gameView);
+					const mappedState = mapProtoGameViewToState(normalized);
+
+					// Apply initial state
+					update((state) => ({
+						...state,
+						...mappedState,
+						isConnected: true,
+						isInitialized: true,
+						pendingActions: []
+					}));
+				} else {
+					// GameView fetch returned null/undefined
+					update((state) => ({
+						...state,
+						isConnected: true,
+						isInitialized: false // No game state available
+					}));
+				}
+			} else {
+				console.warn('[MultiplayerGame] No player ID available, waiting for GAME_UPDATE');
+				// Will be initialized when first GAME_UPDATE arrives
+			}
+		} catch (err) {
+			console.error('[MultiplayerGame] Failed to join game:', err);
+			// Don't throw - let WebSocket events handle initialization
+			// If join fails, we'll wait for GAME_UPDATE events
+		}
 
 		console.log('[MultiplayerGame] Initialized for game:', gameId);
 	}
@@ -385,15 +526,12 @@ function createMultiplayerGameStore() {
 	/**
 	 * Mill cards (move top N cards from library to graveyard)
 	 * From playtest-game.ts lines 923-957
-	 * Modified: Send to server via moveCard (not directly implemented in direct-actions)
-	 * Note: This may need server implementation for atomic mill operation
+	 * Modified: Send to server via direct-actions API
 	 */
 	function millCards(playerId: string, count: number): void {
-		console.warn('[MultiplayerGame] millCards not yet implemented server-side:', {
-			playerId,
-			count
-		});
-		// TODO: Implement MILL command in direct-actions API
+		const state = get({ subscribe });
+		directActions.millCards(state.gameId, playerId, count);
+		console.log('[MultiplayerGame] millCards:', { playerId, count });
 	}
 
 	/**
@@ -413,14 +551,14 @@ function createMultiplayerGameStore() {
 	/**
 	 * Start a scry session
 	 * From playtest-game.ts lines 983-1011
-	 * Modified: This requires server support for scry state
+	 * Modified: Send to server via direct-actions API
+	 * Note: This is a simplified scry that just initiates the action.
+	 * Full scry UI with card selection would need additional implementation.
 	 */
 	function scryCards(playerId: string, count: number): ScrySession | null {
-		console.warn('[MultiplayerGame] scryCards not yet implemented server-side:', {
-			playerId,
-			count
-		});
-		// TODO: Implement SCRY command in direct-actions API
+		const state = get({ subscribe });
+		directActions.scryCards(state.gameId, playerId, count);
+		console.log('[MultiplayerGame] scryCards:', { playerId, count });
 		return null;
 	}
 
@@ -447,14 +585,12 @@ function createMultiplayerGameStore() {
 	/**
 	 * Set revealed top card state
 	 * From playtest-game.ts lines 1058-1071
-	 * Modified: This requires server state tracking
+	 * Modified: Send to server via direct-actions API
 	 */
 	function setRevealedTop(playerId: string, revealed: boolean): void {
-		console.warn('[MultiplayerGame] setRevealedTop not yet implemented server-side:', {
-			playerId,
-			revealed
-		});
-		// TODO: Implement REVEAL_TOP_PERMANENT command in direct-actions API
+		const state = get({ subscribe });
+		directActions.setRevealedTop(state.gameId, playerId, revealed);
+		console.log('[MultiplayerGame] setRevealedTop:', { playerId, revealed });
 	}
 
 	/**
@@ -505,21 +641,23 @@ function createMultiplayerGameStore() {
 	/**
 	 * Mulligan for a player
 	 * From playtest-game.ts lines 1095-1146
-	 * Modified: This requires server mulligan implementation
+	 * Modified: Send to server via direct-actions API
 	 */
 	function mulligan(playerId: string): void {
-		console.warn('[MultiplayerGame] mulligan not yet implemented server-side:', { playerId });
-		// TODO: Implement MULLIGAN command in direct-actions API
+		const state = get({ subscribe });
+		directActions.mulligan(state.gameId, playerId);
+		console.log('[MultiplayerGame] mulligan:', { playerId });
 	}
 
 	/**
 	 * Keep hand (no mulligan)
 	 * From playtest-game.ts lines 1151-1161
-	 * Modified: This requires server mulligan state tracking
+	 * Modified: Send to server via direct-actions API
 	 */
 	function keepHand(playerId: string): void {
-		console.warn('[MultiplayerGame] keepHand not yet implemented server-side:', { playerId });
-		// TODO: Implement KEEP_HAND command in direct-actions API
+		const state = get({ subscribe });
+		directActions.keepHand(state.gameId, playerId);
+		console.log('[MultiplayerGame] keepHand:', { playerId });
 	}
 
 	/**

@@ -165,6 +165,60 @@ export async function drawCards(gameId: string, playerId: string, count: number)
 }
 
 /**
+ * Mill cards (move top N cards from library to graveyard)
+ * @param gameId - The game ID
+ * @param playerId - The player whose library to mill
+ * @param count - Number of cards to mill
+ */
+export async function millCards(gameId: string, playerId: string, count: number): Promise<void> {
+	return sendPlayerString(gameId, `MILL:${playerId}:${count}`);
+}
+
+/**
+ * Scry N cards (look at top N cards and rearrange them)
+ * Note: This is a simplified version that just initiates a scry.
+ * Full scry UI with card selection would require additional commands.
+ * @param gameId - The game ID
+ * @param playerId - The player who is scrying
+ * @param count - Number of cards to scry
+ */
+export async function scryCards(gameId: string, playerId: string, count: number): Promise<void> {
+	return sendPlayerString(gameId, `SCRY:${playerId}:${count}`);
+}
+
+/**
+ * Set whether the top card of library is revealed to all players
+ * @param gameId - The game ID
+ * @param playerId - The player whose library top card to reveal/hide
+ * @param revealed - Whether the top card should be revealed
+ */
+export async function setRevealedTop(
+	gameId: string,
+	playerId: string,
+	revealed: boolean
+): Promise<void> {
+	return sendPlayerString(gameId, `REVEAL_TOP:${playerId}:${revealed}`);
+}
+
+/**
+ * Mulligan (shuffle hand into library and draw N-1 cards)
+ * @param gameId - The game ID
+ * @param playerId - The player who is mulliganing
+ */
+export async function mulligan(gameId: string, playerId: string): Promise<void> {
+	return sendPlayerString(gameId, `MULLIGAN:${playerId}`);
+}
+
+/**
+ * Keep hand (end mulligan phase for this player)
+ * @param gameId - The game ID
+ * @param playerId - The player who is keeping their hand
+ */
+export async function keepHand(gameId: string, playerId: string): Promise<void> {
+	return sendPlayerString(gameId, `KEEP_HAND:${playerId}`);
+}
+
+/**
  * Alias for modifyPlayerLife for convenience
  * @param gameId - The game ID
  * @param playerId - The player whose life to modify

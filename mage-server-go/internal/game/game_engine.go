@@ -5,6 +5,8 @@ package game
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 
 	"go.uber.org/zap"
@@ -249,6 +251,14 @@ func (e *GameEngine) ProcessAction(gameID string, action PlayerAction) error {
 	case "KEEP_HAND":
 		return e.KeepHand(gameID, playerID)
 
+	case "SEND_STRING":
+		// Parse string command from direct-actions.ts
+		cmdStr, ok := action.Data.(string)
+		if !ok {
+			return fmt.Errorf("SEND_STRING action data must be a string")
+		}
+		return e.ParseAndExecuteStringCommand(gameID, playerID, cmdStr)
+
 	default:
 		return fmt.Errorf("unknown action type: %s", actionType)
 	}
@@ -395,4 +405,171 @@ func getStringSliceFromData(data map[string]interface{}, key string) []string {
 		}
 	}
 	return []string{}
+}
+
+// ParseAndExecuteStringCommand parses a colon-delimited command string and executes the corresponding action.
+// Command format: "ACTION:param1:param2:..."
+// Used by direct-actions.ts client API for rules-light gameplay.
+func (e *GameEngine) ParseAndExecuteStringCommand(gameID, playerID, command string) error {
+	if command == "" {
+		return fmt.Errorf("empty command string")
+	}
+
+	parts := strings.Split(command, ":")
+	if len(parts) == 0 {
+		return fmt.Errorf("invalid command format")
+	}
+
+	actionType := parts[0]
+
+	switch actionType {
+	case "TAP":
+		if len(parts) < 2 {
+			return fmt.Errorf("TAP command requires cardId parameter")
+		}
+		cardID := parts[1]
+		return e.TapCard(gameID, playerID, cardID, true)
+
+	case "UNTAP":
+		if len(parts) < 2 {
+			return fmt.Errorf("UNTAP command requires cardId parameter")
+		}
+		cardID := parts[1]
+		return e.TapCard(gameID, playerID, cardID, false)
+
+	case "MOVE":
+		if len(parts) < 3 {
+			return fmt.Errorf("MOVE command requires cardId and targetZone parameters")
+		}
+		cardID := parts[1]
+		targetZone := parts[2]
+		return e.MoveCard(gameID, playerID, cardID, targetZone)
+
+	case "FLIP":
+		if len(parts) < 3 {
+			return fmt.Errorf("FLIP command requires cardId and faceDown parameters")
+		}
+		cardID := parts[1]
+		faceDown, _ := strconv.ParseBool(parts[2])
+		return e.FlipCard(gameID, playerID, cardID, faceDown)
+
+	case "DRAW":
+		if len(parts) < 3 {
+			return fmt.Errorf("DRAW command requires playerId and count parameters")
+		}
+		targetPlayerID := parts[1]
+		count, _ := strconv.Atoi(parts[2])
+		return e.DrawCards(gameID, targetPlayerID, count)
+
+	case "MODIFY_LIFE":
+		if len(parts) < 3 {
+			return fmt.Errorf("MODIFY_LIFE command requires targetPlayerId and delta parameters")
+		}
+		targetPlayerID := parts[1]
+		delta, _ := strconv.Atoi(parts[2])
+		return e.ModifyLife(gameID, targetPlayerID, delta)
+
+	case "SET_COUNTER":
+		if len(parts) < 4 {
+			return fmt.Errorf("SET_COUNTER command requires targetPlayerId, counterType, and value parameters")
+		}
+		targetPlayerID := parts[1]
+		counterType := parts[2]
+		value, _ := strconv.Atoi(parts[3])
+		return e.SetPlayerCounter(gameID, targetPlayerID, counterType, value)
+
+	case "SHUFFLE":
+		if len(parts) < 2 {
+			return fmt.Errorf("SHUFFLE command requires playerId parameter")
+		}
+		targetPlayerID := parts[1]
+		return e.ShuffleLibrary(gameID, targetPlayerID)
+
+	case "CREATE_TOKEN":
+		if len(parts) < 6 {
+			return fmt.Errorf("CREATE_TOKEN command requires name, types, power, toughness, and color parameters")
+		}
+		name := parts[1]
+		types := parts[2]
+		power := parts[3]
+		toughness := parts[4]
+		color := parts[5]
+		return e.CreateToken(gameID, playerID, name, types, power, toughness, color)
+
+	case "ADD_COUNTER":
+		if len(parts) < 4 {
+			return fmt.Errorf("ADD_COUNTER command requires cardId, counterName, and amount parameters")
+		}
+		cardID := parts[1]
+		counterName := parts[2]
+		amount, _ := strconv.Atoi(parts[3])
+		return e.AddCounter(gameID, playerID, cardID, counterName, amount)
+
+	case "REMOVE_COUNTER":
+		if len(parts) < 4 {
+			return fmt.Errorf("REMOVE_COUNTER command requires cardId, counterName, and amount parameters")
+		}
+		cardID := parts[1]
+		counterName := parts[2]
+		amount, _ := strconv.Atoi(parts[3])
+		return e.RemoveCounter(gameID, playerID, cardID, counterName, amount)
+
+	case "SET_CARD_COUNTER":
+		if len(parts) < 4 {
+			return fmt.Errorf("SET_CARD_COUNTER command requires cardId, counterName, and amount parameters")
+		}
+		cardID := parts[1]
+		counterName := parts[2]
+		amount, _ := strconv.Atoi(parts[3])
+		return e.SetCounter(gameID, playerID, cardID, counterName, amount)
+
+	case "MILL":
+		if len(parts) < 3 {
+			return fmt.Errorf("MILL command requires playerId and count parameters")
+		}
+		targetPlayerID := parts[1]
+		count, _ := strconv.Atoi(parts[2])
+		return e.MillCards(gameID, targetPlayerID, count)
+
+	case "SCRY":
+		if len(parts) < 3 {
+			return fmt.Errorf("SCRY command requires playerId and scryCount parameters")
+		}
+		targetPlayerID := parts[1]
+		scryCount, _ := strconv.Atoi(parts[2])
+		// For simple string command, assume keep all on top (full scry UI would need more params)
+		return e.ScryCards(gameID, targetPlayerID, scryCount, []string{}, []string{})
+
+	case "REVEAL_TOP":
+		if len(parts) < 3 {
+			return fmt.Errorf("REVEAL_TOP command requires playerId and revealed parameters")
+		}
+		targetPlayerID := parts[1]
+		revealed, _ := strconv.ParseBool(parts[2])
+		return e.SetRevealedTop(gameID, targetPlayerID, revealed)
+
+	case "NEXT_TURN":
+		if len(parts) < 2 {
+			return fmt.Errorf("NEXT_TURN command requires playerId parameter")
+		}
+		targetPlayerID := parts[1]
+		return e.NextTurn(gameID, targetPlayerID)
+
+	case "MULLIGAN":
+		if len(parts) < 2 {
+			return fmt.Errorf("MULLIGAN command requires playerId parameter")
+		}
+		targetPlayerID := parts[1]
+		return e.Mulligan(gameID, targetPlayerID)
+
+	case "KEEP_HAND":
+		if len(parts) < 2 {
+			return fmt.Errorf("KEEP_HAND command requires playerId parameter")
+		}
+		targetPlayerID := parts[1]
+		return e.KeepHand(gameID, targetPlayerID)
+
+	default:
+		return fmt.Errorf("unknown string command type: %s", actionType)
+	}
 }

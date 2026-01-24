@@ -90,6 +90,9 @@ message GameView {
   bool special = 17;
   google.protobuf.Timestamp start_time = 18;
 
+  // Field 19: Which player perspective this view is for (their own player ID)
+  string active_control_seat = 19;
+
   // Pre-computed display values (server source of truth)
   string active_player_name = 20;
   string priority_player_name = 21;
@@ -122,6 +125,7 @@ message PlayerView {
   int32 hand_count = 7;
   repeated CardView hand = 8;
   repeated CardView graveyard = 9;
+  repeated CardView library = 19; // Only populated for viewing player, empty for opponents
   ManaPoolView mana_pool = 10;
   bool has_priority = 11;
   bool passed = 12;

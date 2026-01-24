@@ -257,6 +257,8 @@ export interface GameView {
   startTime?:
     | Date
     | undefined;
+  /** Field 19: Which player perspective this view is for (their own player ID) */
+  activeControlSeat: string;
   /** Pre-computed display values (server source of truth) */
   activePlayerName: string;
   priorityPlayerName: string;
@@ -289,6 +291,8 @@ export interface PlayerView {
   handCount: number;
   hand: CardView[];
   graveyard: CardView[];
+  /** Only populated for viewing player, empty for opponents */
+  library: CardView[];
   manaPool?: ManaPoolView | undefined;
   hasPriority: boolean;
   passed: boolean;
@@ -1462,6 +1466,7 @@ function createBaseGameView(): GameView {
     combat: undefined,
     special: false,
     startTime: undefined,
+    activeControlSeat: "",
     activePlayerName: "",
     priorityPlayerName: "",
     gameFormat: "",
@@ -1527,6 +1532,9 @@ export const GameView: MessageFns<GameView> = {
     }
     if (message.startTime !== undefined) {
       Timestamp.encode(toTimestamp(message.startTime), writer.uint32(146).fork()).join();
+    }
+    if (message.activeControlSeat !== "") {
+      writer.uint32(154).string(message.activeControlSeat);
     }
     if (message.activePlayerName !== "") {
       writer.uint32(162).string(message.activePlayerName);
@@ -1703,6 +1711,14 @@ export const GameView: MessageFns<GameView> = {
           message.startTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
+        case 19: {
+          if (tag !== 154) {
+            break;
+          }
+
+          message.activeControlSeat = reader.string();
+          continue;
+        }
         case 20: {
           if (tag !== 162) {
             break;
@@ -1796,6 +1812,7 @@ export const GameView: MessageFns<GameView> = {
       combat: isSet(object.combat) ? CombatView.fromJSON(object.combat) : undefined,
       special: isSet(object.special) ? globalThis.Boolean(object.special) : false,
       startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
+      activeControlSeat: isSet(object.activeControlSeat) ? globalThis.String(object.activeControlSeat) : "",
       activePlayerName: isSet(object.activePlayerName) ? globalThis.String(object.activePlayerName) : "",
       priorityPlayerName: isSet(object.priorityPlayerName) ? globalThis.String(object.priorityPlayerName) : "",
       gameFormat: isSet(object.gameFormat) ? globalThis.String(object.gameFormat) : "",
@@ -1864,6 +1881,9 @@ export const GameView: MessageFns<GameView> = {
     if (message.startTime !== undefined) {
       obj.startTime = message.startTime.toISOString();
     }
+    if (message.activeControlSeat !== "") {
+      obj.activeControlSeat = message.activeControlSeat;
+    }
     if (message.activePlayerName !== "") {
       obj.activePlayerName = message.activePlayerName;
     }
@@ -1913,6 +1933,7 @@ export const GameView: MessageFns<GameView> = {
       : undefined;
     message.special = object.special ?? false;
     message.startTime = object.startTime ?? undefined;
+    message.activeControlSeat = object.activeControlSeat ?? "";
     message.activePlayerName = object.activePlayerName ?? "";
     message.priorityPlayerName = object.priorityPlayerName ?? "";
     message.gameFormat = object.gameFormat ?? "";
@@ -2061,6 +2082,7 @@ function createBasePlayerView(): PlayerView {
     handCount: 0,
     hand: [],
     graveyard: [],
+    library: [],
     manaPool: undefined,
     hasPriority: false,
     passed: false,
@@ -2101,6 +2123,9 @@ export const PlayerView: MessageFns<PlayerView> = {
     }
     for (const v of message.graveyard) {
       CardView.encode(v!, writer.uint32(74).fork()).join();
+    }
+    for (const v of message.library) {
+      CardView.encode(v!, writer.uint32(154).fork()).join();
     }
     if (message.manaPool !== undefined) {
       ManaPoolView.encode(message.manaPool, writer.uint32(82).fork()).join();
@@ -2211,6 +2236,14 @@ export const PlayerView: MessageFns<PlayerView> = {
           message.graveyard.push(CardView.decode(reader, reader.uint32()));
           continue;
         }
+        case 19: {
+          if (tag !== 154) {
+            break;
+          }
+
+          message.library.push(CardView.decode(reader, reader.uint32()));
+          continue;
+        }
         case 10: {
           if (tag !== 82) {
             break;
@@ -2305,6 +2338,7 @@ export const PlayerView: MessageFns<PlayerView> = {
       graveyard: globalThis.Array.isArray(object?.graveyard)
         ? object.graveyard.map((e: any) => CardView.fromJSON(e))
         : [],
+      library: globalThis.Array.isArray(object?.library) ? object.library.map((e: any) => CardView.fromJSON(e)) : [],
       manaPool: isSet(object.manaPool) ? ManaPoolView.fromJSON(object.manaPool) : undefined,
       hasPriority: isSet(object.hasPriority) ? globalThis.Boolean(object.hasPriority) : false,
       passed: isSet(object.passed) ? globalThis.Boolean(object.passed) : false,
@@ -2345,6 +2379,9 @@ export const PlayerView: MessageFns<PlayerView> = {
     }
     if (message.graveyard?.length) {
       obj.graveyard = message.graveyard.map((e) => CardView.toJSON(e));
+    }
+    if (message.library?.length) {
+      obj.library = message.library.map((e) => CardView.toJSON(e));
     }
     if (message.manaPool !== undefined) {
       obj.manaPool = ManaPoolView.toJSON(message.manaPool);
@@ -2390,6 +2427,7 @@ export const PlayerView: MessageFns<PlayerView> = {
     message.handCount = object.handCount ?? 0;
     message.hand = object.hand?.map((e) => CardView.fromPartial(e)) || [];
     message.graveyard = object.graveyard?.map((e) => CardView.fromPartial(e)) || [];
+    message.library = object.library?.map((e) => CardView.fromPartial(e)) || [];
     message.manaPool = (object.manaPool !== undefined && object.manaPool !== null)
       ? ManaPoolView.fromPartial(object.manaPool)
       : undefined;

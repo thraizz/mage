@@ -728,6 +728,8 @@ type GameView struct {
 	Combat           *CombatView            `protobuf:"bytes,16,opt,name=combat,proto3" json:"combat,omitempty"`
 	Special          bool                   `protobuf:"varint,17,opt,name=special,proto3" json:"special,omitempty"`
 	StartTime        *timestamppb.Timestamp `protobuf:"bytes,18,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// Field 19: Which player perspective this view is for (their own player ID)
+	ActiveControlSeat string `protobuf:"bytes,19,opt,name=active_control_seat,json=activeControlSeat,proto3" json:"active_control_seat,omitempty"`
 	// Pre-computed display values (server source of truth)
 	ActivePlayerName     string `protobuf:"bytes,20,opt,name=active_player_name,json=activePlayerName,proto3" json:"active_player_name,omitempty"`
 	PriorityPlayerName   string `protobuf:"bytes,21,opt,name=priority_player_name,json=priorityPlayerName,proto3" json:"priority_player_name,omitempty"`
@@ -897,6 +899,13 @@ func (x *GameView) GetStartTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *GameView) GetActiveControlSeat() string {
+	if x != nil {
+		return x.ActiveControlSeat
+	}
+	return ""
+}
+
 func (x *GameView) GetActivePlayerName() string {
 	if x != nil {
 		return x.ActivePlayerName
@@ -1035,6 +1044,7 @@ type PlayerView struct {
 	HandCount           int32                  `protobuf:"varint,7,opt,name=hand_count,json=handCount,proto3" json:"hand_count,omitempty"`
 	Hand                []*CardView            `protobuf:"bytes,8,rep,name=hand,proto3" json:"hand,omitempty"`
 	Graveyard           []*CardView            `protobuf:"bytes,9,rep,name=graveyard,proto3" json:"graveyard,omitempty"`
+	Library             []*CardView            `protobuf:"bytes,19,rep,name=library,proto3" json:"library,omitempty"` // Only populated for viewing player, empty for opponents
 	ManaPool            *ManaPoolView          `protobuf:"bytes,10,opt,name=mana_pool,json=manaPool,proto3" json:"mana_pool,omitempty"`
 	HasPriority         bool                   `protobuf:"varint,11,opt,name=has_priority,json=hasPriority,proto3" json:"has_priority,omitempty"`
 	Passed              bool                   `protobuf:"varint,12,opt,name=passed,proto3" json:"passed,omitempty"`
@@ -1137,6 +1147,13 @@ func (x *PlayerView) GetHand() []*CardView {
 func (x *PlayerView) GetGraveyard() []*CardView {
 	if x != nil {
 		return x.Graveyard
+	}
+	return nil
+}
+
+func (x *PlayerView) GetLibrary() []*CardView {
+	if x != nil {
+		return x.Library
 	}
 	return nil
 }
@@ -2976,7 +2993,7 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\n" +
 	"legal_sets\x18\x05 \x03(\tR\tlegalSets\x12!\n" +
 	"\fbanned_cards\x18\x06 \x03(\tR\vbannedCards\x12)\n" +
-	"\x10restricted_cards\x18\a \x03(\tR\x0frestrictedCards\"\xb8\b\n" +
+	"\x10restricted_cards\x18\a \x03(\tR\x0frestrictedCards\"\xe8\b\n" +
 	"\bGameView\x12\x17\n" +
 	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12\x14\n" +
 	"\x05state\x18\x02 \x01(\tR\x05state\x12-\n" +
@@ -2997,7 +3014,8 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\x06combat\x18\x10 \x01(\v2\x13.mage.v1.CombatViewR\x06combat\x12\x18\n" +
 	"\aspecial\x18\x11 \x01(\bR\aspecial\x129\n" +
 	"\n" +
-	"start_time\x18\x12 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12,\n" +
+	"start_time\x18\x12 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12.\n" +
+	"\x13active_control_seat\x18\x13 \x01(\tR\x11activeControlSeat\x12,\n" +
 	"\x12active_player_name\x18\x14 \x01(\tR\x10activePlayerName\x120\n" +
 	"\x14priority_player_name\x18\x15 \x01(\tR\x12priorityPlayerName\x12\x1f\n" +
 	"\vgame_format\x18\x16 \x01(\tR\n" +
@@ -3012,7 +3030,7 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\vdestination\x18\x03 \x01(\tR\vdestination\x12'\n" +
 	"\x05cards\x18\x04 \x03(\v2\x11.mage.v1.CardViewR\x05cards\x12\x1d\n" +
 	"\n" +
-	"can_cancel\x18\x05 \x01(\bR\tcanCancel\"\xbe\x04\n" +
+	"can_cancel\x18\x05 \x01(\bR\tcanCancel\"\xeb\x04\n" +
 	"\n" +
 	"PlayerView\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\tR\bplayerId\x12\x12\n" +
@@ -3024,7 +3042,8 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\n" +
 	"hand_count\x18\a \x01(\x05R\thandCount\x12%\n" +
 	"\x04hand\x18\b \x03(\v2\x11.mage.v1.CardViewR\x04hand\x12/\n" +
-	"\tgraveyard\x18\t \x03(\v2\x11.mage.v1.CardViewR\tgraveyard\x122\n" +
+	"\tgraveyard\x18\t \x03(\v2\x11.mage.v1.CardViewR\tgraveyard\x12+\n" +
+	"\alibrary\x18\x13 \x03(\v2\x11.mage.v1.CardViewR\alibrary\x122\n" +
 	"\tmana_pool\x18\n" +
 	" \x01(\v2\x15.mage.v1.ManaPoolViewR\bmanaPool\x12!\n" +
 	"\fhas_priority\x18\v \x01(\bR\vhasPriority\x12\x16\n" +
@@ -3289,34 +3308,35 @@ var file_mage_v1_models_proto_depIdxs = []int32{
 	11, // 16: mage.v1.LibrarySearchView.cards:type_name -> mage.v1.CardView
 	11, // 17: mage.v1.PlayerView.hand:type_name -> mage.v1.CardView
 	11, // 18: mage.v1.PlayerView.graveyard:type_name -> mage.v1.CardView
-	15, // 19: mage.v1.PlayerView.mana_pool:type_name -> mage.v1.ManaPoolView
-	12, // 20: mage.v1.CardView.abilities:type_name -> mage.v1.AbilityView
-	14, // 21: mage.v1.CardView.counters:type_name -> mage.v1.CounterView
-	13, // 22: mage.v1.CardView.available_actions:type_name -> mage.v1.CardAction
-	0,  // 23: mage.v1.CardAction.action_type:type_name -> mage.v1.CardActionType
-	31, // 24: mage.v1.GameMessage.time:type_name -> google.protobuf.Timestamp
-	18, // 25: mage.v1.CombatView.groups:type_name -> mage.v1.CombatGroupView
-	11, // 26: mage.v1.RevealedView.cards:type_name -> mage.v1.CardView
-	11, // 27: mage.v1.LookedAtView.cards:type_name -> mage.v1.CardView
-	22, // 28: mage.v1.TournamentView.players:type_name -> mage.v1.TournamentPlayerView
-	23, // 29: mage.v1.TournamentView.rounds:type_name -> mage.v1.RoundView
-	31, // 30: mage.v1.TournamentView.start_time:type_name -> google.protobuf.Timestamp
-	31, // 31: mage.v1.TournamentView.end_time:type_name -> google.protobuf.Timestamp
-	24, // 32: mage.v1.RoundView.pairings:type_name -> mage.v1.PairingView
-	11, // 33: mage.v1.DraftPickView.booster:type_name -> mage.v1.CardView
-	11, // 34: mage.v1.DraftPickView.picks:type_name -> mage.v1.CardView
-	27, // 35: mage.v1.UserView.stats:type_name -> mage.v1.UserStatsView
-	31, // 36: mage.v1.UserView.connected_at:type_name -> google.protobuf.Timestamp
-	31, // 37: mage.v1.ChatMessage.time:type_name -> google.protobuf.Timestamp
-	1,  // 38: mage.v1.ChatMessage.color:type_name -> mage.v1.MessageColor
-	2,  // 39: mage.v1.ChatMessage.message_type:type_name -> mage.v1.MessageType
-	31, // 40: mage.v1.ServerState.server_time:type_name -> google.protobuf.Timestamp
-	5,  // 41: mage.v1.MatchQueueView.match_options:type_name -> mage.v1.MatchOptions
-	42, // [42:42] is the sub-list for method output_type
-	42, // [42:42] is the sub-list for method input_type
-	42, // [42:42] is the sub-list for extension type_name
-	42, // [42:42] is the sub-list for extension extendee
-	0,  // [0:42] is the sub-list for field type_name
+	11, // 19: mage.v1.PlayerView.library:type_name -> mage.v1.CardView
+	15, // 20: mage.v1.PlayerView.mana_pool:type_name -> mage.v1.ManaPoolView
+	12, // 21: mage.v1.CardView.abilities:type_name -> mage.v1.AbilityView
+	14, // 22: mage.v1.CardView.counters:type_name -> mage.v1.CounterView
+	13, // 23: mage.v1.CardView.available_actions:type_name -> mage.v1.CardAction
+	0,  // 24: mage.v1.CardAction.action_type:type_name -> mage.v1.CardActionType
+	31, // 25: mage.v1.GameMessage.time:type_name -> google.protobuf.Timestamp
+	18, // 26: mage.v1.CombatView.groups:type_name -> mage.v1.CombatGroupView
+	11, // 27: mage.v1.RevealedView.cards:type_name -> mage.v1.CardView
+	11, // 28: mage.v1.LookedAtView.cards:type_name -> mage.v1.CardView
+	22, // 29: mage.v1.TournamentView.players:type_name -> mage.v1.TournamentPlayerView
+	23, // 30: mage.v1.TournamentView.rounds:type_name -> mage.v1.RoundView
+	31, // 31: mage.v1.TournamentView.start_time:type_name -> google.protobuf.Timestamp
+	31, // 32: mage.v1.TournamentView.end_time:type_name -> google.protobuf.Timestamp
+	24, // 33: mage.v1.RoundView.pairings:type_name -> mage.v1.PairingView
+	11, // 34: mage.v1.DraftPickView.booster:type_name -> mage.v1.CardView
+	11, // 35: mage.v1.DraftPickView.picks:type_name -> mage.v1.CardView
+	27, // 36: mage.v1.UserView.stats:type_name -> mage.v1.UserStatsView
+	31, // 37: mage.v1.UserView.connected_at:type_name -> google.protobuf.Timestamp
+	31, // 38: mage.v1.ChatMessage.time:type_name -> google.protobuf.Timestamp
+	1,  // 39: mage.v1.ChatMessage.color:type_name -> mage.v1.MessageColor
+	2,  // 40: mage.v1.ChatMessage.message_type:type_name -> mage.v1.MessageType
+	31, // 41: mage.v1.ServerState.server_time:type_name -> google.protobuf.Timestamp
+	5,  // 42: mage.v1.MatchQueueView.match_options:type_name -> mage.v1.MatchOptions
+	43, // [43:43] is the sub-list for method output_type
+	43, // [43:43] is the sub-list for method input_type
+	43, // [43:43] is the sub-list for extension type_name
+	43, // [43:43] is the sub-list for extension extendee
+	0,  // [0:43] is the sub-list for field type_name
 }
 
 func init() { file_mage_v1_models_proto_init() }
