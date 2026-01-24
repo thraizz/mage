@@ -1,17 +1,18 @@
 <script lang="ts">
 	import ArrowDown from '@lucide/svelte/icons/arrow-down';
-	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import Shuffle from '@lucide/svelte/icons/shuffle';
-	import Search from '@lucide/svelte/icons/search';
-	import Plus from '@lucide/svelte/icons/plus';
+	import Clock from '@lucide/svelte/icons/clock';
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
-	import Clock from '@lucide/svelte/icons/clock';
 	import FastForward from '@lucide/svelte/icons/fast-forward';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import Menu from '@lucide/svelte/icons/menu';
+	import Plus from '@lucide/svelte/icons/plus';
+	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import Search from '@lucide/svelte/icons/search';
+	import Shuffle from '@lucide/svelte/icons/shuffle';
 
 	interface Props {
+		isMultiplayer: boolean;
 		players: Array<{ playerId: string; name: string }>;
 		activeControlSeat: string;
 		availableSessions: number;
@@ -34,6 +35,7 @@
 	}
 
 	let {
+		isMultiplayer,
 		players,
 		activeControlSeat,
 		availableSessions,
@@ -59,54 +61,62 @@
 <div class="playtest-header">
 	<div class="header-left">
 		<button class="btn-back" onclick={onBack} title="Back to Lobby"> ← Back </button>
-		<span class="mode-badge">Playtest</span>
-		<button class="btn-sessions" onclick={onSessionsClick} title="Manage sessions">
-			Sessions ({availableSessions})
-		</button>
+		{#if !isMultiplayer}
+			<span class="mode-badge">Playtest</span>
+			<button class="btn-sessions" onclick={onSessionsClick} title="Manage sessions">
+				Sessions ({availableSessions})
+			</button>
+		{/if}
 	</div>
 
-	<div class="playtest-controls">
-		<label for="playtest-controlling-select">Controlling:</label>
-		<select
-			id="playtest-controlling-select"
-			class="player-select"
-			value={activeControlSeat}
-			onchange={(e) => onSwitchPlayer(e.currentTarget.value)}
-		>
-			{#each players as player}
-				<option value={player.playerId}>{player.name}</option>
-			{/each}
-		</select>
-		<button class="btn-toggle" onclick={onToggleAllHands} title="Toggle visibility of all hands">
-			{#if showAllHands}
-				<EyeOff size={16} />
-				Hide
-			{:else}
-				<Eye size={16} />
-				Show
-			{/if}
-			Hands
-		</button>
-	</div>
+	{#if !isMultiplayer}
+		<div class="playtest-controls">
+			<label for="playtest-controlling-select">Controlling:</label>
+			<select
+				id="playtest-controlling-select"
+				class="player-select"
+				value={activeControlSeat}
+				onchange={(e) => onSwitchPlayer(e.currentTarget.value)}
+			>
+				{#each players as player}
+					<option value={player.playerId}>{player.name}</option>
+				{/each}
+			</select>
+			<button
+				class="btn-secondary"
+				onclick={onToggleAllHands}
+				title="Toggle visibility of all hands"
+			>
+				{#if showAllHands}
+					<EyeOff size={16} />
+					Hide
+				{:else}
+					<Eye size={16} />
+					Show
+				{/if}
+				Hands
+			</button>
+		</div>
+	{/if}
 
 	<div class="header-actions">
-		<button class="btn-action" onclick={onDrawCard} title="Draw a card (C)">
+		<button class="btn-secondary" onclick={onDrawCard} title="Draw a card (C)">
 			<ArrowDown size={16} />
 			Draw
 		</button>
-		<button class="btn-action" onclick={onUntapAll} title="Untap all permanents (X)">
+		<button class="btn-secondary" onclick={onUntapAll} title="Untap all permanents (X)">
 			<RotateCcw size={16} />
 			Untap All
 		</button>
-		<button class="btn-action" onclick={onShuffleLibrary} title="Shuffle library (V)">
+		<button class="btn-secondary" onclick={onShuffleLibrary} title="Shuffle library (V)">
 			<Shuffle size={16} />
 			Shuffle
 		</button>
-		<button class="btn-action" onclick={onSearchLibrary} title="Search library (F)">
+		<button class="btn-secondary" onclick={onSearchLibrary} title="Search library (F)">
 			<Search size={16} />
 			Search
 		</button>
-		<button class="btn-action" onclick={onCreateToken} title="Create token (W)">
+		<button class="btn-secondary" onclick={onCreateToken} title="Create token (W)">
 			<Plus size={16} />
 			Token
 		</button>
@@ -119,7 +129,7 @@
 				Turn {turnNumber}{activePlayerName ? ` · ${activePlayerName}` : ''}
 			</span>
 		</div>
-		<button class="btn-action btn-next-turn" onclick={onNextTurn} title="Next turn (E)">
+		<button class="btn-primary" onclick={onNextTurn} title="Next turn (E)">
 			<FastForward size={16} />
 			Next Turn
 		</button>

@@ -6,7 +6,7 @@
 
 import type { Deck } from '$lib/types/deck';
 import type { CardView } from '$lib/generated/mage/v1/models';
-import type { PlaytestPlayer } from '$lib/stores/playtest-game';
+import type { PlaytestPlayer } from '$lib/types/gamestore';
 import { getDeckDetails } from '$lib/api/decks';
 import { ZoneId } from '$lib/utils/zones';
 import { shuffleArray } from '$lib/utils/playtest-helpers';

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import ManaSymbol from '$lib/components/mtg/ManaSymbol.svelte';
 	import {
 		getScryfallImageUrl,
-		getScryfallVersionForSize,
-		getScryfallTokenSearchUrl
+		getScryfallTokenSearchUrl,
+		getScryfallVersionForSize
 	} from '$lib/utils/scryfall';
-	import ManaSymbol from '$lib/components/mtg/ManaSymbol.svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	// Props
 	let {
@@ -294,9 +294,11 @@
 
 	// Debug the power and toughness values whenever they change
 	$effect(() => {
-		console.log('power', power);
-		console.log('toughness', toughness);
-		console.log('hasPowerToughness', hasPowerToughness);
+		console.log(
+			power !== '' || toughness !== ''
+				? `Card ${cardName} has P/T ${power}/${toughness}`
+				: `Card ${cardName} has no P/T, its a ${cardType}`
+		);
 	});
 </script>
 

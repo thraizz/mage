@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Card as CardType } from '../types';
-	import Card from './Card.svelte';
+	import Card from './game/Card.svelte';
 
 	interface Props {
 		cards: CardType[];
@@ -17,7 +17,15 @@
 
 	<div class="cards-grid">
 		{#each cards as cardItem (cardItem.id)}
-			<Card card={cardItem} onclick={() => onCardClick?.(cardItem)} />
+			<Card
+				cardId={cardItem.id}
+				cardName={cardItem.name}
+				cardType={cardItem.type}
+				power={cardItem.power || ''}
+				toughness={cardItem.toughness || ''}
+				isTapped={cardItem.tapped}
+				onclick={() => onCardClick?.(cardItem)}
+			/>
 		{/each}
 	</div>
 

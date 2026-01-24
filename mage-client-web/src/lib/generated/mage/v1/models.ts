@@ -304,6 +304,8 @@ export interface PlayerView {
   keptHand: boolean;
   /** Server-computed: does this player have any legal actions right now? */
   hasAvailableActions: boolean;
+  /** Number of times this player has mulliganed this game */
+  mulliganCount: number;
 }
 
 /** CardView represents a card */
@@ -2092,6 +2094,7 @@ function createBasePlayerView(): PlayerView {
     wins: 0,
     keptHand: false,
     hasAvailableActions: false,
+    mulliganCount: 0,
   };
 }
 
@@ -2153,6 +2156,9 @@ export const PlayerView: MessageFns<PlayerView> = {
     }
     if (message.hasAvailableActions !== false) {
       writer.uint32(144).bool(message.hasAvailableActions);
+    }
+    if (message.mulliganCount !== 0) {
+      writer.uint32(160).int32(message.mulliganCount);
     }
     return writer;
   },
@@ -2316,6 +2322,14 @@ export const PlayerView: MessageFns<PlayerView> = {
           message.hasAvailableActions = reader.bool();
           continue;
         }
+        case 20: {
+          if (tag !== 160) {
+            break;
+          }
+
+          message.mulliganCount = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2348,6 +2362,7 @@ export const PlayerView: MessageFns<PlayerView> = {
       wins: isSet(object.wins) ? globalThis.Number(object.wins) : 0,
       keptHand: isSet(object.keptHand) ? globalThis.Boolean(object.keptHand) : false,
       hasAvailableActions: isSet(object.hasAvailableActions) ? globalThis.Boolean(object.hasAvailableActions) : false,
+      mulliganCount: isSet(object.mulliganCount) ? globalThis.Number(object.mulliganCount) : 0,
     };
   },
 
@@ -2410,6 +2425,9 @@ export const PlayerView: MessageFns<PlayerView> = {
     if (message.hasAvailableActions !== false) {
       obj.hasAvailableActions = message.hasAvailableActions;
     }
+    if (message.mulliganCount !== 0) {
+      obj.mulliganCount = Math.round(message.mulliganCount);
+    }
     return obj;
   },
 
@@ -2439,6 +2457,7 @@ export const PlayerView: MessageFns<PlayerView> = {
     message.wins = object.wins ?? 0;
     message.keptHand = object.keptHand ?? false;
     message.hasAvailableActions = object.hasAvailableActions ?? false;
+    message.mulliganCount = object.mulliganCount ?? 0;
     return message;
   },
 };

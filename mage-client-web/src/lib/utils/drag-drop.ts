@@ -106,8 +106,7 @@ function createDragDropStore() {
 		cardName: string,
 		sourceZone: SourceZone,
 		startX: number,
-		startY: number,
-		validZones: DropZone[] = ['battlefield']
+		startY: number
 	): void {
 		update((state) => ({
 			...state,
@@ -117,7 +116,6 @@ function createDragDropStore() {
 			sourceZone,
 			position: { x: startX, y: startY },
 			startPosition: { x: startX, y: startY },
-			validDropZones: validZones,
 			currentDropZone: 'none',
 			isOverValidZone: false
 		}));
@@ -140,25 +138,22 @@ function createDragDropStore() {
 		if (!state.isDragging) return;
 
 		// Check which drop zone we're over
-		const currentZone = detectDropZone(x, y, state.validDropZones);
-		const isValid = currentZone !== 'none' && state.validDropZones.includes(currentZone);
+		const currentZone = detectDropZone(x, y);
 
 		update((s) => ({
 			...s,
 			position: { x, y },
 			currentDropZone: currentZone,
-			isOverValidZone: isValid
+			isOverValidZone: currentZone !== 'none'
 		}));
 	}
 
 	/**
 	 * Detect which drop zone contains the given coordinates
 	 */
-	function detectDropZone(x: number, y: number, validZones: DropZone[]): DropZone {
+	function detectDropZone(x: number, y: number): DropZone {
 		const zones = Array.from(dropZones.values());
 		for (const zone of zones) {
-			if (!validZones.includes(zone.type)) continue;
-
 			const rect = zone.element.getBoundingClientRect();
 			const isInside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 
@@ -292,25 +287,8 @@ export const currentDropZone = derived(dragDropStore, ($state) => $state.current
  * Check if a card can be played from hand
  * This is a utility function to determine valid drop zones based on card type
  */
-export function getValidDropZonesForCard(
-	cardType: string,
-	phase: string,
-	hasPriority: boolean
-): DropZone[] {
-	if (!hasPriority) return [];
-
-	const isLand = cardType.toLowerCase().includes('land');
-	const isMainPhase =
-		phase.includes('MAIN') || phase === 'PRECOMBAT_MAIN' || phase === 'POSTCOMBAT_MAIN';
-
-	// Lands can only be played during main phase
-	if (isLand) {
-		return isMainPhase ? ['battlefield'] : [];
-	}
-
-	// Spells can be cast whenever player has priority (with mana)
-	// The actual validation happens server-side
-	return ['battlefield'];
+export function getValidDropZonesForCard(): DropZone[] {
+	return ['battlefield', 'graveyard', 'exile', 'library', 'command', 'stack'];
 }
 
 /**

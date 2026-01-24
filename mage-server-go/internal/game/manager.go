@@ -394,9 +394,15 @@ func (a *engineNotificationAdapter) NotifyGameStateChange(playerID string, gameV
 		return
 	}
 
+	// Extract GameID from the view
+	var gameID string
+	if view, ok := gameView.(*PlaytestGameView); ok && view != nil {
+		gameID = view.GameID
+	}
+
 	notification := GameNotification{
 		Type:      "GAME_UPDATE",
-		GameID:    "", // Will be set from gameView if available
+		GameID:    gameID,
 		PlayerID:  playerID,
 		Timestamp: time.Now(),
 		Data:      map[string]interface{}{"view": gameView},

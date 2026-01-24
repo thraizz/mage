@@ -1,100 +1,67 @@
 <script lang="ts">
 	// From playtest/+page.svelte lines 1-110: Imports and setup
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { createGamePageController } from '$lib/controllers/game-page-controller';
 	import { auth } from '$lib/stores/auth';
-
+	import { onMount } from 'svelte';
 	// CHANGE: Import multiplayerGameStore instead of playtestGameStore
 	import {
-		multiplayerGameStore,
-		multiplayerPlayers,
-		multiplayerLocalPlayer,
-		multiplayerOpponents,
+		multiplayerActiveControlSeat,
 		multiplayerBattlefield,
 		multiplayerExile,
-		multiplayerActiveControlSeat,
+		multiplayerGameStore,
 		multiplayerIsInitialized,
-		type PlaytestPlayer,
-		type ScrySession
+		multiplayerLocalPlayer,
+		multiplayerOpponents,
+		multiplayerPlayers
 	} from '$lib/stores/multiplayer-game';
 
+	import { createGameUIState } from '$lib/stores/game-ui-state.svelte';
 	import { toast } from '$lib/stores/toast';
-
 	// Game components (from playtest/+page.svelte lines 20-46)
-	import Card from '$lib/components/game/Card.svelte';
-	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
-	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
-	import CreateTokenDialog from '$lib/components/game/CreateTokenDialog.svelte';
-	import CounterDialog from '$lib/components/game/CounterDialog.svelte';
-	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte';
-	import NumberInputDialog from '$lib/components/game/NumberInputDialog.svelte';
-	import ScryDialog from '$lib/components/game/ScryDialog.svelte';
-	import RevealTopDialog from '$lib/components/game/RevealTopDialog.svelte';
-	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
-	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
-	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
 	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
+	import CounterDialog from '$lib/components/game/CounterDialog.svelte';
+	import CreateTokenDialog from '$lib/components/game/CreateTokenDialog.svelte';
+	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte';
 	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
-
+	import NumberInputDialog from '$lib/components/game/NumberInputDialog.svelte';
+	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
+	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
+	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
+	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
+	import RevealTopDialog from '$lib/components/game/RevealTopDialog.svelte';
+	import ScryDialog from '$lib/components/game/ScryDialog.svelte';
+	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	// ADD: Multiplayer components
 	import GameChatOverlay from '$lib/components/game/GameChatOverlay.svelte';
 
 	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import X from '@lucide/svelte/icons/x';
-	import Eye from '@lucide/svelte/icons/eye';
-	import EyeOff from '@lucide/svelte/icons/eye-off';
-	import Heart from '@lucide/svelte/icons/heart';
 
+	import LibrarySearch from '$lib/components/game/LibrarySearch.svelte';
+	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import {
+		currentDropZone,
 		dragDropStore,
-		isDragging as isDraggingStore,
 		draggedCardName,
 		dragPosition,
+		isDragging as isDraggingStore,
 		isOverValidDropZone,
-		currentDropZone,
-		getAllValidDropZones,
 		type SourceZone
 	} from '$lib/utils/drag-drop';
 	import { getScryfallImageUrl } from '$lib/utils/scryfall';
+	import { useDropZones } from '$lib/utils/use-drop-zones.svelte';
 
 	// Page data from load function (CHANGE: Initialize from URL params)
 	const { data } = $props<{ data: { gameId: string } }>();
 
-	// State (from playtest/+page.svelte lines 58-92)
+	// State
 	let loading = $state(true);
 	let error = $state<string | null>(null);
-	let showTokenCreator = $state(false);
-	let showCreateTokenDialog = $state(false);
-	let showCounterDialog = $state(false);
-	let selectedCardForCounters = $state<{ id: string; name: string } | null>(null);
-	let showKeyboardShortcuts = $state(false);
-	let showAllHands = $state(false);
-	let showMenu = $state(false);
-	let hoveredCardId = $state<string | null>(null);
-	let showLifeMenu = $state(false);
-	let lifeMenuEl: HTMLDivElement | null = $state(null);
-	let showDebugOverlay = $state(false);
-	let selectedOpponentId = $state<string | null>(null);
-	let showOpponentLifeMenu = $state(false);
-	let opponentLifeMenuEl: HTMLDivElement | null = $state(null);
-	let showDeckSearch = $state(false);
 
-	// Deck context menu and dialog state (from playtest/+page.svelte lines 77-92)
-	let showDeckContextMenu = $state(false);
-	let deckContextMenuPosition = $state<{ x: number; y: number }>({ x: 0, y: 0 });
-	let showNumberInputDialog = $state(false);
-	let numberInputDialogConfig = $state<{
-		title: string;
-		defaultValue: number;
-		min: number;
-		max: number;
-		onConfirm: (value: number) => void;
-	} | null>(null);
-	let showScryDialog = $state(false);
-	let currentScrySession = $state<ScrySession | null>(null);
-	let showRevealTopDialog = $state(false);
-	let revealedCards = $state<import('$lib/generated/mage/v1/models').CardView[]>([]);
+	// Shared UI state
+	const uiState = createGameUIState();
 
 	// Drag-drop state (from playtest/+page.svelte lines 96-102)
 	const isDragging = $derived($isDraggingStore);
@@ -106,19 +73,13 @@
 	// Game log (from playtest/+page.svelte line 104)
 	const gameLog = $derived($multiplayerGameStore.log || []);
 
-	// Drop zone elements (from playtest/+page.svelte lines 106-118)
+	// Drop zone elements
 	let battlefieldDropZoneEl: HTMLDivElement | null = $state(null);
 	let graveyardDropZoneEl: HTMLElement | null = $state(null);
 	let exileDropZoneEl: HTMLElement | null = $state(null);
 	let handDropZoneEl: HTMLElement | null = $state(null);
 	let libraryDropZoneEl: HTMLElement | null = $state(null);
 	let commandDropZoneEl: HTMLElement | null = $state(null);
-	let dropZoneUnregister: (() => void) | null = null;
-	let graveyardDropZoneUnregister: (() => void) | null = null;
-	let exileDropZoneUnregister: (() => void) | null = null;
-	let handDropZoneUnregister: (() => void) | null = null;
-	let libraryDropZoneUnregister: (() => void) | null = null;
-	let commandDropZoneUnregister: (() => void) | null = null;
 
 	// Battlefield drag state (from playtest/+page.svelte lines 120-123)
 	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
@@ -142,10 +103,13 @@
 	// Selected opponent (from playtest/+page.svelte lines 142-150)
 	const selectedOpponent = $derived.by(() => {
 		if (otherPlayers.length === 0) return null;
-		if (!selectedOpponentId || !otherPlayers.find((p) => p.playerId === selectedOpponentId)) {
+		if (
+			!uiState.selectedOpponentId ||
+			!otherPlayers.find((p) => p.playerId === uiState.selectedOpponentId)
+		) {
 			return otherPlayers[0];
 		}
-		return otherPlayers.find((p) => p.playerId === selectedOpponentId) || otherPlayers[0];
+		return otherPlayers.find((p) => p.playerId === uiState.selectedOpponentId) || otherPlayers[0];
 	});
 
 	// Split battlefield by controller (from playtest/+page.svelte lines 152-172)
@@ -174,9 +138,9 @@
 		me?.manaPool || { white: 0, blue: 0, black: 0, red: 0, green: 0, colorless: 0 }
 	);
 
-	// Reactive card lookup for counter dialog (from playtest/+page.svelte lines 180-203)
+	// Reactive card lookup for counter dialog
 	const selectedCardForCountersData = $derived.by(() => {
-		const currentId = selectedCardForCounters?.id;
+		const currentId = uiState.selectedCardForCounters?.id;
 		if (!currentId) return null;
 
 		const card =
@@ -188,9 +152,9 @@
 		return card;
 	});
 
-	// Hovered card (from playtest/+page.svelte lines 205-208)
+	// Hovered card
 	const hoveredCard = $derived(
-		hoveredCardId ? battlefield.find((c) => c.id === hoveredCardId) : null
+		uiState.hoveredCardId ? battlefield.find((c) => c.id === uiState.hoveredCardId) : null
 	);
 
 	const activePlayerName = $derived.by(() => {
@@ -218,6 +182,53 @@
 	});
 
 	const isCommanderGame = $derived(commandCards.length > 0);
+
+	let selectedCardIds = $state<string[]>([]);
+	let playingCardIds = $state<string[]>([]);
+
+	// NOTE: We are not consindering priority anymore in the rules-light engine
+	// const hasPriority = $derived($multiplayerGameStore.activePlayerId === me?.playerId);
+
+	// Create game page controller
+	const controller = createGamePageController(
+		{
+			gameStore: multiplayerGameStore,
+			getState: () => $multiplayerGameStore,
+			getLocalPlayer: () => me,
+			getPlayers: () => players,
+			getBattlefield: () => battlefield
+		},
+		{
+			setScryDialog: (show, session) => {
+				uiState.showScryDialog = show;
+				uiState.currentScrySession = session;
+			},
+			setRevealTopDialog: (show, cards) => {
+				uiState.showRevealTopDialog = show;
+				uiState.revealedCards = cards;
+			},
+			setNumberInputDialog: (config) => {
+				uiState.showNumberInputDialog = config.show;
+				if (config.show && config.title && config.onConfirm) {
+					uiState.numberInputDialogConfig = {
+						title: config.title,
+						defaultValue: config.defaultValue || 1,
+						min: 1,
+						max: 99,
+						onConfirm: config.onConfirm
+					};
+				} else {
+					uiState.numberInputDialogConfig = null;
+				}
+			},
+			setDeckContextMenu: (show, position) => {
+				uiState.showDeckContextMenu = show;
+				if (position) {
+					uiState.deckContextMenuPosition = position;
+				}
+			}
+		}
+	);
 
 	/**
 	 * Initialize from game ID (CHANGE: Server-based initialization)
@@ -250,70 +261,41 @@
 		}
 	}
 
-	/**
-	 * Handle life change (from playtest/+page.svelte lines 439-443)
-	 * CHANGE: Use multiplayerGameStore
-	 */
-	function handleLifeChange(delta: number, playerId?: string): void {
-		const targetPlayerId = playerId || me?.playerId;
-		if (!targetPlayerId) return;
-		multiplayerGameStore.modifyLife(targetPlayerId, delta);
-	}
+	// Use controller handlers (delegated to controller)
+	const handleLifeChange = controller.handleLifeChange;
+	const handlePoisonChange = controller.handlePoisonChange;
+	const handleDrawCard = controller.handleDrawCard;
+	const handleShuffleLibrary = controller.handleShuffleLibrary;
+	const handleUntapAll = controller.handleUntapAll;
+	const handleNextTurn = controller.handleNextTurn;
 
 	/**
-	 * Handle poison counter change (from playtest/+page.svelte lines 446-456)
-	 * CHANGE: Use multiplayerGameStore
+	 * Mulligan handlers
 	 */
-	function handlePoisonChange(delta: number, playerId?: string): void {
-		const targetPlayerId = playerId || me?.playerId;
-		if (!targetPlayerId) return;
-		const player = players.find((p) => p.playerId === targetPlayerId);
-		if (!player) return;
-		const newValue = Math.max(0, (player.poison || 0) + delta);
-		multiplayerGameStore.setPlayerCounter(targetPlayerId, 'poison', newValue);
-	}
+	const showMulliganDialog = $derived.by(() => {
+		// Show if game is initialized, player exists, and hasn't kept hand yet
+		return isInitialized && me && !me.keptHand;
+	});
 
-	/**
-	 * Draw a card (from playtest/+page.svelte lines 459-465)
-	 * CHANGE: Use multiplayerGameStore
-	 */
-	function handleDrawCard(): void {
+	async function handleKeepHand(): Promise<void> {
 		if (!me) return;
-		multiplayerGameStore.drawCards(me.playerId, 1);
-		toast.success('Drew a card');
+		try {
+			await multiplayerGameStore.keepHand(me.playerId);
+			// Server will broadcast GAME_UPDATE with keptHand=true, which will hide the dialog
+		} catch (err) {
+			console.error('Failed to keep hand:', err);
+			toast.error('Failed to keep hand');
+		}
 	}
 
-	/**
-	 * Shuffle library (from playtest/+page.svelte lines 467-474)
-	 * CHANGE: Use multiplayerGameStore
-	 */
-	function handleShuffleLibrary(): void {
+	async function handleMulligan(): Promise<void> {
 		if (!me) return;
-		multiplayerGameStore.shuffleLibrary(me.playerId);
-		toast.success('Shuffled library');
-	}
-
-	/**
-	 * Untap all permanents (from playtest/+page.svelte lines 476-483)
-	 * CHANGE: Use multiplayerGameStore
-	 */
-	function handleUntapAll(): void {
-		if (!me) return;
-		multiplayerGameStore.untapAll(me.playerId);
-		toast.success('Untapped all');
-	}
-
-	/**
-	 * Next turn (from playtest/+page.svelte lines 485-494)
-	 * CHANGE: Use multiplayerGameStore
-	 */
-	function handleNextTurn(): void {
-		multiplayerGameStore.nextTurn();
-		const newActivePlayer = players.find(
-			(p) => p.playerId === $multiplayerGameStore.activePlayerId
-		);
-		if (newActivePlayer) {
-			toast.info(`${newActivePlayer.name}'s turn`);
+		try {
+			await multiplayerGameStore.mulligan(me.playerId);
+			// Server will broadcast GAME_UPDATE with new hand, keptHand will remain false
+		} catch (err) {
+			console.error('Failed to mulligan:', err);
+			toast.error('Failed to mulligan');
 		}
 	}
 
@@ -323,8 +305,8 @@
 	 */
 	function handleDeckContextMenu(event: MouseEvent): void {
 		if (!me) return;
-		deckContextMenuPosition = { x: event.clientX, y: event.clientY };
-		showDeckContextMenu = true;
+		uiState.deckContextMenuPosition = { x: event.clientX, y: event.clientY };
+		uiState.showDeckContextMenu = true;
 	}
 
 	function handleDrawN(count: number): void {
@@ -343,8 +325,8 @@
 		if (!me) return;
 		const session = multiplayerGameStore.scryCards(me.playerId, count);
 		if (session) {
-			currentScrySession = session;
-			showScryDialog = true;
+			uiState.currentScrySession = session;
+			uiState.showScryDialog = true;
 		} else {
 			toast.error('No cards to scry');
 		}
@@ -354,19 +336,19 @@
 		keepOnTop: import('$lib/generated/mage/v1/models').CardView[],
 		putToBottom: import('$lib/generated/mage/v1/models').CardView[]
 	): void {
-		if (!me || !currentScrySession) return;
-		const scryCount = currentScrySession.cards.length;
+		if (!me || !uiState.currentScrySession) return;
+		const scryCount = uiState.currentScrySession.cards.length;
 		multiplayerGameStore.applyScryDecision(me.playerId, scryCount, keepOnTop, putToBottom);
-		showScryDialog = false;
-		currentScrySession = null;
+		uiState.showScryDialog = false;
+		uiState.currentScrySession = null;
 		toast.success(`Scry ${scryCount} complete`);
 	}
 
 	function handleRevealTop(count: number): void {
 		if (!me) return;
 		const cards = multiplayerGameStore.revealTopCards(me.playerId, count);
-		revealedCards = cards;
-		showRevealTopDialog = true;
+		uiState.revealedCards = cards;
+		uiState.showRevealTopDialog = true;
 	}
 
 	function handleToggleRevealedTop(): void {
@@ -381,18 +363,18 @@
 		defaultValue: number,
 		onConfirm: (value: number) => void
 	): void {
-		numberInputDialogConfig = {
+		uiState.numberInputDialogConfig = {
 			title,
 			defaultValue,
 			min: 1,
 			max: 99,
 			onConfirm: (value) => {
 				onConfirm(value);
-				showNumberInputDialog = false;
-				numberInputDialogConfig = null;
+				uiState.showNumberInputDialog = false;
+				uiState.numberInputDialogConfig = null;
 			}
 		};
-		showNumberInputDialog = true;
+		uiState.showNumberInputDialog = true;
 	}
 
 	const deckContextMenuActions = $derived<MenuAction[]>(
@@ -441,7 +423,7 @@
 					{
 						label: 'Search Library',
 						onClick: () => {
-							showDeckSearch = true;
+							uiState.showDeckSearch = true;
 						}
 					},
 					{
@@ -486,14 +468,12 @@
 
 			if (distance >= DRAG_THRESHOLD) {
 				battlefieldIsDragPending = false;
-				const validZones = getAllValidDropZones('battlefield' as SourceZone);
 				dragDropStore.startDrag(
 					cardId,
 					cardName,
 					'battlefield' as SourceZone,
 					moveEvent.clientX,
-					moveEvent.clientY,
-					validZones
+					moveEvent.clientY
 				);
 
 				document.removeEventListener('mousemove', handleMouseMove);
@@ -533,14 +513,12 @@
 
 			if (distance >= DRAG_THRESHOLD) {
 				commandIsDragPending = false;
-				const validZones = getAllValidDropZones('command' as SourceZone);
 				dragDropStore.startDrag(
 					cardId,
 					cardName,
 					'command' as SourceZone,
 					moveEvent.clientX,
-					moveEvent.clientY,
-					validZones
+					moveEvent.clientY
 				);
 
 				document.removeEventListener('mousemove', handleMouseMove);
@@ -594,49 +572,49 @@
 
 		switch (key) {
 			case 'm':
-				showMenu = !showMenu;
+				uiState.showMenu = !uiState.showMenu;
 				event.preventDefault();
 				break;
 			case 'escape':
-				if (showMenu) {
-					showMenu = false;
+				if (uiState.showMenu) {
+					uiState.showMenu = false;
 					event.preventDefault();
-				} else if (showKeyboardShortcuts) {
-					showKeyboardShortcuts = false;
+				} else if (uiState.showKeyboardShortcuts) {
+					uiState.showKeyboardShortcuts = false;
 					event.preventDefault();
-				} else if (showScryDialog) {
-					showScryDialog = false;
-					currentScrySession = null;
+				} else if (uiState.showScryDialog) {
+					uiState.showScryDialog = false;
+					uiState.currentScrySession = null;
 					event.preventDefault();
-				} else if (showRevealTopDialog) {
-					showRevealTopDialog = false;
-					revealedCards = [];
+				} else if (uiState.showRevealTopDialog) {
+					uiState.showRevealTopDialog = false;
+					uiState.revealedCards = [];
 					event.preventDefault();
-				} else if (showNumberInputDialog) {
-					showNumberInputDialog = false;
-					numberInputDialogConfig = null;
+				} else if (uiState.showNumberInputDialog) {
+					uiState.showNumberInputDialog = false;
+					uiState.numberInputDialogConfig = null;
 					event.preventDefault();
-				} else if (showDeckContextMenu) {
-					showDeckContextMenu = false;
+				} else if (uiState.showDeckContextMenu) {
+					uiState.showDeckContextMenu = false;
 					event.preventDefault();
-				} else if (showTokenCreator) {
-					showTokenCreator = false;
+				} else if (uiState.showTokenCreator) {
+					uiState.showTokenCreator = false;
 					event.preventDefault();
-				} else if (showCreateTokenDialog) {
-					showCreateTokenDialog = false;
+				} else if (uiState.showCreateTokenDialog) {
+					uiState.showCreateTokenDialog = false;
 					event.preventDefault();
-				} else if (showCounterDialog) {
-					showCounterDialog = false;
-					selectedCardForCounters = null;
+				} else if (uiState.showCounterDialog) {
+					uiState.showCounterDialog = false;
+					uiState.selectedCardForCounters = null;
 					event.preventDefault();
 				}
 				break;
 			case '?':
-				showKeyboardShortcuts = !showKeyboardShortcuts;
+				uiState.showKeyboardShortcuts = !uiState.showKeyboardShortcuts;
 				event.preventDefault();
 				break;
 			case 'f':
-				showDeckSearch = true;
+				uiState.showDeckSearch = true;
 				event.preventDefault();
 				break;
 			case 'x':
@@ -656,149 +634,64 @@
 				event.preventDefault();
 				break;
 			case 'w':
-				showCreateTokenDialog = true;
+				uiState.showCreateTokenDialog = true;
 				event.preventDefault();
 				break;
 		}
 
-		// Hover card shortcuts (from playtest/+page.svelte lines 1032-1056)
+		// Hover card shortcuts - use controller
 		if (hoveredCard) {
-			switch (key) {
-				case 'd':
-					multiplayerGameStore.moveCardToZone(hoveredCard.id, 'GRAVEYARD');
-					event.preventDefault();
-					break;
-				case 's':
-					multiplayerGameStore.moveCardToZone(hoveredCard.id, 'EXILE');
-					event.preventDefault();
-					break;
-				case 'r':
-					multiplayerGameStore.moveCardToZone(hoveredCard.id, 'HAND');
-					event.preventDefault();
-					break;
-				case 't':
-					multiplayerGameStore.moveCardToZone(hoveredCard.id, 'LIBRARY');
-					event.preventDefault();
-					break;
-				case 'k':
-					selectedCardForCounters = { id: hoveredCard.id, name: hoveredCard.name };
-					showCounterDialog = true;
-					event.preventDefault();
-					break;
+			const handled = controller.handleHoveredCardShortcut(key, hoveredCard.id);
+			if (handled) {
+				event.preventDefault();
+			} else if (key === 'k') {
+				// Counter dialog shortcut (not in controller)
+				uiState.selectedCardForCounters = { id: hoveredCard.id, name: hoveredCard.name };
+				uiState.showCounterDialog = true;
+				event.preventDefault();
 			}
 		}
 	}
 
+	function handleSelectCard(cardId: string, isMultiSelect: boolean) {
+		if (isMultiSelect) {
+			// Toggle in selection
+			if (selectedCardIds.includes(cardId)) {
+				selectedCardIds = selectedCardIds.filter((id) => id !== cardId);
+			} else {
+				selectedCardIds = [...selectedCardIds, cardId];
+			}
+		} else {
+			// Single select - toggle or replace
+			selectedCardIds = selectedCardIds.includes(cardId) ? [] : [cardId];
+		}
+	}
+
+	function handleClearSelection() {
+		selectedCardIds = [];
+	}
+
 	/**
-	 * Register drop zones (from playtest/+page.svelte lines 1059-1168)
+	 * Register all drop zones using shared helper
 	 */
-	$effect(() => {
-		if (battlefieldDropZoneEl && !dropZoneUnregister) {
-			dropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'battlefield',
-				type: 'battlefield',
-				element: battlefieldDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'battlefield',
-				onDrop: handleBattlefieldDrop
-			});
+	useDropZones(
+		() => ({
+			battlefield: battlefieldDropZoneEl,
+			graveyard: graveyardDropZoneEl,
+			exile: exileDropZoneEl,
+			hand: handDropZoneEl,
+			library: libraryDropZoneEl,
+			command: commandDropZoneEl
+		}),
+		{
+			onBattlefieldDrop: handleBattlefieldDrop,
+			onGraveyardDrop: (cardId) => handleZoneDrop(cardId, 'GRAVEYARD'),
+			onExileDrop: (cardId) => handleZoneDrop(cardId, 'EXILE'),
+			onHandDrop: (cardId) => handleZoneDrop(cardId, 'HAND'),
+			onLibraryDrop: (cardId) => handleZoneDrop(cardId, 'LIBRARY'),
+			onCommandDrop: (cardId) => handleZoneDrop(cardId, 'COMMAND')
 		}
-		return () => {
-			if (dropZoneUnregister) {
-				dropZoneUnregister();
-				dropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (graveyardDropZoneEl && !graveyardDropZoneUnregister) {
-			graveyardDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'graveyard',
-				type: 'graveyard',
-				element: graveyardDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'graveyard',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'GRAVEYARD')
-			});
-		}
-		return () => {
-			if (graveyardDropZoneUnregister) {
-				graveyardDropZoneUnregister();
-				graveyardDropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (exileDropZoneEl && !exileDropZoneUnregister) {
-			exileDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'exile',
-				type: 'exile',
-				element: exileDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'exile',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'EXILE')
-			});
-		}
-		return () => {
-			if (exileDropZoneUnregister) {
-				exileDropZoneUnregister();
-				exileDropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (handDropZoneEl && !handDropZoneUnregister) {
-			handDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'hand',
-				type: 'hand',
-				element: handDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'hand',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'HAND')
-			});
-		}
-		return () => {
-			if (handDropZoneUnregister) {
-				handDropZoneUnregister();
-				handDropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (libraryDropZoneEl && !libraryDropZoneUnregister) {
-			libraryDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'library',
-				type: 'library',
-				element: libraryDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'library',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'LIBRARY')
-			});
-		}
-		return () => {
-			if (libraryDropZoneUnregister) {
-				libraryDropZoneUnregister();
-				libraryDropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (commandDropZoneEl && !commandDropZoneUnregister) {
-			commandDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'command',
-				type: 'command',
-				element: commandDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'command',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'COMMAND')
-			});
-		}
-		return () => {
-			if (commandDropZoneUnregister) {
-				commandDropZoneUnregister();
-				commandDropZoneUnregister = null;
-			}
-		};
-	});
+	);
 
 	// Initialize on mount (CHANGE: Server-based initialization)
 	onMount(() => {
@@ -832,83 +725,59 @@
 	{:else}
 		<!-- Template from playtest/+page.svelte lines 1378+ adapted for multiplayer -->
 		<PlaytestHeader
+			isMultiplayer={true}
 			{players}
 			{activeControlSeat}
 			availableSessions={0}
 			{turnNumber}
 			{activePlayerName}
-			{showAllHands}
+			showAllHands={uiState.showAllHands}
 			onBack={() => goto('/lobby')}
 			onSessionsClick={() => {}}
 			onSwitchPlayer={(playerId) => multiplayerGameStore.switchControlSeat(playerId)}
-			onToggleAllHands={() => (showAllHands = !showAllHands)}
+			onToggleAllHands={() => (uiState.showAllHands = !uiState.showAllHands)}
 			onDrawCard={handleDrawCard}
 			onUntapAll={handleUntapAll}
 			onShuffleLibrary={handleShuffleLibrary}
-			onSearchLibrary={() => (showDeckSearch = true)}
-			onCreateToken={() => (showCreateTokenDialog = true)}
+			onSearchLibrary={() => (uiState.showDeckSearch = true)}
+			onCreateToken={() => (uiState.showCreateTokenDialog = true)}
 			onNextTurn={handleNextTurn}
-			onShowKeyboardShortcuts={() => (showKeyboardShortcuts = true)}
-			onShowDebug={() => (showDebugOverlay = true)}
-			onToggleMenu={() => (showMenu = !showMenu)}
+			onShowKeyboardShortcuts={() => (uiState.showKeyboardShortcuts = true)}
+			onShowDebug={() => (uiState.showDebugOverlay = true)}
+			onToggleMenu={() => (uiState.showMenu = !uiState.showMenu)}
 		/>
 
 		<!-- Menu Overlay (from playtest/+page.svelte lines 1403-1514) -->
-		{#if showMenu}
+		{#if uiState.showMenu}
 			<div
 				class="menu-backdrop"
 				role="button"
 				tabindex="0"
-				onclick={() => (showMenu = false)}
-				onkeydown={(e) => e.key === 'Escape' && (showMenu = false)}
+				onclick={() => (uiState.showMenu = false)}
+				onkeydown={(e) => e.key === 'Escape' && (uiState.showMenu = false)}
 			></div>
 
 			<div class="menu-overlay open">
 				<div class="menu-header">
 					<h2>Menu</h2>
-					<button class="menu-close-btn" onclick={() => (showMenu = false)} aria-label="Close menu">
+					<button
+						class="menu-close-btn"
+						onclick={() => (uiState.showMenu = false)}
+						aria-label="Close menu"
+					>
 						<X size={24} />
 					</button>
 				</div>
 
 				<div class="menu-content">
 					<div class="menu-section">
-						<h3 class="menu-section-title">Controls</h3>
-						<div class="menu-section-content">
-							<label>
-								<span class="menu-label">Controlling:</span>
-								<select
-									class="control-select"
-									value={activeControlSeat}
-									onchange={(e) => multiplayerGameStore.switchControlSeat(e.currentTarget.value)}
-								>
-									{#each players as player}
-										<option value={player.playerId}>{player.name}</option>
-									{/each}
-								</select>
-							</label>
-
-							<button class="menu-btn" onclick={() => (showAllHands = !showAllHands)}>
-								{#if showAllHands}
-									<EyeOff size={16} />
-									Hide
-								{:else}
-									<Eye size={16} />
-									Show
-								{/if}
-								All Hands
-							</button>
-						</div>
-					</div>
-
-					<div class="menu-section">
 						<h3 class="menu-section-title">Utilities</h3>
 						<div class="menu-section-content">
 							<button
 								class="menu-btn"
 								onclick={() => {
-									showKeyboardShortcuts = true;
-									showMenu = false;
+									uiState.showKeyboardShortcuts = true;
+									uiState.showMenu = false;
 								}}
 							>
 								<Keyboard size={18} />
@@ -927,25 +796,6 @@
 			</div>
 		{/if}
 
-		<!-- All Hands Overlay (from playtest/+page.svelte lines 1516-1533) -->
-		{#if showAllHands}
-			<div class="all-hands-overlay">
-				{#each players as player}
-					<div class="player-hand-compact" class:active={player.playerId === activeControlSeat}>
-						<div class="compact-header">
-							<span class="player-name-compact">{player.name}</span>
-							<span class="life-compact"><Heart size={14} /> {player.life}</span>
-						</div>
-						<div class="cards-compact">
-							{#each player.hand as card}
-								<Card cardId={card.id} cardName={card.name} size="large" manaCost={card.manaCost} />
-							{/each}
-						</div>
-					</div>
-				{/each}
-			</div>
-		{/if}
-
 		<!-- Main Game Area (from playtest/+page.svelte lines 1535-1677) -->
 		<main class="game-layout">
 			<!-- Opponent Section(s) -->
@@ -959,14 +809,14 @@
 						battlefieldLands={opponentBattlefieldLands}
 						commandCards={opponentCommandCards}
 						{isCommanderGame}
-						showLifeMenu={showOpponentLifeMenu}
-						onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+						showLifeMenu={uiState.showOpponentLifeMenu}
+						onSelectOpponent={(playerId) => (uiState.selectedOpponentId = playerId)}
 						onLifeChange={handleLifeChange}
 						onPoisonChange={handlePoisonChange}
-						onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+						onToggleLifeMenu={() => (uiState.showOpponentLifeMenu = !uiState.showOpponentLifeMenu)}
 						onCardContextMenu={(cardId, cardName) => {
-							selectedCardForCounters = { id: cardId, name: cardName };
-							showCounterDialog = true;
+							uiState.selectedCardForCounters = { id: cardId, name: cardName };
+							uiState.showCounterDialog = true;
 						}}
 					/>
 				{/if}
@@ -995,8 +845,8 @@
 							onPoisonChange={handlePoisonChange}
 							onToggleLifeMenu={() => {}}
 							onCardContextMenu={(cardId, cardName) => {
-								selectedCardForCounters = { id: cardId, name: cardName };
-								showCounterDialog = true;
+								uiState.selectedCardForCounters = { id: cardId, name: cardName };
+								uiState.showCounterDialog = true;
 							}}
 						/>
 					{/each}
@@ -1011,14 +861,15 @@
 							battlefieldLands={opponentBattlefieldLands}
 							commandCards={opponentCommandCards}
 							{isCommanderGame}
-							showLifeMenu={showOpponentLifeMenu}
-							onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+							showLifeMenu={uiState.showOpponentLifeMenu}
+							onSelectOpponent={(playerId) => (uiState.selectedOpponentId = playerId)}
 							onLifeChange={handleLifeChange}
 							onPoisonChange={handlePoisonChange}
-							onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+							onToggleLifeMenu={() =>
+								(uiState.showOpponentLifeMenu = !uiState.showOpponentLifeMenu)}
 							onCardContextMenu={(cardId, cardName) => {
-								selectedCardForCounters = { id: cardId, name: cardName };
-								showCounterDialog = true;
+								uiState.selectedCardForCounters = { id: cardId, name: cardName };
+								uiState.showCounterDialog = true;
 							}}
 						/>
 					{/if}
@@ -1034,15 +885,15 @@
 				{isDragging}
 				{isOverValidDrop}
 				{dropZone}
-				{hoveredCardId}
+				hoveredCardId={uiState.hoveredCardId}
 				onCardClick={handleBattlefieldCardClick}
 				onCardMouseDown={handleBattlefieldCardMouseDown}
 				onCardContextMenu={(cardId, cardName) => {
-					selectedCardForCounters = { id: cardId, name: cardName };
-					showCounterDialog = true;
+					uiState.selectedCardForCounters = { id: cardId, name: cardName };
+					uiState.showCounterDialog = true;
 				}}
 				onCommandCardMouseDown={handleCommandCardMouseDown}
-				onCardHover={(cardId) => (hoveredCardId = cardId)}
+				onCardHover={(cardId) => (uiState.hoveredCardId = cardId)}
 				battlefieldDropZoneRef={(el) => (battlefieldDropZoneEl = el)}
 				commandDropZoneRef={(el) => (commandDropZoneEl = el)}
 			/>
@@ -1059,11 +910,11 @@
 					graveyard={myGrave}
 					{exile}
 					mana={myMana}
-					{showLifeMenu}
+					showLifeMenu={uiState.showLifeMenu}
 					onLifeChange={handleLifeChange}
 					onPoisonChange={handlePoisonChange}
-					onToggleLifeMenu={() => (showLifeMenu = !showLifeMenu)}
-					onSearchLibrary={() => (showDeckSearch = true)}
+					onToggleLifeMenu={() => (uiState.showLifeMenu = !uiState.showLifeMenu)}
+					onSearchLibrary={() => (uiState.showDeckSearch = true)}
 					onDeckContextMenu={handleDeckContextMenu}
 					libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
 					graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
@@ -1079,6 +930,12 @@
 				class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
 			>
 				<PlayerHand
+					cards={me?.hand || []}
+					{selectedCardIds}
+					{playingCardIds}
+					hasPriority={true}
+					onSelectCard={handleSelectCard}
+					onClearSelection={handleClearSelection}
 					onCardClick={() => {}}
 					size="normal"
 					currentPhase="PRECOMBAT_MAIN"
@@ -1088,23 +945,23 @@
 		</main>
 
 		<!-- Token Creator -->
-		{#if showTokenCreator}
-			<TokenCreator gameId={data.gameId} onClose={() => (showTokenCreator = false)} />
+		{#if uiState.showTokenCreator}
+			<TokenCreator gameId={data.gameId} onClose={() => (uiState.showTokenCreator = false)} />
 		{/if}
 
 		<!-- Create Token Dialog -->
-		{#if showCreateTokenDialog}
+		{#if uiState.showCreateTokenDialog}
 			<CreateTokenDialog
 				onCreateToken={(name, types, power, toughness, color) => {
 					multiplayerGameStore.createToken(name, types, power, toughness, color);
-					showCreateTokenDialog = false;
+					uiState.showCreateTokenDialog = false;
 				}}
-				onClose={() => (showCreateTokenDialog = false)}
+				onClose={() => (uiState.showCreateTokenDialog = false)}
 			/>
 		{/if}
 
 		<!-- Counter Dialog -->
-		{#if showCounterDialog && selectedCardForCounters && selectedCardForCountersData}
+		{#if uiState.showCounterDialog && uiState.selectedCardForCounters && selectedCardForCountersData}
 			<CounterDialog
 				cardName={selectedCardForCountersData.name}
 				cardId={selectedCardForCountersData.id}
@@ -1122,15 +979,14 @@
 					multiplayerGameStore.setCounter(card.id, counterName, amount);
 				}}
 				onClose={() => {
-					showCounterDialog = false;
-					selectedCardForCounters = null;
+					uiState.showCounterDialog = false;
+					uiState.selectedCardForCounters = null;
 				}}
 			/>
 		{/if}
 
 		<!-- Deck Search -->
-		<!-- TODO: Re-enable when LibrarySearch component supports local data or when server-side library search is implemented
-		{#if showDeckSearch && me}
+		{#if uiState.showDeckSearch && me}
 			<LibrarySearch
 				gameId={data.gameId}
 				librarySearchData={{
@@ -1140,69 +996,81 @@
 					cards: me.library,
 					canCancel: true
 				}}
-				onComplete={() => (showDeckSearch = false)}
-				onCancel={() => (showDeckSearch = false)}
+				onComplete={() => (uiState.showDeckSearch = false)}
+				onCancel={() => (uiState.showDeckSearch = false)}
 			/>
 		{/if}
-		-->
 
 		<!-- Deck Context Menu -->
-		{#if showDeckContextMenu}
+		{#if uiState.showDeckContextMenu}
 			<DeckContextMenu
-				position={deckContextMenuPosition}
+				position={uiState.deckContextMenuPosition}
 				deckCount={me?.libraryCount || 0}
 				playerName={me?.name || 'You'}
-				onClose={() => (showDeckContextMenu = false)}
+				onClose={() => (uiState.showDeckContextMenu = false)}
 				actions={deckContextMenuActions}
 			/>
 		{/if}
 
 		<!-- Number Input Dialog -->
-		{#if showNumberInputDialog && numberInputDialogConfig}
+		{#if uiState.showNumberInputDialog && uiState.numberInputDialogConfig}
 			<NumberInputDialog
-				title={numberInputDialogConfig.title}
-				defaultValue={numberInputDialogConfig.defaultValue}
-				min={numberInputDialogConfig.min}
-				max={numberInputDialogConfig.max}
-				onConfirm={numberInputDialogConfig.onConfirm}
+				title={uiState.numberInputDialogConfig.title}
+				defaultValue={uiState.numberInputDialogConfig.defaultValue}
+				min={uiState.numberInputDialogConfig.min}
+				max={uiState.numberInputDialogConfig.max}
+				onConfirm={uiState.numberInputDialogConfig.onConfirm}
 				onCancel={() => {
-					showNumberInputDialog = false;
-					numberInputDialogConfig = null;
+					uiState.showNumberInputDialog = false;
+					uiState.numberInputDialogConfig = null;
 				}}
 			/>
 		{/if}
 
 		<!-- Scry Dialog -->
-		{#if showScryDialog && currentScrySession}
+		{#if uiState.showScryDialog && uiState.currentScrySession}
 			<ScryDialog
-				cards={currentScrySession.cards}
+				cards={uiState.currentScrySession.cards}
 				onComplete={handleScryComplete}
 				onCancel={() => {
-					showScryDialog = false;
-					currentScrySession = null;
+					uiState.showScryDialog = false;
+					uiState.currentScrySession = null;
 				}}
 			/>
 		{/if}
 
 		<!-- Reveal Top Dialog -->
-		{#if showRevealTopDialog}
+		{#if uiState.showRevealTopDialog}
 			<RevealTopDialog
-				cards={revealedCards}
+				cards={uiState.revealedCards}
 				onClose={() => {
-					showRevealTopDialog = false;
-					revealedCards = [];
+					uiState.showRevealTopDialog = false;
+					uiState.revealedCards = [];
 				}}
 			/>
 		{/if}
 
-		<KeyboardShortcutsModal bind:open={showKeyboardShortcuts} mode="game" />
+		<!-- Mulligan Dialog -->
+		{#if showMulliganDialog && me}
+			<MulliganDialog
+				cards={me.hand}
+				mulliganCount={me.mulliganCount}
+				freeMulligans={$multiplayerGameStore.freeMulligans}
+				onKeep={handleKeepHand}
+				onMulligan={handleMulligan}
+				hasKeptHand={me.keptHand}
+				playerName={me.name}
+			/>
+		{/if}
+
+		<KeyboardShortcutsModal bind:open={uiState.showKeyboardShortcuts} mode="game" />
 
 		<!-- ADD: GameChatOverlay for multiplayer -->
 		<GameChatOverlay gameId={data.gameId} />
 
 		<!-- Drag Ghost (from playtest/+page.svelte lines 1978-1990) -->
 		{#if isDragging && dragCardName}
-			{@const dragImageUrl = getScryfallImageUrl(dragCardName, 'small')}
+			{@const dragImageUrl = getScryfallImageUrl(dragCardName, 'normal')}
 			<div class="drag-ghost" style="left: {dragPos.x}px; top: {dragPos.y}px;">
 				<div class="drag-ghost-card" class:valid={isOverValidDrop}>
 					{#if dragImageUrl}

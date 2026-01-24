@@ -135,6 +135,7 @@ message PlayerView {
   int32 wins = 16;
   bool kept_hand = 17;  // Whether player has kept their hand during mulligan phase
   bool has_available_actions = 18;  // Server-computed: does this player have any legal actions right now?
+  int32 mulligan_count = 20;  // Number of times this player has mulliganed this game
 }
 
 // CardView represents a card

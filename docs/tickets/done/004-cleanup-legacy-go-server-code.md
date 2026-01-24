@@ -1,13 +1,16 @@
 # Complete Legacy Go Server Code Cleanup - Full Migration
 
-## Status: READY
+## Status: DONE
+
 **Created**: January 23, 2026
+**Updated**: January 24, 2026
 **Priority**: HIGH
 **Estimated Effort**: 2-3 days
 
 ## Problem
 
 After completing the playtest-first migration, the Go server contains massive amounts of dead code from the old MageEngine:
+
 - **~100+ files** of legacy rules enforcement code
 - **~50,000+ LOC** of unused complexity
 - MageEngine (13,786 lines) no longer needed
@@ -28,6 +31,7 @@ After completing the playtest-first migration, the Go server contains massive am
 **Primary target**: Remove the massive legacy engine file.
 
 **Files to delete**:
+
 1. `internal/game/mage_engine.go` (13,786 lines, 430KB)
 2. `internal/game/engine_priority.go`
 3. `internal/game/engine_stack.go`
@@ -37,6 +41,7 @@ After completing the playtest-first migration, the Go server contains massive am
 7. `internal/game/null_engine.go` (test stub)
 
 **Action**:
+
 ```bash
 cd /Users/aron/dev/opensource/mage/mage-server-go
 
@@ -51,6 +56,7 @@ rm internal/game/null_engine.go
 ```
 
 **Verification**:
+
 ```bash
 go build ./...
 # Will fail - expected, fix imports in Phase 2
@@ -69,6 +75,7 @@ go build ./...
 #### File: `cmd/server/main.go`
 
 **Delete** (lines ~145-177):
+
 ```go
 // Remove entire engine_type switch
 engineType := cfg.Server.EngineType
@@ -85,6 +92,7 @@ case "mage":
 ```
 
 **Replace with** (simple, single engine):
+
 ```go
 // Create playtest engine (only engine)
 engine := game.NewEngine(logger, cardRepo)
@@ -94,6 +102,7 @@ gameAdapter := game.NewEngineAdapter(engine)
 ```
 
 **Delete** (lines ~169-192):
+
 ```go
 // Remove MageEngine persistence/crash recovery
 if mageEngine, ok := engine.(*game.MageEngine); ok {
@@ -108,16 +117,19 @@ activeGames, err := activeGameRepo.ListAll(ctx)
 #### File: `internal/config/config.go`
 
 **Delete** (line 33):
+
 ```go
 EngineType string `mapstructure:"engine_type"`
 ```
 
 **Delete** (line 205):
+
 ```go
 v.SetDefault("server.engine_type", "mage")
 ```
 
 **Delete** (lines 285-287):
+
 ```go
 // Validate engine type
 if c.Server.EngineType != "" && c.Server.EngineType != "mage" && c.Server.EngineType != "playtest" {
@@ -128,6 +140,7 @@ if c.Server.EngineType != "" && c.Server.EngineType != "mage" && c.Server.Engine
 #### File: `internal/game/manager.go`
 
 **Simplify** `SetNotificationCallback`:
+
 ```go
 func (a *EngineAdapter) SetNotificationCallback(callback func(GameNotification)) {
     if e, ok := a.engine.(*Engine); ok {
@@ -142,6 +155,7 @@ func (a *EngineAdapter) SetNotificationCallback(callback func(GameNotification))
 ```
 
 Or even simpler - assume it's always Engine:
+
 ```go
 func (a *EngineAdapter) SetNotificationCallback(callback func(GameNotification)) {
     e := a.engine.(*Engine)
@@ -151,6 +165,7 @@ func (a *EngineAdapter) SetNotificationCallback(callback func(GameNotification))
 ```
 
 **Verification**:
+
 ```bash
 go build ./cmd/server/...
 # Should compile now
@@ -165,12 +180,14 @@ go build ./cmd/server/...
 **Remove all MTG rules enforcement infrastructure.**
 
 **Directories to delete**:
+
 ```bash
 rm -rf internal/game/rules/
 rm -rf internal/game/effects/
 ```
 
 **Files deleted**:
+
 - `rules/` directory: 21 files (~18,000 LOC)
   - priority.go, stack.go, state_based_actions.go
   - trigger.go, turn.go, watcher.go, legality.go
@@ -180,6 +197,7 @@ rm -rf internal/game/effects/
   - Layer system, replacement effects, prevention effects
 
 **Verification**:
+
 ```bash
 # Check for any remaining imports
 grep -r "game/rules\|game/effects" mage-server-go/ --include="*.go"
@@ -195,6 +213,7 @@ grep -r "game/rules\|game/effects" mage-server-go/ --include="*.go"
 **Delete complex ability implementations, keep minimal infrastructure.**
 
 **Files to delete** (from `internal/game/abilities/`):
+
 ```bash
 cd internal/game/abilities/
 
@@ -212,6 +231,7 @@ rm keyword_abilities_combat.go  # Combat keywords
 ```
 
 **Files to keep**:
+
 - `ability.go` - Base structures
 - `activated.go` - Simple activated abilities
 - `static.go` - Static abilities
@@ -219,6 +239,7 @@ rm keyword_abilities_combat.go  # Combat keywords
 - `targets.go` - Target structures
 
 **Verification**:
+
 ```bash
 ls internal/game/abilities/
 # Should only show ~5-8 files kept
@@ -245,6 +266,7 @@ rm internal/integration/watcher_integration_test.go
 **Files deleted**: ~45 test files (~8,500 LOC)
 
 **Verification**:
+
 ```bash
 # Run remaining tests
 go test ./internal/game/... -v
@@ -261,6 +283,7 @@ go test ./internal/integration/... -v
 **Remove database persistence and serialization (MageEngine only).**
 
 **Files to delete**:
+
 ```bash
 rm internal/game/persistence_adapter.go
 rm internal/game/serialization.go
@@ -268,11 +291,13 @@ rm internal/repository/active_games.go
 ```
 
 **Rationale**:
+
 - Playtest engine is in-memory only
 - No need for complex game state serialization
 - No crash recovery system needed
 
 **Verification**:
+
 ```bash
 grep -r "persistence_adapter\|serialization\|active_games" internal/ --include="*.go"
 # Expected: No results
@@ -287,6 +312,7 @@ grep -r "persistence_adapter\|serialization\|active_games" internal/ --include="
 **Check and delete if not actually used.**
 
 #### Draft System
+
 ```bash
 # Check if used
 grep -r "draft" mage-client-web/src --include="*.ts" --include="*.svelte"
@@ -297,6 +323,7 @@ rm internal/server/grpc_draft.go
 ```
 
 #### Tournament System
+
 ```bash
 # Check if used
 grep -r "tournament" mage-client-web/src --include="*.ts" --include="*.svelte"
@@ -307,6 +334,7 @@ rm internal/server/grpc_tournament.go
 ```
 
 #### Replay System
+
 ```bash
 # Check if replay handlers exist
 grep -r "replay\|Replay" internal/server --include="*.go"
@@ -329,6 +357,7 @@ rm internal/game/rollback.go  # Old rollback, not new engine's
 #### File: `internal/server/grpc.go`
 
 **Simplify** `engineViewToProto`:
+
 ```go
 func (s *MageServer) engineViewToProto(view interface{}) (*pb.GameView, error) {
     // Only handle PlaytestGameView now
@@ -344,6 +373,7 @@ func (s *MageServer) engineViewToProto(view interface{}) (*pb.GameView, error) {
 **Delete**: All EngineGameView handling code (lines ~646-691)
 
 **Verification**:
+
 ```bash
 go build ./internal/server/...
 ```
@@ -359,18 +389,21 @@ go build ./internal/server/...
 #### Cleanup Tasks
 
 1. **Search for MageEngine references**:
+
 ```bash
 grep -r "MageEngine\|mage_engine" mage-server-go/ --include="*.go"
 # Fix or delete any remaining references
 ```
 
 2. **Search for engine_type references**:
+
 ```bash
 grep -r "engine_type\|EngineType" mage-server-go/ --include="*.go"
 # Should only be in config structs (can leave for legacy config files)
 ```
 
 3. **Remove unused imports**:
+
 ```bash
 # Many files will have unused imports after deletions
 go fmt ./...
@@ -379,6 +412,7 @@ go build ./...
 ```
 
 4. **Update proto definitions** (if needed):
+
 ```bash
 # Check if any proto messages reference old engine
 grep -r "mage.*engine" api/proto/
@@ -408,6 +442,7 @@ grep -r "mage.*engine" api/proto/
 **Now that only one engine exists, remove confusing naming.**
 
 Since we deleted MageEngine and only have the playtest/rules-light engine, the current naming is confusing:
+
 - File: `engine.go` (generic name)
 - Struct: `Engine` (too generic)
 - State: `EngineGameState`, `EngineCard`, etc. (why "Engine" prefix?)
@@ -431,6 +466,7 @@ mv state.go game_state.go
 **File: `game_engine.go`**
 
 Rename `Engine` → `GameEngine`:
+
 ```go
 // Before
 type Engine struct {
@@ -450,6 +486,7 @@ type GameEngine struct {
 ```
 
 Constructor rename:
+
 ```go
 // Before
 func NewEngine(logger *zap.Logger) *Engine
@@ -501,6 +538,7 @@ type DeckList struct { ... }
 #### Update All References
 
 **Files to update**:
+
 1. `cmd/server/main.go` - Constructor call
 2. `internal/game/manager.go` - EngineAdapter references
 3. `internal/game/actions.go` - Method receivers and parameters
@@ -508,6 +546,7 @@ type DeckList struct { ... }
 5. All test files in `internal/game/*_test.go`
 
 **Search and replace pattern**:
+
 ```bash
 # Find all Engine references
 grep -r "type Engine struct\|*Engine\|NewEngine" internal/game --include="*.go"
@@ -522,6 +561,7 @@ grep -r "type Engine struct\|*Engine\|NewEngine" internal/game --include="*.go"
 **File: `manager.go`**
 
 Update EngineAdapter to use new names:
+
 ```go
 // Before
 type EngineAdapter struct {
@@ -605,6 +645,7 @@ go test ./internal/game/...
 ```
 
 **Checklist**:
+
 - [ ] Rename `engine.go` → `game_engine.go`
 - [ ] Rename `state.go` → `game_state.go`
 - [ ] Rename `Engine` → `GameEngine`
@@ -628,23 +669,25 @@ go test ./internal/game/...
 
 ### Total Deletions
 
-| Category | Files | LOC |
-|----------|-------|-----|
-| MageEngine core | 7 | ~14,000 |
-| Rules system | 21 | ~18,000 |
-| Effects system | 17 | ~4,000 |
-| Abilities (complex) | 10 | ~3,000 |
-| Combat tests | 45 | ~8,500 |
-| Persistence | 3 | ~1,000 |
-| Unused features | 0-6 | 0-2,000 |
-| **TOTAL** | **103-109** | **~48,500-50,500** |
+| Category            | Files       | LOC                |
+| ------------------- | ----------- | ------------------ |
+| MageEngine core     | 7           | ~14,000            |
+| Rules system        | 21          | ~18,000            |
+| Effects system      | 17          | ~4,000             |
+| Abilities (complex) | 10          | ~3,000             |
+| Combat tests        | 45          | ~8,500             |
+| Persistence         | 3           | ~1,000             |
+| Unused features     | 0-6         | 0-2,000            |
+| **TOTAL**           | **103-109** | **~48,500-50,500** |
 
 ### Before Cleanup
+
 - Total files: ~241 Go files
 - Backend LOC: ~85,000
 - Engine options: 2 (MageEngine, PlaytestEngine)
 
 ### After Cleanup
+
 - Total files: ~132-138 Go files
 - Backend LOC: ~34,500-36,500
 - Engine options: 1 (GameEngine only)
@@ -657,6 +700,7 @@ go test ./internal/game/...
 ## Breaking Changes
 
 ### API Changes
+
 - ❌ **Removed**: `engine_type` config option
 - ❌ **Removed**: MageEngine support
 - ❌ **Removed**: Game state persistence/serialization
@@ -664,9 +708,11 @@ go test ./internal/game/...
 - ❌ **Removed**: Complex rules enforcement
 
 ### Migration Path
+
 **NONE** - This is a clean break. Old games cannot be restored.
 
 **Impact**: All existing games will be lost. This is acceptable since:
+
 1. This is a single-user development project
 2. Playtest-first is the new primary architecture
 3. No production users to migrate
@@ -678,6 +724,7 @@ go test ./internal/game/...
 **Aggressive 2-3 day cleanup:**
 
 ### Day 1: Core Deletions
+
 1. ✅ Phase 1: Delete MageEngine (will break build)
 2. ✅ Phase 2: Remove engine selection logic (fixes build)
 3. ✅ Phase 3: Delete rules/ and effects/ directories
@@ -685,12 +732,14 @@ go test ./internal/game/...
 5. ✅ Verify: `go test ./...` passes
 
 ### Day 2: System Cleanup
+
 6. ✅ Phase 4: Clean abilities system
 7. ✅ Phase 6: Delete persistence layer
 8. ✅ Phase 7: Delete unused features (verify each)
 9. ✅ Verify: `go build ./...` succeeds
 
 ### Day 3: Final Polish
+
 10. ✅ Phase 8: Simplify server handlers
 11. ✅ Phase 9: Final cleanup and verification
 12. ✅ Phase 10: Rename engine for clarity (GameEngine, game_engine.go)
@@ -702,12 +751,14 @@ go test ./internal/game/...
 ## Benefits
 
 ### Immediate
+
 1. **Simplicity**: Single engine, clear architecture
 2. **Code reduction**: 57% smaller codebase
 3. **Clarity**: No confusion about which engine to use
 4. **Performance**: Faster compilation, smaller binary
 
 ### Long-term
+
 1. **Maintainability**: Far less code to maintain
 2. **Developer experience**: New devs see only relevant code
 3. **Feature velocity**: No legacy code slowing development
@@ -718,18 +769,24 @@ go test ./internal/game/...
 ## Risks & Mitigation
 
 ### Risk 1: Breaking something critical
+
 **Mitigation**:
+
 - Run tests after each phase
 - Keep git commits granular
 - Can rollback individual phases if needed
 
 ### Risk 2: Losing functionality we need
+
 **Mitigation**:
+
 - Phase 7 explicitly verifies feature usage before deletion
 - Draft/tournament only deleted if confirmed unused
 
 ### Risk 3: Frontend breaks
+
 **Mitigation**:
+
 - Frontend already uses multiplayer-game store (not old game store)
 - gRPC API unchanged (still returns GameView)
 - Only backend implementation changes
@@ -779,6 +836,7 @@ After cleanup, update these docs:
 ## Post-Cleanup Verification
 
 ### Build Verification
+
 ```bash
 cd mage-server-go
 go build ./...
@@ -787,6 +845,7 @@ go test ./...
 ```
 
 ### Frontend Verification
+
 ```bash
 cd mage-client-web
 bun run check
@@ -795,6 +854,7 @@ bun run dev
 ```
 
 ### End-to-End Test
+
 1. Start server: `./server`
 2. Start frontend: `bun run dev`
 3. Create 2-player game
@@ -816,6 +876,7 @@ bun run dev
 **No backward compatibility**: This is a full migration. Accept that old games are lost.
 
 **Git strategy**:
+
 - Commit after each phase
 - Descriptive commit messages
 - Easy to rollback individual phases if needed
@@ -836,24 +897,27 @@ bun run dev
 ## Execution Checklist
 
 Day 1:
-- [ ] Phase 1: Delete MageEngine files
-- [ ] Phase 2: Simplify main.go and config
-- [ ] Phase 3: Delete rules/ and effects/
-- [ ] Phase 5: Delete combat tests
-- [ ] Verify tests pass
+
+- [x] Phase 1: Delete MageEngine files
+- [x] Phase 2: Simplify main.go and config
+- [x] Phase 3: Delete rules/ and effects/
+- [x] Phase 5: Delete combat tests
+- [x] Verify tests pass
 
 Day 2:
-- [ ] Phase 4: Clean abilities/
-- [ ] Phase 6: Delete persistence
-- [ ] Phase 7: Delete unused features
-- [ ] Verify build succeeds
+
+- [x] Phase 4: Clean abilities/
+- [x] Phase 6: Delete persistence
+- [x] Phase 7: Delete unused features
+- [x] Verify build succeeds
 
 Day 3:
+
 - [x] Phase 8: Simplify handlers
 - [x] Phase 9: Final cleanup (97% complete, see 004-phase-9-verification-report.md)
-- [ ] Phase 10: Rename engine (game_engine.go, GameEngine struct)
-- [ ] Update docs
-- [ ] End-to-end testing
-- [ ] Git commits and push
+- [x] Phase 10: Rename engine (game_engine.go, GameEngine struct)
+- [x] Update docs
+- [x] End-to-end testing
+- [x] Git commits and push
 
 **Status after completion**: Production-ready, fully migrated playtest-first architecture with zero legacy code.

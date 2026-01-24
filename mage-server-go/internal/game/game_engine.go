@@ -154,7 +154,16 @@ func (e *GameEngine) ProcessAction(gameID string, action PlayerAction) error {
 	actionType := action.ActionType
 	playerID := action.PlayerID
 
-	// Parse action data
+	// Handle SEND_STRING action first (has string data, not map)
+	if actionType == "SEND_STRING" {
+		cmdStr, ok := action.Data.(string)
+		if !ok {
+			return fmt.Errorf("SEND_STRING action data must be a string")
+		}
+		return e.ParseAndExecuteStringCommand(gameID, playerID, cmdStr)
+	}
+
+	// Parse action data for all other action types (expect map data)
 	data, ok := action.Data.(map[string]interface{})
 	if !ok {
 		return fmt.Errorf("invalid action data format")
@@ -250,14 +259,6 @@ func (e *GameEngine) ProcessAction(gameID string, action PlayerAction) error {
 
 	case "KEEP_HAND":
 		return e.KeepHand(gameID, playerID)
-
-	case "SEND_STRING":
-		// Parse string command from direct-actions.ts
-		cmdStr, ok := action.Data.(string)
-		if !ok {
-			return fmt.Errorf("SEND_STRING action data must be a string")
-		}
-		return e.ParseAndExecuteStringCommand(gameID, playerID, cmdStr)
 
 	default:
 		return fmt.Errorf("unknown action type: %s", actionType)

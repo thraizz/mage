@@ -1,23 +1,29 @@
 <script lang="ts">
-	import Card from './Card.svelte';
-	import type { GameCard } from '$lib/types/game';
 	import type { CardView } from '$lib/generated/mage/v1/models';
-	import {
-		myHand,
-		selectedCards,
-		gameStore,
-		cardsBeingPlayed,
-		hasPriority
-	} from '$lib/stores/game.legacy';
+	import type { GameCard } from '$lib/types/game';
 	import {
 		dragDropStore,
-		isDragging as isDraggingStore,
 		draggedCardId,
-		getValidDropZonesForCard
+		getValidDropZonesForCard,
+		isDragging as isDraggingStore
 	} from '$lib/utils/drag-drop';
+	import { getScryfallImageUrl } from '$lib/utils/scryfall';
+	import Card from './Card.svelte';
 
 	// Props (optional callbacks for additional handling like target selection)
 	let {
+		// NEW: Required - the cards to display
+		cards = [],
+
+		// NEW: Selection state (optional, for shared components)
+		selectedCardIds = [],
+		playingCardIds = [],
+		hasPriority = true,
+
+		// NEW: Selection callbacks (instead of calling store directly)
+		onSelectCard = (cardId: string, isMultiSelect: boolean) => {},
+		onClearSelection = () => {},
+
 		// eslint-disable-next-line no-unused-vars
 		onCardClick = (cardId: string) => {},
 		// eslint-disable-next-line no-unused-vars
@@ -31,6 +37,12 @@
 		canDrag = true,
 		showHeader = false
 	}: {
+		cards: CardView[];
+		selectedCardIds: string[];
+		playingCardIds: string[];
+		hasPriority: boolean;
+		onSelectCard?: (cardId: string, isMultiSelect: boolean) => void;
+		onClearSelection?: () => void;
 		// eslint-disable-next-line no-unused-vars
 		onCardClick?: (cardId: string) => void;
 		// eslint-disable-next-line no-unused-vars
@@ -48,8 +60,9 @@
 	// Drag state from store
 	const isDraggingGlobal = $derived($isDraggingStore);
 	const draggedId = $derived($draggedCardId);
-	const playingCards = $derived($cardsBeingPlayed);
-	const playerHasPriority = $derived($hasPriority);
+	// Derived values
+	const handCount = $derived(cards.length);
+	const isEmpty = $derived(handCount === 0);
 
 	// State
 	let multiSelectMode = $state(false);
@@ -76,10 +89,6 @@
 		};
 	}
 
-	// Always use game store for cards and selection
-	const handCards = $derived.by(() => ($myHand || []).map(toGameCard));
-	const selectedCardIds = $derived($selectedCards || []);
-
 	/**
 	 * Handle card click
 	 */
@@ -88,14 +97,14 @@
 		if (event?.shiftKey) {
 			multiSelectMode = true;
 			// Toggle selection in game store
-			gameStore.toggleCardSelection(cardId);
+			onSelectCard(cardId, true);
 		} else {
 			// Single select - clear all and select this one
 			multiSelectMode = false;
 			const isSelected = selectedCardIds.includes(cardId);
-			gameStore.clearSelection();
+			onClearSelection();
 			if (!isSelected) {
-				gameStore.toggleCardSelection(cardId);
+				onSelectCard(cardId, false);
 			}
 		}
 
@@ -130,8 +139,8 @@
 	 * Check if card can be dragged
 	 */
 	function canDragCard(cardType: string): boolean {
-		if (!canDrag || !playerHasPriority) return false;
-		const validZones = getValidDropZonesForCard(cardType, currentPhase, playerHasPriority);
+		if (!canDrag || !hasPriority) return false;
+		const validZones = getValidDropZonesForCard();
 		return validZones.length > 0;
 	}
 
@@ -150,7 +159,7 @@
 		isDragPending = true;
 
 		// Store the card info for potential drag
-		const card = handCards.find((c) => c.id === cardId);
+		const card = cards.find((c) => c.id === cardId);
 		if (!card) return;
 
 		// Add mousemove listener to detect actual drag
@@ -164,15 +173,7 @@
 			if (distance >= DRAG_THRESHOLD) {
 				// Start the drag
 				isDragPending = false;
-				const validZones = getValidDropZonesForCard(cardType, currentPhase, playerHasPriority);
-				dragDropStore.startDrag(
-					cardId,
-					card.name,
-					'hand',
-					moveEvent.clientX,
-					moveEvent.clientY,
-					validZones
-				);
+				dragDropStore.startDrag(cardId, card.name, 'hand', moveEvent.clientX, moveEvent.clientY);
 				onCardDragStart(cardId);
 
 				// Remove this listener
@@ -210,7 +211,7 @@
 		dragStartPosition = { x: touch.clientX, y: touch.clientY };
 		isDragPending = true;
 
-		const card = handCards.find((c) => c.id === cardId);
+		const card = cards.find((c) => c.id === cardId);
 		if (!card) return;
 
 		const handleTouchMove = (moveEvent: TouchEvent) => {
@@ -225,15 +226,7 @@
 			if (distance >= DRAG_THRESHOLD) {
 				moveEvent.preventDefault();
 				isDragPending = false;
-				const validZones = getValidDropZonesForCard(cardType, currentPhase, playerHasPriority);
-				dragDropStore.startDrag(
-					cardId,
-					card.name,
-					'hand',
-					touch.clientX,
-					touch.clientY,
-					validZones
-				);
+				dragDropStore.startDrag(cardId, card.name, 'hand', touch.clientX, touch.clientY);
 				onCardDragStart(cardId);
 
 				document.removeEventListener('touchmove', handleTouchMove);
@@ -263,12 +256,8 @@
 	 * Check if a card is currently being played (animating)
 	 */
 	function isCardBeingPlayed(cardId: string): boolean {
-		return playingCards.includes(cardId);
+		return playingCardIds.includes(cardId);
 	}
-
-	// Derived values
-	const handCount = $derived(handCards.length);
-	const isEmpty = $derived(handCount === 0);
 </script>
 
 <div class="player-hand" class:no-header={!showHeader}>
@@ -288,10 +277,10 @@
 		</div>
 	{:else}
 		<div class="hand-cards" class:dragging-active={isDraggingGlobal}>
-			{#each handCards as card (card.id)}
+			{#each cards as card (card.id)}
 				{@const cardIsDragging = isCardDragging(card.id)}
 				{@const cardIsPlaying = isCardBeingPlayed(card.id)}
-				{@const cardCanDrag = canDragCard(card.cardType || '')}
+				{@const cardCanDrag = canDragCard(card.type || '')}
 				<div
 					class="card-wrapper"
 					class:draggable={cardCanDrag}
@@ -303,8 +292,8 @@
 					onclick={(e) => handleCardClick(card.id, e)}
 					onkeydown={(e) => handleKeydown(card.id, e)}
 					onmouseenter={() => handleCardHover(card.id)}
-					onmousedown={(e) => handleMouseDown(card.id, card.cardType || '', e)}
-					ontouchstart={(e) => handleTouchStart(card.id, card.cardType || '', e)}
+					onmousedown={(e) => handleMouseDown(card.id, card.type || '', e)}
+					ontouchstart={(e) => handleTouchStart(card.id, card.type || '', e)}
 					ondragstart={handleDragStart}
 					aria-label={`Card: ${card.name}${cardCanDrag ? ' - Drag to play' : ''}`}
 				>
@@ -312,16 +301,16 @@
 						cardId={card.id}
 						cardName={card.name}
 						manaCost={card.manaCost || ''}
-						cardType={card.cardType || ''}
+						cardType={card.type || ''}
 						power={card.power || ''}
 						toughness={card.toughness || ''}
-						imageUrl={card.imageUrl || ''}
-						isTapped={card.isTapped || false}
+						imageUrl={getScryfallImageUrl(card.name)}
+						isTapped={card.tapped || false}
 						isSelected={isCardSelected(card.id)}
-						counters={card.counters?.map((c) => ({ name: c.type, count: c.count })) || []}
+						counters={card.counters || []}
 						{size}
-						onclick={() => {}}
-						onhover={() => {}}
+						onclick={() => handleCardClick(card.id)}
+						onhover={() => handleCardHover(card.id)}
 						isDragging={cardIsDragging}
 						isBeingPlayed={cardIsPlaying}
 					/>
@@ -341,20 +330,12 @@
 	.player-hand {
 		display: flex;
 		flex-direction: column;
-		height: 100%;
-		overflow: hidden;
-	}
-
-	/* When header is hidden, reduce top padding */
-	.player-hand.no-header .hand-cards {
-		padding-top: 0.5rem;
 	}
 
 	.hand-header {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.75rem 1rem;
 		background: #141821;
 		border-bottom: 1px solid #2a3441;
 	}
@@ -399,10 +380,12 @@
 		flex: 1;
 		display: flex;
 		gap: 0.5rem;
-		padding: 1rem;
-		overflow-x: auto;
-		overflow-y: hidden;
-		align-items: center;
+		overflow-x: visible;
+		z-index: 10;
+		overflow-y: visible;
+		height: 100%;
+		align-items: flex-end;
+		justify-content: flex-start;
 	}
 
 	.card-wrapper {

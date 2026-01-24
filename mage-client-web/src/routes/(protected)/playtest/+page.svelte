@@ -1,96 +1,69 @@
 <script lang="ts">
-	import GameStateLog from './GameStateLog.svelte';
+	import GameStateLog from '../../../lib/components/game/GameStateLog.svelte';
 
-	import { onMount, untrack } from 'svelte';
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { gameStore } from '$lib/stores/game.legacy';
+	import { page } from '$app/state';
+	import { createGamePageController } from '$lib/controllers/game-page-controller';
+	import { initializePlaytest, validateDeckIds } from '$lib/playtest/initializer';
+	import { createGameUIState } from '$lib/stores/game-ui-state.svelte';
 	import {
-		playtestGameStore,
-		playtestPlayers,
-		playtestLocalPlayer,
-		playtestOpponents,
+		playtestActiveControlSeat,
 		playtestBattlefield,
 		playtestExile,
-		playtestActiveControlSeat,
+		playtestGameStore,
 		playtestIsInitialized,
+		playtestLocalPlayer,
+		playtestOpponents,
+		playtestPlayers,
 		type PlaytestSessionMeta
 	} from '$lib/stores/playtest-game';
-	import { initializePlaytest, validateDeckIds } from '$lib/playtest/initializer';
 	import { toast } from '$lib/stores/toast';
-
+	import { onMount } from 'svelte';
 	// Game components
-	import Card from '$lib/components/game/Card.svelte';
-	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
-	import PlaytestLibrarySearch from '$lib/components/game/PlaytestLibrarySearch.svelte';
-	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
-	import CreateTokenDialog from '$lib/components/game/CreateTokenDialog.svelte';
-	import CounterDialog from '$lib/components/game/CounterDialog.svelte';
-	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
-	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte';
-	import NumberInputDialog from '$lib/components/game/NumberInputDialog.svelte';
-	import ScryDialog from '$lib/components/game/ScryDialog.svelte';
-	import RevealTopDialog from '$lib/components/game/RevealTopDialog.svelte';
-	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
-	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
-	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
 	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
+	import Card from '$lib/components/game/Card.svelte';
+	import CounterDialog from '$lib/components/game/CounterDialog.svelte';
+	import CreateTokenDialog from '$lib/components/game/CreateTokenDialog.svelte';
 	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
-	import type { ScrySession } from '$lib/stores/playtest-game';
-	import Keyboard from '@lucide/svelte/icons/keyboard';
-	import Clock from '@lucide/svelte/icons/clock';
-	import Copy from '@lucide/svelte/icons/copy';
-	import X from '@lucide/svelte/icons/x';
-	import Eye from '@lucide/svelte/icons/eye';
-	import EyeOff from '@lucide/svelte/icons/eye-off';
-	import Heart from '@lucide/svelte/icons/heart';
+	import DeckContextMenu from '$lib/components/game/DeckContextMenu.svelte';
 	import KeyboardShortcutsModal from '$lib/components/game/KeyboardShortcutsModal.svelte';
+	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
+	import NumberInputDialog from '$lib/components/game/NumberInputDialog.svelte';
+	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
+	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
+	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
+	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
+	import PlaytestLibrarySearch from '$lib/components/game/PlaytestLibrarySearch.svelte';
+	import RevealTopDialog from '$lib/components/game/RevealTopDialog.svelte';
+	import ScryDialog from '$lib/components/game/ScryDialog.svelte';
+	import TokenCreator from '$lib/components/game/TokenCreator.svelte';
 	import {
+		currentDropZone,
 		dragDropStore,
-		isDragging as isDraggingStore,
 		draggedCardName,
 		dragPosition,
+		isDragging as isDraggingStore,
 		isOverValidDropZone,
-		currentDropZone,
-		getAllValidDropZones,
 		type SourceZone
 	} from '$lib/utils/drag-drop';
 	import { getScryfallImageUrl } from '$lib/utils/scryfall';
+	import { useDropZones } from '$lib/utils/use-drop-zones.svelte';
+	import Clock from '@lucide/svelte/icons/clock';
+	import Copy from '@lucide/svelte/icons/copy';
+	import Eye from '@lucide/svelte/icons/eye';
+	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import Heart from '@lucide/svelte/icons/heart';
+	import Keyboard from '@lucide/svelte/icons/keyboard';
+	import X from '@lucide/svelte/icons/x';
 
 	// State
 	let loading = $state(true);
 	let error = $state<string | null>(null);
-	let showTokenCreator = $state(false);
-	let showCreateTokenDialog = $state(false);
-	let showCounterDialog = $state(false);
-	let selectedCardForCounters = $state<{ id: string; name: string } | null>(null);
-	let showKeyboardShortcuts = $state(false);
-	let showAllHands = $state(false);
-	let showMenu = $state(false);
-	let hoveredCardId = $state<string | null>(null);
-	let showLifeMenu = $state(false);
-	let showDebugOverlay = $state(false);
-	let selectedOpponentId = $state<string | null>(null);
-	let showOpponentLifeMenu = $state(false);
-	let showDeckSearch = $state(false);
 
-	// Deck context menu and dialog state
-	let showDeckContextMenu = $state(false);
-	let deckContextMenuPosition = $state<{ x: number; y: number }>({ x: 0, y: 0 });
-	let showNumberInputDialog = $state(false);
-	let numberInputDialogConfig = $state<{
-		title: string;
-		defaultValue: number;
-		min: number;
-		max: number;
-		onConfirm: (value: number) => void;
-	} | null>(null);
-	let showScryDialog = $state(false);
-	let currentScrySession = $state<ScrySession | null>(null);
-	let showRevealTopDialog = $state(false);
-	let revealedCards = $state<import('$lib/generated/mage/v1/models').CardView[]>([]);
+	// Shared UI state
+	const uiState = createGameUIState();
 
-	// Mulligan state
+	// Mulligan state (playtest-specific)
 	let mulliganPlayerIndex = $state<number | null>(null);
 
 	// Drag-drop state
@@ -110,12 +83,6 @@
 	let handDropZoneEl: HTMLElement | null = $state(null);
 	let libraryDropZoneEl: HTMLElement | null = $state(null);
 	let commandDropZoneEl: HTMLElement | null = $state(null);
-	let dropZoneUnregister: (() => void) | null = null;
-	let graveyardDropZoneUnregister: (() => void) | null = null;
-	let exileDropZoneUnregister: (() => void) | null = null;
-	let handDropZoneUnregister: (() => void) | null = null;
-	let libraryDropZoneUnregister: (() => void) | null = null;
-	let commandDropZoneUnregister: (() => void) | null = null;
 
 	// Battlefield drag state
 	let battlefieldDragStartPosition = $state<{ x: number; y: number } | null>(null);
@@ -142,11 +109,14 @@
 	// Selected opponent (auto-select first opponent if not set)
 	const selectedOpponent = $derived.by(() => {
 		if (otherPlayers.length === 0) return null;
-		if (!selectedOpponentId || !otherPlayers.find((p) => p.playerId === selectedOpponentId)) {
+		if (
+			!uiState.selectedOpponentId ||
+			!otherPlayers.find((p) => p.playerId === uiState.selectedOpponentId)
+		) {
 			// Auto-select first opponent
 			return otherPlayers[0];
 		}
-		return otherPlayers.find((p) => p.playerId === selectedOpponentId) || otherPlayers[0];
+		return otherPlayers.find((p) => p.playerId === uiState.selectedOpponentId) || otherPlayers[0];
 	});
 
 	// Split battlefield by controller
@@ -180,7 +150,7 @@
 	// Reactive card lookup for counter dialog
 	const selectedCardForCountersData = $derived.by(() => {
 		// 1. Capture the value in a local variable for "Type Narrowing"
-		const currentId = selectedCardForCounters?.id;
+		const currentId = uiState.selectedCardForCounters?.id;
 
 		// 2. If no ID exists, exit early
 		if (!currentId) return null;
@@ -194,7 +164,7 @@
 			null;
 
 		console.log(
-			'[selectedCardForCountersData] Re-evaluated.',
+			'[uiState.selectedCardForCountersData] Re-evaluated.',
 			`Card: ${card?.name}`,
 			`Counters: ${card?.counters}`
 		);
@@ -204,7 +174,7 @@
 
 	// Hovered card
 	const hoveredCard = $derived(
-		hoveredCardId ? battlefield.find((c) => c.id === hoveredCardId) : null
+		uiState.hoveredCardId ? battlefield.find((c) => c.id === uiState.hoveredCardId) : null
 	);
 
 	const activePlayerName = $derived.by(() => {
@@ -243,13 +213,54 @@
 	// Check if this is a Commander game (has or had command zone cards)
 	const isCommanderGame = $derived(commandCards.length > 0);
 
+	// Create game page controller
+	const controller = createGamePageController(
+		{
+			gameStore: playtestGameStore,
+			getState: () => $playtestGameStore,
+			getLocalPlayer: () => me,
+			getPlayers: () => players,
+			getBattlefield: () => battlefield
+		},
+		{
+			setScryDialog: (show, session) => {
+				uiState.showScryDialog = show;
+				uiState.currentScrySession = session;
+			},
+			setRevealTopDialog: (show, cards) => {
+				uiState.showRevealTopDialog = show;
+				uiState.revealedCards = cards;
+			},
+			setNumberInputDialog: (config) => {
+				uiState.showNumberInputDialog = config.show;
+				if (config.show && config.title && config.onConfirm) {
+					uiState.numberInputDialogConfig = {
+						title: config.title,
+						defaultValue: config.defaultValue || 1,
+						min: 1,
+						max: 99,
+						onConfirm: config.onConfirm
+					};
+				} else {
+					uiState.numberInputDialogConfig = null;
+				}
+			},
+			setDeckContextMenu: (show, position) => {
+				uiState.showDeckContextMenu = show;
+				if (position) {
+					uiState.deckContextMenuPosition = position;
+				}
+			}
+		}
+	);
+
 	/**
 	 * Update the URL with playtestId parameter
 	 */
 	async function updateUrlWithPlaytestId(playtestId: string): Promise<void> {
-		const newSearchParams = new URLSearchParams($page.url.searchParams);
+		const newSearchParams = new URLSearchParams(page.url.searchParams);
 		newSearchParams.set('playtestId', playtestId);
-		await goto(`${$page.url.pathname}?${newSearchParams.toString()}`, {
+		await goto(`${page.url.pathname}?${newSearchParams.toString()}`, {
 			replaceState: true,
 			noScroll: true,
 			keepFocus: true
@@ -264,12 +275,12 @@
 		error = null;
 
 		try {
-			const searchParams = $page.url.searchParams;
+			const searchParams = new URLSearchParams(page.url.searchParams);
 			const deckIds = validateDeckIds(searchParams);
 
 			// Parse mulligan settings from URL
 			const mulliganType = (searchParams.get('mulliganType') as 'london') || 'london';
-			const freeMulligans = parseInt(searchParams.get('freeMulligans') || '0', 10);
+			const freeMulligans = parseInt(searchParams.get('freeMulligans') ?? '0', 10);
 
 			console.log('[Playtest] Initializing with deck IDs:', deckIds);
 			console.log('[Playtest] Mulligan settings:', { mulliganType, freeMulligans });
@@ -283,11 +294,6 @@
 				freeMulligans
 			});
 			playtestGameStore.setCommand(init.command);
-
-			// Initialize the normal game store with playtest data so PlayerHand works
-			gameStore.initGame(gameId, initializedPlayers[0].playerId);
-			console.log('[syncPlaytestToGameStore] Initialized game store');
-			syncPlaytestToGameStore();
 
 			// Set playtestId in URL
 			await updateUrlWithPlaytestId(gameId);
@@ -307,91 +313,6 @@
 			}, 3000);
 		}
 	}
-
-	/**
-	 * Sync playtest store to game store for component compatibility
-	 */
-	function syncPlaytestToGameStore(): void {
-		console.log('[syncPlaytestToGameStore] Called');
-		const state = $playtestGameStore;
-		const controllingPlayer = players.find((p) => p.playerId === activeControlSeat);
-
-		if (!controllingPlayer) {
-			console.log('[syncPlaytestToGameStore] No controlling player found');
-			return;
-		}
-
-		// Convert playtest state to GameView format
-		const gameView = {
-			gameId: state.gameId,
-			state: 'IN_PROGRESS',
-			turn: state.turn,
-			phase: '',
-			step: '',
-			activePlayerId: state.activePlayerId,
-			activePlayerName: controllingPlayer.name,
-			priorityPlayerId: activeControlSeat,
-			priorityPlayerName: controllingPlayer.name,
-			players: players.map((p) => ({
-				playerId: p.playerId,
-				name: p.name,
-				life: p.life,
-				poison: p.poison,
-				energy: p.energy,
-				libraryCount: p.libraryCount,
-				handCount: p.handCount,
-				hand: p.hand,
-				graveyard: p.graveyard,
-				manaPool: p.manaPool,
-				keptHand: p.keptHand,
-				hasPriority: p.playerId === activeControlSeat,
-				hasAvailableActions: false,
-				passed: false,
-				stateOrdinal: 0,
-				lost: false,
-				left: false,
-				wins: 0,
-				losses: 0
-			})),
-			battlefield: state.battlefield,
-			stack: state.stack,
-			exile: state.exile,
-			command: state.command,
-			messages: [],
-			revealed: [],
-			lookedAt: [],
-			special: false,
-			isMulliganPhase: mulliganPlayerIndex !== null,
-			gameFormat: 'Playtest',
-			landsPlayedThisTurn: 0,
-			landsAllowedThisTurn: 1
-		};
-
-		const currentState = JSON.stringify(state);
-		const newState = JSON.stringify(gameView);
-
-		// Only update the store if the data is actually different
-		if (currentState !== newState) {
-			// Reinitialize the game with the current controlling player
-			gameStore.initGame(state.gameId, activeControlSeat);
-			gameStore.setGameView(gameView);
-		} else {
-			console.log('[syncPlaytestToGameStore] No changes to game store');
-		}
-	}
-	$effect(() => {
-		// We keep this outside untrack so the effect re-runs when the store changes
-		void $playtestGameStore;
-
-		if (isInitialized) {
-			// We wrap the sync in untrack so that any state changes
-			// inside the sync function don't trigger this effect again.
-			untrack(() => {
-				console.log('[syncPlaytestToGameStore] Syncing...');
-				syncPlaytestToGameStore();
-			});
-		}
-	});
 
 	/**
 	 * Handle mulligan decision
@@ -434,208 +355,35 @@
 		}
 	}
 
-	/**
-	 * Handle life change
-	 */
-	function handleLifeChange(delta: number, playerId?: string): void {
-		const targetPlayerId = playerId || me?.playerId;
-		if (!targetPlayerId) return;
-		playtestGameStore.modifyLife(targetPlayerId, delta);
-	}
+	// Use controller handlers (delegated to controller)
+	const handleLifeChange = controller.handleLifeChange;
+	const handlePoisonChange = controller.handlePoisonChange;
+	const handleDrawCard = controller.handleDrawCard;
+	const handleShuffleLibrary = controller.handleShuffleLibrary;
+	const handleUntapAll = controller.handleUntapAll;
+	const handleNextTurn = controller.handleNextTurn;
 
-	/**
-	 * Handle poison counter change
-	 */
-	function handlePoisonChange(delta: number, playerId?: string): void {
-		const targetPlayerId = playerId || me?.playerId;
-		if (!targetPlayerId) return;
-		const player = players.find((p) => p.playerId === targetPlayerId);
-		if (!player) return;
-		const newValue = Math.max(0, (player.poison || 0) + delta);
-		playtestGameStore.setPlayerCounter(targetPlayerId, 'poison', newValue);
-	}
+	// Use controller deck handlers
+	const handleDeckContextMenu = controller.handleDeckContextMenu;
 
-	/**
-	 * Draw a card
-	 */
-	function handleDrawCard(): void {
-		if (!me) return;
-		playtestGameStore.drawCards(me.playerId, 1);
-		toast.success('Drew a card');
-	}
-
-	/**
-	 * Shuffle library
-	 */
-	function handleShuffleLibrary(): void {
-		if (!me) return;
-		playtestGameStore.shuffleLibrary(me.playerId);
-		toast.success('Shuffled library');
-	}
-
-	/**
-	 * Untap all permanents
-	 */
-	function handleUntapAll(): void {
-		if (!me) return;
-		playtestGameStore.untapAll(me.playerId);
-		toast.success('Untapped all');
-	}
-
-	/**
-	 * Next turn
-	 */
-	function handleNextTurn(): void {
-		playtestGameStore.nextTurn();
-		const newActivePlayer = players.find((p) => p.playerId === $playtestGameStore.activePlayerId);
-		if (newActivePlayer) {
-			toast.info(`${newActivePlayer.name}'s turn`);
-		}
-	}
-
-	/**
-	 * Deck context menu handlers
-	 */
-	function handleDeckContextMenu(event: MouseEvent): void {
-		if (!me) return;
-		deckContextMenuPosition = { x: event.clientX, y: event.clientY };
-		showDeckContextMenu = true;
-	}
-
-	function handleDrawN(count: number): void {
-		if (!me) return;
-		playtestGameStore.drawCards(me.playerId, count);
-		toast.success(`Drew ${count} card(s)`);
-	}
-
-	function handleMill(count: number): void {
-		if (!me) return;
-		playtestGameStore.millCards(me.playerId, count);
-		toast.success(`Milled ${count} card(s)`);
-	}
-
-	function handleScry(count: number): void {
-		if (!me) return;
-		const session = playtestGameStore.scryCards(me.playerId, count);
-		if (session) {
-			currentScrySession = session;
-			showScryDialog = true;
-		} else {
-			toast.error('No cards to scry');
-		}
-	}
-
+	// Wrap handleScryComplete to pass currentSession
 	function handleScryComplete(
 		keepOnTop: import('$lib/generated/mage/v1/models').CardView[],
 		putToBottom: import('$lib/generated/mage/v1/models').CardView[]
 	): void {
-		if (!me || !currentScrySession) return;
-		const scryCount = currentScrySession.cards.length;
-		playtestGameStore.applyScryDecision(me.playerId, scryCount, keepOnTop, putToBottom);
-		showScryDialog = false;
-		currentScrySession = null;
-		toast.success(`Scry ${scryCount} complete`);
+		if (!uiState.currentScrySession) return;
+		controller.handleScryComplete(keepOnTop, putToBottom, uiState.currentScrySession);
 	}
 
-	function handleRevealTop(count: number): void {
-		if (!me) return;
-		const cards = playtestGameStore.revealTopCards(me.playerId, count);
-		revealedCards = cards;
-		showRevealTopDialog = true;
-	}
-
-	function handleToggleRevealedTop(): void {
-		if (!me) return;
-		const willReveal = !me.revealedTopCard;
-		playtestGameStore.setRevealedTop(me.playerId, willReveal);
-		toast.info(willReveal ? 'Top card revealed permanently' : 'Top card hidden');
-	}
-
-	function showNumberInput(
-		title: string,
-		defaultValue: number,
-		onConfirm: (value: number) => void
-	): void {
-		numberInputDialogConfig = {
-			title,
-			defaultValue,
-			min: 1,
-			max: 99,
-			onConfirm: (value) => {
-				onConfirm(value);
-				showNumberInputDialog = false;
-				numberInputDialogConfig = null;
-			}
-		};
-		showNumberInputDialog = true;
-	}
-
+	// Create deck context menu actions using controller
 	const deckContextMenuActions = $derived<MenuAction[]>(
-		!me
-			? []
-			: [
-					{
-						label: 'Draw Cards',
-						submenu: [
-							{ label: '1 Card', onClick: () => handleDrawN(1) },
-							{ label: '2 Cards', onClick: () => handleDrawN(2) },
-							{ label: '3 Cards', onClick: () => handleDrawN(3) },
-							{ label: '7 Cards', onClick: () => handleDrawN(7) },
-							{ label: 'Custom...', onClick: () => showNumberInput('Draw N Cards', 1, handleDrawN) }
-						]
-					},
-					{
-						label: 'Scry',
-						submenu: [
-							{ label: '1 Card', onClick: () => handleScry(1) },
-							{ label: '2 Cards', onClick: () => handleScry(2) },
-							{ label: '3 Cards', onClick: () => handleScry(3) },
-							{ label: 'Custom...', onClick: () => showNumberInput('Scry N Cards', 1, handleScry) }
-						]
-					},
-					{
-						label: 'Mill Cards',
-						submenu: [
-							{ label: '1 Card', onClick: () => handleMill(1) },
-							{ label: '2 Cards', onClick: () => handleMill(2) },
-							{ label: '3 Cards', onClick: () => handleMill(3) },
-							{ label: '5 Cards', onClick: () => handleMill(5) },
-							{ label: 'Custom...', onClick: () => showNumberInput('Mill N Cards', 1, handleMill) }
-						]
-					},
-					{ divider: true },
-					{
-						label: 'Reveal Top Card',
-						onClick: () => handleRevealTop(1)
-					},
-					{
-						label: me.revealedTopCard ? 'Hide Revealed Top' : 'Reveal Top Permanently',
-						onClick: handleToggleRevealedTop
-					},
-					{ divider: true },
-					{
-						label: 'Search Library',
-						onClick: () => {
-							showDeckSearch = true;
-						}
-					},
-					{
-						label: 'Shuffle Library',
-						onClick: handleShuffleLibrary
-					}
-				]
+		controller.createDeckContextMenuActions(() => {
+			uiState.showDeckSearch = true;
+		})
 	);
 
-	/**
-	 * Handle battlefield card click
-	 */
-	function handleBattlefieldCardClick(cardId: string): void {
-		const card = battlefield.find((c) => c.id === cardId);
-		if (!card) return;
-
-		// Toggle tap/untap
-		playtestGameStore.tapCard(cardId, !card.tapped);
-	}
+	// Use controller battlefield handlers
+	const handleBattlefieldCardClick = controller.handleBattlefieldCardClick;
 
 	/**
 	 * Handle battlefield card mouse down (for drag)
@@ -662,14 +410,12 @@
 
 			if (distance >= DRAG_THRESHOLD) {
 				battlefieldIsDragPending = false;
-				const validZones = getAllValidDropZones('battlefield' as SourceZone);
 				dragDropStore.startDrag(
 					cardId,
 					cardName,
 					'battlefield' as SourceZone,
 					moveEvent.clientX,
-					moveEvent.clientY,
-					validZones
+					moveEvent.clientY
 				);
 
 				document.removeEventListener('mousemove', handleMouseMove);
@@ -709,14 +455,12 @@
 
 			if (distance >= DRAG_THRESHOLD) {
 				commandIsDragPending = false;
-				const validZones = getAllValidDropZones('command' as SourceZone);
 				dragDropStore.startDrag(
 					cardId,
 					cardName,
 					'command' as SourceZone,
 					moveEvent.clientX,
-					moveEvent.clientY,
-					validZones
+					moveEvent.clientY
 				);
 
 				document.removeEventListener('mousemove', handleMouseMove);
@@ -740,29 +484,13 @@
 	 */
 	function handleBattlefieldDrop(cardId: string): void {
 		const dragState = $dragDropStore;
-		const sourceZone = dragState.sourceZone;
-
-		if (sourceZone === 'hand') {
-			// Move from hand to battlefield
-			playtestGameStore.moveCardToZone(cardId, 'BATTLEFIELD');
-			// Sync to game store
-			console.log('[syncPlaytestToGameStore] Syncing after moving card to battlefield');
-			syncPlaytestToGameStore();
-		} else if (sourceZone && sourceZone !== 'battlefield') {
-			console.log('[syncPlaytestToGameStore] Syncing after moving card to zone', sourceZone);
-			playtestGameStore.moveCardToZone(cardId, 'BATTLEFIELD');
-			syncPlaytestToGameStore();
-		}
+		controller.handleBattlefieldDrop(cardId, dragState.sourceZone);
 	}
 
 	/**
 	 * Handle zone drop (graveyard, exile, hand)
 	 */
-	function handleZoneDrop(cardId: string, zone: string): void {
-		playtestGameStore.moveCardToZone(cardId, zone);
-		console.log('[syncPlaytestToGameStore] Syncing after dropping card in zone');
-		syncPlaytestToGameStore();
-	}
+	const handleZoneDrop = controller.handleZoneDrop;
 
 	/**
 	 * Copy game log to clipboard
@@ -970,40 +698,40 @@
 			case 'm':
 				// M - Toggle menu (only when game started)
 				if (isGameStarted) {
-					showMenu = !showMenu;
+					uiState.showMenu = !uiState.showMenu;
 					event.preventDefault();
 				}
 				break;
 			case 'escape':
 				// Escape - Close menu or modals
-				if (showMenu) {
-					showMenu = false;
+				if (uiState.showMenu) {
+					uiState.showMenu = false;
 					event.preventDefault();
-				} else if (showKeyboardShortcuts) {
-					showKeyboardShortcuts = false;
+				} else if (uiState.showKeyboardShortcuts) {
+					uiState.showKeyboardShortcuts = false;
 					event.preventDefault();
-				} else if (showTokenCreator) {
-					showTokenCreator = false;
+				} else if (uiState.showTokenCreator) {
+					uiState.showTokenCreator = false;
 					event.preventDefault();
-				} else if (showCreateTokenDialog) {
-					showCreateTokenDialog = false;
+				} else if (uiState.showCreateTokenDialog) {
+					uiState.showCreateTokenDialog = false;
 					event.preventDefault();
-				} else if (showCounterDialog) {
-					showCounterDialog = false;
-					selectedCardForCounters = null;
+				} else if (uiState.showCounterDialog) {
+					uiState.showCounterDialog = false;
+					uiState.selectedCardForCounters = null;
 					event.preventDefault();
-				} else if (showDebugOverlay) {
-					showDebugOverlay = false;
+				} else if (uiState.showDebugOverlay) {
+					uiState.showDebugOverlay = false;
 					event.preventDefault();
 				}
 				break;
 			case '?':
-				showKeyboardShortcuts = !showKeyboardShortcuts;
+				uiState.showKeyboardShortcuts = !uiState.showKeyboardShortcuts;
 				event.preventDefault();
 				break;
 			case 'f':
 				// F - Search your deck
-				showDeckSearch = true;
+				uiState.showDeckSearch = true;
 				event.preventDefault();
 				break;
 			case 'x':
@@ -1023,149 +751,46 @@
 				event.preventDefault();
 				break;
 			case 'w':
-				showCreateTokenDialog = true;
+				uiState.showCreateTokenDialog = true;
 				event.preventDefault();
 				break;
 		}
 
-		// Hover card shortcuts
+		// Hover card shortcuts - use controller
 		if (hoveredCard) {
-			switch (key) {
-				case 'd':
-					playtestGameStore.moveCardToZone(hoveredCard.id, 'GRAVEYARD');
-					event.preventDefault();
-					break;
-				case 's':
-					playtestGameStore.moveCardToZone(hoveredCard.id, 'EXILE');
-					event.preventDefault();
-					break;
-				case 'r':
-					playtestGameStore.moveCardToZone(hoveredCard.id, 'HAND');
-					event.preventDefault();
-					break;
-				case 't':
-					playtestGameStore.moveCardToZone(hoveredCard.id, 'LIBRARY');
-					event.preventDefault();
-					break;
-				case 'k':
-					selectedCardForCounters = { id: hoveredCard.id, name: hoveredCard.name };
-					showCounterDialog = true;
-					event.preventDefault();
-					break;
+			const handled = controller.handleHoveredCardShortcut(key, hoveredCard.id);
+			if (handled) {
+				event.preventDefault();
+			} else if (key === 'k') {
+				// Counter dialog shortcut (not in controller)
+				uiState.selectedCardForCounters = { id: hoveredCard.id, name: hoveredCard.name };
+				uiState.showCounterDialog = true;
+				event.preventDefault();
 			}
 		}
 	}
 
 	/**
-	 * Register drop zones
+	 * Register all drop zones using shared helper
 	 */
-	$effect(() => {
-		if (battlefieldDropZoneEl && !dropZoneUnregister) {
-			dropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'battlefield',
-				type: 'battlefield',
-				element: battlefieldDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'battlefield',
-				onDrop: handleBattlefieldDrop
-			});
+	useDropZones(
+		() => ({
+			battlefield: battlefieldDropZoneEl,
+			graveyard: graveyardDropZoneEl,
+			exile: exileDropZoneEl,
+			hand: handDropZoneEl,
+			library: libraryDropZoneEl,
+			command: commandDropZoneEl
+		}),
+		{
+			onBattlefieldDrop: handleBattlefieldDrop,
+			onGraveyardDrop: (cardId) => handleZoneDrop(cardId, 'GRAVEYARD'),
+			onExileDrop: (cardId) => handleZoneDrop(cardId, 'EXILE'),
+			onHandDrop: (cardId) => handleZoneDrop(cardId, 'HAND'),
+			onLibraryDrop: (cardId) => handleZoneDrop(cardId, 'LIBRARY'),
+			onCommandDrop: (cardId) => handleZoneDrop(cardId, 'COMMAND')
 		}
-		return () => {
-			if (dropZoneUnregister) {
-				dropZoneUnregister();
-				dropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (graveyardDropZoneEl && !graveyardDropZoneUnregister) {
-			graveyardDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'graveyard',
-				type: 'graveyard',
-				element: graveyardDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'graveyard',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'GRAVEYARD')
-			});
-		}
-		return () => {
-			if (graveyardDropZoneUnregister) {
-				graveyardDropZoneUnregister();
-				graveyardDropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (exileDropZoneEl && !exileDropZoneUnregister) {
-			exileDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'exile',
-				type: 'exile',
-				element: exileDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'exile',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'EXILE')
-			});
-		}
-		return () => {
-			if (exileDropZoneUnregister) {
-				exileDropZoneUnregister();
-				exileDropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (handDropZoneEl && !handDropZoneUnregister) {
-			handDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'hand',
-				type: 'hand',
-				element: handDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'hand',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'HAND')
-			});
-		}
-		return () => {
-			if (handDropZoneUnregister) {
-				handDropZoneUnregister();
-				handDropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (libraryDropZoneEl && !libraryDropZoneUnregister) {
-			libraryDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'library',
-				type: 'library',
-				element: libraryDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'library',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'LIBRARY')
-			});
-		}
-		return () => {
-			if (libraryDropZoneUnregister) {
-				libraryDropZoneUnregister();
-				libraryDropZoneUnregister = null;
-			}
-		};
-	});
-
-	$effect(() => {
-		if (commandDropZoneEl && !commandDropZoneUnregister) {
-			commandDropZoneUnregister = dragDropStore.registerDropZone({
-				id: 'command',
-				type: 'command',
-				element: commandDropZoneEl,
-				accepts: (_cardId, sourceZone) => sourceZone !== 'command',
-				onDrop: (cardId) => handleZoneDrop(cardId, 'COMMAND')
-			});
-		}
-		return () => {
-			if (commandDropZoneUnregister) {
-				commandDropZoneUnregister();
-				commandDropZoneUnregister = null;
-			}
-		};
-	});
+	);
 
 	/**
 	 * Load available sessions for restoration
@@ -1187,11 +812,6 @@
 			const idx = players.findIndex((p) => !p.keptHand);
 			mulliganPlayerIndex = idx === -1 ? null : idx;
 
-			// Ensure the normal game store is initialized for shared components.
-			gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
-			console.log('[syncPlaytestToGameStore] Syncing after restoring session');
-			syncPlaytestToGameStore();
-
 			// Set playtestId in URL
 			await updateUrlWithPlaytestId($playtestGameStore.gameId);
 
@@ -1211,7 +831,7 @@
 	}
 
 	async function initializeFromPlaytestId(): Promise<void> {
-		const playtestId = $page.url.searchParams.get('playtestId');
+		const playtestId = page.url.searchParams.get('playtestId');
 		if (playtestId) {
 			const success = playtestGameStore.restoreSession(playtestId);
 			if (success) {
@@ -1220,11 +840,6 @@
 				// Restore mulligan phase based on first player who hasn't kept.
 				const idx = players.findIndex((p) => !p.keptHand);
 				mulliganPlayerIndex = idx === -1 ? null : idx;
-
-				// Ensure the normal game store is initialized for shared components.
-				gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
-				console.log('[syncPlaytestToGameStore] Syncing after initializing from playtest id');
-				syncPlaytestToGameStore();
 
 				// URL already has playtestId, but ensure it's set correctly
 				await updateUrlWithPlaytestId(playtestId);
@@ -1238,8 +853,8 @@
 	// Initialize on mount
 	onMount(() => {
 		// Check if URL has deck params (user wants to start a new playtest)
-		const hasUrlDecks = $page.url.searchParams.has('d1') || $page.url.searchParams.has('d2');
-		const hasPlaytestIdInUrl = $page.url.searchParams.has('playtestId');
+		const hasUrlDecks = page.url.searchParams.has('d1') || page.url.searchParams.has('d2');
+		const hasPlaytestIdInUrl = page.url.searchParams.has('playtestId');
 
 		// Otherwise, check for existing sessions
 		loadAvailableSessions();
@@ -1271,11 +886,6 @@
 			// Restore mulligan phase based on first player who hasn't kept.
 			const idx = players.findIndex((p) => !p.keptHand);
 			mulliganPlayerIndex = idx === -1 ? null : idx;
-
-			// Ensure the normal game store is initialized for shared components.
-			gameStore.initGame($playtestGameStore.gameId, $playtestGameStore.activeControlSeat);
-			console.log('[syncPlaytestToGameStore] Syncing after initializing from url');
-			syncPlaytestToGameStore();
 
 			// Set playtestId in URL
 			updateUrlWithPlaytestId($playtestGameStore.gameId);
@@ -1311,54 +921,6 @@
 			<p>{error}</p>
 			<button class="btn-primary" onclick={() => goto('/lobby')}> Return to Lobby </button>
 		</div>
-	{:else if showSessionPicker}
-		<div class="session-picker-overlay">
-			<div class="session-picker-modal">
-				<h2>Restore Playtest Session</h2>
-				<p class="session-picker-hint">
-					Select a recent playtest session to continue, or start a new one.
-				</p>
-
-				{#if availableSessions.length > 0}
-					<div class="sessions-list">
-						{#each availableSessions as session (session.id)}
-							<div class="session-card">
-								<div class="session-info">
-									<div class="session-label">{session.label}</div>
-									<div class="session-meta">
-										{session.playerCount} players · Turn {session.turn} ·
-										{new Date(session.savedAt).toLocaleDateString()}
-										{new Date(session.savedAt).toLocaleTimeString([], {
-											hour: '2-digit',
-											minute: '2-digit'
-										})}
-									</div>
-								</div>
-								<div class="session-actions">
-									<button class="btn-restore" onclick={() => restoreSession(session.id)}>
-										Restore
-									</button>
-									<button
-										class="btn-delete"
-										onclick={() => deleteSession(session.id)}
-										title="Delete session"
-									>
-										✕
-									</button>
-								</div>
-							</div>
-						{/each}
-					</div>
-				{:else}
-					<p class="no-sessions">No saved sessions found.</p>
-				{/if}
-
-				<div class="session-picker-actions">
-					<button class="btn-secondary" onclick={() => goto('/lobby')}> Back to Lobby </button>
-					<button class="btn-primary" onclick={() => goto('/lobby')}> Start New Playtest </button>
-				</div>
-			</div>
-		</div>
 	{:else if !isInitialized}
 		<div class="loading-overlay">
 			<p>Initializing game state...</p>
@@ -1376,46 +938,102 @@
 		/>
 	{:else}
 		<PlaytestHeader
+			isMultiplayer={false}
 			{players}
 			{activeControlSeat}
 			availableSessions={availableSessions.length}
 			{turnNumber}
 			{activePlayerName}
-			{showAllHands}
+			showAllHands={uiState.showAllHands}
 			onBack={() => goto('/lobby')}
 			onSessionsClick={() => {
 				loadAvailableSessions();
 				showSessionPicker = true;
 			}}
 			onSwitchPlayer={switchPlayer}
-			onToggleAllHands={() => (showAllHands = !showAllHands)}
+			onToggleAllHands={() => (uiState.showAllHands = !uiState.showAllHands)}
 			onDrawCard={handleDrawCard}
 			onUntapAll={handleUntapAll}
 			onShuffleLibrary={handleShuffleLibrary}
-			onSearchLibrary={() => (showDeckSearch = true)}
-			onCreateToken={() => (showCreateTokenDialog = true)}
+			onSearchLibrary={() => (uiState.showDeckSearch = true)}
+			onCreateToken={() => (uiState.showCreateTokenDialog = true)}
 			onNextTurn={handleNextTurn}
-			onShowKeyboardShortcuts={() => (showKeyboardShortcuts = true)}
-			onShowDebug={() => (showDebugOverlay = true)}
-			onToggleMenu={() => (showMenu = !showMenu)}
+			onShowKeyboardShortcuts={() => (uiState.showKeyboardShortcuts = true)}
+			onShowDebug={() => (uiState.showDebugOverlay = true)}
+			onToggleMenu={() => (uiState.showMenu = !uiState.showMenu)}
 		/>
 
+		<!-- Session Picker Overlay for restoring older playtest sessions -->
+		{#if showSessionPicker}
+			<div class="session-picker-overlay">
+				<div class="session-picker-modal">
+					<h2>Restore Playtest Session</h2>
+					<p class="session-picker-hint">
+						Select a recent playtest session to continue, or start a new one.
+					</p>
+
+					{#if availableSessions.length > 0}
+						<div class="sessions-list">
+							{#each availableSessions as session (session.id)}
+								<div class="session-card">
+									<div class="session-info">
+										<div class="session-label">{session.label}</div>
+										<div class="session-meta">
+											{session.playerCount} players · Turn {session.turn} ·
+											{new Date(session.savedAt).toLocaleDateString()}
+											{new Date(session.savedAt).toLocaleTimeString([], {
+												hour: '2-digit',
+												minute: '2-digit'
+											})}
+										</div>
+									</div>
+									<div class="session-actions">
+										<button class="btn-restore" onclick={() => restoreSession(session.id)}>
+											Restore
+										</button>
+										<button
+											class="btn-delete"
+											onclick={() => deleteSession(session.id)}
+											title="Delete session"
+										>
+											✕
+										</button>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="no-sessions">No saved sessions found.</p>
+					{/if}
+
+					<div class="session-picker-actions">
+						<button class="btn-back" onclick={() => (showSessionPicker = false)}> Back</button>
+						<button class="btn-primary" onclick={() => goto('/lobby')}> Start New Playtest </button>
+					</div>
+				</div>
+			</div>
+		{/if}
+
 		<!-- Menu Overlay (slide-in from right) -->
-		{#if showMenu}
+		{#if uiState.showMenu}
 			<!-- Backdrop -->
 			<div
 				class="menu-backdrop"
 				role="button"
 				tabindex="0"
-				onclick={() => (showMenu = false)}
-				onkeydown={(e) => e.key === 'Escape' && (showMenu = false)}
+				onclick={() => (uiState.showMenu = false)}
+				onkeydown={(e) => e.key === 'Escape' && (uiState.showMenu = false)}
 			></div>
 
 			<!-- Menu Panel -->
 			<div class="menu-overlay open">
 				<div class="menu-header">
 					<h2>Menu</h2>
-					<button class="menu-close-btn" onclick={() => (showMenu = false)} aria-label="Close menu">
+					<button
+						class="menu-close-btn"
+						onclick={() => (uiState.showMenu = false)}
+						aria-label="Close menu"
+					>
 						<X size={24} />
 					</button>
 				</div>
@@ -1438,8 +1056,11 @@
 								</select>
 							</label>
 
-							<button class="menu-btn" onclick={() => (showAllHands = !showAllHands)}>
-								{#if showAllHands}
+							<button
+								class="menu-btn"
+								onclick={() => (uiState.showAllHands = !uiState.showAllHands)}
+							>
+								{#if uiState.showAllHands}
 									<EyeOff size={16} />
 									Hide
 								{:else}
@@ -1473,8 +1094,8 @@
 							<button
 								class="menu-btn"
 								onclick={() => {
-									showKeyboardShortcuts = true;
-									showMenu = false;
+									uiState.showKeyboardShortcuts = true;
+									uiState.showMenu = false;
 								}}
 							>
 								<Keyboard size={18} />
@@ -1483,8 +1104,8 @@
 							<button
 								class="menu-btn"
 								onclick={() => {
-									showDebugOverlay = true;
-									showMenu = false;
+									uiState.showDebugOverlay = true;
+									uiState.showMenu = false;
 								}}
 							>
 								🔧 Debug View
@@ -1501,7 +1122,7 @@
 								class="menu-btn"
 								onclick={() => {
 									showSessionPicker = true;
-									showMenu = false;
+									uiState.showMenu = false;
 								}}
 							>
 								<Clock size={18} />
@@ -1514,7 +1135,7 @@
 		{/if}
 
 		<!-- All Hands Overlay -->
-		{#if showAllHands}
+		{#if uiState.showAllHands}
 			<div class="all-hands-overlay">
 				{#each players as player}
 					<div class="player-hand-compact" class:active={player.playerId === activeControlSeat}>
@@ -1547,14 +1168,15 @@
 							battlefieldLands={opponentBattlefieldLands}
 							commandCards={opponentCommandCards}
 							{isCommanderGame}
-							showLifeMenu={showOpponentLifeMenu}
-							onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+							showLifeMenu={uiState.showOpponentLifeMenu}
+							onSelectOpponent={(playerId) => (uiState.selectedOpponentId = playerId)}
 							onLifeChange={handleLifeChange}
 							onPoisonChange={handlePoisonChange}
-							onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+							onToggleLifeMenu={() =>
+								(uiState.showOpponentLifeMenu = !uiState.showOpponentLifeMenu)}
 							onCardContextMenu={(cardId, cardName) => {
-								selectedCardForCounters = { id: cardId, name: cardName };
-								showCounterDialog = true;
+								uiState.selectedCardForCounters = { id: cardId, name: cardName };
+								uiState.showCounterDialog = true;
 							}}
 						/>
 					{/if}
@@ -1586,8 +1208,8 @@
 								onPoisonChange={handlePoisonChange}
 								onToggleLifeMenu={() => {}}
 								onCardContextMenu={(cardId, cardName) => {
-									selectedCardForCounters = { id: cardId, name: cardName };
-									showCounterDialog = true;
+									uiState.selectedCardForCounters = { id: cardId, name: cardName };
+									uiState.showCounterDialog = true;
 								}}
 							/>
 						{/each}
@@ -1603,14 +1225,15 @@
 								battlefieldLands={opponentBattlefieldLands}
 								commandCards={opponentCommandCards}
 								{isCommanderGame}
-								showLifeMenu={showOpponentLifeMenu}
-								onSelectOpponent={(playerId) => (selectedOpponentId = playerId)}
+								showLifeMenu={uiState.showOpponentLifeMenu}
+								onSelectOpponent={(playerId) => (uiState.selectedOpponentId = playerId)}
 								onLifeChange={handleLifeChange}
 								onPoisonChange={handlePoisonChange}
-								onToggleLifeMenu={() => (showOpponentLifeMenu = !showOpponentLifeMenu)}
+								onToggleLifeMenu={() =>
+									(uiState.showOpponentLifeMenu = !uiState.showOpponentLifeMenu)}
 								onCardContextMenu={(cardId, cardName) => {
-									selectedCardForCounters = { id: cardId, name: cardName };
-									showCounterDialog = true;
+									uiState.selectedCardForCounters = { id: cardId, name: cardName };
+									uiState.showCounterDialog = true;
 								}}
 							/>
 						{/if}
@@ -1626,15 +1249,15 @@
 					{isDragging}
 					{isOverValidDrop}
 					{dropZone}
-					{hoveredCardId}
+					hoveredCardId={uiState.hoveredCardId}
 					onCardClick={handleBattlefieldCardClick}
 					onCardMouseDown={handleBattlefieldCardMouseDown}
 					onCardContextMenu={(cardId, cardName) => {
-						selectedCardForCounters = { id: cardId, name: cardName };
-						showCounterDialog = true;
+						uiState.selectedCardForCounters = { id: cardId, name: cardName };
+						uiState.showCounterDialog = true;
 					}}
 					onCommandCardMouseDown={handleCommandCardMouseDown}
-					onCardHover={(cardId) => (hoveredCardId = cardId)}
+					onCardHover={(cardId) => (uiState.hoveredCardId = cardId)}
 					battlefieldDropZoneRef={(el) => (battlefieldDropZoneEl = el)}
 					commandDropZoneRef={(el) => (commandDropZoneEl = el)}
 				/>
@@ -1651,11 +1274,11 @@
 						graveyard={myGrave}
 						{exile}
 						mana={myMana}
-						{showLifeMenu}
+						showLifeMenu={uiState.showLifeMenu}
 						onLifeChange={handleLifeChange}
 						onPoisonChange={handlePoisonChange}
-						onToggleLifeMenu={() => (showLifeMenu = !showLifeMenu)}
-						onSearchLibrary={() => (showDeckSearch = true)}
+						onToggleLifeMenu={() => (uiState.showLifeMenu = !uiState.showLifeMenu)}
+						onSearchLibrary={() => (uiState.showDeckSearch = true)}
 						onDeckContextMenu={handleDeckContextMenu}
 						libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
 						graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
@@ -1670,39 +1293,39 @@
 					class:drag-active={isDragging}
 					class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
 				>
+					<!-- TODO: Verify the props here -->
 					<PlayerHand
-						onCardClick={() => {}}
+						cards={me?.hand || []}
+						selectedCardIds={[]}
+						playingCardIds={[]}
+						hasPriority={true}
 						size="normal"
 						currentPhase="PRECOMBAT_MAIN"
 						canDrag={true}
 					/>
 				</div>
 			</main>
-			<div class="game-log-container">
-				<GameStateLog />
-			</div>
+			<GameStateLog />
 		</div>
 
 		<!-- Token Creator -->
-		{#if showTokenCreator}
-			<TokenCreator gameId="playtest" onClose={() => (showTokenCreator = false)} />
+		{#if uiState.showTokenCreator}
+			<TokenCreator gameId="playtest" onClose={() => (uiState.showTokenCreator = false)} />
 		{/if}
 
 		<!-- Create Token Dialog (New) -->
-		{#if showCreateTokenDialog}
+		{#if uiState.showCreateTokenDialog}
 			<CreateTokenDialog
 				onCreateToken={(name, types, power, toughness, color) => {
 					playtestGameStore.createToken(name, types, power, toughness, color);
-					console.log('[syncPlaytestToGameStore] Syncing after creating token');
-					syncPlaytestToGameStore();
-					showCreateTokenDialog = false;
+					uiState.showCreateTokenDialog = false;
 				}}
-				onClose={() => (showCreateTokenDialog = false)}
+				onClose={() => (uiState.showCreateTokenDialog = false)}
 			/>
 		{/if}
 
 		<!-- Counter Dialog -->
-		{#if showCounterDialog && selectedCardForCounters && selectedCardForCountersData}
+		{#if uiState.showCounterDialog && uiState.selectedCardForCounters && selectedCardForCountersData}
 			<CounterDialog
 				cardName={selectedCardForCountersData.name}
 				cardId={selectedCardForCountersData.id}
@@ -1710,100 +1333,90 @@
 				onAddCounter={(counterName, amount) => {
 					const card = selectedCardForCountersData;
 					playtestGameStore.addCounter(card.id, counterName, amount);
-					console.log('[syncPlaytestToGameStore] Syncing after adding counter');
-					syncPlaytestToGameStore();
 				}}
 				onRemoveCounter={(counterName, amount) => {
 					const card = selectedCardForCountersData;
 					playtestGameStore.removeCounter(card.id, counterName, amount);
-					console.log('[syncPlaytestToGameStore] Syncing after removing counter');
-					syncPlaytestToGameStore();
 				}}
 				onSetCounter={(counterName, amount) => {
 					const card = selectedCardForCountersData;
 					playtestGameStore.setCounter(card.id, counterName, amount);
-					console.log('[syncPlaytestToGameStore] Syncing after setting counter');
-					syncPlaytestToGameStore();
 				}}
 				onClose={() => {
-					showCounterDialog = false;
-					selectedCardForCounters = null;
+					uiState.showCounterDialog = false;
+					uiState.selectedCardForCounters = null;
 				}}
 			/>
 		{/if}
 
 		<!-- Deck Search -->
-		{#if showDeckSearch && me}
+		{#if uiState.showDeckSearch && me}
 			<PlaytestLibrarySearch
 				cards={me.library}
 				playerName="You"
 				onMove={(cardId, zone) => {
 					playtestGameStore.moveCardToZone(cardId, zone);
-					console.log('[syncPlaytestToGameStore] Syncing after moving card to zone', zone);
-					syncPlaytestToGameStore();
 				}}
 				onShuffle={() => {
 					playtestGameStore.shuffleLibrary(me.playerId);
-					console.log('[syncPlaytestToGameStore] Syncing after shuffling library');
-					syncPlaytestToGameStore();
 				}}
-				onClose={() => (showDeckSearch = false)}
+				onClose={() => (uiState.showDeckSearch = false)}
 			/>
 		{/if}
 
 		<!-- Deck Context Menu -->
-		{#if showDeckContextMenu}
+		{#if uiState.showDeckContextMenu}
 			<DeckContextMenu
-				position={deckContextMenuPosition}
+				position={uiState.deckContextMenuPosition}
 				deckCount={me?.libraryCount || 0}
 				playerName={me?.name || 'You'}
-				onClose={() => (showDeckContextMenu = false)}
+				onClose={() => (uiState.showDeckContextMenu = false)}
 				actions={deckContextMenuActions}
 			/>
 		{/if}
 
 		<!-- Number Input Dialog -->
-		{#if showNumberInputDialog && numberInputDialogConfig}
+		{#if uiState.showNumberInputDialog && uiState.numberInputDialogConfig}
 			<NumberInputDialog
-				title={numberInputDialogConfig.title}
-				defaultValue={numberInputDialogConfig.defaultValue}
-				min={numberInputDialogConfig.min}
-				max={numberInputDialogConfig.max}
-				onConfirm={numberInputDialogConfig.onConfirm}
+				title={uiState.numberInputDialogConfig.title}
+				defaultValue={uiState.numberInputDialogConfig.defaultValue}
+				min={uiState.numberInputDialogConfig.min}
+				max={uiState.numberInputDialogConfig.max}
+				onConfirm={uiState.numberInputDialogConfig.onConfirm}
 				onCancel={() => {
-					showNumberInputDialog = false;
-					numberInputDialogConfig = null;
+					uiState.showNumberInputDialog = false;
+					uiState.numberInputDialogConfig = null;
 				}}
 			/>
 		{/if}
 
 		<!-- Scry Dialog -->
-		{#if showScryDialog && currentScrySession}
+		{#if uiState.showScryDialog && uiState.currentScrySession}
 			<ScryDialog
-				cards={currentScrySession.cards}
+				cards={uiState.currentScrySession.cards}
 				onComplete={handleScryComplete}
 				onCancel={() => {
-					showScryDialog = false;
-					currentScrySession = null;
+					uiState.showScryDialog = false;
+					uiState.currentScrySession = null;
 				}}
 			/>
 		{/if}
 
 		<!-- Reveal Top Dialog -->
-		{#if showRevealTopDialog}
+		{#if uiState.showRevealTopDialog}
 			<RevealTopDialog
-				cards={revealedCards}
+				cards={uiState.revealedCards}
 				onClose={() => {
-					showRevealTopDialog = false;
-					revealedCards = [];
+					uiState.showRevealTopDialog = false;
+					uiState.revealedCards = [];
 				}}
 			/>
 		{/if}
 
-		<KeyboardShortcutsModal bind:open={showKeyboardShortcuts} mode="playtest" />
+		<KeyboardShortcutsModal bind:open={uiState.showKeyboardShortcuts} mode="playtest" />
 
 		<!-- Debug Overlay -->
-		{#if showDebugOverlay}
+		{#if uiState.showDebugOverlay}
 			<div class="debug-overlay" role="dialog" aria-modal="true">
 				<div class="debug-modal">
 					<header class="debug-header">
@@ -1812,7 +1425,9 @@
 							<div class="debug-status connected">● Playtest Mode</div>
 						</div>
 						<div class="debug-header-right">
-							<button class="debug-close" onclick={() => (showDebugOverlay = false)}>✕</button>
+							<button class="debug-close" onclick={() => (uiState.showDebugOverlay = false)}
+								>✕</button
+							>
 						</div>
 					</header>
 

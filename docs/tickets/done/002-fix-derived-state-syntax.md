@@ -1,14 +1,17 @@
 # Fix Incorrect $derived Syntax in Svelte 5 Components
 
+**Status**: Done
+
 ## Problem
 
-In Svelte 5, when using `$derived` with a function that has a block body (curly braces), you must use `$derived.by(() => { ... })` instead of `$derived(() => { ... })`. 
+In Svelte 5, when using `$derived` with a function that has a block body (curly braces), you must use `$derived.by(() => { ... })` instead of `$derived(() => { ... })`.
 
 Using `$derived(() => { ... })` creates a derived state that **returns a function** rather than evaluating the function and returning its result. This causes the function code to leak into production builds, appearing as raw JavaScript in the rendered output.
 
 ### Example Bug
 
 **Incorrect:**
+
 ```svelte
 const nextHandSize = $derived(() => {
     if (nextMulliganCount <= freeMulligans) {
@@ -21,6 +24,7 @@ const nextHandSize = $derived(() => {
 ```
 
 **Correct:**
+
 ```svelte
 const nextHandSize = $derived.by(() => {
     if (nextMulliganCount <= freeMulligans) {
@@ -35,12 +39,14 @@ const nextHandSize = $derived.by(() => {
 ### When to Use Each Syntax
 
 - **`$derived(expression)`** - For simple expressions (no block body)
+
   ```svelte
   const count = $derived(items.length);
   const isActive = $derived(status === 'active');
   ```
 
 - **`$derived(() => expression)`** - For simple arrow function expressions (no block body)
+
   ```svelte
   const filtered = $derived(() => items.filter(i => i.active));
   ```

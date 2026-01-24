@@ -44,7 +44,15 @@ export default [
 				extraFileExtensions: ['.svelte']
 			},
 			globals: {
-				...globals.browser
+				...globals.browser,
+				// Svelte 5 runes
+				$state: 'readonly',
+				$derived: 'readonly',
+				$effect: 'readonly',
+				$props: 'readonly',
+				$bindable: 'readonly',
+				$inspect: 'readonly',
+				$host: 'readonly'
 			}
 		},
 		plugins: {
@@ -53,6 +61,40 @@ export default [
 		rules: {
 			...svelte.configs.recommended.rules,
 			'svelte/no-at-html-tags': 'warn'
+		}
+	},
+	{
+		files: ['**/*.svelte.ts', '**/*.svelte.js'],
+		languageOptions: {
+			parser: tsParser,
+			ecmaVersion: 2020,
+			sourceType: 'module',
+			globals: {
+				...globals.browser,
+				...globals.es2017,
+				// Svelte 5 runes
+				$state: 'readonly',
+				$derived: 'readonly',
+				$effect: 'readonly',
+				$props: 'readonly',
+				$bindable: 'readonly',
+				$inspect: 'readonly',
+				$host: 'readonly'
+			}
+		},
+		plugins: {
+			'@typescript-eslint': ts
+		},
+		rules: {
+			...ts.configs.recommended.rules,
+			'@typescript-eslint/no-unused-vars': [
+				'warn',
+				{
+					argsIgnorePattern: '^_',
+					varsIgnorePattern: '^_'
+				}
+			],
+			'@typescript-eslint/no-explicit-any': 'warn'
 		}
 	},
 	prettier,

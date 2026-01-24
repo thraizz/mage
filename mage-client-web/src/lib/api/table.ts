@@ -307,8 +307,12 @@ export async function startGame(tableId: string): Promise<string> {
 		throw new Error(response.error || 'Failed to start game');
 	}
 
-	// Return game ID if provided, otherwise use table ID
-	return response.gameId || tableId;
+	// Must have a valid game ID to proceed
+	if (!response.gameId) {
+		throw new Error('Server did not return a game ID after starting match');
+	}
+
+	return response.gameId;
 }
 
 /**

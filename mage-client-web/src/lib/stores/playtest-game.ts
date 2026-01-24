@@ -7,7 +7,7 @@
 
 import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { CardView, ManaPoolView } from '$lib/generated/mage/v1/models';
+import type { CardView, GameView } from '$lib/generated/mage/v1/models';
 import { ZoneId } from '$lib/utils/zones';
 import {
 	updatePlayer,
@@ -18,26 +18,7 @@ import {
 	getNextPlayer,
 	updateCardInZone
 } from '$lib/utils/playtest-helpers';
-
-/**
- * Local player state for playtest
- */
-export interface PlaytestPlayer {
-	playerId: string;
-	name: string;
-	life: number;
-	poison: number;
-	energy: number;
-	libraryCount: number;
-	handCount: number;
-	hand: CardView[];
-	library: CardView[];
-	graveyard: CardView[];
-	manaPool: ManaPoolView;
-	keptHand: boolean;
-	mulliganCount: number;
-	revealedTopCard: boolean; // When true, top card of library is permanently visible
-}
+import type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
 
 /**
  * Playtest game state
@@ -57,6 +38,9 @@ export interface PlaytestGameState {
 	mulliganType: 'london';
 	freeMulligans: number;
 }
+
+// Re-export types for backward compatibility
+export type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
 
 const initialState: PlaytestGameState = {
 	gameId: '',
@@ -108,28 +92,6 @@ type PersistedPlaytestSession = {
 type PersistedPlaytestSessionsPayload = {
 	version: number;
 	sessions: PersistedPlaytestSession[];
-};
-
-/**
- * Game log (for playtest analysis)
- */
-export type PlaytestLogEntry = {
-	id: string;
-	at: number; // unix ms
-	turn: number;
-	activePlayerId: string;
-	controlSeat: string; // activeControlSeat at time of event
-	kind: string; // "draw" | "move" | "life" | ...
-	message: string;
-};
-
-/**
- * Scry session for tracking ongoing scry operations
- */
-export type ScrySession = {
-	sessionId: string;
-	playerId: string;
-	cards: CardView[];
 };
 
 const PLAYTEST_LOG_MAX_ENTRIES = 1000;
@@ -464,6 +426,50 @@ function createPlaytestGameStore() {
 		upsertSessionFromState(nextState, { bumpSavedAt: true });
 
 		console.log('[PlaytestGame] Initialized with', players.length, 'players');
+	}
+
+	function initializeFromGameView(gameView: GameView): void {
+		const nextState: PlaytestGameState = {
+			gameId: gameView.gameId,
+			activeControlSeat: gameView.activeControlSeat,
+			players: gameView.players.map((p) => ({
+				playerId: p.playerId,
+				name: p.name,
+				life: p.life,
+				poison: p.poison,
+				energy: p.energy,
+				libraryCount: p.libraryCount,
+				handCount: p.handCount,
+				hand: p.hand,
+				library: p.library,
+				graveyard: p.graveyard,
+				manaPool: p.manaPool || {
+					white: 0,
+					blue: 0,
+					black: 0,
+					red: 0,
+					green: 0,
+					colorless: 0
+				},
+				keptHand: p.keptHand,
+				mulliganCount: p.mulliganCount,
+				revealedTopCard: false
+			})),
+			battlefield: gameView.battlefield,
+			exile: gameView.exile,
+			stack: gameView.stack,
+			command: gameView.command,
+			turn: gameView.turn,
+			activePlayerId: gameView.activePlayerId,
+			isInitialized: true,
+			log: [],
+			mulliganType: 'london',
+			freeMulligans: 0
+		};
+		set(nextState);
+		// Persist immediately as a new/active session.
+		upsertSessionFromState(nextState, { bumpSavedAt: true });
+		console.log('[PlaytestGame] Initialized with', gameView.players.length, 'players');
 	}
 
 	/**
@@ -1188,6 +1194,7 @@ function createPlaytestGameStore() {
 	return {
 		subscribe,
 		initialize,
+		initializeFromGameView,
 		setCommand,
 		switchControlSeat,
 		drawCards,

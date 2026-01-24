@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/magefree/mage-server-go/internal/game"
@@ -80,6 +81,32 @@ func (s *mageServer) MatchStart(ctx context.Context, req *pb.MatchStartRequest) 
 
 	if len(players) < 2 {
 		return &pb.MatchStartResponse{Success: false, Error: "not enough players to start match"}, nil
+	}
+
+	// Validate that all players have active WebSocket sessions
+	// This prevents games from starting when players won't receive GAME_UPDATE events
+	s.logger.Info("[MATCH START] Validating WebSocket sessions for all players",
+		zap.String("table_id", tbl.ID),
+		zap.Strings("players", players),
+	)
+
+	for _, playerName := range players {
+		sessions := s.sessionMgr.GetSessionsByUser(playerName)
+		if len(sessions) == 0 {
+			s.logger.Warn("[MATCH START] Player has no active WebSocket sessions - cannot start game",
+				zap.String("table_id", tbl.ID),
+				zap.String("player", playerName),
+			)
+			return &pb.MatchStartResponse{
+				Success: false,
+				Error:   fmt.Sprintf("Player %s has no active connection - please ensure all players are connected before starting", playerName),
+			}, nil
+		}
+		s.logger.Info("[MATCH START] Player has active WebSocket session(s)",
+			zap.String("table_id", tbl.ID),
+			zap.String("player", playerName),
+			zap.Int("session_count", len(sessions)),
+		)
 	}
 
 	// Collect submitted decks from the table
@@ -352,21 +379,16 @@ func (s *mageServer) GameGetView(ctx context.Context, req *pb.GameGetViewRequest
 		playerID = sess.GetUserID()
 	}
 
-	// TODO: Phase 8 - Implement engine view conversion
-	// The following code is commented out until EngineGameView and related view types are implemented
-	// See ticket 004-final-action-check.md Phase 8
-	/*
-		if s.gameAdapter != nil {
-			s.logger.Info("GameGetView calling gameAdapter.GetGameView",
-				zap.String("game_id", gameInstance.ID),
-				zap.String("player_id", playerID),
-			)
-			if engineView, engineErr := s.gameAdapter.GetGameView(gameInstance.ID, playerID); engineErr == nil && engineView != nil {
-				s.logger.Info("GameGetView got engine view")
-				// Engine view conversion will be implemented in Phase 8
-			}
+	if s.gameAdapter != nil {
+		s.logger.Info("GameGetView calling gameAdapter.GetGameView",
+			zap.String("game_id", gameInstance.ID),
+			zap.String("player_id", playerID),
+		)
+		if engineView, engineErr := s.gameAdapter.GetGameView(gameInstance.ID, playerID); engineErr == nil && engineView != nil {
+			s.logger.Info("GameGetView got engine view")
+			view = s.engineViewToProto(engineView, playerID)
 		}
-	*/
+	}
 
 	return &pb.GameGetViewResponse{
 		Game: view,

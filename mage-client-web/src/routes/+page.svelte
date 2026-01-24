@@ -1,6 +1,4 @@
 <script lang="ts">
-	export const ssr = false;
-
 	import { toast } from '$lib/stores/toast';
 	import { confirm } from '$lib/stores/confirm';
 	import Modal from '$lib/components/Modal.svelte';

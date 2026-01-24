@@ -183,26 +183,123 @@ func (s *mageServer) handleGameNotification(notification game.GameNotification) 
 		return
 	}
 
-	// Send game update to all players
-	for _, playerName := range gameInstance.Players {
-		s.logger.Info("sending GAME_UPDATE to player",
+	// GAME_UPDATE notifications come with a pre-built view for a specific player.
+	// The engine's broadcast() already iterates over all players and sends one notification per player.
+	// We should NOT loop through all players here - that would cause N² notifications.
+	// More importantly, calling GetGameView() here would deadlock since broadcast() is called
+	// while holding the engine's write lock, and GetGameView() needs a read lock.
+
+	// Extract the pre-built view from the notification
+	view, hasView := notification.Data["view"]
+	if !hasView || view == nil {
+		s.logger.Warn("GAME_UPDATE notification missing view data",
+			zap.String("game_id", gameID),
+			zap.String("player_id", notification.PlayerID),
+		)
+		return
+	}
+
+	// Send to the specific player this notification is for
+	playerName := notification.PlayerID
+	if playerName == "" {
+		s.logger.Warn("GAME_UPDATE notification missing player_id",
+			zap.String("game_id", gameID),
+		)
+		return
+	}
+
+	s.logger.Info("sending GAME_UPDATE to player",
+		zap.String("game_id", gameID),
+		zap.String("player", playerName),
+	)
+	s.sendGameUpdateWithView(gameID, playerName, view)
+
+	// TODO: Support watchers. Currently the engine's broadcast() only sends to players.
+	// Watchers are tracked in Game.Watchers (manager level), not in GameState.Players (engine level).
+	// To properly support watchers, either:
+	// 1. Have the engine also broadcast to watchers (would need access to watcher list), or
+	// 2. Queue watcher updates to be sent after the engine lock is released
+}
+
+// sendGameUpdateWithView sends a GAME_UPDATE event to a specific player using a pre-built view.
+// This avoids calling GetGameView() which would acquire a lock and cause deadlock when called
+// from within broadcast() which already holds the write lock.
+func (s *mageServer) sendGameUpdateWithView(gameID, playerName string, engineView interface{}) {
+	// Convert engine view to protobuf
+	gameView := s.engineViewToProto(engineView, playerName)
+	if gameView == nil {
+		s.logger.Warn("engineViewToProto returned nil",
 			zap.String("game_id", gameID),
 			zap.String("player", playerName),
 		)
-		s.sendGameUpdateToPlayer(gameID, playerName)
+		return
 	}
 
-	// Also send to watchers
-	for _, watcher := range gameInstance.GetWatchers() {
-		s.logger.Info("sending GAME_UPDATE to watcher",
+	// Create the GAME_UPDATE event
+	updateData := &pb.GameUpdateData{
+		Game: gameView,
+	}
+
+	event := &pb.ServerEvent{
+		ObjectId: gameID,
+		Method:   pb.CallbackMethod_GAME_UPDATE,
+	}
+
+	anyData, err := anypb.New(updateData)
+	if err != nil {
+		s.logger.Error("failed to marshal GameUpdateData",
 			zap.String("game_id", gameID),
-			zap.String("watcher", watcher),
+			zap.Error(err),
 		)
-		s.sendGameUpdateToPlayer(gameID, watcher)
+		return
+	}
+	event.Data = anyData
+
+	// Send to all sessions for this player
+	s.logger.Info("looking up WebSocket sessions for player",
+		zap.String("game_id", gameID),
+		zap.String("player", playerName),
+	)
+
+	sessions := s.sessionMgr.GetSessionsByUser(playerName)
+	if len(sessions) == 0 {
+		s.logger.Warn("❌ NO WEBSOCKET SESSIONS FOUND - player will not receive update",
+			zap.String("game_id", gameID),
+			zap.String("player", playerName),
+		)
+		return
+	}
+
+	s.logger.Info("✓ found WebSocket sessions - sending GAME_UPDATE",
+		zap.String("game_id", gameID),
+		zap.String("player", playerName),
+		zap.Int("session_count", len(sessions)),
+		zap.Int32("turn", gameView.Turn),
+		zap.String("phase", gameView.Phase),
+		zap.String("priority_player", gameView.PriorityPlayerId),
+	)
+
+	for _, sess := range sessions {
+		if !sess.SendCallback(event) {
+			s.logger.Warn("failed to send GAME_UPDATE to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		} else {
+			s.logger.Info("successfully sent GAME_UPDATE to session",
+				zap.String("game_id", gameID),
+				zap.String("player", playerName),
+				zap.String("session_id", sess.ID),
+			)
+		}
 	}
 }
 
-// sendGameUpdateToPlayer sends a GAME_UPDATE event to a specific player
+// sendGameUpdateToPlayer sends a GAME_UPDATE event to a specific player by fetching the view.
+// NOTE: This function calls GetGameView() which acquires a read lock. Do NOT call this from
+// within handleGameNotification when processing broadcast notifications, as that would deadlock.
+// Use sendGameUpdateWithView instead for broadcast notifications.
 func (s *mageServer) sendGameUpdateToPlayer(gameID, playerName string) {
 	// Get the player's view of the game
 	if s.gameAdapter == nil {
@@ -254,16 +351,21 @@ func (s *mageServer) sendGameUpdateToPlayer(gameID, playerName string) {
 	event.Data = anyData
 
 	// Send to all sessions for this player
+	s.logger.Info("looking up WebSocket sessions for player",
+		zap.String("game_id", gameID),
+		zap.String("player", playerName),
+	)
+
 	sessions := s.sessionMgr.GetSessionsByUser(playerName)
 	if len(sessions) == 0 {
-		s.logger.Warn("no sessions found for player",
+		s.logger.Warn("❌ NO WEBSOCKET SESSIONS FOUND - player will not receive update",
 			zap.String("game_id", gameID),
 			zap.String("player", playerName),
 		)
 		return
 	}
 
-	s.logger.Info("sending GAME_UPDATE via WebSocket",
+	s.logger.Info("✓ found WebSocket sessions - sending GAME_UPDATE",
 		zap.String("game_id", gameID),
 		zap.String("player", playerName),
 		zap.Int("session_count", len(sessions)),
@@ -666,31 +768,35 @@ func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID s
 	// Add the viewing player first
 	if data.Me != nil {
 		players = append(players, &pb.PlayerView{
-			PlayerId:     data.Me.PlayerID,
-			Name:         data.Me.Name,
-			Life:         int32(data.Me.Life),
-			Poison:       int32(data.Me.Poison),
-			Energy:       int32(data.Me.Energy),
-			LibraryCount: int32(data.Me.LibraryCount),
-			HandCount:    int32(data.Me.HandCount),
-			Hand:         playtestEngineCardsToProto(data.Me.Hand),
-			Library:      playtestEngineCardsToProto(data.Me.Library), // Task 1.6: Include library for viewing player
-			Graveyard:    playtestEngineCardsToProto(data.Me.Graveyard),
+			PlayerId:      data.Me.PlayerID,
+			Name:          data.Me.Name,
+			Life:          int32(data.Me.Life),
+			Poison:        int32(data.Me.Poison),
+			Energy:        int32(data.Me.Energy),
+			LibraryCount:  int32(data.Me.LibraryCount),
+			HandCount:     int32(data.Me.HandCount),
+			Hand:          playtestEngineCardsToProto(data.Me.Hand),
+			Library:       playtestEngineCardsToProto(data.Me.Library), // Task 1.6: Include library for viewing player
+			Graveyard:     playtestEngineCardsToProto(data.Me.Graveyard),
+			KeptHand:      data.Me.KeptHand,
+			MulliganCount: int32(data.Me.MulliganCount),
 		})
 	}
 
 	// Add opponents
 	for _, opponent := range data.Opponents {
 		players = append(players, &pb.PlayerView{
-			PlayerId:     opponent.PlayerID,
-			Name:         opponent.Name,
-			Life:         int32(opponent.Life),
-			Poison:       int32(opponent.Poison),
-			Energy:       int32(opponent.Energy),
-			LibraryCount: int32(opponent.LibraryCount),
-			HandCount:    int32(opponent.HandCount),
-			Hand:         playtestEngineCardsToProto(opponent.Hand), // Empty for opponents
-			Graveyard:    playtestEngineCardsToProto(opponent.Graveyard),
+			PlayerId:      opponent.PlayerID,
+			Name:          opponent.Name,
+			Life:          int32(opponent.Life),
+			Poison:        int32(opponent.Poison),
+			Energy:        int32(opponent.Energy),
+			LibraryCount:  int32(opponent.LibraryCount),
+			HandCount:     int32(opponent.HandCount),
+			Hand:          playtestEngineCardsToProto(opponent.Hand), // Empty for opponents
+			Graveyard:     playtestEngineCardsToProto(opponent.Graveyard),
+			KeptHand:      opponent.KeptHand,
+			MulliganCount: int32(opponent.MulliganCount),
 		})
 	}
 

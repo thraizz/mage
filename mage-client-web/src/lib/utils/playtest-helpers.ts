@@ -6,11 +6,8 @@
  */
 
 import type { AbilityView, CardAction, CardView, CounterView } from '$lib/generated/mage/v1/models';
-import type {
-	PlaytestPlayer,
-	PlaytestGameState,
-	PlaytestLogEntry
-} from '$lib/stores/playtest-game';
+import type { PlaytestPlayer, PlaytestLogEntry } from '$lib/types/gamestore';
+import type { PlaytestGameState } from '$lib/stores/playtest-game';
 import { ZoneId, isLibraryTop, isLibraryBottom, normalizeZoneName } from './zones';
 
 /**

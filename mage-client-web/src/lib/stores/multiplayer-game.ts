@@ -7,58 +7,15 @@
  */
 
 import { writable, derived, get } from 'svelte/store';
-import type { CardView, ManaPoolView, GameView, PlayerView } from '$lib/generated/mage/v1/models';
+import type { CardView, GameView, PlayerView } from '$lib/generated/mage/v1/models';
 import { CallbackMethod } from '$lib/generated/mage/v1/websocket';
 import type { GameUpdateData, GameInitData, StartGameData } from '$lib/generated/mage/v1/websocket';
 import { websocketStore } from './websocket';
 import * as directActions from '$lib/api/direct-actions';
 import { joinGame, fetchGameView } from '$lib/api/game';
 import { auth } from './auth';
-
-/**
- * Player state for multiplayer game
- * From playtest-game.ts lines 25-40
- */
-export interface PlaytestPlayer {
-	playerId: string;
-	name: string;
-	life: number;
-	poison: number;
-	energy: number;
-	libraryCount: number;
-	handCount: number;
-	hand: CardView[];
-	library: CardView[];
-	graveyard: CardView[];
-	manaPool: ManaPoolView;
-	keptHand: boolean;
-	mulliganCount: number;
-	revealedTopCard: boolean; // When true, top card of library is permanently visible
-}
-
-/**
- * Game log entry
- * From playtest-game.ts lines 116-124
- */
-export type PlaytestLogEntry = {
-	id: string;
-	at: number; // unix ms
-	turn: number;
-	activePlayerId: string;
-	controlSeat: string; // activeControlSeat at time of event
-	kind: string; // "draw" | "move" | "life" | ...
-	message: string;
-};
-
-/**
- * Scry session for tracking ongoing scry operations
- * From playtest-game.ts lines 129-133
- */
-export type ScrySession = {
-	sessionId: string;
-	playerId: string;
-	cards: CardView[];
-};
+import { goto } from '$app/navigation';
+import type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';
 
 /**
  * Multiplayer game state
@@ -67,7 +24,7 @@ export type ScrySession = {
  */
 export interface MultiplayerGameState {
 	gameId: string;
-	activeControlSeat: string; // Which player perspective you're controlling
+	activeControlSeat: string; // Which player perspective you're controlling (only the logged-in player in multiplayer mode, but other perspectives in playtest mode)
 	players: PlaytestPlayer[];
 	battlefield: CardView[];
 	exile: CardView[];
@@ -111,7 +68,7 @@ function convertPlayerViewToPlaytestPlayer(pv: PlayerView): PlaytestPlayer {
 			colorless: 0
 		},
 		keptHand: pv.keptHand || false,
-		mulliganCount: 0, // Not in proto yet, default to 0
+		mulliganCount: Number(pv.mulliganCount) || 0,
 		revealedTopCard: false // Not in proto yet, default to false
 	};
 }
@@ -281,7 +238,13 @@ function createMultiplayerGameStore() {
 		try {
 			console.log('[MultiplayerGame] Joining game:', gameId);
 			// Join the game to register with the server
-			await joinGame(gameId);
+			try {
+				await joinGame(gameId);
+			} catch (err) {
+				console.error('[MultiplayerGame] Failed to join game:', err);
+				goto('/lobby');
+				return;
+			}
 			console.log('[MultiplayerGame] Joined game successfully');
 
 			// Fetch initial game view to get current state
@@ -290,10 +253,43 @@ function createMultiplayerGameStore() {
 			const playerId = currentAuth.user?.username || currentAuth.user?.id || '';
 			if (playerId) {
 				console.log('[MultiplayerGame] Fetching initial game view...');
-				const gameView = await fetchGameView(gameId, playerId);
-				console.log('[MultiplayerGame] Got initial game view:', gameView);
 
-				if (gameView) {
+				// Poll for game view with exponential backoff
+				// This handles cases where game engine is still initializing
+				let retries = 0;
+				const maxRetries = 5;
+				const baseDelay = 500; // ms
+				let gameView: GameView | null = null;
+
+				while (retries < maxRetries) {
+					try {
+						gameView = await fetchGameView(gameId, playerId);
+						console.log(`[MultiplayerGame] Fetch attempt ${retries + 1}:`, gameView);
+
+						// Check if we got valid game state
+						if (gameView && gameView.players && gameView.players.length > 0) {
+							console.log('[MultiplayerGame] Got valid game view with players');
+							break;
+						}
+
+						// If gameView is null or has no players, retry after delay
+						retries++;
+						if (retries < maxRetries) {
+							const delay = baseDelay * Math.pow(2, retries - 1);
+							console.log(`[MultiplayerGame] Game state not ready, retrying in ${delay}ms...`);
+							await new Promise((resolve) => setTimeout(resolve, delay));
+						}
+					} catch (err) {
+						console.error(`[MultiplayerGame] Fetch attempt ${retries + 1} failed:`, err);
+						retries++;
+						if (retries < maxRetries) {
+							const delay = baseDelay * Math.pow(2, retries - 1);
+							await new Promise((resolve) => setTimeout(resolve, delay));
+						}
+					}
+				}
+
+				if (gameView && gameView.players && gameView.players.length > 0) {
 					// Normalize and map the fetched GameView
 					const normalized = normalizeProtoGameView(gameView);
 					const mappedState = mapProtoGameViewToState(normalized);
@@ -306,12 +302,16 @@ function createMultiplayerGameStore() {
 						isInitialized: true,
 						pendingActions: []
 					}));
+					console.log('[MultiplayerGame] Initialized with polled game state');
 				} else {
-					// GameView fetch returned null/undefined
+					// After all retries, still no valid game state
+					console.warn(
+						'[MultiplayerGame] No valid game state after polling, waiting for GAME_UPDATE'
+					);
 					update((state) => ({
 						...state,
 						isConnected: true,
-						isInitialized: false // No game state available
+						isInitialized: false // Will be initialized when GAME_UPDATE arrives
 					}));
 				}
 			} else {
@@ -643,10 +643,10 @@ function createMultiplayerGameStore() {
 	 * From playtest-game.ts lines 1095-1146
 	 * Modified: Send to server via direct-actions API
 	 */
-	function mulligan(playerId: string): void {
+	function mulligan(playerId: string): Promise<void> {
 		const state = get({ subscribe });
-		directActions.mulligan(state.gameId, playerId);
 		console.log('[MultiplayerGame] mulligan:', { playerId });
+		return directActions.mulligan(state.gameId, playerId);
 	}
 
 	/**
@@ -654,10 +654,10 @@ function createMultiplayerGameStore() {
 	 * From playtest-game.ts lines 1151-1161
 	 * Modified: Send to server via direct-actions API
 	 */
-	function keepHand(playerId: string): void {
+	function keepHand(playerId: string): Promise<void> {
 		const state = get({ subscribe });
-		directActions.keepHand(state.gameId, playerId);
 		console.log('[MultiplayerGame] keepHand:', { playerId });
+		return directActions.keepHand(state.gameId, playerId);
 	}
 
 	/**
@@ -775,3 +775,6 @@ export const multiplayerIsInitialized = derived(
 );
 
 export const multiplayerIsConnected = derived(multiplayerGameStore, ($game) => $game.isConnected);
+
+// Re-export types for backward compatibility
+export type { PlaytestPlayer, PlaytestLogEntry, ScrySession } from '$lib/types/gamestore';

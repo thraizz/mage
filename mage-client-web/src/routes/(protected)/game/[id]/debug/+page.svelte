@@ -1,34 +1,23 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import type { CardView } from '$lib/generated/mage/v1/models';
 	import { auth } from '$lib/stores/auth';
+	import {
+		multiplayerBattlefield,
+		multiplayerGameStore,
+		multiplayerIsInitialized,
+		multiplayerLocalPlayer,
+		multiplayerOpponents,
+		multiplayerPlayers,
+		multiplayerStack
+	} from '$lib/stores/multiplayer-game';
 	import { websocketStore } from '$lib/stores/websocket';
 	import { getSessionIdFromToken } from '$lib/utils/jwt';
-	import {
-		gameStore,
-		players,
-		localPlayer,
-		opponents,
-		hasPriority,
-		currentPhase,
-		currentTurn,
-		battlefield,
-		stack,
-		command,
-		myHand,
-		myGraveyard,
-		myManaPool,
-		pendingPrompt,
-		gameOver,
-		winner,
-		gameError,
-		isLoading
-	} from '$lib/stores/game.legacy';
-	import { joinGame, fetchGameView } from '$lib/api/game';
+	import { onDestroy, onMount } from 'svelte';
 
 	// Game ID from route params
-	const gameId = $derived($page.params.id);
+	const gameId = $derived(page.params.id);
 
 	// Local state
 	let initialized = $state(false);
@@ -49,37 +38,25 @@
 	// Get local player ID from auth
 	const localPlayerId = $derived($auth.user?.username || '');
 
-	// Derived state from stores
-	const gameState = $derived($gameStore);
-	const allPlayers = $derived($players);
-	const me = $derived($localPlayer);
-	const otherPlayers = $derived($opponents);
-	const myCards = $derived($myHand);
-	const myGrave = $derived($myGraveyard);
-	const myMana = $derived($myManaPool);
-	const havePriority = $derived($hasPriority);
-	const phase = $derived($currentPhase);
-	const turn = $derived($currentTurn);
-	const battlefieldCards = $derived($battlefield);
-	const stackCards = $derived($stack);
-	const commandCards = $derived($command);
-	const prompt = $derived($pendingPrompt);
-	const isGameOver = $derived($gameOver);
-	const gameWinner = $derived($winner);
-	const error = $derived($gameError);
-	const loading = $derived($isLoading);
-
-	// Track state changes
-	let previousStateJson = $state('');
-
-	$effect(() => {
-		const currentJson = JSON.stringify(gameState.gameView);
-		if (currentJson !== previousStateJson && gameState.gameView) {
-			previousStateJson = currentJson;
-			lastUpdateTime = new Date();
-			updateCount++;
-		}
-	});
+	// Derived state from multiplayer game store
+	const gameState = $derived($multiplayerGameStore);
+	const allPlayers = $derived($multiplayerPlayers);
+	const me = $derived($multiplayerLocalPlayer);
+	const otherPlayers = $derived($multiplayerOpponents);
+	const myCards = $derived(me?.hand || []);
+	const myGrave = $derived(me?.graveyard || []);
+	const myMana = $derived(me?.manaPool);
+	const havePriority = $derived(false); // Not available in multiplayer store
+	const phase = $derived('N/A'); // Not available in multiplayer store
+	const turn = $derived(gameState.turn);
+	const battlefieldCards = $derived($multiplayerBattlefield);
+	const stackCards = $derived($multiplayerStack);
+	const commandCards = $derived(gameState.command);
+	const prompt = $derived(null); // Not available in multiplayer store
+	const isGameOver = $derived(false); // Not available in multiplayer store
+	const gameWinner = $derived(null); // Not available in multiplayer store
+	const error = $derived(null); // Not available in multiplayer store
+	const loading = $derived(!$multiplayerIsInitialized);
 
 	/**
 	 * Initialize game connection
@@ -107,22 +84,15 @@
 			}
 
 			console.log('[DebugPage] Initializing game store...');
-			gameStore.initGame(gameId, localPlayerId);
+			await multiplayerGameStore.initialize(gameId);
 
-			console.log('[DebugPage] Joining game...');
-			await joinGame(gameId);
-			console.log('[DebugPage] Joined game successfully');
-
-			console.log('[DebugPage] Fetching initial game state...');
-			const gameView = await fetchGameView(gameId, localPlayerId);
-			console.log('[DebugPage] Got game state');
-			gameStore.setGameView(gameView);
+			console.log('[DebugPage] Game store initialized');
 
 			initialized = true;
 			console.log('[DebugPage] Game initialization complete');
 		} catch (err) {
 			console.error('[DebugPage] Failed to initialize game:', err);
-			gameStore.setError(err instanceof Error ? err.message : 'Failed to load game');
+			goto('/lobby');
 		}
 	}
 
@@ -156,7 +126,7 @@
 
 	// Cleanup on destroy
 	onDestroy(() => {
-		gameStore.reset();
+		multiplayerGameStore.reset();
 	});
 </script>
 
@@ -174,12 +144,6 @@
 		<div class="header-right">
 			<div class="status-pill" class:connected={gameState.isConnected}>
 				{gameState.isConnected ? '● Connected' : '○ Disconnected'}
-			</div>
-			<div class="update-info">
-				<span class="update-count">Updates: {updateCount}</span>
-				{#if lastUpdateTime}
-					<span class="last-update">Last: {lastUpdateTime.toLocaleTimeString()}</span>
-				{/if}
 			</div>
 		</div>
 	</header>
@@ -236,9 +200,9 @@
 <span class="key">poison:</span> <span class="number">${player.poison}</span>
 <span class="key">libraryCount:</span> <span class="number">${player.libraryCount}</span>
 <span class="key">handCount:</span> <span class="number">${player.handCount}</span>
-<span class="key">hand:</span> [${player.hand?.map((c) => `\n  <span class="string">"${c.name}"</span> <span class="comment">// ${c.id}</span>`).join(',') || ''}
+<span class="key">hand:</span> [${player.hand?.map((c: CardView) => `\n  <span class="string">"${c.name}"</span> <span class="comment">// ${c.id}</span>`).join(',') || ''}
 ]
-<span class="key">graveyard:</span> [${player.graveyard?.map((c) => `\n  <span class="string">"${c.name}"</span>`).join(',') || ''}
+<span class="key">graveyard:</span> [${player.graveyard?.map((c: CardView) => `\n  <span class="string">"${c.name}"</span>`).join(',') || ''}
 ]
 <span class="key">manaPool:</span> {
   <span class="key">white:</span> <span class="number">${player.manaPool?.white || 0}</span>,
@@ -269,7 +233,7 @@
 							<pre><code
 									>{battlefieldCards.length > 0
 										? formatJson(
-												battlefieldCards.map((c) => ({
+												battlefieldCards.map((c: CardView) => ({
 													id: c.id,
 													name: c.name,
 													type: c.type,
@@ -290,7 +254,7 @@
 							<pre><code
 									>{stackCards.length > 0
 										? formatJson(
-												stackCards.map((c) => ({
+												stackCards.map((c: CardView) => ({
 													id: c.id,
 													name: c.name,
 													type: c.type,
@@ -308,7 +272,7 @@
 							<pre><code
 									>{commandCards.length > 0
 										? formatJson(
-												commandCards.map((c) => ({
+												commandCards.map((c: CardView) => ({
 													id: c.id,
 													name: c.name,
 													type: c.type
@@ -320,12 +284,12 @@
 					</div>
 
 					<div class="zone-block">
-						<h3>🚫 Exile ({gameState.gameView?.exile?.length || 0})</h3>
+						<h3>🚫 Exile ({gameState.exile?.length || 0})</h3>
 						<div class="code-block small">
 							<pre><code
-									>{gameState.gameView?.exile && gameState.gameView.exile.length > 0
+									>{gameState.exile && gameState.exile.length > 0
 										? formatJson(
-												gameState.gameView.exile.map((c) => ({
+												gameState.exile.map((c: CardView) => ({
 													id: c.id,
 													name: c.name
 												}))

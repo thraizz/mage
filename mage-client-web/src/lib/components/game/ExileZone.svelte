@@ -110,8 +110,7 @@
 					cardName,
 					'exile' as SourceZone,
 					moveEvent.clientX,
-					moveEvent.clientY,
-					validZones
+					moveEvent.clientY
 				);
 				onCardDragStart(cardId);
 				closeModal(); // Close modal when starting drag

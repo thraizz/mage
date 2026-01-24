@@ -1,25 +1,7 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
-	import { initializePlaytest, validateDeckIds } from '$lib/playtest/initializer';
-	import { gameStore } from '$lib/stores/game.legacy';
-	import {
-		playtestActiveControlSeat,
-		playtestBattlefield,
-		playtestExile,
-		playtestGameStore,
-		playtestIsInitialized,
-		playtestLocalPlayer,
-		playtestOpponents,
-		playtestPlayers,
-		type PlaytestSessionMeta
-	} from '$lib/stores/playtest-game';
+	import { playtestGameStore } from '$lib/stores/playtest-game';
 	import { toast } from '$lib/stores/toast';
-	import { onMount, untrack } from 'svelte';
 	// Game components
-	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
-	import type { ScrySession } from '$lib/stores/playtest-game';
-	import { dragDropStore, getAllValidDropZones, type SourceZone } from '$lib/utils/drag-drop';
 	import Copy from '@lucide/svelte/icons/copy';
 
 	// Game log

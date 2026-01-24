@@ -1054,6 +1054,7 @@ type PlayerView struct {
 	Wins                int32                  `protobuf:"varint,16,opt,name=wins,proto3" json:"wins,omitempty"`
 	KeptHand            bool                   `protobuf:"varint,17,opt,name=kept_hand,json=keptHand,proto3" json:"kept_hand,omitempty"`                                    // Whether player has kept their hand during mulligan phase
 	HasAvailableActions bool                   `protobuf:"varint,18,opt,name=has_available_actions,json=hasAvailableActions,proto3" json:"has_available_actions,omitempty"` // Server-computed: does this player have any legal actions right now?
+	MulliganCount       int32                  `protobuf:"varint,20,opt,name=mulligan_count,json=mulliganCount,proto3" json:"mulligan_count,omitempty"`                     // Number of times this player has mulliganed this game
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -1219,6 +1220,13 @@ func (x *PlayerView) GetHasAvailableActions() bool {
 		return x.HasAvailableActions
 	}
 	return false
+}
+
+func (x *PlayerView) GetMulliganCount() int32 {
+	if x != nil {
+		return x.MulliganCount
+	}
+	return 0
 }
 
 // CardView represents a card
@@ -3030,7 +3038,7 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\vdestination\x18\x03 \x01(\tR\vdestination\x12'\n" +
 	"\x05cards\x18\x04 \x03(\v2\x11.mage.v1.CardViewR\x05cards\x12\x1d\n" +
 	"\n" +
-	"can_cancel\x18\x05 \x01(\bR\tcanCancel\"\xeb\x04\n" +
+	"can_cancel\x18\x05 \x01(\bR\tcanCancel\"\x92\x05\n" +
 	"\n" +
 	"PlayerView\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\tR\bplayerId\x12\x12\n" +
@@ -3053,7 +3061,8 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\x04left\x18\x0f \x01(\bR\x04left\x12\x12\n" +
 	"\x04wins\x18\x10 \x01(\x05R\x04wins\x12\x1b\n" +
 	"\tkept_hand\x18\x11 \x01(\bR\bkeptHand\x122\n" +
-	"\x15has_available_actions\x18\x12 \x01(\bR\x13hasAvailableActions\"\xe7\x06\n" +
+	"\x15has_available_actions\x18\x12 \x01(\bR\x13hasAvailableActions\x12%\n" +
+	"\x0emulligan_count\x18\x14 \x01(\x05R\rmulliganCount\"\xe7\x06\n" +
 	"\bCardView\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +

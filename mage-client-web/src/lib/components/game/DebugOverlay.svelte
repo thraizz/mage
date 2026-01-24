@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { websocketStore } from '$lib/stores/websocket';
-	import type { GameStoreState } from '$lib/stores/game.legacy';
-	import type { PlayerView, CardView } from '$lib/generated/mage/v1/models';
+	import type { PlayerView, CardView, GameView } from '$lib/generated/mage/v1/models';
+
+	// Legacy game store state shape for debug overlay
+	interface GameStoreState {
+		gameView: GameView | null;
+		isConnected: boolean;
+		isLoading: boolean;
+		selectedCardIds: string[];
+		showStack: boolean;
+		gameOver: boolean;
+	}
 
 	interface Props {
 		open: boolean;
@@ -256,7 +265,7 @@
 									<pre><code
 											>{gameState.gameView?.exile?.length
 												? formatJson(
-														gameState.gameView.exile.map((c) => ({ id: c.id, name: c.name }))
+														gameState.gameView.exile.map((c: CardView) => ({ id: c.id, name: c.name }))
 													)
 												: '[]'}</code
 										></pre>
@@ -279,7 +288,7 @@
 <span class="dk">isConnected:</span> <span class="db">${gameState.isConnected}</span>
 <span class="dk">isLoading:</span> <span class="db">${gameState.isLoading}</span>
 <span class="dk">error:</span> <span class="ds">${error ? `"${error}"` : 'null'}</span>
-<span class="dk">selectedCardIds:</span> [${gameState.selectedCardIds.map((id) => `<span class="ds">"${id}"</span>`).join(', ')}]
+<span class="dk">selectedCardIds:</span> [${gameState.selectedCardIds.map((id: string) => `<span class="ds">"${id}"</span>`).join(', ')}]
 <span class="dk">showStack:</span> <span class="db">${gameState.showStack}</span>
 <span class="dk">gameOver:</span> <span class="db">${gameState.gameOver}</span>
 <span class="dk">pendingPrompt:</span> ${prompt ? `{ type: "${prompt.type}", message: "${prompt.message}" }` : 'null'}`}</code
