@@ -5,12 +5,12 @@
 	let {
 		stackObjects = [],
 		playerNames = new Map<string, string>(),
-		// eslint-disable-next-line no-unused-vars
+		 
 		onStackObjectClick = (stackId: string) => {}
 	}: {
 		stackObjects?: StackObject[];
 		playerNames?: Map<string, string>;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onStackObjectClick?: (stackId: string) => void;
 	} = $props();
 

@@ -22,7 +22,7 @@
 		selectedCardIds?: string[];
 		expanded?: boolean;
 		position?: 'top' | 'left' | 'right';
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardClick?: (cardId: string) => void;
 	} = $props();
 

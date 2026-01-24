@@ -60,6 +60,7 @@ export default [
 		},
 		rules: {
 			...svelte.configs.recommended.rules,
+			'no-unused-vars': 'off',
 			'svelte/no-at-html-tags': 'warn'
 		}
 	},

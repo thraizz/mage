@@ -17,11 +17,11 @@
 		isOpponent = false,
 		canDrag = false,
 		compact = false,
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardClick = (cardId: string) => {},
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardDragStart = (cardId: string) => {},
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardDragEnd = (cardId: string, dropped: boolean) => {}
 	}: {
 		cards?: GameCard[];
@@ -29,11 +29,11 @@
 		isOpponent?: boolean;
 		canDrag?: boolean;
 		compact?: boolean;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardClick?: (cardId: string) => void;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardDragStart?: (cardId: string) => void;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardDragEnd?: (cardId: string, dropped: boolean) => void;
 	} = $props();
 

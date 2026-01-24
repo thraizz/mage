@@ -3,6 +3,6 @@
 //   protoc-gen-ts_proto  v2.8.3
 //   protoc               v6.33.4
 
-/* eslint-disable */
+ 
 
 export * as v1 from "./index.mage.v1";

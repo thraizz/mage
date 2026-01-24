@@ -17,7 +17,7 @@
 	}: {
 		open: boolean;
 		table: Table | null;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onSuccess: (tableId: string) => void;
 	} = $props();
 

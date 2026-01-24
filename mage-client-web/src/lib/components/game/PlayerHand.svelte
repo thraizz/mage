@@ -24,13 +24,13 @@
 		onSelectCard = (cardId: string, isMultiSelect: boolean) => {},
 		onClearSelection = () => {},
 
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardClick = (cardId: string) => {},
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardHover = (cardId: string) => {},
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardDragStart = (cardId: string) => {},
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardDragEnd = (cardId: string, dropped: boolean) => {},
 		size = 'normal',
 		currentPhase = '',
@@ -43,13 +43,13 @@
 		hasPriority: boolean;
 		onSelectCard?: (cardId: string, isMultiSelect: boolean) => void;
 		onClearSelection?: () => void;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardClick?: (cardId: string) => void;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardHover?: (cardId: string) => void;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardDragStart?: (cardId: string) => void;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardDragEnd?: (cardId: string, dropped: boolean) => void;
 		size?: 'small' | 'normal' | 'large';
 		currentPhase?: string;

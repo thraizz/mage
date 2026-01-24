@@ -9,7 +9,7 @@
 
 	// Props
 	let {
-		// eslint-disable-next-line no-unused-vars
+		 
 		cardId,
 		cardName,
 		manaCost = '',

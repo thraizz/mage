@@ -3,7 +3,7 @@
 
 	// Props
 	export let table: Table;
-	// eslint-disable-next-line no-unused-vars
+	 
 	export let onClick: ((table: Table) => void) | undefined = undefined;
 
 	function getStatusColor(): string {

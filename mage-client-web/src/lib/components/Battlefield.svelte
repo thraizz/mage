@@ -5,7 +5,7 @@
 	interface Props {
 		cards: CardType[];
 		title: string;
-		// eslint-disable-next-line no-unused-vars
+		 
 		onCardClick?: (cardItem: CardType) => void;
 	}
 
