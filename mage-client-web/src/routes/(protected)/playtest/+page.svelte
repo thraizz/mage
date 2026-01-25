@@ -26,6 +26,7 @@
 	import DragGhost from '$lib/components/game/DragGhost.svelte';
 	import GameDialogs from '$lib/components/game/GameDialogs.svelte';
 	import GameMenu from '$lib/components/game/GameMenu.svelte';
+	import GameShell from '$lib/components/game/GameShell.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
@@ -896,24 +897,8 @@
 	<title>Playtest Mode - MAGE</title>
 </svelte:head>
 
-<div class="playtest-container">
-	{#if loading}
-		<div class="loading-overlay">
-			<div class="spinner"></div>
-			<p>Setting up playtest...</p>
-		</div>
-	{:else if error}
-		<div class="error-overlay">
-			<div class="error-icon">⚠️</div>
-			<h2>Error</h2>
-			<p>{error}</p>
-			<button class="btn-primary" onclick={() => goto('/lobby')}> Return to Lobby </button>
-		</div>
-	{:else if !isInitialized}
-		<div class="loading-overlay">
-			<p>Initializing game state...</p>
-		</div>
-	{:else if mulliganPlayerIndex !== null && !allPlayersKept}
+<GameShell {loading} {error} {isInitialized} onRetry={() => goto('/lobby')}>
+	{#if mulliganPlayerIndex !== null && !allPlayersKept}
 		<MulliganDialog
 			cards={players[mulliganPlayerIndex]?.hand || []}
 			mulliganCount={players[mulliganPlayerIndex]?.mulliganCount || 0}
@@ -1369,4 +1354,4 @@
 			imageSize="small"
 		/>
 	{/if}
-</div>
+</GameShell>
