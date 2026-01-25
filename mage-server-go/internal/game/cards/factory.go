@@ -2,7 +2,6 @@ package cards
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -33,17 +32,17 @@ type FactoryStats struct {
 
 // factory implements the Factory interface
 type factory struct {
-	cardRepo *repository.CardRepository
-	registry *cardRegistry
-	logger   *zap.Logger
+	scryfallCardRepo *repository.ScryfallCardRepository
+	registry         *cardRegistry
+	logger           *zap.Logger
 }
 
 // NewFactory creates a new card factory
-func NewFactory(cardRepo *repository.CardRepository, logger *zap.Logger) Factory {
+func NewFactory(scryfallCardRepo *repository.ScryfallCardRepository, logger *zap.Logger) Factory {
 	return &factory{
-		cardRepo: cardRepo,
-		registry: Registry,
-		logger:   logger,
+		scryfallCardRepo: scryfallCardRepo,
+		registry:         Registry,
+		logger:           logger,
 	}
 }
 
@@ -56,7 +55,7 @@ func (f *factory) CreateCard(ctx context.Context, name string, ownerID uuid.UUID
 	}
 
 	// 2. Get card metadata from database
-	cards, err := f.cardRepo.GetByName(ctx, name)
+	cards, err := f.scryfallCardRepo.GetByName(ctx, name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get card metadata: %w", err)
 	}
@@ -68,20 +67,46 @@ func (f *factory) CreateCard(ctx context.Context, name string, ownerID uuid.UUID
 	// Use first printing (could be enhanced to select specific set)
 	cardData := cards[0]
 
-	// 3. Convert repository.Card to cards.CardInfo
+	// 3. Convert repository.ScryfallCard to cards.CardInfo
+	// Extract string values from nullable fields
+	manaCost := ""
+	if cardData.ManaCost.Valid {
+		manaCost = cardData.ManaCost.String
+	}
+	power := ""
+	if cardData.Power.Valid {
+		power = cardData.Power.String
+	}
+	toughness := ""
+	if cardData.Toughness.Valid {
+		toughness = cardData.Toughness.String
+	}
+	oracleText := ""
+	if cardData.OracleText.Valid {
+		oracleText = cardData.OracleText.String
+	}
+
+	// Convert UUID to int64 (simplified hash - matches CardRepository logic)
+	// This is a temporary solution until we fully migrate to UUID-based IDs
+	idBytes := cardData.ID[0:8]
+	id := int64(0)
+	for i := 0; i < 8; i++ {
+		id = (id << 8) | int64(idBytes[i])
+	}
+
 	cardInfo := &CardInfo{
-		ID:         cardData.ID,
-		CardNumber: cardData.CardNumber,
+		ID:         id,
+		CardNumber: cardData.CollectorNumber,
 		SetCode:    cardData.SetCode,
 		Name:       cardData.Name,
-		CardType:   cardData.CardType,
-		ManaCost:   cardData.ManaCost,
-		Power:      cardData.Power,
-		Toughness:  cardData.Toughness,
-		RulesText:  cardData.RulesText,
-		FlavorText: nullStringToString(cardData.FlavorText),
+		CardType:   cardData.TypeLine,
+		ManaCost:   manaCost,
+		Power:      power,
+		Toughness:  toughness,
+		RulesText:  oracleText,
+		FlavorText: "", // Not available in ScryfallCard
 		Rarity:     cardData.Rarity,
-		// TODO: Parse types, subtypes, supertypes, colors from CardType string
+		// TODO: Parse types, subtypes, supertypes, colors from TypeLine string
 	}
 
 	// 4. Build the card using the registered builder
@@ -115,12 +140,4 @@ func (f *factory) Stats() FactoryStats {
 		UnimplementedCards: 30459 - implementedCount,
 		PercentImplemented: float64(implementedCount) / 30459.0 * 100.0,
 	}
-}
-
-// nullStringToString converts sql.NullString to string
-func nullStringToString(ns sql.NullString) string {
-	if ns.Valid {
-		return ns.String
-	}
-	return ""
 }

@@ -42,7 +42,7 @@ type mageServer struct {
 	userRepo         *repository.UserRepository
 	statsRepo        *repository.StatsRepository
 	deckRepo         *repository.DeckRepository
-	cardRepo         *repository.CardRepository
+	scryfallCardRepo *repository.ScryfallCardRepository
 	matchHistoryRepo *repository.MatchHistoryRepository
 	roomMgr          *room.Manager
 	chatMgr          *chat.Manager
@@ -72,7 +72,7 @@ func NewMageServer(
 	userRepo *repository.UserRepository,
 	statsRepo *repository.StatsRepository,
 	deckRepo *repository.DeckRepository,
-	cardRepo *repository.CardRepository,
+	scryfallCardRepo *repository.ScryfallCardRepository,
 	matchHistoryRepo *repository.MatchHistoryRepository,
 	roomMgr *room.Manager,
 	chatMgr *chat.Manager,
@@ -93,7 +93,7 @@ func NewMageServer(
 		userRepo:         userRepo,
 		statsRepo:        statsRepo,
 		deckRepo:         deckRepo,
-		cardRepo:         cardRepo,
+		scryfallCardRepo: scryfallCardRepo,
 		matchHistoryRepo: matchHistoryRepo,
 		roomMgr:          roomMgr,
 		chatMgr:          chatMgr,
@@ -225,8 +225,9 @@ func (s *mageServer) handleGameNotification(notification game.GameNotification) 
 // This avoids calling GetGameView() which would acquire a lock and cause deadlock when called
 // from within broadcast() which already holds the write lock.
 func (s *mageServer) sendGameUpdateWithView(gameID, playerName string, engineView interface{}) {
-	// Convert engine view to protobuf
-	gameView := s.engineViewToProto(engineView, playerName)
+	// Convert engine view to protobuf (use background context for notification path)
+	ctx := context.Background()
+	gameView := s.engineViewToProto(ctx, engineView, playerName)
 	if gameView == nil {
 		s.logger.Warn("engineViewToProto returned nil",
 			zap.String("game_id", gameID),
@@ -320,8 +321,9 @@ func (s *mageServer) sendGameUpdateToPlayer(gameID, playerName string) {
 		return
 	}
 
-	// Convert engine view to protobuf
-	gameView := s.engineViewToProto(engineView, playerName)
+	// Convert engine view to protobuf (use background context for notification path)
+	ctx := context.Background()
+	gameView := s.engineViewToProto(ctx, engineView, playerName)
 	if gameView == nil {
 		s.logger.Warn("engineViewToProto returned nil",
 			zap.String("game_id", gameID),
@@ -729,14 +731,14 @@ func (s *mageServer) sendGameChoiceToPlayer(gameID, playerName string, choiceDat
 
 // engineViewToProto converts an engine view to protobuf GameView
 // Phase 8: Simplified to only handle PlaytestGameView (MageEngine removed)
-func (s *mageServer) engineViewToProto(engineView interface{}, playerID string) *pb.GameView {
+func (s *mageServer) engineViewToProto(ctx context.Context, engineView interface{}, playerID string) *pb.GameView {
 	if engineView == nil {
 		return nil
 	}
 
 	// Only handle PlaytestGameView now (MageEngine support removed)
 	if playtestData, ok := engineView.(*game.PlaytestGameView); ok {
-		return s.playtestViewToProto(playtestData, playerID)
+		return s.playtestViewToProto(ctx, playtestData, playerID)
 	}
 
 	// Unknown view type
@@ -747,7 +749,7 @@ func (s *mageServer) engineViewToProto(engineView interface{}, playerID string) 
 }
 
 // playtestViewToProto converts a PlaytestGameView to protobuf GameView
-func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID string) *pb.GameView {
+func (s *mageServer) playtestViewToProto(ctx context.Context, data *game.PlaytestGameView, playerID string) *pb.GameView {
 	view := &pb.GameView{
 		GameId:            data.GameID,
 		State:             "IN_PROGRESS", // Playtest is always in progress
@@ -756,10 +758,10 @@ func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID s
 		Turn:              int32(data.Turn),
 		ActivePlayerId:    data.ActivePlayerID,
 		ActiveControlSeat: playerID, // Viewing player's ID (from Task 1.2)
-		Battlefield:       playtestEngineCardsToProto(data.Battlefield),
-		Stack:             playtestEngineCardsToProto(data.Stack),
-		Exile:             playtestEngineCardsToProto(data.Exile),
-		Command:           playtestEngineCardsToProto(data.Command),
+		Battlefield:       playtestEngineCardsToProto(ctx, data.Battlefield, s.scryfallCardRepo),
+		Stack:             playtestEngineCardsToProto(ctx, data.Stack, s.scryfallCardRepo),
+		Exile:             playtestEngineCardsToProto(ctx, data.Exile, s.scryfallCardRepo),
+		Command:           playtestEngineCardsToProto(ctx, data.Command, s.scryfallCardRepo),
 	}
 
 	// Convert players
@@ -775,9 +777,9 @@ func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID s
 			Energy:        int32(data.Me.Energy),
 			LibraryCount:  int32(data.Me.LibraryCount),
 			HandCount:     int32(data.Me.HandCount),
-			Hand:          playtestEngineCardsToProto(data.Me.Hand),
-			Library:       playtestEngineCardsToProto(data.Me.Library), // Task 1.6: Include library for viewing player
-			Graveyard:     playtestEngineCardsToProto(data.Me.Graveyard),
+			Hand:          playtestEngineCardsToProto(ctx, data.Me.Hand, s.scryfallCardRepo),
+			Library:       playtestEngineCardsToProto(ctx, data.Me.Library, s.scryfallCardRepo), // Task 1.6: Include library for viewing player
+			Graveyard:     playtestEngineCardsToProto(ctx, data.Me.Graveyard, s.scryfallCardRepo),
 			KeptHand:      data.Me.KeptHand,
 			MulliganCount: int32(data.Me.MulliganCount),
 		})
@@ -793,8 +795,8 @@ func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID s
 			Energy:        int32(opponent.Energy),
 			LibraryCount:  int32(opponent.LibraryCount),
 			HandCount:     int32(opponent.HandCount),
-			Hand:          playtestEngineCardsToProto(opponent.Hand), // Empty for opponents
-			Graveyard:     playtestEngineCardsToProto(opponent.Graveyard),
+			Hand:          playtestEngineCardsToProto(ctx, opponent.Hand, s.scryfallCardRepo), // Empty for opponents
+			Graveyard:     playtestEngineCardsToProto(ctx, opponent.Graveyard, s.scryfallCardRepo),
 			KeptHand:      opponent.KeptHand,
 			MulliganCount: int32(opponent.MulliganCount),
 		})
@@ -805,7 +807,7 @@ func (s *mageServer) playtestViewToProto(data *game.PlaytestGameView, playerID s
 }
 
 // playtestEngineCardsToProto converts playtest engine cards to protobuf
-func playtestEngineCardsToProto(cards []*game.Card) []*pb.CardView {
+func playtestEngineCardsToProto(ctx context.Context, cards []*game.Card, scryfallRepo *repository.ScryfallCardRepository) []*pb.CardView {
 	if cards == nil {
 		return []*pb.CardView{}
 	}
@@ -835,6 +837,64 @@ func playtestEngineCardsToProto(cards []*game.Card) []*pb.CardView {
 			Transformed:  card.Transformed,
 			FaceDown:     card.FaceDown,
 			RulesText:    card.RulesText,
+		}
+
+		// Fetch Scryfall metadata if card metadata is missing (e.g., cards created from deck lists)
+		if scryfallRepo != nil && card.Name != "" && (card.Type == "" || (card.Power == "" && card.Toughness == "")) {
+			if scryfallCards, err := scryfallRepo.GetByNameCaseInsensitive(ctx, card.Name); err == nil && len(scryfallCards) > 0 {
+				// Use the first (most recent) printing
+				scryfallCard := scryfallCards[0]
+				cardView.ScryfallId = scryfallCard.ID.String()
+
+				// Populate missing metadata from Scryfall
+				if card.Type == "" && scryfallCard.TypeLine != "" {
+					cardView.Type = scryfallCard.TypeLine
+				}
+				if card.Power == "" && scryfallCard.Power.Valid {
+					cardView.Power = scryfallCard.Power.String
+				}
+				if card.Toughness == "" && scryfallCard.Toughness.Valid {
+					cardView.Toughness = scryfallCard.Toughness.String
+				}
+				if card.ManaCost == "" && scryfallCard.ManaCost.Valid {
+					cardView.ManaCost = scryfallCard.ManaCost.String
+				}
+				if card.RulesText == "" && scryfallCard.OracleText.Valid {
+					cardView.RulesText = scryfallCard.OracleText.String
+				}
+
+				// Populate image URIs
+				if scryfallCard.ImageURISmall.Valid {
+					cardView.ImageUriSmall = scryfallCard.ImageURISmall.String
+				}
+				if scryfallCard.ImageURINormal.Valid {
+					cardView.ImageUriNormal = scryfallCard.ImageURINormal.String
+				}
+				if scryfallCard.ImageURILarge.Valid {
+					cardView.ImageUriLarge = scryfallCard.ImageURILarge.String
+				}
+				if scryfallCard.ImageURIPNG.Valid {
+					cardView.ImageUriPng = scryfallCard.ImageURIPNG.String
+				}
+			}
+		} else if scryfallRepo != nil && card.Name != "" {
+			// Card has metadata, just fetch images
+			if scryfallCards, err := scryfallRepo.GetByNameCaseInsensitive(ctx, card.Name); err == nil && len(scryfallCards) > 0 {
+				scryfallCard := scryfallCards[0]
+				cardView.ScryfallId = scryfallCard.ID.String()
+				if scryfallCard.ImageURISmall.Valid {
+					cardView.ImageUriSmall = scryfallCard.ImageURISmall.String
+				}
+				if scryfallCard.ImageURINormal.Valid {
+					cardView.ImageUriNormal = scryfallCard.ImageURINormal.String
+				}
+				if scryfallCard.ImageURILarge.Valid {
+					cardView.ImageUriLarge = scryfallCard.ImageURILarge.String
+				}
+				if scryfallCard.ImageURIPNG.Valid {
+					cardView.ImageUriPng = scryfallCard.ImageURIPNG.String
+				}
+			}
 		}
 
 		// Convert counters

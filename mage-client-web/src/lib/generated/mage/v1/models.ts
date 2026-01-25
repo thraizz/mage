@@ -335,6 +335,16 @@ export interface CardView {
   attachedTo: string[];
   /** Creature has summoning sickness (can't attack/tap) */
   summoningSickness: boolean;
+  /** Scryfall image data (direct CDN URLs for faster loading) */
+  scryfallId: string;
+  /** 146 × 204 */
+  imageUriSmall: string;
+  /** 488 × 680 */
+  imageUriNormal: string;
+  /** 672 × 936 */
+  imageUriLarge: string;
+  /** High quality PNG */
+  imageUriPng: string;
   /** Available actions for this card (context-aware, server source of truth) */
   availableActions: CardAction[];
 }
@@ -2534,6 +2544,11 @@ function createBaseCardView(): CardView {
     counters: [],
     attachedTo: [],
     summoningSickness: false,
+    scryfallId: '',
+    imageUriSmall: '',
+    imageUriNormal: '',
+    imageUriLarge: '',
+    imageUriPng: '',
     availableActions: []
   };
 }
@@ -2617,6 +2632,21 @@ export const CardView: MessageFns<CardView> = {
     }
     if (message.summoningSickness !== false) {
       writer.uint32(208).bool(message.summoningSickness);
+    }
+    if (message.scryfallId !== '') {
+      writer.uint32(218).string(message.scryfallId);
+    }
+    if (message.imageUriSmall !== '') {
+      writer.uint32(226).string(message.imageUriSmall);
+    }
+    if (message.imageUriNormal !== '') {
+      writer.uint32(234).string(message.imageUriNormal);
+    }
+    if (message.imageUriLarge !== '') {
+      writer.uint32(250).string(message.imageUriLarge);
+    }
+    if (message.imageUriPng !== '') {
+      writer.uint32(258).string(message.imageUriPng);
     }
     for (const v of message.availableActions) {
       CardAction.encode(v!, writer.uint32(242).fork()).join();
@@ -2839,6 +2869,46 @@ export const CardView: MessageFns<CardView> = {
           message.summoningSickness = reader.bool();
           continue;
         }
+        case 27: {
+          if (tag !== 218) {
+            break;
+          }
+
+          message.scryfallId = reader.string();
+          continue;
+        }
+        case 28: {
+          if (tag !== 226) {
+            break;
+          }
+
+          message.imageUriSmall = reader.string();
+          continue;
+        }
+        case 29: {
+          if (tag !== 234) {
+            break;
+          }
+
+          message.imageUriNormal = reader.string();
+          continue;
+        }
+        case 31: {
+          if (tag !== 250) {
+            break;
+          }
+
+          message.imageUriLarge = reader.string();
+          continue;
+        }
+        case 32: {
+          if (tag !== 258) {
+            break;
+          }
+
+          message.imageUriPng = reader.string();
+          continue;
+        }
         case 30: {
           if (tag !== 242) {
             break;
@@ -2894,6 +2964,11 @@ export const CardView: MessageFns<CardView> = {
       summoningSickness: isSet(object.summoningSickness)
         ? globalThis.Boolean(object.summoningSickness)
         : false,
+      scryfallId: isSet(object.scryfallId) ? globalThis.String(object.scryfallId) : '',
+      imageUriSmall: isSet(object.imageUriSmall) ? globalThis.String(object.imageUriSmall) : '',
+      imageUriNormal: isSet(object.imageUriNormal) ? globalThis.String(object.imageUriNormal) : '',
+      imageUriLarge: isSet(object.imageUriLarge) ? globalThis.String(object.imageUriLarge) : '',
+      imageUriPng: isSet(object.imageUriPng) ? globalThis.String(object.imageUriPng) : '',
       availableActions: globalThis.Array.isArray(object?.availableActions)
         ? object.availableActions.map((e: any) => CardAction.fromJSON(e))
         : []
@@ -2980,6 +3055,21 @@ export const CardView: MessageFns<CardView> = {
     if (message.summoningSickness !== false) {
       obj.summoningSickness = message.summoningSickness;
     }
+    if (message.scryfallId !== '') {
+      obj.scryfallId = message.scryfallId;
+    }
+    if (message.imageUriSmall !== '') {
+      obj.imageUriSmall = message.imageUriSmall;
+    }
+    if (message.imageUriNormal !== '') {
+      obj.imageUriNormal = message.imageUriNormal;
+    }
+    if (message.imageUriLarge !== '') {
+      obj.imageUriLarge = message.imageUriLarge;
+    }
+    if (message.imageUriPng !== '') {
+      obj.imageUriPng = message.imageUriPng;
+    }
     if (message.availableActions?.length) {
       obj.availableActions = message.availableActions.map((e) => CardAction.toJSON(e));
     }
@@ -3017,6 +3107,11 @@ export const CardView: MessageFns<CardView> = {
     message.counters = object.counters?.map((e) => CounterView.fromPartial(e)) || [];
     message.attachedTo = object.attachedTo?.map((e) => e) || [];
     message.summoningSickness = object.summoningSickness ?? false;
+    message.scryfallId = object.scryfallId ?? '';
+    message.imageUriSmall = object.imageUriSmall ?? '';
+    message.imageUriNormal = object.imageUriNormal ?? '';
+    message.imageUriLarge = object.imageUriLarge ?? '';
+    message.imageUriPng = object.imageUriPng ?? '';
     message.availableActions = object.availableActions?.map((e) => CardAction.fromPartial(e)) || [];
     return message;
   }

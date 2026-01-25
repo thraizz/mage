@@ -64,7 +64,7 @@ func (s *mageServer) resolveCardNames(ctx context.Context, cardNames []string) (
 		}
 
 		// Try full name first
-		cards, err := s.cardRepo.GetByNameCaseInsensitive(ctx, normalized)
+		cards, err := s.scryfallCardRepo.GetByNameCaseInsensitive(ctx, normalized)
 		if err == nil && len(cards) > 0 {
 			cache[normalized] = cards[0].Name
 			resolved = append(resolved, cards[0].Name)
@@ -86,7 +86,7 @@ func (s *mageServer) resolveCardNames(ctx context.Context, cardNames []string) (
 				left = strings.TrimSpace(normalized[:idx])
 			}
 			if left != "" {
-				cards2, err2 := s.cardRepo.GetByNameCaseInsensitive(ctx, left)
+				cards2, err2 := s.scryfallCardRepo.GetByNameCaseInsensitive(ctx, left)
 				if err2 == nil && len(cards2) > 0 {
 					cache[normalized] = cards2[0].Name
 					resolved = append(resolved, cards2[0].Name)
@@ -1328,7 +1328,7 @@ func (s *mageServer) buildDeckCardsWithMetadata(ctx context.Context, cardNames [
 	var deckCards []*pb.DeckCard
 	for cardName, quantity := range cardQuantities {
 		// Look up card metadata from database
-		cards, err := s.cardRepo.GetByName(ctx, cardName)
+		cards, err := s.scryfallCardRepo.GetByName(ctx, cardName)
 		if err != nil {
 			s.logger.Warn("failed to get card metadata",
 				zap.String("card_name", cardName),
@@ -1354,20 +1354,44 @@ func (s *mageServer) buildDeckCardsWithMetadata(ctx context.Context, cardNames [
 		// Use first printing (could be enhanced to allow set selection)
 		cardData := cards[0]
 
+		// Extract string values from nullable fields
+		manaCost := ""
+		if cardData.ManaCost.Valid {
+			manaCost = cardData.ManaCost.String
+		}
+
 		// Parse types from card type string (e.g., "Creature - Human Wizard" -> ["CREATURE"])
-		types := parseCardTypes(cardData.CardType)
+		types := parseCardTypes(cardData.TypeLine)
 
 		// Parse colors from mana cost (e.g., "{2}{U}{U}" -> ["U"])
-		colors := parseColorsFromManaCost(cardData.ManaCost)
+		colors := parseColorsFromManaCost(manaCost)
+
+		// Determine if this is a creature to properly handle power/toughness
+		isCreature := false
+		for _, t := range types {
+			if t == "CREATURE" {
+				isCreature = true
+				break
+			}
+		}
+
+		// Only include power/toughness for creatures
+		// Non-creatures might have "0" in database from bad imports - filter those out
+		power := ""
+		toughness := ""
+		if isCreature && cardData.Power.Valid && cardData.Toughness.Valid {
+			power = cardData.Power.String
+			toughness = cardData.Toughness.String
+		}
 
 		deckCards = append(deckCards, &pb.DeckCard{
 			Name:      cardData.Name,
-			ManaCost:  cardData.ManaCost,
-			CardType:  cardData.CardType,
+			ManaCost:  manaCost,
+			CardType:  cardData.TypeLine,
 			Types:     types,
 			Colors:    colors,
-			Power:     cardData.Power,
-			Toughness: cardData.Toughness,
+			Power:     power,
+			Toughness: toughness,
 			Quantity:  quantity,
 		})
 	}

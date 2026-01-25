@@ -1258,6 +1258,12 @@ type CardView struct {
 	Counters          []*CounterView         `protobuf:"bytes,24,rep,name=counters,proto3" json:"counters,omitempty"`
 	AttachedTo        []string               `protobuf:"bytes,25,rep,name=attached_to,json=attachedTo,proto3" json:"attached_to,omitempty"`
 	SummoningSickness bool                   `protobuf:"varint,26,opt,name=summoning_sickness,json=summoningSickness,proto3" json:"summoning_sickness,omitempty"` // Creature has summoning sickness (can't attack/tap)
+	// Scryfall image data (direct CDN URLs for faster loading)
+	ScryfallId     string `protobuf:"bytes,27,opt,name=scryfall_id,json=scryfallId,proto3" json:"scryfall_id,omitempty"`
+	ImageUriSmall  string `protobuf:"bytes,28,opt,name=image_uri_small,json=imageUriSmall,proto3" json:"image_uri_small,omitempty"`    // 146 × 204
+	ImageUriNormal string `protobuf:"bytes,29,opt,name=image_uri_normal,json=imageUriNormal,proto3" json:"image_uri_normal,omitempty"` // 488 × 680
+	ImageUriLarge  string `protobuf:"bytes,31,opt,name=image_uri_large,json=imageUriLarge,proto3" json:"image_uri_large,omitempty"`    // 672 × 936
+	ImageUriPng    string `protobuf:"bytes,32,opt,name=image_uri_png,json=imageUriPng,proto3" json:"image_uri_png,omitempty"`          // High quality PNG
 	// Available actions for this card (context-aware, server source of truth)
 	AvailableActions []*CardAction `protobuf:"bytes,30,rep,name=available_actions,json=availableActions,proto3" json:"available_actions,omitempty"`
 	unknownFields    protoimpl.UnknownFields
@@ -1474,6 +1480,41 @@ func (x *CardView) GetSummoningSickness() bool {
 		return x.SummoningSickness
 	}
 	return false
+}
+
+func (x *CardView) GetScryfallId() string {
+	if x != nil {
+		return x.ScryfallId
+	}
+	return ""
+}
+
+func (x *CardView) GetImageUriSmall() string {
+	if x != nil {
+		return x.ImageUriSmall
+	}
+	return ""
+}
+
+func (x *CardView) GetImageUriNormal() string {
+	if x != nil {
+		return x.ImageUriNormal
+	}
+	return ""
+}
+
+func (x *CardView) GetImageUriLarge() string {
+	if x != nil {
+		return x.ImageUriLarge
+	}
+	return ""
+}
+
+func (x *CardView) GetImageUriPng() string {
+	if x != nil {
+		return x.ImageUriPng
+	}
+	return ""
 }
 
 func (x *CardView) GetAvailableActions() []*CardAction {
@@ -3062,7 +3103,7 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\x04wins\x18\x10 \x01(\x05R\x04wins\x12\x1b\n" +
 	"\tkept_hand\x18\x11 \x01(\bR\bkeptHand\x122\n" +
 	"\x15has_available_actions\x18\x12 \x01(\bR\x13hasAvailableActions\x12%\n" +
-	"\x0emulligan_count\x18\x14 \x01(\x05R\rmulliganCount\"\xe7\x06\n" +
+	"\x0emulligan_count\x18\x14 \x01(\x05R\rmulliganCount\"\xa6\b\n" +
 	"\bCardView\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
@@ -3094,7 +3135,13 @@ const file_mage_v1_models_proto_rawDesc = "" +
 	"\bcounters\x18\x18 \x03(\v2\x14.mage.v1.CounterViewR\bcounters\x12\x1f\n" +
 	"\vattached_to\x18\x19 \x03(\tR\n" +
 	"attachedTo\x12-\n" +
-	"\x12summoning_sickness\x18\x1a \x01(\bR\x11summoningSickness\x12@\n" +
+	"\x12summoning_sickness\x18\x1a \x01(\bR\x11summoningSickness\x12\x1f\n" +
+	"\vscryfall_id\x18\x1b \x01(\tR\n" +
+	"scryfallId\x12&\n" +
+	"\x0fimage_uri_small\x18\x1c \x01(\tR\rimageUriSmall\x12(\n" +
+	"\x10image_uri_normal\x18\x1d \x01(\tR\x0eimageUriNormal\x12&\n" +
+	"\x0fimage_uri_large\x18\x1f \x01(\tR\rimageUriLarge\x12\"\n" +
+	"\rimage_uri_png\x18  \x01(\tR\vimageUriPng\x12@\n" +
 	"\x11available_actions\x18\x1e \x03(\v2\x13.mage.v1.CardActionR\x10availableActions\"E\n" +
 	"\vAbilityView\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +

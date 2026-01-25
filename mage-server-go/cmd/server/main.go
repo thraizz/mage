@@ -98,7 +98,7 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	statsRepo := repository.NewStatsRepository(db)
 	deckRepo := repository.NewDeckRepository(db)
-	cardRepo := repository.NewCardRepository(db, logger)
+	scryfallCardRepo := repository.NewScryfallCardRepository(db, logger)
 	matchHistoryRepo := repository.NewMatchHistoryRepository(db)
 
 	// Initialize user manager
@@ -153,7 +153,7 @@ func main() {
 		userRepo,
 		statsRepo,
 		deckRepo,
-		cardRepo,
+		scryfallCardRepo,
 		matchHistoryRepo,
 		roomMgr,
 		chatMgr,

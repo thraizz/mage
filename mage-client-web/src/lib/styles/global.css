@@ -532,7 +532,6 @@ input[type='checkbox'] {
 }
 
 .playtest-header {
-  margin: 0 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1430,7 +1429,7 @@ input[type='checkbox'] {
   flex-shrink: 0;
   transition: all 0.2s ease;
   border-radius: 8px;
-  height: calc(var(--card-height) + 32px);
+  height: var(--card-height);
 }
 
 .hand-area.drag-valid {
@@ -2371,4 +2370,10 @@ input[type='checkbox'] {
   100% {
     transform: translateX(100%);
   }
+}
+
+.my-player-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }

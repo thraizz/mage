@@ -797,6 +797,11 @@ function createPlaytestGameStore() {
         faceDown: false,
         counters: [],
         attachedTo: [],
+        scryfallId: '',
+        imageUriSmall: '',
+        imageUriNormal: '',
+        imageUriLarge: '',
+        imageUriPng: '',
         summoningSickness: true,
         availableActions: []
       };

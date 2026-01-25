@@ -5,22 +5,43 @@
  * API docs: https://scryfall.com/docs/api
  */
 
+import type { CardView } from '$lib/generated/mage/v1/models';
+
 /**
- * Generate a Scryfall image URL for a card by exact name.
- * Uses the redirect endpoint which returns a 302 to the actual image.
+ * Generate a Scryfall image URL for a card.
+ * Prefers direct CDN URLs from the database if available, otherwise falls back to the redirect API.
  *
  * @param cardName - The exact name of the card
  * @param version - Image version: 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop'
+ * @param card - Optional CardView with direct image URIs from the database
  * @returns The Scryfall image URL
  */
 export function getScryfallImageUrl(
   cardName: string,
-  version: 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop' = 'normal'
+  version: 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop' = 'normal',
+  card?: CardView
 ): string {
   if (!cardName) return '';
 
-  // Use the named card image redirect endpoint
-  // This is faster than making an API call to get the image URI
+  // Use direct CDN URLs if available (much faster, no redirect needed)
+  if (card) {
+    switch (version) {
+      case 'small':
+        if (card.imageUriSmall) return card.imageUriSmall;
+        break;
+      case 'normal':
+        if (card.imageUriNormal) return card.imageUriNormal;
+        break;
+      case 'large':
+        if (card.imageUriLarge) return card.imageUriLarge;
+        break;
+      case 'png':
+        if (card.imageUriPng) return card.imageUriPng;
+        break;
+    }
+  }
+
+  // Fall back to redirect API if direct URLs not available
   const encodedName = encodeURIComponent(cardName);
   return `https://api.scryfall.com/cards/named?format=image&version=${version}&exact=${encodedName}`;
 }

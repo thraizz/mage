@@ -7,6 +7,7 @@
   import X from '@lucide/svelte/icons/x';
 
   interface GameMenuProps {
+    isOpen: boolean;
     // Data
     isMultiplayer: boolean;
     players?: Player[];

@@ -41,7 +41,6 @@
     isOverValidDropZone,
     type SourceZone
   } from '$lib/utils/drag-drop';
-  import { getScryfallImageUrl } from '$lib/utils/scryfall';
   import { useDropZones } from '$lib/utils/use-drop-zones.svelte';
 
   // Page data from load function (CHANGE: Initialize from URL params)
@@ -829,49 +828,51 @@
       commandDropZoneRef={(el) => (commandDropZoneEl = el)}
     />
 
-    <!-- Player Info Row -->
-    {#if me}
-      <PlayerInfoRow
-        player={{
-          name: me.name,
-          life: me.life,
-          poison: me.poison,
-          libraryCount: me.libraryCount
-        }}
-        graveyard={myGrave}
-        {exile}
-        mana={myMana}
-        showLifeMenu={uiState.showLifeMenu}
-        onLifeChange={handleLifeChange}
-        onPoisonChange={handlePoisonChange}
-        onToggleLifeMenu={() => (uiState.showLifeMenu = !uiState.showLifeMenu)}
-        onSearchLibrary={() => (uiState.showDeckSearch = true)}
-        onDeckContextMenu={handleDeckContextMenu}
-        libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
-        graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
-        exileDropZoneRef={(el) => (exileDropZoneEl = el)}
-      />
-    {/if}
+    <div class="my-player-container">
+      <!-- Player Info Row -->
+      {#if me}
+        <PlayerInfoRow
+          player={{
+            name: me.name,
+            life: me.life,
+            poison: me.poison,
+            libraryCount: me.libraryCount
+          }}
+          graveyard={myGrave}
+          {exile}
+          mana={myMana}
+          showLifeMenu={uiState.showLifeMenu}
+          onLifeChange={handleLifeChange}
+          onPoisonChange={handlePoisonChange}
+          onToggleLifeMenu={() => (uiState.showLifeMenu = !uiState.showLifeMenu)}
+          onSearchLibrary={() => (uiState.showDeckSearch = true)}
+          onDeckContextMenu={handleDeckContextMenu}
+          libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
+          graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
+          exileDropZoneRef={(el) => (exileDropZoneEl = el)}
+        />
+      {/if}
 
-    <!-- Player Hand -->
-    <div
-      bind:this={handDropZoneEl}
-      class="hand-area"
-      class:drag-active={isDragging}
-      class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
-    >
-      <PlayerHand
-        cards={me?.hand || []}
-        {selectedCardIds}
-        {playingCardIds}
-        hasPriority={true}
-        onSelectCard={handleSelectCard}
-        onClearSelection={handleClearSelection}
-        onCardClick={() => {}}
-        size="normal"
-        currentPhase="PRECOMBAT_MAIN"
-        canDrag={true}
-      />
+      <!-- Player Hand -->
+      <div
+        bind:this={handDropZoneEl}
+        class="hand-area"
+        class:drag-active={isDragging}
+        class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
+      >
+        <PlayerHand
+          cards={me?.hand || []}
+          {selectedCardIds}
+          {playingCardIds}
+          hasPriority={true}
+          onSelectCard={handleSelectCard}
+          onClearSelection={handleClearSelection}
+          onCardClick={() => {}}
+          size="normal"
+          currentPhase="PRECOMBAT_MAIN"
+          canDrag={true}
+        />
+      </div>
     </div>
   </main>
 

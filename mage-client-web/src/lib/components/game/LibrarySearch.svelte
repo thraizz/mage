@@ -298,9 +298,9 @@
                 tabindex="0"
               >
                 <div class="card-thumbnail">
-                  {#if getScryfallImageUrl(card.name, 'small')}
+                  {#if getScryfallImageUrl(card.name, 'small', card)}
                     <img
-                      src={getScryfallImageUrl(card.name, 'small')}
+                      src={getScryfallImageUrl(card.name, 'small', card)}
                       alt={card.name}
                       class="card-image"
                       draggable="false"
@@ -383,7 +383,8 @@
 
   <!-- Drag ghost -->
   {#if isDragging && draggedCard}
-    {@const dragImageUrl = getScryfallImageUrl(draggedCard.name, 'small')}
+    {@const dragCard = cards.find((c) => c.id === draggedCard?.id)}
+    {@const dragImageUrl = getScryfallImageUrl(draggedCard?.name || '', 'small', dragCard)}
     <div class="drag-ghost" style="left: {dragPosition.x}px; top: {dragPosition.y}px;">
       <div class="drag-ghost-card" class:over-zone={hoveredDropZone !== null}>
         {#if dragImageUrl}

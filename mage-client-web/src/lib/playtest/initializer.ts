@@ -192,7 +192,12 @@ function createCardView(
     counters: [],
     attachedTo: [],
     summoningSickness: false,
-    availableActions: []
+    availableActions: [],
+    scryfallId: '',
+    imageUriSmall: '',
+    imageUriNormal: '',
+    imageUriLarge: '',
+    imageUriPng: ''
   };
 }
 

@@ -386,7 +386,7 @@ func (s *mageServer) GameGetView(ctx context.Context, req *pb.GameGetViewRequest
 		)
 		if engineView, engineErr := s.gameAdapter.GetGameView(gameInstance.ID, playerID); engineErr == nil && engineView != nil {
 			s.logger.Info("GameGetView got engine view")
-			view = s.engineViewToProto(engineView, playerID)
+			view = s.engineViewToProto(ctx, engineView, playerID)
 		}
 	}
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import ManaSymbol from '$lib/components/mtg/ManaSymbol.svelte';
+  import type { CardView } from '$lib/generated/mage/v1/models';
   import {
     getScryfallImageUrl,
     getScryfallTokenSearchUrl,
@@ -17,6 +18,7 @@
     toughness = '',
     color = '',
     imageUrl = '',
+    card,
     isTapped = false,
     isSelected = false,
     counters = [],
@@ -50,6 +52,7 @@
     toughness?: string;
     color?: string;
     imageUrl?: string;
+    card?: CardView;
     isTapped?: boolean;
     isSelected?: boolean;
     counters?: Array<{ name: string; count: number }>;
@@ -165,7 +168,7 @@
       (isToken && tokenImageUrl
         ? tokenImageUrl
         : !isCardBack && !isPlaceholder && cardName
-          ? getScryfallImageUrl(cardName, getScryfallVersionForSize(size))
+          ? getScryfallImageUrl(cardName, getScryfallVersionForSize(size), card)
           : '')
   );
 

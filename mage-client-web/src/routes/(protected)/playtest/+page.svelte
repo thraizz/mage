@@ -970,7 +970,13 @@
             </div>
             <div class="cards-compact">
               {#each player.hand as card}
-                <Card cardId={card.id} cardName={card.name} size="large" manaCost={card.manaCost} />
+                <Card
+                  cardId={card.id}
+                  cardName={card.name}
+                  size="large"
+                  manaCost={card.manaCost}
+                  {card}
+                />
               {/each}
             </div>
           </div>
@@ -1087,51 +1093,53 @@
           commandDropZoneRef={(el) => (commandDropZoneEl = el)}
         />
 
-        <!-- Player Info Row -->
-        {#if me}
-          <PlayerInfoRow
-            player={{
-              name: me.name,
-              life: me.life,
-              poison: me.poison,
-              libraryCount: me.libraryCount
-            }}
-            graveyard={myGrave}
-            {exile}
-            mana={myMana}
-            showLifeMenu={uiState.showLifeMenu}
-            onLifeChange={handleLifeChange}
-            onPoisonChange={handlePoisonChange}
-            onToggleLifeMenu={() => (uiState.showLifeMenu = !uiState.showLifeMenu)}
-            onSearchLibrary={() => (uiState.showDeckSearch = true)}
-            onDeckContextMenu={handleDeckContextMenu}
-            libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
-            graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
-            exileDropZoneRef={(el) => (exileDropZoneEl = el)}
-            isPlaytest={true}
-            {players}
-            {activeControlSeat}
-            onSwitchPlayer={switchPlayer}
-          />
-        {/if}
+        <div class="my-player-container">
+          <!-- Player Info Row -->
+          {#if me}
+            <PlayerInfoRow
+              player={{
+                name: me.name,
+                life: me.life,
+                poison: me.poison,
+                libraryCount: me.libraryCount
+              }}
+              graveyard={myGrave}
+              {exile}
+              mana={myMana}
+              showLifeMenu={uiState.showLifeMenu}
+              onLifeChange={handleLifeChange}
+              onPoisonChange={handlePoisonChange}
+              onToggleLifeMenu={() => (uiState.showLifeMenu = !uiState.showLifeMenu)}
+              onSearchLibrary={() => (uiState.showDeckSearch = true)}
+              onDeckContextMenu={handleDeckContextMenu}
+              libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
+              graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
+              exileDropZoneRef={(el) => (exileDropZoneEl = el)}
+              isPlaytest={true}
+              {players}
+              {activeControlSeat}
+              onSwitchPlayer={switchPlayer}
+            />
+          {/if}
 
-        <!-- Player Hand -->
-        <div
-          bind:this={handDropZoneEl}
-          class="hand-area"
-          class:drag-active={isDragging}
-          class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
-        >
-          <!-- TODO: Verify the props here -->
-          <PlayerHand
-            cards={me?.hand || []}
-            selectedCardIds={[]}
-            playingCardIds={[]}
-            hasPriority={true}
-            size="normal"
-            currentPhase="PRECOMBAT_MAIN"
-            canDrag={true}
-          />
+          <!-- Player Hand -->
+          <div
+            bind:this={handDropZoneEl}
+            class="hand-area"
+            class:drag-active={isDragging}
+            class:drag-valid={isDragging && isOverValidDrop && dropZone === 'hand'}
+          >
+            <!-- TODO: Verify the props here -->
+            <PlayerHand
+              cards={me?.hand || []}
+              selectedCardIds={[]}
+              playingCardIds={[]}
+              hasPriority={true}
+              size="normal"
+              currentPhase="PRECOMBAT_MAIN"
+              canDrag={true}
+            />
+          </div>
         </div>
       </main>
     </div>

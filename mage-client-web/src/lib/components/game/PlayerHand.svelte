@@ -7,7 +7,6 @@
     getValidDropZonesForCard,
     isDragging as isDraggingStore
   } from '$lib/utils/drag-drop';
-  import { getScryfallImageUrl } from '$lib/utils/scryfall';
   import Card from './Card.svelte';
 
   // Props (optional callbacks for additional handling like target selection)
@@ -303,7 +302,7 @@
             cardType={card.type || ''}
             power={card.power || ''}
             toughness={card.toughness || ''}
-            imageUrl={getScryfallImageUrl(card.name)}
+            {card}
             isTapped={card.tapped || false}
             isSelected={isCardSelected(card.id)}
             counters={card.counters || []}

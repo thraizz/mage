@@ -167,6 +167,13 @@ message CardView {
   repeated string attached_to = 25;
   bool summoning_sickness = 26;  // Creature has summoning sickness (can't attack/tap)
 
+  // Scryfall image data (direct CDN URLs for faster loading)
+  string scryfall_id = 27;
+  string image_uri_small = 28;   // 146 × 204
+  string image_uri_normal = 29;  // 488 × 680
+  string image_uri_large = 31;   // 672 × 936
+  string image_uri_png = 32;     // High quality PNG
+
   // Available actions for this card (context-aware, server source of truth)
   repeated CardAction available_actions = 30;
 }
