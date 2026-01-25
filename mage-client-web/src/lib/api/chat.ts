@@ -1,16 +1,16 @@
 import type { ChatMessage as ClientChatMessage, SendMessageRequest } from '$lib/types/chat';
 import { getMageClient } from '$lib/grpc/client';
 import type {
-	ChatFindByRoomRequest,
-	ChatFindByRoomResponse,
-	ChatFindByTableRequest,
-	ChatFindByTableResponse,
-	ChatFindByGameRequest,
-	ChatFindByGameResponse,
-	ChatJoinRequest,
-	ChatJoinResponse,
-	ChatSendMessageRequest,
-	ChatSendMessageResponse
+  ChatFindByRoomRequest,
+  ChatFindByRoomResponse,
+  ChatFindByTableRequest,
+  ChatFindByTableResponse,
+  ChatFindByGameRequest,
+  ChatFindByGameResponse,
+  ChatJoinRequest,
+  ChatJoinResponse,
+  ChatSendMessageRequest,
+  ChatSendMessageResponse
 } from '$lib/generated/mage/v1/chat';
 
 /**
@@ -21,95 +21,95 @@ import type {
  * Real chat messages should come through WebSocket callbacks.
  */
 export async function fetchLobbyMessages(_limit: number = 50): Promise<ClientChatMessage[]> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	try {
-		// Get main room ID
-		const roomResponse = await client.getMainRoomId();
-		if (!roomResponse.roomId) {
-			throw new Error('Failed to get main room ID');
-		}
+  try {
+    // Get main room ID
+    const roomResponse = await client.getMainRoomId();
+    if (!roomResponse.roomId) {
+      throw new Error('Failed to get main room ID');
+    }
 
-		// Find chat ID for this room
-		const chatResponse = await client.call<ChatFindByRoomRequest, ChatFindByRoomResponse>(
-			'ChatFindByRoom',
-			{
-				sessionId,
-				roomId: roomResponse.roomId
-			}
-		);
+    // Find chat ID for this room
+    const chatResponse = await client.call<ChatFindByRoomRequest, ChatFindByRoomResponse>(
+      'ChatFindByRoom',
+      {
+        sessionId,
+        roomId: roomResponse.roomId
+      }
+    );
 
-		// Note: The actual chat messages come through WebSocket callbacks
-		// This is just a placeholder to join the chat room
-		// Return empty array for now - messages will come via WebSocket
-		console.log(`Chat ID for lobby: ${chatResponse.chatId}`);
+    // Note: The actual chat messages come through WebSocket callbacks
+    // This is just a placeholder to join the chat room
+    // Return empty array for now - messages will come via WebSocket
+    console.log(`Chat ID for lobby: ${chatResponse.chatId}`);
 
-		// In a real implementation, you would store the chatId and listen for
-		// WebSocket callbacks of type CHATMESSAGE to populate messages
-		return [];
-	} catch (error) {
-		console.error('Failed to fetch lobby messages:', error);
-		// Return empty array instead of throwing - chat is not critical
-		return [];
-	}
+    // In a real implementation, you would store the chatId and listen for
+    // WebSocket callbacks of type CHATMESSAGE to populate messages
+    return [];
+  } catch (error) {
+    console.error('Failed to fetch lobby messages:', error);
+    // Return empty array instead of throwing - chat is not critical
+    return [];
+  }
 }
 
 /**
  * Send a message to lobby chat
  */
 export async function sendLobbyMessage(request: SendMessageRequest): Promise<ClientChatMessage> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	// Get main room ID
-	const roomResponse = await client.getMainRoomId();
-	if (!roomResponse.roomId) {
-		throw new Error('Failed to get main room ID');
-	}
+  // Get main room ID
+  const roomResponse = await client.getMainRoomId();
+  if (!roomResponse.roomId) {
+    throw new Error('Failed to get main room ID');
+  }
 
-	// Find chat ID for this room
-	const chatResponse = await client.call<ChatFindByRoomRequest, ChatFindByRoomResponse>(
-		'ChatFindByRoom',
-		{
-			sessionId,
-			roomId: roomResponse.roomId
-		}
-	);
+  // Find chat ID for this room
+  const chatResponse = await client.call<ChatFindByRoomRequest, ChatFindByRoomResponse>(
+    'ChatFindByRoom',
+    {
+      sessionId,
+      roomId: roomResponse.roomId
+    }
+  );
 
-	// Send the message
-	const sendRequest: ChatSendMessageRequest = {
-		sessionId,
-		chatId: chatResponse.chatId,
-		message: request.content
-	};
+  // Send the message
+  const sendRequest: ChatSendMessageRequest = {
+    sessionId,
+    chatId: chatResponse.chatId,
+    message: request.content
+  };
 
-	const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
-		'ChatSendMessage',
-		sendRequest
-	);
+  const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
+    'ChatSendMessage',
+    sendRequest
+  );
 
-	if (!response.success) {
-		throw new Error('Failed to send message');
-	}
+  if (!response.success) {
+    throw new Error('Failed to send message');
+  }
 
-	// Return a client message representation
-	// Note: The actual message will come back through WebSocket callback
-	return {
-		id: `msg-${Date.now()}`,
-		type: 'user',
-		username: 'You', // This would come from auth store in real implementation
-		content: request.content,
-		timestamp: Date.now()
-	};
+  // Return a client message representation
+  // Note: The actual message will come back through WebSocket callback
+  return {
+    id: `msg-${Date.now()}`,
+    type: 'user',
+    username: 'You', // This would come from auth store in real implementation
+    content: request.content,
+    timestamp: Date.now()
+  };
 }
 
 /**
@@ -119,13 +119,13 @@ export async function sendLobbyMessage(request: SendMessageRequest): Promise<Cli
  * This is a placeholder implementation
  */
 export async function sendWhisper(toUsername: string, content: string): Promise<ClientChatMessage> {
-	// Note: The server might not have a separate whisper API
-	// Whispers might be handled by prefixing the message or using a different chat type
-	// This is a placeholder that sends a regular message
-	// You may need to implement this differently based on server capabilities
+  // Note: The server might not have a separate whisper API
+  // Whispers might be handled by prefixing the message or using a different chat type
+  // This is a placeholder that sends a regular message
+  // You may need to implement this differently based on server capabilities
 
-	const message = `/whisper ${toUsername} ${content}`;
-	return await sendLobbyMessage({ content: message });
+  const message = `/whisper ${toUsername} ${content}`;
+  return await sendLobbyMessage({ content: message });
 }
 
 /**
@@ -133,69 +133,69 @@ export async function sendWhisper(toUsername: string, content: string): Promise<
  * This should be called when entering a room to start receiving messages
  */
 export async function joinChat(chatId: string): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	const joinRequest: ChatJoinRequest = {
-		sessionId,
-		chatId
-	};
+  const joinRequest: ChatJoinRequest = {
+    sessionId,
+    chatId
+  };
 
-	const response = await client.call<ChatJoinRequest, ChatJoinResponse>('ChatJoin', joinRequest);
+  const response = await client.call<ChatJoinRequest, ChatJoinResponse>('ChatJoin', joinRequest);
 
-	if (!response.success) {
-		throw new Error('Failed to join chat');
-	}
+  if (!response.success) {
+    throw new Error('Failed to join chat');
+  }
 }
 
 /**
  * Leave a chat room
  */
 export async function leaveChat(chatId: string): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	const leaveRequest = {
-		sessionId,
-		chatId
-	};
+  const leaveRequest = {
+    sessionId,
+    chatId
+  };
 
-	await client.call('ChatLeave', leaveRequest);
+  await client.call('ChatLeave', leaveRequest);
 }
 
 /**
  * Get the chat ID for a table
  */
 export async function getTableChatId(tableId: string): Promise<string> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	// Use ChatFindByTable to get the chat ID for this table
-	const chatResponse = await client.call<ChatFindByTableRequest, ChatFindByTableResponse>(
-		'ChatFindByTable',
-		{
-			sessionId,
-			tableId
-		}
-	);
+  // Use ChatFindByTable to get the chat ID for this table
+  const chatResponse = await client.call<ChatFindByTableRequest, ChatFindByTableResponse>(
+    'ChatFindByTable',
+    {
+      sessionId,
+      tableId
+    }
+  );
 
-	if (!chatResponse.chatId) {
-		throw new Error('Failed to get chat ID for table');
-	}
+  if (!chatResponse.chatId) {
+    throw new Error('Failed to get chat ID for table');
+  }
 
-	return chatResponse.chatId;
+  return chatResponse.chatId;
 }
 
 /**
@@ -206,125 +206,125 @@ export async function getTableChatId(tableId: string): Promise<string> {
  * Real chat messages should come through WebSocket callbacks.
  */
 export async function fetchTableMessages(
-	_tableId: string,
-	_limit: number = 50
+  _tableId: string,
+  _limit: number = 50
 ): Promise<ClientChatMessage[]> {
-	// Note: Real chat messages should come through WebSocket callbacks
-	// This just returns empty array - the TableChat component should use WebSocket
-	console.log(`fetchTableMessages is a placeholder - use WebSocket for live chat`);
-	return [];
+  // Note: Real chat messages should come through WebSocket callbacks
+  // This just returns empty array - the TableChat component should use WebSocket
+  console.log(`fetchTableMessages is a placeholder - use WebSocket for live chat`);
+  return [];
 }
 
 /**
  * Send a message to table chat
  */
 export async function sendTableMessage(
-	tableId: string,
-	request: SendMessageRequest
+  tableId: string,
+  request: SendMessageRequest
 ): Promise<ClientChatMessage> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	// Get the chat ID for this table
-	const chatId = await getTableChatId(tableId);
+  // Get the chat ID for this table
+  const chatId = await getTableChatId(tableId);
 
-	// Send the message
-	const sendRequest: ChatSendMessageRequest = {
-		sessionId,
-		chatId: chatId,
-		message: request.content
-	};
+  // Send the message
+  const sendRequest: ChatSendMessageRequest = {
+    sessionId,
+    chatId: chatId,
+    message: request.content
+  };
 
-	const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
-		'ChatSendMessage',
-		sendRequest
-	);
+  const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
+    'ChatSendMessage',
+    sendRequest
+  );
 
-	if (!response.success) {
-		throw new Error('Failed to send message');
-	}
+  if (!response.success) {
+    throw new Error('Failed to send message');
+  }
 
-	// Return a client message representation
-	// Note: The actual message will come back through WebSocket callback
-	return {
-		id: `msg-${Date.now()}`,
-		type: 'user',
-		username: 'You', // This would come from auth store in real implementation
-		content: request.content,
-		timestamp: Date.now()
-	};
+  // Return a client message representation
+  // Note: The actual message will come back through WebSocket callback
+  return {
+    id: `msg-${Date.now()}`,
+    type: 'user',
+    username: 'You', // This would come from auth store in real implementation
+    content: request.content,
+    timestamp: Date.now()
+  };
 }
 
 /**
  * Get the chat ID for a game
  */
 export async function getGameChatId(gameId: string): Promise<string> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	// Use ChatFindByGame to get the chat ID for this game
-	const chatResponse = await client.call<ChatFindByGameRequest, ChatFindByGameResponse>(
-		'ChatFindByGame',
-		{
-			sessionId,
-			gameId
-		}
-	);
+  // Use ChatFindByGame to get the chat ID for this game
+  const chatResponse = await client.call<ChatFindByGameRequest, ChatFindByGameResponse>(
+    'ChatFindByGame',
+    {
+      sessionId,
+      gameId
+    }
+  );
 
-	if (!chatResponse.chatId) {
-		throw new Error('Failed to get chat ID for game');
-	}
+  if (!chatResponse.chatId) {
+    throw new Error('Failed to get chat ID for game');
+  }
 
-	return chatResponse.chatId;
+  return chatResponse.chatId;
 }
 
 /**
  * Send a message to game chat
  */
 export async function sendGameMessage(gameId: string, content: string): Promise<ClientChatMessage> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	// Get the chat ID for this game
-	const chatId = await getGameChatId(gameId);
+  // Get the chat ID for this game
+  const chatId = await getGameChatId(gameId);
 
-	// Send the message
-	const sendRequest: ChatSendMessageRequest = {
-		sessionId,
-		chatId: chatId,
-		message: content
-	};
+  // Send the message
+  const sendRequest: ChatSendMessageRequest = {
+    sessionId,
+    chatId: chatId,
+    message: content
+  };
 
-	const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
-		'ChatSendMessage',
-		sendRequest
-	);
+  const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
+    'ChatSendMessage',
+    sendRequest
+  );
 
-	if (!response.success) {
-		throw new Error('Failed to send message');
-	}
+  if (!response.success) {
+    throw new Error('Failed to send message');
+  }
 
-	// Return a client message representation
-	// Note: The actual message will come back through WebSocket callback
-	return {
-		id: `msg-${Date.now()}`,
-		type: 'user',
-		username: 'You',
-		content: content,
-		timestamp: Date.now()
-	};
+  // Return a client message representation
+  // Note: The actual message will come back through WebSocket callback
+  return {
+    id: `msg-${Date.now()}`,
+    type: 'user',
+    username: 'You',
+    content: content,
+    timestamp: Date.now()
+  };
 }
 
 /**
@@ -332,25 +332,25 @@ export async function sendGameMessage(gameId: string, content: string): Promise<
  * This is a lower-level function used when you already have the chat ID
  */
 export async function sendChatMessage(chatId: string, content: string): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	const sendRequest: ChatSendMessageRequest = {
-		sessionId,
-		chatId,
-		message: content
-	};
+  const sendRequest: ChatSendMessageRequest = {
+    sessionId,
+    chatId,
+    message: content
+  };
 
-	const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
-		'ChatSendMessage',
-		sendRequest
-	);
+  const response = await client.call<ChatSendMessageRequest, ChatSendMessageResponse>(
+    'ChatSendMessage',
+    sendRequest
+  );
 
-	if (!response.success) {
-		throw new Error('Failed to send message');
-	}
+  if (!response.success) {
+    throw new Error('Failed to send message');
+  }
 }

@@ -238,11 +238,11 @@ const lobbyClient = createLobbyServiceClient();
 
 // Make RPC calls
 lobbyClient.listTables({ formatFilter: '', openOnly: false }, (err, response) => {
-	if (err) {
-		console.error('Error:', err);
-	} else {
-		console.log('Tables:', response.tables);
-	}
+  if (err) {
+    console.error('Error:', err);
+  } else {
+    console.log('Tables:', response.tables);
+  }
 });
 ```
 

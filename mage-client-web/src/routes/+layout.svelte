@@ -1,16 +1,16 @@
 <script lang="ts">
-	import '$lib/styles/variables.css';
-	import '$lib/styles/global.css';
-	import 'mana-font/css/mana.css';
-	import favicon from '$lib/assets/favicon.svg';
-	import ToastContainer from '$lib/components/ToastContainer.svelte';
-	import GlobalConfirmDialog from '$lib/components/GlobalConfirmDialog.svelte';
+  import '$lib/styles/variables.css';
+  import '$lib/styles/global.css';
+  import 'mana-font/css/mana.css';
+  import favicon from '$lib/assets/favicon.svg';
+  import ToastContainer from '$lib/components/ToastContainer.svelte';
+  import GlobalConfirmDialog from '$lib/components/GlobalConfirmDialog.svelte';
 
-	let { children } = $props();
+  let { children } = $props();
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+  <link rel="icon" href={favicon} />
 </svelte:head>
 
 {@render children()}

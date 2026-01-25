@@ -1,218 +1,218 @@
 import type {
-	UserProfile,
-	UserStats,
-	MatchHistory,
-	ChangePasswordRequest
+  UserProfile,
+  UserStats,
+  MatchHistory,
+  ChangePasswordRequest
 } from '$lib/types/profile';
 import { getMageClient } from '$lib/grpc/client';
 
 // Define request/response types locally since they're not generated yet
 interface UserGetProfileRequest {
-	sessionId: string;
+  sessionId: string;
 }
 
 interface UserGetProfileResponse {
-	success: boolean;
-	error?: string;
-	profile?: {
-		userId: string;
-		username: string;
-		email?: string;
-		createdAt: number;
-		lastLogin?: number;
-	};
+  success: boolean;
+  error?: string;
+  profile?: {
+    userId: string;
+    username: string;
+    email?: string;
+    createdAt: number;
+    lastLogin?: number;
+  };
 }
 
 interface UserGetStatsRequest {
-	sessionId: string;
+  sessionId: string;
 }
 
 interface UserGetStatsResponse {
-	success: boolean;
-	error?: string;
-	stats?: {
-		wins: number;
-		losses: number;
-		draws: number;
-		quits: number;
-		totalPlayTime?: number;
-	};
+  success: boolean;
+  error?: string;
+  stats?: {
+    wins: number;
+    losses: number;
+    draws: number;
+    quits: number;
+    totalPlayTime?: number;
+  };
 }
 
 interface UserGetMatchHistoryRequest {
-	sessionId: string;
-	limit: number;
+  sessionId: string;
+  limit: number;
 }
 
 interface MatchRecord {
-	matchId: string;
-	opponentName?: string;
-	format?: string;
-	result: string;
-	timestamp: number;
-	duration?: number;
+  matchId: string;
+  opponentName?: string;
+  format?: string;
+  result: string;
+  timestamp: number;
+  duration?: number;
 }
 
 interface UserGetMatchHistoryResponse {
-	success: boolean;
-	error?: string;
-	matches?: MatchRecord[];
+  success: boolean;
+  error?: string;
+  matches?: MatchRecord[];
 }
 
 interface UserChangePasswordRequest {
-	sessionId: string;
-	currentPassword: string;
-	newPassword: string;
+  sessionId: string;
+  currentPassword: string;
+  newPassword: string;
 }
 
 interface UserChangePasswordResponse {
-	success: boolean;
-	error?: string;
+  success: boolean;
+  error?: string;
 }
 
 /**
  * Fetch user profile information
  */
 export async function fetchUserProfile(): Promise<UserProfile> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	const request: UserGetProfileRequest = {
-		sessionId
-	};
+  const request: UserGetProfileRequest = {
+    sessionId
+  };
 
-	const response = await client.call<UserGetProfileRequest, UserGetProfileResponse>(
-		'UserGetProfile',
-		request
-	);
+  const response = await client.call<UserGetProfileRequest, UserGetProfileResponse>(
+    'UserGetProfile',
+    request
+  );
 
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to fetch user profile');
-	}
+  if (!response.success) {
+    throw new Error(response.error || 'Failed to fetch user profile');
+  }
 
-	if (!response.profile) {
-		throw new Error('No profile data returned');
-	}
+  if (!response.profile) {
+    throw new Error('No profile data returned');
+  }
 
-	return {
-		id: response.profile.userId,
-		username: response.profile.username,
-		email: response.profile.email || '',
-		createdAt: response.profile.createdAt * 1000, // Convert seconds to milliseconds
-		lastLogin: response.profile.lastLogin ? response.profile.lastLogin * 1000 : undefined
-	};
+  return {
+    id: response.profile.userId,
+    username: response.profile.username,
+    email: response.profile.email || '',
+    createdAt: response.profile.createdAt * 1000, // Convert seconds to milliseconds
+    lastLogin: response.profile.lastLogin ? response.profile.lastLogin * 1000 : undefined
+  };
 }
 
 /**
  * Fetch user statistics
  */
 export async function fetchUserStats(): Promise<UserStats> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	const request: UserGetStatsRequest = {
-		sessionId
-	};
+  const request: UserGetStatsRequest = {
+    sessionId
+  };
 
-	const response = await client.call<UserGetStatsRequest, UserGetStatsResponse>(
-		'UserGetStats',
-		request
-	);
+  const response = await client.call<UserGetStatsRequest, UserGetStatsResponse>(
+    'UserGetStats',
+    request
+  );
 
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to fetch user stats');
-	}
+  if (!response.success) {
+    throw new Error(response.error || 'Failed to fetch user stats');
+  }
 
-	if (!response.stats) {
-		throw new Error('No stats data returned');
-	}
+  if (!response.stats) {
+    throw new Error('No stats data returned');
+  }
 
-	const stats = response.stats;
-	const totalGames = stats.wins + stats.losses + stats.draws;
-	const winRate = totalGames > 0 ? (stats.wins / totalGames) * 100 : 0;
-	const quitRate = totalGames > 0 ? (stats.quits / totalGames) * 100 : 0;
+  const stats = response.stats;
+  const totalGames = stats.wins + stats.losses + stats.draws;
+  const winRate = totalGames > 0 ? (stats.wins / totalGames) * 100 : 0;
+  const quitRate = totalGames > 0 ? (stats.quits / totalGames) * 100 : 0;
 
-	return {
-		gamesPlayed: totalGames,
-		wins: stats.wins,
-		losses: stats.losses,
-		draws: stats.draws,
-		winRate: Math.round(winRate * 100) / 100, // Round to 2 decimal places
-		quitRate: Math.round(quitRate * 100) / 100,
-		totalPlayTime: stats.totalPlayTime || undefined
-	};
+  return {
+    gamesPlayed: totalGames,
+    wins: stats.wins,
+    losses: stats.losses,
+    draws: stats.draws,
+    winRate: Math.round(winRate * 100) / 100, // Round to 2 decimal places
+    quitRate: Math.round(quitRate * 100) / 100,
+    totalPlayTime: stats.totalPlayTime || undefined
+  };
 }
 
 /**
  * Fetch user match history
  */
 export async function fetchMatchHistory(limit: number = 20): Promise<MatchHistory[]> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	const request: UserGetMatchHistoryRequest = {
-		sessionId,
-		limit
-	};
+  const request: UserGetMatchHistoryRequest = {
+    sessionId,
+    limit
+  };
 
-	const response = await client.call<UserGetMatchHistoryRequest, UserGetMatchHistoryResponse>(
-		'UserGetMatchHistory',
-		request
-	);
+  const response = await client.call<UserGetMatchHistoryRequest, UserGetMatchHistoryResponse>(
+    'UserGetMatchHistory',
+    request
+  );
 
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to fetch match history');
-	}
+  if (!response.success) {
+    throw new Error(response.error || 'Failed to fetch match history');
+  }
 
-	if (!response.matches) {
-		return [];
-	}
+  if (!response.matches) {
+    return [];
+  }
 
-	return response.matches.map((match) => ({
-		id: match.matchId,
-		opponent: match.opponentName || 'Unknown',
-		format: match.format || 'Unknown',
-		result: match.result as 'win' | 'loss' | 'draw',
-		timestamp: match.timestamp * 1000, // Convert seconds to milliseconds
-		duration: match.duration || undefined
-	}));
+  return response.matches.map((match) => ({
+    id: match.matchId,
+    opponent: match.opponentName || 'Unknown',
+    format: match.format || 'Unknown',
+    result: match.result as 'win' | 'loss' | 'draw',
+    timestamp: match.timestamp * 1000, // Convert seconds to milliseconds
+    duration: match.duration || undefined
+  }));
 }
 
 /**
  * Change user password
  */
 export async function changePassword(request: ChangePasswordRequest): Promise<void> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	const changePasswordRequest: UserChangePasswordRequest = {
-		sessionId,
-		currentPassword: request.currentPassword,
-		newPassword: request.newPassword
-	};
+  const changePasswordRequest: UserChangePasswordRequest = {
+    sessionId,
+    currentPassword: request.currentPassword,
+    newPassword: request.newPassword
+  };
 
-	const response = await client.call<UserChangePasswordRequest, UserChangePasswordResponse>(
-		'UserChangePassword',
-		changePasswordRequest
-	);
+  const response = await client.call<UserChangePasswordRequest, UserChangePasswordResponse>(
+    'UserChangePassword',
+    changePasswordRequest
+  );
 
-	if (!response.success) {
-		throw new Error(response.error || 'Failed to change password');
-	}
+  if (!response.success) {
+    throw new Error(response.error || 'Failed to change password');
+  }
 }

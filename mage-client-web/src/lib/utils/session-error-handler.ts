@@ -14,23 +14,23 @@ import { toast } from '$lib/stores/toast';
  * This should be called when we detect that the session is invalid
  */
 export function handleSessionError(message = 'Session expired. Please log in again.'): void {
-	// Only handle in browser context
-	if (!browser) {
-		return;
-	}
+  // Only handle in browser context
+  if (!browser) {
+    return;
+  }
 
-	// Logout user
-	auth.logout();
+  // Logout user
+  auth.logout();
 
-	// Show error toast
-	toast.error(message);
+  // Show error toast
+  toast.error(message);
 
-	// Get current page URL for return redirect
-	const currentPage = get(page);
-	const returnUrl = currentPage.url.pathname + currentPage.url.search;
+  // Get current page URL for return redirect
+  const currentPage = get(page);
+  const returnUrl = currentPage.url.pathname + currentPage.url.search;
 
-	// Redirect to login with return URL
-	goto(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+  // Redirect to login with return URL
+  goto(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
 }
 
 /**
@@ -38,34 +38,34 @@ export function handleSessionError(message = 'Session expired. Please log in aga
  * Returns true if the response indicates a session error
  */
 export function isSessionErrorResponse(response: { error?: string; success?: boolean }): boolean {
-	if (!response) {
-		return false;
-	}
+  if (!response) {
+    return false;
+  }
 
-	// Check if response has an error field indicating session issues
-	if (response.error) {
-		const errorMsg = response.error.toLowerCase();
-		return (
-			errorMsg.includes('session not found') ||
-			errorMsg.includes('invalid or expired session') ||
-			errorMsg.includes('missing session') ||
-			errorMsg.includes('session expired') ||
-			errorMsg.includes('unauthorized') ||
-			errorMsg.includes('unauthenticated')
-		);
-	}
+  // Check if response has an error field indicating session issues
+  if (response.error) {
+    const errorMsg = response.error.toLowerCase();
+    return (
+      errorMsg.includes('session not found') ||
+      errorMsg.includes('invalid or expired session') ||
+      errorMsg.includes('missing session') ||
+      errorMsg.includes('session expired') ||
+      errorMsg.includes('unauthorized') ||
+      errorMsg.includes('unauthenticated')
+    );
+  }
 
-	// Check if success is false and we're in an authenticated context
-	// (this might indicate session issues, but we need to be careful not to
-	// trigger on all failed requests)
-	if (response.success === false) {
-		const authState = get(auth);
-		if (authState.isAuthenticated) {
-			// If we're authenticated but got a failure, it might be a session issue
-			// We'll let the caller decide based on the error message
-			return false; // Don't auto-detect based on success=false alone
-		}
-	}
+  // Check if success is false and we're in an authenticated context
+  // (this might indicate session issues, but we need to be careful not to
+  // trigger on all failed requests)
+  if (response.success === false) {
+    const authState = get(auth);
+    if (authState.isAuthenticated) {
+      // If we're authenticated but got a failure, it might be a session issue
+      // We'll let the caller decide based on the error message
+      return false; // Don't auto-detect based on success=false alone
+    }
+  }
 
-	return false;
+  return false;
 }

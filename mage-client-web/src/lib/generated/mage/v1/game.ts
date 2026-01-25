@@ -9,363 +9,363 @@ import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
 import { GameView } from './models';
 
 export enum PlayerAction {
-	PLAYER_ACTION_UNSPECIFIED = 0,
-	PASS = 1,
-	PASS_TURN = 2,
-	UNDO = 3,
-	CONCEDE = 4,
-	PASS_UNTIL_END_OF_TURN = 5,
-	PASS_UNTIL_NEXT_TURN = 6,
-	PASS_UNTIL_STACK_RESOLVED = 7,
-	PASS_UNTIL_MY_NEXT_TURN = 8,
-	UNRECOGNIZED = -1
+  PLAYER_ACTION_UNSPECIFIED = 0,
+  PASS = 1,
+  PASS_TURN = 2,
+  UNDO = 3,
+  CONCEDE = 4,
+  PASS_UNTIL_END_OF_TURN = 5,
+  PASS_UNTIL_NEXT_TURN = 6,
+  PASS_UNTIL_STACK_RESOLVED = 7,
+  PASS_UNTIL_MY_NEXT_TURN = 8,
+  UNRECOGNIZED = -1
 }
 
 export function playerActionFromJSON(object: any): PlayerAction {
-	switch (object) {
-		case 0:
-		case 'PLAYER_ACTION_UNSPECIFIED':
-			return PlayerAction.PLAYER_ACTION_UNSPECIFIED;
-		case 1:
-		case 'PASS':
-			return PlayerAction.PASS;
-		case 2:
-		case 'PASS_TURN':
-			return PlayerAction.PASS_TURN;
-		case 3:
-		case 'UNDO':
-			return PlayerAction.UNDO;
-		case 4:
-		case 'CONCEDE':
-			return PlayerAction.CONCEDE;
-		case 5:
-		case 'PASS_UNTIL_END_OF_TURN':
-			return PlayerAction.PASS_UNTIL_END_OF_TURN;
-		case 6:
-		case 'PASS_UNTIL_NEXT_TURN':
-			return PlayerAction.PASS_UNTIL_NEXT_TURN;
-		case 7:
-		case 'PASS_UNTIL_STACK_RESOLVED':
-			return PlayerAction.PASS_UNTIL_STACK_RESOLVED;
-		case 8:
-		case 'PASS_UNTIL_MY_NEXT_TURN':
-			return PlayerAction.PASS_UNTIL_MY_NEXT_TURN;
-		case -1:
-		case 'UNRECOGNIZED':
-		default:
-			return PlayerAction.UNRECOGNIZED;
-	}
+  switch (object) {
+    case 0:
+    case 'PLAYER_ACTION_UNSPECIFIED':
+      return PlayerAction.PLAYER_ACTION_UNSPECIFIED;
+    case 1:
+    case 'PASS':
+      return PlayerAction.PASS;
+    case 2:
+    case 'PASS_TURN':
+      return PlayerAction.PASS_TURN;
+    case 3:
+    case 'UNDO':
+      return PlayerAction.UNDO;
+    case 4:
+    case 'CONCEDE':
+      return PlayerAction.CONCEDE;
+    case 5:
+    case 'PASS_UNTIL_END_OF_TURN':
+      return PlayerAction.PASS_UNTIL_END_OF_TURN;
+    case 6:
+    case 'PASS_UNTIL_NEXT_TURN':
+      return PlayerAction.PASS_UNTIL_NEXT_TURN;
+    case 7:
+    case 'PASS_UNTIL_STACK_RESOLVED':
+      return PlayerAction.PASS_UNTIL_STACK_RESOLVED;
+    case 8:
+    case 'PASS_UNTIL_MY_NEXT_TURN':
+      return PlayerAction.PASS_UNTIL_MY_NEXT_TURN;
+    case -1:
+    case 'UNRECOGNIZED':
+    default:
+      return PlayerAction.UNRECOGNIZED;
+  }
 }
 
 export function playerActionToJSON(object: PlayerAction): string {
-	switch (object) {
-		case PlayerAction.PLAYER_ACTION_UNSPECIFIED:
-			return 'PLAYER_ACTION_UNSPECIFIED';
-		case PlayerAction.PASS:
-			return 'PASS';
-		case PlayerAction.PASS_TURN:
-			return 'PASS_TURN';
-		case PlayerAction.UNDO:
-			return 'UNDO';
-		case PlayerAction.CONCEDE:
-			return 'CONCEDE';
-		case PlayerAction.PASS_UNTIL_END_OF_TURN:
-			return 'PASS_UNTIL_END_OF_TURN';
-		case PlayerAction.PASS_UNTIL_NEXT_TURN:
-			return 'PASS_UNTIL_NEXT_TURN';
-		case PlayerAction.PASS_UNTIL_STACK_RESOLVED:
-			return 'PASS_UNTIL_STACK_RESOLVED';
-		case PlayerAction.PASS_UNTIL_MY_NEXT_TURN:
-			return 'PASS_UNTIL_MY_NEXT_TURN';
-		case PlayerAction.UNRECOGNIZED:
-		default:
-			return 'UNRECOGNIZED';
-	}
+  switch (object) {
+    case PlayerAction.PLAYER_ACTION_UNSPECIFIED:
+      return 'PLAYER_ACTION_UNSPECIFIED';
+    case PlayerAction.PASS:
+      return 'PASS';
+    case PlayerAction.PASS_TURN:
+      return 'PASS_TURN';
+    case PlayerAction.UNDO:
+      return 'UNDO';
+    case PlayerAction.CONCEDE:
+      return 'CONCEDE';
+    case PlayerAction.PASS_UNTIL_END_OF_TURN:
+      return 'PASS_UNTIL_END_OF_TURN';
+    case PlayerAction.PASS_UNTIL_NEXT_TURN:
+      return 'PASS_UNTIL_NEXT_TURN';
+    case PlayerAction.PASS_UNTIL_STACK_RESOLVED:
+      return 'PASS_UNTIL_STACK_RESOLVED';
+    case PlayerAction.PASS_UNTIL_MY_NEXT_TURN:
+      return 'PASS_UNTIL_MY_NEXT_TURN';
+    case PlayerAction.UNRECOGNIZED:
+    default:
+      return 'UNRECOGNIZED';
+  }
 }
 
 /** Special action types (lands, foretell, etc.) */
 export enum SpecialActionType {
-	SPECIAL_ACTION_UNSPECIFIED = 0,
-	PLAY_LAND = 1,
-	FORETELL = 2,
-	SUSPEND = 3,
-	COMPANION = 4,
-	/** ADVANCE_PHASE - Manually advance to next phase/step */
-	ADVANCE_PHASE = 5,
-	/** ACTIVATE_MANA_ABILITY - Tap a land for mana */
-	ACTIVATE_MANA_ABILITY = 6,
-	UNRECOGNIZED = -1
+  SPECIAL_ACTION_UNSPECIFIED = 0,
+  PLAY_LAND = 1,
+  FORETELL = 2,
+  SUSPEND = 3,
+  COMPANION = 4,
+  /** ADVANCE_PHASE - Manually advance to next phase/step */
+  ADVANCE_PHASE = 5,
+  /** ACTIVATE_MANA_ABILITY - Tap a land for mana */
+  ACTIVATE_MANA_ABILITY = 6,
+  UNRECOGNIZED = -1
 }
 
 export function specialActionTypeFromJSON(object: any): SpecialActionType {
-	switch (object) {
-		case 0:
-		case 'SPECIAL_ACTION_UNSPECIFIED':
-			return SpecialActionType.SPECIAL_ACTION_UNSPECIFIED;
-		case 1:
-		case 'PLAY_LAND':
-			return SpecialActionType.PLAY_LAND;
-		case 2:
-		case 'FORETELL':
-			return SpecialActionType.FORETELL;
-		case 3:
-		case 'SUSPEND':
-			return SpecialActionType.SUSPEND;
-		case 4:
-		case 'COMPANION':
-			return SpecialActionType.COMPANION;
-		case 5:
-		case 'ADVANCE_PHASE':
-			return SpecialActionType.ADVANCE_PHASE;
-		case 6:
-		case 'ACTIVATE_MANA_ABILITY':
-			return SpecialActionType.ACTIVATE_MANA_ABILITY;
-		case -1:
-		case 'UNRECOGNIZED':
-		default:
-			return SpecialActionType.UNRECOGNIZED;
-	}
+  switch (object) {
+    case 0:
+    case 'SPECIAL_ACTION_UNSPECIFIED':
+      return SpecialActionType.SPECIAL_ACTION_UNSPECIFIED;
+    case 1:
+    case 'PLAY_LAND':
+      return SpecialActionType.PLAY_LAND;
+    case 2:
+    case 'FORETELL':
+      return SpecialActionType.FORETELL;
+    case 3:
+    case 'SUSPEND':
+      return SpecialActionType.SUSPEND;
+    case 4:
+    case 'COMPANION':
+      return SpecialActionType.COMPANION;
+    case 5:
+    case 'ADVANCE_PHASE':
+      return SpecialActionType.ADVANCE_PHASE;
+    case 6:
+    case 'ACTIVATE_MANA_ABILITY':
+      return SpecialActionType.ACTIVATE_MANA_ABILITY;
+    case -1:
+    case 'UNRECOGNIZED':
+    default:
+      return SpecialActionType.UNRECOGNIZED;
+  }
 }
 
 export function specialActionTypeToJSON(object: SpecialActionType): string {
-	switch (object) {
-		case SpecialActionType.SPECIAL_ACTION_UNSPECIFIED:
-			return 'SPECIAL_ACTION_UNSPECIFIED';
-		case SpecialActionType.PLAY_LAND:
-			return 'PLAY_LAND';
-		case SpecialActionType.FORETELL:
-			return 'FORETELL';
-		case SpecialActionType.SUSPEND:
-			return 'SUSPEND';
-		case SpecialActionType.COMPANION:
-			return 'COMPANION';
-		case SpecialActionType.ADVANCE_PHASE:
-			return 'ADVANCE_PHASE';
-		case SpecialActionType.ACTIVATE_MANA_ABILITY:
-			return 'ACTIVATE_MANA_ABILITY';
-		case SpecialActionType.UNRECOGNIZED:
-		default:
-			return 'UNRECOGNIZED';
-	}
+  switch (object) {
+    case SpecialActionType.SPECIAL_ACTION_UNSPECIFIED:
+      return 'SPECIAL_ACTION_UNSPECIFIED';
+    case SpecialActionType.PLAY_LAND:
+      return 'PLAY_LAND';
+    case SpecialActionType.FORETELL:
+      return 'FORETELL';
+    case SpecialActionType.SUSPEND:
+      return 'SUSPEND';
+    case SpecialActionType.COMPANION:
+      return 'COMPANION';
+    case SpecialActionType.ADVANCE_PHASE:
+      return 'ADVANCE_PHASE';
+    case SpecialActionType.ACTIVATE_MANA_ABILITY:
+      return 'ACTIVATE_MANA_ABILITY';
+    case SpecialActionType.UNRECOGNIZED:
+    default:
+      return 'UNRECOGNIZED';
+  }
 }
 
 export interface GameJoinRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface GameJoinResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface GameWatchStartRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface GameWatchStartResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface GameWatchStopRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface GameWatchStopResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface GameGetViewRequest {
-	sessionId: string;
-	gameId: string;
-	playerId: string;
+  sessionId: string;
+  gameId: string;
+  playerId: string;
 }
 
 export interface GameGetViewResponse {
-	game?: GameView | undefined;
+  game?: GameView | undefined;
 }
 
 export interface SendPlayerUUIDRequest {
-	sessionId: string;
-	gameId: string;
-	uuid: string;
+  sessionId: string;
+  gameId: string;
+  uuid: string;
 }
 
 export interface SendPlayerUUIDResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface SendPlayerStringRequest {
-	sessionId: string;
-	gameId: string;
-	data: string;
+  sessionId: string;
+  gameId: string;
+  data: string;
 }
 
 export interface SendPlayerStringResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface SendPlayerBooleanRequest {
-	sessionId: string;
-	gameId: string;
-	data: boolean;
+  sessionId: string;
+  gameId: string;
+  data: boolean;
 }
 
 export interface SendPlayerBooleanResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface SendPlayerIntegerRequest {
-	sessionId: string;
-	gameId: string;
-	data: number;
+  sessionId: string;
+  gameId: string;
+  data: number;
 }
 
 export interface SendPlayerIntegerResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface SendPlayerManaTypeRequest {
-	sessionId: string;
-	gameId: string;
-	manaType: string;
-	manaTypeStr: string;
+  sessionId: string;
+  gameId: string;
+  manaType: string;
+  manaTypeStr: string;
 }
 
 export interface SendPlayerManaTypeResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface SendPlayerActionRequest {
-	sessionId: string;
-	gameId: string;
-	action: PlayerAction;
+  sessionId: string;
+  gameId: string;
+  action: PlayerAction;
 }
 
 export interface SendPlayerActionResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface SendSpecialActionRequest {
-	sessionId: string;
-	gameId: string;
-	actionType: SpecialActionType;
-	/** Card UUID */
-	sourceId: string;
+  sessionId: string;
+  gameId: string;
+  actionType: SpecialActionType;
+  /** Card UUID */
+  sourceId: string;
 }
 
 export interface SendSpecialActionResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 /** Activate an activated ability on a permanent */
 export interface ActivateAbilityRequest {
-	sessionId: string;
-	gameId: string;
-	/** Permanent with the ability */
-	cardId: string;
-	/** Specific ability to activate */
-	abilityId: string;
-	/** Target UUIDs if required */
-	targets: string[];
+  sessionId: string;
+  gameId: string;
+  /** Permanent with the ability */
+  cardId: string;
+  /** Specific ability to activate */
+  abilityId: string;
+  /** Target UUIDs if required */
+  targets: string[];
 }
 
 export interface ActivateAbilityResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface MatchStartRequest {
-	sessionId: string;
-	tableId: string;
+  sessionId: string;
+  tableId: string;
 }
 
 export interface MatchStartResponse {
-	success: boolean;
-	error: string;
-	gameId: string;
+  success: boolean;
+  error: string;
+  gameId: string;
 }
 
 export interface MatchQuitRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface MatchQuitResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ReplayInitRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface ReplayInitResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ReplayStartRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface ReplayStartResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ReplayStopRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface ReplayStopResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ReplayNextRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface ReplayNextResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ReplayPreviousRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface ReplayPreviousResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ReplaySkipForwardRequest {
-	sessionId: string;
-	gameId: string;
-	steps: number;
+  sessionId: string;
+  gameId: string;
+  steps: number;
 }
 
 export interface ReplaySkipForwardResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 /**
@@ -373,26 +373,26 @@ export interface ReplaySkipForwardResponse {
  * Used for reconnection after disconnection or server restart
  */
 export interface GetMyActiveGamesRequest {
-	sessionId: string;
+  sessionId: string;
 }
 
 /** ActiveGameInfo represents summary information about an active game */
 export interface ActiveGameInfo {
-	gameId: string;
-	tableId: string;
-	gameType: string;
-	players: string[];
-	turnNumber: number;
-	/** STARTING, MULLIGAN, IN_PROGRESS, PAUSED */
-	state: string;
-	/** ISO8601 timestamp */
-	createdAt: string;
-	/** ISO8601 timestamp */
-	updatedAt: string;
+  gameId: string;
+  tableId: string;
+  gameType: string;
+  players: string[];
+  turnNumber: number;
+  /** STARTING, MULLIGAN, IN_PROGRESS, PAUSED */
+  state: string;
+  /** ISO8601 timestamp */
+  createdAt: string;
+  /** ISO8601 timestamp */
+  updatedAt: string;
 }
 
 export interface GetMyActiveGamesResponse {
-	games: ActiveGameInfo[];
+  games: ActiveGameInfo[];
 }
 
 /**
@@ -400,4216 +400,4216 @@ export interface GetMyActiveGamesResponse {
  * Requires opponent consent in multiplayer games
  */
 export interface RequestRollbackRequest {
-	sessionId: string;
-	gameId: string;
-	/** ID of the message to rollback to */
-	messageId: number;
+  sessionId: string;
+  gameId: string;
+  /** ID of the message to rollback to */
+  messageId: number;
 }
 
 export interface RequestRollbackResponse {
-	success: boolean;
-	error: string;
-	/** UUID to track the request */
-	requestId: string;
+  success: boolean;
+  error: string;
+  /** UUID to track the request */
+  requestId: string;
 }
 
 /** Respond to a pending rollback request */
 export interface RespondToRollbackRequest {
-	sessionId: string;
-	gameId: string;
-	/** The request ID from RequestRollbackResponse */
-	requestId: string;
-	/** Whether to approve the rollback */
-	approved: boolean;
+  sessionId: string;
+  gameId: string;
+  /** The request ID from RequestRollbackResponse */
+  requestId: string;
+  /** Whether to approve the rollback */
+  approved: boolean;
 }
 
 export interface RespondToRollbackResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 /** Cancel a pending rollback request (only the requester can cancel) */
 export interface CancelRollbackRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface CancelRollbackResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 function createBaseGameJoinRequest(): GameJoinRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const GameJoinRequest: MessageFns<GameJoinRequest> = {
-	encode(message: GameJoinRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: GameJoinRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameJoinRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameJoinRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameJoinRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameJoinRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameJoinRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): GameJoinRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: GameJoinRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: GameJoinRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameJoinRequest>): GameJoinRequest {
-		return GameJoinRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameJoinRequest>): GameJoinRequest {
-		const message = createBaseGameJoinRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameJoinRequest>): GameJoinRequest {
+    return GameJoinRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameJoinRequest>): GameJoinRequest {
+    const message = createBaseGameJoinRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseGameJoinResponse(): GameJoinResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const GameJoinResponse: MessageFns<GameJoinResponse> = {
-	encode(message: GameJoinResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: GameJoinResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameJoinResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameJoinResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameJoinResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameJoinResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameJoinResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): GameJoinResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: GameJoinResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: GameJoinResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameJoinResponse>): GameJoinResponse {
-		return GameJoinResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameJoinResponse>): GameJoinResponse {
-		const message = createBaseGameJoinResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameJoinResponse>): GameJoinResponse {
+    return GameJoinResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameJoinResponse>): GameJoinResponse {
+    const message = createBaseGameJoinResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseGameWatchStartRequest(): GameWatchStartRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const GameWatchStartRequest: MessageFns<GameWatchStartRequest> = {
-	encode(message: GameWatchStartRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: GameWatchStartRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameWatchStartRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameWatchStartRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameWatchStartRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameWatchStartRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameWatchStartRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): GameWatchStartRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: GameWatchStartRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: GameWatchStartRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameWatchStartRequest>): GameWatchStartRequest {
-		return GameWatchStartRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameWatchStartRequest>): GameWatchStartRequest {
-		const message = createBaseGameWatchStartRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameWatchStartRequest>): GameWatchStartRequest {
+    return GameWatchStartRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameWatchStartRequest>): GameWatchStartRequest {
+    const message = createBaseGameWatchStartRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseGameWatchStartResponse(): GameWatchStartResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const GameWatchStartResponse: MessageFns<GameWatchStartResponse> = {
-	encode(message: GameWatchStartResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: GameWatchStartResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameWatchStartResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameWatchStartResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameWatchStartResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameWatchStartResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameWatchStartResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): GameWatchStartResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: GameWatchStartResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: GameWatchStartResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameWatchStartResponse>): GameWatchStartResponse {
-		return GameWatchStartResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameWatchStartResponse>): GameWatchStartResponse {
-		const message = createBaseGameWatchStartResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameWatchStartResponse>): GameWatchStartResponse {
+    return GameWatchStartResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameWatchStartResponse>): GameWatchStartResponse {
+    const message = createBaseGameWatchStartResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseGameWatchStopRequest(): GameWatchStopRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const GameWatchStopRequest: MessageFns<GameWatchStopRequest> = {
-	encode(message: GameWatchStopRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: GameWatchStopRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameWatchStopRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameWatchStopRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameWatchStopRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameWatchStopRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameWatchStopRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): GameWatchStopRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: GameWatchStopRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: GameWatchStopRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameWatchStopRequest>): GameWatchStopRequest {
-		return GameWatchStopRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameWatchStopRequest>): GameWatchStopRequest {
-		const message = createBaseGameWatchStopRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameWatchStopRequest>): GameWatchStopRequest {
+    return GameWatchStopRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameWatchStopRequest>): GameWatchStopRequest {
+    const message = createBaseGameWatchStopRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseGameWatchStopResponse(): GameWatchStopResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const GameWatchStopResponse: MessageFns<GameWatchStopResponse> = {
-	encode(message: GameWatchStopResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: GameWatchStopResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameWatchStopResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameWatchStopResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameWatchStopResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameWatchStopResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameWatchStopResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): GameWatchStopResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: GameWatchStopResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: GameWatchStopResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameWatchStopResponse>): GameWatchStopResponse {
-		return GameWatchStopResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameWatchStopResponse>): GameWatchStopResponse {
-		const message = createBaseGameWatchStopResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameWatchStopResponse>): GameWatchStopResponse {
+    return GameWatchStopResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameWatchStopResponse>): GameWatchStopResponse {
+    const message = createBaseGameWatchStopResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseGameGetViewRequest(): GameGetViewRequest {
-	return { sessionId: '', gameId: '', playerId: '' };
+  return { sessionId: '', gameId: '', playerId: '' };
 }
 
 export const GameGetViewRequest: MessageFns<GameGetViewRequest> = {
-	encode(message: GameGetViewRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.playerId !== '') {
-			writer.uint32(26).string(message.playerId);
-		}
-		return writer;
-	},
+  encode(message: GameGetViewRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.playerId !== '') {
+      writer.uint32(26).string(message.playerId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameGetViewRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameGetViewRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameGetViewRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameGetViewRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.playerId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.playerId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameGetViewRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			playerId: isSet(object.playerId) ? globalThis.String(object.playerId) : ''
-		};
-	},
+  fromJSON(object: any): GameGetViewRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      playerId: isSet(object.playerId) ? globalThis.String(object.playerId) : ''
+    };
+  },
 
-	toJSON(message: GameGetViewRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.playerId !== '') {
-			obj.playerId = message.playerId;
-		}
-		return obj;
-	},
+  toJSON(message: GameGetViewRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.playerId !== '') {
+      obj.playerId = message.playerId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameGetViewRequest>): GameGetViewRequest {
-		return GameGetViewRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameGetViewRequest>): GameGetViewRequest {
-		const message = createBaseGameGetViewRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.playerId = object.playerId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GameGetViewRequest>): GameGetViewRequest {
+    return GameGetViewRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameGetViewRequest>): GameGetViewRequest {
+    const message = createBaseGameGetViewRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.playerId = object.playerId ?? '';
+    return message;
+  }
 };
 
 function createBaseGameGetViewResponse(): GameGetViewResponse {
-	return { game: undefined };
+  return { game: undefined };
 }
 
 export const GameGetViewResponse: MessageFns<GameGetViewResponse> = {
-	encode(message: GameGetViewResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.game !== undefined) {
-			GameView.encode(message.game, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(message: GameGetViewResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.game !== undefined) {
+      GameView.encode(message.game, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GameGetViewResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGameGetViewResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GameGetViewResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGameGetViewResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.game = GameView.decode(reader, reader.uint32());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.game = GameView.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GameGetViewResponse {
-		return { game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined };
-	},
+  fromJSON(object: any): GameGetViewResponse {
+    return { game: isSet(object.game) ? GameView.fromJSON(object.game) : undefined };
+  },
 
-	toJSON(message: GameGetViewResponse): unknown {
-		const obj: any = {};
-		if (message.game !== undefined) {
-			obj.game = GameView.toJSON(message.game);
-		}
-		return obj;
-	},
+  toJSON(message: GameGetViewResponse): unknown {
+    const obj: any = {};
+    if (message.game !== undefined) {
+      obj.game = GameView.toJSON(message.game);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GameGetViewResponse>): GameGetViewResponse {
-		return GameGetViewResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GameGetViewResponse>): GameGetViewResponse {
-		const message = createBaseGameGetViewResponse();
-		message.game =
-			object.game !== undefined && object.game !== null
-				? GameView.fromPartial(object.game)
-				: undefined;
-		return message;
-	}
+  create(base?: DeepPartial<GameGetViewResponse>): GameGetViewResponse {
+    return GameGetViewResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GameGetViewResponse>): GameGetViewResponse {
+    const message = createBaseGameGetViewResponse();
+    message.game =
+      object.game !== undefined && object.game !== null
+        ? GameView.fromPartial(object.game)
+        : undefined;
+    return message;
+  }
 };
 
 function createBaseSendPlayerUUIDRequest(): SendPlayerUUIDRequest {
-	return { sessionId: '', gameId: '', uuid: '' };
+  return { sessionId: '', gameId: '', uuid: '' };
 }
 
 export const SendPlayerUUIDRequest: MessageFns<SendPlayerUUIDRequest> = {
-	encode(message: SendPlayerUUIDRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.uuid !== '') {
-			writer.uint32(26).string(message.uuid);
-		}
-		return writer;
-	},
+  encode(message: SendPlayerUUIDRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.uuid !== '') {
+      writer.uint32(26).string(message.uuid);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerUUIDRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerUUIDRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerUUIDRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerUUIDRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.uuid = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.uuid = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerUUIDRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			uuid: isSet(object.uuid) ? globalThis.String(object.uuid) : ''
-		};
-	},
+  fromJSON(object: any): SendPlayerUUIDRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      uuid: isSet(object.uuid) ? globalThis.String(object.uuid) : ''
+    };
+  },
 
-	toJSON(message: SendPlayerUUIDRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.uuid !== '') {
-			obj.uuid = message.uuid;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerUUIDRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.uuid !== '') {
+      obj.uuid = message.uuid;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerUUIDRequest>): SendPlayerUUIDRequest {
-		return SendPlayerUUIDRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerUUIDRequest>): SendPlayerUUIDRequest {
-		const message = createBaseSendPlayerUUIDRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.uuid = object.uuid ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerUUIDRequest>): SendPlayerUUIDRequest {
+    return SendPlayerUUIDRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerUUIDRequest>): SendPlayerUUIDRequest {
+    const message = createBaseSendPlayerUUIDRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.uuid = object.uuid ?? '';
+    return message;
+  }
 };
 
 function createBaseSendPlayerUUIDResponse(): SendPlayerUUIDResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const SendPlayerUUIDResponse: MessageFns<SendPlayerUUIDResponse> = {
-	encode(message: SendPlayerUUIDResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: SendPlayerUUIDResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerUUIDResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerUUIDResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerUUIDResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerUUIDResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerUUIDResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): SendPlayerUUIDResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: SendPlayerUUIDResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerUUIDResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerUUIDResponse>): SendPlayerUUIDResponse {
-		return SendPlayerUUIDResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerUUIDResponse>): SendPlayerUUIDResponse {
-		const message = createBaseSendPlayerUUIDResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerUUIDResponse>): SendPlayerUUIDResponse {
+    return SendPlayerUUIDResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerUUIDResponse>): SendPlayerUUIDResponse {
+    const message = createBaseSendPlayerUUIDResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseSendPlayerStringRequest(): SendPlayerStringRequest {
-	return { sessionId: '', gameId: '', data: '' };
+  return { sessionId: '', gameId: '', data: '' };
 }
 
 export const SendPlayerStringRequest: MessageFns<SendPlayerStringRequest> = {
-	encode(
-		message: SendPlayerStringRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.data !== '') {
-			writer.uint32(26).string(message.data);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerStringRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.data !== '') {
+      writer.uint32(26).string(message.data);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerStringRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerStringRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerStringRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerStringRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.data = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.data = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerStringRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			data: isSet(object.data) ? globalThis.String(object.data) : ''
-		};
-	},
+  fromJSON(object: any): SendPlayerStringRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      data: isSet(object.data) ? globalThis.String(object.data) : ''
+    };
+  },
 
-	toJSON(message: SendPlayerStringRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.data !== '') {
-			obj.data = message.data;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerStringRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.data !== '') {
+      obj.data = message.data;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerStringRequest>): SendPlayerStringRequest {
-		return SendPlayerStringRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerStringRequest>): SendPlayerStringRequest {
-		const message = createBaseSendPlayerStringRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.data = object.data ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerStringRequest>): SendPlayerStringRequest {
+    return SendPlayerStringRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerStringRequest>): SendPlayerStringRequest {
+    const message = createBaseSendPlayerStringRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.data = object.data ?? '';
+    return message;
+  }
 };
 
 function createBaseSendPlayerStringResponse(): SendPlayerStringResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const SendPlayerStringResponse: MessageFns<SendPlayerStringResponse> = {
-	encode(
-		message: SendPlayerStringResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerStringResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerStringResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerStringResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerStringResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerStringResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerStringResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): SendPlayerStringResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: SendPlayerStringResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerStringResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerStringResponse>): SendPlayerStringResponse {
-		return SendPlayerStringResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerStringResponse>): SendPlayerStringResponse {
-		const message = createBaseSendPlayerStringResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerStringResponse>): SendPlayerStringResponse {
+    return SendPlayerStringResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerStringResponse>): SendPlayerStringResponse {
+    const message = createBaseSendPlayerStringResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseSendPlayerBooleanRequest(): SendPlayerBooleanRequest {
-	return { sessionId: '', gameId: '', data: false };
+  return { sessionId: '', gameId: '', data: false };
 }
 
 export const SendPlayerBooleanRequest: MessageFns<SendPlayerBooleanRequest> = {
-	encode(
-		message: SendPlayerBooleanRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.data !== false) {
-			writer.uint32(24).bool(message.data);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerBooleanRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.data !== false) {
+      writer.uint32(24).bool(message.data);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerBooleanRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerBooleanRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerBooleanRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerBooleanRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.data = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.data = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerBooleanRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			data: isSet(object.data) ? globalThis.Boolean(object.data) : false
-		};
-	},
+  fromJSON(object: any): SendPlayerBooleanRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      data: isSet(object.data) ? globalThis.Boolean(object.data) : false
+    };
+  },
 
-	toJSON(message: SendPlayerBooleanRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.data !== false) {
-			obj.data = message.data;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerBooleanRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.data !== false) {
+      obj.data = message.data;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerBooleanRequest>): SendPlayerBooleanRequest {
-		return SendPlayerBooleanRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerBooleanRequest>): SendPlayerBooleanRequest {
-		const message = createBaseSendPlayerBooleanRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.data = object.data ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerBooleanRequest>): SendPlayerBooleanRequest {
+    return SendPlayerBooleanRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerBooleanRequest>): SendPlayerBooleanRequest {
+    const message = createBaseSendPlayerBooleanRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.data = object.data ?? false;
+    return message;
+  }
 };
 
 function createBaseSendPlayerBooleanResponse(): SendPlayerBooleanResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const SendPlayerBooleanResponse: MessageFns<SendPlayerBooleanResponse> = {
-	encode(
-		message: SendPlayerBooleanResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerBooleanResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerBooleanResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerBooleanResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerBooleanResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerBooleanResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerBooleanResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): SendPlayerBooleanResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: SendPlayerBooleanResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerBooleanResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerBooleanResponse>): SendPlayerBooleanResponse {
-		return SendPlayerBooleanResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerBooleanResponse>): SendPlayerBooleanResponse {
-		const message = createBaseSendPlayerBooleanResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerBooleanResponse>): SendPlayerBooleanResponse {
+    return SendPlayerBooleanResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerBooleanResponse>): SendPlayerBooleanResponse {
+    const message = createBaseSendPlayerBooleanResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseSendPlayerIntegerRequest(): SendPlayerIntegerRequest {
-	return { sessionId: '', gameId: '', data: 0 };
+  return { sessionId: '', gameId: '', data: 0 };
 }
 
 export const SendPlayerIntegerRequest: MessageFns<SendPlayerIntegerRequest> = {
-	encode(
-		message: SendPlayerIntegerRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.data !== 0) {
-			writer.uint32(24).int32(message.data);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerIntegerRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.data !== 0) {
+      writer.uint32(24).int32(message.data);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerIntegerRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerIntegerRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerIntegerRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerIntegerRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.data = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.data = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerIntegerRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			data: isSet(object.data) ? globalThis.Number(object.data) : 0
-		};
-	},
+  fromJSON(object: any): SendPlayerIntegerRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      data: isSet(object.data) ? globalThis.Number(object.data) : 0
+    };
+  },
 
-	toJSON(message: SendPlayerIntegerRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.data !== 0) {
-			obj.data = Math.round(message.data);
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerIntegerRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.data !== 0) {
+      obj.data = Math.round(message.data);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerIntegerRequest>): SendPlayerIntegerRequest {
-		return SendPlayerIntegerRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerIntegerRequest>): SendPlayerIntegerRequest {
-		const message = createBaseSendPlayerIntegerRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.data = object.data ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerIntegerRequest>): SendPlayerIntegerRequest {
+    return SendPlayerIntegerRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerIntegerRequest>): SendPlayerIntegerRequest {
+    const message = createBaseSendPlayerIntegerRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.data = object.data ?? 0;
+    return message;
+  }
 };
 
 function createBaseSendPlayerIntegerResponse(): SendPlayerIntegerResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const SendPlayerIntegerResponse: MessageFns<SendPlayerIntegerResponse> = {
-	encode(
-		message: SendPlayerIntegerResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerIntegerResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerIntegerResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerIntegerResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerIntegerResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerIntegerResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerIntegerResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): SendPlayerIntegerResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: SendPlayerIntegerResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerIntegerResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerIntegerResponse>): SendPlayerIntegerResponse {
-		return SendPlayerIntegerResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerIntegerResponse>): SendPlayerIntegerResponse {
-		const message = createBaseSendPlayerIntegerResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerIntegerResponse>): SendPlayerIntegerResponse {
+    return SendPlayerIntegerResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerIntegerResponse>): SendPlayerIntegerResponse {
+    const message = createBaseSendPlayerIntegerResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseSendPlayerManaTypeRequest(): SendPlayerManaTypeRequest {
-	return { sessionId: '', gameId: '', manaType: '', manaTypeStr: '' };
+  return { sessionId: '', gameId: '', manaType: '', manaTypeStr: '' };
 }
 
 export const SendPlayerManaTypeRequest: MessageFns<SendPlayerManaTypeRequest> = {
-	encode(
-		message: SendPlayerManaTypeRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.manaType !== '') {
-			writer.uint32(26).string(message.manaType);
-		}
-		if (message.manaTypeStr !== '') {
-			writer.uint32(34).string(message.manaTypeStr);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerManaTypeRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.manaType !== '') {
+      writer.uint32(26).string(message.manaType);
+    }
+    if (message.manaTypeStr !== '') {
+      writer.uint32(34).string(message.manaTypeStr);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerManaTypeRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerManaTypeRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerManaTypeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerManaTypeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.manaType = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.manaType = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.manaTypeStr = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.manaTypeStr = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerManaTypeRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			manaType: isSet(object.manaType) ? globalThis.String(object.manaType) : '',
-			manaTypeStr: isSet(object.manaTypeStr) ? globalThis.String(object.manaTypeStr) : ''
-		};
-	},
+  fromJSON(object: any): SendPlayerManaTypeRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      manaType: isSet(object.manaType) ? globalThis.String(object.manaType) : '',
+      manaTypeStr: isSet(object.manaTypeStr) ? globalThis.String(object.manaTypeStr) : ''
+    };
+  },
 
-	toJSON(message: SendPlayerManaTypeRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.manaType !== '') {
-			obj.manaType = message.manaType;
-		}
-		if (message.manaTypeStr !== '') {
-			obj.manaTypeStr = message.manaTypeStr;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerManaTypeRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.manaType !== '') {
+      obj.manaType = message.manaType;
+    }
+    if (message.manaTypeStr !== '') {
+      obj.manaTypeStr = message.manaTypeStr;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerManaTypeRequest>): SendPlayerManaTypeRequest {
-		return SendPlayerManaTypeRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerManaTypeRequest>): SendPlayerManaTypeRequest {
-		const message = createBaseSendPlayerManaTypeRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.manaType = object.manaType ?? '';
-		message.manaTypeStr = object.manaTypeStr ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerManaTypeRequest>): SendPlayerManaTypeRequest {
+    return SendPlayerManaTypeRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerManaTypeRequest>): SendPlayerManaTypeRequest {
+    const message = createBaseSendPlayerManaTypeRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.manaType = object.manaType ?? '';
+    message.manaTypeStr = object.manaTypeStr ?? '';
+    return message;
+  }
 };
 
 function createBaseSendPlayerManaTypeResponse(): SendPlayerManaTypeResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const SendPlayerManaTypeResponse: MessageFns<SendPlayerManaTypeResponse> = {
-	encode(
-		message: SendPlayerManaTypeResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerManaTypeResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerManaTypeResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerManaTypeResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerManaTypeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerManaTypeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerManaTypeResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): SendPlayerManaTypeResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: SendPlayerManaTypeResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerManaTypeResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerManaTypeResponse>): SendPlayerManaTypeResponse {
-		return SendPlayerManaTypeResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerManaTypeResponse>): SendPlayerManaTypeResponse {
-		const message = createBaseSendPlayerManaTypeResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerManaTypeResponse>): SendPlayerManaTypeResponse {
+    return SendPlayerManaTypeResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerManaTypeResponse>): SendPlayerManaTypeResponse {
+    const message = createBaseSendPlayerManaTypeResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseSendPlayerActionRequest(): SendPlayerActionRequest {
-	return { sessionId: '', gameId: '', action: 0 };
+  return { sessionId: '', gameId: '', action: 0 };
 }
 
 export const SendPlayerActionRequest: MessageFns<SendPlayerActionRequest> = {
-	encode(
-		message: SendPlayerActionRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.action !== 0) {
-			writer.uint32(24).int32(message.action);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerActionRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.action !== 0) {
+      writer.uint32(24).int32(message.action);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerActionRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerActionRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerActionRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerActionRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.action = reader.int32() as any;
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.action = reader.int32() as any;
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerActionRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			action: isSet(object.action) ? playerActionFromJSON(object.action) : 0
-		};
-	},
+  fromJSON(object: any): SendPlayerActionRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      action: isSet(object.action) ? playerActionFromJSON(object.action) : 0
+    };
+  },
 
-	toJSON(message: SendPlayerActionRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.action !== 0) {
-			obj.action = playerActionToJSON(message.action);
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerActionRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.action !== 0) {
+      obj.action = playerActionToJSON(message.action);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerActionRequest>): SendPlayerActionRequest {
-		return SendPlayerActionRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerActionRequest>): SendPlayerActionRequest {
-		const message = createBaseSendPlayerActionRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.action = object.action ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerActionRequest>): SendPlayerActionRequest {
+    return SendPlayerActionRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerActionRequest>): SendPlayerActionRequest {
+    const message = createBaseSendPlayerActionRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.action = object.action ?? 0;
+    return message;
+  }
 };
 
 function createBaseSendPlayerActionResponse(): SendPlayerActionResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const SendPlayerActionResponse: MessageFns<SendPlayerActionResponse> = {
-	encode(
-		message: SendPlayerActionResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: SendPlayerActionResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerActionResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendPlayerActionResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendPlayerActionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendPlayerActionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendPlayerActionResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): SendPlayerActionResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: SendPlayerActionResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: SendPlayerActionResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendPlayerActionResponse>): SendPlayerActionResponse {
-		return SendPlayerActionResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendPlayerActionResponse>): SendPlayerActionResponse {
-		const message = createBaseSendPlayerActionResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendPlayerActionResponse>): SendPlayerActionResponse {
+    return SendPlayerActionResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendPlayerActionResponse>): SendPlayerActionResponse {
+    const message = createBaseSendPlayerActionResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseSendSpecialActionRequest(): SendSpecialActionRequest {
-	return { sessionId: '', gameId: '', actionType: 0, sourceId: '' };
+  return { sessionId: '', gameId: '', actionType: 0, sourceId: '' };
 }
 
 export const SendSpecialActionRequest: MessageFns<SendSpecialActionRequest> = {
-	encode(
-		message: SendSpecialActionRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.actionType !== 0) {
-			writer.uint32(24).int32(message.actionType);
-		}
-		if (message.sourceId !== '') {
-			writer.uint32(34).string(message.sourceId);
-		}
-		return writer;
-	},
+  encode(
+    message: SendSpecialActionRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.actionType !== 0) {
+      writer.uint32(24).int32(message.actionType);
+    }
+    if (message.sourceId !== '') {
+      writer.uint32(34).string(message.sourceId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendSpecialActionRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendSpecialActionRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendSpecialActionRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendSpecialActionRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.actionType = reader.int32() as any;
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.actionType = reader.int32() as any;
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.sourceId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.sourceId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendSpecialActionRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			actionType: isSet(object.actionType) ? specialActionTypeFromJSON(object.actionType) : 0,
-			sourceId: isSet(object.sourceId) ? globalThis.String(object.sourceId) : ''
-		};
-	},
+  fromJSON(object: any): SendSpecialActionRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      actionType: isSet(object.actionType) ? specialActionTypeFromJSON(object.actionType) : 0,
+      sourceId: isSet(object.sourceId) ? globalThis.String(object.sourceId) : ''
+    };
+  },
 
-	toJSON(message: SendSpecialActionRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.actionType !== 0) {
-			obj.actionType = specialActionTypeToJSON(message.actionType);
-		}
-		if (message.sourceId !== '') {
-			obj.sourceId = message.sourceId;
-		}
-		return obj;
-	},
+  toJSON(message: SendSpecialActionRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.actionType !== 0) {
+      obj.actionType = specialActionTypeToJSON(message.actionType);
+    }
+    if (message.sourceId !== '') {
+      obj.sourceId = message.sourceId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendSpecialActionRequest>): SendSpecialActionRequest {
-		return SendSpecialActionRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendSpecialActionRequest>): SendSpecialActionRequest {
-		const message = createBaseSendSpecialActionRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.actionType = object.actionType ?? 0;
-		message.sourceId = object.sourceId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendSpecialActionRequest>): SendSpecialActionRequest {
+    return SendSpecialActionRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendSpecialActionRequest>): SendSpecialActionRequest {
+    const message = createBaseSendSpecialActionRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.actionType = object.actionType ?? 0;
+    message.sourceId = object.sourceId ?? '';
+    return message;
+  }
 };
 
 function createBaseSendSpecialActionResponse(): SendSpecialActionResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const SendSpecialActionResponse: MessageFns<SendSpecialActionResponse> = {
-	encode(
-		message: SendSpecialActionResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: SendSpecialActionResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendSpecialActionResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendSpecialActionResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendSpecialActionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendSpecialActionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendSpecialActionResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): SendSpecialActionResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: SendSpecialActionResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: SendSpecialActionResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendSpecialActionResponse>): SendSpecialActionResponse {
-		return SendSpecialActionResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendSpecialActionResponse>): SendSpecialActionResponse {
-		const message = createBaseSendSpecialActionResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendSpecialActionResponse>): SendSpecialActionResponse {
+    return SendSpecialActionResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendSpecialActionResponse>): SendSpecialActionResponse {
+    const message = createBaseSendSpecialActionResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseActivateAbilityRequest(): ActivateAbilityRequest {
-	return { sessionId: '', gameId: '', cardId: '', abilityId: '', targets: [] };
+  return { sessionId: '', gameId: '', cardId: '', abilityId: '', targets: [] };
 }
 
 export const ActivateAbilityRequest: MessageFns<ActivateAbilityRequest> = {
-	encode(message: ActivateAbilityRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.cardId !== '') {
-			writer.uint32(26).string(message.cardId);
-		}
-		if (message.abilityId !== '') {
-			writer.uint32(34).string(message.abilityId);
-		}
-		for (const v of message.targets) {
-			writer.uint32(42).string(v!);
-		}
-		return writer;
-	},
+  encode(message: ActivateAbilityRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.cardId !== '') {
+      writer.uint32(26).string(message.cardId);
+    }
+    if (message.abilityId !== '') {
+      writer.uint32(34).string(message.abilityId);
+    }
+    for (const v of message.targets) {
+      writer.uint32(42).string(v!);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ActivateAbilityRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseActivateAbilityRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ActivateAbilityRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseActivateAbilityRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.cardId = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.cardId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.abilityId = reader.string();
-					continue;
-				}
-				case 5: {
-					if (tag !== 42) {
-						break;
-					}
+          message.abilityId = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
 
-					message.targets.push(reader.string());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.targets.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ActivateAbilityRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			cardId: isSet(object.cardId) ? globalThis.String(object.cardId) : '',
-			abilityId: isSet(object.abilityId) ? globalThis.String(object.abilityId) : '',
-			targets: globalThis.Array.isArray(object?.targets)
-				? object.targets.map((e: any) => globalThis.String(e))
-				: []
-		};
-	},
+  fromJSON(object: any): ActivateAbilityRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      cardId: isSet(object.cardId) ? globalThis.String(object.cardId) : '',
+      abilityId: isSet(object.abilityId) ? globalThis.String(object.abilityId) : '',
+      targets: globalThis.Array.isArray(object?.targets)
+        ? object.targets.map((e: any) => globalThis.String(e))
+        : []
+    };
+  },
 
-	toJSON(message: ActivateAbilityRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.cardId !== '') {
-			obj.cardId = message.cardId;
-		}
-		if (message.abilityId !== '') {
-			obj.abilityId = message.abilityId;
-		}
-		if (message.targets?.length) {
-			obj.targets = message.targets;
-		}
-		return obj;
-	},
+  toJSON(message: ActivateAbilityRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.cardId !== '') {
+      obj.cardId = message.cardId;
+    }
+    if (message.abilityId !== '') {
+      obj.abilityId = message.abilityId;
+    }
+    if (message.targets?.length) {
+      obj.targets = message.targets;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ActivateAbilityRequest>): ActivateAbilityRequest {
-		return ActivateAbilityRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ActivateAbilityRequest>): ActivateAbilityRequest {
-		const message = createBaseActivateAbilityRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.cardId = object.cardId ?? '';
-		message.abilityId = object.abilityId ?? '';
-		message.targets = object.targets?.map((e) => e) || [];
-		return message;
-	}
+  create(base?: DeepPartial<ActivateAbilityRequest>): ActivateAbilityRequest {
+    return ActivateAbilityRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ActivateAbilityRequest>): ActivateAbilityRequest {
+    const message = createBaseActivateAbilityRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.cardId = object.cardId ?? '';
+    message.abilityId = object.abilityId ?? '';
+    message.targets = object.targets?.map((e) => e) || [];
+    return message;
+  }
 };
 
 function createBaseActivateAbilityResponse(): ActivateAbilityResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ActivateAbilityResponse: MessageFns<ActivateAbilityResponse> = {
-	encode(
-		message: ActivateAbilityResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: ActivateAbilityResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ActivateAbilityResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseActivateAbilityResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ActivateAbilityResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseActivateAbilityResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ActivateAbilityResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ActivateAbilityResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ActivateAbilityResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ActivateAbilityResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ActivateAbilityResponse>): ActivateAbilityResponse {
-		return ActivateAbilityResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ActivateAbilityResponse>): ActivateAbilityResponse {
-		const message = createBaseActivateAbilityResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ActivateAbilityResponse>): ActivateAbilityResponse {
+    return ActivateAbilityResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ActivateAbilityResponse>): ActivateAbilityResponse {
+    const message = createBaseActivateAbilityResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseMatchStartRequest(): MatchStartRequest {
-	return { sessionId: '', tableId: '' };
+  return { sessionId: '', tableId: '' };
 }
 
 export const MatchStartRequest: MessageFns<MatchStartRequest> = {
-	encode(message: MatchStartRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(18).string(message.tableId);
-		}
-		return writer;
-	},
+  encode(message: MatchStartRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.tableId !== '') {
+      writer.uint32(18).string(message.tableId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): MatchStartRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseMatchStartRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): MatchStartRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMatchStartRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tableId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): MatchStartRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
-		};
-	},
+  fromJSON(object: any): MatchStartRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
+    };
+  },
 
-	toJSON(message: MatchStartRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		return obj;
-	},
+  toJSON(message: MatchStartRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.tableId !== '') {
+      obj.tableId = message.tableId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<MatchStartRequest>): MatchStartRequest {
-		return MatchStartRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<MatchStartRequest>): MatchStartRequest {
-		const message = createBaseMatchStartRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.tableId = object.tableId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<MatchStartRequest>): MatchStartRequest {
+    return MatchStartRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MatchStartRequest>): MatchStartRequest {
+    const message = createBaseMatchStartRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.tableId = object.tableId ?? '';
+    return message;
+  }
 };
 
 function createBaseMatchStartResponse(): MatchStartResponse {
-	return { success: false, error: '', gameId: '' };
+  return { success: false, error: '', gameId: '' };
 }
 
 export const MatchStartResponse: MessageFns<MatchStartResponse> = {
-	encode(message: MatchStartResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(26).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: MatchStartResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(26).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): MatchStartResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseMatchStartResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): MatchStartResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMatchStartResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): MatchStartResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): MatchStartResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: MatchStartResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: MatchStartResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<MatchStartResponse>): MatchStartResponse {
-		return MatchStartResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<MatchStartResponse>): MatchStartResponse {
-		const message = createBaseMatchStartResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<MatchStartResponse>): MatchStartResponse {
+    return MatchStartResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MatchStartResponse>): MatchStartResponse {
+    const message = createBaseMatchStartResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseMatchQuitRequest(): MatchQuitRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const MatchQuitRequest: MessageFns<MatchQuitRequest> = {
-	encode(message: MatchQuitRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: MatchQuitRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): MatchQuitRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseMatchQuitRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): MatchQuitRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMatchQuitRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): MatchQuitRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): MatchQuitRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: MatchQuitRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: MatchQuitRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<MatchQuitRequest>): MatchQuitRequest {
-		return MatchQuitRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<MatchQuitRequest>): MatchQuitRequest {
-		const message = createBaseMatchQuitRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<MatchQuitRequest>): MatchQuitRequest {
+    return MatchQuitRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MatchQuitRequest>): MatchQuitRequest {
+    const message = createBaseMatchQuitRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseMatchQuitResponse(): MatchQuitResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const MatchQuitResponse: MessageFns<MatchQuitResponse> = {
-	encode(message: MatchQuitResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: MatchQuitResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): MatchQuitResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseMatchQuitResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): MatchQuitResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMatchQuitResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): MatchQuitResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): MatchQuitResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: MatchQuitResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: MatchQuitResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<MatchQuitResponse>): MatchQuitResponse {
-		return MatchQuitResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<MatchQuitResponse>): MatchQuitResponse {
-		const message = createBaseMatchQuitResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<MatchQuitResponse>): MatchQuitResponse {
+    return MatchQuitResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MatchQuitResponse>): MatchQuitResponse {
+    const message = createBaseMatchQuitResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayInitRequest(): ReplayInitRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const ReplayInitRequest: MessageFns<ReplayInitRequest> = {
-	encode(message: ReplayInitRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: ReplayInitRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayInitRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayInitRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayInitRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayInitRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayInitRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): ReplayInitRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: ReplayInitRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayInitRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayInitRequest>): ReplayInitRequest {
-		return ReplayInitRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayInitRequest>): ReplayInitRequest {
-		const message = createBaseReplayInitRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayInitRequest>): ReplayInitRequest {
+    return ReplayInitRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayInitRequest>): ReplayInitRequest {
+    const message = createBaseReplayInitRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayInitResponse(): ReplayInitResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ReplayInitResponse: MessageFns<ReplayInitResponse> = {
-	encode(message: ReplayInitResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ReplayInitResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayInitResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayInitResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayInitResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayInitResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayInitResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ReplayInitResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ReplayInitResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayInitResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayInitResponse>): ReplayInitResponse {
-		return ReplayInitResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayInitResponse>): ReplayInitResponse {
-		const message = createBaseReplayInitResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayInitResponse>): ReplayInitResponse {
+    return ReplayInitResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayInitResponse>): ReplayInitResponse {
+    const message = createBaseReplayInitResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayStartRequest(): ReplayStartRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const ReplayStartRequest: MessageFns<ReplayStartRequest> = {
-	encode(message: ReplayStartRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: ReplayStartRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayStartRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayStartRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayStartRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayStartRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayStartRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): ReplayStartRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: ReplayStartRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayStartRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayStartRequest>): ReplayStartRequest {
-		return ReplayStartRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayStartRequest>): ReplayStartRequest {
-		const message = createBaseReplayStartRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayStartRequest>): ReplayStartRequest {
+    return ReplayStartRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayStartRequest>): ReplayStartRequest {
+    const message = createBaseReplayStartRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayStartResponse(): ReplayStartResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ReplayStartResponse: MessageFns<ReplayStartResponse> = {
-	encode(message: ReplayStartResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ReplayStartResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayStartResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayStartResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayStartResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayStartResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayStartResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ReplayStartResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ReplayStartResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayStartResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayStartResponse>): ReplayStartResponse {
-		return ReplayStartResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayStartResponse>): ReplayStartResponse {
-		const message = createBaseReplayStartResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayStartResponse>): ReplayStartResponse {
+    return ReplayStartResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayStartResponse>): ReplayStartResponse {
+    const message = createBaseReplayStartResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayStopRequest(): ReplayStopRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const ReplayStopRequest: MessageFns<ReplayStopRequest> = {
-	encode(message: ReplayStopRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: ReplayStopRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayStopRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayStopRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayStopRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayStopRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayStopRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): ReplayStopRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: ReplayStopRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayStopRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayStopRequest>): ReplayStopRequest {
-		return ReplayStopRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayStopRequest>): ReplayStopRequest {
-		const message = createBaseReplayStopRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayStopRequest>): ReplayStopRequest {
+    return ReplayStopRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayStopRequest>): ReplayStopRequest {
+    const message = createBaseReplayStopRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayStopResponse(): ReplayStopResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ReplayStopResponse: MessageFns<ReplayStopResponse> = {
-	encode(message: ReplayStopResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ReplayStopResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayStopResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayStopResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayStopResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayStopResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayStopResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ReplayStopResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ReplayStopResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayStopResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayStopResponse>): ReplayStopResponse {
-		return ReplayStopResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayStopResponse>): ReplayStopResponse {
-		const message = createBaseReplayStopResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayStopResponse>): ReplayStopResponse {
+    return ReplayStopResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayStopResponse>): ReplayStopResponse {
+    const message = createBaseReplayStopResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayNextRequest(): ReplayNextRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const ReplayNextRequest: MessageFns<ReplayNextRequest> = {
-	encode(message: ReplayNextRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: ReplayNextRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayNextRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayNextRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayNextRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayNextRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayNextRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): ReplayNextRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: ReplayNextRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayNextRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayNextRequest>): ReplayNextRequest {
-		return ReplayNextRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayNextRequest>): ReplayNextRequest {
-		const message = createBaseReplayNextRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayNextRequest>): ReplayNextRequest {
+    return ReplayNextRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayNextRequest>): ReplayNextRequest {
+    const message = createBaseReplayNextRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayNextResponse(): ReplayNextResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ReplayNextResponse: MessageFns<ReplayNextResponse> = {
-	encode(message: ReplayNextResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ReplayNextResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayNextResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayNextResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayNextResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayNextResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayNextResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ReplayNextResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ReplayNextResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayNextResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayNextResponse>): ReplayNextResponse {
-		return ReplayNextResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayNextResponse>): ReplayNextResponse {
-		const message = createBaseReplayNextResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayNextResponse>): ReplayNextResponse {
+    return ReplayNextResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayNextResponse>): ReplayNextResponse {
+    const message = createBaseReplayNextResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayPreviousRequest(): ReplayPreviousRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const ReplayPreviousRequest: MessageFns<ReplayPreviousRequest> = {
-	encode(message: ReplayPreviousRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: ReplayPreviousRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayPreviousRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayPreviousRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayPreviousRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayPreviousRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayPreviousRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): ReplayPreviousRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: ReplayPreviousRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayPreviousRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayPreviousRequest>): ReplayPreviousRequest {
-		return ReplayPreviousRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayPreviousRequest>): ReplayPreviousRequest {
-		const message = createBaseReplayPreviousRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayPreviousRequest>): ReplayPreviousRequest {
+    return ReplayPreviousRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayPreviousRequest>): ReplayPreviousRequest {
+    const message = createBaseReplayPreviousRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseReplayPreviousResponse(): ReplayPreviousResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ReplayPreviousResponse: MessageFns<ReplayPreviousResponse> = {
-	encode(message: ReplayPreviousResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ReplayPreviousResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplayPreviousResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplayPreviousResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplayPreviousResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplayPreviousResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplayPreviousResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ReplayPreviousResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ReplayPreviousResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ReplayPreviousResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplayPreviousResponse>): ReplayPreviousResponse {
-		return ReplayPreviousResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplayPreviousResponse>): ReplayPreviousResponse {
-		const message = createBaseReplayPreviousResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplayPreviousResponse>): ReplayPreviousResponse {
+    return ReplayPreviousResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplayPreviousResponse>): ReplayPreviousResponse {
+    const message = createBaseReplayPreviousResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseReplaySkipForwardRequest(): ReplaySkipForwardRequest {
-	return { sessionId: '', gameId: '', steps: 0 };
+  return { sessionId: '', gameId: '', steps: 0 };
 }
 
 export const ReplaySkipForwardRequest: MessageFns<ReplaySkipForwardRequest> = {
-	encode(
-		message: ReplaySkipForwardRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.steps !== 0) {
-			writer.uint32(24).int32(message.steps);
-		}
-		return writer;
-	},
+  encode(
+    message: ReplaySkipForwardRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.steps !== 0) {
+      writer.uint32(24).int32(message.steps);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplaySkipForwardRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplaySkipForwardRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplaySkipForwardRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplaySkipForwardRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.steps = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.steps = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplaySkipForwardRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			steps: isSet(object.steps) ? globalThis.Number(object.steps) : 0
-		};
-	},
+  fromJSON(object: any): ReplaySkipForwardRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      steps: isSet(object.steps) ? globalThis.Number(object.steps) : 0
+    };
+  },
 
-	toJSON(message: ReplaySkipForwardRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.steps !== 0) {
-			obj.steps = Math.round(message.steps);
-		}
-		return obj;
-	},
+  toJSON(message: ReplaySkipForwardRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.steps !== 0) {
+      obj.steps = Math.round(message.steps);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplaySkipForwardRequest>): ReplaySkipForwardRequest {
-		return ReplaySkipForwardRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplaySkipForwardRequest>): ReplaySkipForwardRequest {
-		const message = createBaseReplaySkipForwardRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.steps = object.steps ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<ReplaySkipForwardRequest>): ReplaySkipForwardRequest {
+    return ReplaySkipForwardRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplaySkipForwardRequest>): ReplaySkipForwardRequest {
+    const message = createBaseReplaySkipForwardRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.steps = object.steps ?? 0;
+    return message;
+  }
 };
 
 function createBaseReplaySkipForwardResponse(): ReplaySkipForwardResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ReplaySkipForwardResponse: MessageFns<ReplaySkipForwardResponse> = {
-	encode(
-		message: ReplaySkipForwardResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: ReplaySkipForwardResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ReplaySkipForwardResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseReplaySkipForwardResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ReplaySkipForwardResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReplaySkipForwardResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ReplaySkipForwardResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ReplaySkipForwardResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ReplaySkipForwardResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ReplaySkipForwardResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ReplaySkipForwardResponse>): ReplaySkipForwardResponse {
-		return ReplaySkipForwardResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ReplaySkipForwardResponse>): ReplaySkipForwardResponse {
-		const message = createBaseReplaySkipForwardResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ReplaySkipForwardResponse>): ReplaySkipForwardResponse {
+    return ReplaySkipForwardResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReplaySkipForwardResponse>): ReplaySkipForwardResponse {
+    const message = createBaseReplaySkipForwardResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseGetMyActiveGamesRequest(): GetMyActiveGamesRequest {
-	return { sessionId: '' };
+  return { sessionId: '' };
 }
 
 export const GetMyActiveGamesRequest: MessageFns<GetMyActiveGamesRequest> = {
-	encode(
-		message: GetMyActiveGamesRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		return writer;
-	},
+  encode(
+    message: GetMyActiveGamesRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GetMyActiveGamesRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGetMyActiveGamesRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GetMyActiveGamesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetMyActiveGamesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.sessionId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GetMyActiveGamesRequest {
-		return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '' };
-	},
+  fromJSON(object: any): GetMyActiveGamesRequest {
+    return { sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '' };
+  },
 
-	toJSON(message: GetMyActiveGamesRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		return obj;
-	},
+  toJSON(message: GetMyActiveGamesRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GetMyActiveGamesRequest>): GetMyActiveGamesRequest {
-		return GetMyActiveGamesRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GetMyActiveGamesRequest>): GetMyActiveGamesRequest {
-		const message = createBaseGetMyActiveGamesRequest();
-		message.sessionId = object.sessionId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<GetMyActiveGamesRequest>): GetMyActiveGamesRequest {
+    return GetMyActiveGamesRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetMyActiveGamesRequest>): GetMyActiveGamesRequest {
+    const message = createBaseGetMyActiveGamesRequest();
+    message.sessionId = object.sessionId ?? '';
+    return message;
+  }
 };
 
 function createBaseActiveGameInfo(): ActiveGameInfo {
-	return {
-		gameId: '',
-		tableId: '',
-		gameType: '',
-		players: [],
-		turnNumber: 0,
-		state: '',
-		createdAt: '',
-		updatedAt: ''
-	};
+  return {
+    gameId: '',
+    tableId: '',
+    gameType: '',
+    players: [],
+    turnNumber: 0,
+    state: '',
+    createdAt: '',
+    updatedAt: ''
+  };
 }
 
 export const ActiveGameInfo: MessageFns<ActiveGameInfo> = {
-	encode(message: ActiveGameInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.gameId !== '') {
-			writer.uint32(10).string(message.gameId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(18).string(message.tableId);
-		}
-		if (message.gameType !== '') {
-			writer.uint32(26).string(message.gameType);
-		}
-		for (const v of message.players) {
-			writer.uint32(34).string(v!);
-		}
-		if (message.turnNumber !== 0) {
-			writer.uint32(40).int32(message.turnNumber);
-		}
-		if (message.state !== '') {
-			writer.uint32(50).string(message.state);
-		}
-		if (message.createdAt !== '') {
-			writer.uint32(58).string(message.createdAt);
-		}
-		if (message.updatedAt !== '') {
-			writer.uint32(66).string(message.updatedAt);
-		}
-		return writer;
-	},
+  encode(message: ActiveGameInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.gameId !== '') {
+      writer.uint32(10).string(message.gameId);
+    }
+    if (message.tableId !== '') {
+      writer.uint32(18).string(message.tableId);
+    }
+    if (message.gameType !== '') {
+      writer.uint32(26).string(message.gameType);
+    }
+    for (const v of message.players) {
+      writer.uint32(34).string(v!);
+    }
+    if (message.turnNumber !== 0) {
+      writer.uint32(40).int32(message.turnNumber);
+    }
+    if (message.state !== '') {
+      writer.uint32(50).string(message.state);
+    }
+    if (message.createdAt !== '') {
+      writer.uint32(58).string(message.createdAt);
+    }
+    if (message.updatedAt !== '') {
+      writer.uint32(66).string(message.updatedAt);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ActiveGameInfo {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseActiveGameInfo();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ActiveGameInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseActiveGameInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.tableId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.gameType = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.gameType = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.players.push(reader.string());
-					continue;
-				}
-				case 5: {
-					if (tag !== 40) {
-						break;
-					}
+          message.players.push(reader.string());
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
 
-					message.turnNumber = reader.int32();
-					continue;
-				}
-				case 6: {
-					if (tag !== 50) {
-						break;
-					}
+          message.turnNumber = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
 
-					message.state = reader.string();
-					continue;
-				}
-				case 7: {
-					if (tag !== 58) {
-						break;
-					}
+          message.state = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
 
-					message.createdAt = reader.string();
-					continue;
-				}
-				case 8: {
-					if (tag !== 66) {
-						break;
-					}
+          message.createdAt = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
 
-					message.updatedAt = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.updatedAt = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ActiveGameInfo {
-		return {
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : '',
-			gameType: isSet(object.gameType) ? globalThis.String(object.gameType) : '',
-			players: globalThis.Array.isArray(object?.players)
-				? object.players.map((e: any) => globalThis.String(e))
-				: [],
-			turnNumber: isSet(object.turnNumber) ? globalThis.Number(object.turnNumber) : 0,
-			state: isSet(object.state) ? globalThis.String(object.state) : '',
-			createdAt: isSet(object.createdAt) ? globalThis.String(object.createdAt) : '',
-			updatedAt: isSet(object.updatedAt) ? globalThis.String(object.updatedAt) : ''
-		};
-	},
+  fromJSON(object: any): ActiveGameInfo {
+    return {
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : '',
+      gameType: isSet(object.gameType) ? globalThis.String(object.gameType) : '',
+      players: globalThis.Array.isArray(object?.players)
+        ? object.players.map((e: any) => globalThis.String(e))
+        : [],
+      turnNumber: isSet(object.turnNumber) ? globalThis.Number(object.turnNumber) : 0,
+      state: isSet(object.state) ? globalThis.String(object.state) : '',
+      createdAt: isSet(object.createdAt) ? globalThis.String(object.createdAt) : '',
+      updatedAt: isSet(object.updatedAt) ? globalThis.String(object.updatedAt) : ''
+    };
+  },
 
-	toJSON(message: ActiveGameInfo): unknown {
-		const obj: any = {};
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		if (message.gameType !== '') {
-			obj.gameType = message.gameType;
-		}
-		if (message.players?.length) {
-			obj.players = message.players;
-		}
-		if (message.turnNumber !== 0) {
-			obj.turnNumber = Math.round(message.turnNumber);
-		}
-		if (message.state !== '') {
-			obj.state = message.state;
-		}
-		if (message.createdAt !== '') {
-			obj.createdAt = message.createdAt;
-		}
-		if (message.updatedAt !== '') {
-			obj.updatedAt = message.updatedAt;
-		}
-		return obj;
-	},
+  toJSON(message: ActiveGameInfo): unknown {
+    const obj: any = {};
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.tableId !== '') {
+      obj.tableId = message.tableId;
+    }
+    if (message.gameType !== '') {
+      obj.gameType = message.gameType;
+    }
+    if (message.players?.length) {
+      obj.players = message.players;
+    }
+    if (message.turnNumber !== 0) {
+      obj.turnNumber = Math.round(message.turnNumber);
+    }
+    if (message.state !== '') {
+      obj.state = message.state;
+    }
+    if (message.createdAt !== '') {
+      obj.createdAt = message.createdAt;
+    }
+    if (message.updatedAt !== '') {
+      obj.updatedAt = message.updatedAt;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ActiveGameInfo>): ActiveGameInfo {
-		return ActiveGameInfo.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ActiveGameInfo>): ActiveGameInfo {
-		const message = createBaseActiveGameInfo();
-		message.gameId = object.gameId ?? '';
-		message.tableId = object.tableId ?? '';
-		message.gameType = object.gameType ?? '';
-		message.players = object.players?.map((e) => e) || [];
-		message.turnNumber = object.turnNumber ?? 0;
-		message.state = object.state ?? '';
-		message.createdAt = object.createdAt ?? '';
-		message.updatedAt = object.updatedAt ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ActiveGameInfo>): ActiveGameInfo {
+    return ActiveGameInfo.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ActiveGameInfo>): ActiveGameInfo {
+    const message = createBaseActiveGameInfo();
+    message.gameId = object.gameId ?? '';
+    message.tableId = object.tableId ?? '';
+    message.gameType = object.gameType ?? '';
+    message.players = object.players?.map((e) => e) || [];
+    message.turnNumber = object.turnNumber ?? 0;
+    message.state = object.state ?? '';
+    message.createdAt = object.createdAt ?? '';
+    message.updatedAt = object.updatedAt ?? '';
+    return message;
+  }
 };
 
 function createBaseGetMyActiveGamesResponse(): GetMyActiveGamesResponse {
-	return { games: [] };
+  return { games: [] };
 }
 
 export const GetMyActiveGamesResponse: MessageFns<GetMyActiveGamesResponse> = {
-	encode(
-		message: GetMyActiveGamesResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		for (const v of message.games) {
-			ActiveGameInfo.encode(v!, writer.uint32(10).fork()).join();
-		}
-		return writer;
-	},
+  encode(
+    message: GetMyActiveGamesResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    for (const v of message.games) {
+      ActiveGameInfo.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): GetMyActiveGamesResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseGetMyActiveGamesResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): GetMyActiveGamesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetMyActiveGamesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.games.push(ActiveGameInfo.decode(reader, reader.uint32()));
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.games.push(ActiveGameInfo.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): GetMyActiveGamesResponse {
-		return {
-			games: globalThis.Array.isArray(object?.games)
-				? object.games.map((e: any) => ActiveGameInfo.fromJSON(e))
-				: []
-		};
-	},
+  fromJSON(object: any): GetMyActiveGamesResponse {
+    return {
+      games: globalThis.Array.isArray(object?.games)
+        ? object.games.map((e: any) => ActiveGameInfo.fromJSON(e))
+        : []
+    };
+  },
 
-	toJSON(message: GetMyActiveGamesResponse): unknown {
-		const obj: any = {};
-		if (message.games?.length) {
-			obj.games = message.games.map((e) => ActiveGameInfo.toJSON(e));
-		}
-		return obj;
-	},
+  toJSON(message: GetMyActiveGamesResponse): unknown {
+    const obj: any = {};
+    if (message.games?.length) {
+      obj.games = message.games.map((e) => ActiveGameInfo.toJSON(e));
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<GetMyActiveGamesResponse>): GetMyActiveGamesResponse {
-		return GetMyActiveGamesResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<GetMyActiveGamesResponse>): GetMyActiveGamesResponse {
-		const message = createBaseGetMyActiveGamesResponse();
-		message.games = object.games?.map((e) => ActiveGameInfo.fromPartial(e)) || [];
-		return message;
-	}
+  create(base?: DeepPartial<GetMyActiveGamesResponse>): GetMyActiveGamesResponse {
+    return GetMyActiveGamesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetMyActiveGamesResponse>): GetMyActiveGamesResponse {
+    const message = createBaseGetMyActiveGamesResponse();
+    message.games = object.games?.map((e) => ActiveGameInfo.fromPartial(e)) || [];
+    return message;
+  }
 };
 
 function createBaseRequestRollbackRequest(): RequestRollbackRequest {
-	return { sessionId: '', gameId: '', messageId: 0 };
+  return { sessionId: '', gameId: '', messageId: 0 };
 }
 
 export const RequestRollbackRequest: MessageFns<RequestRollbackRequest> = {
-	encode(message: RequestRollbackRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.messageId !== 0) {
-			writer.uint32(24).int32(message.messageId);
-		}
-		return writer;
-	},
+  encode(message: RequestRollbackRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.messageId !== 0) {
+      writer.uint32(24).int32(message.messageId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RequestRollbackRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRequestRollbackRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RequestRollbackRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequestRollbackRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 24) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
 
-					message.messageId = reader.int32();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.messageId = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RequestRollbackRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			messageId: isSet(object.messageId) ? globalThis.Number(object.messageId) : 0
-		};
-	},
+  fromJSON(object: any): RequestRollbackRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      messageId: isSet(object.messageId) ? globalThis.Number(object.messageId) : 0
+    };
+  },
 
-	toJSON(message: RequestRollbackRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.messageId !== 0) {
-			obj.messageId = Math.round(message.messageId);
-		}
-		return obj;
-	},
+  toJSON(message: RequestRollbackRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.messageId !== 0) {
+      obj.messageId = Math.round(message.messageId);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RequestRollbackRequest>): RequestRollbackRequest {
-		return RequestRollbackRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RequestRollbackRequest>): RequestRollbackRequest {
-		const message = createBaseRequestRollbackRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.messageId = object.messageId ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<RequestRollbackRequest>): RequestRollbackRequest {
+    return RequestRollbackRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RequestRollbackRequest>): RequestRollbackRequest {
+    const message = createBaseRequestRollbackRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.messageId = object.messageId ?? 0;
+    return message;
+  }
 };
 
 function createBaseRequestRollbackResponse(): RequestRollbackResponse {
-	return { success: false, error: '', requestId: '' };
+  return { success: false, error: '', requestId: '' };
 }
 
 export const RequestRollbackResponse: MessageFns<RequestRollbackResponse> = {
-	encode(
-		message: RequestRollbackResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		if (message.requestId !== '') {
-			writer.uint32(26).string(message.requestId);
-		}
-		return writer;
-	},
+  encode(
+    message: RequestRollbackResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    if (message.requestId !== '') {
+      writer.uint32(26).string(message.requestId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RequestRollbackResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRequestRollbackResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RequestRollbackResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequestRollbackResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.error = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.requestId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.requestId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RequestRollbackResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : '',
-			requestId: isSet(object.requestId) ? globalThis.String(object.requestId) : ''
-		};
-	},
+  fromJSON(object: any): RequestRollbackResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : '',
+      requestId: isSet(object.requestId) ? globalThis.String(object.requestId) : ''
+    };
+  },
 
-	toJSON(message: RequestRollbackResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		if (message.requestId !== '') {
-			obj.requestId = message.requestId;
-		}
-		return obj;
-	},
+  toJSON(message: RequestRollbackResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    if (message.requestId !== '') {
+      obj.requestId = message.requestId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RequestRollbackResponse>): RequestRollbackResponse {
-		return RequestRollbackResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RequestRollbackResponse>): RequestRollbackResponse {
-		const message = createBaseRequestRollbackResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		message.requestId = object.requestId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RequestRollbackResponse>): RequestRollbackResponse {
+    return RequestRollbackResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RequestRollbackResponse>): RequestRollbackResponse {
+    const message = createBaseRequestRollbackResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    message.requestId = object.requestId ?? '';
+    return message;
+  }
 };
 
 function createBaseRespondToRollbackRequest(): RespondToRollbackRequest {
-	return { sessionId: '', gameId: '', requestId: '', approved: false };
+  return { sessionId: '', gameId: '', requestId: '', approved: false };
 }
 
 export const RespondToRollbackRequest: MessageFns<RespondToRollbackRequest> = {
-	encode(
-		message: RespondToRollbackRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		if (message.requestId !== '') {
-			writer.uint32(26).string(message.requestId);
-		}
-		if (message.approved !== false) {
-			writer.uint32(32).bool(message.approved);
-		}
-		return writer;
-	},
+  encode(
+    message: RespondToRollbackRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    if (message.requestId !== '') {
+      writer.uint32(26).string(message.requestId);
+    }
+    if (message.approved !== false) {
+      writer.uint32(32).bool(message.approved);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RespondToRollbackRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRespondToRollbackRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RespondToRollbackRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRespondToRollbackRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.gameId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.requestId = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 32) {
-						break;
-					}
+          message.requestId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
 
-					message.approved = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.approved = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RespondToRollbackRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
-			requestId: isSet(object.requestId) ? globalThis.String(object.requestId) : '',
-			approved: isSet(object.approved) ? globalThis.Boolean(object.approved) : false
-		};
-	},
+  fromJSON(object: any): RespondToRollbackRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : '',
+      requestId: isSet(object.requestId) ? globalThis.String(object.requestId) : '',
+      approved: isSet(object.approved) ? globalThis.Boolean(object.approved) : false
+    };
+  },
 
-	toJSON(message: RespondToRollbackRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		if (message.requestId !== '') {
-			obj.requestId = message.requestId;
-		}
-		if (message.approved !== false) {
-			obj.approved = message.approved;
-		}
-		return obj;
-	},
+  toJSON(message: RespondToRollbackRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    if (message.requestId !== '') {
+      obj.requestId = message.requestId;
+    }
+    if (message.approved !== false) {
+      obj.approved = message.approved;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RespondToRollbackRequest>): RespondToRollbackRequest {
-		return RespondToRollbackRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RespondToRollbackRequest>): RespondToRollbackRequest {
-		const message = createBaseRespondToRollbackRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		message.requestId = object.requestId ?? '';
-		message.approved = object.approved ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<RespondToRollbackRequest>): RespondToRollbackRequest {
+    return RespondToRollbackRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RespondToRollbackRequest>): RespondToRollbackRequest {
+    const message = createBaseRespondToRollbackRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    message.requestId = object.requestId ?? '';
+    message.approved = object.approved ?? false;
+    return message;
+  }
 };
 
 function createBaseRespondToRollbackResponse(): RespondToRollbackResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const RespondToRollbackResponse: MessageFns<RespondToRollbackResponse> = {
-	encode(
-		message: RespondToRollbackResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: RespondToRollbackResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): RespondToRollbackResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseRespondToRollbackResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): RespondToRollbackResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRespondToRollbackResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): RespondToRollbackResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): RespondToRollbackResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: RespondToRollbackResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: RespondToRollbackResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<RespondToRollbackResponse>): RespondToRollbackResponse {
-		return RespondToRollbackResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<RespondToRollbackResponse>): RespondToRollbackResponse {
-		const message = createBaseRespondToRollbackResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<RespondToRollbackResponse>): RespondToRollbackResponse {
+    return RespondToRollbackResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RespondToRollbackResponse>): RespondToRollbackResponse {
+    const message = createBaseRespondToRollbackResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseCancelRollbackRequest(): CancelRollbackRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const CancelRollbackRequest: MessageFns<CancelRollbackRequest> = {
-	encode(message: CancelRollbackRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: CancelRollbackRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): CancelRollbackRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseCancelRollbackRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): CancelRollbackRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCancelRollbackRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): CancelRollbackRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): CancelRollbackRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: CancelRollbackRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: CancelRollbackRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<CancelRollbackRequest>): CancelRollbackRequest {
-		return CancelRollbackRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<CancelRollbackRequest>): CancelRollbackRequest {
-		const message = createBaseCancelRollbackRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<CancelRollbackRequest>): CancelRollbackRequest {
+    return CancelRollbackRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CancelRollbackRequest>): CancelRollbackRequest {
+    const message = createBaseCancelRollbackRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseCancelRollbackResponse(): CancelRollbackResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const CancelRollbackResponse: MessageFns<CancelRollbackResponse> = {
-	encode(message: CancelRollbackResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: CancelRollbackResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): CancelRollbackResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseCancelRollbackResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): CancelRollbackResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCancelRollbackResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): CancelRollbackResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): CancelRollbackResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: CancelRollbackResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: CancelRollbackResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<CancelRollbackResponse>): CancelRollbackResponse {
-		return CancelRollbackResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<CancelRollbackResponse>): CancelRollbackResponse {
-		const message = createBaseCancelRollbackResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<CancelRollbackResponse>): CancelRollbackResponse {
+    return CancelRollbackResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CancelRollbackResponse>): CancelRollbackResponse {
+    const message = createBaseCancelRollbackResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 type DeepPartial<T> = T extends Builtin
-	? T
-	: T extends globalThis.Array<infer U>
-		? globalThis.Array<DeepPartial<U>>
-		: T extends ReadonlyArray<infer U>
-			? ReadonlyArray<DeepPartial<U>>
-			: T extends {}
-				? { [K in keyof T]?: DeepPartial<T[K]> }
-				: Partial<T>;
+  ? T
+  : T extends globalThis.Array<infer U>
+    ? globalThis.Array<DeepPartial<U>>
+    : T extends ReadonlyArray<infer U>
+      ? ReadonlyArray<DeepPartial<U>>
+      : T extends {}
+        ? { [K in keyof T]?: DeepPartial<T[K]> }
+        : Partial<T>;
 
 function isSet(value: any): boolean {
-	return value !== null && value !== undefined;
+  return value !== null && value !== undefined;
 }
 
 interface MessageFns<T> {
-	encode(message: T, writer?: BinaryWriter): BinaryWriter;
-	decode(input: BinaryReader | Uint8Array, length?: number): T;
-	fromJSON(object: any): T;
-	toJSON(message: T): unknown;
-	create(base?: DeepPartial<T>): T;
-	fromPartial(object: DeepPartial<T>): T;
+  encode(message: T, writer?: BinaryWriter): BinaryWriter;
+  decode(input: BinaryReader | Uint8Array, length?: number): T;
+  fromJSON(object: any): T;
+  toJSON(message: T): unknown;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }

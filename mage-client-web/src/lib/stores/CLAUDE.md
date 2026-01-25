@@ -5,7 +5,8 @@
 
 ### Jan 21, 2026
 
-| ID | Time | T | Title | Read |
-|----|------|---|-------|------|
-| #1430 | 11:46 PM | 🔵 | Combat Store Manages Rules-Enforced Combat Phases | ~289 |
+| ID    | Time     | T   | Title                                             | Read |
+| ----- | -------- | --- | ------------------------------------------------- | ---- |
+| #1430 | 11:46 PM | 🔵  | Combat Store Manages Rules-Enforced Combat Phases | ~289 |
+
 </claude-mem-context>

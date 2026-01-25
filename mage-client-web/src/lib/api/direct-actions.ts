@@ -14,8 +14,8 @@ import { sendPlayerString } from './game';
  * @param tapped - Whether the card should be tapped (true) or untapped (false)
  */
 export async function tapUntap(gameId: string, cardId: string, tapped: boolean): Promise<void> {
-	const command = tapped ? `TAP:${cardId}` : `UNTAP:${cardId}`;
-	return sendPlayerString(gameId, command);
+  const command = tapped ? `TAP:${cardId}` : `UNTAP:${cardId}`;
+  return sendPlayerString(gameId, command);
 }
 
 /**
@@ -23,7 +23,7 @@ export async function tapUntap(gameId: string, cardId: string, tapped: boolean):
  * @param gameId - The game ID
  */
 export async function untapAll(gameId: string): Promise<void> {
-	return sendPlayerString(gameId, 'UNTAP_ALL');
+  return sendPlayerString(gameId, 'UNTAP_ALL');
 }
 
 /**
@@ -33,7 +33,7 @@ export async function untapAll(gameId: string): Promise<void> {
  * @param faceDown - Whether the card should be face-down
  */
 export async function flipCard(gameId: string, cardId: string, faceDown: boolean): Promise<void> {
-	return sendPlayerString(gameId, `FLIP:${cardId}:${faceDown}`);
+  return sendPlayerString(gameId, `FLIP:${cardId}:${faceDown}`);
 }
 
 /**
@@ -42,7 +42,7 @@ export async function flipCard(gameId: string, cardId: string, faceDown: boolean
  * @param cardId - The card to transform
  */
 export async function transformCard(gameId: string, cardId: string): Promise<void> {
-	return sendPlayerString(gameId, `TRANSFORM:${cardId}`);
+  return sendPlayerString(gameId, `TRANSFORM:${cardId}`);
 }
 
 /**
@@ -52,7 +52,7 @@ export async function transformCard(gameId: string, cardId: string): Promise<voi
  * @param targetZone - The target zone (HAND, BATTLEFIELD, GRAVEYARD, EXILE, LIBRARY, COMMAND)
  */
 export async function moveCard(gameId: string, cardId: string, targetZone: string): Promise<void> {
-	return sendPlayerString(gameId, `MOVE:${cardId}:${targetZone}`);
+  return sendPlayerString(gameId, `MOVE:${cardId}:${targetZone}`);
 }
 
 /**
@@ -63,12 +63,12 @@ export async function moveCard(gameId: string, cardId: string, targetZone: strin
  * @param amount - The amount to set
  */
 export async function setCardCounter(
-	gameId: string,
-	cardId: string,
-	counterType: string,
-	amount: number
+  gameId: string,
+  cardId: string,
+  counterType: string,
+  amount: number
 ): Promise<void> {
-	return sendPlayerString(gameId, `SET_COUNTER:${cardId}:${counterType}:${amount}`);
+  return sendPlayerString(gameId, `SET_COUNTER:${cardId}:${counterType}:${amount}`);
 }
 
 /**
@@ -79,12 +79,12 @@ export async function setCardCounter(
  * @param delta - The amount to add (positive) or remove (negative)
  */
 export async function modifyCardCounter(
-	gameId: string,
-	cardId: string,
-	counterType: string,
-	delta: number
+  gameId: string,
+  cardId: string,
+  counterType: string,
+  delta: number
 ): Promise<void> {
-	return sendPlayerString(gameId, `MODIFY_COUNTER:${cardId}:${counterType}:${delta}`);
+  return sendPlayerString(gameId, `MODIFY_COUNTER:${cardId}:${counterType}:${delta}`);
 }
 
 /**
@@ -99,22 +99,22 @@ export async function modifyCardCounter(
  * @param _count - Number of tokens to create (not yet implemented server-side)
  */
 export async function createToken(
-	gameId: string,
-	name: string,
-	types: string,
-	power: string,
-	toughness: string,
-	color: string,
-	abilities: string[],
-	_count: number = 1
+  gameId: string,
+  name: string,
+  types: string,
+  power: string,
+  toughness: string,
+  color: string,
+  abilities: string[],
+  _count: number = 1
 ): Promise<{ tokenId: string }> {
-	const abilitiesStr = abilities.join(',');
-	await sendPlayerString(
-		gameId,
-		`CREATE_TOKEN:${name}:${types}:${power}:${toughness}:${color}:${abilitiesStr}`
-	);
-	// Note: Server doesn't return token ID yet, but UI can refresh state
-	return { tokenId: 'pending' };
+  const abilitiesStr = abilities.join(',');
+  await sendPlayerString(
+    gameId,
+    `CREATE_TOKEN:${name}:${types}:${power}:${toughness}:${color}:${abilitiesStr}`
+  );
+  // Note: Server doesn't return token ID yet, but UI can refresh state
+  return { tokenId: 'pending' };
 }
 
 /**
@@ -123,7 +123,7 @@ export async function createToken(
  * @param cardId - The token to destroy
  */
 export async function destroyToken(gameId: string, cardId: string): Promise<void> {
-	return sendPlayerString(gameId, `DESTROY_TOKEN:${cardId}`);
+  return sendPlayerString(gameId, `DESTROY_TOKEN:${cardId}`);
 }
 
 /**
@@ -133,11 +133,11 @@ export async function destroyToken(gameId: string, cardId: string): Promise<void
  * @param amount - The new life total
  */
 export async function setPlayerLife(
-	gameId: string,
-	playerId: string,
-	amount: number
+  gameId: string,
+  playerId: string,
+  amount: number
 ): Promise<void> {
-	return sendPlayerString(gameId, `SET_LIFE:${playerId}:${amount}`);
+  return sendPlayerString(gameId, `SET_LIFE:${playerId}:${amount}`);
 }
 
 /**
@@ -147,11 +147,11 @@ export async function setPlayerLife(
  * @param delta - The amount to add (positive) or remove (negative)
  */
 export async function modifyPlayerLife(
-	gameId: string,
-	playerId: string,
-	delta: number
+  gameId: string,
+  playerId: string,
+  delta: number
 ): Promise<void> {
-	return sendPlayerString(gameId, `MODIFY_LIFE:${playerId}:${delta}`);
+  return sendPlayerString(gameId, `MODIFY_LIFE:${playerId}:${delta}`);
 }
 
 /**
@@ -161,7 +161,7 @@ export async function modifyPlayerLife(
  * @param count - Number of cards to draw
  */
 export async function drawCards(gameId: string, playerId: string, count: number): Promise<void> {
-	return sendPlayerString(gameId, `DRAW:${playerId}:${count}`);
+  return sendPlayerString(gameId, `DRAW:${playerId}:${count}`);
 }
 
 /**
@@ -171,7 +171,7 @@ export async function drawCards(gameId: string, playerId: string, count: number)
  * @param count - Number of cards to mill
  */
 export async function millCards(gameId: string, playerId: string, count: number): Promise<void> {
-	return sendPlayerString(gameId, `MILL:${playerId}:${count}`);
+  return sendPlayerString(gameId, `MILL:${playerId}:${count}`);
 }
 
 /**
@@ -183,7 +183,7 @@ export async function millCards(gameId: string, playerId: string, count: number)
  * @param count - Number of cards to scry
  */
 export async function scryCards(gameId: string, playerId: string, count: number): Promise<void> {
-	return sendPlayerString(gameId, `SCRY:${playerId}:${count}`);
+  return sendPlayerString(gameId, `SCRY:${playerId}:${count}`);
 }
 
 /**
@@ -193,11 +193,11 @@ export async function scryCards(gameId: string, playerId: string, count: number)
  * @param revealed - Whether the top card should be revealed
  */
 export async function setRevealedTop(
-	gameId: string,
-	playerId: string,
-	revealed: boolean
+  gameId: string,
+  playerId: string,
+  revealed: boolean
 ): Promise<void> {
-	return sendPlayerString(gameId, `REVEAL_TOP:${playerId}:${revealed}`);
+  return sendPlayerString(gameId, `REVEAL_TOP:${playerId}:${revealed}`);
 }
 
 /**
@@ -206,7 +206,7 @@ export async function setRevealedTop(
  * @param playerId - The player who is mulliganing
  */
 export async function mulligan(gameId: string, playerId: string): Promise<void> {
-	return sendPlayerString(gameId, `MULLIGAN:${playerId}`);
+  return sendPlayerString(gameId, `MULLIGAN:${playerId}`);
 }
 
 /**
@@ -215,7 +215,7 @@ export async function mulligan(gameId: string, playerId: string): Promise<void> 
  * @param playerId - The player who is keeping their hand
  */
 export async function keepHand(gameId: string, playerId: string): Promise<void> {
-	return sendPlayerString(gameId, `KEEP_HAND:${playerId}`);
+  return sendPlayerString(gameId, `KEEP_HAND:${playerId}`);
 }
 
 /**
@@ -225,7 +225,7 @@ export async function keepHand(gameId: string, playerId: string): Promise<void> 
  * @param delta - The amount to add (positive) or remove (negative)
  */
 export async function modifyLife(gameId: string, playerId: string, delta: number): Promise<void> {
-	return modifyPlayerLife(gameId, playerId, delta);
+  return modifyPlayerLife(gameId, playerId, delta);
 }
 
 /**
@@ -236,12 +236,12 @@ export async function modifyLife(gameId: string, playerId: string, delta: number
  * @param amount - The amount to set
  */
 export async function setPlayerCounter(
-	gameId: string,
-	playerId: string,
-	counterType: string,
-	amount: number
+  gameId: string,
+  playerId: string,
+  counterType: string,
+  amount: number
 ): Promise<void> {
-	return sendPlayerString(gameId, `SET_PLAYER_COUNTER:${playerId}:${counterType}:${amount}`);
+  return sendPlayerString(gameId, `SET_PLAYER_COUNTER:${playerId}:${counterType}:${amount}`);
 }
 
 /**
@@ -250,8 +250,8 @@ export async function setPlayerCounter(
  * @param playerId - The player whose library to shuffle (optional, defaults to current player)
  */
 export async function shuffleLibrary(gameId: string, playerId?: string): Promise<void> {
-	const command = playerId ? `SHUFFLE:${playerId}` : 'SHUFFLE';
-	return sendPlayerString(gameId, command);
+  const command = playerId ? `SHUFFLE:${playerId}` : 'SHUFFLE';
+  return sendPlayerString(gameId, command);
 }
 
 /**
@@ -259,7 +259,7 @@ export async function shuffleLibrary(gameId: string, playerId?: string): Promise
  * @param gameId - The game ID
  */
 export async function nextTurn(gameId: string): Promise<void> {
-	return sendPlayerString(gameId, 'NEXT_TURN');
+  return sendPlayerString(gameId, 'NEXT_TURN');
 }
 
 /**
@@ -267,7 +267,7 @@ export async function nextTurn(gameId: string): Promise<void> {
  * @param gameId - The game ID
  */
 export async function clearCombat(gameId: string): Promise<void> {
-	return sendPlayerString(gameId, 'CLEAR_COMBAT');
+  return sendPlayerString(gameId, 'CLEAR_COMBAT');
 }
 
 /**
@@ -278,13 +278,13 @@ export async function clearCombat(gameId: string): Promise<void> {
  * @param message - Optional message describing what to search for
  */
 export async function searchLibrary(
-	gameId: string,
-	destination: 'hand' | 'battlefield' | 'top' | 'graveyard' = 'hand',
-	shuffle: boolean = true,
-	message?: string
+  gameId: string,
+  destination: 'hand' | 'battlefield' | 'top' | 'graveyard' = 'hand',
+  shuffle: boolean = true,
+  message?: string
 ): Promise<void> {
-	const msgPart = message ? `:${message}` : '';
-	return sendPlayerString(gameId, `SEARCH_LIBRARY:${destination}:${shuffle}${msgPart}`);
+  const msgPart = message ? `:${message}` : '';
+  return sendPlayerString(gameId, `SEARCH_LIBRARY:${destination}:${shuffle}${msgPart}`);
 }
 
 /**
@@ -293,7 +293,7 @@ export async function searchLibrary(
  * @param cardId - The ID of the card to select (or "CANCEL" to cancel the search)
  */
 export async function selectLibraryCard(gameId: string, cardId: string): Promise<void> {
-	return sendPlayerString(gameId, cardId);
+  return sendPlayerString(gameId, cardId);
 }
 
 /**
@@ -304,7 +304,7 @@ export async function selectLibraryCard(gameId: string, cardId: string): Promise
  * @param cardId - The card to add to the stack
  */
 export async function addToStack(gameId: string, cardId: string): Promise<void> {
-	return sendPlayerString(gameId, `STACK_ADD:${cardId}`);
+  return sendPlayerString(gameId, `STACK_ADD:${cardId}`);
 }
 
 /**
@@ -313,5 +313,5 @@ export async function addToStack(gameId: string, cardId: string): Promise<void> 
  * @param itemId - The stack item ID to remove
  */
 export async function removeFromStack(gameId: string, itemId: string): Promise<void> {
-	return sendPlayerString(gameId, `STACK_REMOVE:${itemId}`);
+  return sendPlayerString(gameId, `STACK_REMOVE:${itemId}`);
 }

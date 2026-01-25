@@ -1,638 +1,638 @@
 <script lang="ts">
-	import { auth } from '$lib/stores/auth';
-	import { toast } from '$lib/stores/toast';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	import { getMageClient } from '$lib/grpc/client';
-	import { createSessionToken } from '$lib/utils/jwt';
-	import Modal from '$lib/components/Modal.svelte';
-	import Copy from '@lucide/svelte/icons/copy';
+  import { auth } from '$lib/stores/auth';
+  import { toast } from '$lib/stores/toast';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { getMageClient } from '$lib/grpc/client';
+  import { createSessionToken } from '$lib/utils/jwt';
+  import Modal from '$lib/components/Modal.svelte';
+  import Copy from '@lucide/svelte/icons/copy';
 
-	// Form state
-	let username = '';
-	let password = '';
-	let rememberMe = false;
-	let isLoading = false;
-	let errorMessage = '';
+  // Form state
+  let username = '';
+  let password = '';
+  let rememberMe = false;
+  let isLoading = false;
+  let errorMessage = '';
 
-	// Validation errors
-	let usernameError = '';
-	let passwordError = '';
+  // Validation errors
+  let usernameError = '';
+  let passwordError = '';
 
-	// Guest registration modal state
-	let showPasswordModal = false;
-	let guestUsername = '';
-	let guestPassword = '';
+  // Guest registration modal state
+  let showPasswordModal = false;
+  let guestUsername = '';
+  let guestPassword = '';
 
-	// Available background images
-	const backgroundImages = ['Boros.jpg', 'Golgari.jpg', 'Gruul.jpg', 'Izzet.jpg', 'Rakdos.jpg'];
-	// Randomly select a background image
-	let selectedBackground = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+  // Available background images
+  const backgroundImages = ['Boros.jpg', 'Golgari.jpg', 'Gruul.jpg', 'Izzet.jpg', 'Rakdos.jpg'];
+  // Randomly select a background image
+  let selectedBackground = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
 
-	// Get return URL from query params
-	$: returnUrl = $page.url.searchParams.get('returnUrl') || '/lobby';
+  // Get return URL from query params
+  $: returnUrl = $page.url.searchParams.get('returnUrl') || '/lobby';
 
-	// Redirect if already authenticated
-	onMount(() => {
-		const restored = auth.loadAuthFromStorage();
-		if (restored) {
-			goto(returnUrl);
-		}
-	});
+  // Redirect if already authenticated
+  onMount(() => {
+    const restored = auth.loadAuthFromStorage();
+    if (restored) {
+      goto(returnUrl);
+    }
+  });
 
-	function validateForm(): boolean {
-		usernameError = '';
-		passwordError = '';
-		errorMessage = '';
+  function validateForm(): boolean {
+    usernameError = '';
+    passwordError = '';
+    errorMessage = '';
 
-		let isValid = true;
+    let isValid = true;
 
-		if (!username) {
-			usernameError = 'Username is required';
-			isValid = false;
-		} else if (username.length < 3) {
-			usernameError = 'Username must be at least 3 characters';
-			isValid = false;
-		}
+    if (!username) {
+      usernameError = 'Username is required';
+      isValid = false;
+    } else if (username.length < 3) {
+      usernameError = 'Username must be at least 3 characters';
+      isValid = false;
+    }
 
-		if (!password) {
-			passwordError = 'Password is required';
-			isValid = false;
-		} else if (password.length < 6) {
-			passwordError = 'Password must be at least 6 characters';
-			isValid = false;
-		}
+    if (!password) {
+      passwordError = 'Password is required';
+      isValid = false;
+    } else if (password.length < 6) {
+      passwordError = 'Password must be at least 6 characters';
+      isValid = false;
+    }
 
-		return isValid;
-	}
+    return isValid;
+  }
 
-	async function performLogin(loginUsername: string, loginPassword: string) {
-		isLoading = true;
-		errorMessage = '';
+  async function performLogin(loginUsername: string, loginPassword: string) {
+    isLoading = true;
+    errorMessage = '';
 
-		try {
-			// Connect to server using real gRPC client
-			const client = getMageClient();
-			const response = await client.connectUser(loginUsername, loginPassword);
+    try {
+      // Connect to server using real gRPC client
+      const client = getMageClient();
+      const response = await client.connectUser(loginUsername, loginPassword);
 
-			if (!response.success) {
-				throw new Error(response.error || 'Login failed');
-			}
+      if (!response.success) {
+        throw new Error(response.error || 'Login failed');
+      }
 
-			// Debug: log the response to see what we're getting
-			if (import.meta.env.DEV) {
-				console.log('Login response:', {
-					success: response.success,
-					sessionId: response.sessionId,
-					userId: response.userId,
-					error: response.error
-				});
-			}
+      // Debug: log the response to see what we're getting
+      if (import.meta.env.DEV) {
+        console.log('Login response:', {
+          success: response.success,
+          sessionId: response.sessionId,
+          userId: response.userId,
+          error: response.error
+        });
+      }
 
-			// Check if sessionId is in the response or already set in client
-			let sessionId = response.sessionId || client.getSessionId();
+      // Check if sessionId is in the response or already set in client
+      let sessionId = response.sessionId || client.getSessionId();
 
-			// If still no sessionId, this is an error
-			if (!sessionId || sessionId.trim() === '') {
-				console.error('Login response missing sessionId:', response);
-				throw new Error('Login succeeded but no session ID received from server');
-			}
+      // If still no sessionId, this is an error
+      if (!sessionId || sessionId.trim() === '') {
+        console.error('Login response missing sessionId:', response);
+        throw new Error('Login succeeded but no session ID received from server');
+      }
 
-			// Ensure sessionId is set in client
-			if (response.sessionId && response.sessionId !== client.getSessionId()) {
-				client.setSessionId(response.sessionId);
-			} else if (!client.getSessionId()) {
-				client.setSessionId(sessionId);
-			}
+      // Ensure sessionId is set in client
+      if (response.sessionId && response.sessionId !== client.getSessionId()) {
+        client.setSessionId(response.sessionId);
+      } else if (!client.getSessionId()) {
+        client.setSessionId(sessionId);
+      }
 
-			// Create a session-based token from server response
-			// The server returns sessionId and userId, which we use to create a token
-			const token = createSessionToken(
-				sessionId,
-				response.userId,
-				loginUsername,
-				`${loginUsername}@example.com`
-			);
+      // Create a session-based token from server response
+      // The server returns sessionId and userId, which we use to create a token
+      const token = createSessionToken(
+        sessionId,
+        response.userId,
+        loginUsername,
+        `${loginUsername}@example.com`
+      );
 
-			// Store in auth store (this will also ensure sessionId is set)
-			auth.login(token, {
-				id: response.userId,
-				username: loginUsername
-			});
+      // Store in auth store (this will also ensure sessionId is set)
+      auth.login(token, {
+        id: response.userId,
+        username: loginUsername
+      });
 
-			// Show success toast
-			toast.success(`Spell Resolved. Welcome back, ${loginUsername}!`);
+      // Show success toast
+      toast.success(`Spell Resolved. Welcome back, ${loginUsername}!`);
 
-			// Small delay to ensure everything is set before navigation
-			await new Promise((resolve) => setTimeout(resolve, 50));
+      // Small delay to ensure everything is set before navigation
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
-			// Redirect to original URL or lobby on successful login
-			goto(returnUrl);
-		} catch (error) {
-			if (error instanceof Error) {
-				errorMessage = `Spell Fizzled. ${error.message}`;
-				toast.error(`Spell Fizzled. ${error.message}`);
-			} else {
-				errorMessage = 'Spell Fizzled. Valid target not found.';
-				toast.error('Spell Fizzled. Valid target not found.');
-			}
-		} finally {
-			isLoading = false;
-		}
-	}
+      // Redirect to original URL or lobby on successful login
+      goto(returnUrl);
+    } catch (error) {
+      if (error instanceof Error) {
+        errorMessage = `Spell Fizzled. ${error.message}`;
+        toast.error(`Spell Fizzled. ${error.message}`);
+      } else {
+        errorMessage = 'Spell Fizzled. Valid target not found.';
+        toast.error('Spell Fizzled. Valid target not found.');
+      }
+    } finally {
+      isLoading = false;
+    }
+  }
 
-	async function handleLogin(event: Event) {
-		event.preventDefault();
+  async function handleLogin(event: Event) {
+    event.preventDefault();
 
-		if (!validateForm()) {
-			return;
-		}
+    if (!validateForm()) {
+      return;
+    }
 
-		await performLogin(username, password);
-	}
+    await performLogin(username, password);
+  }
 
-	/**
-	 * Generate a random password with at least 8 characters
-	 */
-	function generateRandomPassword(): string {
-		const length = 12; // Generate 12 character password
-		const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
-		let password = '';
-		for (let i = 0; i < length; i++) {
-			password += charset.charAt(Math.floor(Math.random() * charset.length));
-		}
-		return password;
-	}
+  /**
+   * Generate a random password with at least 8 characters
+   */
+  function generateRandomPassword(): string {
+    const length = 12; // Generate 12 character password
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return password;
+  }
 
-	/**
-	 * Generate a random guest username
-	 * Must match pattern: ^[a-z0-9_]+$ (lowercase letters, numbers, and underscores only)
-	 */
-	function generateGuestUsername(): string {
-		// Use lowercase 'guest_' prefix and random alphanumeric suffix
-		const randomPart = Math.random().toString(36).substring(2, 9); // lowercase letters and numbers
-		return 'guest_' + randomPart;
-	}
+  /**
+   * Generate a random guest username
+   * Must match pattern: ^[a-z0-9_]+$ (lowercase letters, numbers, and underscores only)
+   */
+  function generateGuestUsername(): string {
+    // Use lowercase 'guest_' prefix and random alphanumeric suffix
+    const randomPart = Math.random().toString(36).substring(2, 9); // lowercase letters and numbers
+    return 'guest_' + randomPart;
+  }
 
-	async function handleGuestLogin() {
-		isLoading = true;
-		errorMessage = '';
+  async function handleGuestLogin() {
+    isLoading = true;
+    errorMessage = '';
 
-		try {
-			// Generate random credentials
-			guestUsername = generateGuestUsername();
-			guestPassword = generateRandomPassword();
+    try {
+      // Generate random credentials
+      guestUsername = generateGuestUsername();
+      guestPassword = generateRandomPassword();
 
-			const client = getMageClient();
+      const client = getMageClient();
 
-			// Register the guest user
-			const registerResponse = await client.register(guestUsername, guestPassword);
+      // Register the guest user
+      const registerResponse = await client.register(guestUsername, guestPassword);
 
-			if (!registerResponse.success) {
-				throw new Error(registerResponse.error || 'Guest registration failed');
-			}
+      if (!registerResponse.success) {
+        throw new Error(registerResponse.error || 'Guest registration failed');
+      }
 
-			// Show password modal
-			showPasswordModal = true;
-			isLoading = false;
-		} catch (error) {
-			if (error instanceof Error) {
-				errorMessage = error.message;
-				toast.error(error.message);
-			} else {
-				errorMessage = 'Guest registration failed. Please try again.';
-				toast.error('Guest registration failed. Please try again.');
-			}
-			isLoading = false;
-		}
-	}
+      // Show password modal
+      showPasswordModal = true;
+      isLoading = false;
+    } catch (error) {
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        toast.error(error.message);
+      } else {
+        errorMessage = 'Guest registration failed. Please try again.';
+        toast.error('Guest registration failed. Please try again.');
+      }
+      isLoading = false;
+    }
+  }
 
-	async function handleGuestLoginAfterModal() {
-		// Close modal and proceed with login
-		showPasswordModal = false;
-		isLoading = true;
-		errorMessage = '';
+  async function handleGuestLoginAfterModal() {
+    // Close modal and proceed with login
+    showPasswordModal = false;
+    isLoading = true;
+    errorMessage = '';
 
-		try {
-			const client = getMageClient();
-			const response = await client.connectUser(guestUsername, guestPassword);
+    try {
+      const client = getMageClient();
+      const response = await client.connectUser(guestUsername, guestPassword);
 
-			if (!response.success) {
-				throw new Error(response.error || 'Guest login failed');
-			}
+      if (!response.success) {
+        throw new Error(response.error || 'Guest login failed');
+      }
 
-			// Verify sessionId is set in client
-			if (!response.sessionId) {
-				throw new Error('Guest login succeeded but no session ID received');
-			}
+      // Verify sessionId is set in client
+      if (!response.sessionId) {
+        throw new Error('Guest login succeeded but no session ID received');
+      }
 
-			// Ensure sessionId is in client
-			const currentSessionId = client.getSessionId();
-			if (!currentSessionId) {
-				client.setSessionId(response.sessionId);
-			}
+      // Ensure sessionId is in client
+      const currentSessionId = client.getSessionId();
+      if (!currentSessionId) {
+        client.setSessionId(response.sessionId);
+      }
 
-			// Create a session-based token from server response
-			const token = createSessionToken(
-				response.sessionId,
-				response.userId,
-				guestUsername,
-				'guest@example.com'
-			);
+      // Create a session-based token from server response
+      const token = createSessionToken(
+        response.sessionId,
+        response.userId,
+        guestUsername,
+        'guest@example.com'
+      );
 
-			// Store in auth store
-			auth.login(token, {
-				id: response.userId,
-				username: guestUsername
-			});
+      // Store in auth store
+      auth.login(token, {
+        id: response.userId,
+        username: guestUsername
+      });
 
-			// Show success toast
-			toast.success(`Spell Resolved. Welcome, ${guestUsername}!`);
+      // Show success toast
+      toast.success(`Spell Resolved. Welcome, ${guestUsername}!`);
 
-			// Redirect to original URL or lobby on successful login
-			goto(returnUrl);
-		} catch (error) {
-			if (error instanceof Error) {
-				errorMessage = error.message;
-				toast.error(error.message);
-			} else {
-				errorMessage = 'Guest login failed. Please try again.';
-				toast.error('Guest login failed. Please try again.');
-			}
-		} finally {
-			isLoading = false;
-		}
-	}
+      // Redirect to original URL or lobby on successful login
+      goto(returnUrl);
+    } catch (error) {
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        toast.error(error.message);
+      } else {
+        errorMessage = 'Guest login failed. Please try again.';
+        toast.error('Guest login failed. Please try again.');
+      }
+    } finally {
+      isLoading = false;
+    }
+  }
 
-	function copyPasswordToClipboard() {
-		if (typeof navigator !== 'undefined' && navigator.clipboard) {
-			navigator.clipboard
-				.writeText(guestPassword)
-				.then(() => {
-					toast.success('Password copied to clipboard!');
-				})
-				.catch(() => {
-					toast.error('Failed to copy password');
-				});
-		}
-	}
+  function copyPasswordToClipboard() {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard
+        .writeText(guestPassword)
+        .then(() => {
+          toast.success('Password copied to clipboard!');
+        })
+        .catch(() => {
+          toast.error('Failed to copy password');
+        });
+    }
+  }
 
-	async function handleDevLogin() {
-		// Auto-fill credentials and trigger login
-		username = 'thraizz';
-		password = 'Test123!';
+  async function handleDevLogin() {
+    // Auto-fill credentials and trigger login
+    username = 'thraizz';
+    password = 'Test123!';
 
-		// Perform login directly with dev credentials
-		await performLogin(username, password);
-	}
+    // Perform login directly with dev credentials
+    await performLogin(username, password);
+  }
 
-	async function handleDevLogin2() {
-		// Auto-fill credentials and trigger login
-		username = 'thraizz2';
-		password = 'Test123!';
+  async function handleDevLogin2() {
+    // Auto-fill credentials and trigger login
+    username = 'thraizz2';
+    password = 'Test123!';
 
-		// Perform login directly with dev credentials
-		await performLogin(username, password);
-	}
+    // Perform login directly with dev credentials
+    await performLogin(username, password);
+  }
 </script>
 
 <svelte:head>
-	<title>Login - MAGE</title>
+  <title>Login - MAGE</title>
 </svelte:head>
 
 <div class="container" style="background-image: url('/images/{selectedBackground}')">
-	<div class="card">
-		<h1>Enter the Blind Eternities</h1>
-		<p class="flavor-text">Welcome, Planeswalker. Ignite your spark and draw your destiny.</p>
+  <div class="card">
+    <h1>Enter the Blind Eternities</h1>
+    <p class="flavor-text">Welcome, Planeswalker. Ignite your spark and draw your destiny.</p>
 
-		{#if errorMessage}
-			<div class="error-message" role="alert" aria-live="polite">
-				{errorMessage}
-			</div>
-		{/if}
+    {#if errorMessage}
+      <div class="error-message" role="alert" aria-live="polite">
+        {errorMessage}
+      </div>
+    {/if}
 
-		<form class="login-form" onsubmit={handleLogin}>
-			<div class="form-group">
-				<label for="username">Username</label>
-				<input
-					type="text"
-					id="username"
-					name="username"
-					bind:value={username}
-					placeholder="Enter your username"
-					disabled={isLoading}
-					aria-required="true"
-					aria-invalid={usernameError ? 'true' : 'false'}
-					aria-describedby={usernameError ? 'username-error' : undefined}
-				/>
-				{#if usernameError}
-					<span class="field-error" id="username-error" role="alert">{usernameError}</span>
-				{/if}
-			</div>
+    <form class="login-form" onsubmit={handleLogin}>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          bind:value={username}
+          placeholder="Enter your username"
+          disabled={isLoading}
+          aria-required="true"
+          aria-invalid={usernameError ? 'true' : 'false'}
+          aria-describedby={usernameError ? 'username-error' : undefined}
+        />
+        {#if usernameError}
+          <span class="field-error" id="username-error" role="alert">{usernameError}</span>
+        {/if}
+      </div>
 
-			<div class="form-group">
-				<label for="password">Password</label>
-				<input
-					type="password"
-					id="password"
-					name="password"
-					bind:value={password}
-					placeholder="Enter your password"
-					disabled={isLoading}
-					aria-required="true"
-					aria-invalid={passwordError ? 'true' : 'false'}
-					aria-describedby={passwordError ? 'password-error' : undefined}
-				/>
-				{#if passwordError}
-					<span class="field-error" id="password-error" role="alert">{passwordError}</span>
-				{/if}
-			</div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          bind:value={password}
+          placeholder="Enter your password"
+          disabled={isLoading}
+          aria-required="true"
+          aria-invalid={passwordError ? 'true' : 'false'}
+          aria-describedby={passwordError ? 'password-error' : undefined}
+        />
+        {#if passwordError}
+          <span class="field-error" id="password-error" role="alert">{passwordError}</span>
+        {/if}
+      </div>
 
-			<div class="form-group checkbox-group">
-				<label for="remember-me">
-					<input
-						type="checkbox"
-						id="remember-me"
-						name="rememberMe"
-						bind:checked={rememberMe}
-						disabled={isLoading}
-					/>
-					<span>Remember me</span>
-				</label>
-			</div>
+      <div class="form-group checkbox-group">
+        <label for="remember-me">
+          <input
+            type="checkbox"
+            id="remember-me"
+            name="rememberMe"
+            bind:checked={rememberMe}
+            disabled={isLoading}
+          />
+          <span>Remember me</span>
+        </label>
+      </div>
 
-			<button type="submit" class="btn-primary" disabled={isLoading}>
-				{#if isLoading}
-					<span class="spinner" aria-hidden="true"></span>
-					Gathering Mana...
-				{:else}
-					Cast Spell
-				{/if}
-			</button>
-		</form>
+      <button type="submit" class="btn-primary" disabled={isLoading}>
+        {#if isLoading}
+          <span class="spinner" aria-hidden="true"></span>
+          Gathering Mana...
+        {:else}
+          Cast Spell
+        {/if}
+      </button>
+    </form>
 
-		<div class="divider">
-			<span>— OR —</span>
-		</div>
+    <div class="divider">
+      <span>— OR —</span>
+    </div>
 
-		<button type="button" class="btn-secondary" onclick={handleGuestLogin} disabled={isLoading}>
-			{#if isLoading}
-				<span class="spinner" aria-hidden="true"></span>
-				Gathering Mana...
-			{:else}
-				Enter as Guest
-			{/if}
-		</button>
+    <button type="button" class="btn-secondary" onclick={handleGuestLogin} disabled={isLoading}>
+      {#if isLoading}
+        <span class="spinner" aria-hidden="true"></span>
+        Gathering Mana...
+      {:else}
+        Enter as Guest
+      {/if}
+    </button>
 
-		{#if import.meta.env.DEV}
-			<div class="divider">
-				<span>DEV MODE</span>
-			</div>
+    {#if import.meta.env.DEV}
+      <div class="divider">
+        <span>DEV MODE</span>
+      </div>
 
-			<div class="dev-login-buttons">
-				<button type="button" class="btn-dev" onclick={handleDevLogin} disabled={isLoading}>
-					{#if isLoading}
-						<span class="spinner" aria-hidden="true"></span>
-						Gathering Mana...
-					{:else}
-						[DEV] thraizz
-					{/if}
-				</button>
+      <div class="dev-login-buttons">
+        <button type="button" class="btn-dev" onclick={handleDevLogin} disabled={isLoading}>
+          {#if isLoading}
+            <span class="spinner" aria-hidden="true"></span>
+            Gathering Mana...
+          {:else}
+            [DEV] thraizz
+          {/if}
+        </button>
 
-				<button type="button" class="btn-dev" onclick={handleDevLogin2} disabled={isLoading}>
-					{#if isLoading}
-						<span class="spinner" aria-hidden="true"></span>
-						Gathering Mana...
-					{:else}
-						[DEV] thraizz2
-					{/if}
-				</button>
-			</div>
-		{/if}
+        <button type="button" class="btn-dev" onclick={handleDevLogin2} disabled={isLoading}>
+          {#if isLoading}
+            <span class="spinner" aria-hidden="true"></span>
+            Gathering Mana...
+          {:else}
+            [DEV] thraizz2
+          {/if}
+        </button>
+      </div>
+    {/if}
 
-		<div class="links">
-			<a href="/register">No spark yet? <strong>Ignite Your Spark</strong></a>
-		</div>
-	</div>
+    <div class="links">
+      <a href="/register">No spark yet? <strong>Ignite Your Spark</strong></a>
+    </div>
+  </div>
 </div>
 
 <!-- Guest Password Modal -->
 <Modal
-	open={showPasswordModal}
-	title="Save Your Guest Account Details"
-	onClose={() => {
-		showPasswordModal = false;
-		handleGuestLoginAfterModal();
-	}}
-	closeOnBackdrop={false}
+  open={showPasswordModal}
+  title="Save Your Guest Account Details"
+  onClose={() => {
+    showPasswordModal = false;
+    handleGuestLoginAfterModal();
+  }}
+  closeOnBackdrop={false}
 >
-	<div class="password-modal-content">
-		<p class="password-warning">
-			A guest account has been created for you. <strong>Save your password</strong> if you want to play
-			again with this account.
-		</p>
+  <div class="password-modal-content">
+    <p class="password-warning">
+      A guest account has been created for you. <strong>Save your password</strong> if you want to play
+      again with this account.
+    </p>
 
-		<div class="credentials-box">
-			<div class="credential-item">
-				<span class="credential-label">Username:</span>
-				<div class="credential-value">
-					<code>{guestUsername}</code>
-					<button
-						type="button"
-						class="copy-button"
-						onclick={() => {
-							if (typeof navigator !== 'undefined' && navigator.clipboard) {
-								navigator.clipboard.writeText(guestUsername);
-								toast.success('Username copied!');
-							}
-						}}
-						title="Copy username"
-					>
-						<Copy size={16} aria-hidden="true" />
-					</button>
-				</div>
-			</div>
+    <div class="credentials-box">
+      <div class="credential-item">
+        <span class="credential-label">Username:</span>
+        <div class="credential-value">
+          <code>{guestUsername}</code>
+          <button
+            type="button"
+            class="copy-button"
+            onclick={() => {
+              if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                navigator.clipboard.writeText(guestUsername);
+                toast.success('Username copied!');
+              }
+            }}
+            title="Copy username"
+          >
+            <Copy size={16} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
 
-			<div class="credential-item">
-				<span class="credential-label">Password:</span>
-				<div class="credential-value">
-					<code class="password-display">{guestPassword}</code>
-					<button
-						type="button"
-						class="copy-button"
-						onclick={copyPasswordToClipboard}
-						title="Copy password"
-					>
-						<Copy size={16} aria-hidden="true" />
-					</button>
-				</div>
-			</div>
-		</div>
+      <div class="credential-item">
+        <span class="credential-label">Password:</span>
+        <div class="credential-value">
+          <code class="password-display">{guestPassword}</code>
+          <button
+            type="button"
+            class="copy-button"
+            onclick={copyPasswordToClipboard}
+            title="Copy password"
+          >
+            <Copy size={16} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+    </div>
 
-		<div class="modal-actions">
-			<button type="button" class="btn-primary" onclick={handleGuestLoginAfterModal}>
-				Continue to Game
-			</button>
-		</div>
-	</div>
+    <div class="modal-actions">
+      <button type="button" class="btn-primary" onclick={handleGuestLoginAfterModal}>
+        Continue to Game
+      </button>
+    </div>
+  </div>
 </Modal>
 
 <style>
-	.container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		min-height: 100vh;
-		padding: 2rem;
-		position: relative;
-		background-size: cover;
-		background-position: center;
-		background-repeat: no-repeat;
-	}
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
 
-	.container::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-color: rgba(11, 12, 16, 0.7);
-		z-index: 0;
-	}
+  .container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(11, 12, 16, 0.7);
+    z-index: 0;
+  }
 
-	.card {
-		width: 100%;
-		max-width: 420px;
-		position: relative;
-		z-index: 1;
-	}
+  .card {
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+  }
 
-	h1 {
-		font-size: 2.25rem;
-		text-align: center;
-		margin: 0 0 0.75rem 0;
-	}
+  h1 {
+    font-size: 2.25rem;
+    text-align: center;
+    margin: 0 0 0.75rem 0;
+  }
 
-	.flavor-text {
-		margin: 0 0 2rem 0;
-		text-align: center;
-	}
+  .flavor-text {
+    margin: 0 0 2rem 0;
+    text-align: center;
+  }
 
-	.login-form {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-	.form-group {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-	.checkbox-group {
-		flex-direction: row;
-		align-items: center;
-	}
+  .checkbox-group {
+    flex-direction: row;
+    align-items: center;
+  }
 
-	/* Password Modal Styles */
-	:global(.password-modal-content) {
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
-	}
+  /* Password Modal Styles */
+  :global(.password-modal-content) {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 
-	:global(.password-warning) {
-		color: #666;
-		line-height: 1.6;
-		margin: 0;
-	}
+  :global(.password-warning) {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+  }
 
-	:global(.password-warning strong) {
-		color: #c33;
-	}
+  :global(.password-warning strong) {
+    color: #c33;
+  }
 
-	:global(.credentials-box) {
-		background: #f9fafb;
-		border: 1px solid #e5e7eb;
-		border-radius: 8px;
-		padding: 1.5rem;
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
+  :global(.credentials-box) {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-	:global(.credential-item) {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
+  :global(.credential-item) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-	:global(.credential-item label) {
-		font-weight: 600;
-		color: #374151;
-		font-size: 0.875rem;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
+  :global(.credential-item label) {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
-	:global(.credential-value) {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		background: white;
-		padding: 0.75rem;
-		border-radius: 4px;
-		border: 1px solid #d1d5db;
-	}
+  :global(.credential-value) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+  }
 
-	:global(.credential-value code) {
-		flex: 1;
-		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-		font-size: 0.9375rem;
-		color: #111827;
-		background: transparent;
-		padding: 0;
-		border: none;
-		word-break: break-all;
-	}
+  :global(.credential-value code) {
+    flex: 1;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9375rem;
+    color: #111827;
+    background: transparent;
+    padding: 0;
+    border: none;
+    word-break: break-all;
+  }
 
-	:global(.password-display) {
-		font-weight: 600;
-		letter-spacing: 0.05em;
-	}
+  :global(.password-display) {
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
 
-	:global(.copy-button) {
-		background: #f3f4f6;
-		border: 1px solid #d1d5db;
-		border-radius: 4px;
-		padding: 0.5rem;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: #6b7280;
-		transition: all 0.2s;
-		flex-shrink: 0;
-	}
+  :global(.copy-button) {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
 
-	:global(.copy-button:hover) {
-		background: #e5e7eb;
-		color: #374151;
-	}
+  :global(.copy-button:hover) {
+    background: #e5e7eb;
+    color: #374151;
+  }
 
-	:global(.modal-actions) {
-		display: flex;
-		justify-content: flex-end;
-		gap: 0.75rem;
-		margin-top: 0.5rem;
-	}
+  :global(.modal-actions) {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
 
-	.dev-login-buttons {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
+  .dev-login-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 </style>

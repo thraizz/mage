@@ -1,112 +1,112 @@
 <script lang="ts">
-	import Modal from './Modal.svelte';
+  import Modal from './Modal.svelte';
 
-	// Props
-	export let open = false;
-	export let title = 'Confirm';
-	export let message = 'Are you sure?';
-	export let confirmText = 'Confirm';
-	export let cancelText = 'Cancel';
-	export let destructive = false;
-	export let onConfirm: (() => void) | undefined = undefined;
-	export let onCancel: (() => void) | undefined = undefined;
+  // Props
+  export let open = false;
+  export let title = 'Confirm';
+  export let message = 'Are you sure?';
+  export let confirmText = 'Confirm';
+  export let cancelText = 'Cancel';
+  export let destructive = false;
+  export let onConfirm: (() => void) | undefined = undefined;
+  export let onCancel: (() => void) | undefined = undefined;
 
-	// Handle confirm action
-	function handleConfirm() {
-		open = false;
-		if (onConfirm) {
-			onConfirm();
-		}
-	}
+  // Handle confirm action
+  function handleConfirm() {
+    open = false;
+    if (onConfirm) {
+      onConfirm();
+    }
+  }
 
-	// Handle cancel action
-	function handleCancel() {
-		open = false;
-		if (onCancel) {
-			onCancel();
-		}
-	}
+  // Handle cancel action
+  function handleCancel() {
+    open = false;
+    if (onCancel) {
+      onCancel();
+    }
+  }
 
-	// Handle keyboard shortcuts
-	function handleKeydown(event: KeyboardEvent) {
-		if (!open) return;
+  // Handle keyboard shortcuts
+  function handleKeydown(event: KeyboardEvent) {
+    if (!open) return;
 
-		if (event.key === 'Enter') {
-			event.preventDefault();
-			handleConfirm();
-		} else if (event.key === 'Escape') {
-			event.preventDefault();
-			handleCancel();
-		}
-	}
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      handleConfirm();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      handleCancel();
+    }
+  }
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
 
 <Modal bind:open {title} size="small" closeOnBackdrop={false} onClose={handleCancel}>
-	<div class="confirm-message">
-		{message}
-	</div>
+  <div class="confirm-message">
+    {message}
+  </div>
 
-	<div slot="footer" class="confirm-actions">
-		<button class="btn-cancel" onclick={handleCancel}>
-			{cancelText}
-		</button>
-		<button class="btn-confirm" class:destructive onclick={handleConfirm}>
-			{confirmText}
-		</button>
-	</div>
+  <div slot="footer" class="confirm-actions">
+    <button class="btn-cancel" onclick={handleCancel}>
+      {cancelText}
+    </button>
+    <button class="btn-confirm" class:destructive onclick={handleConfirm}>
+      {confirmText}
+    </button>
+  </div>
 </Modal>
 
 <style>
-	.confirm-message {
-		color: #374151;
-		font-size: 0.9375rem;
-		line-height: 1.6;
-		margin: 0;
-	}
+  .confirm-message {
+    color: #374151;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin: 0;
+  }
 
-	.confirm-actions {
-		display: flex;
-		gap: 0.75rem;
-		justify-content: flex-end;
-		width: 100%;
-	}
+  .confirm-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    width: 100%;
+  }
 
-	.btn-cancel,
-	.btn-confirm {
-		padding: 0.625rem 1.25rem;
-		border-radius: 0.5rem;
-		font-weight: 600;
-		font-size: 0.875rem;
-		cursor: pointer;
-		transition: all 0.2s;
-		border: none;
-	}
+  .btn-cancel,
+  .btn-confirm {
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
 
-	.btn-cancel {
-		background-color: #e5e7eb;
-		color: #374151;
-	}
+  .btn-cancel {
+    background-color: #e5e7eb;
+    color: #374151;
+  }
 
-	.btn-cancel:hover {
-		background-color: #d1d5db;
-	}
+  .btn-cancel:hover {
+    background-color: #d1d5db;
+  }
 
-	.btn-confirm {
-		background-color: #667eea;
-		color: white;
-	}
+  .btn-confirm {
+    background-color: #667eea;
+    color: white;
+  }
 
-	.btn-confirm:hover {
-		background-color: #5568d3;
-	}
+  .btn-confirm:hover {
+    background-color: #5568d3;
+  }
 
-	.btn-confirm.destructive {
-		background-color: #ef4444;
-	}
+  .btn-confirm.destructive {
+    background-color: #ef4444;
+  }
 
-	.btn-confirm.destructive:hover {
-		background-color: #dc2626;
-	}
+  .btn-confirm.destructive:hover {
+    background-color: #dc2626;
+  }
 </style>

@@ -1,63 +1,63 @@
 <script lang="ts">
-	import type { Card as CardType } from '../types';
-	import Card from './game/Card.svelte';
+  import type { Card as CardType } from '../types';
+  import Card from './game/Card.svelte';
 
-	interface Props {
-		cards: CardType[];
-		title: string;
+  interface Props {
+    cards: CardType[];
+    title: string;
 
-		onCardClick?: (cardItem: CardType) => void;
-	}
+    onCardClick?: (cardItem: CardType) => void;
+  }
 
-	let { cards, title, onCardClick }: Props = $props();
+  let { cards, title, onCardClick }: Props = $props();
 </script>
 
 <div class="battlefield">
-	<h2>{title} ({cards.length} creatures)</h2>
+  <h2>{title} ({cards.length} creatures)</h2>
 
-	<div class="cards-grid">
-		{#each cards as cardItem (cardItem.id)}
-			<Card
-				cardId={cardItem.id}
-				cardName={cardItem.name}
-				cardType={cardItem.type}
-				power={cardItem.power || ''}
-				toughness={cardItem.toughness || ''}
-				isTapped={cardItem.tapped}
-				onclick={() => onCardClick?.(cardItem)}
-			/>
-		{/each}
-	</div>
+  <div class="cards-grid">
+    {#each cards as cardItem (cardItem.id)}
+      <Card
+        cardId={cardItem.id}
+        cardName={cardItem.name}
+        cardType={cardItem.type}
+        power={cardItem.power || ''}
+        toughness={cardItem.toughness || ''}
+        isTapped={cardItem.tapped}
+        onclick={() => onCardClick?.(cardItem)}
+      />
+    {/each}
+  </div>
 
-	{#if cards.length === 0}
-		<div class="empty">No creatures on battlefield</div>
-	{/if}
+  {#if cards.length === 0}
+    <div class="empty">No creatures on battlefield</div>
+  {/if}
 </div>
 
 <style>
-	.battlefield {
-		padding: 16px;
-		background: rgba(0, 0, 0, 0.1);
-		border-radius: 8px;
-		min-height: 250px;
-	}
+  .battlefield {
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    min-height: 250px;
+  }
 
-	h2 {
-		margin: 0 0 16px 0;
-		font-size: 18px;
-		color: #333;
-	}
+  h2 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: #333;
+  }
 
-	.cards-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-		gap: 16px;
-	}
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
 
-	.empty {
-		text-align: center;
-		padding: 64px;
-		color: #999;
-		font-style: italic;
-	}
+  .empty {
+    text-align: center;
+    padding: 64px;
+    color: #999;
+    font-style: italic;
+  }
 </style>

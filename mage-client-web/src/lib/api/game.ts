@@ -5,29 +5,29 @@
 
 import { withSession, withSessionValidated } from '$lib/utils/game-api';
 import type {
-	GameJoinRequest,
-	GameJoinResponse,
-	GameGetViewRequest,
-	GameGetViewResponse,
-	SendPlayerActionRequest,
-	SendPlayerActionResponse,
-	SendPlayerUUIDRequest,
-	SendPlayerUUIDResponse,
-	SendPlayerBooleanRequest,
-	SendPlayerBooleanResponse,
-	SendPlayerIntegerRequest,
-	SendPlayerIntegerResponse,
-	SendPlayerStringRequest,
-	SendPlayerStringResponse,
-	SendPlayerManaTypeRequest,
-	SendPlayerManaTypeResponse,
-	SendSpecialActionRequest,
-	SendSpecialActionResponse,
-	ActivateAbilityRequest,
-	ActivateAbilityResponse,
-	MatchQuitRequest,
-	MatchQuitResponse,
-	PlayerAction
+  GameJoinRequest,
+  GameJoinResponse,
+  GameGetViewRequest,
+  GameGetViewResponse,
+  SendPlayerActionRequest,
+  SendPlayerActionResponse,
+  SendPlayerUUIDRequest,
+  SendPlayerUUIDResponse,
+  SendPlayerBooleanRequest,
+  SendPlayerBooleanResponse,
+  SendPlayerIntegerRequest,
+  SendPlayerIntegerResponse,
+  SendPlayerStringRequest,
+  SendPlayerStringResponse,
+  SendPlayerManaTypeRequest,
+  SendPlayerManaTypeResponse,
+  SendSpecialActionRequest,
+  SendSpecialActionResponse,
+  ActivateAbilityRequest,
+  ActivateAbilityResponse,
+  MatchQuitRequest,
+  MatchQuitResponse,
+  PlayerAction
 } from '$lib/generated/mage/v1/game';
 import { SpecialActionType } from '$lib/generated/mage/v1/game';
 import type { GameView } from '$lib/generated/mage/v1/models';
@@ -40,11 +40,11 @@ export { PlayerAction, SpecialActionType } from '$lib/generated/mage/v1/game';
  * Must be called before receiving game updates
  */
 export async function joinGame(gameId: string): Promise<void> {
-	await withSessionValidated<GameJoinRequest, GameJoinResponse>(
-		'GameJoin',
-		(sessionId) => ({ sessionId, gameId }),
-		'Failed to join game'
-	);
+  await withSessionValidated<GameJoinRequest, GameJoinResponse>(
+    'GameJoin',
+    (sessionId) => ({ sessionId, gameId }),
+    'Failed to join game'
+  );
 }
 
 /**
@@ -52,166 +52,166 @@ export async function joinGame(gameId: string): Promise<void> {
  * Returns the full game state from the player's perspective
  */
 export async function fetchGameView(gameId: string, playerId?: string): Promise<GameView> {
-	console.log('[fetchGameView] Starting', { gameId, playerId });
+  console.log('[fetchGameView] Starting', { gameId, playerId });
 
-	console.log('[fetchGameView] Calling GameGetView RPC...');
-	const response = await withSession<GameGetViewRequest, GameGetViewResponse>(
-		'GameGetView',
-		(sessionId) => ({
-			sessionId,
-			gameId,
-			playerId: playerId || ''
-		})
-	);
-	console.log('[fetchGameView] Got response', { hasGame: !!response.game });
+  console.log('[fetchGameView] Calling GameGetView RPC...');
+  const response = await withSession<GameGetViewRequest, GameGetViewResponse>(
+    'GameGetView',
+    (sessionId) => ({
+      sessionId,
+      gameId,
+      playerId: playerId || ''
+    })
+  );
+  console.log('[fetchGameView] Got response', { hasGame: !!response.game });
 
-	if (!response.game) {
-		throw new Error('Failed to get game view - no game data returned');
-	}
+  if (!response.game) {
+    throw new Error('Failed to get game view - no game data returned');
+  }
 
-	return response.game;
+  return response.game;
 }
 
 /**
  * Send a player action (pass priority, concede, etc.)
  */
 export async function sendPlayerAction(gameId: string, action: PlayerAction): Promise<void> {
-	await withSessionValidated<SendPlayerActionRequest, SendPlayerActionResponse>(
-		'SendPlayerAction',
-		(sessionId) => ({ sessionId, gameId, action }),
-		'Failed to send action'
-	);
+  await withSessionValidated<SendPlayerActionRequest, SendPlayerActionResponse>(
+    'SendPlayerAction',
+    (sessionId) => ({ sessionId, gameId, action }),
+    'Failed to send action'
+  );
 }
 
 /**
  * Send a UUID selection (card, permanent, ability target)
  */
 export async function sendPlayerUUID(gameId: string, uuid: string): Promise<void> {
-	await withSessionValidated<SendPlayerUUIDRequest, SendPlayerUUIDResponse>(
-		'SendPlayerUUID',
-		(sessionId) => ({ sessionId, gameId, uuid }),
-		'Failed to send UUID selection'
-	);
+  await withSessionValidated<SendPlayerUUIDRequest, SendPlayerUUIDResponse>(
+    'SendPlayerUUID',
+    (sessionId) => ({ sessionId, gameId, uuid }),
+    'Failed to send UUID selection'
+  );
 }
 
 /**
  * Send a boolean response (yes/no choices)
  */
 export async function sendPlayerBoolean(gameId: string, value: boolean): Promise<void> {
-	await withSessionValidated<SendPlayerBooleanRequest, SendPlayerBooleanResponse>(
-		'SendPlayerBoolean',
-		(sessionId) => ({ sessionId, gameId, data: value }),
-		'Failed to send boolean response'
-	);
+  await withSessionValidated<SendPlayerBooleanRequest, SendPlayerBooleanResponse>(
+    'SendPlayerBoolean',
+    (sessionId) => ({ sessionId, gameId, data: value }),
+    'Failed to send boolean response'
+  );
 }
 
 /**
  * Send an integer response (amount selections)
  */
 export async function sendPlayerInteger(gameId: string, value: number): Promise<void> {
-	await withSessionValidated<SendPlayerIntegerRequest, SendPlayerIntegerResponse>(
-		'SendPlayerInteger',
-		(sessionId) => ({ sessionId, gameId, data: value }),
-		'Failed to send integer response'
-	);
+  await withSessionValidated<SendPlayerIntegerRequest, SendPlayerIntegerResponse>(
+    'SendPlayerInteger',
+    (sessionId) => ({ sessionId, gameId, data: value }),
+    'Failed to send integer response'
+  );
 }
 
 /**
  * Send a string response (mode/choice selections)
  */
 export async function sendPlayerString(gameId: string, value: string): Promise<void> {
-	await withSessionValidated<SendPlayerStringRequest, SendPlayerStringResponse>(
-		'SendPlayerString',
-		(sessionId) => ({ sessionId, gameId, data: value }),
-		'Failed to send string response'
-	);
+  await withSessionValidated<SendPlayerStringRequest, SendPlayerStringResponse>(
+    'SendPlayerString',
+    (sessionId) => ({ sessionId, gameId, data: value }),
+    'Failed to send string response'
+  );
 }
 
 /**
  * Send a mana type selection
  */
 export async function sendPlayerManaType(
-	gameId: string,
-	manaType: string,
-	manaTypeStr?: string
+  gameId: string,
+  manaType: string,
+  manaTypeStr?: string
 ): Promise<void> {
-	await withSessionValidated<SendPlayerManaTypeRequest, SendPlayerManaTypeResponse>(
-		'SendPlayerManaType',
-		(sessionId) => ({
-			sessionId,
-			gameId,
-			manaType,
-			manaTypeStr: manaTypeStr || manaType
-		}),
-		'Failed to send mana type selection'
-	);
+  await withSessionValidated<SendPlayerManaTypeRequest, SendPlayerManaTypeResponse>(
+    'SendPlayerManaType',
+    (sessionId) => ({
+      sessionId,
+      gameId,
+      manaType,
+      manaTypeStr: manaTypeStr || manaType
+    }),
+    'Failed to send mana type selection'
+  );
 }
 
 /**
  * Concede the game
  */
 export async function concedeGame(gameId: string): Promise<void> {
-	return sendPlayerAction(gameId, 4 as PlayerAction); // CONCEDE = 4
+  return sendPlayerAction(gameId, 4 as PlayerAction); // CONCEDE = 4
 }
 
 /**
  * Pass priority
  */
 export async function passPriority(gameId: string): Promise<void> {
-	return sendPlayerAction(gameId, 1 as PlayerAction); // PASS = 1
+  return sendPlayerAction(gameId, 1 as PlayerAction); // PASS = 1
 }
 
 /**
  * Pass until end of turn (F6 in XMage)
  */
 export async function passUntilEndOfTurn(gameId: string): Promise<void> {
-	return sendPlayerAction(gameId, 5 as PlayerAction); // PASS_UNTIL_END_OF_TURN = 5
+  return sendPlayerAction(gameId, 5 as PlayerAction); // PASS_UNTIL_END_OF_TURN = 5
 }
 
 /**
  * Pass until next turn
  */
 export async function passUntilNextTurn(gameId: string): Promise<void> {
-	return sendPlayerAction(gameId, 6 as PlayerAction); // PASS_UNTIL_NEXT_TURN = 6
+  return sendPlayerAction(gameId, 6 as PlayerAction); // PASS_UNTIL_NEXT_TURN = 6
 }
 
 /**
  * Pass until stack is resolved
  */
 export async function passUntilStackResolved(gameId: string): Promise<void> {
-	return sendPlayerAction(gameId, 7 as PlayerAction); // PASS_UNTIL_STACK_RESOLVED = 7
+  return sendPlayerAction(gameId, 7 as PlayerAction); // PASS_UNTIL_STACK_RESOLVED = 7
 }
 
 /**
  * Pass until my next turn
  */
 export async function passUntilMyNextTurn(gameId: string): Promise<void> {
-	return sendPlayerAction(gameId, 8 as PlayerAction); // PASS_UNTIL_MY_NEXT_TURN = 8
+  return sendPlayerAction(gameId, 8 as PlayerAction); // PASS_UNTIL_MY_NEXT_TURN = 8
 }
 
 /**
  * Keep current hand during mulligan phase
  */
 export async function keepHand(gameId: string): Promise<void> {
-	return sendPlayerString(gameId, 'KEEP');
+  return sendPlayerString(gameId, 'KEEP');
 }
 
 /**
  * Mulligan (redraw hand with one fewer card)
  */
 export async function mulligan(gameId: string): Promise<void> {
-	return sendPlayerString(gameId, 'MULLIGAN');
+  return sendPlayerString(gameId, 'MULLIGAN');
 }
 
 /**
  * Quit the match entirely
  */
 export async function quitMatch(gameId: string): Promise<void> {
-	await withSessionValidated<MatchQuitRequest, MatchQuitResponse>(
-		'MatchQuit',
-		(sessionId) => ({ sessionId, gameId }),
-		'Failed to quit match'
-	);
+  await withSessionValidated<MatchQuitRequest, MatchQuitResponse>(
+    'MatchQuit',
+    (sessionId) => ({ sessionId, gameId }),
+    'Failed to quit match'
+  );
 }
 
 /**
@@ -219,15 +219,15 @@ export async function quitMatch(gameId: string): Promise<void> {
  * Per MTG Rule 116.2a: Special actions don't use the stack
  */
 export async function sendSpecialAction(
-	gameId: string,
-	actionType: SpecialActionType,
-	sourceId: string
+  gameId: string,
+  actionType: SpecialActionType,
+  sourceId: string
 ): Promise<void> {
-	await withSessionValidated<SendSpecialActionRequest, SendSpecialActionResponse>(
-		'SendSpecialAction',
-		(sessionId) => ({ sessionId, gameId, actionType, sourceId }),
-		'Failed to execute special action'
-	);
+  await withSessionValidated<SendSpecialActionRequest, SendSpecialActionResponse>(
+    'SendSpecialAction',
+    (sessionId) => ({ sessionId, gameId, actionType, sourceId }),
+    'Failed to execute special action'
+  );
 }
 
 /**
@@ -235,7 +235,7 @@ export async function sendSpecialAction(
  * Convenience wrapper for sendSpecialAction with PLAY_LAND
  */
 export async function playLand(gameId: string, cardId: string): Promise<void> {
-	return sendSpecialAction(gameId, SpecialActionType.PLAY_LAND, cardId);
+  return sendSpecialAction(gameId, SpecialActionType.PLAY_LAND, cardId);
 }
 
 /**
@@ -243,7 +243,7 @@ export async function playLand(gameId: string, cardId: string): Promise<void> {
  * Debug/development feature for manual turn progression
  */
 export async function advancePhase(gameId: string): Promise<void> {
-	return sendSpecialAction(gameId, SpecialActionType.ADVANCE_PHASE, '');
+  return sendSpecialAction(gameId, SpecialActionType.ADVANCE_PHASE, '');
 }
 
 /**
@@ -251,7 +251,7 @@ export async function advancePhase(gameId: string): Promise<void> {
  * Per MTG Rule 605: Mana abilities don't use the stack and resolve immediately
  */
 export async function activateManaAbility(gameId: string, permanentId: string): Promise<void> {
-	return sendSpecialAction(gameId, SpecialActionType.ACTIVATE_MANA_ABILITY, permanentId);
+  return sendSpecialAction(gameId, SpecialActionType.ACTIVATE_MANA_ABILITY, permanentId);
 }
 
 /**
@@ -259,16 +259,16 @@ export async function activateManaAbility(gameId: string, permanentId: string): 
  * Per MTG Rule 602: Activated abilities use the stack
  */
 export async function activateAbility(
-	gameId: string,
-	cardId: string,
-	abilityId: string,
-	targets: string[] = []
+  gameId: string,
+  cardId: string,
+  abilityId: string,
+  targets: string[] = []
 ): Promise<void> {
-	await withSessionValidated<ActivateAbilityRequest, ActivateAbilityResponse>(
-		'ActivateAbility',
-		(sessionId) => ({ sessionId, gameId, cardId, abilityId, targets }),
-		'Failed to activate ability'
-	);
+  await withSessionValidated<ActivateAbilityRequest, ActivateAbilityResponse>(
+    'ActivateAbility',
+    (sessionId) => ({ sessionId, gameId, cardId, abilityId, targets }),
+    'Failed to activate ability'
+  );
 }
 
 // ============================================================================
@@ -284,11 +284,11 @@ export async function activateAbility(
  * @param defenderId - The defender (player or planeswalker) being attacked
  */
 export async function declareAttacker(
-	gameId: string,
-	cardId: string,
-	defenderId: string
+  gameId: string,
+  cardId: string,
+  defenderId: string
 ): Promise<void> {
-	return sendPlayerString(gameId, `ATTACK:${cardId}:${defenderId}`);
+  return sendPlayerString(gameId, `ATTACK:${cardId}:${defenderId}`);
 }
 
 /**
@@ -296,7 +296,7 @@ export async function declareAttacker(
  * Per MTG Rule 508.1: All attackers are declared simultaneously
  */
 export async function finishDeclaringAttackers(gameId: string): Promise<void> {
-	return sendPlayerString(gameId, 'DONE_ATTACKING');
+  return sendPlayerString(gameId, 'DONE_ATTACKING');
 }
 
 /**
@@ -306,13 +306,13 @@ export async function finishDeclaringAttackers(gameId: string): Promise<void> {
  * @param attackers - Array of attacker declarations
  */
 export async function declareAttackers(
-	gameId: string,
-	attackers: Array<{ cardId: string; defenderId: string }>
+  gameId: string,
+  attackers: Array<{ cardId: string; defenderId: string }>
 ): Promise<void> {
-	for (const attacker of attackers) {
-		await declareAttacker(gameId, attacker.cardId, attacker.defenderId);
-	}
-	await finishDeclaringAttackers(gameId);
+  for (const attacker of attackers) {
+    await declareAttacker(gameId, attacker.cardId, attacker.defenderId);
+  }
+  await finishDeclaringAttackers(gameId);
 }
 
 /**
@@ -323,11 +323,11 @@ export async function declareAttackers(
  * @param attackerId - The attacking creature being blocked
  */
 export async function declareBlocker(
-	gameId: string,
-	blockerId: string,
-	attackerId: string
+  gameId: string,
+  blockerId: string,
+  attackerId: string
 ): Promise<void> {
-	return sendPlayerString(gameId, `BLOCK:${blockerId}:${attackerId}`);
+  return sendPlayerString(gameId, `BLOCK:${blockerId}:${attackerId}`);
 }
 
 /**
@@ -335,7 +335,7 @@ export async function declareBlocker(
  * Per MTG Rule 509.1: All blockers are declared simultaneously
  */
 export async function finishDeclaringBlockers(gameId: string): Promise<void> {
-	return sendPlayerString(gameId, 'DONE_BLOCKING');
+  return sendPlayerString(gameId, 'DONE_BLOCKING');
 }
 
 /**
@@ -345,13 +345,13 @@ export async function finishDeclaringBlockers(gameId: string): Promise<void> {
  * @param blockers - Array of blocker assignments
  */
 export async function declareBlockers(
-	gameId: string,
-	blockers: Array<{ blockerId: string; attackerId: string }>
+  gameId: string,
+  blockers: Array<{ blockerId: string; attackerId: string }>
 ): Promise<void> {
-	for (const blocker of blockers) {
-		await declareBlocker(gameId, blocker.blockerId, blocker.attackerId);
-	}
-	await finishDeclaringBlockers(gameId);
+  for (const blocker of blockers) {
+    await declareBlocker(gameId, blocker.blockerId, blocker.attackerId);
+  }
+  await finishDeclaringBlockers(gameId);
 }
 
 /**
@@ -361,14 +361,14 @@ export async function declareBlockers(
  * @param assignments - Array of damage assignments (targetId + damage amount)
  */
 export async function assignCombatDamage(
-	gameId: string,
-	assignments: Array<{ targetId: string; damage: number }>
+  gameId: string,
+  assignments: Array<{ targetId: string; damage: number }>
 ): Promise<void> {
-	// Format: DAMAGE:targetId:amount for each assignment
-	for (const assignment of assignments) {
-		await sendPlayerString(gameId, `DAMAGE:${assignment.targetId}:${assignment.damage}`);
-	}
-	await sendPlayerString(gameId, 'DONE_DAMAGE');
+  // Format: DAMAGE:targetId:amount for each assignment
+  for (const assignment of assignments) {
+    await sendPlayerString(gameId, `DAMAGE:${assignment.targetId}:${assignment.damage}`);
+  }
+  await sendPlayerString(gameId, 'DONE_DAMAGE');
 }
 
 /**
@@ -376,7 +376,7 @@ export async function assignCombatDamage(
  * Convenience function to immediately finish declaring attackers with none selected
  */
 export async function skipCombat(gameId: string): Promise<void> {
-	return finishDeclaringAttackers(gameId);
+  return finishDeclaringAttackers(gameId);
 }
 
 /**
@@ -384,7 +384,7 @@ export async function skipCombat(gameId: string): Promise<void> {
  * Convenience function to immediately finish declaring blockers with none selected
  */
 export async function declineToBlock(gameId: string): Promise<void> {
-	return finishDeclaringBlockers(gameId);
+  return finishDeclaringBlockers(gameId);
 }
 
 // ============================================================================
@@ -393,12 +393,12 @@ export async function declineToBlock(gameId: string): Promise<void> {
 // ============================================================================
 
 import type {
-	RequestRollbackRequest,
-	RequestRollbackResponse,
-	RespondToRollbackRequest,
-	RespondToRollbackResponse,
-	CancelRollbackRequest,
-	CancelRollbackResponse
+  RequestRollbackRequest,
+  RequestRollbackResponse,
+  RespondToRollbackRequest,
+  RespondToRollbackResponse,
+  CancelRollbackRequest,
+  CancelRollbackResponse
 } from '$lib/generated/mage/v1/game';
 
 /**
@@ -409,19 +409,19 @@ import type {
  * @returns Object containing success status and requestId (for multiplayer)
  */
 export async function requestRollback(
-	gameId: string,
-	messageId: number
+  gameId: string,
+  messageId: number
 ): Promise<{ success: boolean; requestId: string; error?: string }> {
-	const response = await withSession<RequestRollbackRequest, RequestRollbackResponse>(
-		'RequestRollback',
-		(sessionId) => ({ sessionId, gameId, messageId })
-	);
+  const response = await withSession<RequestRollbackRequest, RequestRollbackResponse>(
+    'RequestRollback',
+    (sessionId) => ({ sessionId, gameId, messageId })
+  );
 
-	return {
-		success: response.success,
-		requestId: response.requestId,
-		error: response.error
-	};
+  return {
+    success: response.success,
+    requestId: response.requestId,
+    error: response.error
+  };
 }
 
 /**
@@ -431,19 +431,19 @@ export async function requestRollback(
  * @param approved - Whether to approve or deny the rollback
  */
 export async function respondToRollback(
-	gameId: string,
-	requestId: string,
-	approved: boolean
+  gameId: string,
+  requestId: string,
+  approved: boolean
 ): Promise<{ success: boolean; error?: string }> {
-	const response = await withSession<RespondToRollbackRequest, RespondToRollbackResponse>(
-		'RespondToRollback',
-		(sessionId) => ({ sessionId, gameId, requestId, approved })
-	);
+  const response = await withSession<RespondToRollbackRequest, RespondToRollbackResponse>(
+    'RespondToRollback',
+    (sessionId) => ({ sessionId, gameId, requestId, approved })
+  );
 
-	return {
-		success: response.success,
-		error: response.error
-	};
+  return {
+    success: response.success,
+    error: response.error
+  };
 }
 
 /**
@@ -452,16 +452,16 @@ export async function respondToRollback(
  * @param requestId - The rollback request ID to cancel
  */
 export async function cancelRollback(
-	gameId: string,
-	requestId: string
+  gameId: string,
+  requestId: string
 ): Promise<{ success: boolean; error?: string }> {
-	const response = await withSession<CancelRollbackRequest, CancelRollbackResponse>(
-		'CancelRollback',
-		(sessionId) => ({ sessionId, gameId, requestId }) as CancelRollbackRequest
-	);
+  const response = await withSession<CancelRollbackRequest, CancelRollbackResponse>(
+    'CancelRollback',
+    (sessionId) => ({ sessionId, gameId, requestId }) as CancelRollbackRequest
+  );
 
-	return {
-		success: response.success,
-		error: response.error
-	};
+  return {
+    success: response.success,
+    error: response.error
+  };
 }

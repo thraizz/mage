@@ -8,907 +8,907 @@
 import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
 
 export interface DraftJoinRequest {
-	sessionId: string;
-	draftId: string;
+  sessionId: string;
+  draftId: string;
 }
 
 export interface DraftJoinResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface SendDraftCardPickRequest {
-	sessionId: string;
-	draftId: string;
-	cardId: string;
-	hiddenCards: string[];
+  sessionId: string;
+  draftId: string;
+  cardId: string;
+  hiddenCards: string[];
 }
 
 export interface SendDraftCardPickResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface SendDraftCardMarkRequest {
-	sessionId: string;
-	draftId: string;
-	cardId: string;
+  sessionId: string;
+  draftId: string;
+  cardId: string;
 }
 
 export interface SendDraftCardMarkResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface DraftSetBoosterLoadedRequest {
-	sessionId: string;
-	draftId: string;
+  sessionId: string;
+  draftId: string;
 }
 
 export interface DraftSetBoosterLoadedResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface DraftQuitRequest {
-	sessionId: string;
-	draftId: string;
+  sessionId: string;
+  draftId: string;
 }
 
 export interface DraftQuitResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 function createBaseDraftJoinRequest(): DraftJoinRequest {
-	return { sessionId: '', draftId: '' };
+  return { sessionId: '', draftId: '' };
 }
 
 export const DraftJoinRequest: MessageFns<DraftJoinRequest> = {
-	encode(message: DraftJoinRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.draftId !== '') {
-			writer.uint32(18).string(message.draftId);
-		}
-		return writer;
-	},
+  encode(message: DraftJoinRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.draftId !== '') {
+      writer.uint32(18).string(message.draftId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DraftJoinRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDraftJoinRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DraftJoinRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDraftJoinRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.draftId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.draftId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DraftJoinRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : ''
-		};
-	},
+  fromJSON(object: any): DraftJoinRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : ''
+    };
+  },
 
-	toJSON(message: DraftJoinRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.draftId !== '') {
-			obj.draftId = message.draftId;
-		}
-		return obj;
-	},
+  toJSON(message: DraftJoinRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.draftId !== '') {
+      obj.draftId = message.draftId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DraftJoinRequest>): DraftJoinRequest {
-		return DraftJoinRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DraftJoinRequest>): DraftJoinRequest {
-		const message = createBaseDraftJoinRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.draftId = object.draftId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DraftJoinRequest>): DraftJoinRequest {
+    return DraftJoinRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DraftJoinRequest>): DraftJoinRequest {
+    const message = createBaseDraftJoinRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.draftId = object.draftId ?? '';
+    return message;
+  }
 };
 
 function createBaseDraftJoinResponse(): DraftJoinResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const DraftJoinResponse: MessageFns<DraftJoinResponse> = {
-	encode(message: DraftJoinResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: DraftJoinResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DraftJoinResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDraftJoinResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DraftJoinResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDraftJoinResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DraftJoinResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): DraftJoinResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: DraftJoinResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: DraftJoinResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DraftJoinResponse>): DraftJoinResponse {
-		return DraftJoinResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DraftJoinResponse>): DraftJoinResponse {
-		const message = createBaseDraftJoinResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DraftJoinResponse>): DraftJoinResponse {
+    return DraftJoinResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DraftJoinResponse>): DraftJoinResponse {
+    const message = createBaseDraftJoinResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseSendDraftCardPickRequest(): SendDraftCardPickRequest {
-	return { sessionId: '', draftId: '', cardId: '', hiddenCards: [] };
+  return { sessionId: '', draftId: '', cardId: '', hiddenCards: [] };
 }
 
 export const SendDraftCardPickRequest: MessageFns<SendDraftCardPickRequest> = {
-	encode(
-		message: SendDraftCardPickRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.draftId !== '') {
-			writer.uint32(18).string(message.draftId);
-		}
-		if (message.cardId !== '') {
-			writer.uint32(26).string(message.cardId);
-		}
-		for (const v of message.hiddenCards) {
-			writer.uint32(34).string(v!);
-		}
-		return writer;
-	},
+  encode(
+    message: SendDraftCardPickRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.draftId !== '') {
+      writer.uint32(18).string(message.draftId);
+    }
+    if (message.cardId !== '') {
+      writer.uint32(26).string(message.cardId);
+    }
+    for (const v of message.hiddenCards) {
+      writer.uint32(34).string(v!);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendDraftCardPickRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendDraftCardPickRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendDraftCardPickRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendDraftCardPickRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.draftId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.draftId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.cardId = reader.string();
-					continue;
-				}
-				case 4: {
-					if (tag !== 34) {
-						break;
-					}
+          message.cardId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-					message.hiddenCards.push(reader.string());
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.hiddenCards.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendDraftCardPickRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : '',
-			cardId: isSet(object.cardId) ? globalThis.String(object.cardId) : '',
-			hiddenCards: globalThis.Array.isArray(object?.hiddenCards)
-				? object.hiddenCards.map((e: any) => globalThis.String(e))
-				: []
-		};
-	},
+  fromJSON(object: any): SendDraftCardPickRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : '',
+      cardId: isSet(object.cardId) ? globalThis.String(object.cardId) : '',
+      hiddenCards: globalThis.Array.isArray(object?.hiddenCards)
+        ? object.hiddenCards.map((e: any) => globalThis.String(e))
+        : []
+    };
+  },
 
-	toJSON(message: SendDraftCardPickRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.draftId !== '') {
-			obj.draftId = message.draftId;
-		}
-		if (message.cardId !== '') {
-			obj.cardId = message.cardId;
-		}
-		if (message.hiddenCards?.length) {
-			obj.hiddenCards = message.hiddenCards;
-		}
-		return obj;
-	},
+  toJSON(message: SendDraftCardPickRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.draftId !== '') {
+      obj.draftId = message.draftId;
+    }
+    if (message.cardId !== '') {
+      obj.cardId = message.cardId;
+    }
+    if (message.hiddenCards?.length) {
+      obj.hiddenCards = message.hiddenCards;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendDraftCardPickRequest>): SendDraftCardPickRequest {
-		return SendDraftCardPickRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendDraftCardPickRequest>): SendDraftCardPickRequest {
-		const message = createBaseSendDraftCardPickRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.draftId = object.draftId ?? '';
-		message.cardId = object.cardId ?? '';
-		message.hiddenCards = object.hiddenCards?.map((e) => e) || [];
-		return message;
-	}
+  create(base?: DeepPartial<SendDraftCardPickRequest>): SendDraftCardPickRequest {
+    return SendDraftCardPickRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendDraftCardPickRequest>): SendDraftCardPickRequest {
+    const message = createBaseSendDraftCardPickRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.draftId = object.draftId ?? '';
+    message.cardId = object.cardId ?? '';
+    message.hiddenCards = object.hiddenCards?.map((e) => e) || [];
+    return message;
+  }
 };
 
 function createBaseSendDraftCardPickResponse(): SendDraftCardPickResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const SendDraftCardPickResponse: MessageFns<SendDraftCardPickResponse> = {
-	encode(
-		message: SendDraftCardPickResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: SendDraftCardPickResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendDraftCardPickResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendDraftCardPickResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendDraftCardPickResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendDraftCardPickResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendDraftCardPickResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): SendDraftCardPickResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: SendDraftCardPickResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: SendDraftCardPickResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendDraftCardPickResponse>): SendDraftCardPickResponse {
-		return SendDraftCardPickResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendDraftCardPickResponse>): SendDraftCardPickResponse {
-		const message = createBaseSendDraftCardPickResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendDraftCardPickResponse>): SendDraftCardPickResponse {
+    return SendDraftCardPickResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendDraftCardPickResponse>): SendDraftCardPickResponse {
+    const message = createBaseSendDraftCardPickResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseSendDraftCardMarkRequest(): SendDraftCardMarkRequest {
-	return { sessionId: '', draftId: '', cardId: '' };
+  return { sessionId: '', draftId: '', cardId: '' };
 }
 
 export const SendDraftCardMarkRequest: MessageFns<SendDraftCardMarkRequest> = {
-	encode(
-		message: SendDraftCardMarkRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.draftId !== '') {
-			writer.uint32(18).string(message.draftId);
-		}
-		if (message.cardId !== '') {
-			writer.uint32(26).string(message.cardId);
-		}
-		return writer;
-	},
+  encode(
+    message: SendDraftCardMarkRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.draftId !== '') {
+      writer.uint32(18).string(message.draftId);
+    }
+    if (message.cardId !== '') {
+      writer.uint32(26).string(message.cardId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendDraftCardMarkRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendDraftCardMarkRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendDraftCardMarkRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendDraftCardMarkRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.draftId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.draftId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.cardId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.cardId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendDraftCardMarkRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : '',
-			cardId: isSet(object.cardId) ? globalThis.String(object.cardId) : ''
-		};
-	},
+  fromJSON(object: any): SendDraftCardMarkRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : '',
+      cardId: isSet(object.cardId) ? globalThis.String(object.cardId) : ''
+    };
+  },
 
-	toJSON(message: SendDraftCardMarkRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.draftId !== '') {
-			obj.draftId = message.draftId;
-		}
-		if (message.cardId !== '') {
-			obj.cardId = message.cardId;
-		}
-		return obj;
-	},
+  toJSON(message: SendDraftCardMarkRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.draftId !== '') {
+      obj.draftId = message.draftId;
+    }
+    if (message.cardId !== '') {
+      obj.cardId = message.cardId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendDraftCardMarkRequest>): SendDraftCardMarkRequest {
-		return SendDraftCardMarkRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendDraftCardMarkRequest>): SendDraftCardMarkRequest {
-		const message = createBaseSendDraftCardMarkRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.draftId = object.draftId ?? '';
-		message.cardId = object.cardId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendDraftCardMarkRequest>): SendDraftCardMarkRequest {
+    return SendDraftCardMarkRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendDraftCardMarkRequest>): SendDraftCardMarkRequest {
+    const message = createBaseSendDraftCardMarkRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.draftId = object.draftId ?? '';
+    message.cardId = object.cardId ?? '';
+    return message;
+  }
 };
 
 function createBaseSendDraftCardMarkResponse(): SendDraftCardMarkResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const SendDraftCardMarkResponse: MessageFns<SendDraftCardMarkResponse> = {
-	encode(
-		message: SendDraftCardMarkResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: SendDraftCardMarkResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): SendDraftCardMarkResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseSendDraftCardMarkResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): SendDraftCardMarkResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSendDraftCardMarkResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): SendDraftCardMarkResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): SendDraftCardMarkResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: SendDraftCardMarkResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: SendDraftCardMarkResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<SendDraftCardMarkResponse>): SendDraftCardMarkResponse {
-		return SendDraftCardMarkResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<SendDraftCardMarkResponse>): SendDraftCardMarkResponse {
-		const message = createBaseSendDraftCardMarkResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<SendDraftCardMarkResponse>): SendDraftCardMarkResponse {
+    return SendDraftCardMarkResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SendDraftCardMarkResponse>): SendDraftCardMarkResponse {
+    const message = createBaseSendDraftCardMarkResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseDraftSetBoosterLoadedRequest(): DraftSetBoosterLoadedRequest {
-	return { sessionId: '', draftId: '' };
+  return { sessionId: '', draftId: '' };
 }
 
 export const DraftSetBoosterLoadedRequest: MessageFns<DraftSetBoosterLoadedRequest> = {
-	encode(
-		message: DraftSetBoosterLoadedRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.draftId !== '') {
-			writer.uint32(18).string(message.draftId);
-		}
-		return writer;
-	},
+  encode(
+    message: DraftSetBoosterLoadedRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.draftId !== '') {
+      writer.uint32(18).string(message.draftId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DraftSetBoosterLoadedRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDraftSetBoosterLoadedRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DraftSetBoosterLoadedRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDraftSetBoosterLoadedRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.draftId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.draftId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DraftSetBoosterLoadedRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : ''
-		};
-	},
+  fromJSON(object: any): DraftSetBoosterLoadedRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : ''
+    };
+  },
 
-	toJSON(message: DraftSetBoosterLoadedRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.draftId !== '') {
-			obj.draftId = message.draftId;
-		}
-		return obj;
-	},
+  toJSON(message: DraftSetBoosterLoadedRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.draftId !== '') {
+      obj.draftId = message.draftId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DraftSetBoosterLoadedRequest>): DraftSetBoosterLoadedRequest {
-		return DraftSetBoosterLoadedRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DraftSetBoosterLoadedRequest>): DraftSetBoosterLoadedRequest {
-		const message = createBaseDraftSetBoosterLoadedRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.draftId = object.draftId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DraftSetBoosterLoadedRequest>): DraftSetBoosterLoadedRequest {
+    return DraftSetBoosterLoadedRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DraftSetBoosterLoadedRequest>): DraftSetBoosterLoadedRequest {
+    const message = createBaseDraftSetBoosterLoadedRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.draftId = object.draftId ?? '';
+    return message;
+  }
 };
 
 function createBaseDraftSetBoosterLoadedResponse(): DraftSetBoosterLoadedResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const DraftSetBoosterLoadedResponse: MessageFns<DraftSetBoosterLoadedResponse> = {
-	encode(
-		message: DraftSetBoosterLoadedResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: DraftSetBoosterLoadedResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DraftSetBoosterLoadedResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDraftSetBoosterLoadedResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DraftSetBoosterLoadedResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDraftSetBoosterLoadedResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DraftSetBoosterLoadedResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): DraftSetBoosterLoadedResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: DraftSetBoosterLoadedResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: DraftSetBoosterLoadedResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DraftSetBoosterLoadedResponse>): DraftSetBoosterLoadedResponse {
-		return DraftSetBoosterLoadedResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DraftSetBoosterLoadedResponse>): DraftSetBoosterLoadedResponse {
-		const message = createBaseDraftSetBoosterLoadedResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DraftSetBoosterLoadedResponse>): DraftSetBoosterLoadedResponse {
+    return DraftSetBoosterLoadedResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DraftSetBoosterLoadedResponse>): DraftSetBoosterLoadedResponse {
+    const message = createBaseDraftSetBoosterLoadedResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseDraftQuitRequest(): DraftQuitRequest {
-	return { sessionId: '', draftId: '' };
+  return { sessionId: '', draftId: '' };
 }
 
 export const DraftQuitRequest: MessageFns<DraftQuitRequest> = {
-	encode(message: DraftQuitRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.draftId !== '') {
-			writer.uint32(18).string(message.draftId);
-		}
-		return writer;
-	},
+  encode(message: DraftQuitRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.draftId !== '') {
+      writer.uint32(18).string(message.draftId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DraftQuitRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDraftQuitRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DraftQuitRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDraftQuitRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.draftId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.draftId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DraftQuitRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : ''
-		};
-	},
+  fromJSON(object: any): DraftQuitRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      draftId: isSet(object.draftId) ? globalThis.String(object.draftId) : ''
+    };
+  },
 
-	toJSON(message: DraftQuitRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.draftId !== '') {
-			obj.draftId = message.draftId;
-		}
-		return obj;
-	},
+  toJSON(message: DraftQuitRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.draftId !== '') {
+      obj.draftId = message.draftId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DraftQuitRequest>): DraftQuitRequest {
-		return DraftQuitRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DraftQuitRequest>): DraftQuitRequest {
-		const message = createBaseDraftQuitRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.draftId = object.draftId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DraftQuitRequest>): DraftQuitRequest {
+    return DraftQuitRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DraftQuitRequest>): DraftQuitRequest {
+    const message = createBaseDraftQuitRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.draftId = object.draftId ?? '';
+    return message;
+  }
 };
 
 function createBaseDraftQuitResponse(): DraftQuitResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const DraftQuitResponse: MessageFns<DraftQuitResponse> = {
-	encode(message: DraftQuitResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: DraftQuitResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): DraftQuitResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseDraftQuitResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): DraftQuitResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDraftQuitResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): DraftQuitResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): DraftQuitResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: DraftQuitResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: DraftQuitResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<DraftQuitResponse>): DraftQuitResponse {
-		return DraftQuitResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<DraftQuitResponse>): DraftQuitResponse {
-		const message = createBaseDraftQuitResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<DraftQuitResponse>): DraftQuitResponse {
+    return DraftQuitResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DraftQuitResponse>): DraftQuitResponse {
+    const message = createBaseDraftQuitResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 type DeepPartial<T> = T extends Builtin
-	? T
-	: T extends globalThis.Array<infer U>
-		? globalThis.Array<DeepPartial<U>>
-		: T extends ReadonlyArray<infer U>
-			? ReadonlyArray<DeepPartial<U>>
-			: T extends {}
-				? { [K in keyof T]?: DeepPartial<T[K]> }
-				: Partial<T>;
+  ? T
+  : T extends globalThis.Array<infer U>
+    ? globalThis.Array<DeepPartial<U>>
+    : T extends ReadonlyArray<infer U>
+      ? ReadonlyArray<DeepPartial<U>>
+      : T extends {}
+        ? { [K in keyof T]?: DeepPartial<T[K]> }
+        : Partial<T>;
 
 function isSet(value: any): boolean {
-	return value !== null && value !== undefined;
+  return value !== null && value !== undefined;
 }
 
 interface MessageFns<T> {
-	encode(message: T, writer?: BinaryWriter): BinaryWriter;
-	decode(input: BinaryReader | Uint8Array, length?: number): T;
-	fromJSON(object: any): T;
-	toJSON(message: T): unknown;
-	create(base?: DeepPartial<T>): T;
-	fromPartial(object: DeepPartial<T>): T;
+  encode(message: T, writer?: BinaryWriter): BinaryWriter;
+  decode(input: BinaryReader | Uint8Array, length?: number): T;
+  fromJSON(object: any): T;
+  toJSON(message: T): unknown;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }

@@ -8,1113 +8,1113 @@
 import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
 
 export interface ChatJoinRequest {
-	sessionId: string;
-	chatId: string;
+  sessionId: string;
+  chatId: string;
 }
 
 export interface ChatJoinResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ChatLeaveRequest {
-	sessionId: string;
-	chatId: string;
+  sessionId: string;
+  chatId: string;
 }
 
 export interface ChatLeaveResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ChatSendMessageRequest {
-	sessionId: string;
-	chatId: string;
-	message: string;
+  sessionId: string;
+  chatId: string;
+  message: string;
 }
 
 export interface ChatSendMessageResponse {
-	success: boolean;
-	error: string;
+  success: boolean;
+  error: string;
 }
 
 export interface ChatFindByTableRequest {
-	sessionId: string;
-	tableId: string;
+  sessionId: string;
+  tableId: string;
 }
 
 export interface ChatFindByTableResponse {
-	chatId: string;
+  chatId: string;
 }
 
 export interface ChatFindByGameRequest {
-	sessionId: string;
-	gameId: string;
+  sessionId: string;
+  gameId: string;
 }
 
 export interface ChatFindByGameResponse {
-	chatId: string;
+  chatId: string;
 }
 
 export interface ChatFindByTournamentRequest {
-	sessionId: string;
-	tournamentId: string;
+  sessionId: string;
+  tournamentId: string;
 }
 
 export interface ChatFindByTournamentResponse {
-	chatId: string;
+  chatId: string;
 }
 
 export interface ChatFindByRoomRequest {
-	sessionId: string;
-	roomId: string;
+  sessionId: string;
+  roomId: string;
 }
 
 export interface ChatFindByRoomResponse {
-	chatId: string;
+  chatId: string;
 }
 
 function createBaseChatJoinRequest(): ChatJoinRequest {
-	return { sessionId: '', chatId: '' };
+  return { sessionId: '', chatId: '' };
 }
 
 export const ChatJoinRequest: MessageFns<ChatJoinRequest> = {
-	encode(message: ChatJoinRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.chatId !== '') {
-			writer.uint32(18).string(message.chatId);
-		}
-		return writer;
-	},
+  encode(message: ChatJoinRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.chatId !== '') {
+      writer.uint32(18).string(message.chatId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatJoinRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatJoinRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatJoinRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatJoinRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.chatId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.chatId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatJoinRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : ''
-		};
-	},
+  fromJSON(object: any): ChatJoinRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : ''
+    };
+  },
 
-	toJSON(message: ChatJoinRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.chatId !== '') {
-			obj.chatId = message.chatId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatJoinRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.chatId !== '') {
+      obj.chatId = message.chatId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatJoinRequest>): ChatJoinRequest {
-		return ChatJoinRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatJoinRequest>): ChatJoinRequest {
-		const message = createBaseChatJoinRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.chatId = object.chatId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatJoinRequest>): ChatJoinRequest {
+    return ChatJoinRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatJoinRequest>): ChatJoinRequest {
+    const message = createBaseChatJoinRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.chatId = object.chatId ?? '';
+    return message;
+  }
 };
 
 function createBaseChatJoinResponse(): ChatJoinResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ChatJoinResponse: MessageFns<ChatJoinResponse> = {
-	encode(message: ChatJoinResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ChatJoinResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatJoinResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatJoinResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatJoinResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatJoinResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatJoinResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ChatJoinResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ChatJoinResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ChatJoinResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatJoinResponse>): ChatJoinResponse {
-		return ChatJoinResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatJoinResponse>): ChatJoinResponse {
-		const message = createBaseChatJoinResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatJoinResponse>): ChatJoinResponse {
+    return ChatJoinResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatJoinResponse>): ChatJoinResponse {
+    const message = createBaseChatJoinResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseChatLeaveRequest(): ChatLeaveRequest {
-	return { sessionId: '', chatId: '' };
+  return { sessionId: '', chatId: '' };
 }
 
 export const ChatLeaveRequest: MessageFns<ChatLeaveRequest> = {
-	encode(message: ChatLeaveRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.chatId !== '') {
-			writer.uint32(18).string(message.chatId);
-		}
-		return writer;
-	},
+  encode(message: ChatLeaveRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.chatId !== '') {
+      writer.uint32(18).string(message.chatId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatLeaveRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatLeaveRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatLeaveRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatLeaveRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.chatId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.chatId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatLeaveRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : ''
-		};
-	},
+  fromJSON(object: any): ChatLeaveRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : ''
+    };
+  },
 
-	toJSON(message: ChatLeaveRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.chatId !== '') {
-			obj.chatId = message.chatId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatLeaveRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.chatId !== '') {
+      obj.chatId = message.chatId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatLeaveRequest>): ChatLeaveRequest {
-		return ChatLeaveRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatLeaveRequest>): ChatLeaveRequest {
-		const message = createBaseChatLeaveRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.chatId = object.chatId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatLeaveRequest>): ChatLeaveRequest {
+    return ChatLeaveRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatLeaveRequest>): ChatLeaveRequest {
+    const message = createBaseChatLeaveRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.chatId = object.chatId ?? '';
+    return message;
+  }
 };
 
 function createBaseChatLeaveResponse(): ChatLeaveResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ChatLeaveResponse: MessageFns<ChatLeaveResponse> = {
-	encode(message: ChatLeaveResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(message: ChatLeaveResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatLeaveResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatLeaveResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatLeaveResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatLeaveResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatLeaveResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ChatLeaveResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ChatLeaveResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ChatLeaveResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatLeaveResponse>): ChatLeaveResponse {
-		return ChatLeaveResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatLeaveResponse>): ChatLeaveResponse {
-		const message = createBaseChatLeaveResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatLeaveResponse>): ChatLeaveResponse {
+    return ChatLeaveResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatLeaveResponse>): ChatLeaveResponse {
+    const message = createBaseChatLeaveResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseChatSendMessageRequest(): ChatSendMessageRequest {
-	return { sessionId: '', chatId: '', message: '' };
+  return { sessionId: '', chatId: '', message: '' };
 }
 
 export const ChatSendMessageRequest: MessageFns<ChatSendMessageRequest> = {
-	encode(message: ChatSendMessageRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.chatId !== '') {
-			writer.uint32(18).string(message.chatId);
-		}
-		if (message.message !== '') {
-			writer.uint32(26).string(message.message);
-		}
-		return writer;
-	},
+  encode(message: ChatSendMessageRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.chatId !== '') {
+      writer.uint32(18).string(message.chatId);
+    }
+    if (message.message !== '') {
+      writer.uint32(26).string(message.message);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatSendMessageRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatSendMessageRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatSendMessageRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatSendMessageRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.chatId = reader.string();
-					continue;
-				}
-				case 3: {
-					if (tag !== 26) {
-						break;
-					}
+          message.chatId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-					message.message = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.message = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatSendMessageRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '',
-			message: isSet(object.message) ? globalThis.String(object.message) : ''
-		};
-	},
+  fromJSON(object: any): ChatSendMessageRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '',
+      message: isSet(object.message) ? globalThis.String(object.message) : ''
+    };
+  },
 
-	toJSON(message: ChatSendMessageRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.chatId !== '') {
-			obj.chatId = message.chatId;
-		}
-		if (message.message !== '') {
-			obj.message = message.message;
-		}
-		return obj;
-	},
+  toJSON(message: ChatSendMessageRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.chatId !== '') {
+      obj.chatId = message.chatId;
+    }
+    if (message.message !== '') {
+      obj.message = message.message;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatSendMessageRequest>): ChatSendMessageRequest {
-		return ChatSendMessageRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatSendMessageRequest>): ChatSendMessageRequest {
-		const message = createBaseChatSendMessageRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.chatId = object.chatId ?? '';
-		message.message = object.message ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatSendMessageRequest>): ChatSendMessageRequest {
+    return ChatSendMessageRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatSendMessageRequest>): ChatSendMessageRequest {
+    const message = createBaseChatSendMessageRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.chatId = object.chatId ?? '';
+    message.message = object.message ?? '';
+    return message;
+  }
 };
 
 function createBaseChatSendMessageResponse(): ChatSendMessageResponse {
-	return { success: false, error: '' };
+  return { success: false, error: '' };
 }
 
 export const ChatSendMessageResponse: MessageFns<ChatSendMessageResponse> = {
-	encode(
-		message: ChatSendMessageResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.success !== false) {
-			writer.uint32(8).bool(message.success);
-		}
-		if (message.error !== '') {
-			writer.uint32(18).string(message.error);
-		}
-		return writer;
-	},
+  encode(
+    message: ChatSendMessageResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.error !== '') {
+      writer.uint32(18).string(message.error);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatSendMessageResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatSendMessageResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatSendMessageResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatSendMessageResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.success = reader.bool();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.error = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.error = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatSendMessageResponse {
-		return {
-			success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-			error: isSet(object.error) ? globalThis.String(object.error) : ''
-		};
-	},
+  fromJSON(object: any): ChatSendMessageResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      error: isSet(object.error) ? globalThis.String(object.error) : ''
+    };
+  },
 
-	toJSON(message: ChatSendMessageResponse): unknown {
-		const obj: any = {};
-		if (message.success !== false) {
-			obj.success = message.success;
-		}
-		if (message.error !== '') {
-			obj.error = message.error;
-		}
-		return obj;
-	},
+  toJSON(message: ChatSendMessageResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.error !== '') {
+      obj.error = message.error;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatSendMessageResponse>): ChatSendMessageResponse {
-		return ChatSendMessageResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatSendMessageResponse>): ChatSendMessageResponse {
-		const message = createBaseChatSendMessageResponse();
-		message.success = object.success ?? false;
-		message.error = object.error ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatSendMessageResponse>): ChatSendMessageResponse {
+    return ChatSendMessageResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatSendMessageResponse>): ChatSendMessageResponse {
+    const message = createBaseChatSendMessageResponse();
+    message.success = object.success ?? false;
+    message.error = object.error ?? '';
+    return message;
+  }
 };
 
 function createBaseChatFindByTableRequest(): ChatFindByTableRequest {
-	return { sessionId: '', tableId: '' };
+  return { sessionId: '', tableId: '' };
 }
 
 export const ChatFindByTableRequest: MessageFns<ChatFindByTableRequest> = {
-	encode(message: ChatFindByTableRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.tableId !== '') {
-			writer.uint32(18).string(message.tableId);
-		}
-		return writer;
-	},
+  encode(message: ChatFindByTableRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.tableId !== '') {
+      writer.uint32(18).string(message.tableId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByTableRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatFindByTableRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByTableRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatFindByTableRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.tableId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tableId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatFindByTableRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
-		};
-	},
+  fromJSON(object: any): ChatFindByTableRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      tableId: isSet(object.tableId) ? globalThis.String(object.tableId) : ''
+    };
+  },
 
-	toJSON(message: ChatFindByTableRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.tableId !== '') {
-			obj.tableId = message.tableId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatFindByTableRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.tableId !== '') {
+      obj.tableId = message.tableId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatFindByTableRequest>): ChatFindByTableRequest {
-		return ChatFindByTableRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatFindByTableRequest>): ChatFindByTableRequest {
-		const message = createBaseChatFindByTableRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.tableId = object.tableId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatFindByTableRequest>): ChatFindByTableRequest {
+    return ChatFindByTableRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatFindByTableRequest>): ChatFindByTableRequest {
+    const message = createBaseChatFindByTableRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.tableId = object.tableId ?? '';
+    return message;
+  }
 };
 
 function createBaseChatFindByTableResponse(): ChatFindByTableResponse {
-	return { chatId: '' };
+  return { chatId: '' };
 }
 
 export const ChatFindByTableResponse: MessageFns<ChatFindByTableResponse> = {
-	encode(
-		message: ChatFindByTableResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.chatId !== '') {
-			writer.uint32(10).string(message.chatId);
-		}
-		return writer;
-	},
+  encode(
+    message: ChatFindByTableResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.chatId !== '') {
+      writer.uint32(10).string(message.chatId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByTableResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatFindByTableResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByTableResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatFindByTableResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.chatId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.chatId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatFindByTableResponse {
-		return { chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '' };
-	},
+  fromJSON(object: any): ChatFindByTableResponse {
+    return { chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '' };
+  },
 
-	toJSON(message: ChatFindByTableResponse): unknown {
-		const obj: any = {};
-		if (message.chatId !== '') {
-			obj.chatId = message.chatId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatFindByTableResponse): unknown {
+    const obj: any = {};
+    if (message.chatId !== '') {
+      obj.chatId = message.chatId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatFindByTableResponse>): ChatFindByTableResponse {
-		return ChatFindByTableResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatFindByTableResponse>): ChatFindByTableResponse {
-		const message = createBaseChatFindByTableResponse();
-		message.chatId = object.chatId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatFindByTableResponse>): ChatFindByTableResponse {
+    return ChatFindByTableResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatFindByTableResponse>): ChatFindByTableResponse {
+    const message = createBaseChatFindByTableResponse();
+    message.chatId = object.chatId ?? '';
+    return message;
+  }
 };
 
 function createBaseChatFindByGameRequest(): ChatFindByGameRequest {
-	return { sessionId: '', gameId: '' };
+  return { sessionId: '', gameId: '' };
 }
 
 export const ChatFindByGameRequest: MessageFns<ChatFindByGameRequest> = {
-	encode(message: ChatFindByGameRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.gameId !== '') {
-			writer.uint32(18).string(message.gameId);
-		}
-		return writer;
-	},
+  encode(message: ChatFindByGameRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.gameId !== '') {
+      writer.uint32(18).string(message.gameId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByGameRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatFindByGameRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByGameRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatFindByGameRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.gameId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.gameId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatFindByGameRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
-		};
-	},
+  fromJSON(object: any): ChatFindByGameRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      gameId: isSet(object.gameId) ? globalThis.String(object.gameId) : ''
+    };
+  },
 
-	toJSON(message: ChatFindByGameRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.gameId !== '') {
-			obj.gameId = message.gameId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatFindByGameRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.gameId !== '') {
+      obj.gameId = message.gameId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatFindByGameRequest>): ChatFindByGameRequest {
-		return ChatFindByGameRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatFindByGameRequest>): ChatFindByGameRequest {
-		const message = createBaseChatFindByGameRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.gameId = object.gameId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatFindByGameRequest>): ChatFindByGameRequest {
+    return ChatFindByGameRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatFindByGameRequest>): ChatFindByGameRequest {
+    const message = createBaseChatFindByGameRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.gameId = object.gameId ?? '';
+    return message;
+  }
 };
 
 function createBaseChatFindByGameResponse(): ChatFindByGameResponse {
-	return { chatId: '' };
+  return { chatId: '' };
 }
 
 export const ChatFindByGameResponse: MessageFns<ChatFindByGameResponse> = {
-	encode(message: ChatFindByGameResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.chatId !== '') {
-			writer.uint32(10).string(message.chatId);
-		}
-		return writer;
-	},
+  encode(message: ChatFindByGameResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.chatId !== '') {
+      writer.uint32(10).string(message.chatId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByGameResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatFindByGameResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByGameResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatFindByGameResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.chatId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.chatId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatFindByGameResponse {
-		return { chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '' };
-	},
+  fromJSON(object: any): ChatFindByGameResponse {
+    return { chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '' };
+  },
 
-	toJSON(message: ChatFindByGameResponse): unknown {
-		const obj: any = {};
-		if (message.chatId !== '') {
-			obj.chatId = message.chatId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatFindByGameResponse): unknown {
+    const obj: any = {};
+    if (message.chatId !== '') {
+      obj.chatId = message.chatId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatFindByGameResponse>): ChatFindByGameResponse {
-		return ChatFindByGameResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatFindByGameResponse>): ChatFindByGameResponse {
-		const message = createBaseChatFindByGameResponse();
-		message.chatId = object.chatId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatFindByGameResponse>): ChatFindByGameResponse {
+    return ChatFindByGameResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatFindByGameResponse>): ChatFindByGameResponse {
+    const message = createBaseChatFindByGameResponse();
+    message.chatId = object.chatId ?? '';
+    return message;
+  }
 };
 
 function createBaseChatFindByTournamentRequest(): ChatFindByTournamentRequest {
-	return { sessionId: '', tournamentId: '' };
+  return { sessionId: '', tournamentId: '' };
 }
 
 export const ChatFindByTournamentRequest: MessageFns<ChatFindByTournamentRequest> = {
-	encode(
-		message: ChatFindByTournamentRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.tournamentId !== '') {
-			writer.uint32(18).string(message.tournamentId);
-		}
-		return writer;
-	},
+  encode(
+    message: ChatFindByTournamentRequest,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.tournamentId !== '') {
+      writer.uint32(18).string(message.tournamentId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByTournamentRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatFindByTournamentRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByTournamentRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatFindByTournamentRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.tournamentId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.tournamentId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatFindByTournamentRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : ''
-		};
-	},
+  fromJSON(object: any): ChatFindByTournamentRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      tournamentId: isSet(object.tournamentId) ? globalThis.String(object.tournamentId) : ''
+    };
+  },
 
-	toJSON(message: ChatFindByTournamentRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.tournamentId !== '') {
-			obj.tournamentId = message.tournamentId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatFindByTournamentRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.tournamentId !== '') {
+      obj.tournamentId = message.tournamentId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatFindByTournamentRequest>): ChatFindByTournamentRequest {
-		return ChatFindByTournamentRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatFindByTournamentRequest>): ChatFindByTournamentRequest {
-		const message = createBaseChatFindByTournamentRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.tournamentId = object.tournamentId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatFindByTournamentRequest>): ChatFindByTournamentRequest {
+    return ChatFindByTournamentRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatFindByTournamentRequest>): ChatFindByTournamentRequest {
+    const message = createBaseChatFindByTournamentRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.tournamentId = object.tournamentId ?? '';
+    return message;
+  }
 };
 
 function createBaseChatFindByTournamentResponse(): ChatFindByTournamentResponse {
-	return { chatId: '' };
+  return { chatId: '' };
 }
 
 export const ChatFindByTournamentResponse: MessageFns<ChatFindByTournamentResponse> = {
-	encode(
-		message: ChatFindByTournamentResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.chatId !== '') {
-			writer.uint32(10).string(message.chatId);
-		}
-		return writer;
-	},
+  encode(
+    message: ChatFindByTournamentResponse,
+    writer: BinaryWriter = new BinaryWriter()
+  ): BinaryWriter {
+    if (message.chatId !== '') {
+      writer.uint32(10).string(message.chatId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByTournamentResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatFindByTournamentResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByTournamentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatFindByTournamentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.chatId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.chatId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatFindByTournamentResponse {
-		return { chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '' };
-	},
+  fromJSON(object: any): ChatFindByTournamentResponse {
+    return { chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '' };
+  },
 
-	toJSON(message: ChatFindByTournamentResponse): unknown {
-		const obj: any = {};
-		if (message.chatId !== '') {
-			obj.chatId = message.chatId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatFindByTournamentResponse): unknown {
+    const obj: any = {};
+    if (message.chatId !== '') {
+      obj.chatId = message.chatId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatFindByTournamentResponse>): ChatFindByTournamentResponse {
-		return ChatFindByTournamentResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatFindByTournamentResponse>): ChatFindByTournamentResponse {
-		const message = createBaseChatFindByTournamentResponse();
-		message.chatId = object.chatId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatFindByTournamentResponse>): ChatFindByTournamentResponse {
+    return ChatFindByTournamentResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatFindByTournamentResponse>): ChatFindByTournamentResponse {
+    const message = createBaseChatFindByTournamentResponse();
+    message.chatId = object.chatId ?? '';
+    return message;
+  }
 };
 
 function createBaseChatFindByRoomRequest(): ChatFindByRoomRequest {
-	return { sessionId: '', roomId: '' };
+  return { sessionId: '', roomId: '' };
 }
 
 export const ChatFindByRoomRequest: MessageFns<ChatFindByRoomRequest> = {
-	encode(message: ChatFindByRoomRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.sessionId !== '') {
-			writer.uint32(10).string(message.sessionId);
-		}
-		if (message.roomId !== '') {
-			writer.uint32(18).string(message.roomId);
-		}
-		return writer;
-	},
+  encode(message: ChatFindByRoomRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sessionId !== '') {
+      writer.uint32(10).string(message.sessionId);
+    }
+    if (message.roomId !== '') {
+      writer.uint32(18).string(message.roomId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByRoomRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatFindByRoomRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByRoomRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatFindByRoomRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.sessionId = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.sessionId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.roomId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.roomId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatFindByRoomRequest {
-		return {
-			sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
-			roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : ''
-		};
-	},
+  fromJSON(object: any): ChatFindByRoomRequest {
+    return {
+      sessionId: isSet(object.sessionId) ? globalThis.String(object.sessionId) : '',
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : ''
+    };
+  },
 
-	toJSON(message: ChatFindByRoomRequest): unknown {
-		const obj: any = {};
-		if (message.sessionId !== '') {
-			obj.sessionId = message.sessionId;
-		}
-		if (message.roomId !== '') {
-			obj.roomId = message.roomId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatFindByRoomRequest): unknown {
+    const obj: any = {};
+    if (message.sessionId !== '') {
+      obj.sessionId = message.sessionId;
+    }
+    if (message.roomId !== '') {
+      obj.roomId = message.roomId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatFindByRoomRequest>): ChatFindByRoomRequest {
-		return ChatFindByRoomRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatFindByRoomRequest>): ChatFindByRoomRequest {
-		const message = createBaseChatFindByRoomRequest();
-		message.sessionId = object.sessionId ?? '';
-		message.roomId = object.roomId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatFindByRoomRequest>): ChatFindByRoomRequest {
+    return ChatFindByRoomRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatFindByRoomRequest>): ChatFindByRoomRequest {
+    const message = createBaseChatFindByRoomRequest();
+    message.sessionId = object.sessionId ?? '';
+    message.roomId = object.roomId ?? '';
+    return message;
+  }
 };
 
 function createBaseChatFindByRoomResponse(): ChatFindByRoomResponse {
-	return { chatId: '' };
+  return { chatId: '' };
 }
 
 export const ChatFindByRoomResponse: MessageFns<ChatFindByRoomResponse> = {
-	encode(message: ChatFindByRoomResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		if (message.chatId !== '') {
-			writer.uint32(10).string(message.chatId);
-		}
-		return writer;
-	},
+  encode(message: ChatFindByRoomResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.chatId !== '') {
+      writer.uint32(10).string(message.chatId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByRoomResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseChatFindByRoomResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatFindByRoomResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatFindByRoomResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.chatId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.chatId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): ChatFindByRoomResponse {
-		return { chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '' };
-	},
+  fromJSON(object: any): ChatFindByRoomResponse {
+    return { chatId: isSet(object.chatId) ? globalThis.String(object.chatId) : '' };
+  },
 
-	toJSON(message: ChatFindByRoomResponse): unknown {
-		const obj: any = {};
-		if (message.chatId !== '') {
-			obj.chatId = message.chatId;
-		}
-		return obj;
-	},
+  toJSON(message: ChatFindByRoomResponse): unknown {
+    const obj: any = {};
+    if (message.chatId !== '') {
+      obj.chatId = message.chatId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<ChatFindByRoomResponse>): ChatFindByRoomResponse {
-		return ChatFindByRoomResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<ChatFindByRoomResponse>): ChatFindByRoomResponse {
-		const message = createBaseChatFindByRoomResponse();
-		message.chatId = object.chatId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<ChatFindByRoomResponse>): ChatFindByRoomResponse {
+    return ChatFindByRoomResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatFindByRoomResponse>): ChatFindByRoomResponse {
+    const message = createBaseChatFindByRoomResponse();
+    message.chatId = object.chatId ?? '';
+    return message;
+  }
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 type DeepPartial<T> = T extends Builtin
-	? T
-	: T extends globalThis.Array<infer U>
-		? globalThis.Array<DeepPartial<U>>
-		: T extends ReadonlyArray<infer U>
-			? ReadonlyArray<DeepPartial<U>>
-			: T extends {}
-				? { [K in keyof T]?: DeepPartial<T[K]> }
-				: Partial<T>;
+  ? T
+  : T extends globalThis.Array<infer U>
+    ? globalThis.Array<DeepPartial<U>>
+    : T extends ReadonlyArray<infer U>
+      ? ReadonlyArray<DeepPartial<U>>
+      : T extends {}
+        ? { [K in keyof T]?: DeepPartial<T[K]> }
+        : Partial<T>;
 
 function isSet(value: any): boolean {
-	return value !== null && value !== undefined;
+  return value !== null && value !== undefined;
 }
 
 interface MessageFns<T> {
-	encode(message: T, writer?: BinaryWriter): BinaryWriter;
-	decode(input: BinaryReader | Uint8Array, length?: number): T;
-	fromJSON(object: any): T;
-	toJSON(message: T): unknown;
-	create(base?: DeepPartial<T>): T;
-	fromPartial(object: DeepPartial<T>): T;
+  encode(message: T, writer?: BinaryWriter): BinaryWriter;
+  decode(input: BinaryReader | Uint8Array, length?: number): T;
+  fromJSON(object: any): T;
+  toJSON(message: T): unknown;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }

@@ -9,265 +9,265 @@ import { writable, derived, get } from 'svelte/store';
  * Valid zones for card drops (supports all MTG zones for rules-light mode)
  */
 export type DropZone =
-	| 'battlefield'
-	| 'graveyard'
-	| 'exile'
-	| 'hand'
-	| 'library'
-	| 'command'
-	| 'stack'
-	| 'none';
+  | 'battlefield'
+  | 'graveyard'
+  | 'exile'
+  | 'hand'
+  | 'library'
+  | 'command'
+  | 'stack'
+  | 'none';
 
 /**
  * Source zones where cards can be dragged from (all zones in rules-light mode)
  */
 export type SourceZone =
-	| 'hand'
-	| 'battlefield'
-	| 'graveyard'
-	| 'exile'
-	| 'library'
-	| 'command'
-	| 'stack';
+  | 'hand'
+  | 'battlefield'
+  | 'graveyard'
+  | 'exile'
+  | 'library'
+  | 'command'
+  | 'stack';
 
 /**
  * Drag state interface
  */
 export interface DragState {
-	isDragging: boolean;
-	cardId: string | null;
-	cardName: string | null;
-	sourceZone: SourceZone | null;
-	position: { x: number; y: number };
-	startPosition: { x: number; y: number };
-	validDropZones: DropZone[];
-	currentDropZone: DropZone;
-	isOverValidZone: boolean;
+  isDragging: boolean;
+  cardId: string | null;
+  cardName: string | null;
+  sourceZone: SourceZone | null;
+  position: { x: number; y: number };
+  startPosition: { x: number; y: number };
+  validDropZones: DropZone[];
+  currentDropZone: DropZone;
+  isOverValidZone: boolean;
 }
 
 /**
  * Drop zone registration
  */
 export interface DropZoneConfig {
-	id: string;
-	type: DropZone;
-	element: HTMLElement;
-	accepts: (cardId: string, sourceZone: SourceZone) => boolean;
-	onDrop: (cardId: string) => void;
+  id: string;
+  type: DropZone;
+  element: HTMLElement;
+  accepts: (cardId: string, sourceZone: SourceZone) => boolean;
+  onDrop: (cardId: string) => void;
 }
 
 /**
  * Initial drag state
  */
 const initialDragState: DragState = {
-	isDragging: false,
-	cardId: null,
-	cardName: null,
-	sourceZone: null,
-	position: { x: 0, y: 0 },
-	startPosition: { x: 0, y: 0 },
-	validDropZones: [],
-	currentDropZone: 'none',
-	isOverValidZone: false
+  isDragging: false,
+  cardId: null,
+  cardName: null,
+  sourceZone: null,
+  position: { x: 0, y: 0 },
+  startPosition: { x: 0, y: 0 },
+  validDropZones: [],
+  currentDropZone: 'none',
+  isOverValidZone: false
 };
 
 /**
  * Create the drag-drop store
  */
 function createDragDropStore() {
-	const { subscribe, set, update } = writable<DragState>(initialDragState);
+  const { subscribe, set, update } = writable<DragState>(initialDragState);
 
-	// Registry of drop zones
-	let dropZones: Map<string, DropZoneConfig> = new Map();
+  // Registry of drop zones
+  let dropZones: Map<string, DropZoneConfig> = new Map();
 
-	/**
-	 * Register a drop zone
-	 */
-	function registerDropZone(config: DropZoneConfig): () => void {
-		dropZones.set(config.id, config);
-		// Return unregister function
-		return () => {
-			dropZones.delete(config.id);
-		};
-	}
+  /**
+   * Register a drop zone
+   */
+  function registerDropZone(config: DropZoneConfig): () => void {
+    dropZones.set(config.id, config);
+    // Return unregister function
+    return () => {
+      dropZones.delete(config.id);
+    };
+  }
 
-	/**
-	 * Get all registered drop zones
-	 */
-	function getDropZones(): DropZoneConfig[] {
-		return Array.from(dropZones.values());
-	}
+  /**
+   * Get all registered drop zones
+   */
+  function getDropZones(): DropZoneConfig[] {
+    return Array.from(dropZones.values());
+  }
 
-	/**
-	 * Start dragging a card
-	 */
-	function startDrag(
-		cardId: string,
-		cardName: string,
-		sourceZone: SourceZone,
-		startX: number,
-		startY: number
-	): void {
-		update((state) => ({
-			...state,
-			isDragging: true,
-			cardId,
-			cardName,
-			sourceZone,
-			position: { x: startX, y: startY },
-			startPosition: { x: startX, y: startY },
-			currentDropZone: 'none',
-			isOverValidZone: false
-		}));
+  /**
+   * Start dragging a card
+   */
+  function startDrag(
+    cardId: string,
+    cardName: string,
+    sourceZone: SourceZone,
+    startX: number,
+    startY: number
+  ): void {
+    update((state) => ({
+      ...state,
+      isDragging: true,
+      cardId,
+      cardName,
+      sourceZone,
+      position: { x: startX, y: startY },
+      startPosition: { x: startX, y: startY },
+      currentDropZone: 'none',
+      isOverValidZone: false
+    }));
 
-		// Add document-level event listeners for drag tracking
-		document.addEventListener('mousemove', handleMouseMove);
-		document.addEventListener('mouseup', handleMouseUp);
-		document.addEventListener('touchmove', handleTouchMove, { passive: false });
-		document.addEventListener('touchend', handleTouchEnd);
+    // Add document-level event listeners for drag tracking
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
 
-		// Prevent text selection during drag
-		document.body.style.userSelect = 'none';
-	}
+    // Prevent text selection during drag
+    document.body.style.userSelect = 'none';
+  }
 
-	/**
-	 * Update drag position
-	 */
-	function updatePosition(x: number, y: number): void {
-		const state = get({ subscribe });
-		if (!state.isDragging) return;
+  /**
+   * Update drag position
+   */
+  function updatePosition(x: number, y: number): void {
+    const state = get({ subscribe });
+    if (!state.isDragging) return;
 
-		// Check which drop zone we're over
-		const currentZone = detectDropZone(x, y);
+    // Check which drop zone we're over
+    const currentZone = detectDropZone(x, y);
 
-		update((s) => ({
-			...s,
-			position: { x, y },
-			currentDropZone: currentZone,
-			isOverValidZone: currentZone !== 'none'
-		}));
-	}
+    update((s) => ({
+      ...s,
+      position: { x, y },
+      currentDropZone: currentZone,
+      isOverValidZone: currentZone !== 'none'
+    }));
+  }
 
-	/**
-	 * Detect which drop zone contains the given coordinates
-	 */
-	function detectDropZone(x: number, y: number): DropZone {
-		const zones = Array.from(dropZones.values());
-		for (const zone of zones) {
-			const rect = zone.element.getBoundingClientRect();
-			const isInside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+  /**
+   * Detect which drop zone contains the given coordinates
+   */
+  function detectDropZone(x: number, y: number): DropZone {
+    const zones = Array.from(dropZones.values());
+    for (const zone of zones) {
+      const rect = zone.element.getBoundingClientRect();
+      const isInside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 
-			if (isInside) {
-				const state = get({ subscribe });
-				const accepted =
-					state.cardId && state.sourceZone && zone.accepts(state.cardId, state.sourceZone);
-				if (accepted) {
-					return zone.type;
-				}
-			}
-		}
-		return 'none';
-	}
+      if (isInside) {
+        const state = get({ subscribe });
+        const accepted =
+          state.cardId && state.sourceZone && zone.accepts(state.cardId, state.sourceZone);
+        if (accepted) {
+          return zone.type;
+        }
+      }
+    }
+    return 'none';
+  }
 
-	/**
-	 * End drag operation
-	 */
-	function endDrag(): { cardId: string; dropZone: DropZone; wasValid: boolean } | null {
-		const state = get({ subscribe });
+  /**
+   * End drag operation
+   */
+  function endDrag(): { cardId: string; dropZone: DropZone; wasValid: boolean } | null {
+    const state = get({ subscribe });
 
-		// Remove event listeners
-		document.removeEventListener('mousemove', handleMouseMove);
-		document.removeEventListener('mouseup', handleMouseUp);
-		document.removeEventListener('touchmove', handleTouchMove);
-		document.removeEventListener('touchend', handleTouchEnd);
+    // Remove event listeners
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+    document.removeEventListener('touchmove', handleTouchMove);
+    document.removeEventListener('touchend', handleTouchEnd);
 
-		// Restore text selection
-		document.body.style.userSelect = '';
+    // Restore text selection
+    document.body.style.userSelect = '';
 
-		if (!state.isDragging || !state.cardId) {
-			set(initialDragState);
-			return null;
-		}
+    if (!state.isDragging || !state.cardId) {
+      set(initialDragState);
+      return null;
+    }
 
-		const result = {
-			cardId: state.cardId,
-			dropZone: state.currentDropZone,
-			wasValid: state.isOverValidZone
-		};
+    const result = {
+      cardId: state.cardId,
+      dropZone: state.currentDropZone,
+      wasValid: state.isOverValidZone
+    };
 
-		// Trigger drop handler if over valid zone
-		if (state.isOverValidZone && state.currentDropZone !== 'none') {
-			const zones = Array.from(dropZones.values());
-			for (const zone of zones) {
-				if (zone.type === state.currentDropZone) {
-					const rect = zone.element.getBoundingClientRect();
-					const { x, y } = state.position;
-					if (
-						x >= rect.left &&
-						x <= rect.right &&
-						y >= rect.top &&
-						y <= rect.bottom &&
-						state.sourceZone &&
-						zone.accepts(state.cardId, state.sourceZone)
-					) {
-						zone.onDrop(state.cardId);
-						break;
-					}
-				}
-			}
-		}
+    // Trigger drop handler if over valid zone
+    if (state.isOverValidZone && state.currentDropZone !== 'none') {
+      const zones = Array.from(dropZones.values());
+      for (const zone of zones) {
+        if (zone.type === state.currentDropZone) {
+          const rect = zone.element.getBoundingClientRect();
+          const { x, y } = state.position;
+          if (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom &&
+            state.sourceZone &&
+            zone.accepts(state.cardId, state.sourceZone)
+          ) {
+            zone.onDrop(state.cardId);
+            break;
+          }
+        }
+      }
+    }
 
-		// Reset state
-		set(initialDragState);
+    // Reset state
+    set(initialDragState);
 
-		return result;
-	}
+    return result;
+  }
 
-	/**
-	 * Cancel drag without dropping
-	 */
-	function cancelDrag(): void {
-		// Remove event listeners
-		document.removeEventListener('mousemove', handleMouseMove);
-		document.removeEventListener('mouseup', handleMouseUp);
-		document.removeEventListener('touchmove', handleTouchMove);
-		document.removeEventListener('touchend', handleTouchEnd);
+  /**
+   * Cancel drag without dropping
+   */
+  function cancelDrag(): void {
+    // Remove event listeners
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+    document.removeEventListener('touchmove', handleTouchMove);
+    document.removeEventListener('touchend', handleTouchEnd);
 
-		// Restore text selection
-		document.body.style.userSelect = '';
+    // Restore text selection
+    document.body.style.userSelect = '';
 
-		set(initialDragState);
-	}
+    set(initialDragState);
+  }
 
-	// Internal event handlers
-	function handleMouseMove(e: MouseEvent): void {
-		updatePosition(e.clientX, e.clientY);
-	}
+  // Internal event handlers
+  function handleMouseMove(e: MouseEvent): void {
+    updatePosition(e.clientX, e.clientY);
+  }
 
-	function handleMouseUp(): void {
-		endDrag();
-	}
+  function handleMouseUp(): void {
+    endDrag();
+  }
 
-	function handleTouchMove(e: TouchEvent): void {
-		e.preventDefault(); // Prevent scrolling while dragging
-		if (e.touches.length > 0) {
-			updatePosition(e.touches[0].clientX, e.touches[0].clientY);
-		}
-	}
+  function handleTouchMove(e: TouchEvent): void {
+    e.preventDefault(); // Prevent scrolling while dragging
+    if (e.touches.length > 0) {
+      updatePosition(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }
 
-	function handleTouchEnd(): void {
-		endDrag();
-	}
+  function handleTouchEnd(): void {
+    endDrag();
+  }
 
-	return {
-		subscribe,
-		startDrag,
-		updatePosition,
-		endDrag,
-		cancelDrag,
-		registerDropZone,
-		getDropZones
-	};
+  return {
+    subscribe,
+    startDrag,
+    updatePosition,
+    endDrag,
+    cancelDrag,
+    registerDropZone,
+    getDropZones
+  };
 }
 
 /**
@@ -288,7 +288,7 @@ export const currentDropZone = derived(dragDropStore, ($state) => $state.current
  * This is a utility function to determine valid drop zones based on card type
  */
 export function getValidDropZonesForCard(): DropZone[] {
-	return ['battlefield', 'graveyard', 'exile', 'library', 'command', 'stack'];
+  return ['battlefield', 'graveyard', 'exile', 'library', 'command', 'stack'];
 }
 
 /**
@@ -296,40 +296,40 @@ export function getValidDropZonesForCard(): DropZone[] {
  * In rules-light mode, players can move cards to any zone
  */
 export function getAllValidDropZones(sourceZone: SourceZone): DropZone[] {
-	// All zones except the source zone (and 'none')
-	const allZones: DropZone[] = [
-		'battlefield',
-		'graveyard',
-		'exile',
-		'hand',
-		'library',
-		'command',
-		'stack'
-	];
-	return allZones.filter((zone) => zone !== sourceZone);
+  // All zones except the source zone (and 'none')
+  const allZones: DropZone[] = [
+    'battlefield',
+    'graveyard',
+    'exile',
+    'hand',
+    'library',
+    'command',
+    'stack'
+  ];
+  return allZones.filter((zone) => zone !== sourceZone);
 }
 
 /**
  * Convert zone string to API zone format
  */
 export function zoneToApiFormat(zone: DropZone | SourceZone): string {
-	return zone.toUpperCase();
+  return zone.toUpperCase();
 }
 
 /**
  * Calculate distance between two points
  */
 export function getDistance(p1: { x: number; y: number }, p2: { x: number; y: number }): number {
-	return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+  return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 }
 
 /**
  * Check if drag has moved enough to be considered a real drag (not a click)
  */
 export function isDragThresholdMet(
-	start: { x: number; y: number },
-	current: { x: number; y: number },
-	threshold: number = 5
+  start: { x: number; y: number },
+  current: { x: number; y: number },
+  threshold: number = 5
 ): boolean {
-	return getDistance(start, current) >= threshold;
+  return getDistance(start, current) >= threshold;
 }

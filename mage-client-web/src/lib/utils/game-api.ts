@@ -16,17 +16,17 @@ import { getMageClient } from '$lib/grpc/client';
  * @throws Error if no active session or if the call fails
  */
 export async function withSession<TRequest, TResponse>(
-	method: string,
-	buildRequest: (sessionId: string) => TRequest
+  method: string,
+  buildRequest: (sessionId: string) => TRequest
 ): Promise<TResponse> {
-	const client = getMageClient();
-	const sessionId = await client.ensureSessionId();
+  const client = getMageClient();
+  const sessionId = await client.ensureSessionId();
 
-	if (!sessionId) {
-		throw new Error('No active session - please login first');
-	}
+  if (!sessionId) {
+    throw new Error('No active session - please login first');
+  }
 
-	return client.call<TRequest, TResponse>(method, buildRequest(sessionId));
+  return client.call<TRequest, TResponse>(method, buildRequest(sessionId));
 }
 
 /**
@@ -38,39 +38,39 @@ export async function withSession<TRequest, TResponse>(
  * @throws Error if no active session, if the call fails, or if response.success is false
  */
 export async function withSessionValidated<
-	TRequest,
-	TResponse extends { success: boolean; error?: string }
+  TRequest,
+  TResponse extends { success: boolean; error?: string }
 >(
-	method: string,
-	buildRequest: (sessionId: string) => TRequest,
-	errorMessage: string = 'API call failed'
+  method: string,
+  buildRequest: (sessionId: string) => TRequest,
+  errorMessage: string = 'API call failed'
 ): Promise<TResponse> {
-	const response = await withSession<TRequest, TResponse>(method, buildRequest);
+  const response = await withSession<TRequest, TResponse>(method, buildRequest);
 
-	if (!response.success) {
-		throw new Error(response.error || errorMessage);
-	}
+  if (!response.success) {
+    throw new Error(response.error || errorMessage);
+  }
 
-	return response;
+  return response;
 }
 
 /**
  * Build a standard game request with session and game ID
  */
 export function gameRequest(
-	sessionId: string,
-	gameId: string
+  sessionId: string,
+  gameId: string
 ): { sessionId: string; gameId: string } {
-	return { sessionId, gameId };
+  return { sessionId, gameId };
 }
 
 /**
  * Build a game request with additional data
  */
 export function gameRequestWithData<T>(
-	sessionId: string,
-	gameId: string,
-	data: T
+  sessionId: string,
+  gameId: string,
+  data: T
 ): { sessionId: string; gameId: string } & T {
-	return { sessionId, gameId, ...data };
+  return { sessionId, gameId, ...data };
 }

@@ -13,17 +13,17 @@ import type { PageLoad } from './$types';
  * Automatically redirects based on authentication status
  */
 export const load: PageLoad = async () => {
-	// Only run on client-side (browser)
-	if (!browser) {
-		return {};
-	}
+  // Only run on client-side (browser)
+  if (!browser) {
+    return {};
+  }
 
-	// Check authentication status
-	if (isAuthenticated()) {
-		// User is logged in, redirect to lobby
-		throw redirect(303, '/lobby');
-	} else {
-		// User is not logged in, redirect to login page
-		throw redirect(303, '/login');
-	}
+  // Check authentication status
+  if (isAuthenticated()) {
+    // User is logged in, redirect to lobby
+    throw redirect(303, '/lobby');
+  } else {
+    // User is not logged in, redirect to login page
+    throw redirect(303, '/login');
+  }
 };

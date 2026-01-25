@@ -13,23 +13,23 @@ import type { LayoutLoad } from './$types';
  * Redirects to login if not authenticated
  */
 export const load: LayoutLoad = async ({ url }) => {
-	// On server-side, allow through (client will handle redirect)
-	if (!browser) {
-		return {};
-	}
+  // On server-side, allow through (client will handle redirect)
+  if (!browser) {
+    return {};
+  }
 
-	// Clear any invalid tokens
-	clearInvalidToken();
+  // Clear any invalid tokens
+  clearInvalidToken();
 
-	// Check authentication
-	if (!isAuthenticated()) {
-		// Store the original URL to redirect back after login
-		const returnUrl = url.pathname + url.search;
+  // Check authentication
+  if (!isAuthenticated()) {
+    // Store the original URL to redirect back after login
+    const returnUrl = url.pathname + url.search;
 
-		// Redirect to login with return URL
-		throw redirect(303, `/login?returnUrl=${encodeURIComponent(returnUrl)}`);
-	}
+    // Redirect to login with return URL
+    throw redirect(303, `/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+  }
 
-	// User is authenticated, allow access
-	return {};
+  // User is authenticated, allow access
+  return {};
 };

@@ -14,15 +14,15 @@
  * @returns The Scryfall image URL
  */
 export function getScryfallImageUrl(
-	cardName: string,
-	version: 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop' = 'normal'
+  cardName: string,
+  version: 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop' = 'normal'
 ): string {
-	if (!cardName) return '';
+  if (!cardName) return '';
 
-	// Use the named card image redirect endpoint
-	// This is faster than making an API call to get the image URI
-	const encodedName = encodeURIComponent(cardName);
-	return `https://api.scryfall.com/cards/named?format=image&version=${version}&exact=${encodedName}`;
+  // Use the named card image redirect endpoint
+  // This is faster than making an API call to get the image URI
+  const encodedName = encodeURIComponent(cardName);
+  return `https://api.scryfall.com/cards/named?format=image&version=${version}&exact=${encodedName}`;
 }
 
 /**
@@ -33,31 +33,31 @@ export function getScryfallImageUrl(
  * @returns The Scryfall image URL
  */
 export function getScryfallImageUrlFuzzy(
-	cardName: string,
-	version: 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop' = 'normal'
+  cardName: string,
+  version: 'small' | 'normal' | 'large' | 'png' | 'art_crop' | 'border_crop' = 'normal'
 ): string {
-	if (!cardName) return '';
+  if (!cardName) return '';
 
-	const encodedName = encodeURIComponent(cardName);
-	return `https://api.scryfall.com/cards/named?format=image&version=${version}&fuzzy=${encodedName}`;
+  const encodedName = encodeURIComponent(cardName);
+  return `https://api.scryfall.com/cards/named?format=image&version=${version}&fuzzy=${encodedName}`;
 }
 
 /**
  * Get the appropriate image size for card display
  */
 export function getScryfallVersionForSize(
-	size: 'small' | 'normal' | 'large'
+  size: 'small' | 'normal' | 'large'
 ): 'small' | 'normal' | 'large' {
-	switch (size) {
-		case 'small':
-			return 'small'; // 146 × 204
-		case 'normal':
-			return 'normal'; // 488 × 680
-		case 'large':
-			return 'large'; // 672 × 936
-		default:
-			return 'normal';
-	}
+  switch (size) {
+    case 'small':
+      return 'small'; // 146 × 204
+    case 'normal':
+      return 'normal'; // 488 × 680
+    case 'large':
+      return 'large'; // 672 × 936
+    default:
+      return 'normal';
+  }
 }
 
 /**
@@ -71,47 +71,47 @@ export function getScryfallVersionForSize(
  * @returns A Scryfall search URL that returns JSON with matching token cards
  */
 export function getScryfallTokenSearchUrl(
-	cardName: string,
-	power?: string,
-	toughness?: string,
-	color?: string
+  cardName: string,
+  power?: string,
+  toughness?: string,
+  color?: string
 ): string {
-	if (!cardName) return '';
+  if (!cardName) return '';
 
-	// Build a Scryfall search query for tokens
-	const parts = ['t:token'];
+  // Build a Scryfall search query for tokens
+  const parts = ['t:token'];
 
-	// Add name search (exact match preferred)
-	parts.push(`name:"${cardName}"`);
+  // Add name search (exact match preferred)
+  parts.push(`name:"${cardName}"`);
 
-	// Add power/toughness if provided
-	if (power) {
-		parts.push(`pow=${power}`);
-	}
-	if (toughness) {
-		parts.push(`tou=${toughness}`);
-	}
+  // Add power/toughness if provided
+  if (power) {
+    parts.push(`pow=${power}`);
+  }
+  if (toughness) {
+    parts.push(`tou=${toughness}`);
+  }
 
-	// Add color identity if provided
-	if (color && color !== 'colorless' && color !== 'multicolor') {
-		const colorMap: Record<string, string> = {
-			white: 'w',
-			blue: 'u',
-			black: 'b',
-			red: 'r',
-			green: 'g'
-		};
-		const colorCode = colorMap[color.toLowerCase()];
-		if (colorCode) {
-			parts.push(`c:${colorCode}`);
-		}
-	} else if (color === 'colorless') {
-		parts.push('c:c');
-	}
+  // Add color identity if provided
+  if (color && color !== 'colorless' && color !== 'multicolor') {
+    const colorMap: Record<string, string> = {
+      white: 'w',
+      blue: 'u',
+      black: 'b',
+      red: 'r',
+      green: 'g'
+    };
+    const colorCode = colorMap[color.toLowerCase()];
+    if (colorCode) {
+      parts.push(`c:${colorCode}`);
+    }
+  } else if (color === 'colorless') {
+    parts.push('c:c');
+  }
 
-	// Combine query parts
-	const query = parts.join(' ');
-	const encodedQuery = encodeURIComponent(query);
+  // Combine query parts
+  const query = parts.join(' ');
+  const encodedQuery = encodeURIComponent(query);
 
-	return `https://api.scryfall.com/cards/search?q=${encodedQuery}&order=released`;
+  return `https://api.scryfall.com/cards/search?q=${encodedQuery}&order=released`;
 }

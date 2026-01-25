@@ -1,322 +1,322 @@
 {
-	"gameId": "a4a20d6d-9f6e-4d77-b7a1-364eb79a7b00",
-	"state": "IN_PROGRESS",
-	"players": [
-		{
-			"playerId": "thraizz",
-			"name": "thraizz",
-			"life": 40,
-			"libraryCount": 92,
-			"handCount": 7,
-			"hand": [
-				{
-					"id": "thraizz-card-18",
-					"faceDown": true,
-					"zone": 1
-				},
-				{
-					"id": "thraizz-card-1",
-					"faceDown": true,
-					"zone": 1
-				},
-				{
-					"id": "thraizz-card-8",
-					"faceDown": true,
-					"zone": 1
-				},
-				{
-					"id": "thraizz-card-83",
-					"faceDown": true,
-					"zone": 1
-				},
-				{
-					"id": "thraizz-card-16",
-					"faceDown": true,
-					"zone": 1
-				},
-				{
-					"id": "thraizz-card-20",
-					"faceDown": true,
-					"zone": 1
-				},
-				{
-					"id": "thraizz-card-40",
-					"faceDown": true,
-					"zone": 1
-				}
-			],
-			"manaPool": {
-				"blue": 2
-			},
-			"hasPriority": true,
-			"keptHand": true,
-			"graveyard": []
-		},
-		{
-			"playerId": "thraizz2",
-			"name": "thraizz2",
-			"life": 40,
-			"libraryCount": 91,
-			"handCount": 7,
-			"hand": [
-				{
-					"id": "thraizz2-card-62",
-					"name": "Plains",
-					"displayName": "Plains",
-					"type": "LAND@@@",
-					"color": "Colorless",
-					"power": "0",
-					"toughness": "0",
-					"cardNumber": 364,
-					"expansionSetCode": "10E",
-					"rarity": "LAND",
-					"rulesText": "{T}: Add {W}.@@@",
-					"zone": 1,
-					"controllerId": "thraizz2",
-					"ownerId": "thraizz2",
-					"availableActions": [
-						{
-							"actionType": "CARD_ACTION_PLAY_LAND",
-							"displayText": "Play Land",
-							"disabledReason": "You don't have priority"
-						}
-					]
-				},
-				{
-					"id": "thraizz2-card-50",
-					"name": "Martyr of Dusk",
-					"displayName": "Martyr of Dusk",
-					"manaCost": "{1}{W}",
-					"type": "CREATURE@@@",
-					"color": "White",
-					"power": "2",
-					"toughness": "1",
-					"cardNumber": 132,
-					"expansionSetCode": "LCC",
-					"rarity": "COMMON",
-					"rulesText": "When {this} dies, create a 1/1 white Vampire creature token with lifelink.@@@",
-					"zone": 1,
-					"controllerId": "thraizz2",
-					"ownerId": "thraizz2",
-					"availableActions": [
-						{
-							"actionType": "CARD_ACTION_CAST_SPELL",
-							"displayText": "Cast Martyr of Dusk",
-							"disabledReason": "You don't have priority"
-						}
-					]
-				},
-				{
-					"id": "thraizz2-card-95",
-					"name": "Plains",
-					"displayName": "Plains",
-					"type": "LAND@@@",
-					"color": "Colorless",
-					"power": "0",
-					"toughness": "0",
-					"cardNumber": 364,
-					"expansionSetCode": "10E",
-					"rarity": "LAND",
-					"rulesText": "{T}: Add {W}.@@@",
-					"zone": 1,
-					"controllerId": "thraizz2",
-					"ownerId": "thraizz2",
-					"availableActions": [
-						{
-							"actionType": "CARD_ACTION_PLAY_LAND",
-							"displayText": "Play Land",
-							"disabledReason": "You don't have priority"
-						}
-					]
-				},
-				{
-					"id": "thraizz2-card-73",
-					"name": "Plains",
-					"displayName": "Plains",
-					"type": "LAND@@@",
-					"color": "Colorless",
-					"power": "0",
-					"toughness": "0",
-					"cardNumber": 364,
-					"expansionSetCode": "10E",
-					"rarity": "LAND",
-					"rulesText": "{T}: Add {W}.@@@",
-					"zone": 1,
-					"controllerId": "thraizz2",
-					"ownerId": "thraizz2",
-					"availableActions": [
-						{
-							"actionType": "CARD_ACTION_PLAY_LAND",
-							"displayText": "Play Land",
-							"disabledReason": "You don't have priority"
-						}
-					]
-				},
-				{
-					"id": "thraizz2-card-31",
-					"name": "Kytheon, Hero of Akros",
-					"displayName": "Kytheon, Hero of Akros",
-					"manaCost": "{W}",
-					"type": "CREATURE@@@",
-					"color": "White",
-					"power": "2",
-					"toughness": "1",
-					"cardNumber": 23,
-					"expansionSetCode": "ORI",
-					"rarity": "MYTHIC",
-					"rulesText": "At end of combat, if {this} and at least two other creatures attacked this combat, exile {this}, then return him to the battlefield transformed under his owner's control.@@@{2}{W}: {this} gains indestructible until end of turn.@@@",
-					"zone": 1,
-					"controllerId": "thraizz2",
-					"ownerId": "thraizz2",
-					"availableActions": [
-						{
-							"actionType": "CARD_ACTION_CAST_SPELL",
-							"displayText": "Cast Kytheon, Hero of Akros",
-							"disabledReason": "You don't have priority"
-						}
-					]
-				},
-				{
-					"id": "thraizz2-card-4",
-					"name": "Hunted Witness",
-					"displayName": "Hunted Witness",
-					"manaCost": "{W}",
-					"type": "CREATURE@@@",
-					"color": "White",
-					"power": "1",
-					"toughness": "1",
-					"cardNumber": 15,
-					"expansionSetCode": "GRN",
-					"rarity": "COMMON",
-					"rulesText": "When {this} dies, create a 1/1 white Soldier creature token with lifelink.@@@",
-					"zone": 1,
-					"controllerId": "thraizz2",
-					"ownerId": "thraizz2",
-					"summoningSickness": true,
-					"availableActions": [
-						{
-							"actionType": "CARD_ACTION_CAST_SPELL",
-							"displayText": "Cast Hunted Witness",
-							"disabledReason": "You don't have priority"
-						}
-					]
-				},
-				{
-					"id": "thraizz2-card-38",
-					"name": "Brave the Elements",
-					"displayName": "Brave the Elements",
-					"manaCost": "{W}",
-					"type": "INSTANT@@@",
-					"color": "White",
-					"power": "0",
-					"toughness": "0",
-					"cardNumber": 66,
-					"expansionSetCode": "C14",
-					"rarity": "UNCOMMON",
-					"rulesText": "Choose a color. White creatures you control gain protection from the chosen color until end of turn.@@@",
-					"zone": 1,
-					"controllerId": "thraizz2",
-					"ownerId": "thraizz2",
-					"availableActions": [
-						{
-							"actionType": "CARD_ACTION_CAST_SPELL",
-							"displayText": "Cast Brave the Elements",
-							"disabledReason": "You don't have priority"
-						}
-					]
-				}
-			],
-			"manaPool": {},
-			"keptHand": true,
-			"graveyard": []
-		}
-	],
-	"activePlayerId": "thraizz",
-	"priorityPlayerId": "thraizz",
-	"turn": 3,
-	"phase": "BEGINNING",
-	"step": "DRAW",
-	"battlefield": [
-		{
-			"id": "4289f73e-742f-454b-a44a-41a973de2b1e",
-			"name": "Goblin",
-			"displayName": "Goblin Token",
-			"type": "Creature — Goblin",
-			"color": "red",
-			"power": "1",
-			"toughness": "1",
-			"zone": 2,
-			"controllerId": "thraizz2",
-			"ownerId": "thraizz2"
-		},
-		{
-			"id": "thraizz2-card-87",
-			"name": "Plains",
-			"displayName": "Plains",
-			"type": "LAND@@@",
-			"color": "Colorless",
-			"power": "0",
-			"toughness": "0",
-			"cardNumber": 364,
-			"expansionSetCode": "10E",
-			"rarity": "LAND",
-			"rulesText": "{T}: Add {W}.@@@",
-			"zone": 2,
-			"controllerId": "thraizz2",
-			"ownerId": "thraizz2",
-			"availableActions": [
-				{
-					"actionType": "CARD_ACTION_ACTIVATE_MANA_ABILITY",
-					"actionId": "thraizz2-card-87",
-					"displayText": "{T}: Add {W}",
-					"disabledReason": "You don't have priority"
-				}
-			]
-		},
-		{
-			"id": "thraizz2-card-7",
-			"name": "Doomed Traveler",
-			"displayName": "Doomed Traveler",
-			"manaCost": "{W}",
-			"type": "CREATURE@@@",
-			"color": "White",
-			"power": "1",
-			"toughness": "1",
-			"cardNumber": 9,
-			"expansionSetCode": "2X2",
-			"rarity": "COMMON",
-			"rulesText": "When {this} dies, create a 1/1 white Spirit creature token with flying.@@@",
-			"zone": 2,
-			"controllerId": "thraizz2",
-			"ownerId": "thraizz2",
-			"summoningSickness": true
-		},
-		{
-			"id": "thraizz-card-35",
-			"name": "Island",
-			"displayName": "Island",
-			"type": "LAND@@@",
-			"color": "Colorless",
-			"power": "0",
-			"toughness": "0",
-			"cardNumber": 368,
-			"expansionSetCode": "10E",
-			"rarity": "LAND",
-			"rulesText": "{T}: Add {U}.@@@",
-			"tapped": true,
-			"zone": 2,
-			"controllerId": "thraizz",
-			"ownerId": "thraizz"
-		}
-	],
-	"startTime": "2025-12-08T08:32:48.704846Z",
-	"activePlayerName": "thraizz",
-	"priorityPlayerName": "thraizz",
-	"gameFormat": "Commander",
-	"landsPlayedThisTurn": 1,
-	"landsAllowedThisTurn": 1,
-	"stack": [],
-	"exile": [],
-	"command": [],
-	"messages": []
+  "gameId": "a4a20d6d-9f6e-4d77-b7a1-364eb79a7b00",
+  "state": "IN_PROGRESS",
+  "players": [
+    {
+      "playerId": "thraizz",
+      "name": "thraizz",
+      "life": 40,
+      "libraryCount": 92,
+      "handCount": 7,
+      "hand": [
+        {
+          "id": "thraizz-card-18",
+          "faceDown": true,
+          "zone": 1
+        },
+        {
+          "id": "thraizz-card-1",
+          "faceDown": true,
+          "zone": 1
+        },
+        {
+          "id": "thraizz-card-8",
+          "faceDown": true,
+          "zone": 1
+        },
+        {
+          "id": "thraizz-card-83",
+          "faceDown": true,
+          "zone": 1
+        },
+        {
+          "id": "thraizz-card-16",
+          "faceDown": true,
+          "zone": 1
+        },
+        {
+          "id": "thraizz-card-20",
+          "faceDown": true,
+          "zone": 1
+        },
+        {
+          "id": "thraizz-card-40",
+          "faceDown": true,
+          "zone": 1
+        }
+      ],
+      "manaPool": {
+        "blue": 2
+      },
+      "hasPriority": true,
+      "keptHand": true,
+      "graveyard": []
+    },
+    {
+      "playerId": "thraizz2",
+      "name": "thraizz2",
+      "life": 40,
+      "libraryCount": 91,
+      "handCount": 7,
+      "hand": [
+        {
+          "id": "thraizz2-card-62",
+          "name": "Plains",
+          "displayName": "Plains",
+          "type": "LAND@@@",
+          "color": "Colorless",
+          "power": "0",
+          "toughness": "0",
+          "cardNumber": 364,
+          "expansionSetCode": "10E",
+          "rarity": "LAND",
+          "rulesText": "{T}: Add {W}.@@@",
+          "zone": 1,
+          "controllerId": "thraizz2",
+          "ownerId": "thraizz2",
+          "availableActions": [
+            {
+              "actionType": "CARD_ACTION_PLAY_LAND",
+              "displayText": "Play Land",
+              "disabledReason": "You don't have priority"
+            }
+          ]
+        },
+        {
+          "id": "thraizz2-card-50",
+          "name": "Martyr of Dusk",
+          "displayName": "Martyr of Dusk",
+          "manaCost": "{1}{W}",
+          "type": "CREATURE@@@",
+          "color": "White",
+          "power": "2",
+          "toughness": "1",
+          "cardNumber": 132,
+          "expansionSetCode": "LCC",
+          "rarity": "COMMON",
+          "rulesText": "When {this} dies, create a 1/1 white Vampire creature token with lifelink.@@@",
+          "zone": 1,
+          "controllerId": "thraizz2",
+          "ownerId": "thraizz2",
+          "availableActions": [
+            {
+              "actionType": "CARD_ACTION_CAST_SPELL",
+              "displayText": "Cast Martyr of Dusk",
+              "disabledReason": "You don't have priority"
+            }
+          ]
+        },
+        {
+          "id": "thraizz2-card-95",
+          "name": "Plains",
+          "displayName": "Plains",
+          "type": "LAND@@@",
+          "color": "Colorless",
+          "power": "0",
+          "toughness": "0",
+          "cardNumber": 364,
+          "expansionSetCode": "10E",
+          "rarity": "LAND",
+          "rulesText": "{T}: Add {W}.@@@",
+          "zone": 1,
+          "controllerId": "thraizz2",
+          "ownerId": "thraizz2",
+          "availableActions": [
+            {
+              "actionType": "CARD_ACTION_PLAY_LAND",
+              "displayText": "Play Land",
+              "disabledReason": "You don't have priority"
+            }
+          ]
+        },
+        {
+          "id": "thraizz2-card-73",
+          "name": "Plains",
+          "displayName": "Plains",
+          "type": "LAND@@@",
+          "color": "Colorless",
+          "power": "0",
+          "toughness": "0",
+          "cardNumber": 364,
+          "expansionSetCode": "10E",
+          "rarity": "LAND",
+          "rulesText": "{T}: Add {W}.@@@",
+          "zone": 1,
+          "controllerId": "thraizz2",
+          "ownerId": "thraizz2",
+          "availableActions": [
+            {
+              "actionType": "CARD_ACTION_PLAY_LAND",
+              "displayText": "Play Land",
+              "disabledReason": "You don't have priority"
+            }
+          ]
+        },
+        {
+          "id": "thraizz2-card-31",
+          "name": "Kytheon, Hero of Akros",
+          "displayName": "Kytheon, Hero of Akros",
+          "manaCost": "{W}",
+          "type": "CREATURE@@@",
+          "color": "White",
+          "power": "2",
+          "toughness": "1",
+          "cardNumber": 23,
+          "expansionSetCode": "ORI",
+          "rarity": "MYTHIC",
+          "rulesText": "At end of combat, if {this} and at least two other creatures attacked this combat, exile {this}, then return him to the battlefield transformed under his owner's control.@@@{2}{W}: {this} gains indestructible until end of turn.@@@",
+          "zone": 1,
+          "controllerId": "thraizz2",
+          "ownerId": "thraizz2",
+          "availableActions": [
+            {
+              "actionType": "CARD_ACTION_CAST_SPELL",
+              "displayText": "Cast Kytheon, Hero of Akros",
+              "disabledReason": "You don't have priority"
+            }
+          ]
+        },
+        {
+          "id": "thraizz2-card-4",
+          "name": "Hunted Witness",
+          "displayName": "Hunted Witness",
+          "manaCost": "{W}",
+          "type": "CREATURE@@@",
+          "color": "White",
+          "power": "1",
+          "toughness": "1",
+          "cardNumber": 15,
+          "expansionSetCode": "GRN",
+          "rarity": "COMMON",
+          "rulesText": "When {this} dies, create a 1/1 white Soldier creature token with lifelink.@@@",
+          "zone": 1,
+          "controllerId": "thraizz2",
+          "ownerId": "thraizz2",
+          "summoningSickness": true,
+          "availableActions": [
+            {
+              "actionType": "CARD_ACTION_CAST_SPELL",
+              "displayText": "Cast Hunted Witness",
+              "disabledReason": "You don't have priority"
+            }
+          ]
+        },
+        {
+          "id": "thraizz2-card-38",
+          "name": "Brave the Elements",
+          "displayName": "Brave the Elements",
+          "manaCost": "{W}",
+          "type": "INSTANT@@@",
+          "color": "White",
+          "power": "0",
+          "toughness": "0",
+          "cardNumber": 66,
+          "expansionSetCode": "C14",
+          "rarity": "UNCOMMON",
+          "rulesText": "Choose a color. White creatures you control gain protection from the chosen color until end of turn.@@@",
+          "zone": 1,
+          "controllerId": "thraizz2",
+          "ownerId": "thraizz2",
+          "availableActions": [
+            {
+              "actionType": "CARD_ACTION_CAST_SPELL",
+              "displayText": "Cast Brave the Elements",
+              "disabledReason": "You don't have priority"
+            }
+          ]
+        }
+      ],
+      "manaPool": {},
+      "keptHand": true,
+      "graveyard": []
+    }
+  ],
+  "activePlayerId": "thraizz",
+  "priorityPlayerId": "thraizz",
+  "turn": 3,
+  "phase": "BEGINNING",
+  "step": "DRAW",
+  "battlefield": [
+    {
+      "id": "4289f73e-742f-454b-a44a-41a973de2b1e",
+      "name": "Goblin",
+      "displayName": "Goblin Token",
+      "type": "Creature — Goblin",
+      "color": "red",
+      "power": "1",
+      "toughness": "1",
+      "zone": 2,
+      "controllerId": "thraizz2",
+      "ownerId": "thraizz2"
+    },
+    {
+      "id": "thraizz2-card-87",
+      "name": "Plains",
+      "displayName": "Plains",
+      "type": "LAND@@@",
+      "color": "Colorless",
+      "power": "0",
+      "toughness": "0",
+      "cardNumber": 364,
+      "expansionSetCode": "10E",
+      "rarity": "LAND",
+      "rulesText": "{T}: Add {W}.@@@",
+      "zone": 2,
+      "controllerId": "thraizz2",
+      "ownerId": "thraizz2",
+      "availableActions": [
+        {
+          "actionType": "CARD_ACTION_ACTIVATE_MANA_ABILITY",
+          "actionId": "thraizz2-card-87",
+          "displayText": "{T}: Add {W}",
+          "disabledReason": "You don't have priority"
+        }
+      ]
+    },
+    {
+      "id": "thraizz2-card-7",
+      "name": "Doomed Traveler",
+      "displayName": "Doomed Traveler",
+      "manaCost": "{W}",
+      "type": "CREATURE@@@",
+      "color": "White",
+      "power": "1",
+      "toughness": "1",
+      "cardNumber": 9,
+      "expansionSetCode": "2X2",
+      "rarity": "COMMON",
+      "rulesText": "When {this} dies, create a 1/1 white Spirit creature token with flying.@@@",
+      "zone": 2,
+      "controllerId": "thraizz2",
+      "ownerId": "thraizz2",
+      "summoningSickness": true
+    },
+    {
+      "id": "thraizz-card-35",
+      "name": "Island",
+      "displayName": "Island",
+      "type": "LAND@@@",
+      "color": "Colorless",
+      "power": "0",
+      "toughness": "0",
+      "cardNumber": 368,
+      "expansionSetCode": "10E",
+      "rarity": "LAND",
+      "rulesText": "{T}: Add {U}.@@@",
+      "tapped": true,
+      "zone": 2,
+      "controllerId": "thraizz",
+      "ownerId": "thraizz"
+    }
+  ],
+  "startTime": "2025-12-08T08:32:48.704846Z",
+  "activePlayerName": "thraizz",
+  "priorityPlayerName": "thraizz",
+  "gameFormat": "Commander",
+  "landsPlayedThisTurn": 1,
+  "landsAllowedThisTurn": 1,
+  "stack": [],
+  "exile": [],
+  "command": [],
+  "messages": []
 }

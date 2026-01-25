@@ -12,31 +12,31 @@ import type { JwtPayload } from '$lib/types/auth';
  * @returns Decoded payload or null if invalid
  */
 export function decodeJwt(token: string): JwtPayload | null {
-	try {
-		// JWT format: header.payload.signature
-		const parts = token.split('.');
-		if (parts.length !== 3) {
-			console.error('Invalid JWT format: expected 3 parts');
-			return null;
-		}
+  try {
+    // JWT format: header.payload.signature
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.error('Invalid JWT format: expected 3 parts');
+      return null;
+    }
 
-		// Decode the payload (second part)
-		const payload = parts[1];
+    // Decode the payload (second part)
+    const payload = parts[1];
 
-		// Base64url decode
-		const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-		const jsonPayload = decodeURIComponent(
-			atob(base64)
-				.split('')
-				.map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-				.join('')
-		);
+    // Base64url decode
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
 
-		return JSON.parse(jsonPayload) as JwtPayload;
-	} catch (error) {
-		console.error('Failed to decode JWT:', error);
-		return null;
-	}
+    return JSON.parse(jsonPayload) as JwtPayload;
+  } catch (error) {
+    console.error('Failed to decode JWT:', error);
+    return null;
+  }
 }
 
 /**
@@ -46,14 +46,14 @@ export function decodeJwt(token: string): JwtPayload | null {
  * @returns true if expired, false if valid
  */
 export function isTokenExpired(token: string): boolean {
-	const payload = decodeJwt(token);
-	if (!payload || !payload.exp) {
-		return true;
-	}
+  const payload = decodeJwt(token);
+  if (!payload || !payload.exp) {
+    return true;
+  }
 
-	// exp is in seconds, Date.now() is in milliseconds
-	const currentTime = Date.now() / 1000;
-	return payload.exp < currentTime;
+  // exp is in seconds, Date.now() is in milliseconds
+  const currentTime = Date.now() / 1000;
+  return payload.exp < currentTime;
 }
 
 /**
@@ -63,14 +63,14 @@ export function isTokenExpired(token: string): boolean {
  * @returns seconds until expiration, or 0 if expired/invalid
  */
 export function getTokenTimeRemaining(token: string): number {
-	const payload = decodeJwt(token);
-	if (!payload || !payload.exp) {
-		return 0;
-	}
+  const payload = decodeJwt(token);
+  if (!payload || !payload.exp) {
+    return 0;
+  }
 
-	const currentTime = Date.now() / 1000;
-	const remaining = payload.exp - currentTime;
-	return Math.max(0, remaining);
+  const currentTime = Date.now() / 1000;
+  const remaining = payload.exp - currentTime;
+  return Math.max(0, remaining);
 }
 
 /**
@@ -80,18 +80,18 @@ export function getTokenTimeRemaining(token: string): number {
  * @returns User info object or null if invalid
  */
 export function getUserFromToken(
-	token: string
+  token: string
 ): { id: string; username: string; email: string } | null {
-	const payload = decodeJwt(token);
-	if (!payload) {
-		return null;
-	}
+  const payload = decodeJwt(token);
+  if (!payload) {
+    return null;
+  }
 
-	return {
-		id: payload.sub,
-		username: payload.username,
-		email: payload.email || `${payload.username}@example.com`
-	};
+  return {
+    id: payload.sub,
+    username: payload.username,
+    email: payload.email || `${payload.username}@example.com`
+  };
 }
 
 /**
@@ -101,11 +101,11 @@ export function getUserFromToken(
  * @returns Session ID or null if not found
  */
 export function getSessionIdFromToken(token: string): string | null {
-	const payload = decodeJwt(token);
-	if (!payload) {
-		return null;
-	}
-	return payload.sessionId || null;
+  const payload = decodeJwt(token);
+  if (!payload) {
+    return null;
+  }
+  return payload.sessionId || null;
 }
 
 /**
@@ -120,34 +120,34 @@ export function getSessionIdFromToken(token: string): string | null {
  * @returns JWT-formatted token string
  */
 export function createSessionToken(
-	sessionId: string,
-	userId: string,
-	username: string,
-	email?: string,
-	expiresIn: number = 86400 // 24 hours
+  sessionId: string,
+  userId: string,
+  username: string,
+  email?: string,
+  expiresIn: number = 86400 // 24 hours
 ): string {
-	const now = Math.floor(Date.now() / 1000);
-	const exp = now + expiresIn;
+  const now = Math.floor(Date.now() / 1000);
+  const exp = now + expiresIn;
 
-	const payload = {
-		sub: userId,
-		sessionId: sessionId, // Store sessionId in payload
-		username: username,
-		email: email || `${username}@example.com`,
-		exp,
-		iat: now
-	};
+  const payload = {
+    sub: userId,
+    sessionId: sessionId, // Store sessionId in payload
+    username: username,
+    email: email || `${username}@example.com`,
+    exp,
+    iat: now
+  };
 
-	const payloadStr = JSON.stringify(payload);
-	const encodedPayload = btoa(payloadStr);
+  const payloadStr = JSON.stringify(payload);
+  const encodedPayload = btoa(payloadStr);
 
-	// Create a JWT-like token: header.payload.signature
-	// For session tokens, we use "session" as the header type
-	const header = btoa(JSON.stringify({ typ: 'JWT', alg: 'session' }));
+  // Create a JWT-like token: header.payload.signature
+  // For session tokens, we use "session" as the header type
+  const header = btoa(JSON.stringify({ typ: 'JWT', alg: 'session' }));
 
-	// Use sessionId as part of the signature for validation
-	// In a real implementation, this would be signed by the server
-	const signature = btoa(sessionId).slice(0, 16); // Truncate for consistency
+  // Use sessionId as part of the signature for validation
+  // In a real implementation, this would be signed by the server
+  const signature = btoa(sessionId).slice(0, 16); // Truncate for consistency
 
-	return `${header}.${encodedPayload}.${signature}`;
+  return `${header}.${encodedPayload}.${signature}`;
 }

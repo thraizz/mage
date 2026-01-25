@@ -19,49 +19,49 @@ const self = globalThis.self as unknown as ServiceWorkerGlobalScope;
 const CACHE = `cache-${version}`;
 
 const ASSETS = [
-	...build, // the app itself
-	...files // everything in `static`
+  ...build, // the app itself
+  ...files // everything in `static`
 ];
 
 const IMAGE_CACHE = 'scryfall-images-v1';
 
 self.addEventListener('install', (event) => {
-	// Create a new cache and add all files to it
-	async function addFilesToCache() {
-		const cache = await caches.open(CACHE);
-		await cache.addAll(ASSETS);
-	}
+  // Create a new cache and add all files to it
+  async function addFilesToCache() {
+    const cache = await caches.open(CACHE);
+    await cache.addAll(ASSETS);
+  }
 
-	event.waitUntil(addFilesToCache());
+  event.waitUntil(addFilesToCache());
 });
 
 self.addEventListener('activate', (event) => {
-	// Remove previous cached data from disk
-	async function deleteOldCaches() {
-		for (const key of await caches.keys()) {
-			if (key !== CACHE) await caches.delete(key);
-		}
-	}
+  // Remove previous cached data from disk
+  async function deleteOldCaches() {
+    for (const key of await caches.keys()) {
+      if (key !== CACHE) await caches.delete(key);
+    }
+  }
 
-	event.waitUntil(deleteOldCaches());
+  event.waitUntil(deleteOldCaches());
 });
 self.addEventListener('fetch', (event) => {
-	const url = new URL(event.request.url);
+  const url = new URL(event.request.url);
 
-	// Cache Scryfall images aggressively
-	if (url.hostname === 'api.scryfall.com' && url.pathname.includes('/cards/named')) {
-		event.respondWith(
-			caches.open(IMAGE_CACHE).then((cache) => {
-				return cache.match(event.request).then((response) => {
-					if (response) return response;
+  // Cache Scryfall images aggressively
+  if (url.hostname === 'api.scryfall.com' && url.pathname.includes('/cards/named')) {
+    event.respondWith(
+      caches.open(IMAGE_CACHE).then((cache) => {
+        return cache.match(event.request).then((response) => {
+          if (response) return response;
 
-					return fetch(event.request).then((fetchResponse) => {
-						// Cache for 7 days (Scryfall images rarely change)
-						cache.put(event.request, fetchResponse.clone());
-						return fetchResponse;
-					});
-				});
-			})
-		);
-	}
+          return fetch(event.request).then((fetchResponse) => {
+            // Cache for 7 days (Scryfall images rarely change)
+            cache.put(event.request, fetchResponse.clone());
+            return fetchResponse;
+          });
+        });
+      })
+    );
+  }
 });

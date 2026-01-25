@@ -13,19 +13,19 @@ import type { LayoutLoad } from './$types';
  * This ensures the auth store and connection are initialized before route guards run
  */
 export const load: LayoutLoad = async () => {
-	// Only run on client-side (browser)
-	if (browser) {
-		// Load authentication from localStorage if available
-		auth.loadAuthFromStorage();
+  // Only run on client-side (browser)
+  if (browser) {
+    // Load authentication from localStorage if available
+    auth.loadAuthFromStorage();
 
-		// Initialize connection with session keep-alive
-		// Server lease period is 120 seconds, so ping every 60 seconds to keep session alive
-		connection.initialize({
-			enableHealthCheck: true,
-			healthCheckInterval: 60000, // Ping every 60 seconds (server lease is 120 seconds)
-			autoReconnect: true
-		});
-	}
+    // Initialize connection with session keep-alive
+    // Server lease period is 120 seconds, so ping every 60 seconds to keep session alive
+    connection.initialize({
+      enableHealthCheck: true,
+      healthCheckInterval: 60000, // Ping every 60 seconds (server lease is 120 seconds)
+      autoReconnect: true
+    });
+  }
 
-	return {};
+  return {};
 };
