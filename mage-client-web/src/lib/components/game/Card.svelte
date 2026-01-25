@@ -169,16 +169,6 @@
           : '')
   );
 
-  // Larger image URL for the hover preview
-  const previewImageUrl = $derived(
-    imageUrl ||
-      (isToken && tokenImageUrl
-        ? tokenImageUrl
-        : !isCardBack && !isPlaceholder && cardName
-          ? getScryfallImageUrl(cardName, 'large')
-          : '')
-  );
-
   // Create portal container for preview (to avoid transform issues with fixed positioning)
   let portalContainer: HTMLDivElement | null = null;
 
@@ -263,11 +253,11 @@
   $effect(() => {
     if (!portalContainer) return;
 
-    if (showPreview && !isCardBack && !isPlaceholder && previewImageUrl) {
+    if (showPreview && !isCardBack && !isPlaceholder && effectiveImageUrl) {
       // Create/update preview element - centered in viewport
       portalContainer.innerHTML = `
 				<div class="card-preview">
-					<img src="${previewImageUrl}" alt="${cardName} (preview)" class="preview-image" />
+					<img src="${effectiveImageUrl}" alt="${cardName} (preview)" class="preview-image" />
 				</div>
 			`;
     } else {

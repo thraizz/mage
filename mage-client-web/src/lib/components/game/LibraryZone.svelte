@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { toPossessiveName } from '$lib/utils/localization';
   /**
    * LibraryZone - Compact button to view library/deck contents
    * Styled like Graveyard and ExileZone buttons.
@@ -46,7 +47,7 @@
     }
   }}
   disabled={isOpponent}
-  title="{playerName}'s Library ({libraryCount} cards){isEmpty || isOpponent
+  title="{toPossessiveName(playerName)} Library ({libraryCount} cards){isEmpty || isOpponent
     ? ''
     : ' - Click to view, Right-click for actions'}"
 >

@@ -1,14 +1,15 @@
 <script lang="ts">
-  import Card from './Card.svelte';
   import type { GameCard } from '$lib/types/game';
   import {
     dragDropStore,
-    isDragging as isDraggingStore,
     draggedCardId,
     getAllValidDropZones,
+    isDragging as isDraggingStore,
     type SourceZone
   } from '$lib/utils/drag-drop';
+  import { toPossessiveName } from '$lib/utils/localization';
   import Skull from '@lucide/svelte/icons/skull';
+  import Card from './Card.svelte';
 
   // Props
   let {
@@ -178,7 +179,7 @@
   <div class="graveyard-modal-backdrop" onclick={handleBackdropClick}>
     <div class="graveyard-modal">
       <div class="modal-header">
-        <h3>{playerName}'s Graveyard</h3>
+        <h3>{toPossessiveName(playerName)} Graveyard</h3>
         <span class="card-count-text">{cardCount} card{cardCount !== 1 ? 's' : ''}</span>
         <button class="close-button" onclick={closeModal} title="Close">✕</button>
       </div>

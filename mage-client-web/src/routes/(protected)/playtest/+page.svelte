@@ -32,6 +32,7 @@
   import PlayerHand from '$lib/components/game/PlayerHand.svelte';
   import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
   import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
+  import SessionPicker from '$lib/components/game/SessionPicker.svelte';
   import {
     currentDropZone,
     dragDropStore,
@@ -62,9 +63,6 @@
   const dragPos = $derived($dragPosition);
   const isOverValidDrop = $derived($isOverValidDropZone);
   const dropZone = $derived($currentDropZone);
-
-  // Game log
-  const gameLog = $derived($playtestGameStore.log || []);
 
   // Drop zone elements
   let battlefieldDropZoneEl: HTMLDivElement | null = $state(null);
@@ -915,15 +913,9 @@
       isMultiplayer={false}
       {players}
       {activeControlSeat}
-      availableSessions={availableSessions.length}
       {turnNumber}
       {activePlayerName}
       showAllHands={uiState.showAllHands}
-      onBack={() => goto('/lobby')}
-      onSessionsClick={() => {
-        loadAvailableSessions();
-        showSessionPicker = true;
-      }}
       onSwitchPlayer={switchPlayer}
       onToggleAllHands={() => (uiState.showAllHands = !uiState.showAllHands)}
       onDrawCard={handleDrawCard}
@@ -938,55 +930,14 @@
     />
 
     <!-- Session Picker Overlay for restoring older playtest sessions -->
-    {#if showSessionPicker}
-      <div class="session-picker-overlay">
-        <div class="session-picker-modal">
-          <h2>Restore Playtest Session</h2>
-          <p class="session-picker-hint">
-            Select a recent playtest session to continue, or start a new one.
-          </p>
-
-          {#if availableSessions.length > 0}
-            <div class="sessions-list">
-              {#each availableSessions as session (session.id)}
-                <div class="session-card">
-                  <div class="session-info">
-                    <div class="session-label">{session.label}</div>
-                    <div class="session-meta">
-                      {session.playerCount} players · Turn {session.turn} ·
-                      {new Date(session.savedAt).toLocaleDateString()}
-                      {new Date(session.savedAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </div>
-                  </div>
-                  <div class="session-actions">
-                    <button class="btn-restore" onclick={() => restoreSession(session.id)}>
-                      Restore
-                    </button>
-                    <button
-                      class="btn-delete"
-                      onclick={() => deleteSession(session.id)}
-                      title="Delete session"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-              {/each}
-            </div>
-          {:else}
-            <p class="no-sessions">No saved sessions found.</p>
-          {/if}
-
-          <div class="session-picker-actions">
-            <button class="btn-back" onclick={() => (showSessionPicker = false)}> Back</button>
-            <button class="btn-primary" onclick={() => goto('/lobby')}> Start New Playtest </button>
-          </div>
-        </div>
-      </div>
-    {/if}
+    <SessionPicker
+      show={showSessionPicker}
+      sessions={availableSessions}
+      onRestore={restoreSession}
+      onDelete={deleteSession}
+      onClose={() => (showSessionPicker = false)}
+      onNewPlaytest={() => goto('/lobby')}
+    />
 
     <!-- Menu Overlay -->
     <GameMenu
@@ -1157,6 +1108,10 @@
             libraryDropZoneRef={(el) => (libraryDropZoneEl = el)}
             graveyardDropZoneRef={(el) => (graveyardDropZoneEl = el)}
             exileDropZoneRef={(el) => (exileDropZoneEl = el)}
+            isPlaytest={true}
+            {players}
+            {activeControlSeat}
+            onSwitchPlayer={switchPlayer}
           />
         {/if}
 

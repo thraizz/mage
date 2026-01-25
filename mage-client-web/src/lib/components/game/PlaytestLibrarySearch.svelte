@@ -1,6 +1,7 @@
 <script lang="ts">
-  import type { CardView } from '$lib/generated/mage/v1/models';
   import ManaCost from '$lib/components/mtg/ManaCost.svelte';
+  import type { CardView } from '$lib/generated/mage/v1/models';
+  import { toPossessiveName } from '$lib/utils/localization';
   import { getScryfallImageUrl } from '$lib/utils/scryfall';
 
   let {
@@ -103,7 +104,7 @@
   <div class="modal">
     <header class="header">
       <div class="title">
-        <h2>📚 {playerName === 'You' ? 'Your' : `${playerName}'s`} Deck</h2>
+        <h2>📚 {toPossessiveName(playerName)} Deck</h2>
         <span class="count">{cards.length} cards</span>
       </div>
       <button class="close" onclick={onClose} title="Close">✕</button>

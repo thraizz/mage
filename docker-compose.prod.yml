@@ -1,5 +1,5 @@
 # MAGE - Production Docker Compose Configuration
-# 
+#
 # Pre-configured for Option 1: Separate Subdomains
 # - Frontend: mage.aronschueler.de (port 3000)
 # - Backend:  api.mage.aronschueler.de (port 17171)
@@ -39,8 +39,8 @@ services:
       - ./mage-server-go/migrations:/docker-entrypoint-initdb.d/migrations:ro
       - ./mage-server-go/data:/docker-entrypoint-initdb.d/data:ro
     # Port not exposed to host for security - containers communicate via Docker network
-    # ports:
-    #   - "5432:5432"
+    ports:
+      - "12399:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U mage -d mage"]
       interval: 10s
@@ -74,9 +74,9 @@ services:
       WEBSOCKET_ADDRESS: "0.0.0.0:17179"
       HEALTH_ADDRESS: "0.0.0.0:8080"
     ports:
-      - "17171:17171"  # gRPC / HTTP-JSON API
-      - "17179:17179"  # WebSocket
-      - "8080:8080"    # Health check
+      - "17171:17171" # gRPC / HTTP-JSON API
+      - "17179:17179" # WebSocket
+      - "8080:8080" # Health check
     volumes:
       # Mount the Docker-specific config file
       - ./mage-server-go/config/config.docker.yaml:/app/config/config.yaml:ro
@@ -86,11 +86,19 @@ services:
       - mage-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/health",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 180s  # Extended to allow for Scryfall import on first boot
+      start_period: 180s # Extended to allow for Scryfall import on first boot
 
   # MAGE Svelte web client
   mage-client:
@@ -115,7 +123,15 @@ services:
       - mage-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

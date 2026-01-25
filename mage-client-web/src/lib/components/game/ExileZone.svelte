@@ -1,14 +1,15 @@
 <script lang="ts">
-  import Card from './Card.svelte';
   import type { GameCard } from '$lib/types/game';
   import {
     dragDropStore,
-    isDragging as isDraggingStore,
     draggedCardId,
     getAllValidDropZones,
+    isDragging as isDraggingStore,
     type SourceZone
   } from '$lib/utils/drag-drop';
+  import { toPossessiveName } from '$lib/utils/localization';
   import Sparkles from '@lucide/svelte/icons/sparkles';
+  import Card from './Card.svelte';
 
   // Props
   let {
@@ -166,7 +167,9 @@
     class:has-cards={!isEmpty}
     class:opponent={isOpponent}
     onclick={toggleModal}
-    title="{playerName}'s Exile ({cardCount} cards){isEmpty ? '' : ' - Click to view'}"
+    title="{toPossessiveName(playerName)} Exile ({cardCount} cards){isEmpty
+      ? ''
+      : ' - Click to view'}"
   >
     <span class="exile-icon-compact">
       <Sparkles size={14} />
@@ -182,7 +185,7 @@
       class:empty={isEmpty}
       onclick={toggleModal}
       disabled={isEmpty}
-      title="{playerName}'s Exile ({cardCount} cards)"
+      title="{toPossessiveName(playerName)} Exile ({cardCount} cards)"
     >
       <div class="exile-icon">
         {#if isEmpty}
@@ -208,7 +211,7 @@
   <div class="exile-modal-backdrop" onclick={handleBackdropClick}>
     <div class="exile-modal">
       <div class="modal-header">
-        <h3>{playerName}'s Exile</h3>
+        <h3>{toPossessiveName(playerName)} Exile</h3>
         <span class="card-count-text">{cardCount} card{cardCount !== 1 ? 's' : ''}</span>
         <button class="close-button" onclick={closeModal} title="Close">✕</button>
       </div>

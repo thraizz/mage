@@ -1,12 +1,13 @@
 <script lang="ts">
+  import type { CardView } from '$lib/generated/mage/v1/models';
+  import { toPossessiveName } from '$lib/utils/localization';
   import Heart from '@lucide/svelte/icons/heart';
   import Skull from '@lucide/svelte/icons/skull';
-  import LibraryZone from './LibraryZone.svelte';
-  import Graveyard from './Graveyard.svelte';
-  import ExileZone from './ExileZone.svelte';
-  import ManaPoolComponent from './ManaPool.svelte';
-  import type { CardView } from '$lib/generated/mage/v1/models';
   import type { Action } from 'svelte/action';
+  import ExileZone from './ExileZone.svelte';
+  import Graveyard from './Graveyard.svelte';
+  import LibraryZone from './LibraryZone.svelte';
+  import ManaPoolComponent from './ManaPool.svelte';
 
   interface Player {
     name: string;
@@ -38,6 +39,11 @@
     libraryDropZoneRef?: (el: HTMLElement | null) => void;
     graveyardDropZoneRef?: (el: HTMLElement | null) => void;
     exileDropZoneRef?: (el: HTMLElement | null) => void;
+    // Playtest-specific props
+    isPlaytest?: boolean;
+    players?: Array<{ playerId: string; name: string }>;
+    activeControlSeat?: string;
+    onSwitchPlayer?: (playerId: string) => void;
   }
 
   let {
@@ -53,7 +59,11 @@
     onDeckContextMenu,
     libraryDropZoneRef,
     graveyardDropZoneRef,
-    exileDropZoneRef
+    exileDropZoneRef,
+    isPlaytest = false,
+    players = [],
+    activeControlSeat = '',
+    onSwitchPlayer
   }: Props = $props();
 
   let lifeMenuEl: HTMLDivElement | null = $state(null);
@@ -89,13 +99,34 @@
 
 <div class="player-info-row">
   <div class="player-identity">
-    <span class="player-name">{player.name}</span>
+    {#if isPlaytest && players.length > 0 && onSwitchPlayer}
+      <div class="controlling-dropdown">
+        <select
+          id="player-controlling-select"
+          class="player-select"
+          value={activeControlSeat}
+          onchange={(e) => onSwitchPlayer?.(e.currentTarget.value)}
+        >
+          {#each players as p}
+            <option value={p.playerId}>{p.name}</option>
+          {/each}
+        </select>
+      </div>
+    {:else if player}
+      <span class="player-name">{player.name}</span>
+    {:else}
+      <span class="player-name">Waiting for player...</span>
+    {/if}
   </div>
 
   <div class="player-stats-inline">
     <div class="life-group">
       <button class="stat-btn minus" onclick={() => onLifeChange(-1)}>−</button>
-      <button class="stat-display life" onclick={onToggleLifeMenu}>
+      <button
+        title={`${toPossessiveName(player.name)} Life total`}
+        class="stat-display life"
+        onclick={onToggleLifeMenu}
+      >
         <span class="stat-icon"><Heart size={14} /></span>
         <span class="stat-value">{player.life}</span>
       </button>
@@ -185,3 +216,30 @@
     <ManaPoolComponent {mana} showEmpty={false} size="small" onManaClick={() => {}} />
   </div>
 </div>
+
+<style>
+  .controlling-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .player-select {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 4px;
+    border: 1px solid #374151;
+    background: #1e293b;
+    color: #e2e8f0;
+    cursor: pointer;
+  }
+
+  .player-select:hover {
+    border-color: #4b5563;
+  }
+
+  .player-select:focus {
+    outline: none;
+    border-color: #667eea;
+  }
+</style>
