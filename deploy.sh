@@ -59,6 +59,7 @@ if [[ "$FRONTEND_ONLY" == false ]]; then
 
     echo "  - Copying mage-server-go directory..."
     rsync -avz --progress \
+        --delete \
         --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r \
         --exclude='bin' \
         --exclude='*.log' \
@@ -69,6 +70,7 @@ fi
 
 echo "  - Copying mage-client-web directory..."
 rsync -avz --progress \
+    --delete \
     --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r \
     --exclude='node_modules' \
     --exclude='.svelte-kit' \

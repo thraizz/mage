@@ -24,12 +24,13 @@
 	import Card from '$lib/components/game/Card.svelte';
 	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
 	import DragGhost from '$lib/components/game/DragGhost.svelte';
+	import GameDialogs from '$lib/components/game/GameDialogs.svelte';
+	import GameMenu from '$lib/components/game/GameMenu.svelte';
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
 	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
 	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
-	import GameDialogs from '$lib/components/game/GameDialogs.svelte';
 	import {
 		currentDropZone,
 		dragDropStore,
@@ -40,13 +41,8 @@
 		type SourceZone
 	} from '$lib/utils/drag-drop';
 	import { useDropZones } from '$lib/utils/use-drop-zones.svelte';
-	import Clock from '@lucide/svelte/icons/clock';
 	import Copy from '@lucide/svelte/icons/copy';
-	import Eye from '@lucide/svelte/icons/eye';
-	import EyeOff from '@lucide/svelte/icons/eye-off';
 	import Heart from '@lucide/svelte/icons/heart';
-	import Keyboard from '@lucide/svelte/icons/keyboard';
-	import X from '@lucide/svelte/icons/x';
 
 	// State
 	let loading = $state(true);
@@ -1006,125 +1002,25 @@
 			</div>
 		{/if}
 
-		<!-- Menu Overlay (slide-in from right) -->
-		{#if uiState.showMenu}
-			<!-- Backdrop -->
-			<div
-				class="menu-backdrop"
-				role="button"
-				tabindex="0"
-				onclick={() => (uiState.showMenu = false)}
-				onkeydown={(e) => e.key === 'Escape' && (uiState.showMenu = false)}
-			></div>
-
-			<!-- Menu Panel -->
-			<div class="menu-overlay open">
-				<div class="menu-header">
-					<h2>Menu</h2>
-					<button
-						class="menu-close-btn"
-						onclick={() => (uiState.showMenu = false)}
-						aria-label="Close menu"
-					>
-						<X size={24} />
-					</button>
-				</div>
-
-				<div class="menu-content">
-					<!-- Controls Section -->
-					<div class="menu-section">
-						<h3 class="menu-section-title">Controls</h3>
-						<div class="menu-section-content">
-							<label>
-								<span class="menu-label">Controlling:</span>
-								<select
-									class="control-select"
-									value={activeControlSeat}
-									onchange={(e) => playtestGameStore.switchControlSeat(e.currentTarget.value)}
-								>
-									{#each players as player}
-										<option value={player.playerId}>{player.name}</option>
-									{/each}
-								</select>
-							</label>
-
-							<button
-								class="menu-btn"
-								onclick={() => (uiState.showAllHands = !uiState.showAllHands)}
-							>
-								{#if uiState.showAllHands}
-									<EyeOff size={16} />
-									Hide
-								{:else}
-									<Eye size={16} />
-									Show
-								{/if}
-								All Hands
-							</button>
-						</div>
-					</div>
-
-					<!-- Turn Info Section -->
-					<div class="menu-section">
-						<h3 class="menu-section-title">Turn Info</h3>
-						<div class="menu-section-content">
-							<div class="turn-info">
-								<Clock size={18} />
-								<span>Turn {turnNumber}</span>
-								{#if activePlayerName}
-									<span class="active-player">· {activePlayerName}</span>
-								{/if}
-							</div>
-							<button class="menu-btn primary" onclick={handleNextTurn}>Next Turn</button>
-						</div>
-					</div>
-
-					<!-- Utility Section -->
-					<div class="menu-section">
-						<h3 class="menu-section-title">Utilities</h3>
-						<div class="menu-section-content">
-							<button
-								class="menu-btn"
-								onclick={() => {
-									uiState.showKeyboardShortcuts = true;
-									uiState.showMenu = false;
-								}}
-							>
-								<Keyboard size={18} />
-								Keyboard Shortcuts
-							</button>
-							<button
-								class="menu-btn"
-								onclick={() => {
-									uiState.showDebugOverlay = true;
-									uiState.showMenu = false;
-								}}
-							>
-								🔧 Debug View
-							</button>
-						</div>
-					</div>
-
-					<!-- Navigation Section -->
-					<div class="menu-section">
-						<h3 class="menu-section-title">Navigation</h3>
-						<div class="menu-section-content">
-							<button class="menu-btn" onclick={() => goto('/lobby')}> ← Back to Lobby </button>
-							<button
-								class="menu-btn"
-								onclick={() => {
-									showSessionPicker = true;
-									uiState.showMenu = false;
-								}}
-							>
-								<Clock size={18} />
-								Sessions
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		{/if}
+		<!-- Menu Overlay -->
+		<GameMenu
+			isOpen={uiState.showMenu}
+			isMultiplayer={false}
+			{players}
+			{activeControlSeat}
+			{turnNumber}
+			{activePlayerName}
+			availableSessions={availableSessions.length}
+			showAllHands={uiState.showAllHands}
+			onClose={() => (uiState.showMenu = false)}
+			onBackToLobby={() => goto('/lobby')}
+			onShowKeyboardShortcuts={() => (uiState.showKeyboardShortcuts = true)}
+			onSwitchPlayer={(playerId) => playtestGameStore.switchControlSeat(playerId)}
+			onToggleAllHands={() => (uiState.showAllHands = !uiState.showAllHands)}
+			onNextTurn={handleNextTurn}
+			onShowDebug={() => (uiState.showDebugOverlay = true)}
+			onSessionsClick={() => (showSessionPicker = true)}
+		/>
 
 		<!-- All Hands Overlay -->
 		{#if uiState.showAllHands}
@@ -1374,18 +1270,6 @@
 									<Copy size={16} aria-hidden="true" />
 									<span>Copy JSON</span>
 								</button>
-							</div>
-							<div class="debug-code">
-								<pre><code
-										>{@html `<span class="dc">// Complete game state in JSON format</span>
-<span class="dc">// Includes all players, zones, cards, and game info</span>
-<span class="dc">// Click "Copy JSON" to copy to clipboard</span>
-
-<span class="dk">myState:</span> { hand, battlefield, graveyard, exile, command, manaPool, life, ... }
-<span class="dk">opponents:</span> [{ name, battlefield, graveyard, life, ... }]
-<span class="dk">gameState:</span> { turnNumber, activePlayer, currentPhase, stack }
-<span class="dk">gameLog:</span> "T1: Player drew 7 cards\\nT1: Player kept hand\\n..."`}</code
-									></pre>
 							</div>
 						</section>
 

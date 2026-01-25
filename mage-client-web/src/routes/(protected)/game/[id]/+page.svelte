@@ -22,14 +22,13 @@
 	import BattlefieldArea from '$lib/components/game/BattlefieldArea.svelte';
 	import DragGhost from '$lib/components/game/DragGhost.svelte';
 	import GameDialogs from '$lib/components/game/GameDialogs.svelte';
+	import GameMenu from '$lib/components/game/GameMenu.svelte';
 	import OpponentSection from '$lib/components/game/OpponentSection.svelte';
 	import PlayerHand from '$lib/components/game/PlayerHand.svelte';
 	import PlayerInfoRow from '$lib/components/game/PlayerInfoRow.svelte';
 	import PlaytestHeader from '$lib/components/game/PlaytestHeader.svelte';
 
 	import type { MenuAction } from '$lib/components/game/DeckContextMenu.svelte';
-	import Keyboard from '@lucide/svelte/icons/keyboard';
-	import X from '@lucide/svelte/icons/x';
 
 	import MulliganDialog from '$lib/components/game/MulliganDialog.svelte';
 	import {
@@ -738,54 +737,14 @@
 			onToggleMenu={() => (uiState.showMenu = !uiState.showMenu)}
 		/>
 
-		<!-- Menu Overlay (from playtest/+page.svelte lines 1403-1514) -->
-		{#if uiState.showMenu}
-			<div
-				class="menu-backdrop"
-				role="button"
-				tabindex="0"
-				onclick={() => (uiState.showMenu = false)}
-				onkeydown={(e) => e.key === 'Escape' && (uiState.showMenu = false)}
-			></div>
-
-			<div class="menu-overlay open">
-				<div class="menu-header">
-					<h2>Menu</h2>
-					<button
-						class="menu-close-btn"
-						onclick={() => (uiState.showMenu = false)}
-						aria-label="Close menu"
-					>
-						<X size={24} />
-					</button>
-				</div>
-
-				<div class="menu-content">
-					<div class="menu-section">
-						<h3 class="menu-section-title">Utilities</h3>
-						<div class="menu-section-content">
-							<button
-								class="menu-btn"
-								onclick={() => {
-									uiState.showKeyboardShortcuts = true;
-									uiState.showMenu = false;
-								}}
-							>
-								<Keyboard size={18} />
-								Keyboard Shortcuts
-							</button>
-						</div>
-					</div>
-
-					<div class="menu-section">
-						<h3 class="menu-section-title">Navigation</h3>
-						<div class="menu-section-content">
-							<button class="menu-btn" onclick={() => goto('/lobby')}> ← Back to Lobby </button>
-						</div>
-					</div>
-				</div>
-			</div>
-		{/if}
+		<!-- Menu Overlay -->
+		<GameMenu
+			isOpen={uiState.showMenu}
+			isMultiplayer={true}
+			onClose={() => (uiState.showMenu = false)}
+			onBackToLobby={() => goto('/lobby')}
+			onShowKeyboardShortcuts={() => (uiState.showKeyboardShortcuts = true)}
+		/>
 
 		<!-- Main Game Area (from playtest/+page.svelte lines 1535-1677) -->
 		<main class="game-layout">
@@ -1048,111 +1007,6 @@
 
 	.btn-primary:hover {
 		background: #357abd;
-	}
-
-	.menu-backdrop {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.5);
-		z-index: 999;
-	}
-
-	.menu-overlay {
-		position: fixed;
-		top: 0;
-		right: -400px;
-		width: 400px;
-		height: 100vh;
-		background: #1a1a2e;
-		box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
-		z-index: 1000;
-		transition: right 0.3s ease;
-		overflow-y: auto;
-	}
-
-	.menu-overlay.open {
-		right: 0;
-	}
-
-	.menu-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 20px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-	}
-
-	.menu-header h2 {
-		margin: 0;
-		color: white;
-		font-size: 24px;
-	}
-
-	.menu-close-btn {
-		background: none;
-		border: none;
-		color: white;
-		cursor: pointer;
-		padding: 5px;
-	}
-
-	.menu-content {
-		padding: 20px;
-	}
-
-	.menu-section {
-		margin-bottom: 30px;
-	}
-
-	.menu-section-title {
-		color: #4a90e2;
-		font-size: 14px;
-		text-transform: uppercase;
-		margin-bottom: 10px;
-		letter-spacing: 1px;
-	}
-
-	.menu-section-content {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-	}
-
-	.menu-btn {
-		padding: 10px 15px;
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 4px;
-		color: white;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		transition: background 0.2s;
-	}
-
-	.menu-btn:hover {
-		background: rgba(255, 255, 255, 0.2);
-	}
-
-	.menu-label {
-		color: #aaa;
-		font-size: 14px;
-		margin-bottom: 5px;
-		display: block;
-	}
-
-	.control-select {
-		width: 100%;
-		padding: 8px;
-		background: rgba(0, 0, 0, 0.3);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 4px;
-		color: white;
-		font-size: 14px;
 	}
 
 	.all-hands-overlay {
