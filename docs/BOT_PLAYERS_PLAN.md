@@ -780,6 +780,38 @@ Weeks, not days. Needed for online NPCs regardless of whether bots ever ship —
 
 ---
 
+## Known Issues
+
+### RESOLVED: `TestEveryLegalMoveExecutes` flake — coverage assertion over a random walk
+
+Observed during Phase 4 verification as a rare `internal/bot` failure; reproduced at
+`-count=40` under `-race`:
+
+```
+harness_test.go:389: macro kind "cast" was never exercised
+harness_test.go:392: exercised macro kinds: map[draw:5 modify_life:15 move_zone:7 play_land:4 tap:4 untap:1]
+```
+
+**Cause: a test defect, not a product defect.** The test asserted that every `Macro.Kind` gets
+exercised, but sourced its macros from a *random-policy* game. Whether a castable spell ever
+becomes available depends on draw order and mana, so `cast` legitimately fails to appear on some
+runs. The assertion rested on chance.
+
+**Fix:** the test now constructs the state each macro kind requires — a hand with a castable
+spell and untapped lands to pay for it — rather than hoping a random game produces one. The
+zero-tolerance gate on macros landing (`harness_test.go:219`) was **not** loosened; it is
+correct, and since `ProcessGameActions` swallows action errors it is the only thing that can see
+a dropped macro.
+
+Ruled out along the way, worth keeping: the statistical pacing assertions are fixed-seed
+(`NewHumanPacer(p, 20240826)`) and cannot drift.
+
+Still true and worth remembering: bot games are **not bit-reproducible** (Phase 3 finding — four
+bot goroutines interleave against one async `ActionQueue`; seed 1 finished at turn 40 on one run
+and turn 28 on another). Any future test that asserts an outcome of a *whole game* rather than of
+a constructed state is at risk of the same class of flake. A single-threaded stepper (see Open
+Questions) would remove the class entirely.
+
 ## Open Questions
 
 1. **Poll vs push.** Phase 3 polls because push is a deadlock hazard and needs an engine

@@ -85,15 +85,24 @@ type ViewSource interface {
 	GetGameView(gameID, playerID string) (interface{}, error)
 }
 
-// Pacing controls how fast a bot acts.
+// Pacing controls how fast a bot acts, and is the per-seat human-likeness
+// knob: two seats at one table can carry different Pacing values, which is how
+// personas get different speeds and different voices.
 //
-// Every field defaults to zero here, and zero means "as fast as the scheduler
-// allows". Phase 3's completion-rate test runs a hundred full games; human-like
-// delays would turn that into hours. Phase 4 adds the log-normal pacer that
-// makes bots look human in the real client, and it does it by filling these in
-// -- the runner already puts the delays in the right places, between
-// SendPlayerAction calls in the bot's own goroutine and never inside an engine
-// callback.
+// THE ZERO VALUE IS "NO DELAY AT ALL". Human is nil, the three fixed durations
+// are zero, and every wait below short-circuits to runtime.Gosched(). That is
+// not an accident to be tidied away later: Phase 3's completion-rate test runs
+// a hundred full games and `make bot-sim` runs it from the Makefile, and
+// human-like delays would turn a few seconds into hours. Paced runs opt in.
+//
+// Human, when non-nil, supersedes the fixed durations with log-normal draws
+// weighted by decision type (see pace.go). The fixed fields remain for a caller
+// who wants a flat delay without a distribution -- a slowed-down debugging run,
+// say -- and for the zero case.
+//
+// Every wait these fields drive is performed by the bot's own goroutine between
+// SendPlayerAction calls. None of them is reachable from a notification handler
+// or an engine callback; see the pace.go header and anti-pattern 2.
 type Pacing struct {
 	// Poll is how long to wait between GetGameView calls when there is nothing
 	// to do. Zero yields to the scheduler instead of sleeping.
@@ -103,6 +112,40 @@ type Pacing struct {
 	// BetweenSteps staggers a macro's steps so a watching client animates each
 	// one separately.
 	BetweenSteps time.Duration
+
+	// Human, when non-nil, replaces the three durations above with log-normal
+	// draws. It also owns the hesitation and chat-frequency rolls.
+	Human *HumanPacer
+
+	// Chat is where this seat's lines come from. Nil means the seat plays in
+	// silence. Phase 5 swaps CannedChat for the model's own `why` text without
+	// touching the runner.
+	Chat ChatSource
+}
+
+// preActionDelay is the "thinking" pause before a macro of this kind, weighted
+// by how hard the decision would be for a person.
+func (p Pacing) preActionDelay(k Kind) time.Duration {
+	if p.Human != nil {
+		return p.Human.PreActionDelay(k)
+	}
+	return p.PreAction
+}
+
+// stepDelay is the stagger between two commands of one macro.
+func (p Pacing) stepDelay() time.Duration {
+	if p.Human != nil {
+		return p.Human.StepDelay()
+	}
+	return p.BetweenSteps
+}
+
+// pollDelay is the idle sleep while another seat has the turn.
+func (p Pacing) pollDelay() time.Duration {
+	if p.Human != nil {
+		return p.Human.PollDelay()
+	}
+	return p.Poll
 }
 
 func (p Pacing) wait(ctx context.Context, d time.Duration) bool {
@@ -131,7 +174,20 @@ type RunnerConfig struct {
 	// castable.
 	Oracle OracleLookup
 
+	// Pacing is the default for seats added with AddSeat. AddSeatWithPacing
+	// overrides it per seat.
 	Pacing Pacing
+
+	// Chat is the table-wide half of chat: where lines go. The other half --
+	// what a given seat says -- lives on that seat's Pacing.Chat, because voice
+	// is a per-persona property and the sink is not.
+	Chat ChatConfig
+
+	// Presence is the activity/heartbeat signal a human client emits, if this
+	// deployment has one for a bot to emit too. See ChatConfig's note and the
+	// Presence doc: for an in-process headless bot this is nil, and there is
+	// nothing to emit.
+	Presence Presence
 
 	// MaxActionsPerTurn bounds a seat's action loop before the turn is passed
 	// regardless of what the policy wants. It is what guarantees the simulation
@@ -148,6 +204,45 @@ type RunnerConfig struct {
 	StepTimeout time.Duration
 
 	Logger *zap.Logger
+}
+
+// ChatConfig points a runner's seats at a chat room.
+//
+// Sink is satisfied directly by *chat.Manager (internal/chat/manager.go:152:
+// SendMessage(roomID, username, text string) error). RoomID is the table's chat
+// room -- the same ID grpc_table.go passes to chatMgr, which for a real table
+// is the table's RoomID.
+//
+// Both zero means no chat, which is the headless-simulation case.
+type ChatConfig struct {
+	Sink   ChatSink
+	RoomID string
+}
+
+func (c ChatConfig) enabled() bool { return c.Sink != nil && c.RoomID != "" }
+
+// Presence is the activity/heartbeat signal a human client emits so the server
+// does not expire its session.
+//
+// FINDING (Phase 4, task 4): a headless bot has nothing to emit. The only
+// activity signal in this codebase is session.Manager.UpdateActivity /
+// Session.UpdateActivity (internal/session/session.go:73), which pushes out a
+// session's lease so CleanupExpiredSessions does not reap it. It is driven from
+// exactly three places, all of them gRPC entry points
+// (internal/server/interceptors.go:105, internal/server/grpc.go:961, :1013,
+// :1031) and all of them keyed by a session ID that a gRPC client established.
+// A bot that lives in the server process has no session, no lease, and nothing
+// to keep alive; there is also no client-visible presence indicator to feed --
+// nothing in mage-client-web renders LastActivity or an online/typing state.
+//
+// So this is an interface with no production implementation on purpose. It is
+// the seam for the day bots run out-of-process as real gRPC clients (Open
+// Question 2 in the plan), at which point the transport's own keepalive is what
+// implements it. Building a fake session for an in-process bot would create a
+// lease to expire and a reaper to fight, for no observable benefit.
+type Presence interface {
+	// Touch records that the bot is still alive and playing.
+	Touch()
 }
 
 func (c *RunnerConfig) applyDefaults() {
@@ -203,9 +298,19 @@ func NewBotRunner(cfg RunnerConfig) *BotRunner {
 	return &BotRunner{cfg: cfg}
 }
 
-// AddSeat registers a bot seat and the policy that drives it.
+// AddSeat registers a bot seat and the policy that drives it, using the
+// runner's default Pacing.
 func (r *BotRunner) AddSeat(botID string, p Policy) {
-	r.seats = append(r.seats, &seat{r: r, botID: botID, policy: p})
+	r.AddSeatWithPacing(botID, p, r.cfg.Pacing)
+}
+
+// AddSeatWithPacing registers a seat with its own pacing.
+//
+// This is how personas differ: give each seat a HumanPacer over its own profile
+// and its own seed, and four bots at one table think, fidget and talk at four
+// different rhythms instead of moving in lockstep. Lockstep is a tell.
+func (r *BotRunner) AddSeatWithPacing(botID string, p Policy, pacing Pacing) {
+	r.seats = append(r.seats, &seat{r: r, botID: botID, policy: p, pacing: pacing})
 }
 
 // Stats returns the aggregate statistics of the run.
@@ -313,8 +418,16 @@ type seat struct {
 	r      *BotRunner
 	botID  string
 	policy Policy
+	pacing Pacing
 
 	stats Stats
+
+	// chatTurn / chatCount enforce MAX_CHAT_MESSAGES_PER_TURN, and
+	// lastChatTurn enforces the "at least one message per 2 turn cycles"
+	// floor. All three are touched only by this seat's goroutine.
+	chatTurn     int
+	chatCount    int
+	lastChatTurn int
 
 	// lastUpkeepTurn is the turn number this seat last performed its untap /
 	// draw step on, so the upkeep runs exactly once per turn.
@@ -331,6 +444,13 @@ func (s *seat) run(ctx context.Context) {
 	}()
 
 	for ctx.Err() == nil {
+		// Presence, such as it is. Touch is a no-op seam for an in-process bot
+		// -- see the Presence doc -- but it belongs here, in the seat's own
+		// loop, and not on any path the engine could be holding a lock on.
+		if s.r.cfg.Presence != nil {
+			s.r.cfg.Presence.Touch()
+		}
+
 		v, err := s.r.view(s.botID)
 		if err != nil {
 			s.r.cfg.Logger.Error("bot: view failed",
@@ -348,7 +468,7 @@ func (s *seat) run(ctx context.Context) {
 		case v.ActivePlayerID == s.botID:
 			s.takeTurn(ctx, v)
 		default:
-			if !s.r.cfg.Pacing.wait(ctx, s.r.cfg.Pacing.Poll) {
+			if !s.pacing.wait(ctx, s.pacing.pollDelay()) {
 				return
 			}
 		}
@@ -361,6 +481,9 @@ func (s *seat) takeTurn(ctx context.Context, v *SafeView) {
 
 	// A dead seat still has to pass, or the game stalls on its turn forever.
 	if v.Me.Life <= 0 {
+		if !s.pause(ctx, KindPassTurn) {
+			return
+		}
 		s.exec(ctx, macro(KindPassTurn, "Pass the turn (eliminated)", "NEXT_TURN:"+s.botID))
 		return
 	}
@@ -385,6 +508,9 @@ func (s *seat) takeTurn(ctx context.Context, v *SafeView) {
 
 	// Action budget spent. Passing is not the policy's call any more: the cap
 	// is what guarantees the simulation terminates.
+	if !s.pause(ctx, KindPassTurn) {
+		return
+	}
 	s.exec(ctx, macro(KindPassTurn, "Pass the turn (action budget spent)", "NEXT_TURN:"+s.botID))
 }
 
@@ -401,9 +527,15 @@ func (s *seat) upkeep(ctx context.Context, v *SafeView) {
 		}
 	}
 	if len(steps) > 0 {
+		if !s.pause(ctx, KindUntap) {
+			return
+		}
 		s.exec(ctx, macro(KindUntap, fmt.Sprintf("Untap %d permanent(s)", len(steps)), steps...))
 	}
 	if v.Me.LibraryCount > 0 {
+		if !s.pause(ctx, KindDraw) {
+			return
+		}
 		s.exec(ctx, macro(KindDraw, "Draw for turn", "DRAW:"+s.botID+":1"))
 	}
 }
@@ -423,14 +555,96 @@ func (s *seat) act(ctx context.Context, v *SafeView) bool {
 		}
 		return false
 	}
-	if !s.r.cfg.Pacing.wait(ctx, s.r.cfg.Pacing.PreAction) {
+	// Fidget first, then think, then act -- the order a person does it in.
+	// fidget is state-neutral (see its doc) so it cannot change what m means.
+	if !s.fidget(ctx, v) {
+		return false
+	}
+	if !s.pause(ctx, m.KindOf()) {
 		return false
 	}
 	s.exec(ctx, m)
 	if m.KindOf() == KindPlayLand {
 		s.landDropTurn = v.Turn
 	}
+	s.maybeChat(ctx, v, m)
 	return m.KindOf() != KindPassTurn
+}
+
+// pause is the pre-action "thinking" delay, weighted by how hard a person would
+// find this decision. It runs in the seat's own goroutine, before the first
+// SendPlayerAction of the macro, and reports whether the seat should continue.
+func (s *seat) pause(ctx context.Context, k Kind) bool {
+	return s.pacing.wait(ctx, s.pacing.preActionDelay(k))
+}
+
+// fidget occasionally taps one of the seat's untapped lands and immediately
+// untaps it again, which to anyone watching the board reads as someone working
+// out whether they can afford something.
+//
+// IT MUST NOT CHANGE THE GAME. Both verbs are implemented string commands
+// (TAP:<id>, UNTAP:<id>, §0.6), the target is chosen from this seat's own
+// untapped lands, and the untap restores exactly the card the tap touched --
+// so the state after a fidget is identical to the state before it, and the
+// mana solver in moves.go sees the same untapped sources either way. Nothing
+// else is touched: no zone moves, no life, no cards that were already tapped.
+//
+// It returns false only if the run was cancelled mid-fidget.
+func (s *seat) fidget(ctx context.Context, v *SafeView) bool {
+	if s.pacing.Human == nil || !s.pacing.Human.Hesitate() {
+		return ctx.Err() == nil
+	}
+	var lands []*SafeCard
+	for _, c := range controlledBy(v.Battlefield, s.botID) {
+		if !c.Tapped && IsLand(c) {
+			lands = append(lands, c)
+		}
+	}
+	if len(lands) == 0 {
+		return ctx.Err() == nil
+	}
+	c := lands[s.pacing.Human.Pick(len(lands))]
+	s.exec(ctx, macro(KindTap, "Fidget with "+displayName(c), "TAP:"+c.ID, "UNTAP:"+c.ID))
+	return ctx.Err() == nil
+}
+
+// maybeChat applies mage-bench's chat cadence (§0.4 and reference/
+// system-prompt.md "## Chat"): at most MaxChatMessagesPerTurn lines in one
+// turn, and at least one line every ChatEveryNCycles turn cycles, where a cycle
+// is one turn per seat.
+//
+// The line itself comes from the seat's ChatSource, which in Phase 4 is
+// CannedChat and in Phase 5 is the model's own `why` text. The cadence lives
+// here rather than in the source so that swapping the source cannot
+// accidentally make a bot spam the table.
+func (s *seat) maybeChat(ctx context.Context, v *SafeView, m Macro) {
+	if s.pacing.Chat == nil || !s.r.cfg.Chat.enabled() || v == nil {
+		return
+	}
+	if v.Turn != s.chatTurn {
+		s.chatTurn = v.Turn
+		s.chatCount = 0
+	}
+	if s.chatCount >= MaxChatMessagesPerTurn {
+		return
+	}
+
+	cycle := 1 + len(v.Opponents)
+	due := v.Turn-s.lastChatTurn >= ChatEveryNCycles*cycle
+
+	line, ok := s.pacing.Chat.Line(ctx, v, m, due)
+	if !ok || line == "" {
+		return
+	}
+	// chat.Manager takes its own lock and never touches the engine, so this
+	// cannot stall a broadcast. It still runs in the seat's goroutine.
+	if err := s.r.cfg.Chat.Sink.SendMessage(s.r.cfg.Chat.RoomID, s.botID, line); err != nil {
+		s.r.cfg.Logger.Warn("bot: chat failed",
+			zap.String("bot", s.botID), zap.Error(err))
+		return
+	}
+	s.chatCount++
+	s.lastChatTurn = v.Turn
 }
 
 // available is LegalMoves plus the turn-structure filter the engine does not
@@ -472,7 +686,12 @@ func (s *seat) exec(ctx context.Context, m Macro) bool {
 	}
 
 	for i, step := range m.Steps {
-		if i > 0 && !s.r.cfg.Pacing.wait(ctx, s.r.cfg.Pacing.BetweenSteps) {
+		// The stagger is what makes a tap-out visible: every step broadcasts
+		// (game_engine.go:342), so a client animates each one separately only
+		// if they do not arrive in the same frame. This sleep is in the bot's
+		// goroutine BETWEEN SendPlayerAction calls -- never inside a handler,
+		// never while the engine holds a lock (anti-pattern 2).
+		if i > 0 && !s.pacing.wait(ctx, s.pacing.stepDelay()) {
 			return false
 		}
 		if err := s.r.cfg.Actions.SendPlayerAction(

@@ -347,6 +347,55 @@ func TestEveryLegalMoveExecutes(t *testing.T) {
 	// Now keep, so the rest of the move set unlocks.
 	sendStep("KEEP_HAND:" + me)
 
+	// Phase 1b: build the cast precondition by hand.
+	//
+	// StartGameWithDecks does not shuffle, but GameEngine.Mulligan does, so the
+	// post-mulligan hand above is random. KindCast is only offered when the seat
+	// holds a castable spell AND controls enough untapped mana sources, so
+	// leaving it to the draw made the coverage assertion below a coin flip
+	// (~1 run in 25 never saw a cast in 40 rounds). Put a Forest onto the
+	// battlefield and a {G} creature into hand so a cast is always legal. Do not
+	// "simplify" this away.
+	rawView := func() *game.PlaytestGameView {
+		t.Helper()
+		raw, err := sg.adapter.GetGameView(sg.g.ID, me)
+		if err != nil {
+			t.Fatalf("view: %v", err)
+		}
+		return raw.(*game.PlaytestGameView)
+	}
+	fromLibrary := func(name string) string {
+		t.Helper()
+		for _, c := range rawView().Me.Library {
+			if c.Name == name {
+				return c.ID
+			}
+		}
+		t.Fatalf("no %q left in library to set up the cast precondition", name)
+		return ""
+	}
+
+	forest := fromLibrary("Forest")
+	sendStep("MOVE:" + forest + ":" + ZoneBattlefield)
+	for _, c := range viewOf().Battlefield {
+		if c.ID == forest && c.Tapped {
+			sendStep("UNTAP:" + forest)
+		}
+	}
+	sendStep("MOVE:" + fromLibrary("Llanowar Elves") + ":" + ZoneHand)
+
+	castOffered := false
+	for _, m := range LegalMoves(viewOf()) {
+		if m.KindOf() == KindCast {
+			castOffered = true
+			break
+		}
+	}
+	if !castOffered {
+		t.Fatal("setup failed: no cast macro offered with an untapped Forest in play " +
+			"and Llanowar Elves in hand")
+	}
+
 	// Phase 2: every macro of the full move set, one at a time, each against a
 	// freshly read view (a macro can invalidate the ones after it -- moving a
 	// card out of hand makes the "Discard <that card>" macro stale).
