@@ -1,4 +1,4 @@
-.PHONY: build test proto run clean docker lint fmt help
+.PHONY: build test bot-sim proto run clean docker lint fmt help
 
 # Variables
 BINARY_NAME=mage-server
@@ -18,6 +18,10 @@ GOVET=$(GOCMD) vet
 
 # Build flags
 LDFLAGS=-ldflags "-s -w"
+
+# Bot simulation (make bot-sim)
+BOT_SIM_GAMES?=100
+BOT_SIM_TIMEOUT?=30m
 
 help: ## Display this help screen
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -41,6 +45,11 @@ test: ## Run tests
 	$(GOTEST) -v -race -coverprofile=coverage.out ./...
 	@echo "Test coverage:"
 	$(GOCMD) tool cover -func=coverage.out
+
+bot-sim: ## Run N headless 4-bot games and report the completion rate (N=BOT_SIM_GAMES, default 100)
+	@echo "Running $(BOT_SIM_GAMES) headless bot games..."
+	BOT_SIM_GAMES=$(BOT_SIM_GAMES) $(GOTEST) -count=1 -timeout $(BOT_SIM_TIMEOUT) -v \
+		-run TestBotSimCompletionRate ./internal/bot/
 
 test-integration: ## Run integration tests
 	@echo "Running integration tests..."

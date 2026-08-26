@@ -652,10 +652,14 @@ func (e *GameEngine) NextTurn(gameID, playerID string) error {
 		return fmt.Errorf("game not found: %s", gameID)
 	}
 
-	// Get player order
-	playerIDs := make([]string, 0, len(state.Players))
-	for pid := range state.Players {
-		playerIDs = append(playerIDs, pid)
+	// Get player order.
+	//
+	// This MUST come from state.TurnOrder, not from ranging over state.Players:
+	// Players is a map and Go randomizes map iteration, so the previous version
+	// of this loop produced a different turn order on every single call.
+	playerIDs := state.turnOrder()
+	if len(playerIDs) == 0 {
+		return fmt.Errorf("game has no players: %s", gameID)
 	}
 
 	// Find next player

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"sort"
 	"time"
 )
 
@@ -10,39 +11,49 @@ import (
 // GameState represents the complete game state for the rules-light game engine.
 // All zones, players, and cards in one synchronized structure.
 type GameState struct {
-	GameID            string                   `json:"gameId"`
-	ActiveControlSeat string                   `json:"activeControlSeat"` // Which player perspective is controlling
+	GameID            string             `json:"gameId"`
+	ActiveControlSeat string             `json:"activeControlSeat"` // Which player perspective is controlling
 	Players           map[string]*Player `json:"players"`
-	Battlefield       []*Card            `json:"battlefield"`
-	Exile             []*Card            `json:"exile"`
-	Stack             []*Card            `json:"stack"`
-	Command           []*Card            `json:"command"`
-	Turn              int                      `json:"turn"`
-	ActivePlayerID    string                   `json:"activePlayerId"`
-	IsInitialized     bool                     `json:"isInitialized"`
-	Log               []LogEntry         `json:"log"`
-	MulliganType      string                   `json:"mulliganType"` // "london"
-	FreeMulligans     int                      `json:"freeMulligans"`
-	StartedAt         time.Time                `json:"startedAt"`
+	// TurnOrder is the seating order of Players, captured once at game
+	// creation from the players slice handed to StartGame/StartGameWithDecks.
+	//
+	// It exists because Players is a map and Go randomizes map iteration:
+	// deriving turn order by ranging over Players produced a different order on
+	// every call, so NextTurn was non-deterministic and no test that depends on
+	// sequencing could be reproducible. Sorting the IDs would also be
+	// deterministic, but real Magic turn order is seating order, not
+	// alphabetical, and the seating order is already available here.
+	TurnOrder      []string   `json:"turnOrder"`
+	Battlefield    []*Card    `json:"battlefield"`
+	Exile          []*Card    `json:"exile"`
+	Stack          []*Card    `json:"stack"`
+	Command        []*Card    `json:"command"`
+	Turn           int        `json:"turn"`
+	ActivePlayerID string     `json:"activePlayerId"`
+	IsInitialized  bool       `json:"isInitialized"`
+	Log            []LogEntry `json:"log"`
+	MulliganType   string     `json:"mulliganType"` // "london"
+	FreeMulligans  int        `json:"freeMulligans"`
+	StartedAt      time.Time  `json:"startedAt"`
 }
 
 // Player represents a player in the game engine.
 // Based on playtest-game.ts lines 25-40
 type Player struct {
-	PlayerID        string          `json:"playerId"`
-	Name            string          `json:"name"`
-	Life            int             `json:"life"`
-	Poison          int             `json:"poison"`
-	Energy          int             `json:"energy"`
-	LibraryCount    int             `json:"libraryCount"`
-	HandCount       int             `json:"handCount"`
+	PlayerID        string    `json:"playerId"`
+	Name            string    `json:"name"`
+	Life            int       `json:"life"`
+	Poison          int       `json:"poison"`
+	Energy          int       `json:"energy"`
+	LibraryCount    int       `json:"libraryCount"`
+	HandCount       int       `json:"handCount"`
 	Hand            []*Card   `json:"hand"`
 	Library         []*Card   `json:"library"`
 	Graveyard       []*Card   `json:"graveyard"`
 	ManaPool        *ManaPool `json:"manaPool"`
-	KeptHand        bool            `json:"keptHand"`
-	MulliganCount   int             `json:"mulliganCount"`
-	RevealedTopCard bool            `json:"revealedTopCard"` // When true, top card is visible
+	KeptHand        bool      `json:"keptHand"`
+	MulliganCount   int       `json:"mulliganCount"`
+	RevealedTopCard bool      `json:"revealedTopCard"` // When true, top card is visible
 }
 
 // Card represents a card in the game engine.
@@ -69,12 +80,12 @@ type Card struct {
 	RulesText    string `json:"rulesText"`
 
 	// Game state
-	Zone         string          `json:"zone"`
-	ControllerID string          `json:"controllerId"`
-	Tapped       bool            `json:"tapped"`
-	Flipped      bool            `json:"flipped"`
-	Transformed  bool            `json:"transformed"`
-	FaceDown     bool            `json:"faceDown"`
+	Zone         string    `json:"zone"`
+	ControllerID string    `json:"controllerId"`
+	Tapped       bool      `json:"tapped"`
+	Flipped      bool      `json:"flipped"`
+	Transformed  bool      `json:"transformed"`
+	FaceDown     bool      `json:"faceDown"`
 	Counters     []Counter `json:"counters"`
 
 	// Combat state (manual tracking, no enforcement)
@@ -124,6 +135,7 @@ const (
 func NewGameState(gameID string, playerIDs []string, playerNames map[string]string) *GameState {
 	state := &GameState{
 		GameID:        gameID,
+		TurnOrder:     append([]string(nil), playerIDs...),
 		Players:       make(map[string]*Player),
 		Battlefield:   make([]*Card, 0),
 		Exile:         make([]*Card, 0),
@@ -273,4 +285,23 @@ func joinSlice(slice []string) string {
 		result += s
 	}
 	return result
+}
+
+// turnOrder returns the seating order of the game's players.
+//
+// It prefers the explicit TurnOrder slice captured at game creation. The sorted
+// fallback exists only for GameState values that predate the field (a state
+// restored from an older serialized snapshot, or built by a test that fills the
+// Players map directly): it is arbitrary, but it is at least stable, which is
+// the property NextTurn actually needs.
+func (s *GameState) turnOrder() []string {
+	if len(s.TurnOrder) > 0 {
+		return s.TurnOrder
+	}
+	ids := make([]string, 0, len(s.Players))
+	for pid := range s.Players {
+		ids = append(ids, pid)
+	}
+	sort.Strings(ids)
+	return ids
 }

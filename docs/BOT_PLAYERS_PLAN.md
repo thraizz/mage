@@ -702,7 +702,25 @@ Weeks, not days. Needed for online NPCs regardless of whether bots ever ship —
 6. **Fix the client/server command mismatch.** The web client sends ~11 commands the server
    does not implement (`UNTAP_ALL`, `TRANSFORM:`, `SET_LIFE:`, `CLEAR_COMBAT`, `STACK_ADD:`, …)
    and sends `NEXT_TURN`/`SHUFFLE` without the required `playerId`. Reconcile both directions.
-7. **Notification fan-out.** Convert `NotificationHandler` from a single field to a slice so
+7. **FIX THE `GetGameView` DATA RACE (pre-existing, affects production).** Found in Phase 3 by
+   running the bot sim under `-race`. `GameEngine.GetGameView` (`game_engine.go:270`) takes
+   `e.mu.RLock()` with `defer RUnlock()` — so the lock is released when it **returns**, but the
+   view it returns aliases live engine state by pointer (`view.go:74-81`). Every caller then
+   reads that live state with no lock held:
+   - `internal/server/grpc_game.go:387` (`GameGetView`)
+   - `internal/server/grpc.go:314` — hands the aliased view to protojson
+
+   Observed race: `GameEngine.Mulligan` writing under the write lock vs. a concurrent read of
+   the same memory through the returned view. **This is not a bot bug** — the websocket path
+   has always had it; bots are just the first workload that hits it hard enough to catch.
+
+   Real fix: deep-copy inside `GetGameView` while the read lock is held, so the returned view
+   owns its memory. Phase 3 works around it locally with `internal/bot/guard.go` (`ViewGuard`),
+   which holds a read lock across `GetGameView` + `Redact`'s copy and wraps `ProcessAction` in a
+   write lock. **Delete `guard.go` once `GetGameView` is fixed** — the workaround only protects
+   the bot path, not the server's.
+
+8. **Notification fan-out.** Convert `NotificationHandler` from a single field to a slice so
    bots can subscribe push-style, and replace polling. `broadcast` already builds a per-player
    filtered view, so a bot handler receives exactly what a human does. Keep the goroutine
    hand-off (anti-pattern 2).
