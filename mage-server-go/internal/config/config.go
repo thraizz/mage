@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/spf13/viper"
@@ -19,6 +20,7 @@ type Config struct {
 	Plugins    PluginConfig     `mapstructure:"plugins"`
 	Health     HealthConfig     `mapstructure:"health"`
 	Metrics    MetricsConfig    `mapstructure:"metrics"`
+	Bot        BotConfig        `mapstructure:"bot"`
 }
 
 // ServerConfig contains server-related settings
@@ -148,6 +150,48 @@ type MetricsConfig struct {
 	Path    string `mapstructure:"path"`
 }
 
+// BotConfig configures the LLM-backed bot players (internal/bot/llm).
+//
+// THE API KEY IS NOT IN THIS FILE'S WORLD AT ALL. APIKey is tagged
+// mapstructure:"-", so viper cannot populate it from any YAML under any key
+// name, and Load fills it from the ANTHROPIC_API_KEY environment variable and
+// nowhere else. Two reasons, both concrete:
+//
+//  1. config/config.yaml is a HARD LINK to config.dev.yaml -- one inode, both
+//     names, and it is the file cmd/server/main.go:35 loads by default. A
+//     secret written to either is a secret committed to the repository.
+//  2. Load calls v.AutomaticEnv() with no prefix and NO SetEnvKeyReplacer, so a
+//     nested key like bot.api_key is NOT reachable as BOT_API_KEY. Wiring the
+//     key "through config" would need v.SetEnvKeyReplacer(strings.NewReplacer(
+//     ".", "_")) added first, and would still put the value one careless
+//     `v.Set` away from a YAML dump. An explicit os.Getenv has neither problem.
+type BotConfig struct {
+	// Enabled turns LLM bot seats on. When true, ANTHROPIC_API_KEY must be set.
+	Enabled bool `mapstructure:"enabled"`
+	// Model is the model ID. See internal/bot/llm for the cost table.
+	Model string `mapstructure:"model"`
+	// Effort is the OutputConfig effort level: low|medium|high|xhigh|max, or
+	// empty. IT MUST BE EMPTY FOR claude-haiku-4-5, which does not support the
+	// parameter; Validate rejects the combination rather than letting the API
+	// reject the first request of an overnight run.
+	Effort string `mapstructure:"effort"`
+	// MaxTokens is the output cap per request. mage-bench measured 20000.
+	MaxTokens int `mapstructure:"max_tokens"`
+	// RequestTimeout bounds ONE LLM request attempt. mage-bench raised this to
+	// 120s at harness epoch #15; 45s was empirically too short.
+	RequestTimeout time.Duration `mapstructure:"request_timeout"`
+	// StallTimeout is the table-stall guard: the total wall clock a bot may
+	// hold priority before force-passing. It exists for the other players, so
+	// it is deliberately much shorter than RequestTimeout.
+	StallTimeout time.Duration `mapstructure:"stall_timeout"`
+	// MaxRetries is passed to the SDK. Worst-case request time is
+	// RequestTimeout x (MaxRetries+1), which is why StallTimeout is separate.
+	MaxRetries int `mapstructure:"max_retries"`
+
+	// APIKey comes from ANTHROPIC_API_KEY. Never from YAML -- see the type doc.
+	APIKey string `mapstructure:"-"`
+}
+
 // Load loads configuration from a file and environment variables
 func Load(configPath string) (*Config, error) {
 	v := viper.New()
@@ -178,6 +222,9 @@ func Load(configPath string) (*Config, error) {
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
+
+	// The bot API key comes from the environment only (see BotConfig).
+	cfg.Bot.APIKey = os.Getenv("ANTHROPIC_API_KEY")
 
 	// Validate config
 	if err := cfg.Validate(); err != nil {
@@ -243,6 +290,17 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("metrics.enabled", true)
 	v.SetDefault("metrics.port", 9090)
 	v.SetDefault("metrics.path", "/metrics")
+
+	// Bot defaults. No api_key default of any kind, not even an empty one:
+	// registering the key as a config path at all invites someone to fill it in
+	// (see BotConfig).
+	v.SetDefault("bot.enabled", false)
+	v.SetDefault("bot.model", "claude-sonnet-5")
+	v.SetDefault("bot.effort", "")
+	v.SetDefault("bot.max_tokens", 20000)
+	v.SetDefault("bot.request_timeout", "120s")
+	v.SetDefault("bot.stall_timeout", "50s")
+	v.SetDefault("bot.max_retries", 2)
 }
 
 // Validate validates the configuration
@@ -277,6 +335,35 @@ func (c *Config) Validate() error {
 	validLevels := map[string]bool{"debug": true, "info": true, "warn": true, "error": true}
 	if !validLevels[c.Logging.Level] {
 		return fmt.Errorf("logging.level must be one of: debug, info, warn, error")
+	}
+
+	// Validate bot config
+	validModels := map[string]bool{
+		"claude-sonnet-5": true, "claude-opus-5": true, "claude-haiku-4-5": true,
+	}
+	if !validModels[c.Bot.Model] {
+		return fmt.Errorf("bot.model must be one of: claude-sonnet-5, claude-opus-5, claude-haiku-4-5")
+	}
+	validEfforts := map[string]bool{
+		"": true, "low": true, "medium": true, "high": true, "xhigh": true, "max": true,
+	}
+	if !validEfforts[c.Bot.Effort] {
+		return fmt.Errorf("bot.effort must be one of: low, medium, high, xhigh, max (or empty)")
+	}
+	if c.Bot.Model == "claude-haiku-4-5" && c.Bot.Effort != "" {
+		return fmt.Errorf("bot.effort is not supported on claude-haiku-4-5; leave it empty")
+	}
+	if c.Bot.MaxTokens <= 0 {
+		return fmt.Errorf("bot.max_tokens must be positive")
+	}
+	if c.Bot.RequestTimeout <= 0 {
+		return fmt.Errorf("bot.request_timeout must be positive")
+	}
+	if c.Bot.StallTimeout <= 0 {
+		return fmt.Errorf("bot.stall_timeout must be positive")
+	}
+	if c.Bot.Enabled && c.Bot.APIKey == "" {
+		return fmt.Errorf("bot.enabled requires the ANTHROPIC_API_KEY environment variable")
 	}
 
 	return nil

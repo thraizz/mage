@@ -575,7 +575,15 @@ func (s *seat) act(ctx context.Context, v *SafeView) bool {
 // find this decision. It runs in the seat's own goroutine, before the first
 // SendPlayerAction of the macro, and reports whether the seat should continue.
 func (s *seat) pause(ctx context.Context, k Kind) bool {
-	return s.pacing.wait(ctx, s.pacing.preActionDelay(k))
+	d := s.pacing.preActionDelay(k)
+	// A thinking policy has already spent some of this pause for real. Deduct
+	// it -- see ThinkTimeReporter.
+	if r, ok := s.policy.(ThinkTimeReporter); ok {
+		if d -= r.LastThinkTime(); d < 0 {
+			d = 0
+		}
+	}
+	return s.pacing.wait(ctx, d)
 }
 
 // fidget occasionally taps one of the seat's untapped lands and immediately
@@ -758,4 +766,21 @@ func (s *seat) awaitLogGrowth(ctx context.Context, want int) (landed, aborted bo
 		}
 		runtime.Gosched()
 	}
+}
+
+// ThinkTimeReporter is implemented by a Policy whose Pick spends real
+// wall-clock time deciding -- which is to say, by LLMPolicy.
+//
+// PACING MUST OVERLAP THINKING, NOT FOLLOW IT (plan Phase 5, task 4). A
+// persona's pre-action pause exists to make the seat look like a person
+// weighing a decision. An LLM seat is already weighing it, for seconds at a
+// time; adding the full pause on top would make it slower than a human rather
+// than more like one, and the tell would be the wrong way round.
+//
+// So a policy that thinks reports how long it thought, and seat.pause spends
+// only the remainder. RandomPolicy does not implement this, returns nothing,
+// and is paced exactly as it was in Phase 4.
+type ThinkTimeReporter interface {
+	// LastThinkTime is how long the most recent Pick took.
+	LastThinkTime() time.Duration
 }
