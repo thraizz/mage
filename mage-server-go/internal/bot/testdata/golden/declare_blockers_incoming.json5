@@ -1,0 +1,21 @@
+{
+  "prompt": "## Card Reference\n\
+- Counterspell {U}{U} -- Instant: Counter target spell.\n\
+- Grizzly Bears {1}{G} -- Creature — Bear 2/2\n\
+- Lightning Bolt {R} -- Instant: Lightning Bolt deals 3 damage to any target.\n\
+- Llanowar Elves {G} -- Creature — Elf Druid 1/1: {T}: Add {G}.\n\
+- Serra Angel {3}{W}{W} -- Creature — Angel 4/4: Flying, vigilance\n\
+- Sol Ring {1} -- Artifact: {T}: Add {C}{C}.\n\
+\n\
+## Decision\n\
+\n\
+[Decision 41, snapshot=22] Turn 6 COMBAT - Alice\n\
+  Board: Alice: 20hp hand=[Lightning Bolt, Forest, Serra Angel] lib=3 bf=[Llanowar Elves 1/1, Forest (tapped)] | Bob: 18hp hand=5 lib=40 poison=1 bf=[Grizzly Bears 2/2 (+1/+1=2), Serra Angel 4/4] gy=[Counterspell] exile=[Sol Ring]\n\
+  Combat: Grizzly Bears, Serra Angel -> Alice\n\
+  Combat Phase: declare_blockers\n\
+  Incoming Attackers: Grizzly Bears [id=p5, 4/4], Serra Angel [id=p7, 4/4]\n\
+  Message: Declare blockers\n\
+  Choices (1): Llanowar Elves [id=p3, block]\n\
+  Respond: blockers=blocker:attacker pairs, or choice=no to block with nothing",
+  "scenario": "declare_blockers_incoming",
+}

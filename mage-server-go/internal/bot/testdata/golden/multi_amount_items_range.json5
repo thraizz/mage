@@ -1,0 +1,21 @@
+{
+  "prompt": "## Card Reference\n\
+- Counterspell {U}{U} -- Instant: Counter target spell.\n\
+- Grizzly Bears {1}{G} -- Creature — Bear 2/2\n\
+- Lightning Bolt {R} -- Instant: Lightning Bolt deals 3 damage to any target.\n\
+- Llanowar Elves {G} -- Creature — Elf Druid 1/1: {T}: Add {G}.\n\
+- Serra Angel {3}{W}{W} -- Creature — Angel 4/4: Flying, vigilance\n\
+- Sol Ring {1} -- Artifact: {T}: Add {C}{C}.\n\
+\n\
+## Decision\n\
+\n\
+[Decision 56, snapshot=31] Turn 7 POSTCOMBAT_MAIN - Alice\n\
+  Board: Alice: 20hp hand=[Lightning Bolt, Forest, Serra Angel] lib=3 bf=[Llanowar Elves 1/1 (sick), Forest (tapped)] | Bob: 18hp hand=5 lib=40 poison=1 bf=[Grizzly Bears 2/2 (+1/+1=2)] gy=[Counterspell] exile=[Sol Ring]\n\
+  Message: Pick triggered ability order\n\
+  Items (2): total_min=1, total_max=3\n\
+    0: Llanowar Elves trigger [min=0]\n\
+    1: Wall of Omens trigger [max=3]\n\
+  NOTE: This decision only determines the order triggered abilities are placed on the stack. Targets are chosen in separate decisions.\n\
+  Response type: multi_amount",
+  "scenario": "multi_amount_items_range",
+}

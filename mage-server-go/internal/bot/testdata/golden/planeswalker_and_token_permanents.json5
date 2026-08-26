@@ -1,0 +1,20 @@
+{
+  "prompt": "## Card Reference\n\
+- Chandra, Torch of Defiance {2}{R}{R} -- Legendary Planeswalker — Chandra: +1: Exile the top card of your library. / −3: Chandra deals 4 damage to target creature.\n\
+- Counterspell {U}{U} -- Instant: Counter target spell.\n\
+- Grizzly Bears {1}{G} -- Creature — Bear 2/2\n\
+- Lightning Bolt {R} -- Instant: Lightning Bolt deals 3 damage to any target.\n\
+- Llanowar Elves {G} -- Creature — Elf Druid 1/1: {T}: Add {G}.\n\
+- Serra Angel {3}{W}{W} -- Creature — Angel 4/4: Flying, vigilance\n\
+- Sol Ring {1} -- Artifact: {T}: Add {C}{C}.\n\
+- Wall of Omens {1}{W} -- Creature — Wall 0/4: Defender / When Wall of Omens enters, draw a card.\n\
+\n\
+## Decision\n\
+\n\
+[Decision 60, snapshot=33] Turn 8 PRECOMBAT_MAIN - Alice\n\
+  Board: Alice: 20hp hand=[Lightning Bolt, Forest, Serra Angel] lib=3 bf=[Llanowar Elves 1/1 (sick), Forest (tapped), Chandra, Torch of Defiance (loyalty=4), Beast 3/3 (token), Wall of Omens 0/4 (tapped, face_down, copy of Grizzly Bears)] | Bob: 18hp hand=5 lib=40 poison=1 bf=[Grizzly Bears 2/2 (+1/+1=2)] gy=[Counterspell] exile=[Sol Ring]\n\
+  Message: \n\
+  Choices (0): \n\
+  Response type: priority",
+  "scenario": "planeswalker_and_token_permanents",
+}

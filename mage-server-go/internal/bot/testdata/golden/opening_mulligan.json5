@@ -1,0 +1,14 @@
+{
+  "prompt": "## Card Reference\n\
+- Lightning Bolt {R} -- Instant: Lightning Bolt deals 3 damage to any target.\n\
+- Serra Angel {3}{W}{W} -- Creature — Angel 4/4: Flying, vigilance\n\
+\n\
+## Decision\n\
+\n\
+[Decision 0, snapshot=0] Turn 0 PREGAME - Alice\n\
+  Board: Alice: 20hp hand=[Lightning Bolt, Forest, Serra Angel] lib=3 | Bob: 18hp hand=7 lib=40\n\
+  Message: Mulligan?\n\
+  Choices (2): Mulligan [id=yes], Keep [id=no]\n\
+  Respond: choice=yes to mulligan, or choice=no to keep",
+  "scenario": "opening_mulligan",
+}
