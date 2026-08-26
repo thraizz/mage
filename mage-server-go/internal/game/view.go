@@ -65,20 +65,85 @@ type PlaytestOpponentView struct {
 	RevealedTopCard bool      `json:"revealedTopCard"`
 }
 
-// buildGameView creates a player-specific game view with hidden information filtering
+// copyCard returns a deep copy of c: every field the view exposes is either a
+// value or copied outright, so the result shares no memory with the live card.
+//
+// Card has exactly two reference-typed fields -- Counters ([]Counter) and
+// AttachedTo ([]string) -- and both are copied here. If a field of reference
+// type is ever added to Card, it must be added here too, or buildGameView goes
+// back to handing callers a view that aliases live engine state.
+func copyCard(c *Card) *Card {
+	if c == nil {
+		return nil
+	}
+	out := *c
+	if c.Counters != nil {
+		out.Counters = append([]Counter(nil), c.Counters...)
+	}
+	if c.AttachedTo != nil {
+		out.AttachedTo = append([]string(nil), c.AttachedTo...)
+	}
+	return &out
+}
+
+// copyCards deep-copies a zone slice. A nil input yields an empty (non-nil)
+// slice so the view never distinguishes "no zone" from "empty zone" -- the
+// previous behaviour, since GameState always initialises its zones.
+func copyCards(in []*Card) []*Card {
+	out := make([]*Card, 0, len(in))
+	for _, c := range in {
+		out = append(out, copyCard(c))
+	}
+	return out
+}
+
+// copyManaPool copies the pool by value and returns a fresh pointer, so the
+// view cannot mutate (or race) the player's live pool.
+func copyManaPool(p *ManaPool) *ManaPool {
+	if p == nil {
+		return nil
+	}
+	out := *p
+	return &out
+}
+
+// copyLog copies the game log. LogEntry is all value fields, so a slice copy
+// is a deep copy.
+func copyLog(in []LogEntry) []LogEntry {
+	out := make([]LogEntry, len(in))
+	copy(out, in)
+	return out
+}
+
+// buildGameView creates a player-specific game view with hidden information filtering.
+//
+// THE RETURNED VIEW OWNS ALL OF ITS MEMORY. It used to share Battlefield,
+// Exile, Stack, Command, the log, and every player's hand / library /
+// graveyard / mana pool with the authoritative GameState by pointer. That was a
+// data race: GetGameView releases the engine read lock when it returns, so
+// every caller -- the gRPC GameGetView handler, the protojson marshal on the
+// websocket path, the bot runner -- then read live game memory with no lock
+// held while another goroutine mutated it under the write lock. `go test -race`
+// caught it as GameEngine.Mulligan writing vs. a concurrent read through a
+// previously-returned view.
+//
+// The copy lives HERE rather than in GetGameView so that no future caller of
+// buildGameView can reintroduce the bug. broadcast is the other caller; it runs
+// with e.mu held for writing, where copying is equally safe (and equally
+// necessary -- the views it hands to notifyFn outlive the lock too).
 func (e *GameEngine) buildGameView(state *GameState, viewerID string) *PlaytestGameView {
 	view := &PlaytestGameView{
 		GameID:            state.GameID,
 		ViewerID:          viewerID,
 		ActiveControlSeat: state.ActiveControlSeat,
-		Battlefield:       state.Battlefield, // Public zone
-		Exile:             state.Exile,       // Public zone
-		Stack:             state.Stack,       // Public zone
-		Command:           state.Command,     // Public zone
+		Battlefield:       copyCards(state.Battlefield), // Public zone
+		Exile:             copyCards(state.Exile),       // Public zone
+		Stack:             copyCards(state.Stack),       // Public zone
+		Command:           copyCards(state.Command),     // Public zone
 		Turn:              state.Turn,
 		ActivePlayerID:    state.ActivePlayerID,
 		IsInitialized:     state.IsInitialized,
-		Log:               state.Log,
+		Log:               copyLog(state.Log),
 		MulliganType:      state.MulliganType,
 		FreeMulligans:     state.FreeMulligans,
 		Opponents:         make([]*PlaytestOpponentView, 0),
@@ -96,10 +161,10 @@ func (e *GameEngine) buildGameView(state *GameState, viewerID string) *PlaytestG
 				Energy:          player.Energy,
 				LibraryCount:    player.LibraryCount,
 				HandCount:       player.HandCount,
-				Hand:            player.Hand,    // Full visibility
-				Library:         player.Library, // Full visibility
-				Graveyard:       player.Graveyard,
-				ManaPool:        player.ManaPool,
+				Hand:            copyCards(player.Hand),    // Full visibility
+				Library:         copyCards(player.Library), // Full visibility
+				Graveyard:       copyCards(player.Graveyard),
+				ManaPool:        copyManaPool(player.ManaPool),
 				KeptHand:        player.KeptHand,
 				MulliganCount:   player.MulliganCount,
 				RevealedTopCard: player.RevealedTopCard,
@@ -112,12 +177,12 @@ func (e *GameEngine) buildGameView(state *GameState, viewerID string) *PlaytestG
 				Life:            player.Life,
 				Poison:          player.Poison,
 				Energy:          player.Energy,
-				LibraryCount:    player.LibraryCount, // Count only
-				HandCount:       player.HandCount,    // Count only
-				Hand:            make([]*Card, 0),    // Hidden
-				Library:         make([]*Card, 0),    // Hidden
-				Graveyard:       player.Graveyard,    // Public
-				ManaPool:        player.ManaPool,
+				LibraryCount:    player.LibraryCount,         // Count only
+				HandCount:       player.HandCount,            // Count only
+				Hand:            make([]*Card, 0),            // Hidden
+				Library:         make([]*Card, 0),            // Hidden
+				Graveyard:       copyCards(player.Graveyard), // Public
+				ManaPool:        copyManaPool(player.ManaPool),
 				KeptHand:        player.KeptHand,
 				MulliganCount:   player.MulliganCount,
 				RevealedTopCard: player.RevealedTopCard,
@@ -125,7 +190,7 @@ func (e *GameEngine) buildGameView(state *GameState, viewerID string) *PlaytestG
 
 			// If top card is revealed, include it
 			if player.RevealedTopCard && len(player.Library) > 0 {
-				opponentView.TopCard = player.Library[0]
+				opponentView.TopCard = copyCard(player.Library[0])
 			}
 
 			view.Opponents = append(view.Opponents, opponentView)

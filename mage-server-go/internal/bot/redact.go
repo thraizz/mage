@@ -24,12 +24,12 @@ import (
 // invariants hold for every SafeView produced by Redact:
 //
 //  1. Nothing in it aliases live engine state. game.GameEngine.buildGameView
-//     (internal/game/view.go:74-81, 102, 119-120) shares Battlefield, Exile,
-//     Stack, Command, graveyards, hands and mana pools *by pointer* with the
-//     authoritative GameState. A consumer holding that view can mutate the
-//     running game through those slices. protojson saves the websocket clients
-//     from this because it copies on marshal; a bot in-process has no such luck.
-//     Redact therefore deep-copies every slice and every *game.Card.
+//     deep-copies every zone, card, mana pool and log entry under the engine's
+//     read lock, so its output already owns its memory; Redact copies again on
+//     top of that, into types the bot package controls. The second copy is not
+//     redundant defence-in-depth theatre -- it is what makes SafeView a
+//     distinct type with a different shape (no Library, ManaPool by value), and
+//     it keeps this invariant true independently of what the engine does.
 //  2. It contains no information the viewer is not entitled to. In particular
 //     the viewer's own library is dropped entirely -- see SafePlayerView.
 type SafeView struct {

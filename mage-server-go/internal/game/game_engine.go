@@ -276,7 +276,12 @@ func (e *GameEngine) GetGameView(gameID, playerID string) (interface{}, error) {
 		return nil, fmt.Errorf("game not found: %s", gameID)
 	}
 
-	// Delegate to view.go for hidden information filtering
+	// Delegate to view.go for hidden information filtering.
+	//
+	// buildGameView deep-copies everything reachable from the view while this
+	// read lock is still held, so the value returned here owns its memory. That
+	// matters because the deferred RUnlock fires on return: the caller reads the
+	// result with no lock held. See the comment on buildGameView.
 	return e.buildGameView(state, playerID), nil
 }
 

@@ -133,13 +133,6 @@ type RunnerConfig struct {
 
 	Pacing Pacing
 
-	// Guard, when set, is held for reading across GetGameView and the Redact
-	// deep copy so that neither races the engine's own mutations. It must be
-	// the same ViewGuard whose WrapEngine wrapped the engine behind Actions.
-	// See guard.go: this compensates for GetGameView handing out live engine
-	// pointers. Leaving it nil is only safe in a single-goroutine test.
-	Guard *ViewGuard
-
 	// MaxActionsPerTurn bounds a seat's action loop before the turn is passed
 	// regardless of what the policy wants. It is what guarantees the simulation
 	// makes forward progress: without it a policy that never picks "Pass the
@@ -265,23 +258,22 @@ func (r *BotRunner) seatID(i int) string {
 }
 
 // view polls the engine and redacts the result.
+//
+// No external locking is needed. GameEngine.buildGameView deep-copies under the
+// engine's read lock, so the *game.PlaytestGameView handed back here already
+// owns its memory and Redact's own copy cannot race a concurrent mutation. It
+// did not always -- see the Phase 7 note in docs/BOT_PLAYERS_PLAN.md for the
+// bot-side workaround this replaced.
 func (r *BotRunner) view(botID string) (*SafeView, error) {
-	var sv *SafeView
-	err := r.cfg.Guard.Snapshot(func() error {
-		raw, err := r.cfg.Views.GetGameView(r.cfg.GameID, botID)
-		if err != nil {
-			return err
-		}
-		pv, ok := raw.(*game.PlaytestGameView)
-		if !ok || pv == nil {
-			return fmt.Errorf("bot: unexpected view type %T", raw)
-		}
-		// The deep copy MUST happen inside the guard: the view aliases live
-		// engine state (anti-pattern 3), so this read races every mutation
-		// until the copy is finished.
-		sv, err = RedactErr(pv, botID)
-		return err
-	})
+	raw, err := r.cfg.Views.GetGameView(r.cfg.GameID, botID)
+	if err != nil {
+		return nil, err
+	}
+	pv, ok := raw.(*game.PlaytestGameView)
+	if !ok || pv == nil {
+		return nil, fmt.Errorf("bot: unexpected view type %T", raw)
+	}
+	sv, err := RedactErr(pv, botID)
 	if err != nil {
 		return nil, err
 	}

@@ -702,23 +702,51 @@ Weeks, not days. Needed for online NPCs regardless of whether bots ever ship —
 6. **Fix the client/server command mismatch.** The web client sends ~11 commands the server
    does not implement (`UNTAP_ALL`, `TRANSFORM:`, `SET_LIFE:`, `CLEAR_COMBAT`, `STACK_ADD:`, …)
    and sends `NEXT_TURN`/`SHUFFLE` without the required `playerId`. Reconcile both directions.
-7. **FIX THE `GetGameView` DATA RACE (pre-existing, affects production).** Found in Phase 3 by
-   running the bot sim under `-race`. `GameEngine.GetGameView` (`game_engine.go:270`) takes
-   `e.mu.RLock()` with `defer RUnlock()` — so the lock is released when it **returns**, but the
-   view it returns aliases live engine state by pointer (`view.go:74-81`). Every caller then
-   reads that live state with no lock held:
+7. **~~FIX THE `GetGameView` DATA RACE~~ — DONE. Fixed in `internal/game/view.go`; the
+   `ViewGuard` workaround has been deleted.**
+
+   *The defect, for the record.* Found in Phase 3 by running the bot sim under `-race`.
+   `GameEngine.GetGameView` (`game_engine.go:270`) took `e.mu.RLock()` with `defer RUnlock()`,
+   so the lock was released when it **returned** — but the view it returned aliased live engine
+   state by pointer (the four global zones, plus each player's hand / library / graveyard /
+   mana pool, plus the log). Every caller then read live game memory with no lock held:
    - `internal/server/grpc_game.go:387` (`GameGetView`)
-   - `internal/server/grpc.go:314` — hands the aliased view to protojson
+   - `internal/server/grpc.go:314` — handed the aliased view to protojson
+   - the bot runner, whose `Redact` deep copy *is* the racing read
 
    Observed race: `GameEngine.Mulligan` writing under the write lock vs. a concurrent read of
-   the same memory through the returned view. **This is not a bot bug** — the websocket path
-   has always had it; bots are just the first workload that hits it hard enough to catch.
+   the same memory through a previously-returned view. **This was never a bot bug** — the
+   websocket path always had it; bots were just the first workload that hit it hard enough to
+   catch. Plausibly connected to the user-reported "server laggy / unresponsive on mulligan
+   clicks".
 
-   Real fix: deep-copy inside `GetGameView` while the read lock is held, so the returned view
-   owns its memory. Phase 3 works around it locally with `internal/bot/guard.go` (`ViewGuard`),
-   which holds a read lock across `GetGameView` + `Redact`'s copy and wraps `ProcessAction` in a
-   write lock. **Delete `guard.go` once `GetGameView` is fixed** — the workaround only protects
-   the bot path, not the server's.
+   *The fix.* The deep copy went into `buildGameView`, **not** into `GetGameView`. Both callers
+   of `buildGameView` need it — `GetGameView` because its lock is gone by the time the caller
+   reads, and `broadcast` (`game_engine.go:342`) because the per-player views it hands to
+   `notifyFn` outlive the write lock too — and putting it in the shared builder means no future
+   caller can reintroduce the bug. `view.go` grew four unexported helpers (`copyCard`,
+   `copyCards`, `copyManaPool`, `copyLog`); `internal/game` deliberately does **not** reuse
+   `internal/bot`'s copy helpers, since `bot` already imports `game` and the reverse would be an
+   import cycle. `Card`'s two reference-typed fields (`Counters`, `AttachedTo`) are copied
+   explicitly; a comment on `copyCard` says so, because adding a third and forgetting it would
+   silently restore the aliasing.
+
+   *Cost.* Measured on a 4-player, 90-card-library state (`BenchmarkBroadcastFanout`, M4 Pro):
+   one broadcast fan-out went from ~1.2 µs / 4.3 KB / 32 allocs to ~55 µs / 314 KB / 1432
+   allocs. ~48x, and paid on every mutation while the write lock is held — but 55 µs is far
+   below a network round trip, and the largest single chunk is the viewer's own `Library`, which
+   is copied only because the web client renders search / scry UI from it. If broadcast ever
+   shows up in a profile, that field (or moving the fan-out outside the lock) is where to look.
+
+   *Workaround removed.* `internal/bot/guard.go` (`ViewGuard`) is deleted, along with
+   `RunnerConfig.Guard` and the `Snapshot` wrapper in `BotRunner.view` — the runner now calls
+   `EngineAdapter.GetGameView` and `SendPlayerAction` directly, as Phase 3 originally specified.
+   Regression cover is `internal/game/view_test.go`: `TestGetGameViewDoesNotAliasState` mutates
+   the live state behind a returned view and asserts the view does not move (and that writes
+   through the view do not reach the engine), and `TestGetGameViewConcurrentWithMutation`
+   hammers readers against `Mulligan` / `ModifyLife` / `AddCounter` under `-race`. With the
+   guard gone, three consecutive `BOT_SIM_GAMES=100 go test -race ./internal/bot/ -run
+   Completion` runs reported 100/100 completion and no race reports.
 
 8. **Notification fan-out.** Convert `NotificationHandler` from a single field to a slice so
    bots can subscribe push-style, and replace polling. `broadcast` already builds a per-player

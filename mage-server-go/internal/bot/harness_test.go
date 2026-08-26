@@ -140,7 +140,6 @@ type simGame struct {
 	mgr     *game.Manager
 	adapter *game.EngineAdapter
 	engine  *game.GameEngine
-	guard   *ViewGuard
 	g       *game.Game
 	seats   []string
 }
@@ -151,11 +150,7 @@ func newSimGame(t testing.TB, logger *zap.Logger, tableID string, seats []string
 	t.Helper()
 
 	engine := game.NewGameEngine(logger)
-	// The engine is wrapped so that ProcessAction is serialized against the
-	// bots' view reads. See guard.go: GetGameView hands out live engine
-	// pointers, so Redact's deep copy races every mutation without this.
-	guard := &ViewGuard{}
-	adapter := game.NewEngineAdapter(guard.WrapEngine(engine), logger)
+	adapter := game.NewEngineAdapter(engine, logger)
 	mgr := game.NewManager(logger)
 
 	g := mgr.CreateGame(tableID, "Commander Free For All", seats)
@@ -169,7 +164,7 @@ func newSimGame(t testing.TB, logger *zap.Logger, tableID string, seats []string
 	}
 	go adapter.ProcessGameActions(g)
 
-	return &simGame{mgr: mgr, adapter: adapter, engine: engine, guard: guard, g: g, seats: seats}
+	return &simGame{mgr: mgr, adapter: adapter, engine: engine, g: g, seats: seats}
 }
 
 func fourSeats() []string { return []string{"bot-a", "bot-b", "bot-c", "bot-d"} }
@@ -187,7 +182,6 @@ func runOneGame(t testing.TB, logger *zap.Logger, seed int64, maxTurns int) (boo
 		GameID:  sg.g.ID,
 		Actions: sg.mgr,
 		Views:   sg.adapter,
-		Guard:   sg.guard,
 		Oracle:  simOracle(),
 		// Pacing is entirely zero: a hundred games with human-like delays would
 		// take hours. Phase 4 fills these in.
@@ -301,15 +295,11 @@ func TestEveryLegalMoveExecutes(t *testing.T) {
 
 	viewOf := func() *SafeView {
 		t.Helper()
-		var v *SafeView
-		err := sg.guard.Snapshot(func() error {
-			raw, err := sg.adapter.GetGameView(sg.g.ID, me)
-			if err != nil {
-				return err
-			}
-			v, err = RedactErr(raw.(*game.PlaytestGameView), me)
-			return err
-		})
+		raw, err := sg.adapter.GetGameView(sg.g.ID, me)
+		if err != nil {
+			t.Fatalf("view: %v", err)
+		}
+		v, err := RedactErr(raw.(*game.PlaytestGameView), me)
 		if err != nil {
 			t.Fatalf("view: %v", err)
 		}
