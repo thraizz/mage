@@ -4,7 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
 	"regexp"
 	"strconv"
 	"sync"
@@ -151,6 +154,52 @@ func runHarness(t *testing.T, seed int64, newPolicy func(seat string, i int) bot
 	return done, runner.Stats()
 }
 
+// promptDrivenGemini is the same random-answer stub behind the
+// OpenAI-compatible wire format instead of the SDK one: an httptest server that
+// reads the rendered prompt out of the JSON body and answers with a tool call.
+//
+// It exists so the interchangeability proof covers the SECOND PROVIDER TOO. The
+// seam this phase added is below Policy, so the claim being tested is that a
+// whole game plays identically through either Completer -- which is only worth
+// anything if a real game is actually played through both.
+func newPromptDrivenGemini(t *testing.T, seed int64) string {
+	t.Helper()
+	var mu sync.Mutex
+	rng := rand.New(rand.NewSource(seed))
+	n := 0
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		var req openAIRequest
+		if err := json.Unmarshal(body, &req); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		text := lastUserContent(req)
+		m := choicesRE.FindStringSubmatch(text)
+		if m == nil {
+			http.Error(w, "prompt carried no Choices line", http.StatusBadRequest)
+			return
+		}
+		count, err := strconv.Atoi(m[1])
+		if err != nil || count <= 0 {
+			http.Error(w, "unusable choice count", http.StatusBadRequest)
+			return
+		}
+		mu.Lock()
+		pick := rng.Intn(count) + 1
+		n++
+		id := fmt.Sprintf("tu%d", n)
+		mu.Unlock()
+
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, toolCallBody(id, ToolChooseAction,
+			map[string]any{"choice": fmt.Sprintf("m%d", pick)}))
+	}))
+	t.Cleanup(srv.Close)
+	return srv.URL
+}
+
 func TestPolicyImplementationsAreInterchangeable(t *testing.T) {
 	if testing.Short() {
 		t.Skip("headless game, skipped under -short")
@@ -164,11 +213,26 @@ func TestPolicyImplementationsAreInterchangeable(t *testing.T) {
 		return New(&promptDrivenStub{rng: rand.New(rand.NewSource(seed*1000 + int64(i)))},
 			Options{Seat: seat, Oracle: simOracle()})
 	})
+	geminiDone, geminiStats := runHarness(t, seed, func(seat string, i int) bot.Policy {
+		p, err := NewPolicy(Options{
+			Seat:     seat,
+			Provider: ProviderGemini,
+			APIKey:   "test-key",
+			BaseURL:  newPromptDrivenGemini(t, seed*1000+int64(i)),
+			Oracle:   simOracle(),
+		})
+		if err != nil {
+			t.Fatalf("NewPolicy: %v", err)
+		}
+		return p
+	})
 
-	t.Logf("random: completed=%v turns=%d macros=%d failed=%d",
+	t.Logf("random:    completed=%v turns=%d macros=%d failed=%d",
 		randomDone, randomStats.Turns, randomStats.MacrosExecuted, randomStats.MacrosFailed)
-	t.Logf("llm:    completed=%v turns=%d macros=%d failed=%d",
+	t.Logf("anthropic: completed=%v turns=%d macros=%d failed=%d",
 		llmDone, llmStats.Turns, llmStats.MacrosExecuted, llmStats.MacrosFailed)
+	t.Logf("gemini:    completed=%v turns=%d macros=%d failed=%d",
+		geminiDone, geminiStats.Turns, geminiStats.MacrosExecuted, geminiStats.MacrosFailed)
 
 	for _, tc := range []struct {
 		name  string
@@ -176,7 +240,8 @@ func TestPolicyImplementationsAreInterchangeable(t *testing.T) {
 		stats bot.Stats
 	}{
 		{"RandomPolicy", randomDone, randomStats},
-		{"LLMPolicy", llmDone, llmStats},
+		{"LLMPolicy/anthropic", llmDone, llmStats},
+		{"LLMPolicy/gemini", geminiDone, geminiStats},
 	} {
 		if !tc.done {
 			t.Errorf("%s: game did not reach a terminal state", tc.name)

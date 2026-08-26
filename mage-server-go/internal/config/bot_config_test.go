@@ -32,6 +32,10 @@ func baseConfig() *Config {
 	c.Auth.Mode = "optional"
 	c.Logging.Level = "info"
 	c.Bot = BotConfig{
+		// The Phase 5 cases below are all about the Anthropic path, so the
+		// base fixture pins that provider explicitly. Gemini -- the DEFAULT --
+		// gets its own cases.
+		Provider:       BotProviderAnthropic,
 		Model:          "claude-sonnet-5",
 		MaxTokens:      20000,
 		RequestTimeout: 120 * time.Second,
@@ -74,6 +78,50 @@ func TestBotValidation(t *testing.T) {
 		{"zero stall timeout", func(c *Config) { c.Bot.StallTimeout = 0 }, "bot.stall_timeout"},
 		{"enabled without a key", func(c *Config) { c.Bot.Enabled = true }, "ANTHROPIC_API_KEY"},
 		{"enabled with a key", func(c *Config) { c.Bot.Enabled = true; c.Bot.APIKey = "x" }, ""},
+
+		// Phase 5b: the provider dimension.
+		{"unknown provider", func(c *Config) { c.Bot.Provider = "hal9000" }, "bot.provider"},
+		{
+			"gemini is valid", func(c *Config) {
+				c.Bot.Provider = BotProviderGemini
+				c.Bot.Model = "gemini-3.7-flash"
+			}, "",
+		},
+		{
+			// A model id from the WRONG provider is a 404 on the first request
+			// of an unattended run. It is catchable here for free.
+			"claude model under gemini", func(c *Config) {
+				c.Bot.Provider = BotProviderGemini
+			}, "bot.model",
+		},
+		{
+			"gemini model under anthropic", func(c *Config) {
+				c.Bot.Model = "gemini-3.7-flash"
+			}, "bot.model",
+		},
+		{
+			// reasoning_effort on the OpenAI-compatible endpoint takes
+			// none|low|medium|high. xhigh and max are Anthropic-only.
+			"xhigh effort under gemini", func(c *Config) {
+				c.Bot.Provider = BotProviderGemini
+				c.Bot.Model = "gemini-3.7-flash"
+				c.Bot.Effort = "xhigh"
+			}, "bot.effort",
+		},
+		{
+			"high effort under gemini is fine", func(c *Config) {
+				c.Bot.Provider = BotProviderGemini
+				c.Bot.Model = "gemini-3.7-flash"
+				c.Bot.Effort = "high"
+			}, "",
+		},
+		{
+			"gemini enabled without a key names GEMINI_API_KEY", func(c *Config) {
+				c.Bot.Provider = BotProviderGemini
+				c.Bot.Model = "gemini-3.7-flash"
+				c.Bot.Enabled = true
+			}, "GEMINI_API_KEY",
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -89,5 +137,62 @@ func TestBotValidation(t *testing.T) {
 				t.Fatalf("error = %v, want it to mention %q", err, tc.wantErr)
 			}
 		})
+	}
+}
+
+func TestBotAPIKeyEnvIsProviderSpecific(t *testing.T) {
+	// The key rule of Phase 5, extended rather than loosened: each provider
+	// reads exactly one environment variable, and neither is reachable from
+	// YAML (see TestBotAPIKeyIsNotUnmarshalable).
+	if got := BotAPIKeyEnv(BotProviderGemini); got != "GEMINI_API_KEY" {
+		t.Errorf("gemini key env = %q", got)
+	}
+	if got := BotAPIKeyEnv(BotProviderAnthropic); got != "ANTHROPIC_API_KEY" {
+		t.Errorf("anthropic key env = %q", got)
+	}
+	// An unset/unknown provider must not fall back to the anthropic variable:
+	// gemini is the default, so the default key must follow it.
+	if got := BotAPIKeyEnv(""); got != "GEMINI_API_KEY" {
+		t.Errorf("default key env = %q, want GEMINI_API_KEY", got)
+	}
+}
+
+func TestBotDefaultsAreGemini(t *testing.T) {
+	// Load() fills the provider and the provider-dependent model default. A
+	// config with neither set must come out as a valid gemini config, not as a
+	// validation error.
+	c := baseConfig()
+	c.Bot.Provider = ""
+	c.Bot.Model = ""
+	if c.Bot.Provider == "" {
+		c.Bot.Provider = BotProviderGemini
+	}
+	if c.Bot.Model == "" {
+		c.Bot.Model = botDefaultModel[c.Bot.Provider]
+	}
+	if c.Bot.Model != "gemini-3.7-flash" {
+		t.Fatalf("default model = %q, want gemini-3.7-flash", c.Bot.Model)
+	}
+	if err := c.Validate(); err != nil {
+		t.Fatalf("the default bot config does not validate: %v", err)
+	}
+}
+
+func TestEveryProviderHasAValidDefaultModel(t *testing.T) {
+	// The tables in config.go and the constants in internal/bot/llm are
+	// duplicated on purpose (config imports nothing). This is what keeps them
+	// from drifting apart silently.
+	for _, p := range botProviders {
+		def, ok := botDefaultModel[p]
+		if !ok {
+			t.Errorf("provider %q has no default model", p)
+			continue
+		}
+		if !contains(botModels[p], def) {
+			t.Errorf("provider %q default model %q is not in its own model list", p, def)
+		}
+		if !contains(botEfforts[p], "") {
+			t.Errorf("provider %q does not allow an empty effort", p)
+		}
 	}
 }

@@ -281,7 +281,37 @@ Model constants exist in SDK `main`: `ModelClaudeOpus5`, `ModelClaudeSonnet5`,
 | Sonnet 5 | `claude-sonnet-5` | 2 | 10 | 1M | 128K | 1024 |
 | Haiku 4.5 | `claude-haiku-4-5` | 1 | 5 | 200K | 64K | **4096** |
 
-Thinking/effort per model:
+### 0.7b Gemini (default provider as of Phase 5b)
+
+OpenAI-compatible endpoint: `https://generativelanguage.googleapis.com/v1beta/openai/`.
+Key from `GEMINI_API_KEY` env only, same rule as Anthropic.
+
+| Model | $/MTok in | $/MTok out | $/MTok cached | Notes |
+|---|---|---|---|---|
+| `gemini-3.7-flash` | 0.75 | 3.75 | 0.075 | **default** — newest, tied-cheapest non-lite. 2× from 2027-01-01 |
+| `gemini-3.6-flash` | 0.75 | 3.75 | 0.075 | |
+| `gemini-3.5-flash` | 1.50 | 9.00 | 0.15 | |
+| `gemini-3.5-flash-lite` | 0.30 | 2.50 | 0.03 | cheapest; untested for this task |
+
+Source: ai.google.dev/gemini-api/docs/pricing (verified Aug 2026).
+
+**Caching is implicit and automatic** (ai.google.dev/gemini-api/docs/caching): on by default for
+Gemini 2.5+, no request field, **4096-token minimum prefix** for a hit on 3.5/3.6/3.7 Flash. The
+only caller-side lever is prefix stability — large common content first, similar prefixes close
+together in time. Our sorted frozen tool list and constant system prompt, built once in the
+constructor, *are* the cache strategy. Explicit `CachedContent` is deliberately unused: a
+game-long conversation with an unchanging prefix is exactly implicit caching's workload.
+
+Two translation quirks, both handled in `openai.go`:
+- Gemini accepts only a **subset of OpenAPI schema** for function declarations. `strict` and
+  `additionalProperties` are NOT in it and are stripped on this path (kept on Anthropic).
+- `reasoning_effort` maps to Gemini's `thinking_level`, which takes `none|low|medium|high` —
+  `xhigh`/`max` clamp to `high` and are rejected in config validation.
+
+Cached-token accounting appears as either `prompt_tokens_details.cached_tokens` or Gemini's
+native `cached_content_token_count`; the client reads both and takes the larger.
+
+Thinking/effort per model (Anthropic):
 - Opus 5 / Sonnet 5 — `Thinking: ThinkingConfigParamUnion{OfAdaptive: &ThinkingConfigAdaptiveParam{}}`,
   and `OutputConfig.Effort` from `low`|`medium`|`high`|`xhigh`|`max`.
 - **Haiku 4.5 — no adaptive thinking and NO effort support at all.** Use

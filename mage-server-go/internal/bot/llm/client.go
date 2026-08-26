@@ -377,15 +377,20 @@ func NewClient(t Transport, opts ClientOptions) *Client {
 // Usage returns the accumulated token counters.
 func (c *Client) Usage() Usage { return c.usage }
 
-// Model reports the configured model.
-func (c *Client) Model() anthropic.Model { return c.opts.Model }
+// Provider implements Completer.
+func (c *Client) Provider() string { return ProviderAnthropic }
 
-// Complete renders the conversation and makes one request.
+// Model reports the configured model.
+func (c *Client) Model() Model { return c.opts.Model }
+
+// Complete renders the conversation and makes one request. It implements
+// Completer: the SDK message is folded into the neutral Response so policy.go
+// never sees an Anthropic type.
 //
 // ctx bounds the whole call; RequestTimeout bounds each attempt. Both are
 // needed: a per-attempt timeout alone lets three attempts run to 360s, and a
 // context alone gives a stuck connection no chance to be retried.
-func (c *Client) Complete(ctx context.Context, conv *Conversation) (*anthropic.BetaMessage, error) {
+func (c *Client) Complete(ctx context.Context, conv *Conversation) (*Response, error) {
 	if conv == nil {
 		return nil, errors.New("llm: nil conversation")
 	}
@@ -416,7 +421,7 @@ func (c *Client) Complete(ctx context.Context, conv *Conversation) (*anthropic.B
 		return nil, err
 	}
 	c.usage.add(msg)
-	return msg, nil
+	return responseFromAnthropic(msg), nil
 }
 
 // ToolUse is one tool call pulled out of a response.

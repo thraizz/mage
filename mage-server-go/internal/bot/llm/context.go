@@ -108,6 +108,19 @@ func (c *Conversation) AppendAssistant(m *anthropic.BetaMessage) {
 	c.Append(m.ToParam())
 }
 
+// AppendAssistantTurn appends the model's own reply from a neutral Response.
+//
+// The Completer that produced the Response also rendered the assistant turn,
+// because only it knows what the provider actually sent -- an SDK
+// BetaMessage.ToParam() on the Anthropic path, a reconstruction from
+// tool_calls on the OpenAI-compatible one.
+func (c *Conversation) AppendAssistantTurn(r *Response) {
+	if r == nil || len(r.assistant.Content) == 0 {
+		return
+	}
+	c.Append(r.assistant)
+}
+
 // AppendToolResults appends one user message carrying every tool result of a
 // turn. They must arrive in a single message, in the order the tool_use blocks
 // appeared, or the API rejects the request.
@@ -143,16 +156,35 @@ func (c *Conversation) Reset(text string) {
 	}
 }
 
-// Render produces the bounded, cache-annotated message list for one request.
+// Render produces the bounded, CACHE-ANNOTATED message list for one request.
+// It is the Anthropic strategy: explicit cache_control breakpoints, placed by
+// the arithmetic below.
 //
 // It never mutates the history: the returned messages are copies down to the
 // content blocks it annotates, so the breakpoints of one request cannot leak
 // into the next.
 func (c *Conversation) Render() []anthropic.BetaMessageParam {
-	c.renders++
-	out := c.window()
+	out := c.RenderUncached()
 	placeCacheBreakpoints(out, MaxMessageBreakpoints, CacheBlockInterval)
 	return out
+}
+
+// RenderUncached produces the same bounded window with NO cache annotations.
+//
+// It is what the OpenAI-compatible providers use. That is not a missing
+// feature: Gemini's caching is implicit and enabled by default, has no request
+// field to set, and asks only that the large common content stay at the front
+// of the prompt and that requests with a shared prefix arrive close together
+// (ai.google.dev/gemini-api/docs/caching). The windowing, the summary band and
+// the state bridge all still apply, because those are about context size and
+// prefix stability, which every provider has. Only the breakpoint arithmetic is
+// Anthropic's.
+//
+// The render counter advances here rather than in Render so the state-bridge
+// refresh interval is identical on both providers.
+func (c *Conversation) RenderUncached() []anthropic.BetaMessageParam {
+	c.renders++
+	return c.window()
 }
 
 // window applies the recent/summary/bridge split.

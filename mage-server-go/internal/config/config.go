@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -154,8 +155,9 @@ type MetricsConfig struct {
 //
 // THE API KEY IS NOT IN THIS FILE'S WORLD AT ALL. APIKey is tagged
 // mapstructure:"-", so viper cannot populate it from any YAML under any key
-// name, and Load fills it from the ANTHROPIC_API_KEY environment variable and
-// nowhere else. Two reasons, both concrete:
+// name, and Load fills it from an environment variable and nowhere else --
+// GEMINI_API_KEY for the default provider, ANTHROPIC_API_KEY for the other.
+// Two reasons, both concrete:
 //
 //  1. config/config.yaml is a HARD LINK to config.dev.yaml -- one inode, both
 //     names, and it is the file cmd/server/main.go:35 loads by default. A
@@ -166,14 +168,36 @@ type MetricsConfig struct {
 //     ".", "_")) added first, and would still put the value one careless
 //     `v.Set` away from a YAML dump. An explicit os.Getenv has neither problem.
 type BotConfig struct {
-	// Enabled turns LLM bot seats on. When true, ANTHROPIC_API_KEY must be set.
+	// Enabled turns LLM bot seats on. When true, the API key environment
+	// variable for Provider must be set.
 	Enabled bool `mapstructure:"enabled"`
-	// Model is the model ID. See internal/bot/llm for the cost table.
+
+	// Provider selects the LLM backend: "gemini" (the default) or "anthropic".
+	//
+	// GEMINI IS THE DEFAULT ON PURPOSE, not as a fallback. mage-bench's
+	// 36-model leaderboard puts Gemini 3 Pro fourth at 1722 Elo, inside the
+	// noise of Claude Opus 4.6 at 1747, so the choice costs little on quality;
+	// gemini-3.7-flash is several times cheaper per token than any Claude
+	// model in the table (see internal/bot/llm/completer.go); and the OpenAI-
+	// compatible endpoint it speaks covers every other OpenAI-compatible
+	// provider with a BaseURL change and no new code.
+	Provider string `mapstructure:"provider"`
+
+	// Model is the model ID. It must belong to Provider -- Validate enforces
+	// that pairing, because a mismatched id is otherwise a 404 on the first
+	// request of an unattended run. Empty means the provider's default
+	// (gemini-3.7-flash / claude-sonnet-5), filled in by Load.
+	// See internal/bot/llm for the cost table.
 	Model string `mapstructure:"model"`
-	// Effort is the OutputConfig effort level: low|medium|high|xhigh|max, or
-	// empty. IT MUST BE EMPTY FOR claude-haiku-4-5, which does not support the
-	// parameter; Validate rejects the combination rather than letting the API
-	// reject the first request of an overnight run.
+	// Effort is the reasoning/thinking level.
+	//
+	// On anthropic it is OutputConfig.Effort: low|medium|high|xhigh|max, or
+	// empty, and IT MUST BE EMPTY FOR claude-haiku-4-5, which does not support
+	// the parameter. On gemini it becomes reasoning_effort, which accepts only
+	// none|low|medium|high -- xhigh and max have no meaning there and are
+	// rejected here rather than silently clamped in config. Validate rejects
+	// both bad combinations rather than letting the API reject the first
+	// request of an overnight run.
 	Effort string `mapstructure:"effort"`
 	// MaxTokens is the output cap per request. mage-bench measured 20000.
 	MaxTokens int `mapstructure:"max_tokens"`
@@ -188,7 +212,8 @@ type BotConfig struct {
 	// RequestTimeout x (MaxRetries+1), which is why StallTimeout is separate.
 	MaxRetries int `mapstructure:"max_retries"`
 
-	// APIKey comes from ANTHROPIC_API_KEY. Never from YAML -- see the type doc.
+	// APIKey comes from GEMINI_API_KEY or ANTHROPIC_API_KEY, chosen by
+	// Provider. Never from YAML -- see the type doc.
 	APIKey string `mapstructure:"-"`
 }
 
@@ -223,8 +248,16 @@ func Load(configPath string) (*Config, error) {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
-	// The bot API key comes from the environment only (see BotConfig).
-	cfg.Bot.APIKey = os.Getenv("ANTHROPIC_API_KEY")
+	// The bot API key comes from the environment only (see BotConfig), and
+	// which variable is read depends on the provider. Reading both and picking
+	// later would leave the unused one sitting in memory for no reason.
+	if cfg.Bot.Provider == "" {
+		cfg.Bot.Provider = BotProviderGemini
+	}
+	cfg.Bot.APIKey = os.Getenv(BotAPIKeyEnv(cfg.Bot.Provider))
+	if cfg.Bot.Model == "" {
+		cfg.Bot.Model = botDefaultModel[cfg.Bot.Provider]
+	}
 
 	// Validate config
 	if err := cfg.Validate(); err != nil {
@@ -295,7 +328,11 @@ func setDefaults(v *viper.Viper) {
 	// registering the key as a config path at all invites someone to fill it in
 	// (see BotConfig).
 	v.SetDefault("bot.enabled", false)
-	v.SetDefault("bot.model", "claude-sonnet-5")
+	v.SetDefault("bot.provider", BotProviderGemini)
+	// No model default here: the default depends on the provider, and viper
+	// cannot express that. Load fills it in after unmarshalling, which is also
+	// the only point at which the provider is actually known.
+	v.SetDefault("bot.model", "")
 	v.SetDefault("bot.effort", "")
 	v.SetDefault("bot.max_tokens", 20000)
 	v.SetDefault("bot.request_timeout", "120s")
@@ -338,17 +375,17 @@ func (c *Config) Validate() error {
 	}
 
 	// Validate bot config
-	validModels := map[string]bool{
-		"claude-sonnet-5": true, "claude-opus-5": true, "claude-haiku-4-5": true,
+	models, ok := botModels[c.Bot.Provider]
+	if !ok {
+		return fmt.Errorf("bot.provider must be one of: %s", strings.Join(botProviders, ", "))
 	}
-	if !validModels[c.Bot.Model] {
-		return fmt.Errorf("bot.model must be one of: claude-sonnet-5, claude-opus-5, claude-haiku-4-5")
+	if !contains(models, c.Bot.Model) {
+		return fmt.Errorf("bot.model must be one of: %s (provider %q)",
+			strings.Join(models, ", "), c.Bot.Provider)
 	}
-	validEfforts := map[string]bool{
-		"": true, "low": true, "medium": true, "high": true, "xhigh": true, "max": true,
-	}
-	if !validEfforts[c.Bot.Effort] {
-		return fmt.Errorf("bot.effort must be one of: low, medium, high, xhigh, max (or empty)")
+	if !contains(botEfforts[c.Bot.Provider], c.Bot.Effort) {
+		return fmt.Errorf("bot.effort must be one of: %s (or empty) for provider %q",
+			strings.Join(nonEmpty(botEfforts[c.Bot.Provider]), ", "), c.Bot.Provider)
 	}
 	if c.Bot.Model == "claude-haiku-4-5" && c.Bot.Effort != "" {
 		return fmt.Errorf("bot.effort is not supported on claude-haiku-4-5; leave it empty")
@@ -363,8 +400,80 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("bot.stall_timeout must be positive")
 	}
 	if c.Bot.Enabled && c.Bot.APIKey == "" {
-		return fmt.Errorf("bot.enabled requires the ANTHROPIC_API_KEY environment variable")
+		return fmt.Errorf("bot.enabled requires the %s environment variable",
+			BotAPIKeyEnv(c.Bot.Provider))
 	}
 
 	return nil
+}
+
+// ---------------------------------------------------------------------------
+// Bot provider tables
+// ---------------------------------------------------------------------------
+
+// The accepted provider ids. They mirror internal/bot/llm's Provider* constants
+// and are duplicated here rather than imported so that internal/config keeps
+// depending on nothing: config is loaded by cmd/server before anything else
+// exists, and a config package that imports a feature package is a cycle
+// waiting to happen. bot_config_test.go pins the two lists together.
+const (
+	BotProviderGemini    = "gemini"
+	BotProviderAnthropic = "anthropic"
+)
+
+var botProviders = []string{BotProviderGemini, BotProviderAnthropic}
+
+// botModels is the accepted model id per provider. THE PAIRING IS VALIDATED,
+// not just the id: "claude-sonnet-5" under provider gemini is a 404 on the
+// first request, hours into an unattended run, and it is trivially catchable
+// here instead.
+var botModels = map[string][]string{
+	BotProviderGemini: {
+		"gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite",
+	},
+	BotProviderAnthropic: {
+		"claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5",
+	},
+}
+
+// botDefaultModel is what Load fills in when bot.model is left empty.
+var botDefaultModel = map[string]string{
+	BotProviderGemini:    "gemini-3.7-flash",
+	BotProviderAnthropic: "claude-sonnet-5",
+}
+
+// botEfforts is the accepted reasoning level per provider. Gemini's
+// OpenAI-compatible reasoning_effort takes none|low|medium|high; xhigh and max
+// are Anthropic-only.
+var botEfforts = map[string][]string{
+	BotProviderGemini:    {"", "none", "low", "medium", "high"},
+	BotProviderAnthropic: {"", "low", "medium", "high", "xhigh", "max"},
+}
+
+// BotAPIKeyEnv reports the environment variable a provider's key comes from.
+// It is the ONLY source of that key -- see BotConfig.
+func BotAPIKeyEnv(provider string) string {
+	if provider == BotProviderAnthropic {
+		return "ANTHROPIC_API_KEY"
+	}
+	return "GEMINI_API_KEY"
+}
+
+func contains(list []string, want string) bool {
+	for _, s := range list {
+		if s == want {
+			return true
+		}
+	}
+	return false
+}
+
+func nonEmpty(list []string) []string {
+	out := make([]string, 0, len(list))
+	for _, s := range list {
+		if s != "" {
+			out = append(out, s)
+		}
+	}
+	return out
 }

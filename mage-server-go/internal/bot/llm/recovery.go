@@ -3,6 +3,7 @@ package llm
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/anthropics/anthropic-sdk-go"
@@ -198,13 +199,70 @@ func (r *Recovery) ForcedPass() bool {
 	return false
 }
 
-// Classify maps a transport error onto a FailureKind.
+// APIError is the provider-neutral HTTP error raised by Completers that do not
+// go through the Anthropic SDK (openai.go).
 //
-// Status buckets are §0.7's: 429/500/529 retryable (the SDK's own predicate
-// also covers 408, 409 and everything >= 500), 400/401/403/404/413 not. 402 is
-// added from reference/pilot_recovery.py::_classify_permanent_llm_failure,
-// whose "credits exhausted" case is exactly the failure a long unattended
-// simulation hits at 3am.
+// It exists so THE FAILURE MATRIX STAYS SHARED. Classify and
+// PermanentFailureReason are the whole of this package's opinion about what a
+// bad response means, and that opinion -- a 401 is a dead run, a 429 is worth
+// another go, a 400 will be a 400 again -- is about HTTP, not about Anthropic.
+// Giving the second provider its own classification would let the two drift
+// until an outage degraded differently depending on who was hosting.
+//
+// Message is the response BODY ONLY, truncated. Never the request: it carries
+// the whole transcript, and its headers carry the key.
+type APIError struct {
+	StatusCode int
+	Provider   string
+	Message    string
+}
+
+func (e *APIError) Error() string {
+	if e.Message == "" {
+		return fmt.Sprintf("%s api error: status %d", e.Provider, e.StatusCode)
+	}
+	return fmt.Sprintf("%s api error: status %d: %s", e.Provider, e.StatusCode, e.Message)
+}
+
+// classifyStatus is the one status-code table, shared by every provider.
+//
+// Buckets are §0.7's: 429/500/529 retryable (the SDK's own predicate also
+// covers 408, 409 and everything >= 500), 400/401/403/404/413 not. 402 is added
+// from reference/pilot_recovery.py::_classify_permanent_llm_failure, whose
+// "credits exhausted" case is exactly the failure a long unattended simulation
+// hits at 3am.
+func classifyStatus(code int) FailureKind {
+	switch code {
+	case 401, 402, 403, 404:
+		return FailurePermanent
+	case 400, 413:
+		// A rejected request will be rejected identically next time.
+		return FailurePermanent
+	case 408, 409, 429:
+		return FailureRetryable
+	}
+	if code >= 500 {
+		return FailureRetryable
+	}
+	return FailurePermanent
+}
+
+// statusOf pulls an HTTP status out of whichever error shape the provider
+// raised. It reports false when the error is not an API error at all.
+func statusOf(err error) (int, bool) {
+	var apierr *anthropic.Error
+	if errors.As(err, &apierr) {
+		return apierr.StatusCode, true
+	}
+	var oerr *APIError
+	if errors.As(err, &oerr) {
+		return oerr.StatusCode, true
+	}
+	return 0, false
+}
+
+// Classify maps a transport error onto a FailureKind. It is provider-neutral:
+// see APIError.
 func Classify(err error) FailureKind {
 	if err == nil {
 		return FailureNone
@@ -212,21 +270,8 @@ func Classify(err error) FailureKind {
 	if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 		return FailureTimeout
 	}
-	var apierr *anthropic.Error
-	if errors.As(err, &apierr) {
-		switch apierr.StatusCode {
-		case 401, 402, 403, 404:
-			return FailurePermanent
-		case 400, 413:
-			// A rejected request will be rejected identically next time.
-			return FailurePermanent
-		case 408, 409, 429:
-			return FailureRetryable
-		}
-		if apierr.StatusCode >= 500 {
-			return FailureRetryable
-		}
-		return FailurePermanent
+	if code, ok := statusOf(err); ok {
+		return classifyStatus(code)
 	}
 	// A bare timeout from the HTTP layer does not always wrap
 	// context.DeadlineExceeded.
@@ -245,9 +290,8 @@ func PermanentFailureReason(err error) string {
 	if err == nil {
 		return ""
 	}
-	var apierr *anthropic.Error
-	if errors.As(err, &apierr) {
-		switch apierr.StatusCode {
+	if code, ok := statusOf(err); ok {
+		switch code {
 		case 404:
 			return "model not found"
 		case 401, 403:

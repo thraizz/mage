@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"sync"
@@ -41,7 +42,7 @@ import (
 // waits only for the remainder. Latency becomes visible only when it exceeds
 // the pause we were going to take anyway.
 type LLMPolicy struct {
-	client *Client
+	client Completer
 	conv   *Conversation
 	ser    *bot.Serializer
 	rec    *Recovery
@@ -70,7 +71,25 @@ type Options struct {
 	// Seat is the bot's player ID, for logs.
 	Seat string
 
-	// Model defaults to claude-sonnet-5.
+	// Provider selects the Completer: ProviderGemini (the default) or
+	// ProviderAnthropic. It is only read by NewPolicy -- New() is the Anthropic
+	// constructor and forces it, so every Phase 5 call site keeps its meaning.
+	Provider string
+
+	// APIKey is the credential for Provider. IT COMES FROM THE ENVIRONMENT AND
+	// NOWHERE ELSE (anti-pattern 4): config.Load fills config.BotConfig.APIKey
+	// from GEMINI_API_KEY or ANTHROPIC_API_KEY, and the field is tagged
+	// mapstructure:"-" so no YAML can reach it.
+	APIKey string
+
+	// BaseURL overrides the OpenAI-compatible endpoint. Empty means Gemini's.
+	BaseURL string
+
+	// HTTPClient overrides the HTTP client of the OpenAI-compatible path.
+	HTTPClient *http.Client
+
+	// Model defaults to the provider default: gemini-3.7-flash, or
+	// claude-sonnet-5 on the Anthropic path.
 	//
 	// DO NOT ASSUME HAIKU IS CHEAPER (§0.7). Its minimum cacheable prefix is
 	// 4096 tokens against Sonnet 5's 1024, so a prompt that Sonnet caches from
@@ -134,8 +153,11 @@ const (
 )
 
 func (o *Options) normalise() {
+	if o.Provider == "" {
+		o.Provider = ProviderGemini
+	}
 	if o.Model == "" {
-		o.Model = anthropic.ModelClaudeSonnet5
+		o.Model = DefaultModelFor(o.Provider)
 	}
 	if o.MaxTokens <= 0 {
 		o.MaxTokens = DefaultMaxTokens
@@ -155,7 +177,16 @@ func (o *Options) normalise() {
 	if o.Logger == nil {
 		o.Logger = zap.NewNop()
 	}
-	if IsHaiku(o.Model) {
+	switch {
+	case o.Provider != ProviderAnthropic:
+		// Thinking config is per-provider and NOT forced into a shared shape.
+		// The OpenAI-compatible endpoint has no thinking-budget field at all:
+		// Gemini takes reasoning_effort, which maps onto thinking_level, and
+		// openai.go clamps the two Anthropic-only levels (xhigh, max) rather
+		// than sending an unknown value. A budget here would be silently
+		// dropped, so it is cleared to keep the option struct honest.
+		o.ThinkingBudget = 0
+	case IsHaiku(o.Model):
 		// Haiku 4.5 supports NEITHER adaptive thinking NOR effort (§0.7).
 		// Clearing Effort here rather than trusting the caller is deliberate:
 		// the failure is a 400 on the first request of a long unattended run.
@@ -166,10 +197,24 @@ func (o *Options) normalise() {
 		if o.ThinkingBudget >= o.MaxTokens {
 			o.ThinkingBudget = o.MaxTokens / 2
 		}
-	} else {
+	default:
 		// budget_tokens on Sonnet 5 / Opus 5 returns 400 (plan, Phase 5
 		// anti-pattern guards). Adaptive thinking is the supported form.
 		o.ThinkingBudget = 0
+	}
+}
+
+// clientOptions projects Options onto the Completer-facing subset.
+func (o Options) clientOptions() ClientOptions {
+	return ClientOptions{
+		Model:          o.Model,
+		MaxTokens:      o.MaxTokens,
+		Effort:         o.Effort,
+		ThinkingBudget: o.ThinkingBudget,
+		Adaptive:       o.Provider == ProviderAnthropic && !IsHaiku(o.Model),
+		RequestTimeout: o.RequestTimeout,
+		MaxRetries:     o.MaxRetries,
+		System:         o.System,
 	}
 }
 
@@ -179,25 +224,51 @@ func IsHaiku(m anthropic.Model) bool {
 	return strings.Contains(strings.ToLower(string(m)), "haiku")
 }
 
-// New builds an LLMPolicy over t.
+// New builds an LLMPolicy over an Anthropic Transport.
+//
+// It is the Phase 5 constructor, unchanged in behaviour and signature: taking a
+// Transport is what selects the provider, so o.Provider is forced rather than
+// read. Use NewPolicy to select a provider by name, or NewWithCompleter to
+// inject one directly.
 func New(t Transport, o Options) *LLMPolicy {
+	o.Provider = ProviderAnthropic
+	o.normalise()
+	return NewWithCompleter(NewClient(t, o.clientOptions()), o)
+}
+
+// NewWithCompleter builds an LLMPolicy over any Completer.
+//
+// This is the seam every test injects at, and the reason there is one policy
+// rather than one per provider: everything below this line -- the loop, the
+// recovery matrix, choice resolution, chat cadence, the two timers -- is the
+// same code whoever is answering.
+func NewWithCompleter(c Completer, o Options) *LLMPolicy {
 	o.normalise()
 	return &LLMPolicy{
-		client: NewClient(t, ClientOptions{
-			Model:          o.Model,
-			MaxTokens:      o.MaxTokens,
-			Effort:         o.Effort,
-			ThinkingBudget: o.ThinkingBudget,
-			Adaptive:       !IsHaiku(o.Model),
-			RequestTimeout: o.RequestTimeout,
-			MaxRetries:     o.MaxRetries,
-			System:         o.System,
-		}),
-		conv: NewConversation(),
-		ser:  bot.NewSerializer(o.Oracle),
-		rec:  NewRecovery(),
-		opts: o,
+		client: c,
+		conv:   NewConversation(),
+		ser:    bot.NewSerializer(o.Oracle),
+		rec:    NewRecovery(),
+		opts:   o,
 	}
+}
+
+// NewPolicy builds an LLMPolicy for o.Provider, defaulting to Gemini.
+//
+// It is the production constructor: config.BotConfig maps onto Options, and
+// the API key arrives from the environment through config.Load.
+func NewPolicy(o Options) (*LLMPolicy, error) {
+	o.normalise()
+	c, err := NewCompleter(CompleterOptions{
+		Provider:   o.Provider,
+		APIKey:     o.APIKey,
+		BaseURL:    o.BaseURL,
+		HTTPClient: o.HTTPClient,
+	}, o.clientOptions())
+	if err != nil {
+		return nil, err
+	}
+	return NewWithCompleter(c, o), nil
 }
 
 // Interface assertions. LLMPolicy is a drop-in for RandomPolicy: the runner,
@@ -281,7 +352,7 @@ func (p *LLMPolicy) Pick(ctx context.Context, v *bot.SafeView, moves []bot.Macro
 
 	malformed := 0
 	for step := 0; step < p.opts.MaxSteps; step++ {
-		msg, err := p.client.Complete(ctx, p.conv)
+		resp, err := p.client.Complete(ctx, p.conv)
 		if err != nil {
 			if m, done := p.handleError(err, moves); done {
 				return m, nil
@@ -289,12 +360,12 @@ func (p *LLMPolicy) Pick(ctx context.Context, v *bot.SafeView, moves []bot.Macro
 			p.redecideIfReset(ctx, v, moves)
 			continue
 		}
-		p.conv.AppendAssistant(msg)
+		p.conv.AppendAssistantTurn(resp)
 
-		uses := ToolUses(msg)
+		uses := resp.ToolUses
 		if len(uses) == 0 {
 			kind := FailureEmpty
-			if isTruncated(msg) {
+			if resp.Truncated {
 				kind = FailureTruncated
 			}
 			if m, done := p.handleSoftFailure(kind, moves); done {
